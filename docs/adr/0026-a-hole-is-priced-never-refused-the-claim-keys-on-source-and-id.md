@@ -272,3 +272,22 @@ its own band (ticket 38 D5).
   `unknown-control-id`. Revisit trigger: the first such bump.
 - **Terms.** `CONTEXT.md`'s **Exemption** entry is unchanged; a priced, signed, party-wide
   selection change is not one.
+
+## Note, 2026-09-23 (eco-system ticket 120, delegated): three places where the code does not do what this record says
+
+Eco-system ticket 120 checked eighteen loophole candidates against this ADR and the code on
+platform origin/main `b2820d8`. Three survived. Each is held by a leg in
+`tests/test_loophole_adr_0026.py` and charted as its own ticket. This note records them and
+changes no decision above.
+
+- **Point 2.** Implementing a control does not reduce the regime's price. tuppence claiming all
+  four controls the uk-gdpr lower-tier weights name leaves the regime entry, the exposure total
+  and every proposed tier unchanged. Eco-system ticket 121.
+- **Point 4.** `since` is looked up by the Namespace's name, so renaming an aged ungoverned
+  Namespace restarts its ramp at 1.0, and the old name's closed delta says it is now governed.
+  Eco-system ticket 122.
+- **Consequences, the withdrawn control.** A control the regulator withdraws refuses the adopter
+  with `removed-control`, the refusal for an adopter's own removal. Eco-system ticket 123.
+
+The known lag this ADR names, the removal refusal in `check_selected_set`, still stands on
+platform main. No ticket held its build; eco-system ticket 124 now does.

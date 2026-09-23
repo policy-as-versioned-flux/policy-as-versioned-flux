@@ -276,3 +276,29 @@ Two smaller corrections, both measured:
 - The `infra` declaration drew two more candidates, round two's `loophole-1` and round three's
   `loophole-2`. Both are false: no served body reads `infra` or a party's roles. Across three
   rounds the clause drew four candidates and one real defect, ticket 113.
+
+## Note, 2026-09-23 (eco-system ticket 120, delegated): the second document
+
+Eco-system ticket 120 checked the eighteen candidates of ticket 115's three rounds against
+ADR-0026 against the code, under the same counting rule. The units were read at their
+origin/main: platform `b2820d8`, driftwood `c96c412`, ludlow `32d5696`, tuppence `7009ea9`,
+nist `f83126f`, ico `abcb3a8`, feeds `ff3ac9a`, insurer `d1c1844`. Every verdict is held by a test in
+`tests/test_loophole_adr_0026.py`, and that file computes the numbers below from its own tables.
+
+**3 of 18 candidates against ADR-0026 survived: 17%, by round 2, 0 and 1.** ADR-0022 gave 3 of 18
+as well, so two documents give **6 of 36**. The rate of about one in six holds on a second
+document. Point 2's budget stands as the 2026-09-22 note corrected it.
+
+The survivors kept the pattern of point 3. Two named a false mechanism at a real place: round
+one's `loophole-2` (a delayed tag, which cannot happen; the real defect is that the ramp keys on
+a name, eco-system ticket 122) and round three's `loophole-3` (a withdrawal that vanishes; the
+real defect is that it refuses the adopter as a removal, ticket 123). Round one's `overreach-6`
+named a true fact and a place wider than it said (no hole status moves the price or the tier,
+ticket 121). The judge called 11 of 18 resolvable, and one of the three survivors unresolvable.
+
+**The overlap, measured on a second document.** The file's matching table gives each candidate
+the code place its check tested and the reason it gives. By reason the pairwise overlap is 0, 3
+and 0 of 6; by place it is 5, 4 and 4. All three rounds share four places and no reason. The 18
+candidates give 15 distinct reasons at 8 places. On ADR-0022 the tool repeated its target and
+never its mechanism. On ADR-0026 it repeats its place more and its reason less: round one and
+round three share three reasons, round two shares none with either.

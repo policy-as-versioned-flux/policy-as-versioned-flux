@@ -50,9 +50,10 @@ The subscription absorbs the list price. The owner ruled on 2026-09-21 that ther
 Anthropic API spend, which is why the transport is `claude -p` and not the API.
 
 **That is the cheap half.** The real cost is the deterministic check. Three rounds give about 18
-candidates. At the measured survival rate of 2 in 6, that is about 6 real defects. Checking 6
-candidates took one whole ticket (Laya map ticket 08), so checking 18 costs roughly three times
-that, about half a ticket per candidate. Budget the checking, not only the calls.
+candidates. The measured survival rate is 3 of 18 on ADR-0022 and 3 of 18 on ADR-0026 (eco-system
+tickets 116 and 120), so that is about 3 real defects. Checking 6 candidates took one whole
+ticket (Laya map ticket 08), so checking 18 costs roughly three times that, about half a ticket
+per candidate. Budget the checking, not only the calls.
 
 ## Before the first round
 
@@ -96,8 +97,9 @@ quoted or paraphrased from `NORTH-STAR.md`, `CONTEXT.md` or an ADR, with the sou
 top. Invent nothing. Commit it before the first round.
 
 Attacked so far: ADR-0022 (three rounds, in `.scratch/laya-loophole/research/`) and ADR-0026
-(three rounds, in `rounds/adr-0026/`). The next document is named in eco-system ticket 115's
-build record.
+(three rounds, in `rounds/adr-0026/`, checked by eco-system ticket 120 in
+`tests/test_loophole_adr_0026.py`). The next document is named in eco-system ticket 115's build
+record.
 
 ## A round
 
