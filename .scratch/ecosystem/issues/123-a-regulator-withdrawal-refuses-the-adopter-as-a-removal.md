@@ -1,7 +1,7 @@
 # 123 — A regulator's withdrawal refuses the adopter as a removal
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -205,3 +205,25 @@ Measured after the fix, with the scratch estate whose `platform` is this branch:
   It needs its own ticket. Closing it changes what a claim against a withdrawn id does, which
   is wider than this ticket. Until it closes, the review round's second guard keeps an
   adopter's removal of such an id booked as the adopter's.
+
+## Answer
+
+Resolved 2026-09-23 by platform PR 33 and hub PR 99. A regulator's withdrawal composes as the
+regulator's act, and never names the adopter as the one who removed the control.
+
+1. One counterfactual decides: would the adopter's last baseline name and last overlay still
+   select the control against the catalogue pinned now? If yes, the removal is the adopter's. If
+   no, the regulator withdrew it.
+2. A withdrawal needs a bump. If a source's controls pin did not move since the last header, that
+   source withdrew nothing.
+3. The new delta kind `withdrawn-control` carries `withdrawn_by`, the reason and the catalogue's
+   `from` and `to`. It keeps the adopter's perspective, because the amount is still the adopter's
+   pound.
+4. `test_a_regulator_withdrawal_refuses_the_adopter_as_a_removal` is now the regression test.
+   The review added legs for an adopter's own removal of a withdrawn-status control, with and
+   without a real bump in the same run.
+
+Review: round 1 blocked, because an adopter's own removal of a withdrawn-status control was
+booked as the regulator's. Round 2 passed. One edge is left for ticket 126: a legacy header, a
+real bump and the adopter's drop in the same run. No adopter composes under this build until the
+owner cuts a platform tools release and each adopter moves its pin.
