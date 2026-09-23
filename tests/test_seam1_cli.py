@@ -138,7 +138,12 @@ def test_artefacts_match_the_committed_golden_digests(model_repo_dir: Path, tmp_
     assert sha256_hex(card.read_bytes()) == golden["score-card"]
 
 
-def test_an_attestation_sidecar_accompanies_every_artefact(model_repo_dir: Path, tmp_path: Path) -> None:
+def test_an_attestation_sidecar_accompanies_every_artefact(
+    model_repo_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The test owns its own environment: no key, whatever ran before it in this worker or whatever
+    # the shell exported (ticket 125).
+    monkeypatch.delenv("TWIN_SIGNING_KEY", raising=False)
     out = tmp_path / "bundle.json"
     _forecast(model_repo_dir, out)
 
@@ -446,16 +451,16 @@ def test_a_perspective_the_overlay_does_not_hold_is_a_sentence(model_repo_dir: P
                 "--out", str(tmp_path / "options.json")) == 2
 
 
-def test_the_constraint_set_is_authored_and_signed_as_a_role(tmp_path: Path) -> None:
+def test_the_constraint_set_is_authored_and_signed_as_a_role(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """The second place in this system where a human declaration is the authority."""
     from twin import attest, sign
 
     out = tmp_path / "constraint-set.json"
-    os.environ[sign.KEY_ENV] = KEY
-    try:
+    with monkeypatch.context() as mp:
+        mp.setenv(sign.KEY_ENV, KEY)
         assert main(["constraints", "--out", str(out)]) == 0
-    finally:
-        del os.environ[sign.KEY_ENV]
 
     doc = json.loads(out.read_bytes())
     assert doc["envelope"]["mark"] == "authored"
@@ -467,17 +472,14 @@ def test_the_constraint_set_is_authored_and_signed_as_a_role(tmp_path: Path) -> 
 
 
 def test_a_derived_artefact_from_a_new_verb_still_refuses_a_human_signature(
-    model_repo_dir: Path, tmp_path: Path
+    model_repo_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from twin import sign
 
     out = tmp_path / "blast.json"
     _run(model_repo_dir, "blast", *NETFLIX, "--origin", "content-delivery-network", "--out", str(out))
-    os.environ[sign.KEY_ENV] = KEY
-    try:
-        assert main(["sign", str(out), "--role", "model-steward"]) == 2
-    finally:
-        del os.environ[sign.KEY_ENV]
+    monkeypatch.setenv(sign.KEY_ENV, KEY)
+    assert main(["sign", str(out), "--role", "model-steward"]) == 2
 
 
 # -- sweep and the reliability diagram (build ticket 09) --------------------------------------

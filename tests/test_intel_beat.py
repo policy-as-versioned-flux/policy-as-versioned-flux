@@ -13,7 +13,6 @@ import io
 import json
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
-from typing import Iterator
 
 import pytest
 
@@ -35,12 +34,13 @@ PROPOSITION = "a-leading-edge-foundry-node-lands-a-named-external-customer"
 OPPORTUNITY_SCENARIO = "euv-readiness-wins-the-14a-opportunity"
 
 BEAT = Path(__file__).resolve().parents[1] / "twin" / "beat-intel.sh"
+# AC 1 asks for signed, not merely pinned. The key lives only while `beat` builds; a session-long
+# key signed later artefacts in the same xdist worker (eco-system ticket 125).
+BEAT_KEY = "intel-beat-test-key"
 
 
 @pytest.fixture(scope="session")
-def beat(
-    tmp_path_factory: pytest.TempPathFactory, monkeypatch_session_signing_key: None,
-) -> dict[str, Path]:
+def beat(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
     """The beat's own artefacts, produced through the CLI exactly as the script produces them.
 
     Session-scoped: one fixture repository, one sweep, one standalone run. The script itself is
@@ -53,31 +53,18 @@ def beat(
     out.mkdir()
 
     paths = {name: out / f"{name}.json" for name in ("sweep", "run", "opportunity_run")}
-    assert main(["sweep", "--repo", str(repo), "--out", str(paths["sweep"])]) == 0
-    assert main([
-        "run", "--repo", str(repo), "--org", ORG, "--scenario", SCENARIO,
-        "--regime", "as-consumed", "--out", str(paths["run"]),
-    ]) == 0
-    assert main([
-        "run", "--repo", str(repo), "--org", ORG, "--scenario", OPPORTUNITY_SCENARIO,
-        "--regime", "as-consumed", "--out", str(paths["opportunity_run"]),
-    ]) == 0
-    return {"repo": repo, **paths}
-
-
-@pytest.fixture(scope="session")
-def monkeypatch_session_signing_key(
-    tmp_path_factory: pytest.TempPathFactory,
-) -> Iterator[None]:
-    """A session-scoped signing key. AC 1 asks for signed, not merely pinned.
-
-    `pytest.MonkeyPatch` itself is function-scoped; this fixture uses its context-manager form so
-    the key is set for the whole session's one `beat` build and undone after, the same lifetime the
-    session-scoped `beat` fixture needs.
-    """
     with pytest.MonkeyPatch.context() as mp:
-        mp.setenv("TWIN_SIGNING_KEY", "intel-beat-test-key")
-        yield
+        mp.setenv("TWIN_SIGNING_KEY", BEAT_KEY)
+        assert main(["sweep", "--repo", str(repo), "--out", str(paths["sweep"])]) == 0
+        assert main([
+            "run", "--repo", str(repo), "--org", ORG, "--scenario", SCENARIO,
+            "--regime", "as-consumed", "--out", str(paths["run"]),
+        ]) == 0
+        assert main([
+            "run", "--repo", str(repo), "--org", ORG, "--scenario", OPPORTUNITY_SCENARIO,
+            "--regime", "as-consumed", "--out", str(paths["opportunity_run"]),
+        ]) == 0
+    return {"repo": repo, **paths}
 
 
 def _body(path: Path) -> dict:
