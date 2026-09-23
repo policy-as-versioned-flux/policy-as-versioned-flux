@@ -1,7 +1,7 @@
 # 115 — A loophole round is a procedure this estate can re-run
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -107,7 +107,7 @@ The leak check ran over `bench/loophole/` before the commit that added the round
 nine round files, `principles.md`, the README and both harness files.
 
 **The 18 candidates are not checked against the code.** They are charted as
-[ticket 119](119-the-eighteen-unchecked-candidates-against-adr-0026.md).
+[ticket 120](120-the-eighteen-unchecked-candidates-against-adr-0026.md).
 
 ### The next document
 
@@ -157,4 +157,26 @@ engineer's workaround, which is a behaviour. It is 7,005 bytes against ADR-0026'
 ### Waits on the owner
 
 Nothing. The rounds ran on the subscription the owner authorised on 2026-09-21. Checking the 18
-candidates is ticket 119's work.
+candidates is ticket 120's work.
+
+## Answer
+
+Resolved 2026-09-23 by hub PR 89. A loophole round is now a written procedure that fails on its own
+guards.
+
+1. The harness and the prompt-leak check live in `bench/loophole/`, not `.scratch/`.
+   `bench/loophole/README.md` is the procedure.
+2. The guards fail the run. `--bare` is refused before any call. A reply that is not JSON, a
+   non-zero exit, or `is_error: true` stops the harness. Parse failures, under-production and a
+   missing verdict fail the round. The five control inputs run before every round.
+3. The prompt-leak check runs after every round and fails the round on a hit.
+4. `summary.json` carries every field that ADR-0030 point 9 names.
+5. ADR-0026 was attacked in three rounds from the README: 24 calls, 610.6 s, 1.4505 USD at list
+   price, 18 candidates, both counters at zero. The candidates are ticket 120. The next document
+   is ADR-0020.
+
+The builder charted the candidates as ticket 119. Ticket 116 took 119 first, so the integrator
+renumbered this one to 120 before the merge.
+
+Review: one round, pass, two minor findings, not fixed. `twin.yml` does not run on a change under
+`bench/**` alone. A round that fails its leak check leaves its files on disk for the operator.
