@@ -72,7 +72,7 @@ mechanism by path.
 
 ## Build, 2026-09-22
 
-Platform PR: https://github.com/policy-as-versioned-platform/platform/pull/32. Hub PR: branch `ticket-119-unlabelled-namespace-is-priced`. Merge the platform PR first.
+Platform PR: https://github.com/policy-as-versioned-platform/platform/pull/32. Hub PR: https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/98. Merge the platform PR first.
 
 ### Decisions
 
