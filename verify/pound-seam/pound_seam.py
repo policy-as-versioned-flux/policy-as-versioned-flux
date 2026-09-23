@@ -11,7 +11,8 @@ What it observes, per adopter, on `.estate-clone/<adopter>/composed/evidence.jso
   3. exactly one `source: twin` entry when that adopter publishes a forward-intel feed, carrying
      policy_version, curve_hash and tail — and NO twin entry when it publishes no such feed;
   4. the regime entry's (source: ico) holes[] amounts sum to its total, and the entry's own
-     amount equals that total;
+     amount equals the sum of the lines the adopter has not implemented (status neither
+     `covered` nor `closed`), so implementing a control reduces it (eco-system ticket 121);
   5. no list of amounts anywhere in the document mixes perspectives or currencies — a sum that
      crosses either is the live bug ADR-0020 was written against (GAPS 3.18);
   6. the adopter's appetite is a signed fact on its OWN party.yaml, platform/risk/appetite.json
@@ -73,6 +74,8 @@ ISO4217 = re.compile(r"^[A-Z]{3}$")
 KINDS = {"feed", "twin", "premium", "switching", "reliability", "supersede"}
 SOURCES = {"ico", "feeds", "twin", "insurer", "platform"}   # plus any party name in the estate
 AMOUNT_KEYS = ("amount", "total", "new_price", "old_price")
+# The statuses of a regime line the adopter has implemented (eco-system ticket 121).
+IMPLEMENTED = ("covered", "closed")
 RETIRED_APPETITE = "risk/appetite.json"
 POLICY_PACKAGE = "selection-policy"
 
@@ -232,6 +235,9 @@ def check_doc(doc, ctx):
             continue
         total = e.get("total")
         s = sum(h["amount"] for h in holes)
+        # Eco-system ticket 121: the entry prices the lines still open. A line
+        # the adopter implements reads `covered` or `closed` and comes off.
+        still_open = sum(h["amount"] for h in holes if h.get("status") not in IMPLEMENTED)
         weight_sum = sum(float(h["weight"]) for h in holes)
         priced = e.get("new_price")
         if not isinstance(total, (int, float)):
@@ -244,14 +250,15 @@ def check_doc(doc, ctx):
             out("FAIL", f"{at}: its published control weights sum to {weight_sum}, not 1.0 — a "
                         f"partition that does not cover the exposure is not a partition, and "
                         f"the share it leaves out has no price")
-        elif isinstance(priced, (int, float)) and not close(priced, total):
-            out("FAIL", f"{at}: the entry prices the regime at {priced} but its holes partition "
-                        f"{total} — one entry, two contradictory prices")
-        elif (amt := amount_of(e)) is not None and not close(amt, total):
-            out("FAIL", f"{at}: amount {amt} is not the hole total {total}")
+        elif isinstance(priced, (int, float)) and not close(priced, still_open):
+            out("FAIL", f"{at}: the entry prices the regime at {priced} but its open lines sum "
+                        f"to {still_open} — one entry, two contradictory prices")
+        elif (amt := amount_of(e)) is not None and not close(amt, still_open):
+            out("FAIL", f"{at}: amount {amt} is not the sum of its open lines {still_open} (a "
+                        f"line reading covered or closed is implemented and comes off; ticket 121)")
         else:
             out("PASS", f"{at}: {len(holes)} priced hole(s) sum to its total {total:,.2f} "
-                        f"{e.get('currency')}")
+                        f"{e.get('currency')}; the open lines price it at {still_open:,.2f}")
         for h in holes:
             if not isinstance(h["weight"], (int, float)) or not 0 < h["weight"] <= 1:
                 out("FAIL", f"{at}: hole {h['source']}/{h['id']} has weight {h['weight']!r}, "
@@ -1023,6 +1030,20 @@ def selfcheck():
     doc, ctx = _good()
     doc["prices"][0]["new_price"] = 600.0
     _grade(doc, ctx, "an entry whose partition contradicts its own new_price fails", True)
+
+    doc, ctx = _good()
+    doc["prices"][0]["holes"][0]["status"] = "covered"
+    doc["prices"][0]["amount"] = 100.0
+    doc["prices"][0]["per_customer"]["amount"] = 1.0
+    _grade(doc, ctx, "an implemented line comes off the entry and the rest prices it", False)
+
+    doc, ctx = _good()
+    doc["prices"][0]["holes"][0]["status"] = "covered"
+    _grade(doc, ctx, "an entry that still charges an implemented line fails (ticket 121)", True)
+
+    doc, ctx = _good()
+    doc["prices"][0]["holes"][0]["status"] = "unselected"
+    _grade(doc, ctx, "an unselected line stays on the price", False)
 
     doc, ctx = _good()
     doc["prices"][1]["perspective"] = "ico"

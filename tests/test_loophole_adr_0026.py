@@ -14,9 +14,11 @@ Three candidates survived.
      candidate said a widening to controls no weight names earns no credit. The place is real
      and wider than it said: claiming every control the pinned regulator weights name leaves
      the regime entry, the exposure total and every proposed tier exactly where they were.
-     The entry is a fixed partition of the regime exposure and a hole's status never reaches
+     The entry was a fixed partition of the regime exposure and a hole's status never reached
      it. ADR-0026 point 2 and CONTEXT.md's **Hole** say implementing a control reduces the
-     regime's price. The code does not.
+     regime's price. Eco-system ticket 121 repaired it: the entry is now the sum of the lines
+     still open, so a claim takes its line off the price and the tier follows. The leg is now
+     the regression test of that repair.
 
   2. **The ungoverned ramp keys on a name the adopter chooses** (round 1 `loophole-2`). The
      candidate said an adopter can delay the first signed tag and run unpriced. That is false:
@@ -94,9 +96,9 @@ VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
         "discard", "test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier",
         "priced only while its Namespace is in the repo, by its workload share, and it moves no tier"),
     (1, "overreach-6"): (
-        "survivor", "test_implementing_every_weighted_control_moves_no_regime_price_and_no_tier",
-        "no hole status reaches the regime entry, so implementing even a weighted control moves "
-        "nothing"),
+        "survivor", "test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier",
+        "no hole status reached the regime entry, so implementing even a weighted control moved "
+        "nothing until ticket 121; the entry is now the sum of its open lines"),
     (2, "loophole-1"): (
         "discard", "test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one",
         "an unweighted removal prints a named absence because no pinned weight prices it; a "
@@ -116,8 +118,9 @@ VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
         "discard", "test_a_containment_namespace_is_governed_by_one_label_and_lands_isolated",
         "governing needs one label, no baseline, and an untiered governed Namespace lands isolated"),
     (2, "overreach-6"): (
-        "discard", "test_a_mistranscribed_weight_moves_no_regime_price",
-        "a wrong weight moves no regime price today; the partition only splits a fixed amount"),
+        "discard", "test_a_mistranscribed_weight_moves_the_price_of_what_is_implemented",
+        "a wrong weight moves the price once a control it names is implemented (ticket 121); the "
+        "recourse is the adopter's own pin and a pull request to the publisher"),
     (3, "loophole-1"): (
         "discard", "test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier",
         "same facts as round 1 loophole-1: the withdrawal prints, and a bespoke price reaches no "
@@ -285,36 +288,107 @@ def _signed_tag_naming(comp: ModuleType, repo: Path, tag: str, date: str, ungove
 # the survivors
 # --------------------------------------------------------------------------------------------
 
-def test_implementing_every_weighted_control_moves_no_regime_price_and_no_tier(tmp_path):
-    """Survivor 1, round 1 `overreach-6`. tuppence is composed twice against its real pinned
-    parents: as it is, and with its own claim on every control the pinned regulator weights
-    name. The claims land: every weighted line turns `covered`. Nothing else moves. The regime
-    entry, the exposure total and every proposed tier are the same numbers. ADR-0026 point 2
-    says implementing a control reduces the regime's price; this leg says it does not, and
-    flips when it does."""
+def _claiming(comp: ModuleType, root: Path, ids: list[str], trees: dict[str, Path] | None = None
+              ) -> tuple[dict[str, Any], dict[str, str]]:
+    """tuppence composed with its own claim on `ids`, shipped as its own overlay member."""
+    work = _tuppence(root)
+    _edit_party(work, lambda d: d.setdefault("overlay", {}).setdefault("add", []).append(
+        _own_member(comp, "own-hardening")))
+    comp._write_component_definition(work / comp.ADOPTER_CLAIMS_FILE,
+                                     [(cid, "own-hardening") for cid in ids],
+                                     source="../nist/catalog/NIST_SP-800-53_rev5.2.0_catalog.json")
+    return comp.compose(work, trees or _trees())
+
+
+def _floor() -> str | None:
+    doc = yaml.safe_load((ESTATE / "tuppence" / "party.yaml").read_text())
+    return (doc.get("overlay") or {}).get("floor")
+
+
+def test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier(tmp_path):
+    """Survivor 1, round 1 `overreach-6`, repaired by eco-system ticket 121. tuppence is composed
+    against its real pinned parents three times: as it is, with its own claim on `pl-2` alone,
+    and with its own claim on every control the pinned regulator weights name. The partition on
+    the entry does not change: every line keeps its share and the lines still sum to `total`.
+    The entry's amount is the sum of the lines still open. Claiming `pl-2` takes exactly its
+    line off the entry and off the exposure total. Claiming every weighted control takes the
+    whole entry to zero, and the regime's tier drops to the rung a zero residual selects under
+    tuppence's own floor. Every other entry keeps its tier."""
     comp = _composition()
     before, before_rendered = comp.compose(_tuppence(tmp_path / "before"), _trees())
     assert before["outcome"] == "composed", before["refusals"]
     entry = _regime_entry(before)
     weighted = sorted(h["id"] for h in entry["holes"])
     assert weighted and all(h["status"] != "covered" for h in entry["holes"]), entry["holes"]
+    assert entry["amount"] == pytest.approx(entry["total"]), entry
 
-    work = _tuppence(tmp_path / "after")
-    _edit_party(work, lambda d: d.setdefault("overlay", {}).setdefault("add", []).append(
-        _own_member(comp, "own-hardening")))
-    comp._write_component_definition(work / comp.ADOPTER_CLAIMS_FILE,
-                                     [(cid, "own-hardening") for cid in weighted],
-                                     source="../nist/catalog/NIST_SP-800-53_rev5.2.0_catalog.json")
-    after, after_rendered = comp.compose(work, _trees())
+    one, one_rendered = _claiming(comp, tmp_path / "one", ["pl-2"])
+    assert one["outcome"] == "composed", one["refusals"]
+    one_entry = _regime_entry(one)
+    line = next(h for h in one_entry["holes"] if h["id"] == "pl-2")
+    assert line["status"] == "covered", line
+    assert one_entry["total"] == pytest.approx(entry["total"])
+    assert [h["amount"] for h in one_entry["holes"]] == pytest.approx([h["amount"] for h in entry["holes"]])
+    assert one_entry["amount"] == pytest.approx(entry["amount"] - line["amount"]), (entry, one_entry)
+    assert one_entry["new_price"] == pytest.approx(one_entry["amount"])
+    assert _exposure_total(one_rendered) == pytest.approx(_exposure_total(before_rendered) - line["amount"])
+
+    after, after_rendered = _claiming(comp, tmp_path / "after", weighted)
     assert after["outcome"] == "composed", after["refusals"]
     after_entry = _regime_entry(after)
     assert {h["id"]: h["status"] for h in after_entry["holes"]} == {cid: "covered" for cid in weighted}
+    assert after_entry["total"] == pytest.approx(entry["total"])
+    assert after_entry["amount"] == 0.0, after_entry
+    assert _exposure_total(after_rendered) == pytest.approx(_exposure_total(before_rendered) - entry["amount"])
 
-    assert after_entry["amount"] == entry["amount"], (entry["amount"], after_entry["amount"])
-    assert _exposure_total(after_rendered) == _exposure_total(before_rendered)
-    assert _tiers(after) == _tiers(before)
-    adr = ADR_0026.read_text(encoding="utf-8")
+    rung = comp._cage_engine().select_tier(0.0, 1.0, _floor())
+    assert entry["proposed_tier"] == "isolated" and rung != "isolated", (entry["proposed_tier"], rung)
+    assert after_entry["proposed_tier"] == rung, after_entry
+    others = [t for t in _tiers(before) if t[0] != "ico"]
+    assert [t for t in _tiers(after) if t[0] != "ico"] == others
+    adr = " ".join(ADR_0026.read_text(encoding="utf-8").split())
     assert "so implementing a control reduces the regime's price" in adr
+    assert "Eco-system ticket 121 built it" in adr
+
+
+def test_removing_an_implemented_control_puts_its_line_back_on_the_price(tmp_path):
+    """Ticket 121's consequence for ADR-0026 point 5. The regulator prices a control whether or
+    not the adopter selects it, so only a selected, claimed control comes off the entry. tuppence
+    claims `ra-3` under MODERATE, and its line comes off. Against a nist copy whose LOW drops
+    `ra-3`, tuppence on LOW keeps the claim, the line reads `unselected`, and the entry is the
+    whole partition again."""
+    comp = _composition()
+    nist = tmp_path / "nist"
+    shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+    low = nist / "catalog" / "NIST_SP-800-53_rev5.2.0_LOW-baseline_profile.json"
+    profile = json.loads(low.read_text())
+    for imp in profile["profile"]["imports"]:
+        for inc in imp.get("include-controls", []):
+            if "ra-3" in inc.get("with-ids", []):
+                inc["with-ids"].remove("ra-3")
+    low.write_text(json.dumps(profile))
+    trees = _trees(nist=nist)
+
+    claimed, _ = _claiming(comp, tmp_path / "moderate", ["ra-3"], trees)
+    assert claimed["outcome"] == "composed", claimed["refusals"]
+    entry = _regime_entry(claimed)
+    line = next(h for h in entry["holes"] if h["id"] == "ra-3")
+    assert line["status"] == "covered", line
+    assert entry["amount"] == pytest.approx(entry["total"] - line["amount"]), entry
+
+    work = _tuppence(tmp_path / "low")
+    _edit_party(work, lambda d: (d.update(baseline="LOW"), d.setdefault("overlay", {}).setdefault(
+        "add", []).append(_own_member(comp, "own-hardening"))))
+    pin = work / "gitops" / "apps" / "nist-pin-configmap.yaml"
+    pin.write_text(pin.read_text().replace("MODERATE", "LOW"))
+    comp._write_component_definition(work / comp.ADOPTER_CLAIMS_FILE, [("ra-3", "own-hardening")],
+                                     source="../nist/catalog/NIST_SP-800-53_rev5.2.0_catalog.json")
+    removed, _ = comp.compose(work, trees)
+    assert removed["outcome"] == "composed", removed["refusals"]
+    after = _regime_entry(removed)
+    assert next(h for h in after["holes"] if h["id"] == "ra-3")["status"] == "unselected"
+    assert after["amount"] == pytest.approx(after["total"]), after
+    assert after["total"] == pytest.approx(entry["total"])
 
 
 def test_a_renamed_ungoverned_namespace_keeps_its_ramp_and_the_closed_delta_says_why(tmp_path):
@@ -918,12 +992,15 @@ def test_a_containment_namespace_is_governed_by_one_label_and_lands_isolated(tmp
     assert run.returncode == 0 and "isolated by default" in run.stdout, run.stdout + run.stderr
 
 
-def test_a_mistranscribed_weight_moves_no_regime_price(tmp_path):
+def test_a_mistranscribed_weight_moves_the_price_of_what_is_implemented(tmp_path):
     """Round 2 `overreach-6`. A clone of the regulator's repo carries a wrong partition: 0.7 on
-    one lower-tier control and 0.1 on the others. tuppence composed against it prices the regime
-    entry, the exposure and every tier exactly as against the published weights. A weight only
-    splits a fixed amount, so today it cannot misprice anything. The recourse the candidate asks
-    for is the pin the adopter already holds and a pull request to the publisher's repo."""
+    one lower-tier control and 0.1 on the others. With nothing implemented, tuppence composed
+    against it prices the regime entry, the exposure and every tier exactly as against the
+    published weights: a weight splits the entry, and every line is open. Since ticket 121 the
+    entry is the sum of its open lines, so a wrong weight moves the price once the adopter
+    implements a control it names. Claiming that control takes 0.7 of the entry off instead of
+    its published share. The recourse the candidate asks for exists: the adopter's own pin holds
+    the version it priced against, and a correction is a pull request to the publisher's repo."""
     comp = _composition()
     right, right_rendered = comp.compose(_tuppence(tmp_path / "right"), _trees())
     ico = tmp_path / "ico"
@@ -931,6 +1008,7 @@ def test_a_mistranscribed_weight_moves_no_regime_price(tmp_path):
     feed = ico / "penalty-schema" / "v3" / "feed.json"
     doc = json.loads(feed.read_text())
     lower = (doc.get("payload") or doc)["control_weights"]["uk-gdpr"]["lower-tier"]
+    published = {w["id"]: float(w["weight"]) for w in lower}
     for i, w in enumerate(lower):
         w["weight"] = 0.7 if i == 0 else round(0.3 / (len(lower) - 1), 10)
     feed.write_text(json.dumps(doc, indent=2))
@@ -941,6 +1019,14 @@ def test_a_mistranscribed_weight_moves_no_regime_price(tmp_path):
     assert _regime_entry(wrong)["amount"] == _regime_entry(right)["amount"]
     assert _exposure_total(wrong_rendered) == _exposure_total(right_rendered)
     assert _tiers(wrong) == _tiers(right)
+
+    first = lower[0]["id"]
+    right_claim, _ = _claiming(comp, tmp_path / "right-claim", [first])
+    wrong_claim, _ = _claiming(comp, tmp_path / "wrong-claim", [first], _trees(ico=ico))
+    whole = _regime_entry(right)["total"]
+    assert _regime_entry(right_claim)["amount"] == pytest.approx(whole * (1 - published[first]))
+    assert _regime_entry(wrong_claim)["amount"] == pytest.approx(whole * (1 - 0.7))
+    assert _regime_entry(wrong_claim)["amount"] != pytest.approx(_regime_entry(right_claim)["amount"])
 
 
 def test_a_namespace_reaches_the_cluster_only_in_a_tag_whose_header_names_it(tmp_path):
