@@ -1,7 +1,7 @@
 # 121 — Implementing a control moves no price and no tier
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -162,3 +162,25 @@ uk-gdpr lower-tier control today (every line reads `recorded`), so no committed 
 - **Integrator:** merge platform first, then hub. The hub leg reads `.estate-clone/platform`, so
   it passes only once platform main carries the build.
 - **Next loophole round:** the bespoke price reaches no tier (decision 5).
+
+## Answer
+
+Resolved 2026-09-23 by platform PR 35 and hub PR 101. Implementing a weighted control now takes
+its line off the regime price and can move the tier, as ADR-0026 point 2 says.
+
+1. `price_parent` takes the adopter's implemented set: its selected controls that a claim covers.
+   The regulator's partition does not change. Every line on `holes[]` keeps its weight and
+   amount, and `total` is still their sum.
+2. The regime entry's `amount` and `new_price` are now the sum of the lines not implemented. Both
+   tiers come from `cage.select_tier` on the open share, so there is no second selection rule.
+3. `test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier` is the regression
+   test. For tuppence, claiming pl-2 takes exactly its line off. Claiming all four weighted
+   controls takes the entry to 0.0 and moves its tier off `isolated`.
+4. `verify/pound-seam` check 4 also grades that `amount` equals the sum of the open lines.
+
+No adopter's committed price moves today, measured by recomposing all three adopters under the
+old and the new composer: none claims a weighted uk-gdpr lower-tier control.
+
+Review: one round, pass, three minor findings, not fixed. One names a real edge for the next
+loophole round: when the previous pin published no weights, `old_price` is scaled by the new
+pin's weights.
