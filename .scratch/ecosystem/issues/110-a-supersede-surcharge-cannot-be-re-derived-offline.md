@@ -1,7 +1,7 @@
 # 110 — A supersede surcharge cannot be re-derived offline, so a signed artefact stops re-rendering
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -375,4 +375,23 @@ selfcheck-only, so it needs no release: the gate reads platform at `main`.
 
 ### Current map line
 
-Map line: `- [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — open, rollout measured 2026-09-23. All three adopters already compose with the v3.0.0 compiler and recompose byte-identically; verify passes with ico or feeds absent. The selfcheck's portability leg passes; its stale ticket-84 leg is fixed in a platform PR, so the whole selfcheck passes. The hub supersede check now reads the compiler pin and reports 4 real unpriced behind pins (ticket 84). Held tuppence 27 and ludlow 24 now wait only on rebase, recompose and review.`
+Map line: `- [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — resolved 2026-09-23, rollout measured 2026-09-23. All three adopters already compose with the v3.0.0 compiler and recompose byte-identically; verify passes with ico or feeds absent. The selfcheck's portability leg passes; its stale ticket-84 leg is fixed in a platform PR, so the whole selfcheck passes. The hub supersede check now reads the compiler pin and reports 4 real unpriced behind pins (ticket 84). Held tuppence 27 and ludlow 24 now wait only on rebase, recompose and review.`
+
+## Answer
+
+Resolved 2026-09-23 by platform PR 29 and hub PR 91. Portability won, as the 2026-09-10 build
+decided, and the record says why: a supersede surcharge now describes the publisher tag state
+that the adopter observed when it composed, and `verify` replays that observation offline.
+
+1. `composition.py --selfcheck` passes with the publisher clone present and absent. Its
+   portability leg re-derives every rendered file byte for byte. Platform PR 29 fixed a stale
+   ticket-84 leg that assumed tuppence was one major behind, when it is two.
+2. All three adopters already compose with the v3.0.0 compiler through reviewed PRs merged on
+   2026-09-10, and recompose byte-identically. `verify` passes with ico or feeds absent.
+3. Ticket 45's promise was not narrowed. The surcharge claim was: it is an observation dated by
+   the composition, not a statement about the publisher's current newest major. The handbook
+   prints that limit beside each affected feed.
+
+Hub PR 91 also made `verify-supersede.sh` read the compiler pin, not the policy pin. It now reports
+four true FAILs where it reported a false SKIP. Those four belong to ticket 84's composer rule, and
+the owner's items above name what closes them.
