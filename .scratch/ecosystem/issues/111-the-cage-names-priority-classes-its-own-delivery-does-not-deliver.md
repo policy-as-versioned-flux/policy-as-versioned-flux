@@ -78,3 +78,219 @@ server's own words, is what it predicted and is the outcome it asked to be judge
 
 Record: ticket 86; ticket 26 (the cage ladder lands); ticket 63; platform
 `distribution/policies/v*/priorityclasses.yaml`; each adopter's `composed/policies/v4.0.0/cage-tier.yaml`.
+
+## Build, 2026-09-22
+
+Platform PR: https://github.com/policy-as-versioned-platform/platform/pull/30 (branch
+`ticket-111-the-cage-delivers-its-classes`). No adopter PR: every adopter change waits on a tag
+only the owner can cut (see "What remains"). Measured on detached `origin/main` worktrees of all
+eight units, because the shared `.estate-clone` checkouts were behind `origin/main` on every unit.
+
+### The cause, re-measured
+
+- All three adopters record the refusal, not only driftwood. `drift/samples.jsonl` on each
+  adopter's `origin/main` has fact 6 observed false with `no PriorityClass with name
+  cage-baseline-3-0-0 was found` in driftwood runs 35438978784, 35507849200 and 35722798027,
+  tuppence runs 35443208275, 35512492431, 35617054533 and 35733680722, and ludlow runs
+  35444849712, 35513883790 and 35621907951. Read with a script over the last twelve records per
+  adopter.
+- The cause is in the composer. `compose/composition.py` `load_implementations` skipped every
+  document whose kind was not an admission kind, with the comment "PriorityClasses are dials, not
+  admission". Adopters compose with platform tools `v3.0.0` (`.github/platform-tools-pin.yaml`,
+  commit 3602142e, identical on all three), whose `load_implementations` carries the same skip.
+- A new check (below) run over each adopter's committed `composed/` on `origin/main` names four
+  missing classes, `cage-{baseline,restricted,quarantine,isolated}-4-0-0@4.0.0`. Run over each
+  adopter's `v1.1.0` tag, which is what the lane installs, it names nine: the baseline, restricted
+  and quarantine classes of 2.0.0, 2.0.1 and 3.0.0.
+
+### Decision 1: the composed tree delivers the classes, one version directory at a time (delegated)
+
+Each version's PriorityClasses are composed into `composed/policies/v<version>/`, one per file,
+beside the cage that names them. The version's own composed Kustomization applies them and prunes
+them when the version leaves the array.
+
+Why not platform's own Kustomization: the lane applies `gitops/platform/platform-pin.yaml` only,
+never `platform-distribution.yaml`. Ticket 40 (Q5) split them because installing platform's fan-out
+beside the composed set gave one cluster-scoped name two owners, and fact 4 read the loser. Asking
+platform's Kustomization to deliver the classes would reinstall that second owner, and an adopter
+could then install a policy version only with platform's cooperation. The adopter would not own
+what its own composed artefact needs to admit a pod. Composing the classes keeps the composed
+artefact self-sufficient, signed by the adopter's own tag like every other member.
+
+Why per version and not once at `composed/`: the classes are named per version
+(`cage-isolated-4-0-0`), so versions never share one. The one Kustomization that reconciles a
+version's directory is the one that prunes it, so a class lives exactly as long as the cage that
+names it. `composed/` root is not reconciled by the composed ResourceSet at all today.
+
+### Decision 2: the composer refuses a set that names a class it does not carry (delegated)
+
+`compose()` now refuses with `undelivered-priority-class` (subject `<class>@<version>`, or
+`@machinery`) when a member writes a `priorityClassName` its own version directory does not carry,
+and with `unreadable-priority-class` when it assigns one the composer cannot resolve.
+`named_priority_classes()` reads a literal field, and a CEL assignment that is a quoted literal or
+`variables.<map>.<field>` over a literal dial table. A dial indexed by a variable that is itself a
+literal counts only that row, which is how the machinery cages (tier pinned to `'isolated'`) name
+only `cage-isolated`.
+
+Why a refusal and not a price: ADR-0020 prices a missing behaviour of the estate. This is neither
+a behaviour nor an instrument. It is an artefact that cannot do what it says, the same shape as a
+restated mutate that ADR-0016 refuses. Why refuse the unreadable case: a class the composer cannot
+name is one it cannot prove it carries, and guessing would reopen this ticket's hole.
+
+A third change fell out of building it. `_load_guards` rebound the shared module name `cage_body`
+to whichever parent tree composed last and left it there, so a later composition could render its
+cages through another tree's module, or a deleted one. The new tests hit that. `_load_guards` now
+binds the parent's own `cage_body` for the render and restores the previous binding (delegated).
+
+### Decision 3: fact 6 stays false, and nothing downstream reads it as "the cage does not hold" (delegated)
+
+Read on each adopter's `origin/main`: `drift/five-facts.py` grades fact 6 false and fires
+`the_cage_refuses_or_never_runs_the_workload_it_caged`, whose declared meaning in
+`drift/window.yaml` is "a refusal here is a denial by another name, and it is the composed set that
+produced it". That is what happened. Fact 7, the reach claim, reads could-not-look and names fact 6
+as the carrier. `verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh` quotes the grader's last
+line. `twin/drift.py` reads drift subjects, not facts 6 and 7. No reader turns this false into a
+statement about reach, so no code change.
+
+### The second mismatch: installed and composed can differ, and one of the two ways is not intended (delegated)
+
+- The lane installs `gitops/composed/composed-set.yaml`. It pins the adopter's own tag `v1.1.0`
+  and declares `2.0.0`, `2.0.1`, `3.0.0` in a hand-written array. `render_composed.py` and the
+  ResourceSet both read that array. It is not ranged from platform's array.
+- Between the pinned tag and `main` they differ, and that is intended: the lane installs only a
+  signed tag, and `main` has moved to `composed/policies/v4.0.0/` alone. The array's own comment
+  says 4.0.0 joins in the same pull request that moves the pin to a tag whose tree carries it.
+- Between the array and the pinned tag's own tree they must not differ. Today they agree:
+  `git ls-tree v1.1.0 composed/policies/` holds exactly v2.0.0, v2.0.1 and v3.0.0 on all three.
+  Nothing checks it, though. A pin moved without the array reconciles a path that does not exist.
+- All three still install 2.0.0, 2.0.1 and 3.0.0, which platform retired on 2026-08-29. Platform's
+  own `versions.yaml` says why those lines cannot deploy even with their classes: they write
+  `priorityClassName` without the `priority` pair and the Priority plugin refuses the mismatch. So
+  the classes alone would not close fact 6 on the installed lines. The route has to move the lane
+  to 4.0.0.
+- Not built: a check that the composed-set array equals `composed/policies/` at the pinned tag.
+  It belongs in the same adopter pull request that moves the pin, which waits on the owner.
+
+### Tests run
+
+- `compose/test_priority_classes.py`, 10 tests at the `compose()` seam. Red first: 9 of 10 failed
+  on `origin/main` (the byte-for-byte verify test passed before and after). Green after.
+- `.venv/bin/python -m pytest test_priority_classes.py test_portable_observations.py
+  test_floor_change.py test_comparison_history.py -n0 -q` in platform `compose/`: 34 passed.
+- `compose/verify-composition.sh` with `PAVC_ESTATE_CLONE` on a fresh origin/main estate: exit 3
+  with the same SKIP as `origin/main` before the change (platform@2.0.1 lacks v5.0.0). Step 1b
+  lists the two new refusal kinds.
+- `compose/verify-fresh.sh` own proofs: PASS. `compose/handbook.py --selfcheck`: PASS.
+- `.venv/bin/python -m mypy compose/composition.py` (hub venv interpreter, run from the platform
+  worktree root and from an archive of platform `origin/main`): 89 errors on each, none in the new
+  code. The count moves with the interpreter and cache: the build first read 86 and the review
+  read 89 and 91. The invariant is "no new errors in the new code", not the count.
+- Composing driftwood, tuppence and ludlow with the new composer against their pins, each parent
+  extracted with `git archive` (platform `v2.0.1`, nist `v1.1.0`, ico and feeds at `origin/main`),
+  not the estate working tree. `_default_parent_trees` reads the working tree, so the same command
+  over a platform checkout at `main` renders more (the v5.0.0 classes and the machinery).
+  Result: `outcome: composed`, zero refusals. Against each adopter's committed `composed/` it
+  renders five new files: `composed/policies/v4.0.0/cage-{baseline,restricted,quarantine,isolated}.yaml`
+  from this change, and `composed/floor-change.json`, which the `origin/main` composer also renders
+  (checked on driftwood). `composed/evidence.json` is not in the rendered map because the CLI
+  writes it, not `compose()`.
+- Not run: a cluster rehearsal. Fact 6 true is claimed by nobody until the scheduled lane says so.
+
+### Review round, 2026-09-23
+
+The review blocked on one finding and named two minor ones. Each is fixed on the same branches.
+
+- **Blocking: a JSONPatch write of the class composed green.** A planted overlay MutatingPolicy
+  with `[JSONPatch{op: "add", path: "/spec/priorityClassName", value: "made-up"}]` composed with no
+  refusal. `_PC_ASSIGN` matches only `priorityClassName:` and the dict walk reads only a literal
+  key, so a patch path was never seen. Fix (delegated): any mention of `priorityClassName` in a
+  string that neither reader resolves is now unread, so it refuses as `unreadable-priority-class`.
+  This applies to a CEL JSONPatch, a structured patch `path`, and a classic `patchesJson6902` block.
+  The composer cannot tell a read from a write in such a string, so it refuses rather than guess.
+  Red first: two new tests, `test_a_jsonpatch_that_writes_the_class_refuses` and
+  `test_a_patch_path_in_structured_form_refuses`, failed with `'composed' != 'refused'`. Both
+  pass now. No real member regresses: `named_priority_classes()` over every YAML document under
+  platform `distribution/policies/` and `graded/policies/` and each adopter's committed
+  `composed/` (88 documents) returns zero unread.
+- **Minor: `_load_guards_from` still rebound `cage_body`.** It now loads its own copy without
+  touching `sys.modules` (delegated). Red first: `test_reading_the_machinery_leaves_the_shared_cage_body_alone`
+  failed with the old line put back, and passes without it.
+- **Minor: two numbers in "Tests run" were not derived.** The mypy line and the recompose line
+  above are rewritten from commands run in this round, as they now say.
+
+After the round: `test_priority_classes.py` has 13 tests, all pass. The four-file compose run
+(`test_priority_classes.py test_portable_observations.py test_floor_change.py
+test_comparison_history.py -n0 -q`) reads 37 passed, 11 subtests passed. `compose/verify-fresh.sh`
+and `compose/handbook.py --selfcheck` (47 checks) pass. `verify-composition.sh` was not re-run.
+
+### Review round 2, 2026-09-23
+
+The second review blocked on one finding and named two minor ones.
+
+- **Blocking: hub PR 94 conflicted with `main` in `map.md`.** Tickets 110 and 118 merged after
+  this branch forked, and both edit the lines beside 111's. Fix: `origin/main` is merged into the
+  branch, not rebased, so the pushed history stays as reviewed. The conflict kept `main`'s 110
+  line and this branch's 111 line. Nothing else conflicted. `tests/test_map_surface.py` was re-run
+  on the merged tree (see below).
+- **Minor: a stale estate platform crashed the selfcheck.** `_write_fixture_platform` copies the
+  machinery from the estate's platform clone. The hub's `.estate-clone/platform` is at `bbda376`,
+  before `cage_body.py` existed, so `composition.py --selfcheck` died with a `FileNotFoundError`.
+  Fix (delegated): the copied paths are one list, `FIXTURE_MACHINERY`, and the selfcheck prints a
+  SKIP naming each path the clone lacks. Red first: three new tests in `test_priority_classes.py`
+  failed (no `_selfcheck_missing_machinery`, and a traceback from `--selfcheck` over a stale
+  estate). All three pass now. Against the hub's own clone the selfcheck now prints
+  `SKIP: .estate-clone/platform lacks distribution/cage_body.py, distribution/render-bottom-rung-netpol.py`.
+  Against a fresh estate (each unit cloned from its remote default branch, this branch as
+  `platform`) it prints `selfcheck ok`. Platform commit `a5b1e63`.
+- **Minor, not changed: ADR-0026 point 6 does not name the two new refusal kinds.** Decision
+  (delegated): ADR-0026 stays as it is. Its point 6 classifies the kinds composition emitted on
+  2026-09-04 and says itself that "a kind the source gains later is a fact for the next ADR, not
+  a silent widening of this one". `verify-adr-supersession.sh` keeps its dated fixture for the
+  same reason. Both new kinds are instrument faults, as decision 2 records: nothing pinned
+  delivers or names the class. The next ADR that classifies refusal kinds must add
+  `undelivered-priority-class` and `unreadable-priority-class`, and extend that fixture then.
+
+After round 2: `test_priority_classes.py` has 16 tests, all pass. The four-file compose run reads
+40 passed, 11 subtests passed. `compose/verify-fresh.sh` passes. `mypy compose/composition.py`
+still reads 89 errors, none in the new code.
+
+Hub, on the merged tree: `tests/test_map_surface.py -n0 -q` reads 60 passed.
+`verify-adr-supersession.sh` passes. The hub mypy run reads no issues in 198 source files.
+`verify-derived-status.sh` fails with one fault, and it is not this branch's: ticket 84 is written
+resolved while `verify/supersede/verify-supersede.sh` graded FAIL on run 276. A detached worktree
+of `origin/main` gives the same single fault.
+
+### What remains, in order
+
+1. **Merge** platform PR 30.
+2. **Owner: cut the platform tools release** from platform `main` with `cut-release.yml`, the next
+   `v*` after `v3.2.0` (`v3.3.0` if declared minor; the release gate grades the declaration). It
+   also carries tickets 113 and 110 (platform PRs 28 and 29), already on `main`.
+3. **Pin moves, one pull request per adopter** (agent work once step 2 exists): move
+   `.github/platform-tools-pin.yaml` from `v3.0.0` to the new tag and commit, then recompose
+   `composed/` in the same pull request. The recomposition adds the four
+   `composed/policies/v4.0.0/cage-*.yaml` classes. The jump from tools v3.0.0 also brings the
+   v3.1.0 and v3.2.0 composer changes, so the rest of `composed/` moves too. Tuppence PR 27 and
+   ludlow PR 24 are held under ticket 84 and are not touched by this.
+4. **Owner: cut each adopter's next release tag** with its `cut-release.yml`, after step 3 merges.
+   Today each adopter has `v1.0.0` and `v1.1.0` only.
+5. **Composed-set moves, one pull request per adopter** (agent work once step 4 exists): in
+   `gitops/composed/composed-set.yaml` move `tag` and `commit` to that tag, set the array to
+   `{ version: "4.0.0" }` alone, and move the `gitsign-gates` annotation to
+   `flux-system/composed-v4-0-0`. Add the array-equals-tree check from above in the same pull
+   request.
+6. **Clock: a scheduled `drift-sample.yml` run on each adopter reading fact 6 true.** Waiting on
+   the clock. No run is dispatched to stand in for it.
+
+Ludlow carries one more blocker, not this ticket's, which step 4 may or may not clear. Its lane
+sample of 2026-09-22T14:12:23Z (run 35737379620) has fact 2 false: the gitsign controller's verdict
+on ludlow's `v1.1.0` is `certificate is not yet valid` at tagger time, and the three composed
+Kustomizations report `Source artifact not found`, so no cage-tier was installed and fact 6 read
+could-not-look. Driftwood's run 35601938687 of 2026-09-21 read the same could-not-look. Whether a
+freshly cut ludlow tag verifies is unmeasured until the tag exists.
+
+Also named, not built: the platform machinery (orphan cage, governed-namespace cages and their
+`cage-isolated` class) composes at `composed/` root, and the composed ResourceSet reconciles only
+`composed/policies/v*/`. No adopter pins a platform tree that carries the machinery cages today
+(their implementations pin is `v2.0.1`), so nothing is refused on a cluster yet. The day an
+adopter's implementations pin moves past `v3.0.0`, those objects need a delivery route too.
