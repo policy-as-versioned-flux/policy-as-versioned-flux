@@ -54,7 +54,7 @@ def test_the_harness_is_skill_agnostic() -> None:
     )
     for fn in (
         skills.evaluate, skills.threshold_for, skills.load_thresholds, skills.record_score,
-        skills.load_scores, skills.history_for, skills.detect_regression,
+        skills.load_scores, skills.history_for, skills.detect_regression, skills.attribute,
     ):
         body = inspect.getsource(fn)
         for real_skill in real_skills:
@@ -175,8 +175,13 @@ def _threshold_file(tmp_path, threshold: float, min_items: int | None, name: str
     return path
 
 
-def _corpus(n: int) -> list[dict]:
-    return [{"id": f"i{k}", "input": f"w{k}", "expected": f"W{k}"} for k in range(n)]
+def _corpus(n: int, basis: bool = True) -> list[dict]:
+    """`n` toy items. Each carries the toy's checkable basis unless `basis` is False (ticket 118:
+    a right answer with no checkable basis is unscoreable, so a basis-less corpus cannot pass)."""
+    from twin.skills import TOY_BASIS
+
+    extra = {"basis": TOY_BASIS} if basis else {}
+    return [{"id": f"i{k}", "input": f"w{k}", "expected": f"W{k}", **extra} for k in range(n)]
 
 
 def test_every_threshold_states_the_minimum_its_own_derivation_gives() -> None:
@@ -255,9 +260,8 @@ def test_the_recorded_entry_carries_the_outcome_and_the_minimum(tmp_path) -> Non
 
 
 def test_measurability_counts_the_items_the_seam_names() -> None:
-    """The seam ticket 118 builds on: the run-level outcome reads the corpus size through
-    `measured_count`, and the item-level state only through `score`. A third item state changes
-    the numerator; it does not move this count unless 118 decides it should."""
+    """The seam ticket 118 built on: the run-level outcome reads the corpus through
+    `measured_count`. On a corpus whose every item carries a checkable basis, every item counts."""
     result = evaluate("toy-classifier", toy_classifier, TOY_SKILL_CORPUS)
     assert result.measured_count == len(result.items)
     # Both serialisations of the result carry the seam, so a reader of either sees one count.
@@ -373,3 +377,159 @@ def test_the_guard_skips_rather_than_passes_when_it_has_no_history(monkeypatch) 
     # undeclared guard that skips counts as a suite failure (review round 2 of ticket 112).
     for guard in ("hash_changes_are_authorised", "skill_eval_harness_is_agnostic_and_thresholds_are_guarded"):
         assert harness.may_skip(guard, False, set()), guard
+
+
+# -- a green that rests on luck may not promote (eco-system ticket 118) ------------------------
+
+
+def _toy_threshold(tmp_path):
+    return _threshold_file(tmp_path, 0.8, 16)
+
+
+def _stated(basis: str):
+    """A toy skill that gets every answer right and states `basis` as the reason."""
+    from twin.skills import Stated
+
+    return lambda text: Stated(text.upper(), basis)
+
+
+def test_the_item_verdict_is_a_pure_function_of_two_readings() -> None:
+    """The attribution table. A wrong answer is wrong whatever its basis; a right answer is
+    attributable only on a basis that was checked and held."""
+    from twin.skills import RIGHT, UNSCOREABLE, WRONG, WRONG_BASIS, attribute
+
+    assert attribute(False, True) == WRONG
+    assert attribute(False, False) == WRONG
+    assert attribute(False, None) == WRONG
+    assert attribute(True, True) == RIGHT
+    assert attribute(True, False) == WRONG_BASIS
+    assert attribute(True, None) == UNSCOREABLE
+
+
+def test_the_item_state_is_a_verdict_not_a_passed_flag() -> None:
+    """Ticket 118 item 1: do not reuse `passed`. A bool cannot hold the third state."""
+    from dataclasses import fields
+
+    from twin.skills import ItemResult
+
+    assert [f.name for f in fields(ItemResult)] == ["item_id", "verdict"]
+
+
+def test_item_verdicts_are_not_run_outcomes() -> None:
+    """The item state and the run outcome are kept apart, down to their words, so an item
+    verdict can never be read as a run outcome."""
+    from twin.skills import FAIL, ITEM_VERDICTS, NOT_MEASURABLE, PASS
+
+    assert not set(ITEM_VERDICTS) & {PASS, FAIL, NOT_MEASURABLE}
+
+
+def test_a_right_answer_on_a_wrong_basis_does_not_raise_the_score(tmp_path) -> None:
+    """Ticket 118 item 2. Sixteen right answers, every stated basis wrong: the score does not
+    count them, the attributable rate counts them against, and the run fails."""
+    from twin.skills import FAIL, WRONG_BASIS
+
+    result = evaluate("toy-classifier", _stated("memorised"), _corpus(16), threshold_path=_toy_threshold(tmp_path))
+    assert all(i.verdict == WRONG_BASIS for i in result.items)
+    assert result.answered_right == 16, "every answer was right; that is what makes it luck"
+    assert result.score == 0.0
+    assert result.attributable_rate == 0.0
+    assert result.measured_count == 16, "a wrong basis was checked, so it is measured"
+    assert result.outcome == FAIL
+
+
+def test_luck_lowers_the_attributable_rate_through_the_denominator(tmp_path) -> None:
+    """Excluded from the numerator, kept in the denominator. Sixteen attributable items and four
+    lucky ones rate 16/20 = 0.8, which clears 0.8; a fifth lucky one rates 16/21 and does not."""
+    from twin.skills import FAIL, PASS, Stated
+
+    def mixed(lucky: int):
+        wrong_basis = {f"w{k}" for k in range(16, 16 + lucky)}
+        return lambda text: Stated(text.upper(), "memorised" if text in wrong_basis else "upper-case every letter")
+
+    path = _toy_threshold(tmp_path)
+    four = evaluate("toy-classifier", mixed(4), _corpus(20), threshold_path=path)
+    five = evaluate("toy-classifier", mixed(5), _corpus(21), threshold_path=path)
+    assert (four.attributable_rate, four.measured_count, four.outcome) == (pytest.approx(0.8), 20, PASS)
+    assert (five.attributable_rate, five.measured_count, five.outcome) == (pytest.approx(16 / 21), 21, FAIL)
+
+
+def test_a_right_answer_with_no_checkable_basis_is_unscoreable_not_passed(tmp_path) -> None:
+    """Ticket 118 item 3. A perfect score on sixteen items whose corpus carries no basis is not
+    measurable: nothing separates the skill from luck, so nothing was measured."""
+    from twin.skills import NOT_MEASURABLE, UNSCOREABLE
+
+    result = evaluate("toy-classifier", toy_classifier, _corpus(16, basis=False), threshold_path=_toy_threshold(tmp_path))
+    assert all(i.verdict == UNSCOREABLE for i in result.items)
+    assert result.score == 1.0 and result.clears_threshold
+    assert result.measured_count == 0
+    assert result.attributable_rate is None, "an unmeasured rate is None, never 0.0"
+    assert result.outcome == NOT_MEASURABLE
+
+
+def test_a_skill_that_states_no_basis_is_unscoreable_on_a_corpus_that_has_one(tmp_path) -> None:
+    from twin.skills import UNSCOREABLE
+
+    result = evaluate("toy-classifier", lambda text: text.upper(), _corpus(16), threshold_path=_toy_threshold(tmp_path))
+    assert {i.verdict for i in result.items} == {UNSCOREABLE}
+
+
+def test_a_wrong_answer_is_measured_whatever_its_basis(tmp_path) -> None:
+    """A wrong answer is evidence against the skill with or without a basis, so it counts. On a
+    basis-less corpus a skill that gets sixteen wrong fails; one that gets them right is not
+    measurable. An unscoreable item can only ever be missing evidence, never evidence for."""
+    from twin.skills import FAIL, WRONG
+
+    result = evaluate("toy-classifier", lambda x: "WRONG", _corpus(16, basis=False), threshold_path=_toy_threshold(tmp_path))
+    assert {i.verdict for i in result.items} == {WRONG}
+    assert result.measured_count == 16
+    assert result.attributable_rate == 0.0
+    assert result.outcome == FAIL
+
+
+def test_a_basis_is_checked_by_a_supplied_rule_when_equality_will_not_do(tmp_path) -> None:
+    from twin.skills import RIGHT, WRONG_BASIS
+
+    def prefix_rule(stated: object, basis: object) -> bool:
+        return str(stated).startswith(str(basis))
+
+    path = _toy_threshold(tmp_path)
+    held = evaluate("toy-classifier", _stated("upper-case every letter, twice"), _corpus(16),
+                    threshold_path=path, basis_scorer=prefix_rule)
+    missed = evaluate("toy-classifier", _stated("lower-case"), _corpus(16), threshold_path=path, basis_scorer=prefix_rule)
+    assert {i.verdict for i in held.items} == {RIGHT}
+    assert {i.verdict for i in missed.items} == {WRONG_BASIS}
+
+
+def test_the_toy_skill_is_attributable_on_its_own_corpus() -> None:
+    from twin.skills import PASS, RIGHT
+
+    result = evaluate("toy-classifier", toy_classifier, TOY_SKILL_CORPUS)
+    assert {i.verdict for i in result.items} == {RIGHT}
+    assert result.attributable_rate == 1.0
+    assert result.outcome == PASS
+
+
+def test_the_recorded_row_carries_the_attributable_rate_beside_the_score(tmp_path) -> None:
+    """Done: the attributable rate recorded beside the score in the log, with the counts that
+    derive it, so a reader of the row can recompute it."""
+    from twin.skills import Stated
+
+    def one_lucky(text: str):
+        return Stated(text.upper(), "memorised" if text == "w0" else "upper-case every letter")
+
+    result = evaluate("toy-classifier", one_lucky, _corpus(17), threshold_path=_toy_threshold(tmp_path))
+    entry = record_score(result, "model-a", "2026-09-22T00:00:00Z", path=tmp_path / "s.jsonl")
+    assert entry["attributable_rate"] == pytest.approx(16 / 17)
+    assert entry["score"] == pytest.approx(16 / 17)
+    assert (entry["wrong_basis"], entry["unscoreable"], entry["measured_count"], entry["total"]) == (1, 0, 17, 17)
+    assert load_scores(tmp_path / "s.jsonl") == [entry]
+    doc = result.as_dict()
+    assert doc["attributable_rate"] == entry["attributable_rate"]
+    assert doc["items"][0] == {"id": "i0", "verdict": "wrong-basis"}
+
+
+def test_an_unmeasured_rate_is_recorded_as_null_never_zero(tmp_path) -> None:
+    result = evaluate("toy-classifier", toy_classifier, _corpus(16, basis=False), threshold_path=_toy_threshold(tmp_path))
+    entry = record_score(result, "model-a", "2026-09-22T00:00:00Z", path=tmp_path / "s.jsonl")
+    assert entry["attributable_rate"] is None
+    assert entry["unscoreable"] == 16

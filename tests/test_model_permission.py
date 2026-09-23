@@ -119,6 +119,9 @@ def good_row(facts):
         "min_items": 9,
         "outcome": "pass",
         "total": 9,
+        # Ticket 118: item 1 grades the attributable rate, not the score.
+        "measured_count": 9,
+        "attributable_rate": 0.95,
     }
 
 
@@ -181,7 +184,7 @@ def test_a_run_below_its_stated_minimum_is_refused_whatever_it_scored(facts, goo
 def test_a_legacy_row_below_the_tree_minimum_is_refused(facts, good_row) -> None:
     """Rows written before ticket 112 carry no outcome and no min_items. The minimum the tree
     states today is the one that counts, as the threshold is."""
-    legacy = {k: v for k, v in good_row.items() if k not in ("outcome", "min_items")}
+    legacy = {k: v for k, v in good_row.items() if k not in ("outcome", "min_items", "measured_count")}
     assert 1 in _refused_items(_permission(facts, [{**legacy, "total": 3}]))
 
 
@@ -190,7 +193,7 @@ def test_a_raised_minimum_revokes_a_row_that_met_the_old_one(facts, good_row) ->
 
 
 def test_a_row_with_no_count_or_no_minimum_is_refused(facts, good_row) -> None:
-    uncounted = {k: v for k, v in good_row.items() if k != "total"}
+    uncounted = {k: v for k, v in good_row.items() if k not in ("total", "measured_count")}
     assert 1 in _refused_items(_permission(facts, [uncounted]))
     unsized = {k: v for k, v in good_row.items() if k != "min_items"}
     assert 1 in _refused_items(_permission(facts, [unsized], min_items_now=None))
@@ -199,6 +202,32 @@ def test_a_row_with_no_count_or_no_minimum_is_refused(facts, good_row) -> None:
 def test_the_measured_count_is_read_before_the_total(facts, good_row) -> None:
     """The seam ticket 118 builds on: a run may count fewer items toward its size than it holds."""
     assert 1 in _refused_items(_permission(facts, [{**good_row, "total": 16, "measured_count": 3}]))
+
+
+def test_a_score_that_rests_on_luck_is_refused(facts, good_row) -> None:
+    """Ticket 118. The score clears the bar; the attributable rate does not, because some of the
+    right answers stood on a wrong basis. Item 1 grades the rate."""
+    lucky = {**good_row, "score": 0.95, "attributable_rate": 0.40, "wrong_basis": 5}
+    permission = _permission(facts, [lucky])
+    assert 1 in _refused_items(permission)
+    assert "attributable rate" in permission.why()
+
+
+def test_a_row_with_no_attributable_rate_is_refused(facts, good_row) -> None:
+    """Rows written before ticket 118 carry no rate, so their score may rest on luck. Absence is
+    not consent. A row whose rate is null measured nothing and is refused the same way."""
+    legacy = {k: v for k, v in good_row.items() if k != "attributable_rate"}
+    assert 1 in _refused_items(_permission(facts, [legacy]))
+    assert 1 in _refused_items(_permission(facts, [{**good_row, "attributable_rate": None}]))
+
+
+def test_the_rate_is_compared_with_the_bar_the_tree_sets(facts, good_row) -> None:
+    """The rate meets the tree's bar. Recorded against the same bar, a score that clears 0.75 on a
+    rate that does not is refused, and a rate exactly at the bar holds."""
+    at_75 = {**good_row, "threshold": 0.75}
+    assert 1 in _refused_items(_permission(facts, [{**at_75, "attributable_rate": 0.70}], threshold_now=0.75))
+    assert 1 not in _refused_items(_permission(facts, [{**at_75, "attributable_rate": 0.75}], threshold_now=0.75))
+    assert _permission(facts, [{**good_row, "attributable_rate": 0.65}]).granted
 
 
 def test_a_stale_corpus_digest_is_refused(facts, good_row) -> None:
@@ -443,7 +472,7 @@ def test_the_seam_refuses_a_row_that_met_a_minimum_the_tree_has_since_raised(mon
         "skill": _FACTS_SKILL, "model_version": "fixture-model-1.0.0", "score": 1.0,
         "threshold": 0.65, "corpus_digest": facts["corpus_digest"],
         "recorded_at": "2026-09-22T00:00:00Z", "min_items": 3, "measured_count": 3, "total": 3,
-        "outcome": "pass",
+        "outcome": "pass", "attributable_rate": 1.0,
     }
     perm = _seam_lookup(monkeypatch, [row])(_FACTS_SKILL, "fixture-model-1.0.0")
     assert not perm.granted
@@ -460,7 +489,25 @@ def test_the_seam_grants_a_row_that_meets_the_trees_minimum(monkeypatch, facts) 
         "skill": _FACTS_SKILL, "model_version": "fixture-model-1.0.0", "score": 1.0,
         "threshold": 0.65, "corpus_digest": facts["corpus_digest"],
         "recorded_at": "2026-09-22T00:00:00Z", "min_items": need, "measured_count": need,
-        "total": need, "outcome": "pass",
+        "total": need, "outcome": "pass", "attributable_rate": 1.0,
     }
     perm = _seam_lookup(monkeypatch, [row])(_FACTS_SKILL, "fixture-model-1.0.0")
     assert perm.granted, perm.why()
+
+
+def test_the_seam_refuses_a_row_whose_score_rests_on_luck(monkeypatch, facts) -> None:
+    """Ticket 118 at the live seam: a row at the tree's minimum with a perfect score and a low
+    attributable rate is refused at item 1, where the same row with its rate at 1.0 is granted
+    (the test above), so the refusal is the rate and not the seam refusing everything."""
+    from twin.skills import min_items_for
+
+    need = min_items_for(_FACTS_SKILL)
+    row = {
+        "skill": _FACTS_SKILL, "model_version": "fixture-model-1.0.0", "score": 1.0,
+        "threshold": 0.65, "corpus_digest": facts["corpus_digest"],
+        "recorded_at": "2026-09-22T00:00:00Z", "min_items": need, "measured_count": need,
+        "total": need, "outcome": "pass", "attributable_rate": 0.5,
+    }
+    perm = _seam_lookup(monkeypatch, [row])(_FACTS_SKILL, "fixture-model-1.0.0")
+    assert not perm.granted
+    assert 1 in _refused_items(perm), perm.why()

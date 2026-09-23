@@ -695,6 +695,9 @@ def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> 
     an `authorised_by` citing a decision ticket — the same `hash_changes_are_authorised` pattern,
     applied to a second file.
 
+    Eco-system ticket 118 widened the fixture leg again: a skill right on every item for a wrong
+    stated reason must fail, because the threshold grades the attributable rate, not the score.
+
     Eco-system ticket 112 widened two legs. The fixture leg now also proves the third outcome: the
     same perfect skill on a corpus below the stated minimum is NOT_MEASURABLE, neither passed nor
     failed. The citation leg now also covers `min_items`, and it takes the baseline the way
@@ -725,6 +728,16 @@ def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> 
     bad = skills_mod.evaluate("toy-classifier", lambda x: "wrong", skills_mod.TOY_SKILL_CORPUS)
     if bad.passed or not bad.failed:
         raise Violated("a skill that gets every item wrong did not fail — the threshold is not gating anything")
+    # Eco-system ticket 118: every answer right, every stated basis wrong. The old score would
+    # have passed it at 1.0; the attributable rate must fail it.
+    lucky = skills_mod.evaluate(
+        "toy-classifier", lambda x: skills_mod.Stated(x.upper(), "memorised"), skills_mod.TOY_SKILL_CORPUS
+    )
+    if lucky.answered_right != len(lucky.items) or not lucky.failed or lucky.score != 0.0:
+        raise Violated(
+            f"a skill right on every item for a wrong stated reason reported {lucky.outcome!r} at "
+            f"score {lucky.score}; a threshold graded on a score that counts luck grades nothing"
+        )
     short = skills_mod.TOY_SKILL_CORPUS[: good.min_items - 1]
     small = skills_mod.evaluate("toy-classifier", skills_mod.toy_classifier, short)
     if small.outcome != skills_mod.NOT_MEASURABLE or small.passed or small.failed:
@@ -751,7 +764,8 @@ def _skill_eval_harness_is_agnostic_and_thresholds_are_guarded(ctx: Context) -> 
         )
     return (
         f"{len(real_skills)} real skill names absent from every harness function; the fixture "
-        "skill passes, a degraded one fails and a short corpus is not measurable; no threshold or "
+        "skill passes, a degraded one fails, one right on a wrong basis fails and a short corpus is "
+        "not measurable; no threshold or "
         f"stated minimum lowered without a citation against {source}"
     )
 

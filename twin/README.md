@@ -2964,6 +2964,11 @@ Named here so the skeleton cannot quietly become the definition of done.
   corpus size it is valid at (`min_items`, derived by `twin/corpus_size.py`), and a run on fewer
   items reports **not measurable**, a third outcome that is neither a pass nor a failure. On that
   date six of the seven metrics are not measurable; `verify/twin-evals/verify-corpus-size.sh`
+  grades it. Since eco-system ticket 118 each item gets one of four verdicts (right, wrong,
+  wrong-basis, unscoreable), and the threshold grades the **attributable rate**, right items over
+  measured items, recorded beside the score. A skill states its basis by returning
+  `Stated(answer, basis)` against a corpus item's `basis`. No real corpus carries one yet, so all
+  seven metrics are not measurable on 2026-09-23; `verify/twin-evals/verify-attributable-rate.sh`
   grades it. `signal-classify` (`twin/signal_classify.py`, build ticket 43) is the
   first real skill through it: a keyword and word-overlap heuristic, not a model call, evaluated
   against the pooled Carillion/NMC/Wirecard/Enron labelled corpus — proven only against `political`

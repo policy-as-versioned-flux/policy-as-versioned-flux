@@ -3,26 +3,30 @@ PASS: the derived baseline for causal-claims    is 1.000 on edge.elasticity.mode
 PASS: every metric's reference answer set scores 1.000 on its own corpus, so a frozen-field baseline grants the other fields CORRECTLY (weak: none)
 PASS: the score log records at least one model version to grade (2: heuristic-0.1.0, laya-1c5edc17)
 PERMISSIONS: 0 granted of 14 (metric, model version) pairs
-  signal-classify                heuristic-0.1.0    refused  refused by item(s): 10
-  signal-classify                laya-1c5edc17      refused  refused by item(s): 8,9
-  evolution-judge                heuristic-0.1.0    refused  refused by item(s): 10
+  signal-classify                heuristic-0.1.0    refused  refused by item(s): 1,10
+  signal-classify                laya-1c5edc17      refused  refused by item(s): 1,8,9
+  evolution-judge                heuristic-0.1.0    refused  refused by item(s): 1,10
   evolution-judge                laya-1c5edc17      refused  refused by item(s): 1,8,9
-  causal-claims                  heuristic-0.1.0    refused  refused by item(s): 8,9,10
+  causal-claims                  heuristic-0.1.0    refused  refused by item(s): 1,8,9,10
   causal-claims                  laya-1c5edc17      refused  refused by item(s): 1,8,9
-  causal-claims-grade-accuracy   heuristic-0.1.0    refused  refused by item(s): 10
-  causal-claims-grade-accuracy   laya-1c5edc17      refused  refused by item(s): 8
-  gameplay-lens                  heuristic-0.1.0    refused  refused by item(s): 10
+  causal-claims-grade-accuracy   heuristic-0.1.0    refused  refused by item(s): 1,10
+  causal-claims-grade-accuracy   laya-1c5edc17      refused  refused by item(s): 1,8
+  gameplay-lens                  heuristic-0.1.0    refused  refused by item(s): 1,10
   gameplay-lens                  laya-1c5edc17      refused  refused by item(s): 1,8,9
-  substrate-generator            heuristic-0.1.0    refused  refused by item(s): 9,10
+  substrate-generator            heuristic-0.1.0    refused  refused by item(s): 1,9,10
   substrate-generator            laya-1c5edc17      refused  refused by item(s): 1,2,5,8,9
-  ethics-gate                    heuristic-0.1.0    refused  refused by item(s): 10
+  ethics-gate                    heuristic-0.1.0    refused  refused by item(s): 1,10
   ethics-gate                    laya-1c5edc17      refused  refused by item(s): 1,8,9
 PASS: every one of the 14 pairs was graded on all 7 model-side conditions (items 1, 2, 5, 6, 8, 9 and 10; items 3, 4 and 7 are properties of the claim document and are graded below)
 PASS: the candidate model holds no permission on any of the 7 metrics: item 1; item 2; item 5; item 8; item 9
 PASS: the incumbent heuristic holds no permission either, on any of the 7 metrics: its corpus kind is 'harness-mechanism', which twin/evolution_judge.py defines as fitted on the corpus it is graded against (item 10)
 PASS: POSITIVE control: a fabricated model that clears all six model-side conditions IS granted, so the rule is not simply refusing everything (fixture-model-1.0.0 may judge gameplay-lens: all 7 conditions hold)
-PASS: NEGATIVE control item 1: a score under the versioned threshold -> score 0.100 against the versioned threshold 0.650
-PASS: NEGATIVE control item 1: a score recorded against a bar the threshold file no longer sets -> score 0.950 against the versioned threshold 0.650; the score was recorded against 0.200, a different bar, so it is not a score against this one
+PASS: NEGATIVE control item 1: a score under the versioned threshold -> attributable rate 0.100 (score 0.100) against the versioned threshold 0.650
+PASS: NEGATIVE control item 1: a score recorded against a bar the threshold file no longer sets -> attributable rate 0.950 (score 0.950) against the versioned threshold 0.650; the score was recorded against 0.200, a different bar, so it is not a score against this one
+PASS: NEGATIVE control item 1: a perfect score on 3 items, below the stated minimum, recorded as not-measurable -> attributable rate 1.000 (score 1.000) against the versioned threshold 0.650; the row records its own outcome as not-measurable, so the run is not measurable and its score clears nothing
+PASS: NEGATIVE control item 1: a legacy row with no outcome, 3 items against the minimum the tree states today -> attributable rate 0.950 (score 0.950) against the versioned threshold 0.650; it counted 3 items against a stated minimum of 9, so the run is not measurable and its score clears nothing
+PASS: NEGATIVE control item 1: a score of 0.950 whose attributable rate is 0.400, the rest right on a wrong basis -> attributable rate 0.400 (score 0.950) against the versioned threshold 0.650
+PASS: NEGATIVE control item 1: a row that records no attributable rate, as every row before ticket 118 does -> attributable rate none (score 0.950) against the versioned threshold 0.650; the row records no attributable rate, so its score may rest on luck
 PASS: NEGATIVE control item 2: a scoring run against a corpus the tree no longer holds -> scored on corpus 000000000000, the tree holds be67c9b9eef9
 PASS: NEGATIVE control item 5: no recorded score at all; absence is not consent -> no row in the score log for 'gameplay-lens' and 'fixture-model-1.0.0'; absence is not consent
 PASS: NEGATIVE control item 6: the seam did not run, so nothing was checked -> the seam is .claude/skills/classify-and-judge/assets/validate_claim.py::validate, run by talk/local-clock.sh
@@ -66,6 +70,6 @@ THRESHOLDS AGAINST THEIR OWN CORPUS'S BEST CONSTANT ANSWER (reported, not graded
   gameplay-lens                  n=3   threshold=0.65  baseline=0.333  above its baseline   [always opportunities=[], every other field the scorer reads granted correct]
   substrate-generator            n=3   threshold=0.80  baseline=1.000  CANNOT DETECT A MODEL THAT LEARNED NOTHING   [always channels.events=["[the-onboarding-flow] Lunch order chat in #ops.", "[the-on, every other field the scorer reads granted correct]
   ethics-gate                    n=5   threshold=0.80  baseline=0.800  CANNOT DETECT A MODEL THAT LEARNED NOTHING   [always admitted=false, every other field the scorer reads granted correct]
-WEAK THRESHOLDS: 5 of 7 sit at or below the best constant answer their own corpus admits. Item 9 refuses such a score anyway, so no permission rests on them. The corpus is what is short -- ticket 03 measured 326 items needed per skill against the estate's 42, and eco-system ticket 112 owns the sizing.
+WEAK THRESHOLDS: 5 of 7 sit at or below the best constant answer their own corpus admits. Item 9 refuses such a score anyway, so no permission rests on them. The corpus is what is short -- the minimum each threshold states (min_items, eco-system ticket 112) is printed by verify-corpus-size.sh, and item 1 refuses a run below it.
 SUBTOTAL: 0 observed false
 PASS: the model-judging permission grades all ten conditions (ticket 05's nine, plus a fitted-corpus condition the first run of the nine forced), each with a negative control and the rule with a positive one; 0 granted of 14 (metric, model version) pairs hold a permission today; the clock is derived from the environment and no workflow can present itself as another; the seam is .claude/skills/classify-and-judge/assets/validate_claim.py::validate, run by talk/local-clock.sh out of a tree the model cannot write to; 5 of 7 sit at or below the best constant answer their own corpus admits (reported, not graded)

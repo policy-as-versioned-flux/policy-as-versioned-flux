@@ -1,0 +1,18 @@
+PASS: the verdict is a pure function of (answer right, basis held): False/False -> wrong, False/None -> wrong, False/True -> wrong, True/False -> wrong-basis, True/None -> unscoreable, True/True -> right
+PASS: no item verdict (right, wrong, wrong-basis, unscoreable) shares a word with a run outcome (pass, fail, not-measurable)
+PASS: an honest skill on 16 items with a checkable basis passes at rate 1.000
+PASS: a skill right on all 16 items for a wrong stated reason FAILS at rate 0.000 and score 0.000; NEGATIVE CONTROL: a two-state harness counts 16 of 16 right and would have passed it at 1.000 against 0.80
+PASS: luck lowers the rate through the denominator: 16 right and 4 wrong-basis rate 0.800 (pass), 16 right and 5 wrong-basis rate 0.762 (fail); every wrong-basis item is measured
+PASS: a perfect score (1.000) on 16 items with no checkable basis is not-measurable: 16 unscoreable, rate None, never 0 and never a pass
+PASS: record_score() writes the rate beside the score: attributable_rate=0.0 wrong_basis=16 unscoreable=0 measured_count=16 score=0.0
+PASS: condition 1 grades the rate: POSITIVE control at the bar holds (attributable rate 0.800 (score 1.000) against the versioned threshold 0.800); a score of 1.000 on a rate of 0.500 is refused (attributable rate 0.500 (score 1.000) against the versioned threshold 0.800); a row with no rate is refused (attributable rate none (score 1.000) against the versioned threshold 0.800; the row records no attributable rate, so its score may rest on luck)
+NO RATE: signal-classify              items=23  measured=0   unscoreable=23  wrong-basis=0   score=1.000 rate=none threshold=0.80 min_items=16
+NO RATE: evolution-judge              items=4   measured=0   unscoreable=4   wrong-basis=0   score=1.000 rate=none threshold=0.75 min_items=12
+NO RATE: causal-claims                items=4   measured=0   unscoreable=4   wrong-basis=0   score=1.000 rate=none threshold=0.80 min_items=16
+NO RATE: causal-claims-grade-accuracy items=4   measured=0   unscoreable=4   wrong-basis=0   score=1.000 rate=none threshold=0.80 min_items=16
+NO RATE: gameplay-lens                items=3   measured=0   unscoreable=3   wrong-basis=0   score=1.000 rate=none threshold=0.65 min_items=9
+NO RATE: substrate-generator          items=3   measured=0   unscoreable=3   wrong-basis=0   score=1.000 rate=none threshold=0.80 min_items=16
+NO RATE: ethics-gate                  items=5   measured=0   unscoreable=5   wrong-basis=0   score=1.000 rate=none threshold=0.80 min_items=16
+PASS: twin/skill-scores.jsonl records the attributable rate on the newest row of every one of the 7 metrics (7 of 20 rows carry it; missing on: none)
+SHORT: 7 of 7 skill metrics (signal-classify 0<16, evolution-judge 0<12, causal-claims 0<16, causal-claims-grade-accuracy 0<16, gameplay-lens 0<9, substrate-generator 0<16, ethics-gate 0<16)
+SKIP: 7 of 7 skill metrics (signal-classify 0<16, evolution-judge 0<12, causal-claims 0<16, causal-claims-grade-accuracy 0<16, gameplay-lens 0<9, substrate-generator 0<16, ethics-gate 0<16) have no attributable rate a threshold can grade: too few of their items carry a checkable basis; the verdict table, the rate, its reach into the permission and the log were all observed true

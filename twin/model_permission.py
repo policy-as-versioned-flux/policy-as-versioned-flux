@@ -24,7 +24,9 @@ refused.
    estate no longer means to give. This is item 2's reasoning applied to the bar instead of the
    corpus. The run must also be measurable (ticket 112): a row whose outcome is `not-measurable`,
    or whose item count is below the `min_items` the tree states today, clears nothing, whatever
-   it scored.
+   it scored. And the number that meets the bar is the row's `attributable_rate`, not its
+   `score` (eco-system ticket 118): a right answer on a wrong basis lowers the rate, and a row
+   that records no rate, or a null one, clears nothing, because its score may rest on luck.
 2. `corpus_current` — that scoring run's `corpus_digest` is the digest of the corpus in the tree
    today. A stale digest revokes the permission.
 3. `claim_names_the_model` — the claim records which `model_version` judged it. Graded on the
@@ -454,6 +456,18 @@ def _below_minimum(row: Mapping[str, Any], min_items_now: int | None) -> str:
     return ""
 
 
+def _attributable_rate(row: Mapping[str, Any]) -> tuple[float | None, str]:
+    """The rate item 1 grades, or None with the reason it cannot. Eco-system ticket 118: the
+    threshold is met by the attributable rate, which a right answer on a wrong basis lowers, and
+    never by the score. A row written before ticket 118 records no rate, and a row that measured
+    nothing records null. Both are refused: absence is not consent."""
+    if "attributable_rate" not in row:
+        return None, "the row records no attributable rate, so its score may rest on luck"
+    if row["attributable_rate"] is None:
+        return None, "the row measured no item on a checkable basis, so nothing separates its score from luck"
+    return float(row["attributable_rate"]), ""
+
+
 def permission_for(
     skill: str,
     model_version: str,
@@ -484,7 +498,8 @@ def permission_for(
     112). Item 1 refuses a row whose own outcome is `not-measurable`, and a row whose measured
     count (`measured_count`, else `total`) is below this minimum, whatever it scored. Left out,
     the row's own `min_items` stands; a row with neither has no minimum and is refused, as a row
-    with no threshold is.
+    with no threshold is. The number item 1 compares with the threshold is the row's
+    `attributable_rate` (eco-system ticket 118); a row without one is refused.
 
     `fitted_models` maps a model version to the corpus kind its recorded scores were measured
     under. A model whose kind is `FITTED_CORPUS_KIND` was fitted on the corpus it is graded
@@ -516,7 +531,11 @@ def permission_for(
             )
         else:
             bar_moved = recorded_threshold is not None and abs(recorded_threshold - threshold) > 1e-9
-            detail = f"score {score:.3f} against the versioned threshold {threshold:.3f}"
+            rate, unattributed = _attributable_rate(latest)
+            shown = "none" if rate is None else f"{rate:.3f}"
+            detail = f"attributable rate {shown} (score {score:.3f}) against the versioned threshold {threshold:.3f}"
+            if unattributed:
+                detail += f"; {unattributed}"
             if bar_moved:
                 detail += (
                     f"; the score was recorded against {recorded_threshold:.3f}, a different bar, so it "
@@ -525,7 +544,11 @@ def permission_for(
             short = _below_minimum(latest, min_items_now)
             if short:
                 detail += f"; {short}, so the run is not measurable and its score clears nothing"
-            conditions.append(Condition(1, "threshold_cleared", score >= threshold and not bar_moved and not short, detail))
+            # The score is read as well. An honest row's rate never exceeds its score (a rate drops
+            # the unscoreable items the score counts, and counts only right-on-a-held-basis), so a
+            # row with a rate over the bar and a score under it is not an honest row.
+            cleared = rate is not None and rate >= threshold and score >= threshold and not bar_moved and not short
+            conditions.append(Condition(1, "threshold_cleared", cleared, detail))
         conditions.append(
             Condition(
                 2,

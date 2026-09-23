@@ -63,20 +63,57 @@ SCORES_PATH = PACKAGE_DIR / "skill-scores.jsonl"
 THRESHOLDS_SCHEMA = "twin.skill-thresholds/v1"
 
 Scorer = Callable[[Any, Any], bool]
+# (the basis a skill stated, the basis the corpus item carries) -> did the stated basis hold.
+BasisScorer = Callable[[Any, Any], bool]
 
 # -- the three run-level outcomes (eco-system ticket 112) -----------------------------------
 # A run is graded at two levels, and the two are kept apart on purpose.
-#   ITEM level: `ItemResult` says whether one corpus item was got right. `score` is the fraction.
+#   ITEM level: `ItemResult.verdict` says what one corpus item showed (ticket 118, below).
 #   RUN level:  `EvalResult.outcome` says what the run as a whole may claim. It reads the item
-#               level through two numbers only: `score` (against the threshold) and
+#               level through two numbers only: `attributable_rate` (against the threshold) and
 #               `measured_count` (against the minimum the threshold states).
-# NOT_MEASURABLE is a run-level outcome: the corpus is too small for the threshold to mean
-# anything, whatever the items scored. It is not an item state. Eco-system ticket 118 adds a third
-# ITEM state (a right answer on a wrong basis); that changes the numerator of `score` and leaves
-# this seam alone unless 118 also decides such an item should not count toward `measured_count`.
+# NOT_MEASURABLE is a run-level outcome: too few items were measured for the threshold to mean
+# anything, whatever they scored. It is not an item state.
 PASS = "pass"
 FAIL = "fail"
 NOT_MEASURABLE = "not-measurable"
+
+# -- the item verdicts (eco-system ticket 118) ------------------------------------------------
+# An item is read twice: was the answer right, and did the basis the skill stated hold against
+# the basis the corpus item carries. `attribute()` turns the two readings into one verdict.
+#   RIGHT        the answer was right and its stated basis was checked and held
+#   WRONG        the answer was wrong, whatever its basis
+#   WRONG_BASIS  the answer was right and its stated basis was checked and did not hold
+#   UNSCOREABLE  the answer was right and no basis could be checked: the corpus item carries
+#                none, or the skill stated none
+# The words differ from the run outcomes on purpose, so an item verdict is never read as one.
+# WRONG_BASIS is named for what the harness observes. "Lucky" would name a cause (chance) the
+# harness never measures: a skill that learned a shortcut is right on a wrong basis every time.
+RIGHT = "right"
+WRONG = "wrong"
+WRONG_BASIS = "wrong-basis"
+UNSCOREABLE = "unscoreable"
+ITEM_VERDICTS = (RIGHT, WRONG, WRONG_BASIS, UNSCOREABLE)
+
+
+@dataclass(frozen=True)
+class Stated:
+    """A skill's answer together with the basis it states for it. A skill that returns a bare
+    value states no basis, so a right answer from it is UNSCOREABLE. `evaluate()` scores `answer`
+    with the scorer and `basis` with the basis scorer; neither ever sees the other half."""
+
+    answer: Any
+    basis: Any
+
+
+def attribute(answer_right: bool, basis_held: bool | None) -> str:
+    """One item's verdict from its two readings. `basis_held` is None when no basis could be
+    checked. A pure function, so the whole table is one test (eco-system ticket 118)."""
+    if not answer_right:
+        return WRONG
+    if basis_held is None:
+        return UNSCOREABLE
+    return RIGHT if basis_held else WRONG_BASIS
 
 
 class SkillError(RuntimeError):
@@ -139,14 +176,32 @@ def min_items_for(skill: str, path: Path | None = None) -> int:
 
 @dataclass(frozen=True)
 class ItemResult:
+    """One corpus item's verdict, one of `ITEM_VERDICTS`. Not a `passed` flag: a bool cannot
+    hold a right answer on a wrong basis (eco-system ticket 118)."""
+
     item_id: str
-    passed: bool
+    verdict: str
+
+    @property
+    def answered_right(self) -> bool:
+        return self.verdict != WRONG
 
 
 @dataclass(frozen=True)
 class EvalResult:
-    """One run of one skill against one corpus. `score` is the fraction of items that passed —
-    proportion, never a raw count, so it compares across corpora of different sizes."""
+    """One run of one skill against one corpus.
+
+    Two rates, both proportions so they compare across corpora of different sizes:
+
+    - `score` is the fraction of all items answered right, less those whose stated basis was
+      checked and was wrong. Luck never raises it. On a corpus that carries no basis it is the
+      plain fraction of right answers, which is what every row before ticket 118 recorded.
+    - `attributable_rate` is the fraction of MEASURED items that were right on a basis that held.
+      WRONG_BASIS stays in its denominator and out of its numerator, so luck lowers it.
+      UNSCOREABLE is in neither: nothing was measured. It is None when nothing was measured.
+
+    The threshold grades `attributable_rate`, over `measured_count` items (eco-system ticket 118).
+    """
 
     skill: str
     corpus_digest: str
@@ -154,16 +209,39 @@ class EvalResult:
     items: tuple[ItemResult, ...]
     min_items: int
 
+    def _count(self, verdict: str) -> int:
+        return sum(1 for i in self.items if i.verdict == verdict)
+
+    @property
+    def answered_right(self) -> int:
+        return sum(1 for i in self.items if i.answered_right)
+
+    @property
+    def wrong_basis(self) -> int:
+        return self._count(WRONG_BASIS)
+
+    @property
+    def unscoreable(self) -> int:
+        return self._count(UNSCOREABLE)
+
     @property
     def score(self) -> float:
-        return sum(1 for i in self.items if i.passed) / len(self.items)
+        return (self.answered_right - self.wrong_basis) / len(self.items)
 
     @property
     def measured_count(self) -> int:
-        """How many items the minimum is measured against. Today every item. The seam ticket 118
-        builds on: an item state that should not count toward the corpus size changes this, and
-        only this, on the run-level side."""
-        return len(self.items)
+        """How many items the rate and the minimum are measured against: every item but the
+        unscoreable ones. A wrong-basis item IS measured, because its basis was checked and
+        failed; leaving it out would let luck shrink the corpus instead of lowering the rate. A
+        wrong answer is measured whatever its basis, because it is evidence against the skill
+        either way (eco-system ticket 118)."""
+        return len(self.items) - self.unscoreable
+
+    @property
+    def attributable_rate(self) -> float | None:
+        if self.measured_count == 0:
+            return None
+        return self._count(RIGHT) / self.measured_count
 
     @property
     def measurable(self) -> bool:
@@ -171,17 +249,21 @@ class EvalResult:
 
     @property
     def clears_threshold(self) -> bool:
-        """The score alone against the threshold, whatever the corpus size. What the per-skill
-        guards assert when they prove a threshold gates something; never a pass on its own."""
+        """The score alone against the threshold, whatever the corpus size or its bases. What the
+        per-skill guards assert when they prove a threshold gates something; never a pass on its
+        own."""
         return self.score >= self.threshold
 
     @property
     def outcome(self) -> str:
         """PASS, FAIL or NOT_MEASURABLE. Measurability is decided first: below the minimum the
-        threshold says nothing, so neither a perfect nor a zero score may speak for it."""
-        if not self.measurable:
+        threshold says nothing, so neither a perfect nor a zero rate may speak for it. Then the
+        attributable rate, not the score, meets the threshold: a threshold graded on a score that
+        counts luck grades nothing (eco-system ticket 118)."""
+        rate = self.attributable_rate
+        if not self.measurable or rate is None:
             return NOT_MEASURABLE
-        return PASS if self.clears_threshold else FAIL
+        return PASS if rate >= self.threshold else FAIL
 
     @property
     def passed(self) -> bool:
@@ -199,11 +281,14 @@ class EvalResult:
             "min_items": self.min_items,
             "measured_count": self.measured_count,
             "score": self.score,
+            "attributable_rate": self.attributable_rate,
             "outcome": self.outcome,
             "passed": self.passed,
             "total": len(self.items),
-            "correct": sum(1 for i in self.items if i.passed),
-            "items": [{"id": i.item_id, "passed": i.passed} for i in self.items],
+            "correct": self.answered_right,
+            "wrong_basis": self.wrong_basis,
+            "unscoreable": self.unscoreable,
+            "items": [{"id": i.item_id, "verdict": i.verdict} for i in self.items],
         }
 
 
@@ -213,13 +298,19 @@ def evaluate(
     corpus: list[dict[str, Any]],
     scorer: Scorer = _exact_match,
     threshold_path: Path | None = None,
+    basis_scorer: BasisScorer = _exact_match,
 ) -> EvalResult:
     """Run `skill_fn` against every corpus item, score it, and compare to the versioned threshold.
 
-    A corpus item is `{"id": ..., "input": ..., "expected": ...}`. `skill_fn` sees only `input` —
-    it has no way to read `expected`, which is what keeps this an evaluation rather than a
-    tautology. The default scorer is exact match; a skill whose output space is not equality-
-    comparable (free text, say) supplies its own.
+    A corpus item is `{"id": ..., "input": ..., "expected": ...}`, with an optional `"basis"`:
+    the reason a right answer must rest on. `skill_fn` sees only `input`: it has no way to read
+    `expected` or `basis`, which is what keeps this an evaluation rather than a tautology. The
+    default scorer is exact match; a skill whose output space is not equality-comparable (free
+    text, say) supplies its own. The same holds for `basis_scorer`.
+
+    A skill states a basis by returning `Stated(answer, basis)`. A right answer is RIGHT only when
+    both the item and the skill carry a basis and the basis scorer says the stated one held
+    (eco-system ticket 118). Otherwise `attribute()` decides, and `ITEM_VERDICTS` lists the rest.
     """
     if not corpus:
         raise SkillError(f"skill {skill!r}: an empty corpus evaluates nothing")
@@ -230,13 +321,20 @@ def evaluate(
 
     threshold = threshold_for(skill, threshold_path)
     min_items = min_items_for(skill, threshold_path)
-    items = tuple(
-        ItemResult(item_id=str(item["id"]), passed=bool(scorer(skill_fn(item["input"]), item["expected"])))
-        for item in corpus
-    )
+    items = tuple(_verdict(item, skill_fn(item["input"]), scorer, basis_scorer) for item in corpus)
     return EvalResult(
         skill=skill, corpus_digest=digest_of(corpus), threshold=threshold, items=items, min_items=min_items,
     )
+
+
+def _verdict(item: dict[str, Any], output: Any, scorer: Scorer, basis_scorer: BasisScorer) -> ItemResult:
+    answer, stated = (output.answer, output.basis) if isinstance(output, Stated) else (output, None)
+    right = bool(scorer(answer, item["expected"]))
+    basis = item.get("basis")
+    held = None
+    if right and basis is not None and stated is not None:
+        held = bool(basis_scorer(stated, basis))
+    return ItemResult(item_id=str(item["id"]), verdict=attribute(right, held))
 
 
 # -- score over time -------------------------------------------------------------------------
@@ -258,6 +356,11 @@ def record_score(
         "model_version": model_version,
         "recorded_at": recorded_at,
         "score": result.score,
+        # Eco-system ticket 118: the rate the threshold grades, beside the score, with the two
+        # counts that separate them. None when nothing was measured, never 0.
+        "attributable_rate": result.attributable_rate,
+        "wrong_basis": result.wrong_basis,
+        "unscoreable": result.unscoreable,
         "threshold": result.threshold,
         "min_items": result.min_items,
         "outcome": result.outcome,
@@ -341,29 +444,34 @@ def detect_regression(skill: str, path: Path | None = None) -> dict[str, Any]:
 
 # -- a fixture skill, for the harness to prove itself against ------------------------------
 
+# Eco-system ticket 118: every toy item carries the basis a right answer must rest on, and the toy
+# states it, so the fixture proves an attributable pass and not only the unscoreable state.
+TOY_BASIS = "upper-case every letter"
+
 TOY_SKILL_CORPUS: list[dict[str, Any]] = [
-    {"id": "shout", "input": "hello", "expected": "HELLO"},
-    {"id": "already-upper", "input": "WORLD", "expected": "WORLD"},
-    {"id": "mixed", "input": "MiXeD", "expected": "MIXED"},
-    {"id": "empty", "input": "", "expected": ""},
-    {"id": "punctuation", "input": "hi!", "expected": "HI!"},
+    {"id": "shout", "input": "hello", "expected": "HELLO", "basis": TOY_BASIS},
+    {"id": "already-upper", "input": "WORLD", "expected": "WORLD", "basis": TOY_BASIS},
+    {"id": "mixed", "input": "MiXeD", "expected": "MIXED", "basis": TOY_BASIS},
+    {"id": "empty", "input": "", "expected": "", "basis": TOY_BASIS},
+    {"id": "punctuation", "input": "hi!", "expected": "HI!", "basis": TOY_BASIS},
     # Eco-system ticket 112: the fixture's 0.8 threshold states a 16-item minimum, and a fixture
     # that is itself not measurable would prove only the third outcome. Eleven more, all trivial.
-    {"id": "digits", "input": "abc123", "expected": "ABC123"},
-    {"id": "space", "input": "a b", "expected": "A B"},
-    {"id": "single", "input": "q", "expected": "Q"},
-    {"id": "title", "input": "Title Case", "expected": "TITLE CASE"},
-    {"id": "tab", "input": "x\ty", "expected": "X\tY"},
-    {"id": "hyphen", "input": "re-run", "expected": "RE-RUN"},
-    {"id": "underscore", "input": "snake_case", "expected": "SNAKE_CASE"},
-    {"id": "trailing-space", "input": "end ", "expected": "END "},
-    {"id": "numbers-only", "input": "2026", "expected": "2026"},
-    {"id": "sentence", "input": "a threshold states its corpus.", "expected": "A THRESHOLD STATES ITS CORPUS."},
-    {"id": "camel", "input": "camelCase", "expected": "CAMELCASE"},
+    {"id": "digits", "input": "abc123", "expected": "ABC123", "basis": TOY_BASIS},
+    {"id": "space", "input": "a b", "expected": "A B", "basis": TOY_BASIS},
+    {"id": "single", "input": "q", "expected": "Q", "basis": TOY_BASIS},
+    {"id": "title", "input": "Title Case", "expected": "TITLE CASE", "basis": TOY_BASIS},
+    {"id": "tab", "input": "x\ty", "expected": "X\tY", "basis": TOY_BASIS},
+    {"id": "hyphen", "input": "re-run", "expected": "RE-RUN", "basis": TOY_BASIS},
+    {"id": "underscore", "input": "snake_case", "expected": "SNAKE_CASE", "basis": TOY_BASIS},
+    {"id": "trailing-space", "input": "end ", "expected": "END ", "basis": TOY_BASIS},
+    {"id": "numbers-only", "input": "2026", "expected": "2026", "basis": TOY_BASIS},
+    {"id": "sentence", "input": "a threshold states its corpus.", "expected": "A THRESHOLD STATES ITS CORPUS.", "basis": TOY_BASIS},
+    {"id": "camel", "input": "camelCase", "expected": "CAMELCASE", "basis": TOY_BASIS},
 ]
 
 
-def toy_classifier(text: str) -> str:
+def toy_classifier(text: str) -> Stated:
     """A trivial fixture skill — not one of the six real skills. Exists only so the harness has
-    something to run against; the harness itself must not name this function anywhere."""
-    return text.upper()
+    something to run against; the harness itself must not name this function anywhere. It states
+    its basis, as a skill must for a right answer to count (eco-system ticket 118)."""
+    return Stated(text.upper(), TOY_BASIS)

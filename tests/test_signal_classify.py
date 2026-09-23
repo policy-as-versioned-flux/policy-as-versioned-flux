@@ -11,7 +11,7 @@ import pytest
 
 from twin.schema import SCHEMAS, STEEP
 from twin.signal_classify import SKILL, SignalClassifyError, best_match, classify, labelled_corpus, scorer
-from twin.skills import evaluate, threshold_for
+from twin.skills import NOT_MEASURABLE, evaluate, threshold_for
 
 
 @pytest.fixture(scope="session")
@@ -186,7 +186,10 @@ def test_every_corpus_item_carries_the_fields_evaluate_requires(corpus: list[dic
 
 def test_signal_classify_passes_its_own_labelled_corpus(corpus: list[dict]) -> None:
     result = evaluate(SKILL, classify, corpus, scorer=scorer)
-    assert result.passed, f"scored {result.score}, threshold {result.threshold}: {result.as_dict()}"
+    assert result.clears_threshold, f"scored {result.score}, threshold {result.threshold}: {result.as_dict()}"
+    # Eco-system ticket 118: the corpus carries no checkable basis, so every right answer is
+    # unscoreable and the run is not measurable, however well it scored.
+    assert result.unscoreable == len(corpus) and result.outcome == NOT_MEASURABLE
     assert result.threshold == threshold_for(SKILL)
 
 

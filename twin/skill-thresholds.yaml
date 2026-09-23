@@ -14,6 +14,11 @@
 # citation lowering a threshold does, and the same check enforces it. Every real corpus but
 # signal-classify's sits below its minimum on 2026-09-22; that is the point of stating it.
 #
+# Eco-system ticket 118: a threshold grades the ATTRIBUTABLE RATE (twin/skills.py), right items over
+# measured items, and `min_items` counts measured items. An item answered right with no checkable
+# basis is unscoreable and is not measured, so no real corpus meets its minimum until its items
+# carry a `basis` a skill can be checked against.
+#
 # `toy-classifier` is a fixture skill, not one of the six real skills (signal-classify,
 # causal-claims, evolution-judge, substrate-generator, gameplay-lens, ethics-gate) — all six now
 # exist, as of build ticket 47 (decision ticket 20). It exists to prove the harness against

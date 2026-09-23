@@ -97,8 +97,10 @@ with tempfile.TemporaryDirectory() as tmp:
     path = Path(tmp) / "t.yaml"
     path.write_text(yaml.safe_dump({"schema": skills.THRESHOLDS_SCHEMA,
                                     "thresholds": {"x": {"threshold": 0.8, "min_items": 16}}}))
-    corpus = lambda n: [{"id": str(k), "input": "w%d" % k, "expected": "W%d" % k} for k in range(n)]
-    right, wrong_fn = (lambda s: s.upper()), (lambda s: "?")
+    # Every item carries a basis and the right skill states it (eco-system ticket 118): a right
+    # answer on no checkable basis is unscoreable, so without one nothing here could pass.
+    corpus = lambda n: [{"id": str(k), "input": "w%d" % k, "expected": "W%d" % k, "basis": "upper"} for k in range(n)]
+    right, wrong_fn = (lambda s: skills.Stated(s.upper(), "upper")), (lambda s: "?")
     seen = {
         "perfect on 3": skills.evaluate("x", right, corpus(3), threshold_path=path).outcome,
         "zero on 3": skills.evaluate("x", wrong_fn, corpus(3), threshold_path=path).outcome,
@@ -141,11 +143,14 @@ short = []
 for e in entries:
     bound = cs.accuracy_lower_bound(e["total"])
     bound_s = "bounds nothing" if bound is None else ">= %.3f" % bound
-    line = ("%-28s items=%-3d min_items=%-3d threshold=%.2f score=%.3f  a perfect score on %d item(s) "
-            "puts true accuracy %s (95%%)" % (e["skill"], e["total"], e["min_items"], e["threshold"],
-                                              e["score"], e["total"], bound_s))
+    # Eco-system ticket 118: the minimum is met by MEASURED items, those with a checkable basis or
+    # a wrong answer. An item right on no checkable basis is unscoreable and does not count.
+    line = ("%-28s items=%-3d measured=%-3d min_items=%-3d threshold=%.2f score=%.3f  a perfect score on "
+            "%d item(s) puts true accuracy %s (95%%)" % (e["skill"], e["total"], e["measured_count"],
+                                                         e["min_items"], e["threshold"], e["score"],
+                                                         e["total"], bound_s))
     if e["outcome"] == skills.NOT_MEASURABLE:
-        short.append("%s %d<%d" % (e["skill"], e["total"], e["min_items"]))
+        short.append("%s %d<%d" % (e["skill"], e["measured_count"], e["min_items"]))
         print("NOT MEASURABLE: " + line)
     else:
         out(e["outcome"] == skills.PASS, line)
@@ -163,6 +168,6 @@ case "$rc" in
   3) if [ "$unlooked" != "none" ]; then
        echo "SKIP: not looked at: $unlooked. Short: $short"; exit 3
      fi
-     echo "SKIP: $short are not measurable, each corpus below the minimum its threshold states; the derivation, the third outcome and the citation guard were all observed true"; exit 3 ;;
+     echo "SKIP: $short are not measurable, each corpus below the minimum its threshold states in measured items (an item right on no checkable basis is not measured, eco-system ticket 118); the derivation, the third outcome and the citation guard were all observed true"; exit 3 ;;
   *) echo "FAIL: a threshold's stated corpus, the third outcome or the citation guard observed false; see the lines above"; exit 1 ;;
 esac

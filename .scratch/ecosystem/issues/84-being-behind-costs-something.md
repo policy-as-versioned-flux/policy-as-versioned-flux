@@ -411,3 +411,13 @@ PRs until platform tags and the pins move.
   merges and the clone is refreshed, and green against a scratch estate whose platform is this
   branch (`6 anchor(s) resolve; waits on ticket 46`). Merge order: platform, then refresh, then
   hub -- the ordering the catalogue's own header names.
+
+**Correction, 2026-09-23.** `verify/supersede/verify-supersede.sh` grades FAIL from run 276. It
+was never green on a true reading: it graded every adopter SKIP as "composed under platform
+v2.0.1" because it read the policy pin, not the compiler pin. Ticket 110 (hub PR 91) made it read
+the compiler pin, and it now reports four true FAILs: ico/penalty-schema@v3 has no supersede line
+in driftwood, tuppence or ludlow, and threat-register@v2 has none in driftwood. The cause is this
+ticket's composer rule: when the pinned publisher checkout carries no directory for a newer major,
+the composer records the newer major as unobserved and writes no line, so being behind is free
+again. The fix is a change to that rule in platform, which ships only in a signed platform tools
+release and the adopters' pin moves. Both are the owner's steps, recorded in ticket 110.

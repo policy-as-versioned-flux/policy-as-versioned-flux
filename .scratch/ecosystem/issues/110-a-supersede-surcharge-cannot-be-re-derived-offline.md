@@ -1,7 +1,7 @@
 # 110 — A supersede surcharge cannot be re-derived offline, so a signed artefact stops re-rendering
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -182,4 +182,216 @@ now unblocked, but no adoption or recorded rollout result is implied by publicat
 
 - [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — CHARTED, not built. Ticket 45 promises a signed composed tree re-renders byte-identically with the publisher's clone ABSENT; ticket 84's supersede surcharge is computed from the publisher's TAG DATES, which a vendored copy cannot carry. Cutting ico v4.0.0 made the contradiction observable: composing driftwood with ico present renders a `supersede` row priced GBP 0.00 that composing it with ico absent does not, which renumbers every later price index and moves the artefact's own footer count. `composition.py --selfcheck` fails on it today. The amount is zero only because the tag was cut that day; tomorrow the two renders differ by a priced amount. One of the two claims has to be narrowed, and the record has to say which.
 
-Map line: `- [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — open, implementation reviewed and merged in platform PR24; signed software v3.0.0 published and verified at 3602142. Composition now vendors identity-bound publisher observations and replays them offline; fresh composition observes current tags. Legacy provenance requires fresh composition when upgrading. Adopter pin upgrades, recomposition and recorded rollout proof remain outstanding.`
+The 2026-09-10 entry, superseded by the 2026-09-23 rollout measurement:
+
+- [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — open, implementation reviewed and merged in platform PR24; signed software v3.0.0 published and verified at 3602142. Composition now vendors identity-bound publisher observations and replays them offline; fresh composition observes current tags. Legacy provenance requires fresh composition when upgrading. Adopter pin upgrades, recomposition and recorded rollout proof remain outstanding.
+
+## Build, 2026-09-22
+
+This section is named for the build wave the integrator opened on 2026-09-22. Every
+measurement in it was taken on 2026-09-23.
+
+The rollout was measured first. It had already happened. The work left was one stale selfcheck
+leg in platform and one hub check that read the wrong pin.
+
+### Where each adopter stands, measured 2026-09-23
+
+Each adopter was read at a detached worktree of its `origin/main`: driftwood `c96c412`,
+tuppence `7009ea9`, ludlow `32d5696`. These are the SHAs the hub's TRUTH line for run 270 names.
+
+- **Composer pin.** All three carry `.github/platform-tools-pin.yaml` at platform `v3.0.0`,
+  commit `3602142`. The policy pin `gitops/platform/platform-pin.yaml` stays at `v2.0.1`. The
+  compiler upgrade shipped through ordinary reviewed PRs on 2026-09-10: driftwood PR 37, tuppence
+  PR 32, ludlow PR 29. Each merged as `pavc-other-hand`; `compose-check` and `shift-left` passed
+  on each (read with `gh pr checks`).
+- **Fresh observations.** Every vendored `PROVENANCE.json` on each `origin/main` carries a
+  `publisher_observation` with `schema: 1` (driftwood 3, tuppence 2, ludlow 2; read with a
+  Python one-liner over each file).
+- **Fresh recompose with publisher clones present.** A scratch estate held local clones at each
+  adopter's exact pins: platform `v2.0.1`, nist `v1.1.0`, ico `v3.0.0`, feeds
+  `threat-register/v2.0.0` and `threat-register/v1.0.0` (one commit, `69c89b0`), insurer
+  `v1.0.0`, and the tools at `v3.0.0`. `platform-tools.py check` verified the tools tag's
+  release identity with gitsign 0.17.1. `platform-tools.py compose . --out .` exited 0 for all
+  three, and `git status --porcelain` was empty afterwards. The committed trees are what the
+  v3.0.0 composer writes today.
+- **Verify, present and absent.** `platform-tools.py verify` exited 0 for all three with every
+  clone present, with ico absent, and with feeds absent. That is ticket 45's byte claim, held on
+  the served artefacts.
+- **Offline compose differs only in `evidence.json`.** Composing with ico or feeds absent changed
+  `composed/evidence.json` alone. The diff has two parts: the `publisher-clone-absent` limit
+  opens and names the absent publisher, which is the intended disclosure, and the replayed
+  observation prints its keys sorted where the live one prints them in insertion order.
+  `evidence.json` is outside the rendered set that `verify()` compares, and the selfcheck says
+  so. The key-order difference is cosmetic and is recorded here, not fixed.
+
+No adopter repository needed a change. No adopter PR is opened.
+
+### Done, measured
+
+`composition.py --selfcheck` on platform `origin/main` (`3d7f098`) still failed at the gate.
+The failure was no longer ticket 110's. The portability leg printed
+`OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed` in the
+hub's own capture, and again here. The selfcheck then died on ticket 84's leg:
+`assert len(sups) == 1`. That leg assumed tuppence was behind exactly one publisher, at
+`threat-register/v2`. On 2026-09-10 ico cut `v4.0.0` and feeds cut `threat-register/v3.0.0`, so
+the composer correctly priced two supersede rows, and the fixture's own assumptions went stale.
+
+Reproduced red first in an estate built at the TRUTH line's refs (platform `3d7f098`, driftwood
+`c96c412`, feeds `ff3ac9a`, ico `abcb3a8`, insurer `d1c1844`, ludlow `32d5696`, nist `f83126f`,
+tuppence `7009ea9`): the same `AssertionError` at the same line. The fix reads the majors ahead
+off the feeds clone's tags and directories. It asserts one supersede row per feed line observed
+behind, the newest readable major as the target, and the oldest signed major ahead as `since`.
+Green after: `composition.py --selfcheck` exited 0 with 89 `OK` lines, 84 before the failure.
+The supersede line printed `threat-register/v3.0.0 (cut 2026-09-10), behind since
+threat-register/v2.0.0 was cut 2026-09-01` and named both rows, `feeds/threat-register` and
+`ico/penalty-schema`.
+
+`compose/verify-composition.sh` then exited 3, not 1. Its steps 0, 0a and 0b ran 6, 9 and 9
+tests, all OK. Step 1 (the selfcheck), 1a and 1b passed. Step 2 is a could-not-look:
+`platform@2.0.1 (533dccb0) does not contain distribution/policies/v5.0.0`. That waits on each
+adopter's policy pin moving to policy 5.0.0, which is ticket 113's owner step. So the gate row
+should move from FAIL to SKIP, which is where it stood before run 234.
+
+The record states which claim was narrowed and why: see the 2026-09-10 build decisions. The
+surcharge was narrowed. It describes the publisher tags observed at composition. Portability won.
+
+### The hub read the wrong pin
+
+`verify/supersede/verify-supersede.sh` graded every adopter SKIP with "composed under platform
+v2.0.1, which carries no supersede rule". That was false. It read the composer off the policy
+pin, and since 2026-09-10 the composer runs from the compiler pin. `supersede.py` now reads
+`.github/platform-tools-pin.yaml` at the served ref, and falls back to the policy pin only where
+no compiler pin exists. Red first: a planted case in `supersede.py selfcheck` raised
+`NameError: served_composer_tag`. Green: `OK 25 planted grades bite` (22 before).
+
+Run against the real estate, the check now exits 1 with 4 FAILs and 2 PASSes:
+
+- PASS: tuppence and ludlow `threat-register@v1` carry a supersede line, zero because `as_of`
+  2026-08-28 precedes the 2026-09-01 tag day.
+- FAIL: driftwood, tuppence and ludlow `ico/penalty-schema@v3` sit behind `v4.0.0` and carry no
+  supersede line. FAIL: driftwood `threat-register@v2` sits behind `threat-register/v3.0.0` and
+  carries no line.
+
+Those 4 FAILs are real. Each served feed entry records `superseded.state: unobserved`, because
+the publisher checkout at the adopter's pin carries no directory for any newer major, and
+`newest_published_major()` then writes no line. Ticket 84's review F1 said a missing newer
+directory must never make being behind free. It still does when no newer directory is readable
+at all. That is ticket 84's composer rule, not ticket 110's replay, and fixing it needs a new
+signed platform release. It is recorded here and not built.
+
+Net effect on the gate if both PRs merge: `verify-composition.sh` FAIL to SKIP, and
+`verify-supersede.sh` SKIP to FAIL. The false could-not-look becomes a true finding.
+
+### Decisions (delegated, ADR-0025)
+
+1. **No adopter PR.** The rollout the ticket asked for is on every adopter's `origin/main`, and
+   a fresh recompose reproduces it byte for byte. Opening a PR to re-commit identical bytes
+   would prove nothing. Reason: the measurement is the proof.
+2. **Fix the fixture, not the composer.** The composer priced two rows because two publishers
+   really superseded tuppence. The fixture assumed a world from before 2026-09-10. It now reads
+   the tags instead of naming them.
+3. **The hub reads the compiler pin.** Evidence is written by the composer the compiler pin
+   names. A policy pin says which policy is accepted, not which program composed it.
+4. **Let the hub check go red.** Softening it to accept `unobserved` would hide what ticket 84's
+   review said must not be hidden. A false SKIP is worse than a true FAIL.
+5. **Leave the `evidence.json` key order alone.** It sits outside the verified set and changes
+   no price. It is recorded above.
+
+### Held PRs: tuppence 27 and ludlow 24
+
+Both still say HOLD until a platform tag carries the ticket-84 composer and the platform pin
+moves. That condition is now met another way. The compiler pin on each `origin/main` is
+`v3.0.0`, which carries the ticket-84 composer, and no policy pin move is needed. Measured in
+scratch: each held branch's `party.yaml` on today's `origin/main`, composed with tools `v3.0.0`
+and publisher clones present, gives outcome `composed` with 0 refusals. tuppence prices
+`cve@v2` at 241,549.84 GBP with an `untagged-pin` hole and a `threat-register` supersede line of
+4,268.55 GBP. ludlow prices `eol@v2` at 772,556.59 GBP with an `untagged-pin` hole and a
+supersede line of 6,103.04 GBP. These match the figures in each PR body.
+
+What they wait on now: a rebase onto `origin/main`, a recompose committed with the v3.0.0
+compiler, and review. `git merge-tree` shows one conflict each, in `propose-tier.yml`. Main's
+version already passes `--as-of` through the compiler pin, so the branch's guarded `--as-of`
+is superseded and main's side should be kept. No feeds `cve/v*` or `eol/v*` tag exists on the
+remote (`git ls-remote --tags`), so both pins stay priced holes. Neither PR was rebased or
+merged here.
+
+### A red the rollout made reachable
+
+`propose-tier` has failed on every run in tuppence since 2026-09-10T17:55Z and in ludlow since
+2026-09-10T17:53Z, the runs on the compiler PRs themselves. The last successes were
+2026-09-10T13:08Z and 2026-09-10T13:48Z (read with `gh run list`). The log shows the proposer pushing
+`wargamer/retire-<unit>-feeds-threat-register-v1-to-v2` and then `gh pr create` raising
+`CalledProcessError`. The v3.0.0 composer now sees threat-register v1 as behind, so the
+retirement path runs for the first time. The branches exist on each remote, 1 commit ahead
+touching `party.yaml`. `tier_pr.py` captures `gh`'s stderr and drops it, so the exact error is
+not in the log. What was measured: the repo-level `can_approve_pull_request_reviews` reads
+`false` in all three adopter repos, and no PR by `app/github-actions` exists in any of them.
+That fits the "Actions may not create pull requests" refusal, but the error text was not seen.
+
+### Waiting on the owner
+
+- Allowing GitHub Actions to create pull requests in the tuppence and ludlow orgs, or giving
+  `propose-tier` an app token for that. This is an authorisation. Until then the retirement
+  proposals ticket 84 designed cannot land.
+- A signed platform release for any change to the supersede rule that prices a pin behind an
+  unreadable newer major. That work belongs to ticket 84 and is not built.
+- Policy 5.0.0 acceptance (ticket 113) turns `verify-composition.sh` step 2 from SKIP to PASS.
+  Renovate's tuppence PR 30 and ludlow PR 27 move both pins to `v3.2.0` and fail `compose-check`.
+  They were left alone.
+
+### PRs
+
+- platform: `ticket-110-selfcheck-derives-supersede`, the selfcheck fix.
+- hub: `ticket-110-rollout-measured`, the supersede pin fix and this record.
+
+Merge order: platform first, then the hub. No adopter PR is needed. The platform change is
+selfcheck-only, so it needs no release: the gate reads platform at `main`.
+
+### Tests run
+
+- `composition.py --selfcheck` at the TRUTH refs: red (`assert len(sups) == 1`), then green (rc 0, 89 OK).
+- `compose/verify-composition.sh`: rc 3; 6, 9 and 9 unittests OK; SKIP at step 2 only.
+- `python3 -m py_compile compose/composition.py`: clean.
+- `supersede.py selfcheck`: red (`NameError`), then green (25 plants).
+- `verify/supersede/verify-supersede.sh` against `.estate-clone`: rc 1, 4 FAIL, 2 PASS, as above.
+- `.venv/bin/python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores`:
+  `Success: no issues found in 198 source files`.
+- Per adopter: `platform-tools.py check`, `compose` (clean tree after) and `verify` with every
+  clone present, with ico absent and with feeds absent. All exit 0.
+
+### Review round, 2026-09-23
+
+- **Blocking: the ticket's Map line disagreed with map.md.** The first push rewrote ticket 110's
+  map.md entry but left the backticked `Map line:` block at the 2026-09-10 text.
+  `bash verify/map-surface/verify-map-surface.sh` on this branch printed
+  `map-line-disagrees` for ticket 110 and ended `FAIL`. Fix: the 2026-09-10 entry now sits
+  under the history heading as a plain bullet, and a new `Map line:` block below carries the
+  live map.md text byte for byte. The same script then ends `PASS`.
+- **Minor: two dates.** The heading says 2026-09-22 and the measurements say 2026-09-23. Both
+  are right. A sentence under the heading now says which is which.
+- **Minor: the platform selfcheck re-implements the readability rule.** Left as is (delegated).
+  The reviewer marked it style only. If ticket 84 changes how the composer reads a newer major,
+  that change must update this leg in the same PR.
+
+### Current map line
+
+Map line: `- [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — resolved 2026-09-23, rollout measured 2026-09-23. All three adopters already compose with the v3.0.0 compiler and recompose byte-identically; verify passes with ico or feeds absent. The selfcheck's portability leg passes; its stale ticket-84 leg is fixed in a platform PR, so the whole selfcheck passes. The hub supersede check now reads the compiler pin and reports 4 real unpriced behind pins (ticket 84). Held tuppence 27 and ludlow 24 now wait only on rebase, recompose and review.`
+
+## Answer
+
+Resolved 2026-09-23 by platform PR 29 and hub PR 91. Portability won, as the 2026-09-10 build
+decided, and the record says why: a supersede surcharge now describes the publisher tag state
+that the adopter observed when it composed, and `verify` replays that observation offline.
+
+1. `composition.py --selfcheck` passes with the publisher clone present and absent. Its
+   portability leg re-derives every rendered file byte for byte. Platform PR 29 fixed a stale
+   ticket-84 leg that assumed tuppence was one major behind, when it is two.
+2. All three adopters already compose with the v3.0.0 compiler through reviewed PRs merged on
+   2026-09-10, and recompose byte-identically. `verify` passes with ico or feeds absent.
+3. Ticket 45's promise was not narrowed. The surcharge claim was: it is an observation dated by
+   the composition, not a statement about the publisher's current newest major. The handbook
+   prints that limit beside each affected feed.
+
+Hub PR 91 also made `verify-supersede.sh` read the compiler pin, not the policy pin. It now reports
+four true FAILs where it reported a false SKIP. Those four belong to ticket 84's composer rule, and
+the owner's items above name what closes them.
