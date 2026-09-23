@@ -513,7 +513,7 @@ def main() -> int:
     rows = []
     for metric, source_skill, corpus, scorer in runs:
         result = evaluate(metric, _replay(source_skill, predictions), corpus, scorer=scorer)
-        correct = sum(1 for i in result.items if i.passed)
+        correct = sum(1 for i in result.items if i.answered_right)
         total = len(result.items)
         pairs, used = calibration_pairs(source_skill, corpus, run["raw"][source_skill])
         # `causal-claims` and `causal-claims-grade-accuracy` are two metrics over ONE question
@@ -536,7 +536,7 @@ def main() -> int:
                 "beats_constant_baseline": round(result.score, 4) > baselines[metric]["score"],
                 "heuristic_score": prior[-1]["score"] if prior else None,
                 "calibration": {**expected_calibration_error(pairs), "questions": used, "shared_with": shared.strip() or None},
-                "per_item": [{"id": i.item_id, "passed": i.passed} for i in result.items],
+                "per_item": [{"id": i.item_id, "passed": i.answered_right} for i in result.items],
                 "_result": result,
             }
         )

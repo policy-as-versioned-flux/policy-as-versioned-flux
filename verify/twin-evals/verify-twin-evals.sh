@@ -47,6 +47,9 @@
 # script's job is the harness, and verify/twin-evals/verify-corpus-size.sh is the check that
 # grades measurability and goes amber for it. A FALL still fails a not-measurable metric, because a
 # fall is a change against this model version's own record, not a claim about a threshold.
+# Since eco-system ticket 118 the minimum counts MEASURED items only: an item right on no checkable
+# basis is unscoreable. No real corpus carries a basis yet, so every metric here is not
+# measurable, and verify/twin-evals/verify-attributable-rate.sh is the check that grades that.
 #
 # Three outcomes only:
 #   PASS (exit 0)  every assertion observed true
@@ -99,15 +102,18 @@ def out(ok, msg):
     fails += 0 if ok else 1
     print(("PASS: " if ok else "FAIL: ") + msg)
 
-def verdict(score, threshold, last, measurable=True):
+def verdict(score, threshold, last, measurable=True, rate=None):
     """`fell` even when the score is still above its threshold: a threshold is a floor, and a fall
     against the last recorded value is the regression this harness exists to catch (decision
     ticket 11 answer item 5). Named and asserted below, because a comparison that is only ever
     exercised by scores that all pass cannot tell "correct" from "always says pass".
 
     `unmeasured` (eco-system ticket 112): the corpus is below the minimum the threshold states,
-    so the threshold says nothing either way. A fall still beats it."""
-    if measurable and score < threshold:
+    so the threshold says nothing either way. A fall still beats it.
+
+    `rate` (eco-system ticket 118) is the attributable rate. When the row has one, it and not the
+    score meets the threshold, because a right answer on a wrong basis lowers the rate only."""
+    if measurable and (score if rate is None else rate) < threshold:
         return "below"
     if last is not None and score < last:
         return "fell"
@@ -122,6 +128,7 @@ assert verdict(1.0, 0.8, 1.0) == "pass", verdict(1.0, 0.8, 1.0)
 assert verdict(1.0, 0.8, None, measurable=False) == "unmeasured"
 assert verdict(0.0, 0.8, None, measurable=False) == "unmeasured"   # a zero on 3 items bounds nothing either
 assert verdict(0.5, 0.8, 1.0, measurable=False) == "fell"          # a fall is not excused by size
+assert verdict(1.0, 0.8, None, rate=0.5) == "below"                 # luck does not clear a bar (ticket 118)
 
 declared = (ROOT / "twin" / "VERSION").read_text().strip()
 out(declared == TOOL_VERSION,
@@ -189,12 +196,12 @@ for entry in entries:
     skill, score, threshold = entry["skill"], entry["score"], entry["threshold"]
     last = last_for(skill, entry["model_version"])
     shown = "none recorded" if last is None else "%.3f" % last
-    said = verdict(score, threshold, last, entry["outcome"] != NOT_MEASURABLE)
+    said = verdict(score, threshold, last, entry["outcome"] != NOT_MEASURABLE, entry["attributable_rate"])
     why = {"below": "  -- below its threshold",
            "fell": "  -- FELL against the last value twin/skill-scores.jsonl records for THIS "
                    "model version",
-           "unmeasured": "  -- %d item(s), below the %d its threshold states"
-                         % (entry["total"], entry["min_items"]),
+           "unmeasured": "  -- %d measured item(s) of %d, below the %d its threshold states"
+                         % (entry["measured_count"], entry["total"], entry["min_items"]),
            "pass": ""}[said]
     line = ("%-28s score=%.3f  threshold=%.3f  last=%s (%s)  [%s: scored on the corpus it was "
             "fitted on]%s" % (skill, score, threshold, shown, entry["model_version"], LABEL, why))
