@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-23T16:34Z run=302 hub=fa8ae84 enact=development units=[driftwood=01210a7@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=d1c1844@main ludlow=f299fd1@main nist=f83126f@main platform=13f6b22@main tuppence=79603fd@main] pass=82 [observed=25 self=43 simulated=4 meta=10] fail=10 skip=28 [never=10 waits=18] excluded=8 total=128 ceiling=109
+# TRUTH 2026-09-23T17:43Z run=310 hub=e05fb2c enact=development units=[driftwood=01210a7@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=d1c1844@main ludlow=f299fd1@main nist=f83126f@main platform=38089a6@v3.3.0 tuppence=79603fd@main] pass=82 [observed=25 self=43 simulated=4 meta=10] fail=9 skip=29 [never=10 waits=19] excluded=8 total=128 ceiling=109
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      or absent trust root refuses on the trust material and never on the network, cold and warm (I).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -106,7 +106,7 @@ verify/misuse/verify-misuse.sh	PASS	PASS: three misuse catalogues load through o
 verify/model-permission/verify-model-permission.sh	PASS	PASS: the model-judging permission grades all ten conditions (ticket 05's nine, plus a fitted-corpus condition the first run of the nine forced), each with a ne
 verify/party/verify-party.sh	PASS	mirror each party's OWN signed party.yaml rather than standing in for it.
 verify/portability/verify-portability.sh	SKIP	SKIP: ludlow's switching entry for ico/penalty-schema rests on a price computed at the publisher's statutory cap: its own served entry for penalty-schema says `
-verify/pound-seam/verify-pound-seam.sh	FAIL	FAIL: 4 £-seam check(s) observed false
+verify/pound-seam/verify-pound-seam.sh	SKIP	SKIP: driftwood prices[5] (feeds/threat-register switching) could not be priced, and says why: missing instrument: twin/forward-intel/v1/feed.json supplies no l
 verify/priced-holes/verify-priced-holes.sh	FAIL	FAIL: 3 priced-holes check(s) observed false
 verify/proportionality/verify-proportionality.sh	SKIP	SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- kind-driftwood is not reachable, so driftwood's ren
 verify/provenance/verify-provenance.sh	SKIP	SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- no rekor-cli here to query the transparency log, so
@@ -129,4 +129,4 @@ verify/twin-evals/verify-derived-forecast.sh	SKIP	SKIP: no *.forecast.yaml has r
 verify/twin-evals/verify-scenario-registration.sh	PASS	PASS: 18 of 18 scenario-library entries on refs/remotes/origin/main name a resolution question -- a proposition the world layer carries, a horizon after their o
 verify/twin-evals/verify-twin-evals.sh	PASS	PASS: 7 harness-mechanism metrics, 7 of them not measurable at their corpus size (verify-corpus-size.sh grades that) (the label twin/evolution_judge.py declares
 verify/twin-per-adopter/verify-twin-per-adopter.sh	PASS	PASS: every party claiming the adopter role carries a twin overlay of its own, each with six scenario files, an emitter, and the same vendored world layer pinne
-verify/unreviewed-major/verify-unreviewed-major-in-window.sh	FAIL	FAIL: 3 line(s) observed false: a major carried in an adopter's composed window, or evidence at an adopter's own pin that did not verify -- each named above
+verify/unreviewed-major/verify-unreviewed-major-in-window.sh	FAIL	FAIL: 3 line(s) observed false: a major carried in an adopter's composed window with no record in its own tree accepting it, or evidence at an adopter's own pin

@@ -1,25 +1,25 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
-......
+........
 ----------------------------------------------------------------------
-Ran 6 tests in 4.781s
+Ran 8 tests in 6.703s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 7.918s
+Ran 9 tests in 8.222s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .............
 ----------------------------------------------------------------------
-Ran 13 tests in 8.565s
+Ran 13 tests in 8.744s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 1.645s
+Ran 16 tests in 1.703s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)
@@ -3712,13 +3712,13 @@ OK prices[]: a threat-register bump (v1 -> v2) moves tuppence's exposure through
 OK prices[]: a fixture ico band (v1->v2) that crosses driftwood's real GBP40,000 tolerance prints a proposed tier through compose() (isolated -> quarantine, changed=True), marked as a label; no rendered POLICY file changes and the handbook names the proposed tier `quarantine`, which it did not before the bump
 OK prices[]: one `switching` entry per feed edge, each measured by re-composing with that publisher's edges dropped -- ico's costs its whole regime line, the threat publisher's is not a number at all because driftwood's own twin borrows that feed's LEF and stops pricing without it, and the insurer's moves the exposure by nothing and names the premium it would lose instead of folding it in
 OK composed/feeds/: every priced payload, the publisher's own party artefact and the converter that priced it are vendored under the adopter's own signature, digested into a PROVENANCE.json the header names, with the converter's real source party recorded and a quote feed's absent converter named rather than faked
-OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed, and every one of the 40 files it RENDERS comes back byte-identical -- 11 of them the vendored tree itself, the rest the composed policy set and composed/HEADER.yaml with its parent SHAs. composed/evidence.json is not among them: it is written from the document rather than rendered, and its prices are the comparison just above. The substitution prints as an open limit, and a tampered vendored payload refuses against the digest its own tag signed
+OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed, and every one of the 41 files it RENDERS comes back byte-identical -- 11 of them the vendored tree itself, the rest the composed policy set and composed/HEADER.yaml with its parent SHAs. composed/evidence.json is not among them: it is written from the document rather than rendered, and its prices are the comparison just above. The substitution prints as an open limit, and a tampered vendored payload refuses against the digest its own tag signed
 OK composed/feeds/: each vendored copy records the exact command that priced it and the digest of what that command returned -- and replaying it against the vendored payload alone, in a bare directory, reproduces the digest for penalty-schema, threat-register
 OK prices[]: no entry carries the absolute path of the machine that composed it -- the twin's own refusal travels into the signed artefact naming `twin/forward-intel/v1/feed.json`, which reads the same on every runner
 OK switching: an edge signed AFTER every pinned envelope moves the composition's as-of to that day (its own life 0 months, its siblings' measured up to it), a --as-of EARLIER than a signed since refuses naming both dates rather than reporting the window's absolute size; and on today's estate every pin was signed the day of the newest feed publication, so the window is 0 months and over_pin_life is 0.0 -- arithmetic over two signed dates, not a placeholder
 OK switching: a feed edge carrying no `since` refuses as a missing instrument naming the edge -- a pin's life is a window between two signed dates, never a default
 OK supersede: tuppence's threat-register@v1 sits behind the feeds publisher's real signed threat-register/v3.0.0 (cut 2026-09-10), behind since threat-register/v2.0.0 was cut 2026-09-01; the line prices 0.00 GBP at the composition's own as-of 2026-08-28 (ramp 1.0000 on a 222574.31 base), 222574.31 a year past that day under --as-of, and 0.00 with both dates the day before it; one supersede row per feed line observed behind (feeds/threat-register, ico/penalty-schema); never summed into the exposure
-OK supersede: the same pin at v2 prints no line and the feed entry says `current`; no tag at all is `unobserved`; an unsigned or lightweight tag ahead publishes nothing and is named rather than counted; a signed major ahead whose directory the checkout does not carry is named and the line prices against the newest readable one, behind since the OLDEST signed major ahead was cut
+OK supersede: the same pin at the newest readable major is still behind a signed major this checkout cannot read (priced from the tags, marked unreadable), or else prints no line and says `current`; no tag at all is `unobserved`; an unsigned or lightweight tag ahead publishes nothing and is named rather than counted; a signed major ahead whose directory the checkout does not carry is named and the line prices against the newest readable one, behind since the OLDEST signed major ahead was cut; with no readable major ahead at all the line still prices, from the signed tags alone
 OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with a hole of the whole line, 241549.84 GBP, naming the tag that does not exist (no signed tag cve/v2.x.y (or v2.x.y)); the converter's headline entry is on the line, and the vendored record names the real invocation ['cve']
 {
   "outcome": "composed",
