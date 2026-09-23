@@ -299,7 +299,9 @@ the adopter's last baseline name and last overlay still select it against the ca
 now? If not, the regulator took it away, and it prints as a `withdrawn-control` delta. That
 delta names the regulator and its catalogue on both sides of the bump, and it never names the
 adopter as the one who removed it. A control the catalogue marks `status: withdrawn`, as NIST
-marks 182 of its 1196, counts as no longer defined. The header now records `overlay-controls`
+marks 182 of its 1196, counts as no longer defined. Two guards come first. A withdrawal needs
+the regulator's controls pin to have moved. An id the adopter's last overlay named that the
+catalogue still carries, under any status, stays the adopter's removal. The header now records `overlay-controls`
 so the next run can ask. A header from before that field can tell only a catalogue withdrawal
 apart. A weights feed that still names a withdrawn control keeps its price on the delta, its
 regime line reads `withdrawn`, and the regime entry does not move: that stays the feed's fact

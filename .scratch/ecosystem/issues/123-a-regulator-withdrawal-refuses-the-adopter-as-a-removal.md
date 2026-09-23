@@ -53,7 +53,7 @@ What this ticket owes:
 catalogue bump that withdraws a selected control composes, prints a delta that names the
 regulator's bump, and never names the adopter as the one who removed it.
 
-## Build, 2026-09-22
+## Build, 2026-09-23
 
 Built on platform branch `ticket-123-a-withdrawal-is-the-regulators` (platform PR 33) and hub PR 99 on hub
 branch `ticket-123-a-withdrawal-is-the-regulators`. The platform branch sits on platform
@@ -98,7 +98,7 @@ origin/main `f5213df`, after ticket 124 (`6c29a30`) and ticket 119. It does not 
    adopter's own overlay removal as the regulator's. That opens a loophole; this default only
    keeps the old attribution for one run.
 5. **Both acts in one run go to the adopter.** A control the adopter's last overlay still
-   selects, and the catalogue still defines, is the adopter's removal even when the regulator
+   selects, and the catalogue still carries, is the adopter's removal even when the regulator
    also dropped it from the baseline. Reason: had the adopter kept its overlay, the control
    would still be selected.
 6. **A control of the adopter's own catalogue is never a withdrawal, and nor is one from a
@@ -140,6 +140,56 @@ origin/main `f5213df`, after ticket 124 (`6c29a30`) and ticket 119. It does not 
   weighted lines, none withdrawn. So no real regime line changes status today. Each header
   gains `overlay-controls: []` on its next compose.
 
+### Review round, 2026-09-23
+
+The review blocked on one finding and noted two minor ones. Each fix is on the same two
+branches.
+
+- **Blocking: an adopter's own overlay removal of a `status: withdrawn` control was booked as
+  the regulator's withdrawal.** The review's probe: tuppence with `overlay.controls: [ac-2.10]`
+  composes and selects `ac-2.10`, then the adopter alone drops it. The nist pin did not move,
+  yet the run printed a `withdrawn-control` naming a bump `1.1.0@33a05df1f524 ->
+  1.1.0@33a05df1f524`. The cause: `split_withdrawn` tested `_withdrawn_from_catalogue` before the
+  last overlay. "No longer defines" (absent or `status: withdrawn`) is stricter than the rule
+  compose selects by (the id is in the catalogue). Fix, delegated:
+  1. **A withdrawal needs a bump.** A source whose controls pin (`<version>@<sha12>`) did not
+     move since the last header withdrew nothing, so every control it lost is the adopter's.
+     A source with no known last pin counts as not moved. New `_controls_pins_moved`. Reason:
+     the regulator can act only through its pin. This also covers a header without
+     `overlay-controls`, where the second guard cannot ask.
+  2. **"Still select" uses compose's own rule.** An id the last overlay named that the pinned
+     catalogue still carries, under any status, is still selected by the last inputs. Its
+     removal is the adopter's even when a real bump lands in the same run. Reason: it is the
+     counterfactual of decision 1, asked with the rule compose uses. Decision 2 still holds
+     for a control the last overlay did not name.
+  Red first. Three new hub legs failed on the unfixed branch. Two are
+  `test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal`, with the
+  header's `overlay-controls` recorded and removed; both printed `withdrawn-control` for
+  `ac-2.10` with `catalogue.from == catalogue.to`. The third is
+  `test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump`: nist moves
+  to a new tag that withdraws `ac-1`, and the adopter drops `ac-2.10` in the same run.
+  `ac-2.10` printed `withdrawn-control`. Two new selfcheck cases (fixture `aa-3` under
+  `status: withdrawn`, with no bump and with a real bump) failed the same way. All pass after
+  the fix, and the review's probe script now prints `removed-control` with `nist pin moved:
+  False`.
+- **Minor: the build heading and map line said 2026-09-22.** Both now say 2026-09-23, the date
+  of the build commits (`git log --date=iso` gives 2026-09-23) and of the ticket's graduation.
+- **Minor: the `baseline` reason string and the `withdrawn` regime status.** `split_withdrawn`
+  now gives the `baseline` reason only to a control of the baseline's own source. Any other
+  source's loss is the adopter's. So the detail's "`<source>`'s baseline" always names the
+  baseline the control left. The `withdrawn` status on a regime line stays as built, for
+  selected and unselected controls alike. Reason: a weight naming a withdrawn control is the
+  feed's own fact whoever selected it. The README now says so.
+
+Measured after the fix, with the scratch estate whose `platform` is this branch:
+
+- `.venv/bin/python -m pytest tests/test_loophole_adr_0026.py tests/test_priced_holes.py -n0 -q`:
+  44 passed (41 before, plus the 3 new legs).
+- `tests/test_loophole_rounds_two_and_three.py tests/test_misuse.py`: 53 passed, 6 skipped.
+- mypy over `twin tests conftest.py`: no issues in 199 source files.
+- Platform `composition.py --selfcheck`: exit 0, 95 OK lines (93 before, plus 2).
+  `python3 -m unittest test_comparison_history`: OK.
+
 ### What remains
 
 - **Owner:** a signed platform tools release that carries this build, and each adopter's pin
@@ -153,4 +203,5 @@ origin/main `f5213df`, after ticket 124 (`6c29a30`) and ticket 119. It does not 
   catalogue drops. It does not hold for one NIST keeps under `status: withdrawn`. Measured:
   tuppence with `overlay.controls: [ac-2.10]` composes with no refusal and selects `ac-2.10`.
   It needs its own ticket. Closing it changes what a claim against a withdrawn id does, which
-  is wider than this ticket.
+  is wider than this ticket. Until it closes, the review round's second guard keeps an
+  adopter's removal of such an id booked as the adopter's.

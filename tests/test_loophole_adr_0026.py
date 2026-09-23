@@ -55,6 +55,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+import pytest
 import yaml
 
 HUB = Path(__file__).resolve().parent.parent
@@ -378,6 +379,49 @@ def _withdraw(nist: Path, cid: str, *, from_catalogue: bool, baselines: tuple[st
         path.write_text(json.dumps(doc))
 
 
+def _catalogue_controls(nist: Path) -> tuple[Path, dict[str, Any]]:
+    catalog = nist / "catalog"
+    path = catalog / json.loads((catalog / "CATALOG_VERSION.json").read_text())["file"]
+    return path, json.loads(path.read_text())
+
+
+def _walk(items: list[dict[str, Any]]) -> Any:
+    for c in items:
+        yield c
+        yield from _walk(c.get("controls", []))
+
+
+def _status(nist: Path, cid: str) -> str | None:
+    """The `status` prop the catalogue in `nist` gives `cid`, or None."""
+    _path, doc = _catalogue_controls(nist)
+    for group in doc["catalog"].get("groups", []):
+        for c in _walk(group.get("controls", [])):
+            if c["id"] == cid:
+                return next((p["value"] for p in c.get("props", []) if p.get("name") == "status"), None)
+    raise AssertionError(f"{cid} is not in {nist}'s catalogue")
+
+
+def _mark_withdrawn(nist: Path, cid: str) -> None:
+    """The regulator's next catalogue keeps `cid` under `status: withdrawn`, the way NIST
+    marks the controls it withdrew."""
+    path, doc = _catalogue_controls(nist)
+    for group in doc["catalog"].get("groups", []):
+        for c in _walk(group.get("controls", [])):
+            if c["id"] == cid:
+                c["props"] = [p for p in c.get("props", []) if p.get("name") != "status"]
+                c["props"].append({"name": "status", "value": "withdrawn"})
+    path.write_text(json.dumps(doc))
+
+
+def _move_nist_pin(work: Path, before_pin: dict[str, Any]) -> None:
+    """The bump reaches tuppence the only way one can: its nist pin moves to a new tag."""
+    pin = work / "gitops" / "flux-system" / "gotk-sync-nist.yaml"
+    pin.write_text(pin.read_text().replace(f"tag: v{before_pin['version']}", "tag: v9.0.0")
+                   .replace(before_pin["sha"], "9" * 40))
+    _edit_party(work, lambda doc: [e.update(version="9.0.0") for e in doc["inherits"]
+                                   if e["party"] == "nist" and e["kind"] == "controls"])
+
+
 def _parent(rendered: dict[str, str], party: str) -> dict[str, Any]:
     header = yaml.safe_load(rendered["composed/HEADER.yaml"])
     return next(p for p in header["parents"] if p["party"] == party and p["kind"] == "controls")
@@ -470,6 +514,72 @@ def test_an_adopters_own_removal_stays_a_removal_beside_a_withdrawal(tmp_path):
     assert kinds == {"aa-3": "removed-control", "aa-1.1": "withdrawn-control"}, second["deltas"]
 
 
+# NIST keeps ac-2.10 under `status: withdrawn`, and an overlay can still select it (the gap the
+# ticket-123 build recorded). The review of ticket 123 found the adopter's own removal of it was
+# booked as the regulator's withdrawal.
+OWN_WITHDRAWN_STATUS = "ac-2.10"
+
+
+@pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal(tmp_path, legacy_header):
+    """Ticket 123, review round. tuppence selects ac-2.10 through its overlay. NIST's pinned
+    catalogue keeps ac-2.10 under `status: withdrawn`, and the composition selects it all the
+    same. The adopter alone then takes it out of its overlay; the nist pin does not move. That
+    is the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
+    happen. A last header with no `overlay-controls` must not change the answer."""
+    assert _status(ESTATE / "nist", OWN_WITHDRAWN_STATUS) == "withdrawn"
+    comp = _composition()
+    work = _tuppence(tmp_path / "tuppence")
+    _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[OWN_WITHDRAWN_STATUS]))
+    first, rendered = comp.compose(work, _trees())
+    assert first["outcome"] == "composed", first["refusals"]
+    header = yaml.safe_load(rendered["composed/HEADER.yaml"])
+    assert OWN_WITHDRAWN_STATUS in header["selected-controls"], header["selected-controls"]
+    if legacy_header:
+        header.pop("overlay-controls")
+        header.pop("comparison-inputs", None)
+        rendered = dict(rendered)
+        rendered["composed/HEADER.yaml"] = comp.HEADER_COMMENT + yaml.safe_dump(header, **comp.YAML_KWARGS)
+    comp._commit_header(work, rendered)
+
+    _edit_party(work, lambda doc: doc["overlay"].update(controls=[]))
+    second, second_rendered = comp.compose(work, _trees())
+    assert second["outcome"] == "composed", second["refusals"]
+    assert _parent(rendered, "nist") == _parent(second_rendered, "nist"), "the regulator did nothing"
+    moved = [d for d in second["deltas"] if d.get("control_id") == OWN_WITHDRAWN_STATUS]
+    assert [d["kind"] for d in moved] == ["removed-control"], second["deltas"]
+    assert [d for d in second["deltas"] if d["kind"] == "withdrawn-control"] == [], second["deltas"]
+
+
+def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path):
+    """Ticket 123, review round, the same-run shape. tuppence's overlay selects ac-2.10, which
+    NIST already keeps under `status: withdrawn`. In one run NIST's next tag withdraws another
+    selected control and tuppence takes ac-2.10 out of its overlay. The nist pin moves, so a
+    real bump lands, but the adopter's last overlay would still select ac-2.10 against the new
+    catalogue. ac-2.10 is the adopter's `removed-control`; the other control is NIST's
+    `withdrawn-control`."""
+    comp = _composition()
+    work = _tuppence(tmp_path / "tuppence")
+    _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[OWN_WITHDRAWN_STATUS]))
+    first, rendered = comp.compose(work, _trees())
+    assert first["outcome"] == "composed", first["refusals"]
+    selected = yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"]
+    other = next(c for c in selected if c != OWN_WITHDRAWN_STATUS)
+    comp._commit_header(work, rendered)
+
+    nist = tmp_path / "nist"
+    shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+    _withdraw(nist, other, from_catalogue=False, baselines=("LOW", "MODERATE", "HIGH"))
+    _mark_withdrawn(nist, other)
+    _move_nist_pin(work, _parent(rendered, "nist"))
+    _edit_party(work, lambda doc: doc["overlay"].update(controls=[]))
+    second, _ = comp.compose(work, _trees(nist=nist))
+    assert second["outcome"] == "composed", second["refusals"]
+    kinds = {d["control_id"]: d["kind"] for d in second["deltas"]
+             if d.get("control_id") in (OWN_WITHDRAWN_STATUS, other)}
+    assert kinds == {OWN_WITHDRAWN_STATUS: "removed-control", other: "withdrawn-control"}, second["deltas"]
+
+
 def test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal(tmp_path):
     """Ticket 123 item 2, against tuppence's real pinned parents. NIST withdraws a control the
     way its catalogue already marks 182 of them: the control stays in the catalogue with
@@ -489,28 +599,9 @@ def test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_wi
     nist = tmp_path / "nist"
     shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
     _withdraw(nist, line["id"], from_catalogue=False, baselines=("LOW", "MODERATE", "HIGH"))
-    catalog = nist / "catalog"
-    path = catalog / json.loads((catalog / "CATALOG_VERSION.json").read_text())["file"]
-    text = json.loads(path.read_text())
-
-    def mark(items: list[dict[str, Any]]) -> None:
-        for c in items:
-            if c["id"] == line["id"]:
-                c["props"] = [p for p in c.get("props", []) if p.get("name") != "status"]
-                c["props"].append({"name": "status", "value": "withdrawn"})
-            mark(c.get("controls", []))
-
-    for group in text["catalog"]["groups"]:
-        mark(group.get("controls", []))
-    path.write_text(json.dumps(text))
-
-    # The bump reaches tuppence the only way one can: its nist pin moves to the new tag.
-    pin = work / "gitops" / "flux-system" / "gotk-sync-nist.yaml"
+    _mark_withdrawn(nist, line["id"])
     before_pin = _parent(rendered, "nist")
-    pin.write_text(pin.read_text().replace(f"tag: v{before_pin['version']}", "tag: v9.0.0")
-                   .replace(before_pin["sha"], "9" * 40))
-    _edit_party(work, lambda doc: [e.update(version="9.0.0") for e in doc["inherits"]
-                                   if e["party"] == "nist" and e["kind"] == "controls"])
+    _move_nist_pin(work, before_pin)
     second, _ = comp.compose(work, _trees(nist=nist))
     assert second["outcome"] == "composed", second["refusals"]
     moved = [d for d in second["deltas"] if d.get("control_id") == line["id"]]
