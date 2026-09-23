@@ -1,28 +1,28 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ......
 ----------------------------------------------------------------------
-Ran 6 tests in 4.743s
+Ran 6 tests in 2.562s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 7.760s
+Ran 9 tests in 4.546s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
-.........
+............
 ----------------------------------------------------------------------
-Ran 9 tests in 8.216s
+Ran 12 tests in 4.436s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 1.583s
+Ran 16 tests in 0.877s
 
 OK
-[1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal)
+[1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)
 OK compose(): the real driftwood composes against its real pinned parents; platform's two formerly-dangling claims are fixed, zero refusals
 OK document: carries outcome, parents[], members[], refusals[], restatements[], cages[], holes[], ungoverned[], prices[], deltas[], limits[]
 OK prices[]: computed on the real driftwood's very first composition too, with no prior signed artefact to compare a bump against -- old and new both price at this run's own pin, an honest 'no move'
@@ -3673,6 +3673,12 @@ OK resolve_claims: an adopter-added control is a priced new hole when unfilled (
 OK compute_holes: a second composition with a hole filled (aa-1.1, by an adopter claim added since the last signed artefact) marks it closed
 OK removed_controls: TINY drops aa-1.1 and aa-2 from SMALL's selected set, and the narrowing composes: two removed-control deltas and one baseline-narrowing delta, each a named absence because no pinned weight names a fixture control
 OK baseline_widening_delta: SMALL -> BIG composes and prints one widening delta (1 control added, 0 of them named by a pinned weight, so no amount) beside the new hole it opens; nothing refuses, and a removal does not also fire
+OK split_withdrawn: the regulator drops aa-2 from its catalogue and from SMALL; the adopter changed nothing, and aa-2 prints one withdrawn-control delta naming fixture-nist's bump, never a removed-control in the adopter's name
+OK split_withdrawn: the regulator keeps aa-1.1 defined and drops it from SMALL; the last header's overlay-controls is empty, so aa-1.1 left with the regulator's baseline
+OK split_withdrawn: a last header with no overlay-controls cannot tell a same-name baseline drop from an overlay removal, so aa-1.1 stays the adopter's removal
+OK split_withdrawn: in one run the adopter drops aa-3 from its overlay and the regulator drops aa-1.1 from SMALL; aa-3 is the adopter's removed-control and aa-1.1 the regulator's withdrawn-control
+OK split_withdrawn: the adopter drops aa-3, which the pinned catalogue keeps under status: withdrawn, from its overlay with no bump; aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK split_withdrawn: the adopter drops aa-3, which the pinned catalogue keeps under status: withdrawn, from its overlay with a real bump; aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
 OK resolve_claims: an adopter claim against fixture-platform's own member-a refuses (ADR-0017) -- 'fixture-adopter14 claims aa-2 is evidenced by "member-a", which fixture-platform ships, not fixture-adopter14' -- and still counts as coverage (a claim exists), orthogonal to the claim's own validity
 OK resolve_claims: the real platform component-definition's two formerly-dangling claims (ac-6, cm-6) are fixed -- zero dangling-claim refusals against the real estate
 OK HEADER.yaml: 'holes' and 'selected-controls' live only in the advisory header -- stripping it leaves every file the engine reads unchanged -- and the handbook, which the engine never reads, states both counts (287 selected, 285 holes)
@@ -3685,6 +3691,7 @@ OK leak check: the ungoverned namespace's name planted in a member's matchCondit
 OK HEADER.yaml: carries the recorded ungoverned namespaces, and stripping it leaves every other rendered file unchanged -- nothing composition renders reads either namespace set
 OK ungoverned_price/_ramp: workload share x the EOL feed's own ramp from since, bounded at the whole uncaged residual; no since or no as_of ramps nothing (1.0)
 OK ungoverned[]: the real tuppence-reset prices at 7003870.77 GBP -- 3 of 4 institution workloads (share 0.75) x ramp 1.0082 from since 2026-08-25 (the first signed tag naming it) as of 2026-08-28, of a 9262365.33 residual
+OK ungoverned[] (eco-system ticket 122): a renamed ungoverned Namespace keeps the ramp its workloads carried (since 2024-09-01, ramp 3.0), the old name closes as left-repo and not as governed, a copy beside the original starts its own ramp, and a governed shadow of the old name does not drop the carried age
 OK (source, id): a control added from a second controls parent is a hole keyed on its own source; the header encodes `source:id` only off the baseline's catalogue and round-trips as recorded
 OK (source, id): a bare id resolves against the baseline's catalogue only (bare cc-1 is unknown there), and fixture-nist2:aa-2 is a different control from aa-2
 OK resolve_claims: a claim resolves on (source, id) through its source href -- cc-1 under fixture-nist2's href fills fixture-nist2:cc-1; the same id under fixture-nist's href is unknown there and fills nothing

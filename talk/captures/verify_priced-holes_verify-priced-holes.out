@@ -2,15 +2,20 @@ PASS: composition.py emits none of new-hole, baseline-widening, new-ungoverned-n
 PASS: party schema.json admits overlay.controls as bare ids and `party:id`, and says an addition and a removal are priced, never refused
 PASS: driftwood: no new-hole, baseline-widening or new-ungoverned-namespace refusal
 PASS: driftwood: 285 hole(s) keyed (source, id) under driftwood/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
+PASS: driftwood: every ungoverned Namespace the repo walk finds is priced (none)
 PASS: driftwood regime entry (penalty-schema): all 4 weighted holes carry the adopter's status (recorded)
-PASS: driftwood: 0 delta(s), each one of the 9 kinds under driftwood/GBP, matching the holes and namespaces they report
+PASS: driftwood: 0 delta(s), each one of the 10 kinds under driftwood/GBP, matching the holes and namespaces they report
 PASS: ludlow: no new-hole, baseline-widening or new-ungoverned-namespace refusal
 PASS: ludlow: 285 hole(s) keyed (source, id) under ludlow/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
+PASS: ludlow: every ungoverned Namespace the repo walk finds is priced (none)
 PASS: ludlow regime entry (penalty-schema): all 4 weighted holes carry the adopter's status (recorded)
-PASS: ludlow: 0 delta(s), each one of the 9 kinds under ludlow/GBP, matching the holes and namespaces they report
+PASS: ludlow: 0 delta(s), each one of the 10 kinds under ludlow/GBP, matching the holes and namespaces they report
 PASS: tuppence: no new-hole, baseline-widening or new-ungoverned-namespace refusal
 PASS: tuppence: 285 hole(s) keyed (source, id) under tuppence/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
+FAIL: tuppence ungoverned tuppence-reset: counts 3/3 workloads but the repo walk finds 3/4
+FAIL: tuppence ungoverned tuppence-reset: share 1.0 is not 3/4
 PASS: tuppence ungoverned tuppence-reset: 9,262,365.33 GBP = 3/3 workloads x ramp 1.0082 from since 2026-08-25 as of 2026-08-28, of 9,262,365.33, bounded at the whole residual
+FAIL: tuppence: openbao ungoverned in the adopter's repo but carries no price in composed/evidence.json; a Namespace with no label is priced since eco-system ticket 119, and the artefact predates that rule
 PASS: tuppence regime entry (penalty-schema): all 4 weighted holes carry the adopter's status (recorded)
-PASS: tuppence: 0 delta(s), each one of the 9 kinds under tuppence/GBP, matching the holes and namespaces they report
-PASS: no hole, widening, removal or ungoverned namespace refuses; each is a priced delta keyed (source, id), the ungoverned share ramps from a signed since and stays within the residual, and only a bespoke control with no scenario still refuses
+PASS: tuppence: 0 delta(s), each one of the 10 kinds under tuppence/GBP, matching the holes and namespaces they report
+FAIL: 3 priced-holes check(s) observed false

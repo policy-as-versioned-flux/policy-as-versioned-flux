@@ -1,4 +1,4 @@
-PASS: selfcheck: a row with its mechanism blanked is refused by the loader (exit 1: FAIL: /tmp/tmp.6TEJHDP1Ye/blank.yaml: entry 'x' names no mechanism — a risk with no mechanism is a concern, )
+PASS: selfcheck: a row with its mechanism blanked is refused by the loader (exit 1: FAIL: /tmp/tmp.DvfGYlYzRY/blank.yaml: entry 'x' names no mechanism — a risk with no mechanism is a concern, )
 PASS: selfcheck: a row anchored to a file that does not exist fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: twin/no-such-file.py: no such file; 0 could-not-look by name (none))
 PASS: selfcheck: a row anchored to a token the file lacks fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: platform/c.py: does not mention 'widen_to'; 0 could-not-look by name (n)
 PASS: selfcheck: a row still waiting on a resolved ticket fails (exit 1: FAIL: 1 of 1 row(s) observed false: x: still says it waits on ticket 19 (resolved), which is resolved — name)
@@ -14,7 +14,7 @@ PASS: misuse_catalogues_load_and_every_row_names_a_mechanism -- 3 catalogues, 25
   PASS twin-valuation-used-in-negotiation: 6 anchor(s) resolve
   PASS adopter-runs-uncaged-in-the-platform-substrate: 7 anchor(s) resolve
   PASS adopter-silences-its-own-binding-observation: 5 anchor(s) resolve
-  SKIP adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace: 4 anchor(s) resolve; waits on ticket 119 (open) for a cage or a price for a Namespace that carries none of the estate's labels
-  PASS: 4 of 7 row(s) resolve by path; 3 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream, adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace)
-PASS: eco-system rows: 4 of 7 row(s) resolve by path; 3 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream, adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace)
-PASS: three misuse catalogues load through one loader and every row names a mechanism (misuse_catalogues_load_and_every_row_names_a_mechanism); eco-system rows: 4 of 7 row(s) resolve by path; 3 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream, adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace)
+  PASS adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace: 7 anchor(s) resolve
+  PASS: 5 of 7 row(s) resolve by path; 2 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream)
+PASS: eco-system rows: 5 of 7 row(s) resolve by path; 2 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream)
+PASS: three misuse catalogues load through one loader and every row names a mechanism (misuse_catalogues_load_and_every_row_names_a_mechanism); eco-system rows: 5 of 7 row(s) resolve by path; 2 could-not-look by name (publisher-games-own-feed-price, regulator-data-mispriced-downstream)
