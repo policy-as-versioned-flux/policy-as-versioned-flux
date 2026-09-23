@@ -182,9 +182,14 @@ now unblocked, but no adoption or recorded rollout result is implied by publicat
 
 - [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — CHARTED, not built. Ticket 45 promises a signed composed tree re-renders byte-identically with the publisher's clone ABSENT; ticket 84's supersede surcharge is computed from the publisher's TAG DATES, which a vendored copy cannot carry. Cutting ico v4.0.0 made the contradiction observable: composing driftwood with ico present renders a `supersede` row priced GBP 0.00 that composing it with ico absent does not, which renumbers every later price index and moves the artefact's own footer count. `composition.py --selfcheck` fails on it today. The amount is zero only because the tag was cut that day; tomorrow the two renders differ by a priced amount. One of the two claims has to be narrowed, and the record has to say which.
 
-Map line: `- [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — open, implementation reviewed and merged in platform PR24; signed software v3.0.0 published and verified at 3602142. Composition now vendors identity-bound publisher observations and replays them offline; fresh composition observes current tags. Legacy provenance requires fresh composition when upgrading. Adopter pin upgrades, recomposition and recorded rollout proof remain outstanding.`
+The 2026-09-10 entry, superseded by the 2026-09-23 rollout measurement:
+
+- [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — open, implementation reviewed and merged in platform PR24; signed software v3.0.0 published and verified at 3602142. Composition now vendors identity-bound publisher observations and replays them offline; fresh composition observes current tags. Legacy provenance requires fresh composition when upgrading. Adopter pin upgrades, recomposition and recorded rollout proof remain outstanding.
 
 ## Build, 2026-09-22
+
+This section is named for the build wave the integrator opened on 2026-09-22. Every
+measurement in it was taken on 2026-09-23.
 
 The rollout was measured first. It had already happened. The work left was one stale selfcheck
 leg in platform and one hub check that read the wrong pin.
@@ -353,3 +358,21 @@ selfcheck-only, so it needs no release: the gate reads platform at `main`.
   `Success: no issues found in 198 source files`.
 - Per adopter: `platform-tools.py check`, `compose` (clean tree after) and `verify` with every
   clone present, with ico absent and with feeds absent. All exit 0.
+
+### Review round, 2026-09-23
+
+- **Blocking: the ticket's Map line disagreed with map.md.** The first push rewrote ticket 110's
+  map.md entry but left the backticked `Map line:` block at the 2026-09-10 text.
+  `bash verify/map-surface/verify-map-surface.sh` on this branch printed
+  `map-line-disagrees` for ticket 110 and ended `FAIL`. Fix: the 2026-09-10 entry now sits
+  under the history heading as a plain bullet, and a new `Map line:` block below carries the
+  live map.md text byte for byte. The same script then ends `PASS`.
+- **Minor: two dates.** The heading says 2026-09-22 and the measurements say 2026-09-23. Both
+  are right. A sentence under the heading now says which is which.
+- **Minor: the platform selfcheck re-implements the readability rule.** Left as is (delegated).
+  The reviewer marked it style only. If ticket 84 changes how the composer reads a newer major,
+  that change must update this leg in the same PR.
+
+### Current map line
+
+Map line: `- [110 — A supersede surcharge cannot be re-derived offline](issues/110-a-supersede-surcharge-cannot-be-re-derived-offline.md) — open, rollout measured 2026-09-23. All three adopters already compose with the v3.0.0 compiler and recompose byte-identically; verify passes with ico or feeds absent. The selfcheck's portability leg passes; its stale ticket-84 leg is fixed in a platform PR, so the whole selfcheck passes. The hub supersede check now reads the compiler pin and reports 4 real unpriced behind pins (ticket 84). Held tuppence 27 and ludlow 24 now wait only on rebase, recompose and review.`
