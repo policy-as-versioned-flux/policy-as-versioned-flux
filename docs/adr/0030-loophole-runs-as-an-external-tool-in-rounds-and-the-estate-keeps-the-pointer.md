@@ -282,7 +282,7 @@ Two smaller corrections, both measured:
 Eco-system ticket 120 checked the eighteen candidates of ticket 115's three rounds against
 ADR-0026 against the code, under the same counting rule. The units were read at their
 origin/main: platform `b2820d8`, driftwood `c96c412`, ludlow `32d5696`, tuppence `7009ea9`,
-nist `f83126f`, ico `abcb3a8`, feeds `ff3ac9a`. Every verdict is held by a test in
+nist `f83126f`, ico `abcb3a8`, feeds `ff3ac9a`, insurer `d1c1844`. Every verdict is held by a test in
 `tests/test_loophole_adr_0026.py`, and that file computes the numbers below from its own tables.
 
 **3 of 18 candidates against ADR-0026 survived: 17%, by round 2, 0 and 1.** ADR-0022 gave 3 of 18

@@ -1,7 +1,7 @@
 # 120 — The eighteen unchecked loophole candidates against ADR-0026
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -180,3 +180,21 @@ ADR-0022 ADR-0030 measured a reason overlap of 2, 1 and 3. On ADR-0026 it is 0, 
 ### What remains
 
 Nothing waits on the owner. The repairs are tickets 121 to 124.
+
+## Answer
+
+Resolved 2026-09-23 by hub PR 93. All 18 loophole candidates against ADR-0026 carry a verdict
+from a deterministic check against the served code, each held by a leg of
+`tests/test_loophole_adr_0026.py`.
+
+1. **Three survivors, 3 of 18.** Each is its own ticket: 121 (implementing a control moves no
+   price and no tier), 122 (the ungoverned ramp keys on a Namespace name the adopter chooses) and
+   123 (a regulator's withdrawal refuses the adopter as a removal).
+2. **One more ticket that is not a survivor.** Ticket 124 is the platform build that ADR-0026
+   names to price removals and that nobody opened. Ticket 123 lands with 124 or after it.
+3. **The rate holds across documents.** ADR-0022 and ADR-0026 each gave 3 of 18, so the two give
+   6 of 36. ADR-0026 and ADR-0030 carry dated notes.
+
+Review: one round, pass. The reviewer found four minor points. This Answer and a missing unit in
+the ADR-0030 note are fixed. A counting-rule wording point and a bare `python3` call that copies its
+neighbour's idiom are left as they are.
