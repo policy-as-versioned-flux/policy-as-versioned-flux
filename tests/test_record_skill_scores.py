@@ -53,8 +53,22 @@ def test_a_corpus_below_its_stated_minimum_is_recorded_as_not_measurable(tmp_pat
     for e in entries:
         # The row states the count its minimum is measured against, so the permission (condition
         # 1 in twin/model_permission.py) can read measurability off the row it grades.
-        assert e["measured_count"] == e["total"], e
+        # Ticket 118: an item right on no checkable basis is unscoreable and is not measured.
+        assert e["measured_count"] == e["total"] - e["unscoreable"], e
         expected = "pass" if e["measured_count"] >= e["min_items"] else "not-measurable"
         assert e["outcome"] == expected, e
         assert e["passed"] is (expected == "pass"), e
 
+
+
+def test_every_row_records_the_attributable_rate_beside_the_score(tmp_path: Path) -> None:
+    """Eco-system ticket 118. Each row carries the rate and the counts it is derived from, and
+    the rate is recomputable from them. A metric that measured nothing records null, never 0."""
+    entries = rss.run("2026-09-22T00:00:00Z", "heuristic-test", path=tmp_path / "s.jsonl")
+    for e in entries:
+        assert {"attributable_rate", "wrong_basis", "unscoreable", "measured_count"} <= e.keys(), e
+        right = round(e["score"] * e["total"]) - e["unscoreable"]
+        if e["measured_count"] == 0:
+            assert e["attributable_rate"] is None, e
+        else:
+            assert e["attributable_rate"] == right / e["measured_count"], e

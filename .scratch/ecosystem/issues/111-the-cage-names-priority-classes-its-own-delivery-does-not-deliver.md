@@ -223,6 +223,43 @@ After the round: `test_priority_classes.py` has 13 tests, all pass. The four-fil
 test_comparison_history.py -n0 -q`) reads 37 passed, 11 subtests passed. `compose/verify-fresh.sh`
 and `compose/handbook.py --selfcheck` (47 checks) pass. `verify-composition.sh` was not re-run.
 
+### Review round 2, 2026-09-23
+
+The second review blocked on one finding and named two minor ones.
+
+- **Blocking: hub PR 94 conflicted with `main` in `map.md`.** Tickets 110 and 118 merged after
+  this branch forked, and both edit the lines beside 111's. Fix: `origin/main` is merged into the
+  branch, not rebased, so the pushed history stays as reviewed. The conflict kept `main`'s 110
+  line and this branch's 111 line. Nothing else conflicted. `tests/test_map_surface.py` was re-run
+  on the merged tree (see below).
+- **Minor: a stale estate platform crashed the selfcheck.** `_write_fixture_platform` copies the
+  machinery from the estate's platform clone. The hub's `.estate-clone/platform` is at `bbda376`,
+  before `cage_body.py` existed, so `composition.py --selfcheck` died with a `FileNotFoundError`.
+  Fix (delegated): the copied paths are one list, `FIXTURE_MACHINERY`, and the selfcheck prints a
+  SKIP naming each path the clone lacks. Red first: three new tests in `test_priority_classes.py`
+  failed (no `_selfcheck_missing_machinery`, and a traceback from `--selfcheck` over a stale
+  estate). All three pass now. Against the hub's own clone the selfcheck now prints
+  `SKIP: .estate-clone/platform lacks distribution/cage_body.py, distribution/render-bottom-rung-netpol.py`.
+  Against a fresh estate (each unit cloned from its remote default branch, this branch as
+  `platform`) it prints `selfcheck ok`. Platform commit `a5b1e63`.
+- **Minor, not changed: ADR-0026 point 6 does not name the two new refusal kinds.** Decision
+  (delegated): ADR-0026 stays as it is. Its point 6 classifies the kinds composition emitted on
+  2026-09-04 and says itself that "a kind the source gains later is a fact for the next ADR, not
+  a silent widening of this one". `verify-adr-supersession.sh` keeps its dated fixture for the
+  same reason. Both new kinds are instrument faults, as decision 2 records: nothing pinned
+  delivers or names the class. The next ADR that classifies refusal kinds must add
+  `undelivered-priority-class` and `unreadable-priority-class`, and extend that fixture then.
+
+After round 2: `test_priority_classes.py` has 16 tests, all pass. The four-file compose run reads
+40 passed, 11 subtests passed. `compose/verify-fresh.sh` passes. `mypy compose/composition.py`
+still reads 89 errors, none in the new code.
+
+Hub, on the merged tree: `tests/test_map_surface.py -n0 -q` reads 60 passed.
+`verify-adr-supersession.sh` passes. The hub mypy run reads no issues in 198 source files.
+`verify-derived-status.sh` fails with one fault, and it is not this branch's: ticket 84 is written
+resolved while `verify/supersede/verify-supersede.sh` graded FAIL on run 276. A detached worktree
+of `origin/main` gives the same single fault.
+
 ### What remains, in order
 
 1. **Merge** platform PR 30.
