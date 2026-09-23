@@ -55,7 +55,7 @@ regulator's bump, and never names the adopter as the one who removed it.
 
 ## Build, 2026-09-22
 
-Built on platform branch `ticket-123-a-withdrawal-is-the-regulators` (platform PR 33) and hub
+Built on platform branch `ticket-123-a-withdrawal-is-the-regulators` (platform PR 33) and hub PR 99 on hub
 branch `ticket-123-a-withdrawal-is-the-regulators`. The platform branch sits on platform
 origin/main `f5213df`, after ticket 124 (`6c29a30`) and ticket 119. It does not touch
 `ungoverned_namespaces` or the `since` lookup, which ticket 122 changes.
