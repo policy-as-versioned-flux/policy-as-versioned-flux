@@ -670,70 +670,154 @@ def test_an_adopters_own_removal_stays_a_removal_beside_a_withdrawal(tmp_path):
     assert kinds == {"aa-3": "removed-control", "aa-1.1": "withdrawn-control"}, second["deltas"]
 
 
-# NIST keeps ac-2.10 under `status: withdrawn`, and an overlay can still select it (the gap the
-# ticket-123 build recorded). The review of ticket 123 found the adopter's own removal of it was
-# booked as the regulator's withdrawal.
+# NIST keeps ac-2.10 under `status: withdrawn`. Until eco-system ticket 126 an overlay could still
+# select it, and the review of ticket 123 found the adopter's own removal of it booked as the
+# regulator's withdrawal. Ticket 126 made one rule: an id the adopter or a claimant names must be
+# one the pinned catalogue defines, present and not under `status: withdrawn`. The header records
+# `withdrawn-selectable: false` so the next run knows its selection followed that rule.
 OWN_WITHDRAWN_STATUS = "ac-2.10"
+
+
+def _old_rule_header(comp: ModuleType, rendered: dict[str, str], cid: str, *,
+                     legacy: bool) -> dict[str, str]:
+    """The header a composer from before ticket 126 would have signed for the same adopter with
+    `cid` in its overlay: `cid` selected and a hole, no `withdrawn-selectable` field, and with
+    `legacy` no `overlay-controls` either (a header from before ticket 123)."""
+    header = yaml.safe_load(rendered["composed/HEADER.yaml"])
+    header["selected-controls"] = sorted(set(header["selected-controls"]) | {cid})
+    header["holes"] = sorted(set(header["holes"]) | {cid})
+    header.pop("withdrawn-selectable")
+    header.pop("comparison-inputs", None)
+    if legacy:
+        header.pop("overlay-controls")
+    else:
+        header["overlay-controls"] = sorted(set(header["overlay-controls"]) | {cid})
+    return {**rendered, "composed/HEADER.yaml": comp.HEADER_COMMENT + yaml.safe_dump(header, **comp.YAML_KWARGS)}
+
+
+def test_an_overlay_or_a_claim_naming_a_withdrawn_status_control_refuses_as_unknown(tmp_path):
+    """Eco-system ticket 126. NIST's pinned catalogue keeps ac-2.10 under `status: withdrawn`.
+    tuppence naming it in `overlay.controls` refuses `unknown-control-id`, the instrument fault
+    ADR-0026's Consequences name for an adopter still naming a withdrawn control. A claim on it
+    in tuppence's own component-definition refuses the same way. Neither is selected nor priced
+    as held."""
+    assert _status(ESTATE / "nist", OWN_WITHDRAWN_STATUS) == "withdrawn"
+    comp = _composition()
+    work = _tuppence(tmp_path / "overlay")
+    _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[OWN_WITHDRAWN_STATUS]))
+    doc, _ = comp.compose(work, _trees())
+    assert doc["outcome"] == "refused", doc["deltas"]
+    assert [(r["kind"], r["subject"]) for r in doc["refusals"]] == [
+        ("unknown-control-id", f"tuppence overlay.controls: {OWN_WITHDRAWN_STATUS}")], doc["refusals"]
+    assert "status: withdrawn" in doc["refusals"][0]["detail"], doc["refusals"]
+    assert doc["refusals"][0]["needs_composition"] is False
+
+    claimed = _tuppence(tmp_path / "claim")
+    comp._write_component_definition(claimed / comp.ADOPTER_CLAIMS_FILE,
+                                     [(OWN_WITHDRAWN_STATUS, "tuppence-own-policy")],
+                                     source="../nist/catalog/catalog.json")
+    doc, _ = comp.compose(claimed, _trees())
+    assert doc["outcome"] == "refused", doc["deltas"]
+    assert [(r["kind"], r["subject"]) for r in doc["refusals"]] == [
+        ("unknown-control-id", f"tuppence component-definition: {OWN_WITHDRAWN_STATUS}")], doc["refusals"]
+    assert "status: withdrawn" in doc["refusals"][0]["detail"], doc["refusals"]
 
 
 @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
 def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal(tmp_path, legacy_header):
-    """Ticket 123, review round. tuppence selects ac-2.10 through its overlay. NIST's pinned
-    catalogue keeps ac-2.10 under `status: withdrawn`, and the composition selects it all the
-    same. The adopter alone then takes it out of its overlay; the nist pin does not move. That
-    is the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
-    happen. A last header with no `overlay-controls` must not change the answer."""
-    assert _status(ESTATE / "nist", OWN_WITHDRAWN_STATUS) == "withdrawn"
+    """Ticket 123, review round, kept by ticket 126. A composer from before ticket 126 signed a
+    header in which tuppence's overlay selected ac-2.10, which NIST's pinned catalogue already
+    keeps under `status: withdrawn`. The adopter drops it; the nist pin does not move. That is
+    the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
+    happen. A last header with no `overlay-controls` must not change the answer. The new header
+    records `withdrawn-selectable: false`."""
     comp = _composition()
     work = _tuppence(tmp_path / "tuppence")
-    _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[OWN_WITHDRAWN_STATUS]))
     first, rendered = comp.compose(work, _trees())
     assert first["outcome"] == "composed", first["refusals"]
-    header = yaml.safe_load(rendered["composed/HEADER.yaml"])
-    assert OWN_WITHDRAWN_STATUS in header["selected-controls"], header["selected-controls"]
-    if legacy_header:
-        header.pop("overlay-controls")
-        header.pop("comparison-inputs", None)
-        rendered = dict(rendered)
-        rendered["composed/HEADER.yaml"] = comp.HEADER_COMMENT + yaml.safe_dump(header, **comp.YAML_KWARGS)
-    comp._commit_header(work, rendered)
+    comp._commit_header(work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
 
-    _edit_party(work, lambda doc: doc["overlay"].update(controls=[]))
     second, second_rendered = comp.compose(work, _trees())
     assert second["outcome"] == "composed", second["refusals"]
     assert _parent(rendered, "nist") == _parent(second_rendered, "nist"), "the regulator did nothing"
     moved = [d for d in second["deltas"] if d.get("control_id") == OWN_WITHDRAWN_STATUS]
     assert [d["kind"] for d in moved] == ["removed-control"], second["deltas"]
     assert [d for d in second["deltas"] if d["kind"] == "withdrawn-control"] == [], second["deltas"]
+    assert yaml.safe_load(second_rendered["composed/HEADER.yaml"])["withdrawn-selectable"] is False
 
 
-def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path):
-    """Ticket 123, review round, the same-run shape. tuppence's overlay selects ac-2.10, which
-    NIST already keeps under `status: withdrawn`. In one run NIST's next tag withdraws another
-    selected control and tuppence takes ac-2.10 out of its overlay. The nist pin moves, so a
-    real bump lands, but the adopter's last overlay would still select ac-2.10 against the new
-    catalogue. ac-2.10 is the adopter's `removed-control`; the other control is NIST's
-    `withdrawn-control`."""
+@pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path, legacy_header):
+    """Ticket 123, review round, and ticket 126's legacy-header case. A composer from before
+    ticket 126 signed a header in which tuppence's overlay selected ac-2.10, already under
+    `status: withdrawn`. In one run NIST's next tag withdraws another selected control and
+    tuppence drops ac-2.10. That header cannot prove ac-2.10 was defined when it was selected,
+    so its removal is the adopter's, with or without `overlay-controls`.
+
+    The other control differs by header. With `overlay-controls` recorded, it came from the
+    baseline, so it left with NIST's bump: a `withdrawn-control`. With a legacy header nothing
+    says whether it came from the baseline or from an overlay that selected it while already
+    withdrawn, so it stays the adopter's `removed-control` for this one run (ticket 123
+    decision 4's default, applied to the withdrawn status by ticket 126)."""
     comp = _composition()
     work = _tuppence(tmp_path / "tuppence")
-    _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[OWN_WITHDRAWN_STATUS]))
     first, rendered = comp.compose(work, _trees())
     assert first["outcome"] == "composed", first["refusals"]
-    selected = yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"]
-    other = next(c for c in selected if c != OWN_WITHDRAWN_STATUS)
-    comp._commit_header(work, rendered)
+    other = next(c for c in yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"])
+    comp._commit_header(work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
 
     nist = tmp_path / "nist"
     shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
     _withdraw(nist, other, from_catalogue=False, baselines=("LOW", "MODERATE", "HIGH"))
     _mark_withdrawn(nist, other)
     _move_nist_pin(work, _parent(rendered, "nist"))
-    _edit_party(work, lambda doc: doc["overlay"].update(controls=[]))
     second, _ = comp.compose(work, _trees(nist=nist))
     assert second["outcome"] == "composed", second["refusals"]
     kinds = {d["control_id"]: d["kind"] for d in second["deltas"]
              if d.get("control_id") in (OWN_WITHDRAWN_STATUS, other)}
-    assert kinds == {OWN_WITHDRAWN_STATUS: "removed-control", other: "withdrawn-control"}, second["deltas"]
+    want_other = "removed-control" if legacy_header else "withdrawn-control"
+    assert kinds == {OWN_WITHDRAWN_STATUS: "removed-control", other: want_other}, second["deltas"]
+
+
+def test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators(tmp_path):
+    """Eco-system ticket 126. tuppence's overlay selects a control NIST defines outside
+    MODERATE, and composes under the new rule, so its header records `withdrawn-selectable:
+    false`. NIST's next tag marks that control `status: withdrawn`. tuppence keeping it in its
+    overlay refuses `unknown-control-id`. tuppence dropping it composes, and the control prints
+    as NIST's `withdrawn-control`: the last overlay would no longer select it against the new
+    catalogue, and the header proves it was defined when it was selected."""
+    comp = _composition()
+    moderate = comp._baseline_ids(ESTATE / "nist", "MODERATE")
+    extra = sorted(comp._baseline_ids(ESTATE / "nist", "HIGH") - moderate)[0]
+    assert _status(ESTATE / "nist", extra) is None
+    work = _tuppence(tmp_path / "tuppence")
+    _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[extra]))
+    first, rendered = comp.compose(work, _trees())
+    assert first["outcome"] == "composed", first["refusals"]
+    header = yaml.safe_load(rendered["composed/HEADER.yaml"])
+    assert header["overlay-controls"] == [extra] and header["withdrawn-selectable"] is False, header
+    comp._commit_header(work, rendered)
+
+    nist = tmp_path / "nist"
+    shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+    _withdraw(nist, extra, from_catalogue=False, baselines=("HIGH",))
+    _mark_withdrawn(nist, extra)
+    before_pin = _parent(rendered, "nist")
+    _move_nist_pin(work, before_pin)
+    kept, _ = comp.compose(work, _trees(nist=nist))
+    assert kept["outcome"] == "refused", kept["deltas"]
+    assert [(r["kind"], r["subject"]) for r in kept["refusals"]] == [
+        ("unknown-control-id", f"tuppence overlay.controls: {extra}")], kept["refusals"]
+
+    _edit_party(work, lambda doc: doc["overlay"].update(controls=[]))
+    second, _ = comp.compose(work, _trees(nist=nist))
+    assert second["outcome"] == "composed", second["refusals"]
+    moved = [d for d in second["deltas"] if d.get("control_id") == extra]
+    assert [(d["kind"], d["reason"], d["withdrawn_by"]) for d in moved] == [
+        ("withdrawn-control", "catalogue", "nist")], second["deltas"]
+    assert moved[0]["catalogue"]["from"] == f"{before_pin['version']}@{before_pin['sha'][:12]}", moved
+    assert moved[0]["catalogue"]["to"] == "9.0.0@" + "9" * 12, moved
+    assert "tuppence" not in moved[0]["detail"], moved
 
 
 def test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal(tmp_path):
