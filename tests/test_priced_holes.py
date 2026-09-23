@@ -178,3 +178,55 @@ def test_a_schema_that_still_says_a_removal_refuses_fails(grader: ModuleType) ->
                               "prints as a `removed-control` delta."}}}}})
     assert "FAIL" not in grader.LINES, grader.LINES
     grader.LINES.clear()
+
+# -- eco-system ticket 119: silence buys no exemption from the price ----------------------------
+
+
+def _write(path: Path, *docs: dict) -> None:
+    import yaml
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(yaml.safe_dump_all(list(docs)))
+
+
+def test_the_recount_prices_an_unlabelled_namespace_and_skips_only_the_platform_substrate(
+        grader: ModuleType, tmp_path: Path) -> None:
+    """The grader's own walk follows the rule composition.py follows since ticket 119. A Namespace
+    with no label, or one only a workload names, is ungoverned. The substrate is what the
+    platform declares `infra` in its own tree. An adopter's copy of that label buys nothing."""
+    ns = lambda name, labels: {"apiVersion": "v1", "kind": "Namespace",  # noqa: E731
+                               "metadata": {"name": name, "labels": labels}}
+    job = lambda name, where: {"apiVersion": "batch/v1", "kind": "Job",  # noqa: E731
+                               "metadata": {"name": name, "namespace": where}}
+    estate = tmp_path / "estate"
+    _write(estate / "platform" / "engine" / "namespaces.yaml",
+           ns("kube-system", {"posture.acme.io/tier": "infra"}),
+           ns("flux-system", {"posture.acme.io/tier": "infra"}), ns("access", {}))
+    assert grader._substrate(str(estate)) == {"kube-system", "flux-system"}
+    repo = estate / "adopter"
+    _write(repo / "gitops" / "ns.yaml",
+           ns("home", {"policy-as-versioned.dev/institution": "a", "policy-as-versioned.dev/governed": "true"}),
+           ns("side", {}), ns("mine", {"posture.acme.io/tier": "infra"}))
+    _write(repo / "gitops" / "jobs.yaml", job("a", "home"), job("b", "side"), job("c", "elsewhere"),
+           job("d", "flux-system"))
+    institution, workloads, ungoverned = grader._namespace_facts(str(repo), {"kube-system", "flux-system"})
+    assert institution == {"home", "side", "mine", "elsewhere"}, institution
+    assert workloads == {"home": 1, "side": 1, "elsewhere": 1, "flux-system": 1}, workloads
+    assert ungoverned == {"side", "mine", "elsewhere"}, ungoverned
+
+
+def test_the_substrate_is_unknown_without_the_platform_declaration(grader: ModuleType, tmp_path: Path) -> None:
+    assert grader._substrate(str(tmp_path)) is None
+
+
+def test_an_ungoverned_namespace_the_evidence_leaves_unpriced_is_observed_false(
+        grader: ModuleType, capsys: pytest.CaptureFixture[str]) -> None:
+    """tuppence's shape: the repo walk finds `openbao` ungoverned, and the committed evidence,
+    composed before ticket 119, prices only `tuppence-reset`."""
+    doc, ctx = grader._good()
+    ctx["ungoverned"] = {"reset"}
+    assert "FAIL" not in _lines(grader, doc, ctx)
+    capsys.readouterr()
+    ctx["ungoverned"] = {"reset", "openbao"}
+    assert "FAIL" in _lines(grader, doc, ctx)
+    printed = [line for line in capsys.readouterr().out.splitlines() if line.startswith("FAIL:")]
+    assert len(printed) == 1 and "openbao" in printed[0], printed
