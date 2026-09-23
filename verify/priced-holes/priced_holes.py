@@ -243,6 +243,9 @@ def check_doc(doc: dict, ctx: dict) -> None:
                     out("FAIL", f"{at}: closed_by {why} but the repo walk says {real}")
                 else:
                     out("PASS", f"{at}: closed_by {why}, as the repo walk finds")
+            else:
+                out("SKIP", f"{at}: closed_by {why}, not recounted: the substrate could not be "
+                            f"read, so the repo walk cannot say governed or left-repo")
             continue
         p = e.get("price")
         if not isinstance(p, dict) or not PRICE_FIELDS <= set(p):
@@ -465,21 +468,26 @@ def _workloads_at(repo: str, tag: str) -> dict[str, set[str]]:
         parts = path.split("/")
         if not path.endswith(".yaml") or {".git", "composed", ".work"} & set(parts):
             continue
-        shown = _git(repo, "show", f"{tag}:{path}")
+        shown = subprocess.run(["git", "-C", repo, "show", f"{tag}:{path}"], capture_output=True, timeout=60)
         try:
-            _add_workload_keys(list(yaml.safe_load_all(shown.stdout)), found)
-        except yaml.YAMLError:
+            _add_workload_keys(list(yaml.safe_load_all(shown.stdout.decode())), found)
+        except (yaml.YAMLError, UnicodeDecodeError):
             continue
     return found
 
 
-def _signed_since(repo: str, namespaces: list[str]) -> dict[str, str | None] | None:
+def _signed_since(repo: str, namespaces: list[str],
+                  ungoverned: set[str] | None = None) -> dict[str, str | None] | None:
     """namespace -> the date of the first signed tag whose composed header names it, or names as
     ungoverned a Namespace that held, in that tag's tree, a workload (`Kind/name`) this one holds
-    now and that Namespace no longer holds (eco-system ticket 122: the age follows the workloads,
-    so a rename keeps its ramp and a copy beside the original does not take it). None per
-    namespace where no tag carries it. None overall where the clone is not a git repo or lists no
-    tags (could not look). Re-derived here from the clone; composition.py is not imported."""
+    now and that Namespace no longer holds as an ungoverned Namespace (eco-system ticket 122: the
+    age follows the workloads, so a rename keeps its ramp and a copy beside the original does not
+    take it). "As an ungoverned Namespace" is the review round's repair: re-declaring the old
+    name governed, with inert manifests of the same kind and name, would otherwise drop the age,
+    and a governed Namespace pays no ramp. `ungoverned` is the recount's ungoverned set; None
+    derives it from the repo walk with no substrate. None per namespace where no tag carries it.
+    None overall where the clone is not a git repo or lists no tags (could not look).
+    Re-derived here from the clone; composition.py is not imported."""
     if not os.path.exists(os.path.join(repo, ".git")):
         return None
     listed = _git(repo, "for-each-ref", "--sort=creatordate",
@@ -490,6 +498,9 @@ def _signed_since(repo: str, namespaces: list[str]) -> dict[str, str | None] | N
         return None
     result: dict[str, str | None] = {ns: None for ns in namespaces}
     now = _workloads_now(repo)
+    if ungoverned is None:
+        ungoverned = _namespace_facts(repo, set())[2]
+    still = {ns: keys for ns, keys in now.items() if ns in ungoverned}
     for tag, date, _kind in tags:
         if "-----BEGIN" not in _git(repo, "cat-file", "-p", tag).stdout:
             continue
@@ -506,7 +517,7 @@ def _signed_since(repo: str, namespaces: list[str]) -> dict[str, str | None] | N
             if result[ns] is not None:
                 continue
             mine = now.get(ns, set())
-            if ns in named or any((held.get(x, set()) & mine) - now.get(x, set()) for x in named):
+            if ns in named or any((held.get(x, set()) & mine) - still.get(x, set()) for x in named):
                 result[ns] = date
     return result
 
@@ -598,12 +609,17 @@ def run(estate: str) -> None:
         else:
             institution, workloads, ungoverned = _namespace_facts(repo, substrate)
             ctx.update(workloads=workloads, institution=institution, ungoverned=ungoverned)
-        since = _signed_since(repo, [str(n) for n in namespaces]) if namespaces else {}
-        if since is None:
-            out("SKIP", f"{name}: the clone lists no signed tag, so the since of its ungoverned "
-                        f"namespaces could not be read back")
+        if namespaces and "ungoverned" not in ctx:
+            out("SKIP", f"{name}: without the substrate the recount has no ungoverned set, so a "
+                        f"since carried by a rename (eco-system ticket 122) could not be read back")
         else:
-            ctx["since"] = since
+            since = _signed_since(repo, [str(n) for n in namespaces], ctx.get("ungoverned")) \
+                if namespaces else {}
+            if since is None:
+                out("SKIP", f"{name}: the clone lists no signed tag, so the since of its ungoverned "
+                            f"namespaces could not be read back")
+            else:
+                ctx["since"] = since
         check_doc(doc, ctx)
 
 

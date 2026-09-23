@@ -318,8 +318,9 @@ code read that by name. A rename restarted the ramp, and the old name's close pr
 governance. Ticket 122 keeps point 4's rule and adds a second way to carry the date. `since` is
 now the first signed tag that names the Namespace, or names as ungoverned a Namespace that held,
 in that tag's tree, a workload (`Kind/name`) this one holds now and that Namespace no longer
-holds. So the age follows the workloads across a rename, and a copy beside the original starts
-its own ramp. Each closed `ungoverned[]` entry carries `closed_by`, `governed` or `left-repo`, and
+holds as an ungoverned Namespace. So the age follows the workloads across a rename, and a copy
+beside the original starts its own ramp. A governed Namespace of the old name, holding inert
+manifests of the same kind and name, does not keep the age from carrying: it pays no ramp. Each closed `ungoverned[]` entry carries `closed_by`, `governed` or `left-repo`, and
 its `closed-ungoverned-namespace` delta says which, so point 4's "a governed one as
 `closed-ungoverned`" is now one of two closes. The residual: an adopter that renames every
 workload with the Namespace still restarts the ramp, because a workload's kind and name are the

@@ -14,7 +14,8 @@ control (the last since eco-system ticket 124, ADR-0026 point 5), and that each 
   manifests), the EOL feed's ramp from `since` (re-derived), `min(base, base × share × ramp)` with
   `base` the header's signed exposure total, and `since` the date of the first *signed* tag whose
   header names the namespace, or names as ungoverned a namespace one of its workloads (`Kind/name`)
-  has since left (eco-system ticket 122, re-read from the adopter clone's tags and tagged trees),
+  has since left, a governed one of the old name not counting as still holding it (eco-system
+  ticket 122, re-read from the adopter clone's tags and tagged trees),
   or null with a limit;
 - a `closed_by` on every closed `ungoverned[]` entry, `governed` or `left-repo`, agreeing with the
   recount (eco-system ticket 122). Before it every close printed as governed, a rename included;

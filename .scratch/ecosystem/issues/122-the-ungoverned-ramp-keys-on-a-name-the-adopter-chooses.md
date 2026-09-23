@@ -67,13 +67,14 @@ Built on platform branch `ticket-122-ramp-survives-rename` (platform PR 34, on o
 
 - **Platform, `compose/composition.py`.** `_signed_since` dates an ungoverned Namespace from the
   first signed tag that names it, or that names as ungoverned a Namespace X where, in that tag's
-  tree, X held a workload (`Kind/name`) that this Namespace holds now and X no longer holds. The
+  tree, X held a workload (`Kind/name`) that this Namespace holds now and X no longer holds as an
+  ungoverned Namespace (the last four words came from the review round, below). The
   price carries `since_by`, which names the tag and, for a carried age, X and the workload.
   `compute_ungoverned` takes the governed set and gives each closed entry `closed_by`:
   `governed` or `left-repo`. The `closed-ungoverned-namespace` delta says which. The
   `new-ungoverned-namespace` detail no longer says "carries the institution label", which
-  ticket 119 made untrue, and it names the carried `since`. `_first_signed_since` stays as a
-  wrapper. The selfcheck plants a rename, a copy and a governed close.
+  ticket 119 made untrue, and it names the carried `since`. `_first_signed_since` is gone
+  (review round). The selfcheck plants a rename, a copy and a governed close.
 - **Hub, `verify/priced-holes/priced_holes.py`.** It works out the new `since` by itself from
   the clone and does not import the composer. `_signed_since` reads each signed tag's header,
   then reads the tagged tree (`git ls-tree`, then `git show` for each YAML file) for the
@@ -144,6 +145,56 @@ Built on platform branch `ticket-122-ramp-survives-rename` (platform PR 34, on o
   (2026-08-25). No workload has moved between ungoverned Namespaces across them.
 - `priced_holes.py selfcheck` exit 0. `verify/misuse/verify-misuse.sh` PASS, 6 of 8 rows resolve
   by path. `verify/adr-supersession/verify-adr-supersession.sh` PASS.
+
+### Review round, 2026-09-23
+
+The review blocked on one finding and named four minor ones. Each is fixed on the same branches.
+
+- **Blocking: a governed shadow of the old name dropped the carried age.** "X no longer holds
+  it" was read from the checkout. So after a rename the adopter could re-declare the old name as
+  a governed Namespace holding inert manifests of the same `Kind/name`. The renamed Namespace's
+  `since` fell back to the rename tag and no delta printed. The verifier re-derived the same
+  wrong date. Fix (delegated): X still holds the workload only if X is still ungoverned in the
+  checkout. The composer passes its ungoverned set into `_signed_since`. The verifier passes the
+  recount's ungoverned set, and when the substrate cannot be read it prints a SKIP for the
+  `since` instead of guessing. Reason: a governed Namespace pays no ramp, so it is not where the
+  aged workload still sits. This also closes the one-step form, where the rename and the shadow
+  land in one commit with no signed tag between them. The review's tag-history fix was
+  rejected: "X did not hold it in the first signed tag where this Namespace held it" reopens the
+  two-tag dodge from decision 1 (add the copy, then delete the original), because the first tag
+  would fix it as a copy for good. Keeping X in the ungoverned set to hold the age costs the
+  adopter X's own aged price, so it gains nothing.
+- **Minor: the grader's `_workloads_at` crashed on a non-UTF-8 blob.** It now reads each blob as
+  bytes and skips a file that does not decode, as the composer does.
+- **Minor: `_first_signed_since` had only selfcheck callers.** Removed. The selfcheck calls
+  `_signed_since` directly.
+- **Minor: check d3 printed nothing for a close it could not recount.** It now prints a SKIP
+  naming why.
+- **Minor: function-body imports in `tests/test_priced_holes.py`.** Moved to module level.
+  The `_git` helper stays duplicated in the two test files. Reason (delegated): every test file
+  in `tests/` keeps its own git fixture helper, and none imports from another.
+
+Measured, red first:
+
+- The hub leg gained the shadow, signed and in one step. Against the round-one platform branch it
+  failed: `since` `2026-09-01`, expected `2024-09-01`.
+- Three new tests in `tests/test_priced_holes.py` (the shadow, the non-UTF-8 blob, the d3 SKIP).
+  Against the round-one grader: 2 failed, 23 passed, then the SKIP test failed alone.
+- The platform selfcheck gained the shadow in the ticket 122 case.
+
+Green:
+
+- `pytest tests/test_loophole_adr_0026.py tests/test_priced_holes.py tests/test_misuse.py -n0 -q`:
+  85 passed. `tests/test_misuse.py tests/test_map_surface.py`: 103 passed. mypy: "no issues
+  found in 199 source files".
+- The review's own script, `rev122_govdummy.py`, now prints `v3 gov dummy: side-2 2024-09-01`,
+  ramp 3.003, and `verifier agrees: {'side-2': '2024-09-01'}`.
+- Platform selfcheck on a fresh scratch estate of `git clone --local` copies, with the branch
+  platform: exit 0, 90 OK lines. tuppence-reset still prices at 7003870.77 GBP from since
+  2026-08-25.
+- `priced_holes.py check` on that estate: the same output byte for byte as the round-one grader,
+  exit 1 on ticket 119's three known tuppence FAILs. `priced_holes.py selfcheck` exit 0.
+  `verify-misuse.sh` PASS, 6 of 8 rows by path. `verify-adr-supersession.sh` PASS.
 
 ### The residual
 

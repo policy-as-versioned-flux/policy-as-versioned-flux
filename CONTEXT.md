@@ -607,7 +607,7 @@ that a rewritten entry cites stay as the record of the decision at the time.
   institution namespace) of the adopter's whole uncaged residual, LEF-ramped by the EOL feed's
   own ramp from `since` — the date of the first signed tag whose composed header recorded it,
   or recorded as ungoverned a namespace one of its workloads has since left (ticket 122, so a
-  rename keeps its ramp), read off tag history so it survives a close and a reopen — as of the
+  rename keeps its ramp; a governed namespace of the old name does not count as still holding it), read off tag history so it survives a close and a reopen — as of the
   newest pinned feed's
   publish date, and bounded at the whole residual. What cannot be read (no signed tag names it,
   no feed prices the residual) is a named limit on the price, never an invented date or a zero.

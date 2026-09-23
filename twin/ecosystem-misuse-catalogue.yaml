@@ -261,8 +261,10 @@ entries:
       Found by eco-system ticket 120 (2026-09-23) from round one's `loophole-2`, repaired by ticket
       122. `platform/compose/composition.py` `_signed_since` dates an ungoverned Namespace from the
       first signed tag that names it, or names as ungoverned a Namespace that then held a workload
-      (`Kind/name`) this one holds now and that Namespace no longer holds. The age follows the
-      workloads across a rename, and a copy beside the original does not take it. The price's
+      (`Kind/name`) this one holds now and that Namespace no longer holds as an ungoverned
+      Namespace. The age follows the workloads across a rename, and a copy beside the original
+      does not take it. Re-declaring the old name governed with inert manifests of the same kind
+      and name does not drop the age (the ticket 122 review round). The price's
       `since_by` names the tag, Namespace and workload. `compute_ungoverned` gives each closed
       entry a `closed_by`, `governed` or `left-repo`, and the delta says which. The hub grader
       `verify/priced-holes/priced_holes.py` re-derives the same since from the clone's tagged

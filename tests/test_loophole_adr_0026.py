@@ -325,8 +325,9 @@ def test_a_renamed_ungoverned_namespace_keeps_its_ramp_and_the_closed_delta_says
     printed a `closed-ungoverned` delta saying it now carried governed: "true", which no
     Namespace did. Now `since` is the earliest signed tag that names the Namespace, or names as
     ungoverned a Namespace that then held a workload this one holds now and that no longer
-    holds it. A rename keeps its ramp, and a closed entry says whether it was governed or left
-    the repo."""
+    holds it as an ungoverned Namespace. A rename keeps its ramp, a governed shadow of the old
+    name does not drop it (the review round), and a closed entry says whether it was governed or
+    left the repo."""
     comp = _composition()
     repo = tmp_path / "adopter"
     repo.mkdir()
@@ -360,6 +361,35 @@ def test_a_renamed_ungoverned_namespace_keeps_its_ramp_and_the_closed_delta_says
     opened = [d for d in deltas if d["kind"] == "new-ungoverned-namespace"]
     assert len(opened) == 1 and "since 2024-09-01" in opened[0]["detail"], opened
     assert comp.governed_namespaces(repo) == ["home"], "the renamed Namespace was not governed"
+
+    # Review round: re-declaring the old name as a governed Namespace that holds inert manifests
+    # of the same kind and name does not drop the carried age. A governed Namespace pays no
+    # ramp, so it cannot be the place the workload still sits.
+    dummy_ns = {"apiVersion": "v1", "kind": "Namespace",
+                "metadata": {"name": "side", "labels": {INSTITUTION: "adopter", GOVERNED: "true"}}}
+    dummy = repo / "gitops" / "apps" / "dummy.yaml"
+    dummy.write_text(yaml.safe_dump_all([dummy_ns, {"apiVersion": "apps/v1", "kind": "Deployment",
+                                                    "metadata": {"name": "app-0", "namespace": "side"}}]))
+    _signed_tag_naming(comp, repo, "v1.2.0", "2026-09-02", ["side-2"])
+    shadowed = comp.compute_ungoverned({"side-2"}, {"side-2"}, governed={"home", "side"})
+    comp.price_ungoverned(shadowed, repo, "adopter", "GBP", base, as_of)
+    held = shadowed[0]["price"]
+    assert held["since"] == "2024-09-01" and held["ramp"] == 3.0, held
+    dummy.unlink()
+
+    # The same shadow cut in one step, with no signed tag between the rename and the dummy.
+    once = tmp_path / "once"
+    once.mkdir()
+    _git(once, "init", "-q")
+    _namespaces(once, "side")
+    _signed_tag_naming(comp, once, "v1.0.0", "2024-09-01", ["side"])
+    _namespaces(once, "side-2")
+    (once / "gitops" / "apps" / "dummy.yaml").write_text(yaml.safe_dump_all(
+        [dummy_ns, {"apiVersion": "apps/v1", "kind": "Deployment",
+                    "metadata": {"name": "app-0", "namespace": "side"}}]))
+    one_step = comp.compute_ungoverned({"side-2"}, {"side"}, governed={"home", "side"})
+    comp.price_ungoverned(one_step, once, "adopter", "GBP", base, as_of)
+    assert next(e for e in one_step if e["namespace"] == "side-2")["price"]["since"] == "2024-09-01", one_step
 
     # Governing it is the close that says governed.
     ns_file = repo / "gitops" / "apps" / "namespace.yaml"
