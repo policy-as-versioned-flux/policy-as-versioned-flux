@@ -36,8 +36,9 @@ counterfactual follows it, including the legacy-header case.
 
 ## Build, 2026-09-23
 
-Built on platform branch `ticket-126-a-withdrawn-control-is-not-selectable` and hub branch
-`ticket-126-a-withdrawn-control-is-not-selectable`. The platform branch sits on platform
+Built on platform branch `ticket-126-a-withdrawn-control-is-not-selectable` (platform PR 36)
+and hub branch `ticket-126-a-withdrawn-control-is-not-selectable` (hub PR 104). Merge platform
+first. The platform branch sits on platform
 origin/main `5dadf00`, after tickets 123, 122 and 121. The hub branch sits on hub origin/main
 `e13215b`.
 
