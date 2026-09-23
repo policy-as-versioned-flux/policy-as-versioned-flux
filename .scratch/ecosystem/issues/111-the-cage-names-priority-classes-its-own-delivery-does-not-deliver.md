@@ -181,11 +181,47 @@ statement about reach, so no code change.
   with the same SKIP as `origin/main` before the change (platform@2.0.1 lacks v5.0.0). Step 1b
   lists the two new refusal kinds.
 - `compose/verify-fresh.sh` own proofs: PASS. `compose/handbook.py --selfcheck`: PASS.
-- `mypy compose/composition.py`: 86 errors, equal to `origin/main`, none in the new code.
-- Composing driftwood, tuppence and ludlow with the new composer against platform `v2.0.1` (their
-  implementations pin): `outcome: composed`, zero refusals, and four new files each,
-  `composed/policies/v4.0.0/cage-{baseline,restricted,quarantine,isolated}.yaml`.
+- `.venv/bin/python -m mypy compose/composition.py` (hub venv interpreter, run from the platform
+  worktree root and from an archive of platform `origin/main`): 89 errors on each, none in the new
+  code. The count moves with the interpreter and cache: the build first read 86 and the review
+  read 89 and 91. The invariant is "no new errors in the new code", not the count.
+- Composing driftwood, tuppence and ludlow with the new composer against their pins, each parent
+  extracted with `git archive` (platform `v2.0.1`, nist `v1.1.0`, ico and feeds at `origin/main`),
+  not the estate working tree. `_default_parent_trees` reads the working tree, so the same command
+  over a platform checkout at `main` renders more (the v5.0.0 classes and the machinery).
+  Result: `outcome: composed`, zero refusals. Against each adopter's committed `composed/` it
+  renders five new files: `composed/policies/v4.0.0/cage-{baseline,restricted,quarantine,isolated}.yaml`
+  from this change, and `composed/floor-change.json`, which the `origin/main` composer also renders
+  (checked on driftwood). `composed/evidence.json` is not in the rendered map because the CLI
+  writes it, not `compose()`.
 - Not run: a cluster rehearsal. Fact 6 true is claimed by nobody until the scheduled lane says so.
+
+### Review round, 2026-09-23
+
+The review blocked on one finding and named two minor ones. Each is fixed on the same branches.
+
+- **Blocking: a JSONPatch write of the class composed green.** A planted overlay MutatingPolicy
+  with `[JSONPatch{op: "add", path: "/spec/priorityClassName", value: "made-up"}]` composed with no
+  refusal. `_PC_ASSIGN` matches only `priorityClassName:` and the dict walk reads only a literal
+  key, so a patch path was never seen. Fix (delegated): any mention of `priorityClassName` in a
+  string that neither reader resolves is now unread, so it refuses as `unreadable-priority-class`.
+  This applies to a CEL JSONPatch, a structured patch `path`, and a classic `patchesJson6902` block.
+  The composer cannot tell a read from a write in such a string, so it refuses rather than guess.
+  Red first: two new tests, `test_a_jsonpatch_that_writes_the_class_refuses` and
+  `test_a_patch_path_in_structured_form_refuses`, failed with `'composed' != 'refused'`. Both
+  pass now. No real member regresses: `named_priority_classes()` over every YAML document under
+  platform `distribution/policies/` and `graded/policies/` and each adopter's committed
+  `composed/` (88 documents) returns zero unread.
+- **Minor: `_load_guards_from` still rebound `cage_body`.** It now loads its own copy without
+  touching `sys.modules` (delegated). Red first: `test_reading_the_machinery_leaves_the_shared_cage_body_alone`
+  failed with the old line put back, and passes without it.
+- **Minor: two numbers in "Tests run" were not derived.** The mypy line and the recompose line
+  above are rewritten from commands run in this round, as they now say.
+
+After the round: `test_priority_classes.py` has 13 tests, all pass. The four-file compose run
+(`test_priority_classes.py test_portable_observations.py test_floor_change.py
+test_comparison_history.py -n0 -q`) reads 37 passed, 11 subtests passed. `compose/verify-fresh.sh`
+and `compose/handbook.py --selfcheck` (47 checks) pass. `verify-composition.sh` was not re-run.
 
 ### What remains, in order
 
