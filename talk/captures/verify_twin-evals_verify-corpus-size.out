@@ -10,14 +10,14 @@ PASS: every one of 8 thresholds states the minimum twin/corpus_size.py derives f
 PASS: the harness refuses a stated minimum of 1, of 50 (the imported figure) and none at all at threshold 0.8, which derives 16; refused: [1, 50, None]
 PASS: the harness has three outcomes: perfect on 3 -> not-measurable, zero on 3 -> not-measurable, perfect on 16 -> pass, zero on 16 -> fail; a not-measurable run is neither passed nor failed
 PASS: a planted uncited lowering of a minimum is refused (['x min_items 16 -> 9']) and a cited one is not
-PASS: no threshold or minimum in twin/skill-thresholds.yaml was lowered without a citation against the previous version (49453187a2de) (lowered: none)
-PASS: signal-classify              items=23  min_items=16  threshold=0.80 score=1.000  a perfect score on 23 item(s) puts true accuracy >= 0.870 (95%)
-NOT MEASURABLE: evolution-judge              items=4   min_items=12  threshold=0.75 score=1.000  a perfect score on 4 item(s) puts true accuracy >= 0.250 (95%)
-NOT MEASURABLE: causal-claims                items=4   min_items=16  threshold=0.80 score=1.000  a perfect score on 4 item(s) puts true accuracy >= 0.250 (95%)
-NOT MEASURABLE: causal-claims-grade-accuracy items=4   min_items=16  threshold=0.80 score=1.000  a perfect score on 4 item(s) puts true accuracy >= 0.250 (95%)
-NOT MEASURABLE: gameplay-lens                items=3   min_items=9   threshold=0.65 score=1.000  a perfect score on 3 item(s) puts true accuracy >= 0.000 (95%)
-NOT MEASURABLE: substrate-generator          items=3   min_items=16  threshold=0.80 score=1.000  a perfect score on 3 item(s) puts true accuracy >= 0.000 (95%)
-NOT MEASURABLE: ethics-gate                  items=5   min_items=16  threshold=0.80 score=1.000  a perfect score on 5 item(s) puts true accuracy >= 0.400 (95%)
-SHORT: 6 of 7 skill metrics (evolution-judge 4<12, causal-claims 4<16, causal-claims-grade-accuracy 4<16, gameplay-lens 3<9, substrate-generator 3<16, ethics-gate 5<16)
+PASS: no threshold or minimum in twin/skill-thresholds.yaml was lowered without a citation against the previous version (98caf04a10a9) (lowered: none)
+NOT MEASURABLE: signal-classify              items=23  measured=0   min_items=16  threshold=0.80 score=1.000  a perfect score on 23 item(s) puts true accuracy >= 0.870 (95%)
+NOT MEASURABLE: evolution-judge              items=4   measured=0   min_items=12  threshold=0.75 score=1.000  a perfect score on 4 item(s) puts true accuracy >= 0.250 (95%)
+NOT MEASURABLE: causal-claims                items=4   measured=0   min_items=16  threshold=0.80 score=1.000  a perfect score on 4 item(s) puts true accuracy >= 0.250 (95%)
+NOT MEASURABLE: causal-claims-grade-accuracy items=4   measured=0   min_items=16  threshold=0.80 score=1.000  a perfect score on 4 item(s) puts true accuracy >= 0.250 (95%)
+NOT MEASURABLE: gameplay-lens                items=3   measured=0   min_items=9   threshold=0.65 score=1.000  a perfect score on 3 item(s) puts true accuracy >= 0.000 (95%)
+NOT MEASURABLE: substrate-generator          items=3   measured=0   min_items=16  threshold=0.80 score=1.000  a perfect score on 3 item(s) puts true accuracy >= 0.000 (95%)
+NOT MEASURABLE: ethics-gate                  items=5   measured=0   min_items=16  threshold=0.80 score=1.000  a perfect score on 5 item(s) puts true accuracy >= 0.400 (95%)
+SHORT: 7 of 7 skill metrics (signal-classify 0<16, evolution-judge 0<12, causal-claims 0<16, causal-claims-grade-accuracy 0<16, gameplay-lens 0<9, substrate-generator 0<16, ethics-gate 0<16)
 UNLOOKED: none
-SKIP: 6 of 7 skill metrics (evolution-judge 4<12, causal-claims 4<16, causal-claims-grade-accuracy 4<16, gameplay-lens 3<9, substrate-generator 3<16, ethics-gate 5<16) are not measurable, each corpus below the minimum its threshold states; the derivation, the third outcome and the citation guard were all observed true
+SKIP: 7 of 7 skill metrics (signal-classify 0<16, evolution-judge 0<12, causal-claims 0<16, causal-claims-grade-accuracy 0<16, gameplay-lens 0<9, substrate-generator 0<16, ethics-gate 0<16) are not measurable, each corpus below the minimum its threshold states in measured items (an item right on no checkable basis is not measured, eco-system ticket 118); the derivation, the third outcome and the citation guard were all observed true
