@@ -232,3 +232,42 @@ field as "written by the ticket 07 harness".
   `.scratch/laya-loophole/research/11-loophole-round-three/`,
   `.scratch/laya-loophole/research/11-blind-match/` — the three rounds and the blind reader.
 - `tests/test_cage_ladder_holes.py` — the two survivors, nine legs.
+
+## Note, 2026-09-22 (eco-system ticket 116, delegated): three of eighteen, not a third
+
+Eco-system ticket 116 checked the twelve candidates of rounds two and three against the served
+code. The engine was kyverno 1.18.2. The units were read at their origin/main: platform
+`3d7f098`, driftwood `c96c412`, ludlow `32d5696`, tuppence `7009ea9`. Every verdict is held by a
+test in `tests/test_loophole_rounds_two_and_three.py`, and that file computes the numbers below
+from its own verdict table.
+
+**1 of 12 survived, so 3 of 18 candidates survived across three rounds: 17%.** By round it is 2
+of 6, 1 of 6 and 0 of 6. "About a third" rested on round one alone and is corrected to **about
+one in six**. Point 2's budget changes with it: three rounds produce about 18 candidates and
+about 3 real defects, not about 6. The checking cost per candidate does not change, so a real
+defect now costs about twice the checking that point 2 priced.
+
+The counting rule is ticket 08's. A candidate survives when the place it points at holds a real
+defect that no earlier survivor or ticket already holds. Three more of the twelve point at a real
+place that is already credited: round three's `loophole-1` at ticket 113's, and round two's
+`overreach-4` and round three's `overreach-5` at the new survivor's. Counted as survivors, those
+echoes would give 4 of 12. The rule counts defects found per candidate, which is what a budget
+needs.
+
+The survivor kept the pattern of points 3 and 5. Round two's `loophole-2` said the cage reaches
+only the Namespaces a discovery list names. There is no discovery list, so the mechanism is
+false. The place is real. A pod that claims no policy version, in a Namespace with no governed
+label, is touched by no served policy. The composition prices that Namespace only when it carries
+the institution label, and the adopter chooses whether it does. So silence buys both no cage and
+no price. It graduated as eco-system ticket 119 and entered `twin/ecosystem-misuse-catalogue.yaml`
+as `adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace`. The judge called it
+resolvable, as it called all twelve.
+
+Two smaller corrections, both measured:
+
+- The Consequences above say four of the twelve restate a reason round one gave. Ticket 11's own
+  reason table, `11-targets.json`, gives three: round two's `overreach-4` and `overreach-6`, and
+  round three's `overreach-5`.
+- The `infra` declaration drew two more candidates, round two's `loophole-1` and round three's
+  `loophole-2`. Both are false: no served body reads `infra` or a party's roles. Across three
+  rounds the clause drew four candidates and one real defect, ticket 113.

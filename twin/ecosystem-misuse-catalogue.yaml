@@ -32,7 +32,7 @@
 #
 # Versioned: bump `version` in the same commit as any change to an entry below.
 schema: twin.misuse-catalogue/v1
-version: 6
+version: 7
 entries:
   - id: publisher-games-own-feed-price
     risk: >-
@@ -212,3 +212,36 @@ entries:
       - "platform/shift-left/tier_binding.py::governed Namespace declarations"
     source: laya-loophole ticket 08 (survivor 2 of 6); ticket 07's loophole round against
       ADR-0022; ADR-0020; ticket 78
+
+  - id: adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace
+    risk: >-
+      An adopter runs a workload in a Namespace that carries none of the estate's labels: not
+      governed, not institution, no tier. The pod claims no policy version. No served policy
+      touches it, and the composition does not price the Namespace, so the workload runs with no
+      cage and no price while the estate reads the adopter as caged and priced.
+    mechanism: >-
+      Found by eco-system ticket 116 (2026-09-22) from round two's `loophole-2` of the Laya and
+      loophole map's ticket 11, and not yet closed. What the cage reaches is set by two labels:
+      a pod is caged when it claims a policy version (`cage-tier`'s `claims-a-policy-version`
+      matchCondition, kept on purpose by ticket 113 so CoreDNS stays outside the cage) or when
+      its Namespace is governed (`governed-namespace-requires-claim`'s namespaceSelector). What
+      the composition prices is set by a third: `platform/compose/composition.py`
+      `ungoverned_namespaces` lists a Namespace only when it carries `INSTITUTION_LABEL`, and
+      calls one without it infrastructure. The adopter chooses that label, and nothing checks
+      the choice. `tests/test_loophole_rounds_two_and_three.py` reproduces both halves under
+      kyverno 1.18.2: every policy document each adopter serves and every one the platform
+      delivers next leaves the pod as it arrived, a governed control is reached, and the
+      composition's walk lists the Namespace only once the institution label is added. Measured
+      on tuppence's origin/main: the `openbao-reset-role` Job runs in `openbao`, a Namespace
+      tuppence's repo never declares, and claims no version. Ticket 119 decides and builds the
+      repair, and that repair must keep the substrate outside the cage (ticket 113, proof 3).
+    anchors:
+      - "tests/test_loophole_rounds_two_and_three.py::test_an_unclaimed_pod_in_an_unlabelled_namespace_is_outside_every_served_policy"
+      - "tests/test_loophole_rounds_two_and_three.py::test_the_composition_prices_no_namespace_that_omits_the_institution_label"
+      - "platform/compose/composition.py::def ungoverned_namespaces"
+      - "platform/compose/composition.py::INSTITUTION_LABEL"
+    waits_on:
+      - ticket: "119"
+        for: a cage or a price for a Namespace that carries none of the estate's labels
+    source: eco-system ticket 116 (survivor 1 of 12); the Laya and loophole map's ticket 11,
+      round two `loophole-2`; ADR-0022 ("silence buys nothing anywhere"); ADR-0026 point 4
