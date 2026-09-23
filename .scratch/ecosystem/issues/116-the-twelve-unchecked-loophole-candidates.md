@@ -1,7 +1,7 @@
 # 116 — The twelve unchecked loophole candidates
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -147,3 +147,22 @@ judge called all twelve resolvable.
 ### What remains
 
 Nothing waits on the owner. The survivor's repair is ticket 119.
+
+## Answer
+
+Resolved 2026-09-23 by hub PR 90. All twelve candidates from loophole rounds two and three carry a
+verdict from a deterministic check against the served code, under kyverno 1.18.2.
+
+1. **One survivor.** Round two's `loophole-2` names a mechanism that is false, but its place is
+   real: a pod that claims no policy version, in a Namespace with no governed label, is caged by
+   no served policy and priced by nothing unless its Namespace carries the institution label.
+   tuppence has a live case today. It is ticket 119 and the catalogue row
+   `adopter-runs-uncaged-and-unpriced-in-an-unlabelled-namespace`.
+2. **Eleven discards.** Each names the fact that makes it false and the test that shows it, in
+   `tests/test_loophole_rounds_two_and_three.py`.
+3. **The survival rate is 3 of 18 over three rounds, about one in six.** ADR-0030's "about a third"
+   is corrected in a dated note. A test derives the rate from the verdict table.
+
+Review: one round, pass, four minor findings. They are recorded here and not fixed: an allow-list
+of policy kinds in the survivor leg, a misnamed precedent for the counting rule, an unused import,
+and round one's two counts typed as constants.
