@@ -1,7 +1,7 @@
 # 122 — The ungoverned ramp keys on a name the adopter chooses
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -211,3 +211,27 @@ next loophole round against ADR-0026 (ADR-0030).
 - Moving each adopter's tools pin to that release, then recomposing and pushing. Only tuppence
   has an ungoverned Namespace today. Its evidence will then carry `since_by`, and any close will
   carry `closed_by`.
+
+## Answer
+
+Resolved 2026-09-23 by platform PR 34 and hub PR 100. A renamed ungoverned Namespace keeps its
+ramp, and a closed delta says why it closed.
+
+1. `since` is the first signed tag that names the Namespace, or that names as ungoverned a
+   Namespace which held, in that tag's tree, a workload this one holds now and that Namespace no
+   longer holds. The age follows the workloads across a rename, and a copy beside the original
+   starts its own ramp.
+2. A carried age counts only while the old name is still ungoverned in the checkout. So an
+   adopter cannot drop the age by re-declaring the old name as a governed Namespace that holds
+   inert copies of the workloads.
+3. Each closed `ungoverned[]` entry carries `closed_by`, `governed` or `left-repo`, and its
+   `closed-ungoverned-namespace` delta says which.
+4. `test_renaming_an_ungoverned_namespace_restarts_its_ramp_and_prints_as_governed` is the
+   regression test. The hub grader re-derives the rule from each adopter's own tags.
+
+The residual is recorded for the next loophole round: an adopter that renames every workload
+with the Namespace still restarts the ramp.
+
+Review: round 1 blocked on the governed shadow of the old name. Round 2 passed. No adopter
+composes under this build until the owner cuts a platform tools release and each adopter moves
+its pin. Only tuppence has an ungoverned Namespace today.
