@@ -1,7 +1,7 @@
 # 118 — A green that rests on luck may not promote
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -205,3 +205,23 @@ A fifth wrong-basis item rates 0.762 and fails.
   come from. The check turns PASS by itself when enough items carry bases and every rate clears.
 - **The first recording clock run after merge** re-grades both amber checks on the runner. The
   integrator reads that run and records any fall.
+
+## Answer
+
+Resolved 2026-09-23 by hub PR 92. A right answer on a wrong basis no longer raises the grade.
+
+1. `twin/skills.py` gives each item one of four verdicts from the pure function `attribute()`:
+   `right`, `wrong`, `wrong-basis` and `unscoreable`. The third state is named for what the
+   harness sees, a stated basis that was checked and failed, not for its cause.
+2. The threshold grades the attributable rate: `right` items over `measured_count`. A
+   `wrong-basis` item stays in the denominator, so luck lowers the rate. An `unscoreable` item is
+   left out, so a corpus with no checkable basis cannot pass.
+3. `twin/skill-scores.jsonl` records `attributable_rate` beside the score. Model permission
+   condition 1 reads it and refuses a row without it.
+4. `verify/twin-evals/verify-attributable-rate.sh` grades it. A planted skill that is right on
+   every item for the wrong reason fails at 0.000, where a two-state harness passed it at 1.000.
+
+On the day, no real corpus item carries a basis, so all 7 metrics have no rate and the new check
+is a declared amber. Crediting the prior art in public stays with ticket 82.
+
+Review: one round, pass, two minor findings on stale prose and dates, not fixed.
