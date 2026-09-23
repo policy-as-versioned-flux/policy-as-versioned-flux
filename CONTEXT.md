@@ -573,13 +573,15 @@ that a rewritten entry cites stay as the record of the decision at the time.
 - **Hole** (added 2026-08-28, ticket 15; built 2026-09-03, ticket 38) — A selected control no
   **control claim** covers, keyed `(source, id)`: the catalogue that defines it and its bare id
   there. Priced as the regulator's **control weight** for that control times the adopter's sized
-  **exposure** for the regime, so the regime's price is the sum of its holes and implementing a
-  control reduces it; a hole no pinned weight names carries no amount, a named absence rather
-  than a zero. Never refused, never counted; the new-hole and widening refusals are gone and
+  **exposure** for the regime. The weights partition the exposure, and the regime's price is the
+  sum of the lines the adopter has not implemented, so implementing a control reduces it and can
+  move the tier (ticket 121). A line the adopter does not select stays on the price. A hole no
+  pinned weight names carries no amount, a named absence rather than a zero. Never refused, never counted; the new-hole and widening refusals are gone and
   each new, closed or widened hole prints as a **delta** on the evidence document under the
   adopter's own perspective and currency. A removal prints as a `removed-control` delta carrying
-  the amount the hole carried, and the regime's price does not move (ADR-0026, 2026-09-04; built
-  2026-09-23, ticket 124). A control the regulator withdraws is not the adopter's removal: it
+  the amount the hole carried (ADR-0026, 2026-09-04; built 2026-09-23, ticket 124). Removing an
+  open hole does not move the regime's price; removing an implemented control puts its line back
+  on it. A control the regulator withdraws is not the adopter's removal: it
   prints as a `withdrawn-control` delta that names the regulator's catalogue bump (ticket 123).
 
 - **Delta** (added 2026-09-03, ticket 38; widened 2026-09-23, tickets 124 and 123) — What changed

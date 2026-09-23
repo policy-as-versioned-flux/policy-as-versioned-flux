@@ -327,3 +327,28 @@ workload with the Namespace still restarts the ramp, because a workload's kind a
 adopter's to choose too. It costs a rename of every workload rather than one Namespace, and
 ticket 122 records it for the next loophole round. The decisions and their reasons are in that
 ticket. No decision above changes.
+
+## Note, 2026-09-23 (eco-system ticket 121, delegated): implementing a control reduces the price
+
+Point 2 said implementing a control reduces the regime's price. Ticket 120 found the code did
+not: the regime entry was the whole partition, and no line's status reached it. Eco-system
+ticket 121 built it. The partition stays whole. Every line on `holes[]` keeps its weight and its
+amount, and `total` is still their sum, so the regulator's weights stay a graded fact on their
+own line. The entry's `amount` is now the sum of the lines the adopter has not implemented. A
+line is implemented when the adopter selects that control and a claim covers it; it reads
+`covered` or `closed`. The entry's tiers are selected against the same open share of the
+residual, so implementing a control can move the tier through the selection that already reads
+the entry. That is ticket 15 item 2's reason: a price that cannot move the tier is a report, not
+a cage.
+
+Three consequences. A line the adopter does not select stays on the price, as point 5 says: the
+regulator prices it whether or not it is selected. So removing a control the adopter had
+implemented puts its line back on the entry, and removing an open one moves nothing. A withdrawn
+line stays on the price too, as ticket 123 recorded. And a wrong weight in the regulator's feed
+now moves the price, once the adopter implements a control it names. The recourse is the
+adopter's own pin, which holds the version it priced against, and a pull request to the
+publisher's repo.
+
+The bespoke and ungoverned prices stay reported on their own lines and enter no sum and no
+tier. Ticket 121 records why. The exposure total an ungoverned Namespace takes its share of is
+now smaller where the adopter implements a weighted control. No decision above changes.
