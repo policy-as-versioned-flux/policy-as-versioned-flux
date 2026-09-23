@@ -9,7 +9,8 @@
 #
 # WHAT IS GRADED, item by item:
 #   1  the newest recorded score for that skill AND that model version clears the threshold the
-#      threshold file sets TODAY, and was itself recorded against that same bar
+#      threshold file sets TODAY, and was itself recorded against that same bar; the number that
+#      meets the bar is the row's attributable rate, which luck lowers (eco-system ticket 118)
 #   2  the corpus digest of that scoring run is the digest of the corpus in the tree today
 #   3  the claim records which model_version judged it, or it is not a permitted claim
 #   4  the permission covers judging and never merging; a model makes no override and prices
@@ -174,7 +175,9 @@ good_row = {"skill": "gameplay-lens", "model_version": FAKE, "score": 0.95,
             # A fabricated row: it claims the minimum gameplay-lens states, which the real corpus
             # does not yet hold. The positive control needs a measurable run to grant anything.
             "min_items": min_items_for("gameplay-lens"), "total": min_items_for("gameplay-lens"),
-            "outcome": "pass"}
+            "measured_count": min_items_for("gameplay-lens"), "outcome": "pass",
+            # Eco-system ticket 118: item 1 grades the attributable rate, so a granted row needs one.
+            "attributable_rate": 0.95}
 
 # POSITIVE control first. A rule that refuses everything passes every negative control there is.
 perm = permission("gameplay-lens", FAKE, scores=[good_row], facts=facts, readings=[], fitted={})
@@ -190,16 +193,24 @@ def refused_by(item, row=None, facts_=None, readings=None, seam=True, fitted=Non
     out(bool(hit) and not perm.granted,
         "NEGATIVE control item %d: %s -> %s" % (item, label, hit[0].detail if hit else "NOT refused"))
 
-refused_by(1, row={**good_row, "score": 0.10}, label="a score under the versioned threshold")
+refused_by(1, row={**good_row, "score": 0.10, "attributable_rate": 0.10}, label="a score under the versioned threshold")
 # ...and item 1 reads the bar in the TREE, not the one the row happens to carry. A raised
 # threshold must not be cleared by a score that was graded against the old one.
 refused_by(1, row={**good_row, "threshold": 0.20}, label="a score recorded against a bar the threshold file no longer sets")
 # ...and item 1 refuses a run below the minimum corpus its threshold states (ticket 112), even
 # with a perfect score. This is the review's reproduction: a candidate never fitted, 3 items.
-refused_by(1, row={**good_row, "score": 1.0, "total": 3, "outcome": "not-measurable", "passed": False},
+refused_by(1, row={**good_row, "score": 1.0, "total": 3, "measured_count": 3, "attributable_rate": 1.0,
+                   "outcome": "not-measurable", "passed": False},
            label="a perfect score on 3 items, below the stated minimum, recorded as not-measurable")
-refused_by(1, row={k: v for k, v in {**good_row, "total": 3}.items() if k not in ("outcome", "min_items")},
+refused_by(1, row={k: v for k, v in {**good_row, "total": 3}.items() if k not in ("outcome", "min_items", "measured_count")},
            label="a legacy row with no outcome, 3 items against the minimum the tree states today")
+# ...and item 1 grades the attributable rate, not the score (eco-system ticket 118). A score that
+# clears the bar on answers whose stated basis was wrong clears nothing, and a row with no rate
+# at all may rest on luck, so it is refused as well.
+refused_by(1, row={**good_row, "score": 0.95, "attributable_rate": 0.40, "wrong_basis": 5},
+           label="a score of 0.950 whose attributable rate is 0.400, the rest right on a wrong basis")
+refused_by(1, row={k: v for k, v in good_row.items() if k != "attributable_rate"},
+           label="a row that records no attributable rate, as every row before ticket 118 does")
 refused_by(2, row={**good_row, "corpus_digest": "0" * 64}, label="a scoring run against a corpus the tree no longer holds")
 refused_by(5, row={**good_row, "model_version": "somebody-else-2.0.0"}, label="no recorded score at all; absence is not consent")
 refused_by(6, seam=True and False, label="the seam did not run, so nothing was checked")

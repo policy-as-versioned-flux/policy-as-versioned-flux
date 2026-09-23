@@ -661,6 +661,21 @@ that a rewritten entry cites stay as the record of the decision at the time.
   never typed. A run on fewer items is not measurable: the threshold says nothing about it either
   way. It is a run-level outcome, not an item state. Six of the seven skill metrics were not
   measurable on the day it landed.
+  Since eco-system ticket 118 the minimum counts **measured** items only, so all seven were not
+  measurable on 2026-09-23.
+
+- **Wrong basis** (added 2026-09-23, eco-system ticket 118) — An item verdict in a skill eval: the
+  answer was right, and the basis the skill stated for it was checked against the basis the corpus
+  item carries and did not hold. It is neither a pass nor a fail. It counts toward the
+  **attributable rate**'s denominator and not its numerator, so luck lowers the rate. The other
+  item verdicts are right (a right answer on a basis that held), wrong (a wrong answer, whatever
+  its basis) and **unscoreable** (a right answer with no checkable basis, which is not measured).
+  _Avoid_: lucky, which names a cause the harness never measures; passed.
+
+- **Attributable rate** (added 2026-09-23, eco-system ticket 118) — The number a skill threshold
+  grades: right items over measured items. Measured items are every item but the unscoreable
+  ones. It is recorded beside the score in `twin/skill-scores.jsonl`, and it is null, never 0, when
+  nothing was measured. Model permission condition 1 reads it.
 
 - **Headline skill** (added 2026-08-28, ticket 23) — Judgement a human runs over unbound signals.
   It proposes which component a headline binds to and, if the human judges a move, an attributable

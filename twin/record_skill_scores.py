@@ -144,9 +144,12 @@ def main(argv: list[str] | None = None) -> int:
     labels = {"pass": "PASS", "fail": "FAIL", "not-measurable": "NOT MEASURABLE"}
     for entry in entries:
         status = labels[entry["outcome"]]
+        # Eco-system ticket 118: the attributable rate is what the threshold grades, over the
+        # measured items; the score is printed beside it.
+        rate = "none" if entry["attributable_rate"] is None else f"{entry['attributable_rate']:.3f}"
         print(
-            f"{status:<14}  {entry['skill']:<28} score={entry['score']:.3f}  threshold={entry['threshold']}"
-            f"  items={entry['total']}  min_items={entry['min_items']}"
+            f"{status:<14}  {entry['skill']:<28} rate={rate}  score={entry['score']:.3f}  threshold={entry['threshold']}"
+            f"  items={entry['total']}  measured={entry['measured_count']}  min_items={entry['min_items']}"
         )
     return 1 if any(entry["outcome"] == "fail" for entry in entries) else 0
 
