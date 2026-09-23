@@ -31,7 +31,9 @@ Three candidates survived.
      Consequences say a control the regulator withdraws "is not an adopter removal". The code
      cannot tell the two apart. It compares the selected set with the last signed one and books
      every control that left as a `removed-control` in the adopter's name. Until ticket 124 it
-     refused; since ticket 124 it composes and prints the delta. Either way it names the adopter.
+     refused; since ticket 124 it composes and prints the delta. Either way it named the
+     adopter. Ticket 123 repaired it: a withdrawal now prints as a `withdrawn-control` delta that
+     names the regulator's bump, and its leg is a regression test.
 
 When a survivor's ticket repairs its place, the survivor leg here flips, and that ticket owns
 the flip.
@@ -53,6 +55,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+import pytest
 import yaml
 
 HUB = Path(__file__).resolve().parent.parent
@@ -121,8 +124,9 @@ VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
         "discard", "test_a_namespace_reaches_the_cluster_only_in_a_tag_whose_header_names_it",
         "a Namespace runs only from a signed tag whose verified header names it, so no delay exists"),
     (3, "loophole-3"): (
-        "survivor", "test_a_regulator_withdrawal_refuses_the_adopter_as_a_removal",
-        "the withdrawn hole does not vanish: it is booked as the adopter's own removal"),
+        "survivor", "test_a_regulator_withdrawal_prints_as_the_regulators_bump",
+        "the withdrawn hole does not vanish: it was booked as the adopter's own removal until "
+        "ticket 123, and now prints as the regulator's withdrawal"),
     (3, "overreach-4"): (
         "discard", "test_no_controls_parent_fires_only_when_none_is_declared",
         "`no-controls-parent` never fires on a rotted pin; a missing parent tree is ADR-0020's refusal"),
@@ -348,13 +352,89 @@ def test_renaming_an_ungoverned_namespace_restarts_its_ramp_and_prints_as_govern
     assert comp.governed_namespaces(repo) == ["home"], "the renamed Namespace was not governed"
 
 
-def test_a_regulator_withdrawal_refuses_the_adopter_as_a_removal(tmp_path):
-    """Survivor 3, round 3 `loophole-3`. The adopter keeps its baseline name and changes
-    nothing. The regulator's next catalogue withdraws aa-2 and drops it from SMALL. The
-    composition books aa-2 as a `removed-control` delta under the adopter's own perspective:
-    a removal in the adopter's name. ADR-0026 says a withdrawal is not an adopter removal.
-    Ticket 124 turned the refusal this leg first found into the priced delta; ticket 123 owns
-    telling the two apart, and flips this leg."""
+def _withdraw(nist: Path, cid: str, *, from_catalogue: bool, baselines: tuple[str, ...]) -> None:
+    """The regulator's next catalogue, in place: `cid` leaves every named baseline profile in
+    `baselines` and, with `from_catalogue`, leaves the catalogue too. The adopter's own tree is
+    not touched."""
+    catalog = nist / "catalog"
+    meta = json.loads((catalog / "BASELINE_VERSIONS.json").read_text())
+    for name in baselines:
+        path = catalog / meta["baselines"][name]["file"]
+        profile = json.loads(path.read_text())
+        for imp in profile["profile"]["imports"]:
+            for inc in imp.get("include-controls", []):
+                if cid in inc.get("with-ids", []):
+                    inc["with-ids"].remove(cid)
+        path.write_text(json.dumps(profile))
+    if from_catalogue:
+        path = catalog / json.loads((catalog / "CATALOG_VERSION.json").read_text())["file"]
+        doc = json.loads(path.read_text())
+
+        def drop(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+            return [dict(c, controls=drop(c.get("controls", []))) if c.get("controls") else c
+                    for c in items if c["id"] != cid]
+
+        for group in doc["catalog"].get("groups", []):
+            group["controls"] = drop(group.get("controls", []))
+        path.write_text(json.dumps(doc))
+
+
+def _catalogue_controls(nist: Path) -> tuple[Path, dict[str, Any]]:
+    catalog = nist / "catalog"
+    path = catalog / json.loads((catalog / "CATALOG_VERSION.json").read_text())["file"]
+    return path, json.loads(path.read_text())
+
+
+def _walk(items: list[dict[str, Any]]) -> Any:
+    for c in items:
+        yield c
+        yield from _walk(c.get("controls", []))
+
+
+def _status(nist: Path, cid: str) -> str | None:
+    """The `status` prop the catalogue in `nist` gives `cid`, or None."""
+    _path, doc = _catalogue_controls(nist)
+    for group in doc["catalog"].get("groups", []):
+        for c in _walk(group.get("controls", [])):
+            if c["id"] == cid:
+                return next((p["value"] for p in c.get("props", []) if p.get("name") == "status"), None)
+    raise AssertionError(f"{cid} is not in {nist}'s catalogue")
+
+
+def _mark_withdrawn(nist: Path, cid: str) -> None:
+    """The regulator's next catalogue keeps `cid` under `status: withdrawn`, the way NIST
+    marks the controls it withdrew."""
+    path, doc = _catalogue_controls(nist)
+    for group in doc["catalog"].get("groups", []):
+        for c in _walk(group.get("controls", [])):
+            if c["id"] == cid:
+                c["props"] = [p for p in c.get("props", []) if p.get("name") != "status"]
+                c["props"].append({"name": "status", "value": "withdrawn"})
+    path.write_text(json.dumps(doc))
+
+
+def _move_nist_pin(work: Path, before_pin: dict[str, Any]) -> None:
+    """The bump reaches tuppence the only way one can: its nist pin moves to a new tag."""
+    pin = work / "gitops" / "flux-system" / "gotk-sync-nist.yaml"
+    pin.write_text(pin.read_text().replace(f"tag: v{before_pin['version']}", "tag: v9.0.0")
+                   .replace(before_pin["sha"], "9" * 40))
+    _edit_party(work, lambda doc: [e.update(version="9.0.0") for e in doc["inherits"]
+                                   if e["party"] == "nist" and e["kind"] == "controls"])
+
+
+def _parent(rendered: dict[str, str], party: str) -> dict[str, Any]:
+    header = yaml.safe_load(rendered["composed/HEADER.yaml"])
+    return next(p for p in header["parents"] if p["party"] == party and p["kind"] == "controls")
+
+
+def test_a_regulator_withdrawal_prints_as_the_regulators_bump(tmp_path):
+    """Survivor 3, round 3 `loophole-3`, repaired by eco-system ticket 123. The adopter keeps
+    its baseline name and changes nothing. The regulator's next catalogue withdraws aa-2 and
+    drops it from SMALL. The composition composes and prints one `withdrawn-control` delta. It
+    names the regulator and its catalogue on both sides of the bump, and it never names the
+    adopter as the one who removed it. No `removed-control` delta prints. The perspective stays
+    the adopter's: it says whose pound the amount is, not who acted. Until ticket 124 this
+    refused; from ticket 124 to ticket 123 it printed a `removed-control` in the adopter's name."""
     comp = _composition()
     trees = _fixture_estate(comp, tmp_path)
     work = tmp_path / "fixture-adopter14"
@@ -363,25 +443,178 @@ def test_a_regulator_withdrawal_refuses_the_adopter_as_a_removal(tmp_path):
     assert first["outcome"] == "composed", first["refusals"]
     comp._commit_header(work, rendered)
 
-    catalog = trees["fixture-nist"] / "catalog"
-    doc = json.loads((catalog / "catalog.json").read_text())
-    group = doc["catalog"]["groups"][0]
-    group["controls"] = [c for c in group["controls"] if c["id"] != "aa-2"]
-    (catalog / "catalog.json").write_text(json.dumps(doc))
-    small = json.loads((catalog / "small.json").read_text())
-    small["profile"]["imports"][0]["include-controls"][0]["with-ids"].remove("aa-2")
-    (catalog / "small.json").write_text(json.dumps(small))
+    _withdraw(trees["fixture-nist"], "aa-2", from_catalogue=True, baselines=("SMALL", "BIG"))
     party_before = (work / "party.yaml").read_text()
-
-    second, _ = comp.compose(work, trees)
+    second, second_rendered = comp.compose(work, trees)
     assert (work / "party.yaml").read_text() == party_before, "the adopter changed nothing"
     assert second["outcome"] == "composed", second["refusals"]
-    removed = [d for d in second["deltas"] if d["kind"] == "removed-control"]
-    assert [d["control_id"] for d in removed] == ["aa-2"], second["deltas"]
-    assert removed[0]["perspective"] == "fixture-adopter14", removed
-    assert "left fixture-adopter14's selected control set" in removed[0]["detail"], removed
-    adr = ADR_0026.read_text(encoding="utf-8")
-    assert "A control the regulator withdraws from its catalogue** is not an adopter removal" in adr
+
+    assert [d for d in second["deltas"] if d["kind"] in ("removed-control", "baseline-narrowing")] == []
+    withdrawn = [d for d in second["deltas"] if d["kind"] == "withdrawn-control"]
+    assert [(d["source"], d["control_id"]) for d in withdrawn] == [("fixture-nist", "aa-2")], second["deltas"]
+    d = withdrawn[0]
+    assert d["withdrawn_by"] == "fixture-nist" and d["reason"] == "catalogue", d
+    before, after = _parent(rendered, "fixture-nist"), _parent(second_rendered, "fixture-nist")
+    assert before["sha"] != after["sha"], "the regulator's tree moved"
+    assert d["catalogue"] == {"from": f"{before['version']}@{before['sha'][:12]}",
+                              "to": f"{after['version']}@{after['sha'][:12]}"}, d
+    assert d["catalogue"]["from"] in d["detail"] and d["catalogue"]["to"] in d["detail"], d
+    assert "fixture-adopter14" not in d["detail"], d
+    assert d["perspective"] == "fixture-adopter14" and d["currency"] == "GBP", d
+    assert d["amount"] is None and d["priced_by"] is None, d
+    header = yaml.safe_load(second_rendered["composed/HEADER.yaml"])
+    assert header["selected-controls"] == ["aa-1", "aa-1.1"], header
+
+    record = " ".join(ADR_0026.read_text(encoding="utf-8").split())
+    assert "A control the regulator withdraws from its catalogue** is not an adopter removal" in record
+    assert "Eco-system ticket 123 built the withdrawal" in record
+
+
+def test_a_baseline_the_regulator_narrows_under_the_same_name_is_its_withdrawal(tmp_path):
+    """Ticket 123's second shape. The regulator keeps aa-1.1 in its catalogue and drops it from
+    SMALL. The adopter's last header records what its own overlay selected (nothing), so aa-1.1
+    left with the regulator's baseline, not with the adopter."""
+    comp = _composition()
+    trees = _fixture_estate(comp, tmp_path)
+    work = tmp_path / "fixture-adopter14"
+    comp._write_fixture_adopter(work, "SMALL")
+    first, rendered = comp.compose(work, trees)
+    assert first["outcome"] == "composed", first["refusals"]
+    assert yaml.safe_load(rendered["composed/HEADER.yaml"])["overlay-controls"] == []
+    comp._commit_header(work, rendered)
+
+    _withdraw(trees["fixture-nist"], "aa-1.1", from_catalogue=False, baselines=("SMALL",))
+    second, _ = comp.compose(work, trees)
+    assert second["outcome"] == "composed", second["refusals"]
+    assert [d["kind"] for d in second["deltas"]] == ["withdrawn-control"], second["deltas"]
+    d = second["deltas"][0]
+    assert (d["control_id"], d["reason"], d["withdrawn_by"]) == ("aa-1.1", "baseline", "fixture-nist"), d
+    assert "SMALL" in d["detail"] and "fixture-adopter14" not in d["detail"], d
+
+
+def test_an_adopters_own_removal_stays_a_removal_beside_a_withdrawal(tmp_path):
+    """The repair must not launder an adopter's act as the regulator's. The adopter selects aa-3
+    through its overlay, and the regulator drops aa-1.1 from SMALL. In one run the adopter takes
+    aa-3 out of its overlay and the regulator's bump lands. aa-3 prints as the adopter's
+    `removed-control`; aa-1.1 prints as the regulator's `withdrawn-control`."""
+    comp = _composition()
+    trees = _fixture_estate(comp, tmp_path)
+    work = tmp_path / "fixture-adopter14"
+    comp._write_fixture_adopter(work, "SMALL", controls_add=["aa-3"])
+    first, rendered = comp.compose(work, trees)
+    assert first["outcome"] == "composed", first["refusals"]
+    assert yaml.safe_load(rendered["composed/HEADER.yaml"])["overlay-controls"] == ["aa-3"]
+    comp._commit_header(work, rendered)
+
+    _withdraw(trees["fixture-nist"], "aa-1.1", from_catalogue=False, baselines=("SMALL",))
+    _edit_party(work, lambda doc: doc["overlay"].update(controls=[]))
+    second, _ = comp.compose(work, trees)
+    assert second["outcome"] == "composed", second["refusals"]
+    kinds = {d["control_id"]: d["kind"] for d in second["deltas"] if "control_id" in d}
+    assert kinds == {"aa-3": "removed-control", "aa-1.1": "withdrawn-control"}, second["deltas"]
+
+
+# NIST keeps ac-2.10 under `status: withdrawn`, and an overlay can still select it (the gap the
+# ticket-123 build recorded). The review of ticket 123 found the adopter's own removal of it was
+# booked as the regulator's withdrawal.
+OWN_WITHDRAWN_STATUS = "ac-2.10"
+
+
+@pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal(tmp_path, legacy_header):
+    """Ticket 123, review round. tuppence selects ac-2.10 through its overlay. NIST's pinned
+    catalogue keeps ac-2.10 under `status: withdrawn`, and the composition selects it all the
+    same. The adopter alone then takes it out of its overlay; the nist pin does not move. That
+    is the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
+    happen. A last header with no `overlay-controls` must not change the answer."""
+    assert _status(ESTATE / "nist", OWN_WITHDRAWN_STATUS) == "withdrawn"
+    comp = _composition()
+    work = _tuppence(tmp_path / "tuppence")
+    _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[OWN_WITHDRAWN_STATUS]))
+    first, rendered = comp.compose(work, _trees())
+    assert first["outcome"] == "composed", first["refusals"]
+    header = yaml.safe_load(rendered["composed/HEADER.yaml"])
+    assert OWN_WITHDRAWN_STATUS in header["selected-controls"], header["selected-controls"]
+    if legacy_header:
+        header.pop("overlay-controls")
+        header.pop("comparison-inputs", None)
+        rendered = dict(rendered)
+        rendered["composed/HEADER.yaml"] = comp.HEADER_COMMENT + yaml.safe_dump(header, **comp.YAML_KWARGS)
+    comp._commit_header(work, rendered)
+
+    _edit_party(work, lambda doc: doc["overlay"].update(controls=[]))
+    second, second_rendered = comp.compose(work, _trees())
+    assert second["outcome"] == "composed", second["refusals"]
+    assert _parent(rendered, "nist") == _parent(second_rendered, "nist"), "the regulator did nothing"
+    moved = [d for d in second["deltas"] if d.get("control_id") == OWN_WITHDRAWN_STATUS]
+    assert [d["kind"] for d in moved] == ["removed-control"], second["deltas"]
+    assert [d for d in second["deltas"] if d["kind"] == "withdrawn-control"] == [], second["deltas"]
+
+
+def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path):
+    """Ticket 123, review round, the same-run shape. tuppence's overlay selects ac-2.10, which
+    NIST already keeps under `status: withdrawn`. In one run NIST's next tag withdraws another
+    selected control and tuppence takes ac-2.10 out of its overlay. The nist pin moves, so a
+    real bump lands, but the adopter's last overlay would still select ac-2.10 against the new
+    catalogue. ac-2.10 is the adopter's `removed-control`; the other control is NIST's
+    `withdrawn-control`."""
+    comp = _composition()
+    work = _tuppence(tmp_path / "tuppence")
+    _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[OWN_WITHDRAWN_STATUS]))
+    first, rendered = comp.compose(work, _trees())
+    assert first["outcome"] == "composed", first["refusals"]
+    selected = yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"]
+    other = next(c for c in selected if c != OWN_WITHDRAWN_STATUS)
+    comp._commit_header(work, rendered)
+
+    nist = tmp_path / "nist"
+    shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+    _withdraw(nist, other, from_catalogue=False, baselines=("LOW", "MODERATE", "HIGH"))
+    _mark_withdrawn(nist, other)
+    _move_nist_pin(work, _parent(rendered, "nist"))
+    _edit_party(work, lambda doc: doc["overlay"].update(controls=[]))
+    second, _ = comp.compose(work, _trees(nist=nist))
+    assert second["outcome"] == "composed", second["refusals"]
+    kinds = {d["control_id"]: d["kind"] for d in second["deltas"]
+             if d.get("control_id") in (OWN_WITHDRAWN_STATUS, other)}
+    assert kinds == {OWN_WITHDRAWN_STATUS: "removed-control", other: "withdrawn-control"}, second["deltas"]
+
+
+def test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal(tmp_path):
+    """Ticket 123 item 2, against tuppence's real pinned parents. NIST withdraws a control the
+    way its catalogue already marks 182 of them: the control stays in the catalogue with
+    `status: withdrawn` and leaves every baseline. The pinned ico weights still name it. That is
+    the feed's own fact to fix in its next version (ADR-0026). The composition does not refuse
+    and does not re-partition: the regime entry keeps its amount, its line for the control reads
+    `withdrawn`, and the `withdrawn-control` delta carries the price the hole carried."""
+    comp = _composition()
+    work = _tuppence(tmp_path / "tuppence")
+    first, rendered = comp.compose(work, _trees())
+    assert first["outcome"] == "composed", first["refusals"]
+    entry = _regime_entry(first)
+    selected = set(yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"])
+    line = next(h for h in entry["holes"] if h["id"] in selected)
+    comp._commit_header(work, rendered)
+
+    nist = tmp_path / "nist"
+    shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+    _withdraw(nist, line["id"], from_catalogue=False, baselines=("LOW", "MODERATE", "HIGH"))
+    _mark_withdrawn(nist, line["id"])
+    before_pin = _parent(rendered, "nist")
+    _move_nist_pin(work, before_pin)
+    second, _ = comp.compose(work, _trees(nist=nist))
+    assert second["outcome"] == "composed", second["refusals"]
+    moved = [d for d in second["deltas"] if d.get("control_id") == line["id"]]
+    assert [d["kind"] for d in moved] == ["withdrawn-control"], second["deltas"]
+    assert moved[0]["amount"] == line["amount"] and moved[0]["priced_by"], moved
+    assert moved[0]["reason"] == "catalogue" and moved[0]["withdrawn_by"] == "nist", moved
+    assert moved[0]["catalogue"] == {"from": f"{before_pin['version']}@{before_pin['sha'][:12]}",
+                                     "to": "9.0.0@" + "9" * 12}, moved
+    assert "tuppence" not in moved[0]["detail"], moved
+    after = _regime_entry(second)
+    assert after["amount"] == entry["amount"], (entry["amount"], after["amount"])
+    after_line = next(h for h in after["holes"] if h["id"] == line["id"])
+    assert after_line["status"] == "withdrawn" and after_line["amount"] == line["amount"], after_line
 
 
 # --------------------------------------------------------------------------------------------

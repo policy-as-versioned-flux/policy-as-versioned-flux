@@ -135,12 +135,13 @@ def test_a_kind_the_whitelist_does_not_name_is_still_observed_false(grader: Modu
     assert "FAIL" in _lines(grader, doc, ctx)
 
 
-@pytest.mark.parametrize("kind", ["removed-control", "baseline-narrowing"])
+@pytest.mark.parametrize("kind", ["removed-control", "baseline-narrowing", "withdrawn-control"])
 def test_a_priced_removal_delta_is_a_kind_this_check_admits(grader: ModuleType, kind: str) -> None:
     """Eco-system ticket 124: ADR-0026 point 5 prices a removal as a
     `removed-control` delta beside one `baseline-narrowing` summary. An
     adopter that narrows must not fail this check on the deltas that report
-    it."""
+    it. Eco-system ticket 123 adds `withdrawn-control`: the regulator's
+    withdrawal, which is not the adopter's removal."""
     doc, ctx = grader._good()
     doc["deltas"].append({"kind": kind, "source": "nist", "control_id": "ac-11",
                           "subject": "MODERATE -> LOW", "perspective": "driftwood",
@@ -230,3 +231,14 @@ def test_an_ungoverned_namespace_the_evidence_leaves_unpriced_is_observed_false(
     assert "FAIL" in _lines(grader, doc, ctx)
     printed = [line for line in capsys.readouterr().out.splitlines() if line.startswith("FAIL:")]
     assert len(printed) == 1 and "openbao" in printed[0], printed
+
+
+def test_a_regime_line_the_catalogue_withdrew_reads_withdrawn(grader: ModuleType) -> None:
+    """Eco-system ticket 123 item 2: a weight that still names a control the pinned
+    catalogue withdrew keeps its line, and the line reads `withdrawn`."""
+    doc, ctx = grader._good()
+    entry = next(e for e in doc["prices"] if e.get("holes"))
+    entry["holes"][1]["status"] = "withdrawn"
+    assert "FAIL" not in _lines(grader, doc, ctx)
+    entry["holes"][1]["status"] = "retired"
+    assert "FAIL" in _lines(grader, doc, ctx)
