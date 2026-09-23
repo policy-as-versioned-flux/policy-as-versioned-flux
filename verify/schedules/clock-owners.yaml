@@ -26,15 +26,16 @@ driftwood/twin-sweep.yml:
     bump is ticket 72's
 
 tuppence/propose-tier.yml:
-  ticket: 62
+  ticket: 110
   owns: >-
-    propose-tier checks platform out at a ref that has been deleted, so the run dies in
-    checkout and proposes nothing
+    corrected 2026-09-23 by the integrator: the run pushes its retirement branch and dies at
+    `gh pr create`, because the org does not let GitHub Actions create pull requests (ticket 110's
+    rollout measured it; run 35870163812). The owner is turning that setting on
 
 ludlow/propose-tier.yml:
-  ticket: 62
+  ticket: 110
   owns: >-
-    the same deleted platform ref as tuppence's; ticket 62 lands both adopters' refs together
+    the same refused `gh pr create` as tuppence's (run 35874088089); the same org setting
 
 insurer/fetch.yml:
   ticket: 77
