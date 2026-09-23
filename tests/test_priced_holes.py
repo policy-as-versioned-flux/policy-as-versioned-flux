@@ -133,3 +133,48 @@ def test_a_kind_the_whitelist_does_not_name_is_still_observed_false(grader: Modu
                           "perspective": "driftwood", "currency": "GBP", "amount": 1.0,
                           "detail": ""})
     assert "FAIL" in _lines(grader, doc, ctx)
+
+
+@pytest.mark.parametrize("kind", ["removed-control", "baseline-narrowing"])
+def test_a_priced_removal_delta_is_a_kind_this_check_admits(grader: ModuleType, kind: str) -> None:
+    """Eco-system ticket 124: ADR-0026 point 5 prices a removal as a
+    `removed-control` delta beside one `baseline-narrowing` summary. An
+    adopter that narrows must not fail this check on the deltas that report
+    it."""
+    doc, ctx = grader._good()
+    doc["deltas"].append({"kind": kind, "source": "nist", "control_id": "ac-11",
+                          "subject": "MODERATE -> LOW", "perspective": "driftwood",
+                          "currency": "GBP", "amount": None, "priced_by": None, "detail": ""})
+    assert "FAIL" not in _lines(grader, doc, ctx)
+
+
+def test_a_source_that_still_refuses_a_removal_fails(grader: ModuleType) -> None:
+    """Eco-system ticket 124 adds `removed-control` to the gone set: a refusal
+    literal of that kind fails, a delta literal of the same kind passes."""
+    base = ('{"kind": "missing-instrument", "needs_composition": True}\n'
+            'def compute_deltas\ndeltas\ndef ungoverned_price\neol_ramp\n')
+    grader.LINES.clear()
+    grader.check_source(base + '{"kind": "removed-control", "needs_composition": True}\n')
+    assert "FAIL" in grader.LINES, grader.LINES
+    grader.LINES.clear()
+    grader.check_source(base + 'deltas.append({"kind": "removed-control", "source": s})\n')
+    assert "FAIL" not in grader.LINES, grader.LINES
+    grader.LINES.clear()
+
+
+def test_a_schema_that_still_says_a_removal_refuses_fails(grader: ModuleType) -> None:
+    """The party schema's `overlay.controls` sentence is rewritten by ticket
+    124. The ticket 38 sentence it kept ("May only grow ... an exemption by
+    another name") fails; the priced one passes."""
+    lead = "bare or `party:id`; an addition is a priced hole, never refused. "
+    grader.LINES.clear()
+    grader.check_schema({"properties": {"overlay": {"properties": {"controls": {
+        "description": lead + "May only grow: a composition still refuses on any id that "
+                              "leaves the set, because a removal is an exemption by another name."}}}}})
+    assert "FAIL" in grader.LINES, grader.LINES
+    grader.LINES.clear()
+    grader.check_schema({"properties": {"overlay": {"properties": {"controls": {
+        "description": lead + "A removal is priced, never refused: an id that leaves the set "
+                              "prints as a `removed-control` delta."}}}}})
+    assert "FAIL" not in grader.LINES, grader.LINES
+    grader.LINES.clear()

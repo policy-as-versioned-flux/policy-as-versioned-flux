@@ -1,11 +1,12 @@
 # verify/priced-holes — a hole is priced, not counted (eco-system ticket 38)
 
 `verify-priced-holes.sh` grades, on committed files only, that `platform/compose/composition.py`
-no longer refuses on a new hole, a widened baseline or a new ungoverned namespace, and that each
-adopter's `composed/evidence.json` carries what replaced those refusals:
+no longer refuses on a new hole, a widened baseline, a new ungoverned namespace or a removed
+control (the last since eco-system ticket 124, ADR-0026 point 5), and that each adopter's
+`composed/evidence.json` carries what replaced those refusals:
 
-- `deltas[]` — one entry per new/closed hole, per baseline widening, per new/closed ungoverned
-  namespace, each under the adopter's own perspective and currency, priced where a pinned
+- `deltas[]` — one entry per new/closed hole, per baseline widening, per removed control, per
+  baseline narrowing, per new/closed ungoverned namespace, each under the adopter's own perspective and currency, priced where a pinned
   instrument names a price and a named absence (`amount: null`) where none does;
 - `holes[]` keyed `(source, control_id)` across every controls parent, with `perspective`,
   `currency`, `amount` and `priced_by`;

@@ -25,7 +25,7 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 "$PY" "$HERE/priced_holes.py" selfcheck >/dev/null || { echo "FAIL: priced_holes.py selfcheck -- the planted defects no longer bite"; exit 1; }
 log="$(mktemp)"; "$PY" "$HERE/priced_holes.py" check | tee "$log"; rc=${PIPESTATUS[0]}
 case $rc in
-  0) echo "PASS: no hole, widening or ungoverned namespace refuses; each is a priced delta keyed (source, id), the ungoverned share ramps from a signed since and stays within the residual, and only a bespoke control with no scenario still refuses";;
+  0) echo "PASS: no hole, widening, removal or ungoverned namespace refuses; each is a priced delta keyed (source, id), the ungoverned share ramps from a signed since and stays within the residual, and only a bespoke control with no scenario still refuses";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
   *) echo "FAIL: $(grep -c '^FAIL:' "$log") priced-holes check(s) observed false";;
 esac

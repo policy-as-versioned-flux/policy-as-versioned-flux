@@ -3,15 +3,17 @@
 
 What it observes, on the estate's committed files only:
 
-  1. `platform/compose/composition.py` no longer emits the new-hole, baseline-widening or
-     new-ungoverned-namespace refusal, and the one hole-shaped refusal it still emits is
-     `missing-instrument` (a bespoke control with no signed scenario, ADR-0020);
+  1. `platform/compose/composition.py` no longer emits the new-hole, baseline-widening,
+     new-ungoverned-namespace or removed-control refusal (the last since eco-system ticket 124,
+     ADR-0026 point 5), and the one hole-shaped refusal it still emits is `missing-instrument`
+     (a bespoke control with no signed scenario, ADR-0020);
   2. `platform/party/schema.json` admits `overlay.controls` in both the bare and the `party:id`
-     form, and its description says an addition is priced, not refused;
+     form, and its description says an addition is priced, not refused, and no longer says a
+     removal refuses;
   3. per adopter, `composed/evidence.json`:
      a. carries `deltas[]` (else it was composed under the refusal shape: a could-not-look, because
         re-composing an adopter is an enactment push only the owner makes);
-     b. `refusals[]` carries none of the three deleted kinds;
+     b. `refusals[]` carries none of the four deleted kinds;
      c. every `holes[]` entry is keyed `(source, control_id)` with a status, the adopter's own
         perspective and currency, and an amount that is numeric with a `priced_by`, or null with
         none — never a zero nobody priced;
@@ -23,8 +25,8 @@ What it observes, on the estate's committed files only:
         the namespace (re-read here from the adopter clone's tags) or null with a named limit;
      e. the regime entry's `holes[]` lines each carry the adopter's status for that control, and
         the open ones agree with `holes[]`;
-     f. every `deltas[]` entry is one of the seven kinds `DELTA_KINDS` names (the five hole,
-        baseline and namespace kinds, plus ticket 69's two untagged-pin kinds), under the
+     f. every `deltas[]` entry is one of the nine kinds `DELTA_KINDS` names (the seven hole,
+        removal, baseline and namespace kinds, plus ticket 69's two untagged-pin kinds), under the
         adopter's perspective and currency, and the new/closed hole and namespace deltas match
         the entries they report.
 
@@ -57,12 +59,13 @@ from _estate import ESTATE  # type: ignore[import-not-found]  # noqa: E402
 
 LINES: list[str] = []
 
-GONE = {"new-hole", "baseline-widening", "new-ungoverned-namespace"}
+GONE = {"new-hole", "baseline-widening", "new-ungoverned-namespace", "removed-control"}
 # The kinds compute_deltas may print. `new-untagged-pin` and `closed-untagged-pin` are
 # ticket 69's: an untagged feed pin is a priced hole on the premium entry, and its moves are
 # reported as deltas like every other hole's. This set is a whitelist, so a kind missing from
 # it fails the adopter that reports it -- adding a kind here is how a new delta is admitted.
 DELTA_KINDS = {"new-hole", "closed-hole", "baseline-widening",
+               "removed-control", "baseline-narrowing",
                "new-ungoverned-namespace", "closed-ungoverned-namespace",
                "new-untagged-pin", "closed-untagged-pin"}
 HOLE_STATUS = {"new", "recorded", "closed"}
@@ -127,11 +130,12 @@ def check_source(src: str) -> None:
     emitted = _refusal_kinds(body)
     still = sorted(emitted & GONE)
     if still:
-        out("FAIL", f"composition.py still emits {still} — a new hole, a widened baseline and a new "
-                    f"ungoverned namespace are priced deltas, never refusals (ticket 38, ADR-0020)")
+        out("FAIL", f"composition.py still emits {still} — a new hole, a widened baseline, a new "
+                    f"ungoverned namespace and a removal are priced deltas, never refusals "
+                    f"(tickets 38 and 124, ADR-0020, ADR-0026)")
     else:
         out("PASS", "composition.py emits none of new-hole, baseline-widening, "
-                    "new-ungoverned-namespace")
+                    "new-ungoverned-namespace, removed-control")
     if "missing-instrument" not in emitted:
         out("FAIL", "composition.py emits no missing-instrument refusal — a bespoke control with no "
                     "signed scenario must still refuse as an instrument fault (ADR-0020)")
@@ -154,9 +158,12 @@ def check_schema(schema: dict) -> None:
     elif "priced" not in desc or "never refused" not in desc:
         out("FAIL", "overlay.controls description still reads as a refusal on addition; an added "
                     "control is a priced hole (ticket 38)")
+    elif "May only grow" in desc or "exemption by another name" in desc:
+        out("FAIL", "overlay.controls description still says a removal refuses; a removal is a "
+                    "priced removed-control delta (ticket 124, ADR-0026 point 5)")
     else:
         out("PASS", "party schema.json admits overlay.controls as bare ids and `party:id`, and "
-                    "says an addition is priced, never refused")
+                    "says an addition and a removal are priced, never refused")
 
 
 # --------------------------------------------------------------------------
@@ -656,8 +663,15 @@ def selfcheck() -> None:
     check_source(src_bad)
     assert "FAIL" in LINES, LINES
     LINES.clear()
+    # ticket 124: the removal refusal ADR-0026 point 5 retired is gone too
+    src_removal = ('{"kind": "missing-instrument", "needs_composition": True}\n'
+                   '{"kind": "removed-control", "needs_composition": True}\n'
+                   'def compute_deltas\ndeltas\ndef ungoverned_price\neol_ramp')
+    check_source(src_removal)
+    assert "FAIL" in LINES, LINES
+    LINES.clear()
     src_good = ('{"kind": "missing-instrument", "needs_composition": True}\n'
-                '{"kind": "removed-control", "needs_composition": True}\n'
+                'deltas.append({"kind": "removed-control", "source": s, "perspective": p})\n'
                 'return {"kind": "baseline-widening", "subject": s, "perspective": p}\n'   # a delta, not a refusal
                 'def compute_deltas\ndeltas\ndef ungoverned_price\neol_ramp')
     check_source(src_good)

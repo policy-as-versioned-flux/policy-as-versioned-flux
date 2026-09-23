@@ -26,11 +26,12 @@ Three candidates survived.
      at ramp 1.0, and the old name prints a `closed-ungoverned` delta that says it "now carries
      governed" when nothing was governed.
 
-  3. **A regulator's withdrawal refuses the adopter as a removal** (round 3 `loophole-3`). The
-     candidate said the withdrawn hole vanishes unpriced. That is false: the composition refuses.
-     ADR-0026's Consequences say a control the regulator withdraws "is not an adopter removal".
-     The code cannot tell the two apart. It compares the selected set with the last signed one
-     and refuses `removed-control`, naming the adopter.
+  3. **A regulator's withdrawal is booked as the adopter's removal** (round 3 `loophole-3`). The
+     candidate said the withdrawn hole vanishes unpriced. That is false: it prints. ADR-0026's
+     Consequences say a control the regulator withdraws "is not an adopter removal". The code
+     cannot tell the two apart. It compares the selected set with the last signed one and books
+     every control that left as a `removed-control` in the adopter's name. Until ticket 124 it
+     refused; since ticket 124 it composes and prints the delta. Either way it names the adopter.
 
 When a survivor's ticket repairs its place, the survivor leg here flips, and that ticket owns
 the flip.
@@ -71,8 +72,8 @@ PARENTS = ("platform", "nist", "ico", "feeds", "insurer")
 VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
     (1, "loophole-1"): (
         "discard", "test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier",
-        "the removal it needs still refuses (ADR-0026's known lag); a bespoke hole's price reaches "
-        "no tier, a limit ticket 38 D5 already named"),
+        "withdrawing a bespoke control prints a removed-control delta at its own scenario's "
+        "residual; a bespoke hole's price reaches no tier, a limit ticket 38 D5 already named"),
     (1, "loophole-2"): (
         "survivor", "test_renaming_an_ungoverned_namespace_restarts_its_ramp_and_prints_as_governed",
         "delaying the tag is impossible, but since keys on the Namespace name, so a rename restarts "
@@ -81,8 +82,9 @@ VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
         "discard", "test_a_bespoke_id_never_covers_the_regulators_control_of_the_same_id",
         "(source, id) keeps the regulator's control a hole, and every record names the source"),
     (1, "overreach-4"): (
-        "discard", "test_a_removal_still_refuses_where_adr_0026_says_the_code_lags",
-        "true: the live code refuses a removal, and ADR-0026 already says the record leads the code"),
+        "discard", "test_a_removal_composes_and_prints_as_priced_deltas",
+        "true on 2026-09-23 and named by ADR-0026 as its known lag; ticket 124 built the priced "
+        "removal"),
     (1, "overreach-5"): (
         "discard", "test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier",
         "priced only while its Namespace is in the repo, by its workload share, and it moves no tier"),
@@ -91,17 +93,20 @@ VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
         "no hole status reaches the regime entry, so implementing even a weighted control moves "
         "nothing"),
     (2, "loophole-1"): (
-        "discard", "test_a_removal_still_refuses_where_adr_0026_says_the_code_lags",
-        "a narrowing still refuses today; the composition does not emit `composed`"),
+        "discard", "test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one",
+        "an unweighted removal prints a named absence because no pinned weight prices it; a "
+        "weighted one prints its price, and the regime entry is the pound either way"),
     (2, "loophole-2"): (
         "discard", "test_a_bespoke_id_never_covers_the_regulators_control_of_the_same_id",
-        "a bespoke control never covers a regulator key, and the removal it needs still refuses"),
+        "a bespoke control never covers a regulator key, so the swap leaves the regulator's hole "
+        "open and priced"),
     (2, "loophole-3"): (
         "discard", "test_renaming_an_ungoverned_namespace_restarts_its_ramp_and_prints_as_governed",
         "true, and the place is round 1 loophole-2's: an echo of that survivor"),
     (2, "overreach-4"): (
-        "discard", "test_a_removal_still_refuses_where_adr_0026_says_the_code_lags",
-        "the removal still refuses, and no hole moves a tier, so there is no tier side effect"),
+        "discard", "test_a_removal_composes_and_prints_as_priced_deltas",
+        "a removal is priced as ADR-0026 point 5 chose, and no hole moves a tier, so there is no "
+        "tier side effect"),
     (2, "overreach-5"): (
         "discard", "test_a_containment_namespace_is_governed_by_one_label_and_lands_isolated",
         "governing needs one label, no baseline, and an untiered governed Namespace lands isolated"),
@@ -110,13 +115,14 @@ VERDICTS: dict[tuple[int, str], tuple[str, str, str]] = {
         "a wrong weight moves no regime price today; the partition only splits a fixed amount"),
     (3, "loophole-1"): (
         "discard", "test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier",
-        "same facts as round 1 loophole-1: the removal refuses and a bespoke price reaches no tier"),
+        "same facts as round 1 loophole-1: the withdrawal prints, and a bespoke price reaches no "
+        "tier"),
     (3, "loophole-2"): (
         "discard", "test_a_namespace_reaches_the_cluster_only_in_a_tag_whose_header_names_it",
         "a Namespace runs only from a signed tag whose verified header names it, so no delay exists"),
     (3, "loophole-3"): (
         "survivor", "test_a_regulator_withdrawal_refuses_the_adopter_as_a_removal",
-        "the withdrawn hole does not vanish: the adopter is refused as if it had removed it"),
+        "the withdrawn hole does not vanish: it is booked as the adopter's own removal"),
     (3, "overreach-4"): (
         "discard", "test_no_controls_parent_fires_only_when_none_is_declared",
         "`no-controls-parent` never fires on a rotted pin; a missing parent tree is ADR-0020's refusal"),
@@ -345,9 +351,10 @@ def test_renaming_an_ungoverned_namespace_restarts_its_ramp_and_prints_as_govern
 def test_a_regulator_withdrawal_refuses_the_adopter_as_a_removal(tmp_path):
     """Survivor 3, round 3 `loophole-3`. The adopter keeps its baseline name and changes
     nothing. The regulator's next catalogue withdraws aa-2 and drops it from SMALL. The
-    composition refuses the adopter with `removed-control` for aa-2, the refusal ADR-0013 wrote
-    for an adopter that removes a control. ADR-0026 says a withdrawal is not an adopter
-    removal."""
+    composition books aa-2 as a `removed-control` delta under the adopter's own perspective:
+    a removal in the adopter's name. ADR-0026 says a withdrawal is not an adopter removal.
+    Ticket 124 turned the refusal this leg first found into the priced delta; ticket 123 owns
+    telling the two apart, and flips this leg."""
     comp = _composition()
     trees = _fixture_estate(comp, tmp_path)
     work = tmp_path / "fixture-adopter14"
@@ -368,9 +375,11 @@ def test_a_regulator_withdrawal_refuses_the_adopter_as_a_removal(tmp_path):
 
     second, _ = comp.compose(work, trees)
     assert (work / "party.yaml").read_text() == party_before, "the adopter changed nothing"
-    removed = [r for r in second["refusals"] if r["kind"] == "removed-control"]
-    assert second["outcome"] == "refused" and [r["subject"] for r in removed] == ["aa-2"], second["refusals"]
-    assert "a control may be added, never removed (ADR-0013)" in removed[0]["detail"], removed
+    assert second["outcome"] == "composed", second["refusals"]
+    removed = [d for d in second["deltas"] if d["kind"] == "removed-control"]
+    assert [d["control_id"] for d in removed] == ["aa-2"], second["deltas"]
+    assert removed[0]["perspective"] == "fixture-adopter14", removed
+    assert "left fixture-adopter14's selected control set" in removed[0]["detail"], removed
     adr = ADR_0026.read_text(encoding="utf-8")
     assert "A control the regulator withdraws from its catalogue** is not an adopter removal" in adr
 
@@ -379,24 +388,91 @@ def test_a_regulator_withdrawal_refuses_the_adopter_as_a_removal(tmp_path):
 # the discards, each with the fact that decides it
 # --------------------------------------------------------------------------------------------
 
-def test_a_removal_still_refuses_where_adr_0026_says_the_code_lags(tmp_path):
-    """Round 1 `overreach-4`, round 2 `loophole-1` and `overreach-4`. A narrowing from SMALL to
-    TINY refuses `removed-control` on the live composition, so no removal composes at all, let
-    alone with tier side effects. ADR-0026 names this lag itself, which is ticket 120's rule 4:
-    a candidate that lands here is already known."""
+def test_a_removal_composes_and_prints_as_priced_deltas(tmp_path):
+    """Round 1 `overreach-4` and round 2 `overreach-4`. ADR-0026 point 5: a removal is priced,
+    never refused. Until ticket 124 this leg held the known lag: a narrowing from SMALL to TINY
+    refused `removed-control`. It is now the regression test of the build. The narrowing
+    composes. Each control that left prints one `removed-control` delta under the adopter's
+    perspective, and one `baseline-narrowing` delta summarises the change. No pinned weight names
+    a fixture control, so every amount is a named absence. The next header selects only aa-1."""
     comp = _composition()
     trees = _fixture_estate(comp, tmp_path)
     work = tmp_path / "fixture-adopter14"
     comp._write_fixture_adopter(work, "SMALL")
     first, rendered = comp.compose(work, trees)
+    assert first["outcome"] == "composed", first["refusals"]
     comp._commit_header(work, rendered)
     _edit_party(work, lambda d: d.update(baseline="TINY"))
     comp._write_baseline_configmap(work, "TINY")
-    narrowed, _ = comp.compose(work, trees)
-    assert narrowed["outcome"] == "refused", narrowed
-    assert sorted(r["subject"] for r in narrowed["refusals"] if r["kind"] == "removed-control") == ["aa-1.1", "aa-2"]
-    assert " ".join(ADR_0026.read_text(encoding="utf-8").split()).count(
-        "Its `check_selected_set` still refuses `removed-control`") == 1
+    narrowed, narrowed_rendered = comp.compose(work, trees)
+    assert narrowed["outcome"] == "composed", narrowed["refusals"]
+    assert not [r for r in narrowed["refusals"] if r["kind"] == "removed-control"], narrowed["refusals"]
+
+    removed = [d for d in narrowed["deltas"] if d["kind"] == "removed-control"]
+    assert [d["control_id"] for d in removed] == ["aa-1.1", "aa-2"], narrowed["deltas"]
+    for d in removed:
+        assert d["source"] == "fixture-nist" and d["perspective"] == "fixture-adopter14", d
+        assert d["currency"] == "GBP" and d["amount"] is None and d["priced_by"] is None, d
+    narrowing = [d for d in narrowed["deltas"] if d["kind"] == "baseline-narrowing"]
+    assert len(narrowing) == 1, narrowed["deltas"]
+    assert narrowing[0]["subject"] == "SMALL -> TINY", narrowing
+    assert (narrowing[0]["dropped"], narrowing[0]["priced"], narrowing[0]["amount"]) == (2, 0, None), narrowing
+    assert [h["control_id"] for h in narrowed["holes"]] == [], narrowed["holes"]
+    header = yaml.safe_load(narrowed_rendered["composed/HEADER.yaml"])
+    assert header["selected-controls"] == ["aa-1"], header
+
+    record = " ".join(ADR_0026.read_text(encoding="utf-8").split())
+    assert record.count("Its `check_selected_set` still refuses `removed-control`") == 0
+    assert "Eco-system ticket 124 built the priced removal" in record
+
+
+def test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one(tmp_path):
+    """Round 2 `loophole-1`: a mass removal of unweighted controls prints only absences. True,
+    and it is what ADR-0026 says: no pinned weight prices those controls, so the pound they
+    carry is nothing any regulator named. The weighted pound is the regime entry, and a removal
+    does not move it. tuppence narrows from MODERATE to LOW against a nist copy whose LOW also
+    drops the weighted `ra-3`. The one weighted removal prints the price its hole carried; every
+    other removal is a named absence; the summary delta counts both; the regime entry and its
+    `ra-3` line keep their amounts, and the line reads `unselected`."""
+    comp = _composition()
+    nist = tmp_path / "nist"
+    shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+    low = nist / "catalog" / "NIST_SP-800-53_rev5.2.0_LOW-baseline_profile.json"
+    profile = json.loads(low.read_text())
+    for imp in profile["profile"]["imports"]:
+        for inc in imp.get("include-controls", []):
+            if "ra-3" in inc.get("with-ids", []):
+                inc["with-ids"].remove("ra-3")
+    low.write_text(json.dumps(profile))
+    trees = _trees(nist=nist)
+
+    work = _tuppence(tmp_path / "tuppence")
+    first, rendered = comp.compose(work, trees)
+    assert first["outcome"] == "composed", first["refusals"]
+    ra3 = next(h for h in _regime_entry(first)["holes"] if h["id"] == "ra-3")
+    comp._commit_header(work, rendered)
+    before = set(yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"])
+
+    _edit_party(work, lambda d: d.update(baseline="LOW"))
+    pin = work / "gitops" / "apps" / "nist-pin-configmap.yaml"
+    pin.write_text(pin.read_text().replace("MODERATE", "LOW"))
+    second, second_rendered = comp.compose(work, trees)
+    assert second["outcome"] == "composed", second["refusals"]
+    after = set(yaml.safe_load(second_rendered["composed/HEADER.yaml"])["selected-controls"])
+
+    removed = {d["control_id"]: d for d in second["deltas"] if d["kind"] == "removed-control"}
+    assert sorted(removed) == sorted(before - after) and "ra-3" in removed, sorted(removed)
+    assert removed["ra-3"]["amount"] == ra3["amount"] and removed["ra-3"]["priced_by"], removed["ra-3"]
+    assert all(d["amount"] is None and d["priced_by"] is None
+               for cid, d in removed.items() if cid != "ra-3")
+    narrowing = next(d for d in second["deltas"] if d["kind"] == "baseline-narrowing")
+    assert narrowing["subject"] == "MODERATE -> LOW", narrowing
+    assert (narrowing["dropped"], narrowing["priced"], narrowing["amount"]) == (len(removed), 1, ra3["amount"])
+
+    entry = _regime_entry(second)
+    assert entry["amount"] == _regime_entry(first)["amount"]
+    line = next(h for h in entry["holes"] if h["id"] == "ra-3")
+    assert line["status"] == "unselected" and line["amount"] == ra3["amount"], line
 
 
 def test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier(tmp_path):
@@ -405,7 +481,8 @@ def test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier(tmp_path):
     priced, on its own line, by the adopter's own scenario, and nothing reads that line: the
     regime entry, the exposure total and every tier match the composition without it. Ticket
     38 D5 named this limit ("priced but not yet tiered"), so the place is already held. The
-    removal both candidates need still refuses (the leg above)."""
+    withdrawal both candidates need composes since ticket 124 and prints a `removed-control`
+    delta at the scenario's own residual, so the withdrawn pound is on the record."""
     comp = _composition()
     plain, plain_rendered = comp.compose(_tuppence(tmp_path / "plain"), _trees())
 
@@ -424,6 +501,15 @@ def test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier(tmp_path):
     assert _regime_entry(bespoke)["amount"] == _regime_entry(plain)["amount"]
     assert _exposure_total(bespoke_rendered) == _exposure_total(plain_rendered)
     assert _tiers(bespoke) == _tiers(plain)
+
+    comp._commit_header(work, bespoke_rendered)
+    _edit_party(work, lambda d: d["overlay"].update(controls=[]))
+    withdrawn, _ = comp.compose(work, _trees())
+    assert withdrawn["outcome"] == "composed", withdrawn["refusals"]
+    removed = [d for d in withdrawn["deltas"] if d["kind"] == "removed-control"]
+    assert [(d["source"], d["control_id"]) for d in removed] == [("tuppence", "vendor-review")], removed
+    assert removed[0]["amount"] == hole["amount"], (removed, hole)
+    assert removed[0]["priced_by"] == "tuppence scenario scenarios/vendor-review.json", removed
     readme = (PLATFORM / "compose" / "README.md").read_text(encoding="utf-8")
     assert "so it is priced but not yet tiered" in readme
 

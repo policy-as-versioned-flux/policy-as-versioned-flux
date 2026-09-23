@@ -239,25 +239,24 @@ its own band (ticket 38 D5).
   superseded by ADR-0022 (ticket 09) and carries its banner; nothing here touches it.
 - **CONTEXT.md.** The **Baseline**, **Control id**, **Hole** and **Delta** entries cite this ADR
   and no longer say a removal refuses or that an adopter may never remove a control.
-- **What the code does today, stated honestly.** On the platform integration branch
-  `ecosystem/build-2026-09-03`, `compose/composition.py` no longer refuses a new hole, a widening
-  or a new ungoverned namespace (ticket 38). Its `check_selected_set` still refuses
-  `removed-control`; `composition.py --selfcheck` asserts that refusal in its `run2-removed` case
-  (SMALL to TINY, `outcome: refused` naming `aa-1.1` and `aa-2`), which
-  `compose/verify-composition.sh` runs as its step 1 while its step 1b lists `removed-control`
-  among the refusal kinds still emitted; the party schema's `overlay.controls` description still
-  says "May only grow: a composition still refuses on any id that leaves the last signed composed
-  artefact's selected set, because a removal is an exemption by another name"; and
-  `verify/priced-holes/priced_holes.py`'s `check_source` does not grade its absence, its own
-  selfcheck planting `removed-control` in the source it must pass. The unknown-id refusal of
-  point 1 is emitted under the code kind `unknown-control-id`, not `missing-instrument`; this ADR
-  classifies it as an instrument fault and renames nothing. A platform build ticket deletes
-  the refusal, adds the `removed-control` and `baseline-narrowing` delta kinds to
-  `compute_deltas`, rewrites the `run2-removed` case to expect `outcome: composed` with two
-  `removed-control` deltas and one `baseline-narrowing` delta, rewrites the schema sentence, and
-  adds `removed-control` to `check_source`'s gone set with its selfcheck fixture flipped. Until it
-  lands the record leads the code, as ADR-0013 led the estate on its 285 holes; this ADR's check
-  grades the record only and says so in its header.
+- **What the code does, stated honestly.** On the platform integration branch
+  `ecosystem/build-2026-09-03`, `compose/composition.py` stopped refusing a new hole, a widening
+  or a new ungoverned namespace (ticket 38). The removal refusal lagged this record from
+  2026-09-04 to 2026-09-23. Eco-system ticket 124 built the priced removal on platform main.
+  `check_selected_set` is gone. `removed_controls` lists the controls that left the selected set,
+  and `compute_deltas` prints a `removed-control` delta for each, carrying the amount its hole
+  carried or a named absence. A named-baseline change that only drops controls also prints one
+  `baseline-narrowing` delta. The selfcheck's `run2-removed` case (SMALL to TINY) expects
+  `outcome: composed` with two `removed-control` deltas, on `aa-1.1` and `aa-2`, and one
+  `baseline-narrowing` delta. `compose/verify-composition.sh` step 1b and
+  `verify/priced-holes/priced_holes.py`'s `check_source` both fail a source that still emits
+  `removed-control` as a refusal. The party schema's `overlay.controls` description says a
+  removal is priced, never refused. The unknown-id refusal of point 1 is emitted under the
+  code kind `unknown-control-id`, not `missing-instrument`; this ADR classifies it as an
+  instrument fault and renames nothing. An adopter's own composed evidence shows the priced removal only
+  after a signed platform tools release carries the build and the adopter's pin moves to it.
+  Both are the owner's steps (eco-system ticket 124). This ADR's check grades the record only and
+  says so in its header.
 - **Ticket 38's D6 is superseded** by point 5. Its D1 to D5 and D7 to D12 stand and are cited
   here as the reasons they are.
 - **The three adopters' evidence** (`composed/evidence.json`) still carries the refusal-era shape
