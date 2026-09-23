@@ -173,6 +173,14 @@ that a rewritten entry cites stay as the record of the decision at the time.
   scheduled proposer turns into a **retirement** pull request moving that one pin forward in
   `party.yaml`, forward-only, keyed `<org>/retirement/<slug>` in the derived ledger.
 
+- **Major acceptance record** (ticket 129) — An institution's record that it accepts one major
+  policy version for itself: one file under `accepted-majors/` in the adopter's own repository, read
+  at the commit it serves, naming the party, the publisher, the exact version, who accepted it and
+  on what day. It counts only for its own party, publisher and version; accepting one major accepts
+  no other. The owner decides each one (ADR-0025); a check never writes one. Read by
+  `verify/unreviewed-major/`. See the 2026-09-23 note in
+  [ADR-0011](docs/adr/0011-release-gate-computes-the-bump.md).
+
 - **Version pin** — The single declaration by which a consumer (workload / cluster) states which
   policy version applies to it. The original's signature elegance: **one string** served as both
   the dependency pin *and* the engine's workload selector.

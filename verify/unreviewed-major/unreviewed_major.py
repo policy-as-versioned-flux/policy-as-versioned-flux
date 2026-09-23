@@ -1,14 +1,12 @@
-"""Which majors is an institution carrying in its composed window?
+"""Which majors is an institution carrying in its composed window, and has it accepted each one?
 
-THE NAME OF THIS DIRECTORY AND SCRIPT IS HISTORICAL, and narrower than what they grade. They are
-named for the fact eco-system ticket 99 was about -- a major nobody reviewed -- but this check
-CANNOT see a review and never asserts that one is absent. It looks for no acceptance record and
-therefore says nothing about whether one exists: inventing a place to look would be inventing the
-record, which is exactly what the ticket forbids. What it grades is what is CARRIED, which it
-observes directly. Read "unreviewed" in the paths below as the ticket's
-subject, never as this check's claim (delegated, ADR-0025, 2026-09-05, after review; renaming the
-files would break the manifest row and the capture filenames the truth surface has already
-published, and the sentence is cheaper to fix than the path).
+THE NAME OF THIS DIRECTORY AND SCRIPT IS HISTORICAL. They are named for the fact eco-system ticket
+99 was about, a major nobody reviewed. This check still cannot see a review. What it reads, since
+ticket 129, is an ACCEPTANCE RECORD the institution carries in its own repository, and it grades a
+carried major against that record: accepted, or not. It never says a review did or did not happen;
+it says which record it read, or that it read none. Renaming the files would break the manifest row
+and the capture filenames the truth surface has already published (delegated, ADR-0025,
+2026-09-05), so the name stays and this sentence explains it.
 
 
 Eco-system ticket 99. "An institution should not quietly carry a major nobody reviewed" is a real
@@ -36,13 +34,33 @@ WHAT IS MEASURED, AND AGAINST WHAT.
   constant in its own gate script. The constant is read out of the repository, never typed here. A
   bump is reported only from evidence that really verified under that constant, in this run.
 
-WHAT IT DOES NOT DO. It records no review and invents none. Whether platform policy 4.0.0's major
-is accepted for an institution is an authorisation, and ADR-0025 keeps those with the owner; this
-check has no input for one and will keep naming the version until either the owner disposes of it
-or the version leaves that institution's window. That is the point: an open authorisation is
-visible every day rather than on the days somebody happens to open a pull request. The line it
-prints is therefore about what is CARRIED, which is a fact this run observed -- never about what
-was or was not reviewed, which it cannot see and does not claim to.
+THE ACCEPTANCE RECORD (eco-system ticket 129, delegated, ADR-0025). Accepting a major for an
+institution is an authorisation, and ADR-0025 keeps those with the owner. The owner's decision
+reaches this check as one file per accepted major, in the ADOPTER'S OWN repository, read at the
+commit that repository serves (`git show HEAD:...`), the same read as its composed evidence:
+
+    accepted-majors/<publisher>-<version>.yaml     # the file name is a convention, not a key
+
+    kind: major-acceptance     # exactly this string
+    party: driftwood           # the institution accepting; must be the adopter whose tree holds it
+    publisher: platform        # whose policy version; this check reads platform's evidence only
+    version: 5.0.0             # the exact version string the composed window carries
+    accepted_by: <a name>      # who accepted it; any non-empty string
+    accepted_on: 2026-09-23    # the day, an ISO date
+    # any other key (a note, a pull-request link) is carried and ignored
+
+A record counts for a carried major only when every one of those holds. A record for another
+party, another publisher or another version counts for nothing, and neither does a record in a
+working tree, on an unmerged branch, anywhere outside `accepted-majors/`, or in the hub. Accepting
+one major accepts no other: 4.0.0 stays red beside an accepted 5.0.0 until it is accepted too or
+leaves the window. Why here: the adopter is the risk-bearer (ADR-0015), the record lands only by the
+same reviewed pull request that adopts anything in that repository (ADR-0002), and the tag that
+signs its tree signs the record with it (ADR-0012). What this check does NOT verify: that the name
+in `accepted_by` is the person who merged the record. The record's authority is the reviewed merge
+that put it at the served commit, which this check does not re-grade.
+
+The line it prints for an unaccepted major is about what is CARRIED and what record it did or did
+not find, both observed this run.
 
     unreviewed_major.py <estate-dir>   # grade the estate; prints lines, exits 0/1/3
     unreviewed_major.py --selfcheck    # the pure rules, on planted inputs, no estate and no cosign
@@ -51,6 +69,7 @@ was or was not reviewed, which it cannot see and does not claim to.
 from __future__ import annotations
 
 import ast
+import datetime
 import importlib.util
 import json
 import shutil
@@ -173,6 +192,65 @@ def identity_constants(unit_dir: Path, script: Path | None) -> tuple[str, str] |
     return None
 
 
+# ---------------------------------------------------------------- the acceptance record
+
+RECORD_DIR = "accepted-majors"
+RECORD_KIND = "major-acceptance"
+PUBLISHER = "platform"
+
+
+def acceptance_from_text(text: str) -> dict | str:
+    """One record, parsed to the five fields that make it one; or the reason it is not a record."""
+    try:
+        doc = yaml.safe_load(text)
+    except yaml.YAMLError as err:
+        return f"is not readable YAML ({str(err).splitlines()[0][:80]})"
+    if not isinstance(doc, dict):
+        return "is not a YAML mapping"
+    if doc.get("kind") != RECORD_KIND:
+        return f"carries kind {doc.get('kind')!r}, not {RECORD_KIND!r}"
+    got: dict = {}
+    for key in ("party", "publisher", "version", "accepted_by"):
+        value = doc.get(key)
+        if value is None or not str(value).strip():
+            return f"carries no {key}"
+        got[key] = str(value).strip()
+    on = doc.get("accepted_on")
+    if isinstance(on, datetime.datetime):
+        on = on.date()
+    if isinstance(on, datetime.date):
+        got["accepted_on"] = on.isoformat()
+    else:
+        try:
+            got["accepted_on"] = datetime.date.fromisoformat(str(on).strip()).isoformat()
+        except ValueError:
+            return f"carries accepted_on {on!r}, which is not an ISO date"
+    return {k: got[k] for k in ("party", "publisher", "version", "accepted_by", "accepted_on")}
+
+
+def acceptance_for(records: list[tuple[str, str]], adopter: str, version: str,
+                   publisher: str = PUBLISHER) -> tuple[tuple[str, dict] | None, list[str]]:
+    """The first record in this adopter's own tree that accepts this version of this publisher's
+    policy for this adopter, and a reason for every record that names the version but does not
+    count, so a near miss is named rather than silently read as no record at all."""
+    near: list[str] = []
+    for path, text in records:
+        parsed = acceptance_from_text(text)
+        if isinstance(parsed, str):
+            near.append(f"{path} {parsed}")
+            continue
+        if parsed["version"] != version:
+            continue
+        if parsed["party"] != adopter:
+            near.append(f"{path} accepts {version} for {parsed['party']}, not for {adopter}")
+            continue
+        if parsed["publisher"] != publisher:
+            near.append(f"{path} accepts {parsed['publisher']}'s {version}, not {publisher}'s")
+            continue
+        return (path, parsed), near
+    return None, near
+
+
 # ---------------------------------------------------------------- the report
 
 def grade(findings: list[dict]) -> tuple[str, list[tuple[str, str]]]:
@@ -208,35 +286,58 @@ def grade(findings: list[dict]) -> tuple[str, list[tuple[str, str]]]:
             continue
         standing = [v for v in finding["window"] if finding["computed"].get(v) == MAJOR]
         unread = list(finding.get("unread") or [])
+        served = str(finding.get("served") or "")[:12] or "an unresolved commit"
+        records = list(finding.get("records") or [])
         for version, reason in unread:
             # Named on its own line, never as a reason to stop reading the rest of the window.
             unlooked += 1
             lines.append(("SKIP", f"{adopter} {reason}"))
-        if standing:
+        accepted: list[str] = []
+        unaccepted: list[str] = []
+        for version in standing:
+            match, near = acceptance_for(records, adopter, version)
+            if match is not None:
+                path, rec = match
+                accepted.append(version)
+                lines.append(("PASS", (
+                    f"{adopter} carries policy version {version}, which platform's signed evidence "
+                    f"at {finding['tag']} records as \"{MAJOR}\", and accepts it: {path} at the "
+                    f"commit {adopter} serves ({served}) records it accepted by "
+                    f"{rec['accepted_by']} on {rec['accepted_on']}")))
+                continue
+            unaccepted.append(version)
+            nearly = ("; records that name it and do not count: " + "; ".join(near)) if near else ""
+            lines.append(("FAIL", (
+                f"{adopter} carries policy version {version} in the composed window it serves, "
+                f"and platform's own signed evidence at the tag {adopter} pins "
+                f"({finding['tag']}) records bump.computed \"{MAJOR}\". {adopter}'s own tree at "
+                f"the commit it serves ({served}) carries no {RECORD_DIR}/ record accepting it"
+                f"{nearly}. Accepting a major is an authorisation the owner makes (ADR-0025), "
+                f"recorded in {adopter}'s own repository; this line stands until that record is "
+                f"served or the version leaves the window")))
+        if unaccepted:
             majors += 1
-            for version in standing:
-                lines.append(("FAIL", (
-                    f"{adopter} carries policy version {version} in the composed window it serves, "
-                    f"and platform's own signed evidence at the tag {adopter} pins "
-                    f"({finding['tag']}) records bump.computed \"{MAJOR}\". Disposing of a major an "
-                    f"institution carries is an authorisation the owner makes (ADR-0025); no gate "
-                    f"can, and this line stands until the owner does or the version leaves the "
-                    f"window")))
         elif unread:
-            # No major among what could be read. The adopter's own status is a could-not-look, and
-            # the line says what WAS verified rather than going quiet about the rest of the window.
+            # No unaccepted major among what could be read. The adopter's own status is a
+            # could-not-look, and the line says what WAS verified rather than going quiet.
             read = [v for v in finding["window"] if v in finding["computed"]]
             lines.append(("ok", (
-                f"{adopter}: no major in the {len(read)} version(s) of its composed window that "
-                f"could be read ({', '.join(read) or 'none'}), each verified at {finding['tag']} "
-                f"under {adopter}'s own identity constant; {len(unread)} could not be read, named "
-                f"above")))
+                f"{adopter}: no unaccepted major in the {len(read)} version(s) of its composed "
+                f"window that could be read ({', '.join(read) or 'none'}), each verified at "
+                f"{finding['tag']} under {adopter}'s own identity constant; {len(unread)} could "
+                f"not be read, named above")))
         elif not finding["window"]:
             # Nothing was verified, because there was nothing to verify. Saying so is not the same
             # sentence as "every version verified", and a vacuous claim is still a claim.
             lines.append(("PASS", (
                 f"{adopter}: the composed window it serves carries no policy version at all, so "
                 f"there is no bump to read and no evidence was verified for it")))
+        elif accepted:
+            lines.append(("PASS", (
+                f"{adopter}: no unaccepted major in the {len(finding['window'])} version(s) its "
+                f"composed window carries ({', '.join(finding['window'])}), each read from "
+                f"platform's signed evidence at {finding['tag']} and verified under {adopter}'s "
+                f"own identity constant; {len(accepted)} major(s) accepted, named above")))
         else:
             lines.append(("PASS", (
                 f"{adopter}: no major in the {len(finding['window'])} version(s) its composed "
@@ -256,12 +357,30 @@ def _git(repo: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
 
 
+def records_at_served_ref(unit_dir: Path) -> tuple[str | None, list[tuple[str, str]]]:
+    """The commit this repository serves, and every file under accepted-majors/ in its tree at
+    that commit. A working-tree or staged file is not served and is not read."""
+    head = _git(unit_dir, "rev-parse", "-q", "--verify", "HEAD^{commit}")
+    if head.returncode != 0:
+        return None, []
+    served = head.stdout.strip()
+    listed = _git(unit_dir, "ls-tree", "-r", "--name-only", served, "--", f"{RECORD_DIR}/")
+    records: list[tuple[str, str]] = []
+    for path in sorted(p for p in listed.stdout.splitlines() if p.strip()):
+        shown = _git(unit_dir, "show", f"{served}:{path}")
+        if shown.returncode == 0:
+            records.append((path, shown.stdout))
+    return served, records
+
+
 def look(estate: Path, unit: str, platform_dir: Path) -> dict:
     """One adopter, measured. Every read below is of a served document: the adopter's composed
     evidence at the commit it serves, and platform's evidence at the tag that adopter pins."""
     finding: dict = {"adopter": unit, "tag": None, "window": [], "computed": {}, "skip": None,
-                      "unread": []}
+                      "unread": [], "served": None, "records": []}
     unit_dir = estate / unit
+    # Ticket 129: the acceptance records, read at the same served commit as everything else here.
+    finding["served"], finding["records"] = records_at_served_ref(unit_dir)
 
     pin_text = _git(unit_dir, "show", "HEAD:gitops/platform/platform-pin.yaml")
     if pin_text.returncode != 0:
@@ -449,11 +568,43 @@ def selfcheck() -> int:
           grade([{"adopter": "driftwood", "tag": "v2.0.1", "window": ["4.0.0"], "computed": {},
                   "skip": None, "fail": "did NOT verify"}])[0], "FAIL")
 
+    # Ticket 129: the acceptance record. Planted records only; none of them is a real acceptance.
+    def rec(party: str = "driftwood", version: str = "5.0.0", publisher: str = "platform",
+            by: str = "Example Owner") -> str:
+        return (f"kind: major-acceptance\nparty: {party}\npublisher: {publisher}\n"
+                f"version: {version}\naccepted_by: {by}\naccepted_on: 2026-09-23\n")
+
+    def carrying(window: list[str], records: list[tuple[str, str]]) -> dict:
+        return {"adopter": "driftwood", "tag": "v3.2.0", "window": window,
+                "computed": {v: "major" for v in window}, "skip": None,
+                "served": "c" * 40, "records": records}
+
+    here = "accepted-majors/platform-5.0.0.yaml"
+    check("a well-formed record parses to its five fields",
+          acceptance_from_text(rec()),
+          {"party": "driftwood", "publisher": "platform", "version": "5.0.0",
+           "accepted_by": "Example Owner", "accepted_on": "2026-09-23"})
+    check("a record with no accepted_by is not a record",
+          isinstance(acceptance_from_text(rec(by="''")), str), True)
+    check("a carried major with a record accepting it for this adopter is the pass",
+          grade([carrying(["5.0.0"], [(here, rec())])])[0], "PASS")
+    check("a record for another institution accepts nothing here",
+          grade([carrying(["5.0.0"], [(here, rec(party="tuppence"))])])[0], "FAIL")
+    check("a record for another version accepts nothing here",
+          grade([carrying(["5.0.0"], [(here, rec(version="4.0.0"))])])[0], "FAIL")
+    check("a record for another publisher accepts nothing here",
+          grade([carrying(["5.0.0"], [(here, rec(publisher="nist"))])])[0], "FAIL")
+    status_mixed, lines_mixed = grade([carrying(["4.0.0", "5.0.0"], [(here, rec())])])
+    check("an accepted 5.0.0 does not accept the 4.0.0 still in the window",
+          (status_mixed, [k for k, m in lines_mixed if "4.0.0 in the composed" in m]),
+          ("FAIL", ["FAIL"]))
+
     if bad:
         print(f"FAIL: {bad} selfcheck case(s) did not grade as written")
         return 1
-    print("OK: unreviewed_major selfcheck (the window, the pin, both identity-constant readers and "
-          "the report's arithmetic, on planted inputs; no estate read, no cosign run)")
+    print("OK: unreviewed_major selfcheck (the window, the pin, both identity-constant readers, the "
+          "acceptance record and the report's arithmetic, on planted inputs; no estate read, no "
+          "cosign run)")
     return 0
 
 

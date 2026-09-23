@@ -84,6 +84,35 @@ policy, exactly as `CONTEXT.md` already requires for changing what gets enforced
 - **A coverage hole is grounds for a reviewed PR, never for an override.** The gate states what it
   didn't reach; it does not let an unreached case become a reason to bypass the rule.
 
+## Note, 2026-09-23 (eco-system ticket 129: an accepted major is a record in the adopter's own tree)
+
+The 2026-09-05 note says the standing report "records no review and invents none", and it had no
+input for an owner's acceptance. So a major the owner had accepted stayed red until the version left
+the window. Ticket 129 gives it that input (delegated, ADR-0025).
+
+**The record.** One YAML file per accepted major, under `accepted-majors/` in the adopter's own
+repository, read at the commit that repository serves. It carries `kind: major-acceptance`, the
+`party` accepting, the `publisher`, the exact `version`, `accepted_by` and `accepted_on` (an ISO
+date). `verify/unreviewed-major/unreviewed_major.py` documents the format and holds the only reader.
+
+**Why there.** The adopter is the risk-bearer (ADR-0015), so the acceptance is its own. The record
+lands only by a reviewed pull request, the unit of adoption (ADR-0002). The tag that signs the
+adopter's tree signs the record with it (ADR-0012), so no second signing mechanism is needed. Two
+other homes were refused. `party.yaml` is checked on every pull request by platform's
+`party_artefact.py`, which refuses an unknown top-level field, so a new key there is a change to
+platform's schema. `composed/` is the composer's output, re-rendered from the recorded parent SHAs
+before a release is cut (driftwood `cut-release.yml`, ticket 18), so a hand-written file there is
+not something the composer rendered.
+
+**What counts.** A record counts only for its own party, its own publisher and its own version.
+Accepting one major accepts no other. A record in a working tree, on an unmerged branch, outside
+`accepted-majors/`, or in the hub counts for nothing. A carried major with no counting record is
+still observed false, and the line names any record that named the version and did not count.
+
+**What it does not verify.** That the name in `accepted_by` is the person who merged the record.
+The record's authority is the reviewed merge, which this check does not re-grade. The check writes
+no acceptance. Each one is the owner's decision, per institution.
+
 ## Note, 2026-09-05 (eco-system ticket 99: the adopter gate grades the change, not the window)
 
 "Computes that institution's own composed bump" was read two ways by three adopters, and only one
