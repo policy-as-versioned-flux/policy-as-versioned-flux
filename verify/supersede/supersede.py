@@ -25,7 +25,10 @@ cannot be reached, a tag that cannot be read, is a could-not-look naming the rea
    ramp from `since` to the entry's own `as_of` (restated here: 1 + min(years past, 4), never
    below 1.0 -- the hub is not a party and pins no platform, so the formula is restated as
    verify/priced-holes restates it, not imported), and `amount = base x (ramp - 1)` with `base`
-   the feed line's own amount. A line missing or wrong is a FAIL -- unless the composer the
+   the feed line's own amount. Where the pinned checkout carried no directory for any signed
+   major ahead, the line says `newer.readable: false`, names a signed tag ahead (the newest
+   when it was composed; a major cut since does not move the price) and carries no
+   `published_at` (ticket 128). A line missing or wrong is a FAIL -- unless the composer the
    adopter pins carries no supersede rule at all, which is a could-not-look naming the tag: no
    edit of the adopter's own could put the line there.
 2. UNTAGGED: no tag of the pin's form on the remote. Counted here as a number ("untagged-feed
@@ -71,6 +74,10 @@ PLATFORM_PIN = "gitops/platform/platform-pin.yaml"
 TOOLS_PIN = ".github/platform-tools-pin.yaml"
 COMPOSER = "compose/composition.py"
 RULE_TOKEN = "def price_supersede("
+# Ticket 128: the composer prices a pin behind a signed major whose directory the pinned
+# checkout lacks, marking that target `"readable": False`. A composer without this token
+# writes no line in that case, and being behind is free again.
+UNREADABLE_RULE_TOKEN = '"readable": False'
 RETIRE_PREFIX = "wargamer/retire-"
 SUPERSEDE_KIND = "supersede"
 OPEN = ("new", "recorded")
@@ -182,16 +189,29 @@ def served_composer_tag(repo: str) -> tuple[str | None, str]:
     return served_pin_tag(repo, PLATFORM_PIN), PLATFORM_PIN
 
 
-def composer_carries_rule(estate: str, tag: str) -> bool | None:
-    """Does platform's composer AT THE TAG THE ADOPTER PINS know the supersede rule? None
-    where the tag cannot be read here."""
+def composer_text(estate: str, tag: str) -> str | None:
+    """platform's composer AT THE TAG THE ADOPTER PINS; None where the tag cannot be read."""
     platform = os.path.join(estate, "platform")
     text = show(platform, tag, COMPOSER)
     if text is None:
         if fetch(platform, f"+refs/tags/{tag}:refs/tags/{tag}"):
             return None
         text = show(platform, tag, COMPOSER)
+    return text
+
+
+def composer_carries_rule(estate: str, tag: str) -> bool | None:
+    """Does platform's composer AT THE TAG THE ADOPTER PINS know the supersede rule? None
+    where the tag cannot be read here."""
+    text = composer_text(estate, tag)
     return None if text is None else RULE_TOKEN in text
+
+
+def composer_prices_unreadable(estate: str, tag: str) -> bool | None:
+    """Ticket 128: does that composer price a pin behind a major the pinned checkout cannot
+    read? None where the tag cannot be read here."""
+    text = composer_text(estate, tag)
+    return None if text is None else UNREADABLE_RULE_TOKEN in text
 
 
 def adopters(estate: str) -> list[str]:
@@ -265,12 +285,14 @@ def grade_behind(*, adopter: str, currency: str, party: str, name: str, version:
                  newest_major: int, newest_tag: str, tagged: str | None, line: dict | None,
                  entry: dict | None, rule: bool | None, platform_tag: str | None,
                  signed_ahead: list[str] | None = None, unsigned_ahead: list[str] | None = None,
-                 since_tag: str | None = None) -> tuple[str, str]:
+                 since_tag: str | None = None,
+                 unreadable_rule: bool | None = None) -> tuple[str, str]:
     """One (status, message) for a pin that is BEHIND a newer tagged major. `signed_ahead` are
     the signed tags ahead (any of them is a target the composer may have chosen, depending on
     which directories its checkout carried -- review F1), `since_tag` the oldest of them and
     `tagged` its cut day (review F3), `unsigned_ahead` the tags ahead the composer counts as
-    nothing, named."""
+    nothing, named. `unreadable_rule` says whether that composer prices a pin behind a major
+    its pinned checkout cannot read (ticket 128); False only sharpens a FAIL's reason."""
     signed_ahead = signed_ahead if signed_ahead is not None else [newest_tag]
     since_tag = since_tag or newest_tag
     noted = (f" ({', '.join(unsigned_ahead)} also ahead but unsigned: counted as nothing, as the "
@@ -286,9 +308,25 @@ def grade_behind(*, adopter: str, currency: str, party: str, name: str, version:
             return "SKIP", (f"{label}: could not read platform tag {platform_tag!r} here, so whether "
                             f"the composer that wrote this evidence carries the supersede rule is "
                             f"unobserved")
+        superseded = (entry or {}).get("superseded") or {}
+        no_directory = (superseded.get("state") == "unobserved"
+                        and "carries no directory" in str(superseded.get("detail") or ""))
+        if unreadable_rule is False and no_directory:
+            # Ticket 128. Still a FAIL: the served artefact prices being behind at nothing. The
+            # reason names ticket 128 only where the feed entry says the checkout carried no
+            # directory for any major ahead; otherwise the missing line is another defect.
+            return "FAIL", (f"{label}: the composer it pins ({platform_tag}) carries the supersede "
+                            f"rule but predates ticket 128, so it writes no line when the pinned "
+                            f"checkout carries no directory for the newer major; the served "
+                            f"evidence carries none -- being behind is priced, never free "
+                            f"(ticket 84, ticket 13 D5). It lifts when platform releases ticket "
+                            f"128 and {adopter} moves its compiler pin and re-composes")
+        seen = (f" (the served feed line reports superseded state {superseded.get('state')!r}, so "
+                f"the no-directory case that ticket 128 fixed does not explain the missing line)"
+                if unreadable_rule is False else "")
         return "FAIL", (f"{label}: the composer it pins ({platform_tag}) carries the supersede rule "
-                        f"and the served evidence carries no supersede line for it -- being behind "
-                        f"is priced, never free (ticket 84, ticket 13 D5)")
+                        f"and the served evidence carries no supersede line for it{seen} -- being "
+                        f"behind is priced, never free (ticket 84, ticket 13 D5)")
     problems: list[str] = []
     if line.get("perspective") != adopter or line.get("currency") != currency:
         problems.append(f"under {line.get('perspective')}/{line.get('currency')}, not {adopter}/{currency}")
@@ -296,6 +334,18 @@ def grade_behind(*, adopter: str, currency: str, party: str, name: str, version:
     if newer.get("tag") not in signed_ahead:
         problems.append(f"names newer tag {newer.get('tag')!r}, not a signed tag ahead on the remote "
                         f"({', '.join(signed_ahead)})")
+    if "readable" in newer:
+        # Ticket 128: a target the pinned checkout could not read carries no envelope date. It
+        # was the newest signed tag ahead when the composer ran, but the publisher may have cut
+        # another since; the price does not move (since is the oldest signed ahead), so any
+        # signed tag ahead is accepted, as for a readable target (review F1; review round).
+        if newer["readable"] is not False:
+            problems.append(f"carries readable {newer['readable']!r}; the composer writes the flag "
+                            f"only as false, on a target it could not read")
+        else:
+            if newer.get("published_at") is not None:
+                problems.append(f"names an unreadable target yet carries published_at "
+                                f"{newer.get('published_at')!r}, a date nobody read")
     if tagged is None:
         return "SKIP", f"{label}: could not fetch tag {since_tag} from {party} to read the day it was cut"
     if line.get("since") != tagged or newer.get("since") != tagged:
@@ -382,6 +432,7 @@ def check(estate: str = ESTATE) -> int:
         evidence = served_json(repo, "composed/evidence.json")
         platform_tag, _ = served_composer_tag(repo)
         rule = composer_carries_rule(estate, platform_tag) if platform_tag else None
+        unreadable_rule = composer_prices_unreadable(estate, platform_tag) if platform_tag else None
         if evidence is None:
             out("SKIP", f"{adopter} serves no composed/evidence.json at {SERVED_REF}, so nothing it prices can be read")
         if platform_tag is None:
@@ -440,7 +491,8 @@ def check(estate: str = ESTATE) -> int:
                                        version=version, newest_major=newest_major, newest_tag=newest_tag,
                                        tagged=objects[since_tag]["date"], line=line, entry=entry,
                                        rule=rule, platform_tag=platform_tag, signed_ahead=signed,
-                                       unsigned_ahead=unsigned, since_tag=since_tag)
+                                       unsigned_ahead=unsigned, since_tag=since_tag,
+                                       unreadable_rule=unreadable_rule)
             out(status, msg)
         counts = retirement_prs(adopter)
         if counts is None:
@@ -483,6 +535,13 @@ def selfcheck() -> None:
             "amount": 1000.0 * (ramp - 1.0)}
         base.update(over)
         return base
+
+    def unread(**over: Any) -> dict[str, Any]:
+        target: dict[str, Any] = {"version": "v3", "tag": "wares/v3.0.0", "tagged": "2026-09-05",
+                                  "published_at": None, "readable": False,
+                                  "since_tag": "wares/v2.0.0", "since": "2026-09-01"}
+        target.update(over)
+        return target
 
     def grade(**over: Any) -> tuple[str, str]:
         kw: dict[str, Any] = dict(adopter="ado", currency="GBP", party="pub", name="wares",
@@ -529,6 +588,27 @@ def selfcheck() -> None:
         # review F4: an unsigned tag ahead is named on the label, never counted
         ("unsigned tag ahead is named", grade(unsigned_ahead=["wares/v3.0.0"]), "PASS"),
         ("as_of before the tag day is zero, said so", grade(line=line(as_of="2026-08-28", ramp=1.0, amount=0.0)), "PASS"),
+        # ticket 128: no signed major ahead has a directory in the pinned checkout. The line
+        # targets the NEWEST signed tag, says `readable: false` and carries no published_at.
+        ("unreadable newest target, priced", grade(newest_major=3, newest_tag="wares/v3.0.0",
+                                                    signed_ahead=["wares/v2.0.0", "wares/v3.0.0"],
+                                                    since_tag="wares/v2.0.0", line=line(newer=unread())), "PASS"),
+        # review round: the publisher cuts v4 after the composer wrote an unreadable v3 target.
+        # The price is the same (since is the oldest signed ahead), so this stays a PASS, as a
+        # readable target does (review F1). Only a target that is no signed tag ahead FAILs.
+        ("unreadable target, a newer major signed since", grade(newest_major=4, newest_tag="wares/v4.0.0",
+                                                                signed_ahead=["wares/v2.0.0", "wares/v3.0.0", "wares/v4.0.0"],
+                                                                since_tag="wares/v2.0.0", line=line(newer=unread())), "PASS"),
+        ("unreadable target at or behind the pin", grade(newest_major=3, newest_tag="wares/v3.0.0",
+                                                         signed_ahead=["wares/v2.0.0", "wares/v3.0.0"],
+                                                         since_tag="wares/v2.0.0",
+                                                         line=line(newer=unread(version="v1", tag="wares/v1.0.0"))), "FAIL"),
+        ("unreadable target carrying an envelope date", grade(newest_major=3, newest_tag="wares/v3.0.0",
+                                                              signed_ahead=["wares/v2.0.0", "wares/v3.0.0"],
+                                                              since_tag="wares/v2.0.0",
+                                                              line=line(newer=unread(published_at="2026-07-31"))), "FAIL"),
+        ("readable flag that is not false", grade(line=line(newer=dict(line()["newer"], readable=True))), "FAIL"),
+        ("no line, composer predates ticket 128", grade(line=None, unreadable_rule=False), "FAIL"),
     ]
     for label, (status, msg), want in cases:
         assert status == want, (label, status, msg)
@@ -539,6 +619,17 @@ def selfcheck() -> None:
     assert "0.00 GBP" in msg and "2026-09-01" in msg, msg
     _, msg = grade(line=None)
     assert "never free" in msg, msg
+    # review round: the pre-128 reason is given only where the served feed entry itself says
+    # the checkout carried no directory for any major ahead (ticket 110's `unobserved` detail).
+    nodir = {"amount": 1000.0, "superseded": {"state": "unobserved", "detail": "v2 sign(s) wares majors "
+             "ahead of the pinned v1, but this checkout carries no directory for any of them to price against"}}
+    status, msg = grade(line=None, unreadable_rule=False, entry=nodir)
+    assert status == "FAIL" and "predates ticket 128" in msg and "no directory" in msg, msg
+    assert "v9.9.9" in msg and "never free" in msg, msg
+    readable = {"amount": 1000.0, "superseded": {"state": "behind", "detail": "tag wares/v2.0.0 ..."}}
+    status, msg = grade(line=None, unreadable_rule=False, entry=readable)
+    assert status == "FAIL" and "predates ticket 128" not in msg and "superseded state 'behind'" in msg, msg
+    plants += 2
     _, msg = grade(unsigned_ahead=["wares/v3.0.0"])
     assert "wares/v3.0.0 also ahead but unsigned" in msg, msg
     _, msg = grade(line=line(as_of="2026-08-28", ramp=1.0, amount=0.0))

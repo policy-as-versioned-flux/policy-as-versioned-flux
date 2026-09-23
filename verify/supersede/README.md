@@ -19,7 +19,13 @@ one grader per fact); retirement PRs opened/merged on `wargamer/retire-*` branch
 GitHub and never graded -- opened is the clock's, merged is a human's.
 
 Exit codes follow the gate contract: 0 true, 3 could not look (`SKIP:`), 1 false (`FAIL:`).
-`supersede.py selfcheck` plants 25 grades and proves each bites. What it refuses to grade
+`supersede.py selfcheck` plants 33 grades and proves each bites. Ticket 128 added them: a
+line whose target the adopter's pinned checkout could not read says `readable: false`, names a
+signed tag ahead and carries no `published_at`. It need not be the newest: a major the publisher
+cuts after the composition does not move the price, because `since` is the oldest signed tag
+ahead, so such a line still PASSes, as a readable target does. A missing line under a composer
+that predates ticket 128 is still a FAIL. Its message names ticket 128 only where the served feed
+line says the checkout carried no directory for any major ahead. What it refuses to grade
 is in the module's docstring: whether a tag verifies (the identity-pinned verifier's claim, in
 the untagged-pin check), the untagged hole's shape, and the eol feed's own time-varying price
 (composition's selfcheck's seam).
