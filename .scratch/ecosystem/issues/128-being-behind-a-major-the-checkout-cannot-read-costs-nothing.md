@@ -54,7 +54,8 @@ was taken on 2026-09-23.
   proposed as a retirement.
 - **Platform, `compose/handbook.py`.** Several supersede limits are joined with "; ".
 - **Hub, `verify/supersede/supersede.py`.** The check now reads the new field. A line with
-  `readable: false` must name the newest signed tag on the remote and carry no `published_at`.
+  `readable: false` must name a signed tag ahead on the remote and carry no `published_at`
+  (review round: not necessarily the newest).
   A missing line under a composer that predates ticket 128 is still a FAIL. Its message now says
   so and names what lifts it. The check reads which rule applies from the composer at the
   adopter's compiler pin tag (token `"readable": False`).
@@ -121,7 +122,11 @@ two `composed/` trees were compared file by file and price by price.
 | ludlow | `ico/penalty-schema@v3` | `v4.0.0` (unread) | 2026-09-10 | 2026-08-28 | 0.00 GBP |
 | tuppence | `ico/penalty-schema@v3` | `v4.0.0` (unread) | 2026-09-10 | 2026-08-28 | 0.00 GBP |
 
-- No other price changes and no delta changes. The deltas are identical to main's. tuppence
+- No other price changes its amount, and no delta changes. One shape does change (review
+  round, minor finding 1): each `switching` entry's `unpriceable[]` for the same edge gains the
+  new supersede line, at amount 0.0. That is composition.py's existing rule, `unpriceable` =
+  `full_prices` minus what the counterfactual keeps (line 4304 on the platform branch), and
+  dropping the edge drops its supersede line too. The deltas are identical to main's. tuppence
   carries one delta that its served evidence does not, the ungoverned `openbao` ramp. Main's
   composer writes it too, so it comes from tickets 119 to 126 and not from this one.
 - Price counts go from 7 to 9 (driftwood) and from 5 to 6 (ludlow, tuppence). Each new line sits
@@ -160,6 +165,44 @@ two `composed/` trees were compared file by file and price by price.
   and the refusal text carries the unresolved path. The selfcheck passed with real
   directories. Real estates use real directories, so this is recorded and not built.
 
+### Review round, 2026-09-23
+
+The review blocked on one finding and raised two minor ones. All three are fixed on hub PR 107.
+Platform PR 37 is unchanged.
+
+- **Blocking: an unreadable target turned FAIL when the publisher cut one more major.**
+  `grade_behind` required an unreadable target to be the newest signed tag on the remote. A line
+  composed before v4 existed, targeting v3, then FAILed, while the same line with a readable
+  target PASSed. The price is the same either way, because `since` is the oldest signed tag
+  ahead. Fix: an unreadable target now needs only to be a signed tag ahead, the same test a
+  readable target meets (ticket 84 review F1). The no-`published_at` rule stays. Red first: the
+  new selfcheck case "unreadable target, a newer major signed since" (remote v2, v3, v4; line
+  targets unread v3) failed with `names unreadable target 'wares/v3.0.0', not the newest signed
+  tag ahead (wares/v4.0.0)`, then passed. The old "not the newest" case is replaced by
+  "unreadable target at or behind the pin" (target `wares/v1.0.0`), which FAILs.
+- **Minor 1: the record missed a shape change.** The "Recompose, measured" section now says
+  that each `switching` entry's `unpriceable[]` gains the supersede line. I confirmed the rule by
+  reading composition.py line 4304. The measurement is the reviewer's recompose; I did not rerun
+  it.
+- **Minor 2: the pre-128 FAIL message could misdirect.** It blamed a pre-128 composer for every
+  missing line. Now it names ticket 128 only where the served feed line's `superseded` says
+  `unobserved` and "carries no directory". Otherwise the FAIL names the served `superseded`
+  state and says the no-directory case does not explain it. Red first: the old `grade_behind`,
+  given an entry with `superseded.state: behind`, returned a message containing "predates ticket
+  128". The new code does not.
+- **Delegated decision.** Accept any signed tag ahead, not "the newest at or after the served
+  one". The grader cannot tell when the composer ran, so it has nothing to compare against. The
+  price does not depend on the target. This keeps one rule for readable and unreadable targets.
+
+Measured after the fix:
+
+- `python3 verify/supersede/supersede.py selfcheck`: `OK 33 planted grades bite` (30 before).
+- `verify/supersede/verify-supersede.sh` against `.estate-clone`: rc 1, 4 FAIL pins, 3 PASS,
+  plus the summary FAIL. They are the same four pins. All four still name ticket 128, because
+  each served feed line says `unobserved` with "carries no directory".
+- mypy `twin tests conftest.py`: `Success: no issues found in 199 source files`. mypy on
+  `supersede.py`: no issues.
+
 ### PRs
 
 - platform: `ticket-128-behind-a-major-unreadable`,
@@ -170,4 +213,4 @@ Merge order: platform first, then the hub. The hub change is safe either way. It
 served evidence as it did before, with a sharper FAIL message. Merging platform first keeps the
 record true: the token the hub looks for exists in platform main before the hub names it.
 
-Map line: `- [128 — Being behind a major the checkout cannot read costs nothing](issues/128-being-behind-a-major-the-checkout-cannot-read-costs-nothing.md) — open, built 2026-09-23 in platform PR 37 and a hub PR. The composer prices a pin behind a signed major its pinned checkout cannot read, from the tags alone, marked readable: false; the offline replay is byte-identical. Recomposed in scratch, all four pins carry a line (0.00 GBP at as_of 2026-08-28) and the hub check grades 7 PASS. Waits on the owner's platform tools release, then each adopter's compiler pin move and recompose, with ticket 127 landed first.`
+Map line: `- [128 — Being behind a major the checkout cannot read costs nothing](issues/128-being-behind-a-major-the-checkout-cannot-read-costs-nothing.md) — open, built 2026-09-23 in platform PR 37 and hub PR 107, review round fixed 2026-09-23 (an unreadable target need only be a signed tag ahead). The composer prices a pin behind a signed major its pinned checkout cannot read, from the tags alone, marked readable: false; the offline replay is byte-identical. Recomposed in scratch, all four pins carry a line (0.00 GBP at as_of 2026-08-28) and the hub check grades 7 PASS. Waits on the owner's platform tools release, then each adopter's compiler pin move and recompose, with ticket 127 landed first.`

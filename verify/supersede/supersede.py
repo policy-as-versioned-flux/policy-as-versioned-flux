@@ -26,8 +26,9 @@ cannot be reached, a tag that cannot be read, is a could-not-look naming the rea
    below 1.0 -- the hub is not a party and pins no platform, so the formula is restated as
    verify/priced-holes restates it, not imported), and `amount = base x (ramp - 1)` with `base`
    the feed line's own amount. Where the pinned checkout carried no directory for any signed
-   major ahead, the line says `newer.readable: false`, names the newest signed tag ahead and
-   carries no `published_at` (ticket 128). A line missing or wrong is a FAIL -- unless the composer the
+   major ahead, the line says `newer.readable: false`, names a signed tag ahead (the newest
+   when it was composed; a major cut since does not move the price) and carries no
+   `published_at` (ticket 128). A line missing or wrong is a FAIL -- unless the composer the
    adopter pins carries no supersede rule at all, which is a could-not-look naming the tag: no
    edit of the adopter's own could put the line there.
 2. UNTAGGED: no tag of the pin's form on the remote. Counted here as a number ("untagged-feed
@@ -307,17 +308,25 @@ def grade_behind(*, adopter: str, currency: str, party: str, name: str, version:
             return "SKIP", (f"{label}: could not read platform tag {platform_tag!r} here, so whether "
                             f"the composer that wrote this evidence carries the supersede rule is "
                             f"unobserved")
-        if unreadable_rule is False:
-            # Ticket 128. Still a FAIL: the served artefact prices being behind at nothing.
+        superseded = (entry or {}).get("superseded") or {}
+        no_directory = (superseded.get("state") == "unobserved"
+                        and "carries no directory" in str(superseded.get("detail") or ""))
+        if unreadable_rule is False and no_directory:
+            # Ticket 128. Still a FAIL: the served artefact prices being behind at nothing. The
+            # reason names ticket 128 only where the feed entry says the checkout carried no
+            # directory for any major ahead; otherwise the missing line is another defect.
             return "FAIL", (f"{label}: the composer it pins ({platform_tag}) carries the supersede "
                             f"rule but predates ticket 128, so it writes no line when the pinned "
                             f"checkout carries no directory for the newer major; the served "
                             f"evidence carries none -- being behind is priced, never free "
                             f"(ticket 84, ticket 13 D5). It lifts when platform releases ticket "
                             f"128 and {adopter} moves its compiler pin and re-composes")
+        seen = (f" (the served feed line reports superseded state {superseded.get('state')!r}, so "
+                f"the no-directory case that ticket 128 fixed does not explain the missing line)"
+                if unreadable_rule is False else "")
         return "FAIL", (f"{label}: the composer it pins ({platform_tag}) carries the supersede rule "
-                        f"and the served evidence carries no supersede line for it -- being behind "
-                        f"is priced, never free (ticket 84, ticket 13 D5)")
+                        f"and the served evidence carries no supersede line for it{seen} -- being "
+                        f"behind is priced, never free (ticket 84, ticket 13 D5)")
     problems: list[str] = []
     if line.get("perspective") != adopter or line.get("currency") != currency:
         problems.append(f"under {line.get('perspective')}/{line.get('currency')}, not {adopter}/{currency}")
@@ -326,15 +335,14 @@ def grade_behind(*, adopter: str, currency: str, party: str, name: str, version:
         problems.append(f"names newer tag {newer.get('tag')!r}, not a signed tag ahead on the remote "
                         f"({', '.join(signed_ahead)})")
     if "readable" in newer:
-        # Ticket 128: a target the pinned checkout could not read is the NEWEST signed tag
-        # ahead, since the composer had no directory to prefer, and it carries no envelope date.
+        # Ticket 128: a target the pinned checkout could not read carries no envelope date. It
+        # was the newest signed tag ahead when the composer ran, but the publisher may have cut
+        # another since; the price does not move (since is the oldest signed ahead), so any
+        # signed tag ahead is accepted, as for a readable target (review F1; review round).
         if newer["readable"] is not False:
             problems.append(f"carries readable {newer['readable']!r}; the composer writes the flag "
                             f"only as false, on a target it could not read")
         else:
-            if newer.get("tag") != newest_tag:
-                problems.append(f"names unreadable target {newer.get('tag')!r}, not the newest signed "
-                                f"tag ahead ({newest_tag})")
             if newer.get("published_at") is not None:
                 problems.append(f"names an unreadable target yet carries published_at "
                                 f"{newer.get('published_at')!r}, a date nobody read")
@@ -585,10 +593,16 @@ def selfcheck() -> None:
         ("unreadable newest target, priced", grade(newest_major=3, newest_tag="wares/v3.0.0",
                                                     signed_ahead=["wares/v2.0.0", "wares/v3.0.0"],
                                                     since_tag="wares/v2.0.0", line=line(newer=unread())), "PASS"),
-        ("unreadable target that is not the newest", grade(newest_major=3, newest_tag="wares/v3.0.0",
-                                                           signed_ahead=["wares/v2.0.0", "wares/v3.0.0"],
-                                                           since_tag="wares/v2.0.0",
-                                                           line=line(newer=unread(version="v2", tag="wares/v2.0.0"))), "FAIL"),
+        # review round: the publisher cuts v4 after the composer wrote an unreadable v3 target.
+        # The price is the same (since is the oldest signed ahead), so this stays a PASS, as a
+        # readable target does (review F1). Only a target that is no signed tag ahead FAILs.
+        ("unreadable target, a newer major signed since", grade(newest_major=4, newest_tag="wares/v4.0.0",
+                                                                signed_ahead=["wares/v2.0.0", "wares/v3.0.0", "wares/v4.0.0"],
+                                                                since_tag="wares/v2.0.0", line=line(newer=unread())), "PASS"),
+        ("unreadable target at or behind the pin", grade(newest_major=3, newest_tag="wares/v3.0.0",
+                                                         signed_ahead=["wares/v2.0.0", "wares/v3.0.0"],
+                                                         since_tag="wares/v2.0.0",
+                                                         line=line(newer=unread(version="v1", tag="wares/v1.0.0"))), "FAIL"),
         ("unreadable target carrying an envelope date", grade(newest_major=3, newest_tag="wares/v3.0.0",
                                                               signed_ahead=["wares/v2.0.0", "wares/v3.0.0"],
                                                               since_tag="wares/v2.0.0",
@@ -605,8 +619,17 @@ def selfcheck() -> None:
     assert "0.00 GBP" in msg and "2026-09-01" in msg, msg
     _, msg = grade(line=None)
     assert "never free" in msg, msg
-    _, msg = grade(line=None, unreadable_rule=False)
-    assert "ticket 128" in msg and "v9.9.9" in msg and "never free" in msg, msg
+    # review round: the pre-128 reason is given only where the served feed entry itself says
+    # the checkout carried no directory for any major ahead (ticket 110's `unobserved` detail).
+    nodir = {"amount": 1000.0, "superseded": {"state": "unobserved", "detail": "v2 sign(s) wares majors "
+             "ahead of the pinned v1, but this checkout carries no directory for any of them to price against"}}
+    status, msg = grade(line=None, unreadable_rule=False, entry=nodir)
+    assert status == "FAIL" and "predates ticket 128" in msg and "no directory" in msg, msg
+    assert "v9.9.9" in msg and "never free" in msg, msg
+    readable = {"amount": 1000.0, "superseded": {"state": "behind", "detail": "tag wares/v2.0.0 ..."}}
+    status, msg = grade(line=None, unreadable_rule=False, entry=readable)
+    assert status == "FAIL" and "predates ticket 128" not in msg and "superseded state 'behind'" in msg, msg
+    plants += 2
     _, msg = grade(unsigned_ahead=["wares/v3.0.0"])
     assert "wares/v3.0.0 also ahead but unsigned" in msg, msg
     _, msg = grade(line=line(as_of="2026-08-28", ramp=1.0, amount=0.0))
