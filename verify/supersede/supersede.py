@@ -7,7 +7,7 @@
 |---|---|---|
 | the adopter's feed pins | its own `party.yaml` at the commit it SERVES | `git fetch origin main`, then `git show origin/main:party.yaml` |
 | the prices it signs | its own `composed/evidence.json` at that commit | `git show origin/main:composed/evidence.json` |
-| the composer that wrote them | platform's tree AT THE TAG THIS ADOPTER PINS | `gitops/platform/platform-pin.yaml` at that commit, then `git -C platform show <tag>:compose/composition.py` |
+| the composer that wrote them | platform's tree AT THE TAG THIS ADOPTER PINS FOR ITS COMPILER | `.github/platform-tools-pin.yaml` at that commit (ticket 110; the policy pin `gitops/platform/platform-pin.yaml` only where no compiler pin exists), then `git -C platform show <tag>:compose/composition.py` |
 | what the publisher has published | the publisher's REAL remote tag namespace | `git ls-remote --tags` (feed_contract.remote_tags) |
 | when the newer major was signed | the tag object, fetched read-only into the publisher clone | `git fetch origin tag <tag>`, then `for-each-ref --format=%(creatordate:short)` |
 | the retirement proposals | the adopter's pull requests on `wargamer/retire-*` branches | `gh pr list --state all` |
@@ -66,6 +66,9 @@ ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 ESTATE = os.environ.get("PAVC_ESTATE_CLONE") or os.path.normpath(os.path.join(ROOT, ".estate-clone"))
 SERVED_REF = "origin/main"
 PLATFORM_PIN = "gitops/platform/platform-pin.yaml"
+# Ticket 110. Since 2026-09-10 each adopter pins the compiler separately from the policy it
+# accepts: the composer that writes composed/ runs from this pin, not from PLATFORM_PIN.
+TOOLS_PIN = ".github/platform-tools-pin.yaml"
 COMPOSER = "compose/composition.py"
 RULE_TOKEN = "def price_supersede("
 RETIRE_PREFIX = "wargamer/retire-"
@@ -157,8 +160,8 @@ def served_json(repo: str, path: str) -> dict | None:
     return doc if isinstance(doc, dict) else None
 
 
-def served_platform_tag(repo: str) -> str | None:
-    text = show(repo, SERVED_REF, PLATFORM_PIN)
+def served_pin_tag(repo: str, path: str) -> str | None:
+    text = show(repo, SERVED_REF, path)
     if text is None:
         return None
     for doc in yaml.safe_load_all(text):
@@ -167,6 +170,16 @@ def served_platform_tag(repo: str) -> str | None:
             if tag:
                 return str(tag)
     return None
+
+
+def served_composer_tag(repo: str) -> tuple[str | None, str]:
+    """(tag, pin file) of the platform composer that wrote this adopter's served evidence. The
+    compiler pin wins where the served commit carries one (ticket 110): the adopter's workflows
+    run compose from it, and the policy pin only names which policy the adopter accepts."""
+    tools = served_pin_tag(repo, TOOLS_PIN)
+    if tools is not None:
+        return tools, TOOLS_PIN
+    return served_pin_tag(repo, PLATFORM_PIN), PLATFORM_PIN
 
 
 def composer_carries_rule(estate: str, tag: str) -> bool | None:
@@ -367,12 +380,12 @@ def check(estate: str = ESTATE) -> int:
         party = served_yaml(repo, "party.yaml") or {}
         currency = str(party.get("reporting_currency") or "GBP")
         evidence = served_json(repo, "composed/evidence.json")
-        platform_tag = served_platform_tag(repo)
+        platform_tag, _ = served_composer_tag(repo)
         rule = composer_carries_rule(estate, platform_tag) if platform_tag else None
         if evidence is None:
             out("SKIP", f"{adopter} serves no composed/evidence.json at {SERVED_REF}, so nothing it prices can be read")
         if platform_tag is None:
-            out("SKIP", f"{adopter} declares no platform pin at {SERVED_REF} ({PLATFORM_PIN}), so which composer wrote its evidence is unobserved")
+            out("SKIP", f"{adopter} declares no platform pin at {SERVED_REF} ({TOOLS_PIN} or {PLATFORM_PIN}), so which composer wrote its evidence is unobserved")
         for edge in (party.get("inherits") or []):
             if edge.get("kind") != "feed":
                 continue
@@ -552,6 +565,37 @@ def selfcheck() -> None:
         assert tag_object(clone, "wares/v9.0.0")["state"] == "unreachable"
         assert tag_date(clone, "wares/v3.0.0") is None and tag_date(clone, "wares/v4.0.0")
     plants += 4
+    # ticket 110: the composer that wrote the evidence is the COMPILER pin when the adopter
+    # carries one (.github/platform-tools-pin.yaml, split from the policy pin on 2026-09-10),
+    # and the policy pin only where no compiler pin exists. Read at the served ref, never HEAD.
+    with tempfile.TemporaryDirectory() as td:
+        hooks = os.path.join(td, "nohooks"); os.makedirs(hooks)
+        g = ["git", "-c", "commit.gpgsign=false", "-c", f"core.hooksPath={hooks}",
+             "-c", "user.name=fixture", "-c", "user.email=fixture@invalid"]
+
+        def pin(tag: str, name: str) -> str:
+            return yaml.safe_dump({"apiVersion": "source.toolkit.fluxcd.io/v1", "kind": "GitRepository",
+                                   "metadata": {"name": name},
+                                   "spec": {"ref": {"tag": tag, "commit": "0" * 40}}})
+        repo = os.path.join(td, "ado")
+        subprocess.run(["git", "init", "-q", repo], check=True)
+        os.makedirs(os.path.join(repo, os.path.dirname(PLATFORM_PIN)))
+        with open(os.path.join(repo, PLATFORM_PIN), "w") as fh:
+            fh.write(pin("v2.0.1", "platform"))
+        subprocess.run(g + ["-C", repo, "add", PLATFORM_PIN], check=True)
+        subprocess.run(g + ["-C", repo, "commit", "-q", "-m", "policy pin only"], check=True, capture_output=True)
+        subprocess.run(["git", "-C", repo, "update-ref", f"refs/remotes/{SERVED_REF}", "HEAD"], check=True)
+        assert served_composer_tag(repo) == ("v2.0.1", PLATFORM_PIN), served_composer_tag(repo)
+        os.makedirs(os.path.join(repo, os.path.dirname(TOOLS_PIN)))
+        with open(os.path.join(repo, TOOLS_PIN), "w") as fh:
+            fh.write(pin("v3.0.0", "platform-tools"))
+        subprocess.run(g + ["-C", repo, "add", TOOLS_PIN], check=True)
+        subprocess.run(g + ["-C", repo, "commit", "-q", "-m", "compiler pin"], check=True, capture_output=True)
+        # still the policy pin: the served ref has not moved, and a working tree is never read
+        assert served_composer_tag(repo) == ("v2.0.1", PLATFORM_PIN), served_composer_tag(repo)
+        subprocess.run(["git", "-C", repo, "update-ref", f"refs/remotes/{SERVED_REF}", "HEAD"], check=True)
+        assert served_composer_tag(repo) == ("v3.0.0", TOOLS_PIN), served_composer_tag(repo)
+    plants += 3
     # the lookups
     ev = {"prices": [{"kind": "feed", "source": "pub", "name": "wares", "amount": 7.0, "hole": {"status": "new"}},
                      line()]}
