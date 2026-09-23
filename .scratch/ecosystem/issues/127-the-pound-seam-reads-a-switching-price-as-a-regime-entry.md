@@ -1,7 +1,7 @@
 # 127 — The pound seam reads a switching price as a regime entry
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -98,3 +98,20 @@ is how the row worked before this ticket. Today there is exactly one SKIP, so no
 
 Owner items: none. Whether driftwood's forward-intel feed can ever supply a lef stays near
 grilling ticket 30, as the ticket says.
+
+## Answer
+
+Resolved 2026-09-23 by hub PR 106. The pound seam grades each ico price by its kind.
+
+1. Check 4 picks the regime entry as the ico price of `kind: feed`. ico's `switching` and
+   `supersede` prices are no longer asked for `holes[]`.
+2. A price with no amount and a non-empty `could_not_look` is a named SKIP, never a PASS. A price
+   with neither still FAILs, and so does a price that carries both.
+3. `talk/verify-manifest.txt` declares the one real could-not-look, driftwood's forward-intel
+   feed that supplies no lef. The gate's own judge accepts the real line and refuses the same
+   shape with another reason.
+
+On the real estate the row moves from FAIL (4 lines) to a declared SKIP (30 PASS, 1 SKIP).
+
+Review: one round, pass, four minor findings, not fixed. One names an edge worth a later ticket:
+a document with an ico switching price and no ico feed entry grades a named-absence PASS.
