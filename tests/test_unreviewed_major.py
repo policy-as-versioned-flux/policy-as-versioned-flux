@@ -14,6 +14,8 @@ cosign verification — is verify-unreviewed-major-in-window.sh.
 from __future__ import annotations
 
 import importlib.util
+import subprocess
+import tempfile
 from pathlib import Path
 from types import ModuleType
 
@@ -197,3 +199,161 @@ def test_no_adopter_at_all_is_a_could_not_look(grader: ModuleType) -> None:
     status, lines = grader.grade([])
     assert status == "SKIP"
     assert any("adopter role" in m for _, m in lines)
+
+
+# -- the acceptance record (eco-system ticket 129) ------------------------------------------------
+#
+# An institution accepts a major for itself by carrying a record in its OWN repository, under
+# `accepted-majors/`, at the commit it serves. The check reads it there and nowhere else. These
+# tests plant records; none of them is a real acceptance.
+
+SERVED = "c" * 40
+
+
+def _record(party: str = "driftwood", version: str = "5.0.0", publisher: str = "platform",
+            accepted_by: str = "Example Owner", accepted_on: str = "2026-09-23",
+            kind: str = "major-acceptance") -> str:
+    return (f"kind: {kind}\nparty: {party}\npublisher: {publisher}\nversion: {version}\n"
+            f"accepted_by: {accepted_by}\naccepted_on: {accepted_on}\n")
+
+
+def _carrying(window: list[str], records: list[tuple[str, str]], adopter: str = "driftwood") -> dict:
+    return {"adopter": adopter, "tag": "v3.2.0", "window": window,
+            "computed": {v: "major" for v in window}, "skip": None,
+            "served": SERVED, "records": records}
+
+
+def test_a_well_formed_record_parses_to_the_fields_it_carries(grader: ModuleType) -> None:
+    got = grader.acceptance_from_text(_record())
+    assert got == {"party": "driftwood", "publisher": "platform", "version": "5.0.0",
+                   "accepted_by": "Example Owner", "accepted_on": "2026-09-23"}
+
+
+@pytest.mark.parametrize("text, reason", [
+    (_record(kind="waiver"), "kind"),
+    (_record(accepted_by="''"), "accepted_by"),
+    (_record(accepted_on="yesterday"), "accepted_on"),
+    ("kind: major-acceptance\nparty: driftwood\npublisher: platform\n", "version"),
+    ("- not\n- a mapping\n", "mapping"),
+    ("kind: [unclosed\n", "YAML"),
+])
+def test_a_malformed_record_is_not_a_record_and_says_why(grader: ModuleType, text: str,
+                                                          reason: str) -> None:
+    got = grader.acceptance_from_text(text)
+    assert isinstance(got, str) and reason in got
+
+
+def test_an_accepted_major_is_the_pass_and_names_who_when_where_and_at_which_commit(
+        grader: ModuleType) -> None:
+    status, lines = grader.grade([_carrying(["5.0.0"], [("accepted-majors/platform-5.0.0.yaml",
+                                                          _record())])])
+    assert status == "PASS"
+    body = " ".join(m for _, m in lines)
+    for needle in ("driftwood", "5.0.0", "Example Owner", "2026-09-23",
+                   "accepted-majors/platform-5.0.0.yaml", SERVED[:12]):
+        assert needle in body
+    assert not any(kind == "FAIL" for kind, _ in lines)
+
+
+def test_an_unaccepted_major_is_still_the_fail_and_says_where_a_record_would_be_read(
+        grader: ModuleType) -> None:
+    status, lines = grader.grade([_carrying(["5.0.0"], [])])
+    assert status == "FAIL"
+    fail = next(m for k, m in lines if k == "FAIL")
+    assert "accepted-majors/" in fail and SERVED[:12] in fail
+
+
+def test_a_record_for_another_institution_does_not_count_and_is_named(grader: ModuleType) -> None:
+    # tuppence's acceptance, planted in driftwood's tree, accepts nothing for driftwood.
+    status, lines = grader.grade([_carrying(["5.0.0"], [("accepted-majors/platform-5.0.0.yaml",
+                                                          _record(party="tuppence"))])])
+    assert status == "FAIL"
+    fail = next(m for k, m in lines if k == "FAIL")
+    assert "tuppence" in fail and "accepted-majors/platform-5.0.0.yaml" in fail
+
+
+def test_a_record_for_another_version_does_not_count(grader: ModuleType) -> None:
+    status, lines = grader.grade([_carrying(["5.0.0"], [("accepted-majors/platform-4.0.0.yaml",
+                                                          _record(version="4.0.0"))])])
+    assert status == "FAIL"
+
+
+def test_a_record_for_another_publisher_does_not_count(grader: ModuleType) -> None:
+    status, _ = grader.grade([_carrying(["5.0.0"], [("accepted-majors/nist-5.0.0.yaml",
+                                                     _record(publisher="nist"))])])
+    assert status == "FAIL"
+
+
+def test_a_malformed_record_for_the_carried_version_does_not_count_and_is_named(
+        grader: ModuleType) -> None:
+    status, lines = grader.grade([_carrying(["5.0.0"], [("accepted-majors/platform-5.0.0.yaml",
+                                                          _record(accepted_by="''"))])])
+    assert status == "FAIL"
+    fail = next(m for k, m in lines if k == "FAIL")
+    assert "accepted_by" in fail
+
+
+def test_before_the_rollout_the_unaccepted_4_0_0_stays_red_beside_an_accepted_5_0_0(
+        grader: ModuleType) -> None:
+    # The window the owner's 2026-09-23 decision passes through: 5.0.0 accepted and composed in,
+    # 4.0.0 not yet retired and never accepted. Accepting one major accepts no other.
+    status, lines = grader.grade([_carrying(["4.0.0", "5.0.0"],
+                                            [("accepted-majors/platform-5.0.0.yaml", _record())])])
+    assert status == "FAIL"
+    assert any(k == "FAIL" and "4.0.0" in m for k, m in lines)
+    assert not any(k == "FAIL" and "5.0.0" in m and "4.0.0" not in m for k, m in lines)
+    assert any(k == "PASS" and "5.0.0" in m for k, m in lines)
+
+
+def test_an_accepted_major_does_not_soften_another_adopters_unaccepted_one(
+        grader: ModuleType) -> None:
+    status, _ = grader.grade([
+        _carrying(["5.0.0"], [("accepted-majors/platform-5.0.0.yaml", _record())]),
+        _carrying(["5.0.0"], [], adopter="ludlow"),
+    ])
+    assert status == "FAIL"
+
+
+# -- the record is read from the adopter's own tree at the commit it serves -----------------------
+
+# The fixture's own git runs with no hooks (ticket 92 round 5, R2), so planting a commit makes no
+# network call. The reads under test run plain git, as the check does on the real estate.
+_NO_HOOKS = tempfile.mkdtemp(prefix="unreviewed-major-no-hooks-")
+
+
+def _fixture_git(root: Path, *args: str) -> None:
+    subprocess.run(["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@t",
+                    "-c", "commit.gpgsign=false", "-c", f"core.hooksPath={_NO_HOOKS}", *args],
+                   capture_output=True, text=True, check=True)
+
+
+def test_only_a_record_committed_at_the_served_commit_is_read(grader: ModuleType,
+                                                               tmp_path: Path) -> None:
+    repo = tmp_path / "driftwood"
+    (repo / "accepted-majors").mkdir(parents=True)
+    _fixture_git(repo, "init", "-q", "-b", "main")
+    (repo / "accepted-majors" / "platform-5.0.0.yaml").write_text(_record())
+    (repo / "party.yaml").write_text("party: driftwood\n")
+    _fixture_git(repo, "add", "accepted-majors/platform-5.0.0.yaml", "party.yaml")
+    _fixture_git(repo, "commit", "-q", "-m", "plant")
+    # Written into the working tree and staged, never committed: not served, so not read.
+    (repo / "accepted-majors" / "platform-4.0.0.yaml").write_text(_record(version="4.0.0"))
+    _fixture_git(repo, "add", "accepted-majors/platform-4.0.0.yaml")
+    # A record anywhere but accepted-majors/ is not one either.
+    (repo / "accepted-5.0.0.yaml").write_text(_record())
+    served, records = grader.records_at_served_ref(repo)
+    assert served is not None and len(served) == 40
+    assert [p for p, _ in records] == ["accepted-majors/platform-5.0.0.yaml"]
+    assert grader.acceptance_from_text(records[0][1])["version"] == "5.0.0"
+
+
+def test_a_tree_with_no_record_directory_reads_as_no_records(grader: ModuleType,
+                                                             tmp_path: Path) -> None:
+    repo = tmp_path / "ludlow"
+    repo.mkdir()
+    _fixture_git(repo, "init", "-q", "-b", "main")
+    (repo / "party.yaml").write_text("party: ludlow\n")
+    _fixture_git(repo, "add", "party.yaml")
+    _fixture_git(repo, "commit", "-q", "-m", "plant")
+    served, records = grader.records_at_served_ref(repo)
+    assert served is not None and records == []
