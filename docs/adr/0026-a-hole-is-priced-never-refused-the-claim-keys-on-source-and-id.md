@@ -285,8 +285,10 @@ changes no decision above.
 - **Point 4.** `since` is looked up by the Namespace's name, so renaming an aged ungoverned
   Namespace restarts its ramp at 1.0, and the old name's closed delta says it is now governed.
   Eco-system ticket 122.
-- **Consequences, the withdrawn control.** A control the regulator withdraws refuses the adopter
-  with `removed-control`, the refusal for an adopter's own removal. Eco-system ticket 123.
+- **Consequences, the withdrawn control.** A control the regulator withdraws is charged to the
+  adopter as a `removed-control` delta, the kind for an adopter's own removal. Eco-system ticket
+  123.
 
-The known lag this ADR names, the removal refusal in `check_selected_set`, still stands on
-platform main. No ticket held its build; eco-system ticket 124 now does.
+The known lag this ADR named, the removal refusal in `check_selected_set`, is gone from platform
+main. Eco-system ticket 124 built the priced removal, and `removed_controls` replaced that
+function.

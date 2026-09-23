@@ -1,7 +1,7 @@
 # 124 — The removal ADR-0026 prices has no build
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -143,3 +143,24 @@ and a second set under the scratchpad for the selfcheck, below), never the share
   Until then no adopter's evidence is composed by this build. Read on 2026-09-23 at each
   adopter's origin/main, driftwood, tuppence and ludlow each carry no refusal and an empty
   `deltas[]` in `composed/evidence.json`, so their evidence changes only when one narrows.
+
+## Answer
+
+Resolved 2026-09-23 by platform PR 31 and hub PR 97. A removal composes and prints as priced
+deltas on platform main, as ADR-0026 point 5 decided on 2026-09-04.
+
+1. `compose/composition.py` loses the `removed-control` refusal. `removed_controls` lists the
+   controls that left the selected set, and each one carries the amount its hole carried: the
+   regulator's weight times the triple, a bespoke scenario's residual, or a named absence.
+2. `compute_deltas` prints one `removed-control` delta per control and one `baseline-narrowing`
+   summary for a strict-subset baseline change.
+3. `tests/test_loophole_adr_0026.py::test_a_removal_composes_and_prints_as_priced_deltas` is the
+   regression test. A real narrowing of tuppence from MODERATE to LOW prints 139 removed-control
+   deltas, and one of them is priced.
+4. ADR-0026's Consequences and its closing note now say the code follows the record.
+
+No adopter composes under this build until the owner cuts a platform tools release and each
+adopter moves its pin. Ticket 123 changes the same place next.
+
+Review: one round, pass. The ADR closing note is fixed. Two notes on stale prose in CONTEXT.md
+and in ticket 123 are left for ticket 123, which changes both places.
