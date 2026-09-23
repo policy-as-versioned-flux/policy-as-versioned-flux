@@ -1,19 +1,25 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ......
 ----------------------------------------------------------------------
-Ran 6 tests in 4.185s
+Ran 6 tests in 4.469s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 7.083s
+Ran 9 tests in 7.839s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 7.221s
+Ran 9 tests in 7.740s
+
+OK
+[1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
+................
+----------------------------------------------------------------------
+Ran 16 tests in 1.428s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the one remaining refusal)
@@ -45,7 +51,7 @@ OK limits[]: the two-publisher-conflict limit prints open at driftwood's one pin
 OK parents[]: all five declared parent kinds resolve to a non-empty SHA
 OK load_implementations: cage-tier and cage-netpol, one family, one version, both survive (ADR-0016's fix for the prototype's (family, version) key)
 OK load_implementations: a dedicated fixture, two members of one family at one version, both keys present
-OK render_is_faithful: every member of every live version (10 total) renders back byte-identical after the header is stripped
+OK render_is_faithful: every member of every live version (18 total) renders back byte-identical after the header is stripped
 OK render_member: no validationActions field written onto cage-tier (Mutating) or cage-netpol (Generating)
 OK guards: orphan guard and governed-namespace-requires-claim both compose under the platform tag (no policy-version), rendering back to their offline twins' output
 OK HEADER.yaml/holes[]: the real estate's first composition records 285 holes, all recorded (none new, none refused), ac-6.10 found by walking nested controls, and ac-6/cm-6 are covered (a claim exists, even the dangling one)
@@ -66,7 +72,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "party": "fixture-platform",
       "kind": "implementations",
       "version": "1.0.0",
-      "sha": "4c25945b349a156dbaf4f38a0d44f70d170799c6f3baa83132744b9849ccf0fb"
+      "sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab"
     }
   ],
   "members": [
@@ -76,7 +82,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "ValidatingPolicy",
       "version": "1.0.0",
       "source_party": "fixture-platform",
-      "source_sha": "4c25945b349a156dbaf4f38a0d44f70d170799c6f3baa83132744b9849ccf0fb",
+      "source_sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab",
       "action": "Audit"
     },
     {
@@ -85,7 +91,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "ValidatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "4c25945b349a156dbaf4f38a0d44f70d170799c6f3baa83132744b9849ccf0fb",
+      "source_sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab",
       "action": null
     },
     {
@@ -94,7 +100,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "MutatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "4c25945b349a156dbaf4f38a0d44f70d170799c6f3baa83132744b9849ccf0fb",
+      "source_sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab",
       "action": null
     },
     {
@@ -103,7 +109,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "MutatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "4c25945b349a156dbaf4f38a0d44f70d170799c6f3baa83132744b9849ccf0fb",
+      "source_sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab",
       "action": null
     },
     {
@@ -112,7 +118,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "MutatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "4c25945b349a156dbaf4f38a0d44f70d170799c6f3baa83132744b9849ccf0fb",
+      "source_sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab",
       "action": null
     },
     {
@@ -121,7 +127,7 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "MutatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "4c25945b349a156dbaf4f38a0d44f70d170799c6f3baa83132744b9849ccf0fb",
+      "source_sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab",
       "action": null
     },
     {
@@ -130,7 +136,25 @@ OK verify(): a tampered committed file is caught as a byte-for-byte mismatch
       "kind": "ValidatingPolicy",
       "version": null,
       "source_party": "fixture-platform",
-      "source_sha": "4c25945b349a156dbaf4f38a0d44f70d170799c6f3baa83132744b9849ccf0fb",
+      "source_sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "cage-netpol-bottom-rung",
+      "kind": "GeneratingPolicy",
+      "version": null,
+      "source_party": "fixture-platform",
+      "source_sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": null,
+      "source_party": "fixture-platform",
+      "source_sha": "76c22bc61055c4285cf85ae10f30c0e0c0d3972b41b1240a88395f142ce908ab",
       "action": null
     }
   ],
@@ -242,8 +266,44 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
   "members": [
     {
       "family": "graded-enforcement",
+      "name": "cage-baseline",
+      "kind": "PriorityClass",
+      "version": "4.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": "4.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
       "name": "cage-netpol",
       "kind": "GeneratingPolicy",
+      "version": "4.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-quarantine",
+      "kind": "PriorityClass",
+      "version": "4.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-restricted",
+      "kind": "PriorityClass",
       "version": "4.0.0",
       "source_party": "platform",
       "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
@@ -287,8 +347,44 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
     },
     {
       "family": "graded-enforcement",
+      "name": "cage-baseline",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
       "name": "cage-netpol",
       "kind": "GeneratingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-quarantine",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-restricted",
+      "kind": "PriorityClass",
       "version": "5.0.0",
       "source_party": "platform",
       "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
@@ -3603,7 +3699,7 @@ OK prices[]: a threat-register bump (v1 -> v2) moves tuppence's exposure through
 OK prices[]: a fixture ico band (v1->v2) that crosses driftwood's real GBP40,000 tolerance prints a proposed tier through compose() (isolated -> quarantine, changed=True), marked as a label; no rendered POLICY file changes and the handbook names the proposed tier `quarantine`, which it did not before the bump
 OK prices[]: one `switching` entry per feed edge, each measured by re-composing with that publisher's edges dropped -- ico's costs its whole regime line, the threat publisher's is not a number at all because driftwood's own twin borrows that feed's LEF and stops pricing without it, and the insurer's moves the exposure by nothing and names the premium it would lose instead of folding it in
 OK composed/feeds/: every priced payload, the publisher's own party artefact and the converter that priced it are vendored under the adopter's own signature, digested into a PROVENANCE.json the header names, with the converter's real source party recorded and a quote feed's absent converter named rather than faked
-OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed, and every one of the 32 files it RENDERS comes back byte-identical -- 11 of them the vendored tree itself, the rest the composed policy set and composed/HEADER.yaml with its parent SHAs. composed/evidence.json is not among them: it is written from the document rather than rendered, and its prices are the comparison just above. The substitution prints as an open limit, and a tampered vendored payload refuses against the digest its own tag signed
+OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed, and every one of the 40 files it RENDERS comes back byte-identical -- 11 of them the vendored tree itself, the rest the composed policy set and composed/HEADER.yaml with its parent SHAs. composed/evidence.json is not among them: it is written from the document rather than rendered, and its prices are the comparison just above. The substitution prints as an open limit, and a tampered vendored payload refuses against the digest its own tag signed
 OK composed/feeds/: each vendored copy records the exact command that priced it and the digest of what that command returned -- and replaying it against the vendored payload alone, in a bare directory, reproduces the digest for penalty-schema, threat-register
 OK prices[]: no entry carries the absolute path of the machine that composed it -- the twin's own refusal travels into the signed artefact naming `twin/forward-intel/v1/feed.json`, which reads the same on every runner
 OK switching: an edge signed AFTER every pinned envelope moves the composition's as-of to that day (its own life 0 months, its siblings' measured up to it), a --as-of EARLIER than a signed since refuses naming both dates rather than reporting the window's absolute size; and on today's estate every pin was signed the day of the newest feed publication, so the window is 0 months and over_pin_life is 0.0 -- arithmetic over two signed dates, not a placeholder
@@ -3652,8 +3748,44 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
   "members": [
     {
       "family": "graded-enforcement",
+      "name": "cage-baseline",
+      "kind": "PriorityClass",
+      "version": "4.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": "4.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
       "name": "cage-netpol",
       "kind": "GeneratingPolicy",
+      "version": "4.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-quarantine",
+      "kind": "PriorityClass",
+      "version": "4.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-restricted",
+      "kind": "PriorityClass",
       "version": "4.0.0",
       "source_party": "platform",
       "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
@@ -3697,8 +3829,44 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
     },
     {
       "family": "graded-enforcement",
+      "name": "cage-baseline",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
       "name": "cage-netpol",
       "kind": "GeneratingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-quarantine",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-restricted",
+      "kind": "PriorityClass",
       "version": "5.0.0",
       "source_party": "platform",
       "source_sha": "533dccb0a823001b396fd60ab08014bf75065a37",
@@ -6963,6 +7131,6 @@ selfcheck ok: one seam composes the real driftwood against its real pinned paren
 [1;36m==>[0m 1a. the ONE pin-content rule (ticket 77 item 1): a pinned tree must carry the section the pin is used for
 ok  pin_content selfcheck: an envelope major, a missing major, an undeclared feed, an exposure section present and absent, a missing HEADER.yaml, an implementations path present and absent, and a tree with no party.yaml all grade as the rule says
 [1;36m==>[0m 1b. the three refusals ticket 38 deleted are gone from the source, and no new one took their place
-refusal kinds emitted: dangling-claim, missing-baseline-file, missing-instrument, no-controls-parent, removed-control, restatement-of-non-validating, split-diamond, unknown-control-id, unpriceable-inability
+refusal kinds emitted: dangling-claim, missing-baseline-file, missing-instrument, no-controls-parent, removed-control, restatement-of-non-validating, split-diamond, undelivered-priority-class, unknown-control-id, unpriceable-inability, unreadable-priority-class
 [1;36m==>[0m 2. the header's pinned parent contains the policy versions the set renders
 SKIP: the composed set renders policy versions the pinned parent commit does not contain; the header names a parent release that holds none of these trees. platform@2.0.1 (533dccb0) does not contain distribution/policies/v5.0.0 -- the commit that carries these trees is not on the real remote until cut-release.yml cuts the corresponding policy/v<version> tag in Actions and the adopter's platform-pin.yaml moves with it (ticket 64 moves the pin and recomposes)
