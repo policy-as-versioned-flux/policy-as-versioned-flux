@@ -292,3 +292,19 @@ changes no decision above.
 The known lag this ADR named, the removal refusal in `check_selected_set`, is gone from platform
 main. Eco-system ticket 124 built the priced removal, and `removed_controls` replaced that
 function.
+
+Eco-system ticket 123 built the withdrawal, delegated. `split_withdrawn` in
+`compose/composition.py` asks one question of each control that left the selected set: would
+the adopter's last baseline name and last overlay still select it against the catalogue pinned
+now? If not, the regulator took it away, and it prints as a `withdrawn-control` delta. That
+delta names the regulator and its catalogue on both sides of the bump, and it never names the
+adopter as the one who removed it. A control the catalogue marks `status: withdrawn`, as NIST
+marks 182 of its 1196, counts as no longer defined. The header now records `overlay-controls`
+so the next run can ask. A header from before that field can tell only a catalogue withdrawal
+apart. A weights feed that still names a withdrawn control keeps its price on the delta, its
+regime line reads `withdrawn`, and the regime entry does not move: that stays the feed's fact
+to fix in its next version, as the Consequences say. An adopter still naming a control the
+catalogue removed meets `unknown-control-id`. One naming a control NIST keeps under
+`status: withdrawn` does not yet: the composition still selects it. That gap is recorded in
+ticket 123. This changes no decision above. The revisit trigger, the first such bump, still
+stands.

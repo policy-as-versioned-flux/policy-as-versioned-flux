@@ -27,10 +27,10 @@ What it observes, on the estate's committed files only:
         the namespace (re-read here from the adopter clone's tags) or null with a named limit;
      e. the regime entry's `holes[]` lines each carry the adopter's status for that control, and
         the open ones agree with `holes[]`;
-     f. every `deltas[]` entry is one of the nine kinds `DELTA_KINDS` names (the seven hole,
-        removal, baseline and namespace kinds, plus ticket 69's two untagged-pin kinds), under the
-        adopter's perspective and currency, and the new/closed hole and namespace deltas match
-        the entries they report.
+     f. every `deltas[]` entry is one of the ten kinds `DELTA_KINDS` names (the eight hole,
+        removal, withdrawal, baseline and namespace kinds, plus ticket 69's two untagged-pin
+        kinds), under the adopter's perspective and currency, and the new/closed hole and
+        namespace deltas match the entries they report.
 
 Grading, per the gate contract: any FAIL -> 1; else any SKIP -> 3; else 0.
 
@@ -67,11 +67,13 @@ GONE = {"new-hole", "baseline-widening", "new-ungoverned-namespace", "removed-co
 # reported as deltas like every other hole's. This set is a whitelist, so a kind missing from
 # it fails the adopter that reports it -- adding a kind here is how a new delta is admitted.
 DELTA_KINDS = {"new-hole", "closed-hole", "baseline-widening",
-               "removed-control", "baseline-narrowing",
+               "removed-control", "baseline-narrowing", "withdrawn-control",
                "new-ungoverned-namespace", "closed-ungoverned-namespace",
                "new-untagged-pin", "closed-untagged-pin"}
 HOLE_STATUS = {"new", "recorded", "closed"}
-REGIME_STATUS = HOLE_STATUS | {"covered", "unselected"}
+# `withdrawn` is eco-system ticket 123's: the weight names a control its pinned catalogue
+# no longer defines, the feed's own fact to fix in its next version.
+REGIME_STATUS = HOLE_STATUS | {"covered", "withdrawn", "unselected"}
 HOLE_FIELDS = {"source", "control_id", "status", "perspective", "currency", "amount", "priced_by"}
 PRICE_FIELDS = {"perspective", "currency", "amount", "share", "workloads", "workloads_total",
                 "base", "ramp", "since", "as_of", "bounded", "limits"}

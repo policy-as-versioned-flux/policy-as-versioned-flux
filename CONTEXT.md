@@ -578,16 +578,21 @@ that a rewritten entry cites stay as the record of the decision at the time.
   than a zero. Never refused, never counted; the new-hole and widening refusals are gone and
   each new, closed or widened hole prints as a **delta** on the evidence document under the
   adopter's own perspective and currency. A removal prints as a `removed-control` delta carrying
-  the amount the hole carried, and the regime's price does not move (ADR-0026, 2026-09-04; its
-  platform build waits).
+  the amount the hole carried, and the regime's price does not move (ADR-0026, 2026-09-04; built
+  2026-09-23, ticket 124). A control the regulator withdraws is not the adopter's removal: it
+  prints as a `withdrawn-control` delta that names the regulator's catalogue bump (ticket 123).
 
-- **Delta** (added 2026-09-03, ticket 38) — What changed since the adopter's last signed composed
-  artefact and what a pinned instrument prices it at: a new or closed **hole**, a baseline
-  widening, a new or closed **ungoverned namespace**. Each carries the adopter's perspective and
-  currency and an amount or a named absence. A delta is a report of a priced move, never a wall;
-  it replaced the three composition refusals ADR-0013, ADR-0017 and ADR-0018 point 3 carried
-  (recorded by ADR-0026, 2026-09-04), which also makes a removed control and a baseline narrowing
-  deltas once their platform build lands.
+- **Delta** (added 2026-09-03, ticket 38; widened 2026-09-23, tickets 124 and 123) — What changed
+  since the adopter's last signed composed artefact and what a pinned instrument prices it at: a
+  new or closed **hole**, a baseline widening, a new or closed **ungoverned namespace**, a removed
+  control (`removed-control`), a baseline narrowing (`baseline-narrowing`), and a control the
+  regulator withdrew (`withdrawn-control`). Each carries the adopter's perspective and currency
+  and an amount or a named absence. The perspective says whose pound it is, not who acted: a
+  `withdrawn-control` delta names the regulator and its catalogue on both sides of the bump, and
+  never the adopter as the one who removed it. A delta is a report of a priced move, never a
+  wall; it replaced the three composition refusals ADR-0013, ADR-0017 and ADR-0018 point 3
+  carried (recorded by ADR-0026, 2026-09-04), and ticket 124 built the removal and narrowing
+  deltas that ADR's point 5 named.
 
 - **Control weight** (added 2026-08-28, ticket 15) — A regulator's published statement, keyed on
   the catalogue and **control id**, of which controls a violation type turns on. Part of the
