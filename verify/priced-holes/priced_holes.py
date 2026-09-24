@@ -22,7 +22,9 @@ What it observes, on the estate's committed files only:
         manifests; since eco-system ticket 119 every Namespace the repo declares or a workload
         names counts, labelled or not, except the substrate the platform declares `infra`, and
         every ungoverned one the recount finds must carry a price), whose ramp is the EOL feed's own ramp from `since` to `as_of` (re-derived
-        here), whose amount is `min(base, base * share * ramp)` with `base` the header's signed
+        here; `as_of` is the composer's rule since eco-system ticket 138, the newest of every
+        pinned envelope's published_at, read from the adopter's vendored copy first, and every
+        edge's own since), whose amount is `min(base, base * share * ramp)` with `base` the header's signed
         exposure total, and whose `since` is the date of the first signed tag whose header names
         the namespace, or names as ungoverned a Namespace a workload now in it has left
         (eco-system ticket 122; re-read here from the adopter clone's tags and tagged trees), or
@@ -274,8 +276,8 @@ def check_doc(doc: dict, ctx: dict) -> None:
                                           for lim in p.get("limits") or []):
             out("FAIL", f"{at}: since is null and no limit says so")
         if "as_of" in ctx and p["as_of"] != ctx["as_of"]:
-            out("FAIL", f"{at}: as_of {p['as_of']!r} but the newest pinned feed was published "
-                        f"{ctx['as_of']!r}")
+            out("FAIL", f"{at}: as_of {p['as_of']!r} but the newest signed input, a pinned feed's "
+                        f"published_at or an edge's since, is {ctx['as_of']!r}")
         ramp = expected_ramp(p["since"], p["as_of"])
         if not close(float(p["ramp"]), ramp):
             out("FAIL", f"{at}: ramp {p['ramp']} is not the EOL ramp from {p['since']} to "
@@ -531,11 +533,31 @@ def _header(repo: str) -> dict:
     return doc if isinstance(doc, dict) else {}
 
 
-def _feed_path(estate: str, parties: dict, edge: dict) -> str | None:
+def _published_dir(tree: str, name: str) -> str:
+    """The directory the publisher's own party.yaml declares for a feed name, or the name."""
+    try:
+        with open(os.path.join(tree, "party.yaml")) as fh:
+            doc = yaml.safe_load(fh) or {}
+    except (OSError, yaml.YAMLError):
+        doc = {}
+    return next((str(r.get("path")) for r in doc.get("publishes") or []
+                 if isinstance(r, dict) and r.get("name") == name and r.get("path")), name)
+
+
+def _feed_path(estate: str, parties: dict, edge: dict, repo: str | None = None) -> str | None:
+    """The envelope the adopter priced this feed edge from. First the adopter's own vendored copy,
+    `composed/feeds/<party>/<name>/<version>` (eco-system ticket 136): its bytes are the ones the
+    adopter's signature digested, so a publisher that republished since does not move a signed
+    price (ticket 138). Then the publisher's tree in the estate, then the two pre-envelope files."""
     party, name, version = edge.get("party"), edge.get("name"), str(edge.get("version"))
+    major = "v" + version.lstrip("v").split(".")[0]
+    if repo:
+        copy = os.path.join(repo, "composed", "feeds", str(party), str(name), version)
+        vendored = os.path.join(copy, _published_dir(copy, str(name)), major, "feed.json")
+        if os.path.exists(vendored):
+            return vendored
     pub = parties.get(party) or {}
     path = next((r.get("path") for r in pub.get("publishes") or [] if r.get("name") == name), name)
-    major = "v" + version.lstrip("v").split(".")[0]
     envelope = os.path.join(estate, str(party), str(path), major, "feed.json")
     if os.path.exists(envelope):
         return envelope
@@ -545,15 +567,20 @@ def _feed_path(estate: str, parties: dict, edge: dict) -> str | None:
     return fallback if fallback and os.path.exists(fallback) else None
 
 
-def _as_of(estate: str, parties: dict, adopter_doc: dict) -> str | None:
-    """The newest published_at among the adopter's pinned feeds -- what composition prices as of."""
-    dates = []
+def _as_of(estate: str, parties: dict, adopter_doc: dict, repo: str | None = None) -> str | None:
+    """The date composition prices as of: the newest SIGNED date among its inputs. That is every
+    pinned feed envelope's published_at and, since platform ticket 84, every edge's own `since`
+    (composition.py `_composition_as_of`, ADR-0006's 2026-09-08 note). Before eco-system ticket 138
+    this read the envelopes only, and tuppence's cve@v2 edge, signed 2026-09-08 over envelopes
+    published by 2026-08-28, graded as two dates."""
+    dates = [str(edge["since"])[:10] for edge in adopter_doc.get("inherits") or []
+             if isinstance(edge, dict) and edge.get("since")]
     for edge in adopter_doc.get("inherits") or []:
         if edge.get("kind") not in ("feed", "pricing", "threat"):
             continue
         if edge.get("kind") != "feed":
             edge = dict(edge, name={"pricing": "penalty-schema", "threat": "threat-register"}[edge["kind"]])
-        path = _feed_path(estate, parties, edge)
+        path = _feed_path(estate, parties, edge, repo)
         if not path:
             continue
         try:
@@ -600,7 +627,7 @@ def run(estate: str) -> None:
             "adopter": name,
             "currency": parties[name].get("reporting_currency") or "USD",
             "exposure_total": (_header(repo).get("exposure") or {}).get("total"),
-            "as_of": _as_of(estate, parties, parties[name]),
+            "as_of": _as_of(estate, parties, parties[name], repo),
         }
         substrate = _substrate(estate)
         if substrate is None:
