@@ -16,6 +16,7 @@ import subprocess
 import sys
 from pathlib import Path
 from types import ModuleType
+from typing import Any
 
 import pytest
 import yaml
@@ -482,3 +483,69 @@ def test_the_grader_and_the_composer_derive_one_as_of(
     assert composer == max("2026-09-08", vendored[:10]), composer
     parties = grader._parties(str(estate))
     assert grader._as_of(str(estate), parties, parties["adopter"], str(adopter)) == composer
+
+
+# -- eco-system ticket 139: a since later than as_of holds the ramp at its start, and says so ---
+#
+# tuppence's `openbao` is first named by v2.0.0, cut 2026-09-24. Its composition prices as of
+# 2026-09-08, the newest signed input its tree carries. A tag date is history, not an input, so
+# as_of stays. The price holds the ramp at the value it takes on the since day and names both
+# dates in a limit, as a supersede line does when its tag day is later than as_of.
+
+
+def test_the_ramp_holds_at_its_start_when_since_is_later_than_as_of(grader: ModuleType) -> None:
+    start = grader.expected_ramp("2026-09-24", "2026-09-24")
+    assert grader.expected_ramp("2026-09-24", "2026-09-08") == start == 1.0
+
+
+def test_a_since_later_than_as_of_needs_its_limit_named(grader: ModuleType) -> None:
+    doc, ctx = grader._good()
+    price = doc["ungoverned"][0]["price"]
+    price.update(since="2026-09-24", as_of="2026-09-08", ramp=1.0, amount=150.0, limits=[])
+    ctx.update(since={"reset": "2026-09-24"}, as_of="2026-09-08")
+    assert "FAIL" in _lines(grader, doc, ctx)
+    price["limits"] = ["as_of 2026-09-08 precedes since 2026-09-24: the ramp holds at its start"]
+    assert "FAIL" not in _lines(grader, doc, ctx)
+
+
+def test_a_since_later_than_as_of_that_ramps_below_its_start_fails(grader: ModuleType) -> None:
+    doc, ctx = grader._good()
+    price = doc["ungoverned"][0]["price"]
+    price.update(since="2026-09-24", as_of="2026-09-08", ramp=1.0 - 16 / 365.0,
+                 amount=150.0 * (1.0 - 16 / 365.0),
+                 limits=["as_of 2026-09-08 precedes since 2026-09-24: the ramp holds at its start"])
+    ctx.update(since={"reset": "2026-09-24"}, as_of="2026-09-08")
+    assert "FAIL" in _lines(grader, doc, ctx)
+
+
+@pytest.mark.skipif(not (PLATFORM / "compose" / "composition.py").exists(),
+                    reason="no platform clone under .estate-clone: the composer is not here to agree with")
+def test_the_grader_and_the_composer_agree_on_a_since_later_than_as_of(
+        grader: ModuleType, tmp_path: Path) -> None:
+    """Both sides on one planted adopter: the first signed tag naming `late` is cut after the
+    composition's as_of. The composer prices it with the ramp at its start and a limit naming
+    both dates. The grader re-derives the since from the tag, passes that price, and fails it
+    when the limit is gone."""
+    comp = _composition()
+    repo = _repo(tmp_path, "late")
+    _write(repo / "gitops" / "apps.yaml", _deploy("app-0", "home"), _deploy("app-1", "late"))
+    _write(repo / "gitops" / "ns.yaml", {"apiVersion": "v1", "kind": "Namespace", "metadata": {
+        "name": "home", "labels": {"policy-as-versioned.dev/governed": "true"}}})
+    _cut(repo, "v1.0.0", "2026-09-24", ["late"])
+    entries: list[dict[str, Any]] = [{"namespace": "late", "status": "recorded"}]
+    comp.price_ungoverned(entries, repo, "fixture", "GBP", 1000.0, "2026-09-08")
+    price = entries[0]["price"]
+    assert price["since"] == "2026-09-24" and price["as_of"] == "2026-09-08", price
+    assert price["ramp"] == 1.0 and price["amount"] == 500.0, price
+    held = [lim for lim in price["limits"] if "precedes since" in lim]
+    assert len(held) == 1 and "2026-09-08" in held[0] and "2026-09-24" in held[0], price["limits"]
+
+    doc = {"refusals": [], "holes": [], "prices": [], "deltas": [], "ungoverned": entries}
+    since = grader._signed_since(str(repo), ["late"])
+    ctx = {"adopter": "fixture", "currency": "GBP", "workloads": {"home": 1, "late": 1},
+           "institution": {"home", "late"}, "ungoverned": {"late"}, "exposure_total": 1000.0,
+           "as_of": "2026-09-08", "since": since}
+    lines = _lines(grader, doc, ctx)
+    assert since == {"late": "2026-09-24"} and "FAIL" not in lines, lines
+    price["limits"] = [lim for lim in price["limits"] if "precedes since" not in lim]
+    assert "FAIL" in _lines(grader, doc, ctx)
