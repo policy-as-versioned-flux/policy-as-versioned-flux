@@ -36,7 +36,7 @@ What this ticket owes:
 
 A dispatched `cut-release.yml` on each adopter passes its pre-tag verify on the v3.3.0 rollout.
 
-## Build, 2026-09-22
+## Build, 2026-09-24
 
 ### 1. Reproduced offline
 
@@ -60,7 +60,9 @@ adopter except hidden parts, `__pycache__` and `composed/`. So the nested `platf
 ### 2. cut-release.yml uses the sibling layout
 
 One PR per adopter. Each changes `.github/workflows/cut-release.yml` and adds a test class
-`CutReleaseLayout` to `tests/test_platform_tools.py`, the file shift-left already runs.
+`CutReleaseLayout` in `.github/tests/test_cut_release_layout.py`. shift-left runs that file after
+`tests/test_platform_tools.py`. The first push put the class in `tests/`; the review round below
+says why it moved.
 
 - driftwood: https://github.com/policy-as-versioned-driftwood/driftwood/pull/41
 - tuppence: https://github.com/policy-as-versioned-tuppence/tuppence/pull/38
@@ -71,11 +73,13 @@ The edit: the adopter's own checkout gets `path: <adopter>`. The two local `uses
 verify take `<adopter>/` paths. The refuse-existing-tag, sign and push steps get
 `working-directory: <adopter>`. No step or job is added or removed, and the step order is the same.
 
-Measured:
+Measured at the PR heads (driftwood 96f40bf, tuppence 28999e1, ludlow c758f22), fetched into
+the sibling scratch workspace with every parent at its pinned tag:
 
-- The new test class failed 3 of 3 against the old workflow and passes 3 of 3 after, in each adopter.
-  The whole `test_platform_tools.py` passes: driftwood 5 run (1 skipped), tuppence 7 run
-  (1 skipped), ludlow 5 run (1 skipped). The skip is the existing `PAVF_REAL_ESTATE` class.
+- The layout tests failed 3 of 3 against origin/main's `cut-release.yml` (driftwood, measured by
+  swapping in that file) and pass after, in each adopter. `.github/tests` runs 4 tests OK in each.
+  `tests/test_platform_tools.py`, now identical to main, passes 5 (driftwood), 7 (tuppence) and
+  5 (ludlow) with 1 skipped, and passes in full with `PAVF_REAL_ESTATE` set to the workspace.
 - Every `run:` step of each edited workflow, except sign and push, ran in the sibling scratch
   workspace and exited 0. That covers the tools check, pin reading, `verify-pinned-checkouts.py`,
   the verify and the tag guard. The tag guard ran in `<adopter>/` at the adopter's HEAD.
@@ -108,16 +112,40 @@ charts it with the next free ticket number.
   cut-release a third layout no other job uses.
 - Delegated: the verify runs from the workspace root, as compose-check does. The tag steps run in
   `<adopter>/` so the tag is created on the adopter's own HEAD.
-- Delegated: the layout test lives in `tests/test_platform_tools.py`, because shift-left already
-  runs exactly that file.
+- Delegated (revised in the review round): the layout test lives in
+  `.github/tests/test_cut_release_layout.py`, not `tests/`. `identity()` skips hidden paths, so a
+  test of a workflow can change without changing the adopter's source identity. The alternative
+  was to recompose in each PR. That would start a new comparison for a test-only edit and meet
+  ticket 133's first-pass fixed-point defect. shift-left gains one line to run the new directory.
+
+### Review round
+
+Blocking: the first push added `CutReleaseLayout` to `tests/test_platform_tools.py`. That file is
+non-hidden source, so `identity()` hashed it and the recorded comparison history no longer
+matched. At the first PR heads (ebca1d7, dab8f59, 8658ef8) the sibling-layout verify printed
+`MISMATCH: re-composition refused: ['comparison history does not match current source inputs']`
+in all three adopters, and `RealCompilerLayout` failed with `PAVF_REAL_ESTATE` set. I reproduced
+both. The first build measured origin/main, not the PR tree.
+Fix: the class moved to `.github/tests/test_cut_release_layout.py`, and
+`tests/test_platform_tools.py` is back to main byte for byte. A new test in the class asserts the
+module sits under a hidden path. shift-left's compose-check step runs `.github/tests` too. At the
+new heads the verify prints `OK: composed artefact re-renders byte-for-byte from the recorded
+parent SHAs`, exit 0, in all three, and `RealCompilerLayout` passes.
+
+Minor: the heading said 2026-09-22. `gh pr view --json createdAt` gives 2026-09-24 for all three
+PRs, so the heading now says 2026-09-24.
+
+Minor: the Measured paragraph did not name the commit it measured. It now names the PR heads, and
+every figure in it was re-run at those heads.
 
 ### What remains
 
 - The integrator merges the three PRs (any order; they are independent) and dispatches
   `cut-release.yml` on each adopter. Done needs those runs to pass the pre-tag verify. No
   workflow was dispatched in this build.
-- Risk for the merge: each PR edits a file under `.github/workflows/`. The edit changes two
-  `uses:` values (the `./<adopter>/` prefix) but adds or removes no step. If GitHub still refuses
+- Risk for the merge: each PR edits two files under `.github/workflows/`. The `cut-release.yml`
+  edit changes two `uses:` values (the `./<adopter>/` prefix) but adds or removes no step. The
+  `shift-left.yml` edit adds one test command to an existing step. If GitHub still refuses
   the merge from the app without `workflows` permission, the owner must merge these three.
 - The signed tags the dispatches create are the owner's release act under the standing
   development-mode authorisation. Nothing here creates a tag.
