@@ -1,7 +1,7 @@
 # 135 — A lifted app gets no verdict from the bottom rung
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -32,3 +32,168 @@ What this ticket owes:
 
 `verify-lifted-apps.sh` grades each lifted app by what the served set does to it, and the reason
 for run 314's FAIL is recorded.
+
+## Build, 2026-09-22
+
+The build rules name this section; the work itself ran on 2026-09-24, after run 314
+(2026-09-24T09:47Z).
+
+### Answer: the check was stale, the cage is sound
+
+The served set admits and cages all three lifted apps at CREATE. The check asked a
+PriorityClass for a verdict.
+
+How I measured it. Kyverno CLI 1.18.2. Each adopter's clone was fetched with tags. I read the
+served set from each adopter's own `gitops/composed/composed-set.yaml`: tag v2.0.0 at tuppence
+d5a4bfe, driftwood c26d95c and ludlow ab89691. Each tag resolves to the commit the file pins
+(`git rev-parse v2.0.0^{commit}`).
+
+1. Platform v3.3.0 puts four PriorityClasses in each version directory. At v2.0.0 each
+   adopter's `composed/policies/v4.0.0/` holds nine files. Four are `kind: PriorityClass`
+   (cage-baseline, cage-isolated, cage-quarantine, cage-restricted). Before the rollout commit
+   (tuppence 664967a, driftwood 4d04ac0, ludlow b7c1f36) the directory held five files, all
+   policies.
+2. The check read every `metadata.name` in the directory as a policy. It then required a Pass
+   row for each one in `kyverno apply --table`. Kyverno does not evaluate a PriorityClass, so
+   it prints no row for one. `cage-baseline-4-0-0` sorts first, so run 314 named it.
+3. Over the old check's own inputs (v4.0.0 plus the orphan guard), each of the three apps gets
+   six table rows, all Pass: cage-tier, stamp-posture, posture-trust-boundary, require-nonroot,
+   the orphan guard and cage-netpol. Each summary is `pass: 8, fail: 0, warn: 0, error: 0,
+   skip: 0`, the same line run 314 printed. Ledger's mutated pod names
+   `priorityClassName: cage-baseline-4-0-0`.
+4. Over the whole served set (both versions plus the machinery route), each of the three apps
+   gets `pass: 10, fail: 0, warn: 0, error: 0, skip: 8`. It gets 13 table rows. The five 4.0.0
+   policies and the orphan guard pass. The 5.0.0 policies and `policy-version-orphan-cage` skip.
+   The cage writes `cage-baseline-4-0-0`, and v4.0.0 serves that class.
+
+So no repository other than the hub has to change. No platform release is involved.
+
+### What changed in the hub
+
+- `verify/lifted-apps/lifted_apps.py`: a new `served_set()` reads the adopter's
+  `composed-set.yaml`. It checks the GitRepository's tag against its commit. It renders the
+  ResourceSet template (only `range` over `versions`, `$v.version` and `$v.version | slugify`),
+  then reads each Kustomization path at the pinned commit. A path with a `kustomization.yaml`
+  serves its `resources[]`. A path without one serves every manifest under it, as Flux does.
+  `kyverno_plan()` writes every served policy into a work directory. It names the policies that
+  must pass (the claimed version's plus the orphan guard) and lists the served PriorityClasses.
+- `verify/lifted-apps/verify-lifted-apps.sh`: step 3 applies the whole served set. Every
+  must-pass policy needs a Pass row of its own. Every other row must be Pass or Skip. A skip
+  count above 0 is allowed, because other versions skip by design. A new `class_served` step
+  requires the mutated pod's `priorityClassName` to be a class the set serves. It also fails
+  when no policy writes one.
+- `talk/verify-manifest.txt`: the row for this check now says what step 3 measures.
+
+### Decisions
+
+- Delegated: only objects in the `policies.kyverno.io/` or `kyverno.io/` API groups are asked
+  for a verdict. Anything else a route serves is an object, not a voter. Reason: kyverno
+  evaluates only policies, so any other kind can never produce a row.
+- Delegated: a served PriorityClass is graded by what admission does with it. The class the
+  cage writes must be one the set serves, and a pod with no class fails as uncaged. Reason:
+  Kubernetes' Priority admission refuses a pod that names a missing PriorityClass. So this is
+  a real CREATE fact, and dropping the class from the grade would have hidden it.
+- Delegated: the check applies every route the ResourceSet renders, read at the tag that
+  `composed-set.yaml` pins, not the checkout. Reason: that is what a cluster gets. A policy of
+  another version, or a machinery policy, could refuse the pod, and the old input would not see
+  it. The pin and the checkout differ today only in `HEADER.yaml` and `evidence.json`
+  (`git diff --stat v2.0.0 HEAD -- composed/`).
+- Delegated: any `<< >>` expression the renderer does not know is named as a failure, never
+  guessed. Reason: a guessed route would grade a set nobody serves.
+- Delegated: a pin the clone cannot read is a FAIL, not a could-not-look. Reason:
+  `clone-estate.sh` makes full clones with tags, so an unreadable pin is a defect. The check's
+  own rule is that a gate which has lost its instrument goes red.
+
+### Tests, red then green
+
+- `tests/test_lifted_apps.py`: I added nine tests for the plan and the served set. With the
+  plan unchanged, all nine failed and 37 passed. After the change, 46 passed
+  (`.venv/bin/python -m pytest tests/test_lifted_apps.py -n0 -q`).
+- The selfcheck fixture now serves a `composed-set.yaml` at v2.0.0, with both versions, the
+  machinery route and a PriorityClass in the v4.0.0 directory (run 314's shape). I added the
+  same PriorityClass to origin/main's old selfcheck fixture. The old check then failed with
+  `policy cage-baseline-4-0-0 produced no verdict at all`. The new selfcheck passes. It still
+  catches eight planted failures, each by name: a class the set does not serve, no cage at all,
+  another version refusing the pod, a refusal only at the pin, a claimed version the array does
+  not serve, no orphan guard, no composed set, and a tag and commit that disagree. The 9.9.9
+  pod, a silent policy and a skipping must-pass policy still fail.
+- `verify-lifted-apps.sh` over the estate clone exits 0: three `ok` rows in step 3 and PASS.
+- `mypy twin tests conftest.py` is clean. `mypy verify/lifted-apps/lifted_apps.py` is clean.
+  `tests/test_truth_manifest.py`: 18 passed.
+
+### Observed, not changed
+
+- The four `governed-namespace-*` machinery policies give no row. They select on a namespace
+  label, and `kyverno apply` has no namespace object. They match only pods that claim no
+  version, so they cannot touch a lifted app. That is a limit of the CLI, not of this check.
+- The CLI printed Pass for `cage-netpol-5-0-0` on a pod claiming 4.0.0, even though the policy's
+  `only-this-policy-version` condition is false. So a GeneratingPolicy's Pass row in the CLI is
+  not evidence that its conditions held. The check requires Pass from `cage-netpol-4-0-0` only as
+  "it gave a verdict". It does not read that row as proof of reach.
+
+### Review round
+
+The review of PR #119 blocked on one finding and raised two minor ones. All three are fixed on
+the same branch.
+
+- Blocking: a planner crash graded no app and still printed PASS. `cage_grade` read the planner
+  through process substitution, so it never saw the exit code. The final PASS printed the graded
+  count without comparing it to the landed lifts. I reproduced it: with `apiVersion: [unclosed`
+  written over a copy of tuppence's `composed-set.yaml`, the PR's first commit (4127c9b) printed
+  two tracebacks, then `PASS: 0 lifted applications` at exit 0. Fix, in three layers:
+  - `lifted_apps.py` catches a YAML error in `composed-set.yaml`, in the rendered template and in
+    each served file, and returns it as a named row error. The same broken copy now gives
+    `FAIL ledger: ... composed-set.yaml does not parse as YAML (expected ',' or ']', but got
+    '<stream end>' at line 2)` and exit 1.
+  - `verify-lifted-apps.sh` runs the planner to a file in both step 2 and step 3 and FAILs by
+    name when it exits non-zero. With a wrapper interpreter that exits 1 on `--kyverno-plan`
+    over the real estate clone, the run now prints `the planner (lifted_apps.py --kyverno-plan)
+    exited 1` in steps 2 and 3 and exits 1.
+  - A new `graded_floor` refuses a PASS that graded fewer apps than have landed.
+- Minor: a `resources` entry naming a directory served nothing, silently. `git show <sha>:<dir>`
+  exits 0 with a tree listing. `served_set()` now checks `git cat-file -t` first and names a
+  directory as a failure.
+- Minor: two record slips in this section. Item 4 said "six 4.0.0 policies"; the must-pass list
+  holds five plus the guard, so it now says five. The heading date is the one the build rules
+  set, and the note under the heading gives the real date.
+
+Delegated: an adopter-owned file that does not parse is a named FAIL on that app's row, not a
+crash. Reason: the file is served to a cluster, and Flux would serve nothing from it, so the
+app is uncaged. A crash tells the reader nothing about which adopter broke.
+
+Delegated: the planner's exit code is checked and the graded count is floored, both. Reason:
+the parse fix covers the one crash the review found. The exit check and the floor cover any
+crash not yet found, including one that prints no rows at exit 0.
+
+Tests, red then green. Three new tests in `tests/test_lifted_apps.py` (a composed set that does
+not parse, a served file that does not parse, a directory entry) failed before the fix:
+3 failed, 46 passed. After it: 49 passed. The selfcheck gained three plants: a composed set that
+does not parse, a planner that exits 1, and a floor of 0 graded of 3 landed. Before the shell
+fix the selfcheck exited 1 on the planner and floor plants. After it the selfcheck exits 0.
+Over the real estate clone the check still exits 0 with three `ok` rows, each `pass: 10,
+fail: 0, warn: 0, error: 0, skip: 8`, and `PASS: 3 lifted applications`. Kyverno 1.18.2 for all
+runs.
+
+### What remains
+
+- A scheduled truth run must grade this check PASS on main after the merge. That needs the clock,
+  not the owner.
+- Nothing waits on the owner.
+
+## Answer
+
+Resolved 2026-09-24 by hub PR 119. The check was stale; the cage is not broken.
+
+1. **Why run 314 failed.** Platform tools v3.3.0 (ticket 111) added PriorityClass files beside
+   each version's policies. The check asked `cage-baseline-4-0-0` for a kyverno verdict it can
+   never give once the set also carries those objects, and it applied the set in a different
+   shape from the one each adopter's ResourceSet serves.
+2. **What it asks now.** `served_set()` reads each adopter's `composed-set.yaml` at its pin,
+   renders every route the ResourceSet serves, and applies every served policy. The claimed
+   version's policies and the orphan guard must each pass, and the PriorityClass the cage writes
+   must be one the set serves.
+3. **It cannot go quietly green.** A composed set or served file that does not parse is a named
+   FAIL, the planner's exit code is read, and a PASS that graded fewer apps than have landed is
+   refused. The review found the crash-to-PASS path, and it is closed.
+4. **Measured by the integrator** against each adopter's current main: exit 0, three lifted apps
+   admitted and caged at CREATE by the set their adopter serves at v2.0.0.

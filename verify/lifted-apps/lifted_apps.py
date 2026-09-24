@@ -29,9 +29,13 @@ check said "served"). So:
   * the version the manifest claims is measured against the ADOPTER'S OWN composed artefact
     (composed/orphan-guard.yaml's allowed array -- never a constant held here), and the cage
     constraints the composed set enforces are checked structurally. `verify-lifted-apps.sh` then
-    runs the real `kyverno apply` over the adopter's own `composed/policies/v<claimed>/` plus its
-    `composed/orphan-guard.yaml`, so the last word belongs to the estate's own engine -- at CREATE
-    only, under the baseline dial, because that is all the CLI evaluates (see the shell script).
+    runs the real `kyverno apply` over THE SET THE ADOPTER SERVES: its own
+    `gitops/composed/composed-set.yaml`, whose ResourceSet ranges the version array into one
+    route per version plus the composed-machinery route, each read at the tag its GitRepository
+    pins (ticket 135). Only policies are asked for a verdict; a served PriorityClass is graded by
+    whether the class the cage writes is one the set carries. The last word belongs to the
+    estate's own engine -- at CREATE only, under the baseline dial, because that is all the CLI
+    evaluates (see the shell script).
 
 WHAT IT CANNOT LOOK AT is printed on every run from BLIND_SPOTS, and the limits that matter are
 numbers, not sentences: how many lifted apps are still served an image built and published by the
@@ -53,7 +57,7 @@ import os
 import posixpath
 import re
 import subprocess
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import yaml
@@ -659,27 +663,239 @@ def grade(hub_root: Path, estate_root: Path, register_path: Path) -> Report:
     return report
 
 
-def kyverno_plan(estate_root: Path, register_path: Path) -> list[tuple[str, str, str, str, str]]:
-    """(app, adopter, policy directory, orphan guard, served manifest) for every lift that has
-    landed. `verify-lifted-apps.sh` runs the real `kyverno apply` over each, so the last word on
-    whether the adopter's own composed set admits the workload belongs to the estate's own engine
-    rather than to this file's reading of a manifest."""
-    plan: list[tuple[str, str, str, str, str]] = []
+# ------------------------------------------------------------------ the set the adopter serves
+
+COMPOSED_SET = "gitops/composed/composed-set.yaml"
+# The API groups whose objects kyverno EVALUATES. Anything else a route serves (a PriorityClass,
+# since platform v3.3.0 put the cage's classes in each version directory) is a served OBJECT: it
+# gives no verdict, and asking it for one is the defect run 314 went red on (ticket 135).
+POLICY_API_PREFIXES = ("policies.kyverno.io/", "kyverno.io/")
+# The ResourceSet expressions this check renders. Anything else in the template is named and
+# refused rather than guessed at.
+_RANGE = re.compile(r'^\s*<<\s*range\s+\$v\s*:=\s*\(index\s+\(inputs\)\s+"versions"\)\s*>>\s*$')
+_END = re.compile(r"^\s*<<\s*end\s*>>\s*$")
+_VERSION = re.compile(r"<<\s*\$v\.version\s*>>")
+_SLUG = re.compile(r"<<\s*\$v\.version\s*\|\s*slugify\s*>>")
+
+
+def is_policy(doc: dict) -> bool:
+    return str(doc.get("apiVersion") or "").startswith(POLICY_API_PREFIXES)
+
+
+@dataclass(frozen=True)
+class ServedObject:
+    route: str          # the Kustomization path that serves it, e.g. composed/policies/v4.0.0
+    version: str | None  # the array element that route was ranged from; None for machinery
+    path: str           # the file at the pin
+    doc: dict
+
+
+@dataclass
+class ServedSet:
+    """What the adopter's own gitops/composed/composed-set.yaml puts on a cluster: its
+    ResourceSet's Kustomizations, rendered from the version array, each read from the tree the
+    GitRepository pins (ref.tag, checked against ref.commit)."""
+    pin: str = ""
+    versions: tuple[str, ...] = ()
+    objects: list[ServedObject] = field(default_factory=list)
+    error: str | None = None
+
+
+def _yaml_where(e: yaml.YAMLError) -> str:
+    mark = getattr(e, "problem_mark", None)
+    problem = getattr(e, "problem", None) or type(e).__name__
+    return f"{problem} at line {mark.line + 1}" if mark is not None else str(problem)
+
+
+def _render_template(template: str, versions: tuple[str, ...]) -> tuple[list[tuple[str | None, dict]], str | None]:
+    """The Kustomizations the ResourceSet renders, each with the version it was ranged from.
+    Only `range $v := (index (inputs) "versions")`, `$v.version` and `$v.version | slugify`
+    are rendered; any other `<< >>` expression is returned as an error, never guessed."""
+    out: list[tuple[str | None, str]] = []
+    block: list[str] | None = None
+    plain: list[str] = []
+    for line in template.splitlines():
+        if _RANGE.match(line):
+            out.append((None, "\n".join(plain)))
+            plain, block = [], []
+            continue
+        if _END.match(line) and block is not None:
+            body = "\n".join(block)
+            for v in versions:
+                out.append((v, _VERSION.sub(v, _SLUG.sub(v.replace(".", "-"), body))))
+            block = None
+            continue
+        (block if block is not None else plain).append(line)
+    if block is not None:
+        return [], "the ResourceSet's resourcesTemplate opens a range it never ends"
+    out.append((None, "\n".join(plain)))
+    rendered: list[tuple[str | None, dict]] = []
+    for version, text in out:
+        left = re.findall(r"<<.*?>>", text)
+        if left:
+            return [], (f"the ResourceSet's resourcesTemplate uses {left[0]}, which this check does "
+                        f"not render, so what it serves cannot be derived here")
+        try:
+            docs = list(yaml.safe_load_all(text))
+        except yaml.YAMLError as e:
+            return [], (f"the ResourceSet's resourcesTemplate renders to YAML that does not parse "
+                        f"({_yaml_where(e)}), so what it serves cannot be derived here")
+        for d in docs:
+            if isinstance(d, dict):
+                rendered.append((version, d))
+    return rendered, None
+
+
+def served_set(adopter_dir: Path) -> ServedSet:
+    """Read the composed set the adopter serves, the way its ResourceSet serves it."""
+    f = adopter_dir / COMPOSED_SET
+    if not f.is_file():
+        return ServedSet(error=f"{adopter_dir.name} has no {COMPOSED_SET}, so no composed set is "
+                               f"served to any cluster and nothing cages its workloads")
+    try:
+        docs = [d for d in yaml.safe_load_all(f.read_text()) if isinstance(d, dict)]
+    except yaml.YAMLError as e:
+        return ServedSet(error=f"{adopter_dir.name}'s {COMPOSED_SET} does not parse as YAML "
+                               f"({_yaml_where(e)}), so Flux serves no composed set from it and "
+                               f"nothing cages its workloads")
+    repos = [d for d in docs if d.get("kind") == "GitRepository"]
+    sets = [d for d in docs if d.get("kind") == "ResourceSet"]
+    if len(repos) != 1 or len(sets) != 1:
+        return ServedSet(error=f"{COMPOSED_SET} carries {len(repos)} GitRepository and "
+                               f"{len(sets)} ResourceSet objects; this check reads exactly one "
+                               f"of each")
+    repo_name = str((repos[0].get("metadata") or {}).get("name") or "")
+    ref = ((repos[0].get("spec") or {}).get("ref") or {})
+    tag = None if ref.get("tag") is None else str(ref.get("tag"))
+    commit = None if ref.get("commit") is None else str(ref.get("commit"))
+    if not tag:
+        return ServedSet(error=f"{COMPOSED_SET}'s GitRepository pins no ref.tag")
+    rc, resolved = _git(adopter_dir, "rev-parse", "--verify", f"{tag}^{{commit}}")
+    if rc != 0:
+        return ServedSet(error=f"{COMPOSED_SET} pins tag {tag}, which is not in this clone, so "
+                               f"the served set could not be read")
+    if commit and not resolved.startswith(commit):
+        return ServedSet(error=f"{COMPOSED_SET} pins tag {tag} and commit {commit[:7]}, but the "
+                               f"tag resolves to {resolved[:7]}: Flux verifies the pair and "
+                               f"serves neither")
+    spec = sets[0].get("spec") or {}
+    versions = tuple(str(v.get("version")) for inp in spec.get("inputs") or []
+                     for v in (inp or {}).get("versions") or [] if isinstance(v, dict))
+    rendered, err = _render_template(str(spec.get("resourcesTemplate") or ""), versions)
+    ss = ServedSet(pin=f"{tag}@{resolved[:7]}", versions=versions)
+    if err:
+        ss.error = err
+        return ss
+    for version, k in rendered:
+        if k.get("kind") != "Kustomization":
+            continue
+        kspec = k.get("spec") or {}
+        name = (k.get("metadata") or {}).get("name")
+        if str((kspec.get("sourceRef") or {}).get("name")) != repo_name:
+            ss.error = (f"{COMPOSED_SET}'s Kustomization {name} sources "
+                        f"{(kspec.get('sourceRef') or {}).get('name')!r}, not {repo_name!r}; "
+                        f"this check reads only the tree that GitRepository pins")
+            return ss
+        route = posixpath.normpath(str(kspec.get("path") or "."))
+        if _git(adopter_dir, "cat-file", "-t", f"{resolved}:{route}")[1] != "tree":
+            ss.error = (f"{COMPOSED_SET}'s Kustomization {name} reconciles ./{route}, which "
+                        f"{tag} does not carry: it never becomes Ready and serves nothing")
+            return ss
+        rc, text = _git(adopter_dir, "show", f"{resolved}:{route}/kustomization.yaml")
+        if rc == 0:
+            files = [posixpath.normpath(posixpath.join(route, r)) for r in kustomization_names(text)]
+        else:
+            # No kustomization.yaml: Flux generates one over every manifest under the path.
+            rc, listing = _git(adopter_dir, "ls-tree", "-r", "--name-only", resolved, route + "/")
+            files = [x for x in listing.splitlines() if x.endswith((".yaml", ".yml"))]
+        for path in files:
+            kind = _git(adopter_dir, "cat-file", "-t", f"{resolved}:{path}")[1]
+            if kind == "tree":
+                # `git show <sha>:<dir>` exits 0 with a tree listing; read as YAML it is one
+                # string and serves nothing. Refuse it by name instead (review round, PR #119).
+                ss.error = (f"{route}/kustomization.yaml at {tag} lists {path}, a directory; this "
+                            f"check reads files, not nested kustomizations, so it cannot say what "
+                            f"that entry serves")
+                return ss
+            rc, body = _git(adopter_dir, "show", f"{resolved}:{path}")
+            if rc != 0 or kind != "blob":
+                ss.error = (f"{route}/kustomization.yaml at {tag} lists {path}, which the tree "
+                            f"does not carry (this check reads files, not nested kustomizations)")
+                return ss
+            try:
+                docs = list(yaml.safe_load_all(body))
+            except yaml.YAMLError as e:
+                ss.error = (f"{path} at {tag} does not parse as YAML ({_yaml_where(e)}), so its "
+                            f"Kustomization never becomes Ready and serves nothing")
+                return ss
+            for d in docs:
+                if isinstance(d, dict) and d.get("kind"):
+                    ss.objects.append(ServedObject(route, version, path, d))
+    return ss
+
+
+@dataclass(frozen=True)
+class PlanRow:
+    """One landed lift, ready for `kyverno apply`: every policy the served set carries written
+    into `policy_dir`, the policies that must each give a Pass of their own (the claimed
+    version's, and the orphan guard), and the PriorityClasses the set serves."""
+    app: str
+    adopter: str
+    served: str
+    pin: str = ""
+    policy_dir: str = ""
+    versions: tuple[str, ...] = ()
+    must_pass: tuple[str, ...] = ()
+    classes: tuple[str, ...] = ()
+    error: str | None = None
+
+
+def kyverno_plan(estate_root: Path, register_path: Path, into: Path) -> list[PlanRow]:
+    """A PlanRow for every lift that has landed and claims a version. `verify-lifted-apps.sh`
+    runs the real `kyverno apply` over each, so the last word on what the adopter's served set
+    does to the workload belongs to the estate's own engine rather than to this file's reading
+    of a manifest. The set is the one the adopter's ResourceSet serves, read at its pin: every
+    version in the array plus the composed-machinery route (ticket 135)."""
+    plan: list[PlanRow] = []
     for lift in load_register(register_path):
         adopter_dir = Path(estate_root) / lift.adopter
         served = adopter_dir / lift.served
         if not served.is_file():
             continue
-        docs = [d for d in yaml.safe_load_all(served.read_text()) if d]
         claimed = None
-        for d in docs:
+        for d in (d for d in yaml.safe_load_all(served.read_text()) if d):
             claimed = ((d.get("metadata") or {}).get("labels") or {}).get(LABEL)
         if not claimed:
             continue
-        policies = adopter_dir / "composed" / "policies" / f"v{claimed}"
-        guard = adopter_dir / "composed" / "orphan-guard.yaml"
-        if policies.is_dir():
-            plan.append((lift.app, lift.adopter, str(policies), str(guard), str(served)))
+        claimed = str(claimed)
+        ss = served_set(adopter_dir)
+        row = PlanRow(app=lift.app, adopter=lift.adopter, served=str(served), pin=ss.pin,
+                      versions=ss.versions)
+        if ss.error:
+            plan.append(replace(row, error=ss.error))
+            continue
+        if claimed not in ss.versions:
+            plan.append(replace(row, error=(
+                f"{lift.served} claims {claimed}, and {COMPOSED_SET} serves "
+                f"{list(ss.versions)} at {ss.pin}, so no served policy version cages it")))
+            continue
+        policies = [o for o in ss.objects if is_policy(o.doc)]
+        guard = [o for o in policies if posixpath.basename(o.path) == "orphan-guard.yaml"]
+        if not guard:
+            plan.append(replace(row, error=(
+                f"the set {COMPOSED_SET} serves at {ss.pin} carries no orphan-guard.yaml, the "
+                f"one policy that refuses a version the array does not declare")))
+            continue
+        out = Path(into) / lift.app
+        out.mkdir(parents=True, exist_ok=True)
+        for i, o in enumerate(policies):
+            (out / f"{i:03d}-{o.path.replace('/', '__')}").write_text(yaml.safe_dump(o.doc, sort_keys=False))
+        must = [str(o.doc["metadata"]["name"]) for o in policies if o.version == claimed]
+        must += [str(o.doc["metadata"]["name"]) for o in guard]
+        classes = [str((o.doc.get("metadata") or {}).get("name")) for o in ss.objects
+                   if o.doc.get("kind") == "PriorityClass"]
+        plan.append(replace(row, policy_dir=str(out), must_pass=tuple(must),
+                            classes=tuple(classes)))
     return plan
 
 
@@ -690,13 +906,17 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--hub-root", type=Path, default=here.parent.parent)
     ap.add_argument("--estate-root", type=Path, default=here.parent.parent / ".estate-clone")
     ap.add_argument("--register", type=Path, default=here / "register.yaml")
-    ap.add_argument("--kyverno-plan", action="store_true",
-                    help="print `app<TAB>adopter<TAB>policy-dir<TAB>orphan-guard<TAB>served-manifest` "
-                         "per landed lift and exit 0; the shell script runs kyverno over the rows")
+    ap.add_argument("--kyverno-plan", type=Path, metavar="INTO",
+                    help="write every policy each landed lift's served set carries under INTO and "
+                         "print `app<TAB>adopter<TAB>pin<TAB>policy-dir<TAB>served-manifest<TAB>"
+                         "must-pass<TAB>classes<TAB>error` per lift ('-' for an empty field, "
+                         "commas within one); the shell script runs kyverno over the rows")
     args = ap.parse_args(argv)
     if args.kyverno_plan:
-        for row in kyverno_plan(args.estate_root, args.register):
-            print("\t".join(row))
+        for r in kyverno_plan(args.estate_root, args.register, args.kyverno_plan):
+            print("\t".join(x or "-" for x in (
+                r.app, r.adopter, r.pin, r.policy_dir, r.served, ",".join(r.must_pass),
+                ",".join(r.classes), (r.error or "").replace("\t", " "))))
         return 0
     report = grade(args.hub_root, args.estate_root, args.register)
     print(report.text())
