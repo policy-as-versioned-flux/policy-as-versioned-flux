@@ -1,7 +1,7 @@
 # 130 — The composed root machinery has no delivery route
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -208,3 +208,130 @@ could run only once the tools pin had moved.
 7. **Clock:** a scheduled `drift-sample.yml` run on each adopter reads facts 4 and 5 true, with
    the machinery in the render and in the `composed-machinery` inventory. No run is dispatched to
    stand in for it.
+
+## Build, 2026-09-22: the composed-set move
+
+Built on 2026-09-24. This is step 5 of "What remains" above. Platform PR 38 and hub PR 111 are
+merged. Platform tools `v3.3.0` carries the composer part. Each adopter moved its pins to
+`v3.3.0` and cut a signed, published `v2.0.0`. The three adopter PRs now carry the move, on the same
+branch `ticket-130-the-composed-root-is-delivered`:
+
+- driftwood https://github.com/policy-as-versioned-driftwood/driftwood/pull/39, head `659a135`
+- tuppence https://github.com/policy-as-versioned-tuppence/tuppence/pull/35, head `3d0e254`
+- ludlow https://github.com/policy-as-versioned-ludlow/ludlow/pull/32, head `263ff81`
+
+Each branch was rebased onto `origin/main` with no conflict. `origin/main` is the `v2.0.0` commit
+on all three.
+
+### What was measured first
+
+- `git ls-remote origin 'refs/tags/v2.0.0^{}'` on each adopter: driftwood
+  `c26d95cc7154a56df6b56f70904cd8fba3bfd404`, tuppence `d5a4bfee9e01b658118140950693d757c08c59b9`,
+  ludlow `ab89691912d40f376b5f0c87b0dcf41294423491`. These match the task's values.
+- `git ls-tree v2.0.0 composed/` on each: `policies/v4.0.0`, `policies/v5.0.0`,
+  `kustomization.yaml` and the root machinery.
+- `render_composed.py reach` at `v2.0.0` with the old array `2.0.0, 2.0.1, 3.0.0`: REFUSED, 26
+  faults on each adopter. This is the red.
+- `git grep` for `policy-version:` outside `composed/`, `tests/` and `.github/`: every workload
+  claims `4.0.0`, except tuppence's `teller-stale` in `reset/workloads.yaml`, which claims `1.0.0`
+  on purpose as the out-of-currency case. The orphan cage takes it.
+
+### The move commit
+
+In `gitops/composed/composed-set.yaml`: `tag: v2.0.0` and `commit:` set to the SHA above. The array
+is `4.0.0` and `5.0.0`. `gitsign-gates` is
+`flux-system/composed-v4-0-0,flux-system/composed-v5-0-0,flux-system/composed-machinery`. The
+comments that described `v1.1.0` now describe `v2.0.0`. `drift-sample.yml` already read the tag
+through `render_composed.pinned_tag()` from the first half. It now gives `v2.0.0`.
+
+After the move: `reach` reads OK, 0 faults, and renders 26 objects, on each adopter.
+
+### The recompose commit
+
+The branch edits `scripts/`, `tests/` and `gitops/`. The composer's comparison identity hashes
+every non-hidden file outside `composed/`, so `composed/HEADER.yaml`'s recorded `after` no longer
+matched. Each adopter got one recompose with its own command,
+`.github/scripts/platform-tools.py --adopter-dir <u> --tools-dir platform-tools compose <u>
+--estate-clone . --out <u>`. It ran in a scratch workspace laid out as CI lays it out: tools
+`v3.3.0` and every parent cloned and checked out at the tag and commit the adopter pins
+(`verify-pinned-checkouts.py`: ok for each). It started from `origin/main`'s committed
+`composed/`, with a clean tree. A second pass was byte-identical (`diff -r` of `composed/` and
+`cmp` of the output document) on all three.
+
+The diff to `composed/`, explained:
+
+- On all three, the `after` identity line changes.
+- On all three, the recorded `comparison-inputs.before` moves to what `v2.0.0` signed. On driftwood
+  that is platform 3.3.0 in place of 2.0.1, two `supersede` price lines, `overlay-controls` and
+  `withdrawn-selectable`. On tuppence and ludlow it is the `feeds` `cve` or `eol` v2 parent and its
+  two price lines.
+- On tuppence and ludlow, `deltas[]` goes from 1 to 0 in `evidence.json` and `HANDBOOK.md`. The
+  `new-untagged-pin` delta for `feeds/cve@v2` (241,549.84 GBP) or `feeds/eol@v2` (772,556.59 GBP)
+  was already recorded by `v2.0.0`, so its price line now reads `recorded`, not `new`. The
+  "before" is the last committed artefact, which is the rule ticket 133 asks for.
+- On tuppence only, the `openbao` ramp reads `since: 2026-09-24`, `since_by: v2.0.0 names openbao`,
+  and its limit line goes. This is not from this branch. A control recompose of the `v2.0.0`
+  commit alone, at the same pins, gives exactly this change and nothing else. So tuppence's
+  `main` has drifted since `v2.0.0` was cut: the signed tag is what starts the ramp. The same
+  control on driftwood and ludlow gives no diff.
+
+### Tests run
+
+All on each adopter's pushed head, in the workspace above.
+
+- The compose-check steps, one by one: tools check OK (`v3.3.0` release identity verified);
+  pinned checkouts ok; `unittest discover -p test_platform_tools.py` with `PAVF_REAL_ESTATE` set
+  to the workspace, `RealCompilerLayout` run and passing (driftwood 2 tests, tuppence 4, ludlow 2,
+  all OK); `.github/tests` 4 OK; `test_composed_reach.py` 13 OK; `reach` OK; recompose exit 0 and
+  no drift in `composed/`; tier-check bound.
+- `pytest tests/test_composed_reach.py -n0 -q`: 13 passed on each.
+- `render_composed.py selfcheck`: ok, 26 objects at `v2.0.0`. `drift/five-facts.py selfcheck`: ok.
+- CI on the pushed heads: `compose-check` and `shift-left` passed on all three PRs
+  (`gh pr checks`). `shift-left` runs the new `reach` step.
+
+### Decisions
+
+- **The move array is `4.0.0` and `5.0.0` (delegated).** This is Decision 3 above, applied. The
+  task and the first half agree.
+- **The recompose is its own commit after the move (delegated).** The move is a hand edit. The
+  recompose is generated. Two commits let a reader see which lines a person chose.
+- **Tuppence's `openbao` ramp change stays in this PR (delegated).** It is what the composer
+  renders today at these pins. Leaving it out would keep `compose-check` red here too. The commit
+  message and the PR body say it came from the tag, not the branch.
+- **The first build's heading is reused with a suffix (delegated).** The task asks for a
+  "Build, 2026-09-22" section, and one exists. A second heading of the same name would be
+  ambiguous.
+
+### What remains, in order
+
+1. **Merge each adopter PR.** Integrator. The three are independent of each other. Ticket 132's
+   PRs touch `accepted-majors/` and the adopter gate, not these files, and rebase after.
+2. **Risk before merge (ticket 134):** any lane commit to an adopter's `main` before its PR merges
+   changes the identity again. That PR's `compose-check` then reads drift, and needs one more
+   recompose from the newly committed `composed/`.
+3. **Hub:** step 6 above, the `policy-version-orphan-guard` row of
+   `verify/deny-is-not-a-rung/register.yaml`. Integrator, after the merges.
+4. **Clock:** a scheduled `drift-sample.yml` run on each adopter reads facts 4 and 5 against
+   `v2.0.0`. No run was dispatched.
+5. **Not owed here:** the recompose commit reaches a tag only when an adopter next cuts one. The
+   composed-set keeps pointing at `v2.0.0`, whose objects are the same; only `HEADER.yaml`,
+   `evidence.json` and `HANDBOOK.md` differ.
+
+## Answer
+
+Resolved 2026-09-24 by platform PR 38 and the adopter moves driftwood 39, tuppence 35 and
+ludlow 32, with each adopter's v2.0.0 tag cut and published between them.
+
+1. **The route.** Platform tools v3.3.0 writes `composed/kustomization.yaml`, which lists every
+   object the composer renders at the `composed/` root. Each adopter's `composed-set.yaml` serves
+   it through a `composed-machinery` Kustomization.
+2. **No gap.** The inline Deny orphan guard left `composed-set.yaml` in the same commit that
+   moved the set to v2.0.0 and to the array 4.0.0 and 5.0.0. The array keeps 4.0.0 because every
+   workload still claims it: with 5.0.0 alone, those workloads match no cage.
+3. **The check.** `render_composed.py reach` refuses an object that no served Kustomization
+   reaches. It read 26 faults before each move and 0 after it, with 26 objects delivered.
+4. The deny register's `policy-version-orphan-guard` and `governed-namespace-requires-claim` rows
+   move to `converted`, because no Deny copy of either is left.
+
+What a cluster does with the move is for the next scheduled drift sample on each adopter to read.
+No run was dispatched to stand in for it.
