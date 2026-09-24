@@ -11,14 +11,18 @@ from __future__ import annotations
 import importlib.util
 import math
 import os
+import json
 import subprocess
+import sys
 from pathlib import Path
 from types import ModuleType
 
 import pytest
 import yaml
 
-GRADER = Path(__file__).resolve().parent.parent / "verify" / "priced-holes" / "priced_holes.py"
+HUB = Path(__file__).resolve().parent.parent
+GRADER = HUB / "verify" / "priced-holes" / "priced_holes.py"
+PLATFORM = HUB / ".estate-clone" / "platform"
 
 
 @pytest.fixture(scope="module")
@@ -381,3 +385,100 @@ def test_a_close_the_recount_cannot_check_leaves_a_skip_line(grader: ModuleType)
                           "perspective": "driftwood", "currency": "GBP", "amount": None, "detail": "x"})
     lines = _lines(grader, doc, ctx)
     assert "FAIL" not in lines and "SKIP" in lines, lines
+
+
+# -- eco-system ticket 138: one as_of, the composer's rule ---------------------------------------
+#
+# The composer prices as of the newest SIGNED date among its inputs: every pinned envelope's
+# published_at and, since ticket 84, every edge's own `since` (ADR-0006's note). The grader
+# took the envelopes only, so tuppence's cve@v2 edge, signed 2026-09-08 over envelopes published
+# 2026-07-31 and 2026-08-28, read two different dates. The fixture below is that shape: a second
+# feed of one publisher, pinned later than the first.
+
+
+def _envelope(path: Path, published_at: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"published_at": published_at, "payload": {}}))
+
+
+def _feeds_party(tree: Path) -> None:
+    tree.mkdir(parents=True, exist_ok=True)
+    (tree / "party.yaml").write_text(yaml.safe_dump({
+        "party": "feeds", "roles": ["publisher"], "inherits": [],
+        "publishes": [{"kind": "feed", "name": n, "path": n} for n in ("threat-register", "cve")]}))
+
+
+EDGES = [
+    {"party": "feeds", "kind": "feed", "name": "threat-register", "version": "v1", "since": "2026-08-28"},
+    {"party": "feeds", "kind": "feed", "name": "cve", "version": "v2", "since": "2026-09-08"},
+]
+
+
+def _plant(root: Path, *, head: str, vendored: str) -> tuple[Path, Path]:
+    """An estate whose feeds publisher's head carries envelopes published `head`, and an adopter
+    whose composed/feeds/<party>/<name>/<version> copies (ticket 136's layout) carry the
+    envelopes it priced, published `vendored`."""
+    estate = root / "estate"
+    _feeds_party(estate / "feeds")
+    adopter = estate / "adopter"
+    adopter.mkdir()
+    (adopter / "party.yaml").write_text(yaml.safe_dump({
+        "party": "adopter", "roles": ["adopter"], "inherits": EDGES}))
+    for edge in EDGES:
+        name, version = edge["name"], edge["version"]
+        _envelope(estate / "feeds" / name / version / "feed.json", head)
+        copy = adopter / "composed" / "feeds" / "feeds" / name / version
+        _feeds_party(copy)
+        _envelope(copy / name / version / "feed.json", vendored)
+    return estate, adopter
+
+
+def test_the_grader_takes_the_newest_signed_since_as_the_composer_does(
+        grader: ModuleType, tmp_path: Path) -> None:
+    estate, adopter = _plant(tmp_path, head="2026-07-31T16:22:39+01:00", vendored="2026-07-31T16:22:39+01:00")
+    parties = grader._parties(str(estate))
+    assert grader._as_of(str(estate), parties, parties["adopter"], str(adopter)) == "2026-09-08"
+
+
+def test_the_grader_reads_the_envelope_the_adopter_vendored_not_the_publishers_head(
+        grader: ModuleType, tmp_path: Path) -> None:
+    """The vendored copy is the bytes the adopter's signature digested. A publisher that
+    republished since then does not move a price the adopter already signed."""
+    estate, adopter = _plant(tmp_path, head="2026-09-20T09:00:00+01:00", vendored="2026-09-10T09:00:00+01:00")
+    parties = grader._parties(str(estate))
+    assert grader._as_of(str(estate), parties, parties["adopter"], str(adopter)) == "2026-09-10"
+
+
+def _composition() -> ModuleType:
+    compose_dir = PLATFORM / "compose"
+    for extra in (compose_dir, PLATFORM / "distribution"):
+        if str(extra) not in sys.path:
+            sys.path.insert(0, str(extra))
+    spec = importlib.util.spec_from_file_location("_t138_composition", compose_dir / "composition.py")
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["_t138_composition"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.mark.skipif(not (PLATFORM / "compose" / "composition.py").exists(),
+                    reason="no platform clone under .estate-clone: the composer is not here to agree with")
+@pytest.mark.parametrize("head, vendored", [
+    ("2026-07-31T16:22:39+01:00", "2026-07-31T16:22:39+01:00"),   # tuppence: the since wins
+    ("2026-09-20T09:00:00+01:00", "2026-09-10T09:00:00+01:00"),   # an envelope past every since
+])
+def test_the_grader_and_the_composer_derive_one_as_of(
+        grader: ModuleType, tmp_path: Path, head: str, vendored: str) -> None:
+    """Both sides on one planted adopter. The composer runs as it runs offline: the publisher
+    clone absent, each feed edge reading its own vendored copy (tickets 136 and 137)."""
+    comp = _composition()
+    estate, adopter = _plant(tmp_path, head=head, vendored=vendored)
+    trees = comp.ParentTrees({})
+    for edge in EDGES:
+        trees.feeds[comp._observation_key(edge)] = adopter / comp.vendored_rel(
+            "feeds", edge["name"], edge["version"])
+    composer = comp._composition_as_of(EDGES, trees)
+    assert composer == max("2026-09-08", vendored[:10]), composer
+    parties = grader._parties(str(estate))
+    assert grader._as_of(str(estate), parties, parties["adopter"], str(adopter)) == composer
