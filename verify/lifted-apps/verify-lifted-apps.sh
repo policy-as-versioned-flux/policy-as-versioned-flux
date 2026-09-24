@@ -168,8 +168,17 @@ kyverno_run() {
 # cage_grade <estate root> <register> -> one line per landed lift: what the set its adopter
 # serves does to the served workload. 0 when every one is admitted and caged, 1 otherwise.
 cage_grade() {
-  local estate="$1" reg="$2" work bad=0 app unit pin policies served must classes err
+  local estate="$1" reg="$2" work bad=0 app unit pin policies served must classes err prc
   work="$(mktemp -d)"
+  # The planner writes to a file so its exit code is seen. Read through process substitution, a
+  # planner that died printed no rows, graded nothing and passed (review round, PR #119).
+  "$PY" "$HERE/lifted_apps.py" --estate-root "$estate" --register "$reg" --kyverno-plan "$work/policies" >"$work/plan.tsv" 2>"$work/plan.err"; prc=$?
+  if [ "$prc" != 0 ]; then
+    echo "  FAIL the planner (lifted_apps.py --kyverno-plan) exited $prc, so no served set was graded:"
+    tail -5 "$work/plan.err" | sed 's/^/       /'
+    rm -rf "$work"
+    return 1
+  fi
   while IFS=$'\t' read -r app unit pin policies served must classes err; do
     [ -n "${app:-}" ] || continue
     CAGE_GRADED=$((CAGE_GRADED + 1))
@@ -184,9 +193,17 @@ cage_grade() {
       printf '%s\n' "$KV_OUT" | tail -20 | sed 's/^/       /'
       bad=1
     fi
-  done < <("$PY" "$HERE/lifted_apps.py" --estate-root "$estate" --register "$reg" --kyverno-plan "$work")
+  done <"$work/plan.tsv"
   rm -rf "$work"
   return "$bad"
+}
+
+# graded_floor <graded> <landed> -> 0 when every landed lift got a graded row; 1 with KV_WHY.
+# A PASS that graded fewer apps than have landed has stopped looking (review round, PR #119).
+graded_floor() {
+  [ "$1" -ge "$2" ] 2>/dev/null && return 0
+  KV_WHY="${1:-0} of ${2:-?} landed lifts were put through the served set, so the rest were never looked at"
+  return 1
 }
 
 # ----------------------------------------------------------------------------------- the fixture
@@ -574,7 +591,7 @@ selfcheck() {
     echo "FAIL: selfcheck: the real kyverno over a 9.9.9 pod was taken as admission ($KV_LINE)"; good=0
   fi
   # Each of these is a way the SERVED set can leave the lifted app unadmitted or uncaged.
-  for case in class-not-served uncaged other-version-refuses pin-not-checkout version-not-served no-guard no-composed-set composed-pin-mismatch; do
+  for case in class-not-served uncaged other-version-refuses pin-not-checkout version-not-served no-guard no-composed-set composed-unparseable composed-pin-mismatch; do
     rm -rf "$t"; t="$(mktemp -d)"; plant "$t"; a="$t/estate/tuppence"
     case "$case" in
       class-not-served) desc="the cage writes a PriorityClass the served set does not carry"
@@ -602,6 +619,9 @@ selfcheck() {
       no-composed-set)  desc="the adopter serves no composed set at all"
                         want="has no gitops/composed/composed-set.yaml"
                         rm "$a/gitops/composed/composed-set.yaml" ;;
+      composed-unparseable) desc="composed-set.yaml does not parse as YAML (review round, PR #119)"
+                        want="does not parse as YAML"
+                        printf 'apiVersion: [unclosed\n' >"$a/gitops/composed/composed-set.yaml" ;;
       composed-pin-mismatch) desc="composed-set.yaml's tag and commit disagree"
                         want="but the tag resolves to"
                         sed -i.bak -E 's/commit: [0-9a-f]+/commit: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef/' "$a/gitops/composed/composed-set.yaml" ;;
@@ -614,15 +634,30 @@ selfcheck() {
     fi
   done
 
+  # A planner that dies grades nothing. Review round, PR #119: the shell read it through
+  # process substitution, never saw its exit code, and printed `PASS: 0 lifted applications`.
+  rm -rf "$t"; t="$(mktemp -d)"; plant "$t"
+  printf '#!/usr/bin/env bash\nfor a in "$@"; do [ "$a" = --kyverno-plan ] && { echo "Traceback: planted planner crash" >&2; exit 1; }; done\nexec %q "$@"\n' "$PY" >"$t/py-crash"
+  chmod +x "$t/py-crash"
+  CAGE_GRADED=0
+  if PY="$t/py-crash" cage_grade "$t/estate" "$t/register.yaml" >"$t/cage.txt" 2>&1; then
+    echo "FAIL: selfcheck: a planner that exits 1 was taken as a clean grade"; cat "$t/cage.txt"; good=0
+  elif ! grep -qF "kyverno-plan) exited 1" "$t/cage.txt"; then
+    echo "FAIL: selfcheck: a planner that exits 1 failed without naming it"; cat "$t/cage.txt"; good=0
+  fi
+  # ...and fewer graded rows than landed lifts is never a PASS, whatever the planner said.
+  graded_floor 1 1 || { echo "FAIL: selfcheck: one graded lift of one landed was refused: $KV_WHY"; good=0; }
+  graded_floor 0 3 && { echo "FAIL: selfcheck: 0 graded lifts of 3 landed was taken as a PASS"; good=0; }
+
   rm -rf "$t"
   [ "$good" = 1 ] || return 1
-  echo "  ok   selfcheck: the grader fails fifteen ways a lift can look done and not be (the served path read from the adopter's own gotk-sync.yaml among them), could-not-looks (naming the pull request) when one has not landed, counts both residuals and the pinned trees it could not read, accepts a glob pattern and a ./ entry, parses the kyverno verdict per policy by name (a skipped 9.9.9 pod at exit 0 is not admitted), and grades the set the adopter's composed-set.yaml serves at its pin (a PriorityClass in a version directory gives no verdict and is admitted; eight ways that set can leave the app unadmitted or uncaged all fail by name)"
+  echo "  ok   selfcheck: the grader fails fifteen ways a lift can look done and not be (the served path read from the adopter's own gotk-sync.yaml among them), could-not-looks (naming the pull request) when one has not landed, counts both residuals and the pinned trees it could not read, accepts a glob pattern and a ./ entry, parses the kyverno verdict per policy by name (a skipped 9.9.9 pod at exit 0 is not admitted), and grades the set the adopter's composed-set.yaml serves at its pin (a PriorityClass in a version directory gives no verdict and is admitted; nine ways that set can leave the app unadmitted or uncaged all fail by name; a planner that dies, or grades fewer apps than have landed, fails)"
 }
 
 case "${1:-}" in
   --selfcheck)
     selfcheck || exit 1
-    echo "PASS: selfcheck: an unlisted served manifest, a wrong Flux path, a missing gotk-sync.yaml, a tag+commit mismatch, an orphan version claim, a surviving incumbent label, a missing stack manifest, four broken renovate shapes, four hub copies and a second adopter all fail; an unlanded lift could-not-looks and names its pull request; a pinned tree without the lift, and a pinned tag this clone cannot read, are counted limits on one line; a skipped kyverno verdict at exit 0, and a policy with no row of its own in the kyverno table, are not admission; the set an adopter serves is read from its composed-set.yaml at its pin, a PriorityClass in a version directory is not asked for a verdict (run 314), and a class the set does not serve, no cage at all, another version refusing, a refusal only at the pin, an unserved version, no orphan guard, no composed set and a tag+commit mismatch all fail"
+    echo "PASS: selfcheck: an unlisted served manifest, a wrong Flux path, a missing gotk-sync.yaml, a tag+commit mismatch, an orphan version claim, a surviving incumbent label, a missing stack manifest, four broken renovate shapes, four hub copies and a second adopter all fail; an unlanded lift could-not-looks and names its pull request; a pinned tree without the lift, and a pinned tag this clone cannot read, are counted limits on one line; a skipped kyverno verdict at exit 0, and a policy with no row of its own in the kyverno table, are not admission; the set an adopter serves is read from its composed-set.yaml at its pin, a PriorityClass in a version directory is not asked for a verdict (run 314), and a class the set does not serve, no cage at all, another version refusing, a refusal only at the pin, an unserved version, no orphan guard, no composed set, a composed set that does not parse and a tag+commit mismatch all fail; a planner that exits non-zero, and fewer graded apps than landed lifts, are never a PASS"
     exit 0 ;;
 esac
 
@@ -657,6 +692,13 @@ say "2. the same discovery the adopters' own shift-left gates run"
 # ever disagree, the gate is grading a different set from the one the cluster is served.
 plan_missing=0
 PLAN_WORK="$(mktemp -d)"
+"$PY" "$HERE/lifted_apps.py" --estate-root "$ESTATE" --register "$REG" --kyverno-plan "$PLAN_WORK/policies" >"$PLAN_WORK/plan.tsv" 2>"$PLAN_WORK/plan.err"
+prc=$?
+if [ "$prc" != 0 ]; then
+  echo "  FAIL the planner (lifted_apps.py --kyverno-plan) exited $prc, so no adopter's discovery was checked:"
+  tail -5 "$PLAN_WORK/plan.err" | sed 's/^/       /'
+  plan_missing=1
+fi
 while IFS=$'\t' read -r app unit _pin _policies served _rest; do
   [ -n "${app:-}" ] || continue
   script="$ESTATE/$unit/.github/scripts/served-workloads.py"
@@ -671,7 +713,7 @@ while IFS=$'\t' read -r app unit _pin _policies served _rest; do
     echo "  FAIL $unit's own served-workloads.py does not name $rel, so its shift-left gate never grades it"
     plan_missing=1
   fi
-done < <("$PY" "$HERE/lifted_apps.py" --estate-root "$ESTATE" --register "$REG" --kyverno-plan "$PLAN_WORK")
+done <"$PLAN_WORK/plan.tsv"
 rm -rf "$PLAN_WORK"
 
 say "3. the set each adopter serves (gitops/composed/composed-set.yaml at its pin, every route its ResourceSet renders), run over the served workload (kyverno $(kyverno version 2>/dev/null | awk '/^Version/{print $2}'); CREATE only, baseline dial, no namespaceObject)"
@@ -696,6 +738,10 @@ total="$("$PY" -c "import sys,yaml;print(len(yaml.safe_load(open(sys.argv[1]))['
 if [ "$structural" = 3 ]; then
   echo "SKIP: ${graded} of ${total} lifts have landed in their adopter; the rest are proposed and unmerged, and the rows above name the pull request each one waits on"
   exit 3
+fi
+if ! graded_floor "$graded" "$total"; then
+  echo "FAIL: every registered lift has landed and ${KV_WHY}"
+  exit 1
 fi
 echo "PASS: ${graded} lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml reconciles; admitted and caged at CREATE under the baseline dial by the set that adopter's gitops/composed/composed-set.yaml serves at its pin, every version and the machinery route (kyverno apply, no namespaceObject), onto a PriorityClass that set carries; discovered by that adopter's own served-workloads.py; bumped by that adopter's own renovate manager behind dashboard approval; ${pinned_absent:-?} of ${total} are not in the tree the GitRepository pins (${pinned_tags:-unread}) and ${pinned_unread:-?} of ${total} pinned trees could not be read; the hub carries no working copy of any of them"
 exit 0

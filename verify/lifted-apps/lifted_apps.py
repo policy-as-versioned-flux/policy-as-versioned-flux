@@ -701,6 +701,12 @@ class ServedSet:
     error: str | None = None
 
 
+def _yaml_where(e: yaml.YAMLError) -> str:
+    mark = getattr(e, "problem_mark", None)
+    problem = getattr(e, "problem", None) or type(e).__name__
+    return f"{problem} at line {mark.line + 1}" if mark is not None else str(problem)
+
+
 def _render_template(template: str, versions: tuple[str, ...]) -> tuple[list[tuple[str | None, dict]], str | None]:
     """The Kustomizations the ResourceSet renders, each with the version it was ranged from.
     Only `range $v := (index (inputs) "versions")`, `$v.version` and `$v.version | slugify`
@@ -729,7 +735,12 @@ def _render_template(template: str, versions: tuple[str, ...]) -> tuple[list[tup
         if left:
             return [], (f"the ResourceSet's resourcesTemplate uses {left[0]}, which this check does "
                         f"not render, so what it serves cannot be derived here")
-        for d in yaml.safe_load_all(text):
+        try:
+            docs = list(yaml.safe_load_all(text))
+        except yaml.YAMLError as e:
+            return [], (f"the ResourceSet's resourcesTemplate renders to YAML that does not parse "
+                        f"({_yaml_where(e)}), so what it serves cannot be derived here")
+        for d in docs:
             if isinstance(d, dict):
                 rendered.append((version, d))
     return rendered, None
@@ -741,7 +752,12 @@ def served_set(adopter_dir: Path) -> ServedSet:
     if not f.is_file():
         return ServedSet(error=f"{adopter_dir.name} has no {COMPOSED_SET}, so no composed set is "
                                f"served to any cluster and nothing cages its workloads")
-    docs = [d for d in yaml.safe_load_all(f.read_text()) if isinstance(d, dict)]
+    try:
+        docs = [d for d in yaml.safe_load_all(f.read_text()) if isinstance(d, dict)]
+    except yaml.YAMLError as e:
+        return ServedSet(error=f"{adopter_dir.name}'s {COMPOSED_SET} does not parse as YAML "
+                               f"({_yaml_where(e)}), so Flux serves no composed set from it and "
+                               f"nothing cages its workloads")
     repos = [d for d in docs if d.get("kind") == "GitRepository"]
     sets = [d for d in docs if d.get("kind") == "ResourceSet"]
     if len(repos) != 1 or len(sets) != 1:
@@ -793,12 +809,26 @@ def served_set(adopter_dir: Path) -> ServedSet:
             rc, listing = _git(adopter_dir, "ls-tree", "-r", "--name-only", resolved, route + "/")
             files = [x for x in listing.splitlines() if x.endswith((".yaml", ".yml"))]
         for path in files:
+            kind = _git(adopter_dir, "cat-file", "-t", f"{resolved}:{path}")[1]
+            if kind == "tree":
+                # `git show <sha>:<dir>` exits 0 with a tree listing; read as YAML it is one
+                # string and serves nothing. Refuse it by name instead (review round, PR #119).
+                ss.error = (f"{route}/kustomization.yaml at {tag} lists {path}, a directory; this "
+                            f"check reads files, not nested kustomizations, so it cannot say what "
+                            f"that entry serves")
+                return ss
             rc, body = _git(adopter_dir, "show", f"{resolved}:{path}")
-            if rc != 0:
+            if rc != 0 or kind != "blob":
                 ss.error = (f"{route}/kustomization.yaml at {tag} lists {path}, which the tree "
                             f"does not carry (this check reads files, not nested kustomizations)")
                 return ss
-            for d in yaml.safe_load_all(body):
+            try:
+                docs = list(yaml.safe_load_all(body))
+            except yaml.YAMLError as e:
+                ss.error = (f"{path} at {tag} does not parse as YAML ({_yaml_where(e)}), so its "
+                            f"Kustomization never becomes Ready and serves nothing")
+                return ss
+            for d in docs:
                 if isinstance(d, dict) and d.get("kind"):
                     ss.objects.append(ServedObject(route, version, path, d))
     return ss

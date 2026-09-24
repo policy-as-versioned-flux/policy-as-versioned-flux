@@ -673,6 +673,39 @@ def test_a_served_set_without_its_orphan_guard_is_named(tmp_path):
     assert row.error is not None and "orphan-guard.yaml" in row.error
 
 
+def test_a_composed_set_the_planner_cannot_parse_is_named_not_a_crash(tmp_path):
+    # Review round (PR #119): unparseable YAML in composed-set.yaml crashed the planner, the
+    # shell saw no rows, and the check printed `PASS: 0 lifted applications`. The file is
+    # adopter-owned, so its failure must be a named row, never a traceback.
+    estate = _estate(tmp_path)
+    (estate / "tuppence" / "gitops" / "composed" / "composed-set.yaml").write_text("apiVersion: [unclosed\n")
+    row = lifted_apps.kyverno_plan(estate, _register(tmp_path), tmp_path / "into")[0]
+    assert row.error is not None
+    assert "gitops/composed/composed-set.yaml" in row.error and "not parse" in row.error
+
+
+def test_a_served_file_the_planner_cannot_parse_is_named_not_a_crash(tmp_path):
+    estate = _estate(tmp_path)
+    a = estate / "tuppence"
+    (a / "composed" / "orphan-guard.yaml").write_text("kind: [unclosed\n")
+    _recut(a)
+    row = lifted_apps.kyverno_plan(estate, _register(tmp_path), tmp_path / "into")[0]
+    assert row.error is not None
+    assert "composed/orphan-guard.yaml" in row.error and "not parse" in row.error
+
+
+def test_a_resources_entry_that_names_a_directory_is_refused_by_name(tmp_path):
+    # Review round (minor): `git show <sha>:<dir>` exits 0 with a tree listing, which parsed to
+    # a string and served nothing, silently.
+    estate = _estate(tmp_path)
+    a = estate / "tuppence"
+    (a / "composed" / "kustomization.yaml").write_text(_kustomization(["orphan-guard.yaml", "policies"]))
+    _recut(a)
+    row = lifted_apps.kyverno_plan(estate, _register(tmp_path), tmp_path / "into")[0]
+    assert row.error is not None
+    assert "composed/policies" in row.error and "directory" in row.error
+
+
 # --------------------------------------------------------------------------- tidy 2026-09-08 (R2-1..3)
 
 def test_a_pin_this_clone_cannot_read_is_a_printed_count_not_a_zero(tmp_path):

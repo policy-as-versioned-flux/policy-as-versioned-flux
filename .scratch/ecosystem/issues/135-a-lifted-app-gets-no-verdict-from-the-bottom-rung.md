@@ -35,6 +35,9 @@ for run 314's FAIL is recorded.
 
 ## Build, 2026-09-22
 
+The build rules name this section; the work itself ran on 2026-09-24, after run 314
+(2026-09-24T09:47Z).
+
 ### Answer: the check was stale, the cage is sound
 
 The served set admits and cages all three lifted apps at CREATE. The check asked a
@@ -59,7 +62,7 @@ d5a4bfe, driftwood c26d95c and ludlow ab89691. Each tag resolves to the commit t
    skip: 0`, the same line run 314 printed. Ledger's mutated pod names
    `priorityClassName: cage-baseline-4-0-0`.
 4. Over the whole served set (both versions plus the machinery route), each of the three apps
-   gets `pass: 10, fail: 0, warn: 0, error: 0, skip: 8`. It gets 13 table rows. The six 4.0.0
+   gets `pass: 10, fail: 0, warn: 0, error: 0, skip: 8`. It gets 13 table rows. The five 4.0.0
    policies and the orphan guard pass. The 5.0.0 policies and `policy-version-orphan-cage` skip.
    The cage writes `cage-baseline-4-0-0`, and v4.0.0 serves that class.
 
@@ -127,6 +130,49 @@ So no repository other than the hub has to change. No platform release is involv
   `only-this-policy-version` condition is false. So a GeneratingPolicy's Pass row in the CLI is
   not evidence that its conditions held. The check requires Pass from `cage-netpol-4-0-0` only as
   "it gave a verdict". It does not read that row as proof of reach.
+
+### Review round
+
+The review of PR #119 blocked on one finding and raised two minor ones. All three are fixed on
+the same branch.
+
+- Blocking: a planner crash graded no app and still printed PASS. `cage_grade` read the planner
+  through process substitution, so it never saw the exit code. The final PASS printed the graded
+  count without comparing it to the landed lifts. I reproduced it: with `apiVersion: [unclosed`
+  written over a copy of tuppence's `composed-set.yaml`, the PR's first commit (4127c9b) printed
+  two tracebacks, then `PASS: 0 lifted applications` at exit 0. Fix, in three layers:
+  - `lifted_apps.py` catches a YAML error in `composed-set.yaml`, in the rendered template and in
+    each served file, and returns it as a named row error. The same broken copy now gives
+    `FAIL ledger: ... composed-set.yaml does not parse as YAML (expected ',' or ']', but got
+    '<stream end>' at line 2)` and exit 1.
+  - `verify-lifted-apps.sh` runs the planner to a file in both step 2 and step 3 and FAILs by
+    name when it exits non-zero. With a wrapper interpreter that exits 1 on `--kyverno-plan`
+    over the real estate clone, the run now prints `the planner (lifted_apps.py --kyverno-plan)
+    exited 1` in steps 2 and 3 and exits 1.
+  - A new `graded_floor` refuses a PASS that graded fewer apps than have landed.
+- Minor: a `resources` entry naming a directory served nothing, silently. `git show <sha>:<dir>`
+  exits 0 with a tree listing. `served_set()` now checks `git cat-file -t` first and names a
+  directory as a failure.
+- Minor: two record slips in this section. Item 4 said "six 4.0.0 policies"; the must-pass list
+  holds five plus the guard, so it now says five. The heading date is the one the build rules
+  set, and the note under the heading gives the real date.
+
+Delegated: an adopter-owned file that does not parse is a named FAIL on that app's row, not a
+crash. Reason: the file is served to a cluster, and Flux would serve nothing from it, so the
+app is uncaged. A crash tells the reader nothing about which adopter broke.
+
+Delegated: the planner's exit code is checked and the graded count is floored, both. Reason:
+the parse fix covers the one crash the review found. The exit check and the floor cover any
+crash not yet found, including one that prints no rows at exit 0.
+
+Tests, red then green. Three new tests in `tests/test_lifted_apps.py` (a composed set that does
+not parse, a served file that does not parse, a directory entry) failed before the fix:
+3 failed, 46 passed. After it: 49 passed. The selfcheck gained three plants: a composed set that
+does not parse, a planner that exits 1, and a floor of 0 graded of 3 landed. Before the shell
+fix the selfcheck exited 1 on the planner and floor plants. After it the selfcheck exits 0.
+Over the real estate clone the check still exits 0 with three `ok` rows, each `pass: 10,
+fail: 0, warn: 0, error: 0, skip: 8`, and `PASS: 3 lifted applications`. Kyverno 1.18.2 for all
+runs.
 
 ### What remains
 
