@@ -1,7 +1,7 @@
 # 131 — An adopter cannot cut a tag under tools v3.3.0
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -159,3 +159,24 @@ Fix: a new comment on each PR names the head commit and the measured counts.
   the merge from the app without `workflows` permission, the owner must merge these three.
 - The signed tags the dispatches create are the owner's release act under the standing
   development-mode authorisation. Nothing here creates a tag.
+
+## Answer
+
+Resolved 2026-09-24 by driftwood PR 41, tuppence PR 38 and ludlow PR 35, and measured by the
+dispatches they unblocked.
+
+1. Each adopter's `cut-release.yml` now lays the parents beside the adopter, as `compose-check`
+   does, so the pre-tag verify reads the same source inputs the composition read.
+2. The layout test lives under `.github/tests/`, because the comparison identity skips
+   dot-prefixed paths. A test under `tests/` would itself change the identity.
+3. **Measured.** After the merges, the integrator dispatched `cut-release.yml` on each adopter.
+   All three passed the pre-tag verify and pushed a signed v2.0.0: driftwood run 35978861821
+   (`c26d95c`), tuppence run 35978981227 (`d5a4bfe`), ludlow run 35979079340 (`ab89691`).
+   `release.yml` verified and published each one (runs 35978940310, 35979045755, 35979147368).
+
+Review: three rounds. Round 1 found that the PR's own test edit invalidated the identity, the
+same defect again, which is why the test moved under `.github/`. Round 2 corrected test counts
+in this record.
+
+Recorded for a later tools release: the identity hashes every non-hidden file in the adopter,
+so any edit to a script, a test or a lane observation outside `composed/` needs a recompose.
