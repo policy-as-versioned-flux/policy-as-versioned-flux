@@ -120,6 +120,25 @@ jobs:
           path: ${{ runner.temp }}/clocks.json
           retention-days: 7
           if-no-files-found: error
+      # Ticket 87 item 1. The forge's rulesets for all nine repositories, and GitHub's own answer
+      # for every branch an estate identity pin admits, read here where a credential may be and
+      # graded in the gate by verify/forge-review/verify-forge-review.sh. It runs AFTER the clock
+      # facts are uploaded and may not fail this job: a forge read that breaks costs the forge
+      # check a could-not-look, never the clocks their facts. It reads files and asks GitHub; it
+      # runs no code from another organisation.
+      - name: read the forge's rulesets for every repository
+        id: forge
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 verify/forge-review/forge_review.py collect --out "$RUNNER_TEMP/forge.json"
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.forge.outcome == 'success' }}
+        with:
+          name: forge-facts
+          path: ${{ runner.temp }}/forge.json
+          retention-days: 7
+          if-no-files-found: error
 
   gate:
     runs-on: ubuntu-latest
@@ -245,6 +264,11 @@ jobs:
         with:
           name: clock-verdict
           path: ${{ runner.temp }}/clock-verdict
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: forge-facts
+          path: ${{ runner.temp }}/forge-facts
       - name: install pinned gitsign (binary + checksum, no marketplace action)
         run: |
           set -euo pipefail
@@ -287,6 +311,7 @@ jobs:
         env:
           VERIFY_TIMEOUT: '900'
           CLOCK_VERDICT: ${{ runner.temp }}/clock-verdict/clocks.json
+          FORGE_FACTS: ${{ runner.temp }}/forge-facts/forge.json
         run: set -o pipefail; bash talk/verify-all.sh | tee "$RUNNER_TEMP/gate.out"
       # The line is PRINTED whatever the guard said, into the log and the step summary, because a
       # measurement a run cannot record is still a measurement a reader can quote (ticket 100).

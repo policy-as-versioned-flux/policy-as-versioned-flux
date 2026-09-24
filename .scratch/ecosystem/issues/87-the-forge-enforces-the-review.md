@@ -75,3 +75,78 @@ before this entry.
 NORTH-STAR §6 has a "development-window theatre" bullet. It says that "ticket 87 protects `main`
 and `release/*.x` with a required review from a different identity". On 2026-09-24 that is false.
 The ticket 97 build adds a dated correction.
+
+## Build, 2026-09-22
+
+Built 2026-09-24 under the owner's instruction of that day: items 1 and 2 now, item 3 waits on
+ticket 97. Hub branch `ticket-87-the-forge-enforces-the-review`. No unit repository changed.
+
+### What was measured first
+
+Measured on 2026-09-24 with `gh api repos/<r>/rulesets`, `git log --first-parent origin/main`
+in the hub and each `.estate-clone/<unit>`, `gh api repos/<r>/events` (PushEvent and CreateEvent
+actors), `gh api repos/<r>/actions/workflows/cut-release.yml/runs`, and a grep of every
+workflow for `git push`, `token:` and `secrets.`.
+
+- Before this build all nine repositories had 0 rulesets and no protected branch.
+- Every repository is public, on the organisation free plan, default branch `main`.
+- Since 2026-09-05 the only commits on any `main` whose committer is not GitHub's merge identity
+  are clock and release commits:
+  - hub: 56 `truth surface`, pushed by truth.yml;
+  - driftwood: 19 `drift sampler` and 19 `twin sweep`;
+  - tuppence: 19 `drift sampler` and 14 `twin sweep`;
+  - ludlow: 19 `drift sampler` and 14 `twin sweep`;
+  - platform: 2 `policy-as-versioned release bot`, the evidence commit cut-release.yml pushes;
+  - nist, ico, feeds, insurer: none.
+- The owner's last direct push to a `main` was 2026-09-04 (platform). Everything since is a
+  merge by `pavc-other-hand[bot]`.
+- Every one of those pushes uses the checkout's `GITHUB_TOKEN`. The event feed shows the pusher
+  as `github-actions[bot]`. No workflow in the estate uses an app token or any secret other than
+  `GITHUB_TOKEN`.
+- Tags are pushed only by cut-release.yml with `GITHUB_TOKEN`. The owner dispatches it. The
+  latest platform tags v3.4.0 and v3.4.1 were cut on 2026-09-24.
+- The publishers' `observations` branches and the `fetch/*`, `requote/*` and `renovate/*`
+  branches take pushes too. None is `main` or `release/**`.
+- One release branch exists: platform `release/2.0.x`. Its tip is contained in `main`, and
+  cut-release ran on it once, on 2026-08-24.
+- No workflow pushes with `--force`.
+- The identity pins: 11 distinct anchored patterns name an estate repository. Eight cut-release
+  pins admit `refs/heads/(main|release/[0-9]+\.[0-9]+\.x)`. Three propose-tier pins admit
+  `main` only.
+- The app merges without an approval on the units. The newest three merged PRs on nist, ico
+  and feeds, and two of three on insurer, carry no review. The hub's newest three carry a
+  `pavc-other-hand[bot]` APPROVED review.
+
+### What GitHub refused
+
+The ticket's shape had the GitHub Actions integration (app id 15368) as the one bypass actor, so
+the clocks could keep pushing. GitHub refused it on the hub:
+
+    POST repos/policy-as-versioned-flux/policy-as-versioned-flux/rulesets
+    422 "Actor GitHub Actions integration must be part of the ruleset source or owner organization"
+
+That refusal was measured at 2026-09-24T16:48Z, and nothing was applied by that call. Public
+reports say the same for other organisation-owned repositories. So no ruleset here can let
+`GITHUB_TOKEN` through, and a `pull_request` rule on a branch a clock pushes to would stop that
+clock.
+
+### What was applied
+
+Four rulesets, declared in `.github/rulesets/` in the hub, none with a bypass actor:
+
+- `release-branches-are-reviewed`, on `refs/heads/release/**`: `creation`, `deletion`,
+  `non_fast_forward`, and `pull_request` with one approving review. All nine repositories.
+- `release-tags-hold`, on every tag: `update` and `deletion`. All nine repositories.
+- `main-is-reviewed`, on the default branch: `deletion`, `non_fast_forward`, and
+  `pull_request` with one approving review. nist, ico, feeds and insurer, where nothing pushes
+  `main`.
+- `main-keeps-its-history`, on the default branch: `deletion` and `non_fast_forward`. hub,
+  platform, driftwood, tuppence and ludlow, where a clock or cut-release pushes `main`.
+
+Ruleset ids (from the POST responses):
+
+| Repository | Ruleset | id |
+|---|---|---|
+| hub | main-keeps-its-history | 23950610 |
+| hub | release-branches-are-reviewed | 23950611 |
+| hub | release-tags-hold | 23950612 |
