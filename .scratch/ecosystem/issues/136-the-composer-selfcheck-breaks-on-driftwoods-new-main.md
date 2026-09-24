@@ -1,7 +1,7 @@
 # 136 — The composer selfcheck breaks on driftwood's new main
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -115,3 +115,20 @@ edge in `compose()`, a wider change. It is not charted here; the integrator can 
   before then, because adopters compose with a pinned platform tag.
 - The next truth run grades `verify-composition.sh` against the shared `.estate-clone`. I did
   not run it there. That clone's platform needs this commit, and its driftwood lags at 3f8943d.
+
+## Answer
+
+Resolved 2026-09-24 by platform PR 40. The defect was in the composer, not in driftwood.
+
+1. The composer vendored each feed to `composed/feeds/<party>/<version>`, so two feeds of one
+   publisher at one major landed on one path and composition refused. tuppence pins
+   threat-register and cve from feeds, so its v1 -> v2 threat-register bump in the selfcheck hit
+   it, and a real Renovate bump would have too.
+2. Feeds now vendor to `composed/feeds/<party>/<name>/<version>`. A new unittest was red on the
+   old layout and is green now.
+3. Two selfcheck legs that ticket 84's new subscriptions also broke are fixed.
+4. **Measured by the integrator** after rebasing onto tickets 133 and 134: `composition.py
+   --selfcheck` passes with 102 OK lines against every adopter's current main.
+
+The residual this build named is ticket 137. The layout moves on each adopter's next recompose
+under a tools release that carries PR 40.
