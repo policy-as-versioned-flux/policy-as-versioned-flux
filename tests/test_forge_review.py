@@ -87,7 +87,7 @@ def _facts(fr, main_rules, release_rules, tag_rulesets=(TAG_RULESET,), extra=Non
             "rulesets": [{"id": 1, "name": "x", "target": "branch", "enforcement": "active"},
                          *tag_rulesets],
             "branch_rules": {b: (main_rules if b == "main" else release_rules)
-                             for b in ["main", *fr.PROBES_FOR_TEST, "release/2.0.x"]}}
+                             for b in ["main", *fr.PROBES, "release/2.0.x"]}}
     repo.update(extra or {})
     return {"collector": "test", "repos": {"platform": repo}}
 
@@ -199,3 +199,9 @@ def test_one_repository_unread_is_a_could_not_look_even_beside_passes(fr):
     lines = _grade(fr, facts)
     assert any(l[0] == "PASS" for l in lines)
     assert fr._exit(lines) == 3
+
+
+def test_two_review_rules_on_one_branch_count_as_the_strictest(fr):
+    weak = {"type": "pull_request", "parameters": {"required_approving_review_count": 0}}
+    lines = _grade(fr, _facts(fr, [weak, *MAIN_REVIEWED], REVIEWED))
+    assert not [l for l in lines if l[0] == "FAIL"], lines

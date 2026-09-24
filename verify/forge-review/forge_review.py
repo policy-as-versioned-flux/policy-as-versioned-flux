@@ -59,7 +59,6 @@ TAG_RULES = {"update", "deletion"}
 # patterns carry and a few near misses, so a pattern that widens is caught by a name it now admits.
 PROBES = ["main", "master", "develop", "release/0.0.x", "release/1.0.x", "release/2.0.x",
           "release/10.20.x", "release/99.99.x", "release/1.0", "release/x"]
-PROBES_FOR_TEST = PROBES
 
 # The head of an anchored identity pattern: org, repo and workflow, each still escaped.
 HEAD = re.compile(r"^\^https://github\\\.com/((?:[^/\\]|\\.)+)/((?:[^/\\]|\\.)+)/\\\.github/"
@@ -213,10 +212,24 @@ def ref_matches(ref: str, include: list[str], exclude: list[str], default: str) 
 
 
 def _rule_types(rules: list[dict]) -> dict[str, dict]:
+    """Rule type -> parameters. Two rulesets may both apply a `pull_request` rule to one branch,
+    and the forge enforces the strictest, so the highest review count is the one kept."""
     out: dict[str, dict] = {}
     for r in rules or []:
-        out.setdefault(r.get("type", ""), r.get("parameters") or {})
+        kind, params = r.get("type", ""), r.get("parameters") or {}
+        if kind in out and _reviews(out[kind]) >= _reviews(params):
+            continue
+        out[kind] = params
     return out
+
+
+def _reviews(params: dict) -> int:
+    return int(params.get("required_approving_review_count") or 0)
+
+
+def _ref_name(ruleset: dict) -> tuple[list[str], list[str]]:
+    cond = (ruleset.get("conditions") or {}).get("ref_name") or {}
+    return list(cond.get("include") or []), list(cond.get("exclude") or [])
 
 
 def binding_fault(doc: dict, env: dict) -> str:
@@ -265,9 +278,7 @@ def grade(doc: dict, pats: dict[str, list[Pattern]], env: dict) -> list[tuple[st
             have = _rule_types(br[b])
             want = REVIEW_RULES | ({"creation"} if b != default else set())
             missing = sorted(want - set(have))
-            count = int((have.get("pull_request") or {}).get("required_approving_review_count")
-                        or 0)
-            if "pull_request" in have and count < 1:
+            if "pull_request" in have and _reviews(have["pull_request"]) < 1:
                 missing.append("pull_request with at least one approving review")
             if missing:
                 bad.append(f"{b} is admitted by the {', '.join(sorted(needed[b]))} pin and "
@@ -275,11 +286,8 @@ def grade(doc: dict, pats: dict[str, list[Pattern]], env: dict) -> list[tuple[st
         tag_sets = [r for r in active if r.get("target") == "tag"
                     and TAG_RULES <= set(_rule_types(r.get("rules")))]
         loose = [t for t in repo.get("tags") or []
-                 if not any(ref_matches(f"refs/tags/{t}",
-                                        (r.get("conditions") or {}).get("ref_name", {})
-                                        .get("include", []),
-                                        (r.get("conditions") or {}).get("ref_name", {})
-                                        .get("exclude", []), default) for r in tag_sets)]
+                 if not any(ref_matches(f"refs/tags/{t}", *_ref_name(r), default)
+                            for r in tag_sets)]
         if loose:
             bad.append(f"{len(loose)} tag(s) no active tag ruleset holds against update and "
                        f"deletion, first {loose[:3]}")
