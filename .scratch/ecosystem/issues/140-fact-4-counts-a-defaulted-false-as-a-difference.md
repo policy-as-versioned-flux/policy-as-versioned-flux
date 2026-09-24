@@ -114,6 +114,8 @@ PRs:
   `composed/`, `cmp` of the output document) on all three.
 - compose-check replay: a fresh workspace from each branch head, compose again, then
   `git status --porcelain -- composed/`: empty on all three.
+- PR CI: `compose-check` and `shift-left` pass on all three PRs (`gh pr checks`). The driftwood
+  compose-check log shows the new unittest line and `Ran 9 tests`.
 
 ### Merge order
 
