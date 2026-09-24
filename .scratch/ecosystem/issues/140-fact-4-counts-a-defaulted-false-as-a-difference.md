@@ -34,7 +34,7 @@ What this ticket owes:
 A scheduled sample on each adopter reads fact 4 true with the delivered PriorityClasses, and the
 compare still fails a real difference.
 
-## Build, 2026-09-22
+## Build, 2026-09-24
 
 ### What the failing samples say
 
