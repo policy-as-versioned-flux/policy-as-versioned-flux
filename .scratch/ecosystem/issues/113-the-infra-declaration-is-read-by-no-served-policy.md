@@ -207,3 +207,91 @@ After the fix, through the gate's path, the script reads 6 served bodies. Proof 
 Proof 4 still names the same 4 v4.0.0 bodies at `baseline` and exits 1. Checks rerun:
 `tests/test_cage_ladder_holes.py` and `tests/test_misuse.py` 70 passed, mypy clean over 194
 files. The reviewer's probe script now prints FAIL for all three plants and PASS for the control.
+
+### Fix round, 2026-09-24: the release gate holds with one served line
+
+Platform PR 44 (https://github.com/policy-as-versioned-platform/platform/pull/44, branch
+`retire-policy-4-0-0`) retires 4.0.0 from `distribution/versions.yaml`. Owner-instructed
+2026-09-24, knowing it leaves one live line against ticket 75 Q3. The three adopter claim-move
+PRs are merged (driftwood 44, tuppence 42, ludlow 39; `gh pr view` gives MERGED for each).
+
+**The problem.** `.github/workflows/release.yml` runs `./shift-left/verify-shift-left.sh` as a
+plain step. On the branch at 4f45ae3 that script exited 3, because its flip beat found one major
+line and no neighbour. Every release cut from that tree would fail.
+
+**A second problem found on the way.** On main the flip fixture claimed 4.0.0 and failed at 4.0.0,
+its own target. `ci-check.py` printed `FAIL @ v4.0.0` with no flip mark, and the old beat still
+said "all offline proofs passed". It passed on a plain failure, not a caught flip. And on the
+branch at 4f45ae3, `wargamer/propose-policy-pr.sh` printed "unexpected: the gate passed a
+workload that should trip the flip" when run with the adopters beside it, because the fixture
+now claimed 5.0.0 and passes a one-line window.
+
+#### Decisions
+
+1. **The flip beat runs against a planted two-line window while the served array has one major.**
+   Delegated. New `shift-left/flip_window.py` returns `distribution/versions.yaml` when it
+   declares two or more majors. Otherwise it prints `NOTHING-TO-FLIP` on stderr, naming the
+   served versions, and returns `shift-left/fixtures/flip-window.yaml`. That file declares
+   {4.0.0, 5.0.0} and nothing reconciles it. Both bodies are on disk and unedited:
+   `git diff policy/v4.0.0 HEAD -- distribution/policies/v4.0.0` is empty, and the same holds
+   for v5.0.0. So the beat still proves what it proves: the ±1 window catches, with the real
+   kyverno CLI and the real signed bodies, a workload that passes its target and fails a
+   neighbour. Reason: a could-not-look is honest for the served array, but the mechanism under
+   test does not need the served array to have two lines. `release.yml` needs no change.
+   Rejected: teach `release.yml` to accept exit 3 by name. That would ship releases whose gate
+   observed nothing.
+2. **The beat now requires a real flip.** Delegated. After the non-zero exit it reads the target
+   off `ci-check.py`'s output. It fails if the target itself failed, and it fails if no line
+   carries the `(Audit->Deny flip` mark. Reason: the main-shaped fixture passed on a plain
+   failure, which is the "pass on a technicality" the script's own header warns about.
+3. **One place picks the window.** Delegated. `verify-shift-left.sh` and
+   `wargamer/propose-policy-pr.sh` both call `flip_window.py`, so they cannot pick different
+   windows.
+4. **`distribution/verify/gate.yaml` points at `policy/v5.0.0`.** Delegated. The worked example
+   named the retired tag and path. `verify-source-verification.sh` reads only its two identity
+   annotations, which did not change.
+
+#### What was measured, and how
+
+All with kyverno 1.18.2 (`kyverno version` printed 1.18.2).
+
+- The exact `release.yml` gate step, `./shift-left/verify-shift-left.sh`, run with
+  `bash -eo pipefail` in a clean `git archive` of each commit: exit 3 at 4f45ae3 (red), exit 0
+  at 92eadf5 (green). The green run prints `NOTHING-TO-FLIP`, then
+  `FAIL @ v4.0.0 (Audit->Deny flip: ...)` for the 5.0.0-claiming fixture, then
+  "all offline proofs passed".
+- Controls, each on a scratch copy of `shift-left/` and `distribution/` at the fix:
+  - unchanged: exit 0, window read from the planted file.
+  - fixture claims 4.0.0 (main's shape): exit 1, "fails its own target 4.0.0".
+  - planted window holds 5.0.0 only: exit 1, "ci-check.py passed a workload ...".
+  - planted neighbour renamed to a version with no body: exit 1, "at no neighbour of 5.0.0".
+  - fixture made compliant at 4.0.0: exit 1, "ci-check.py passed a workload ...".
+  - served array replaced by main's two-major array: exit 0, window read from
+    `distribution/versions.yaml`. The same with the planted file corrupted: exit 0, so the planted
+    file is not read when the served array has two majors.
+- `wargamer/propose-policy-pr.sh`, run from a scratch estate of symlinks (platform at the branch,
+  the other seven units at their local clones): at 4f45ae3 it printed "unexpected: the gate
+  passed a workload that should trip the flip"; at the fix it printed `NOTHING-TO-FLIP` and
+  "ok  gate runs (kyverno)".
+- All 47 `verify*.sh` in platform, each run with `bash <script>` from that symlink estate,
+  `PAVC_ESTATE_CLONE` at the shared estate and a 900 s timeout. Once with platform at origin/main
+  (bfd5361), once at the branch (92eadf5). **Every exit code is the same on both sides.** The
+  scripts at 0 on both: 29. At 3 on both: 13. At 1 on both: 5 (`distribution/verify-infra-declaration.sh`,
+  `feeds/verify.sh`, `oscal/verify-claims.sh`, `oscal/verify-upflow.sh`,
+  `verify-publisher-gate.sh`). `shift-left/verify-shift-left.sh` and
+  `wargamer/verify-wargamer.sh` are 0 on both.
+- `verify-infra-declaration.sh` stays at 1 on the branch. It names 3 bodies at `baseline` on
+  the branch (the three adopters' `composed/policies/v4.0.0/cage-tier.yaml`) against 4 on main
+  (those plus platform's own v4.0.0). After `git fetch`, each adopter's origin/main still carries
+  `composed/policies/v4.0.0/`, so fact 2 stays open in the served adopter trees until each
+  recomposes and drops that directory.
+
+#### Waits on the owner, or on a later step
+
+1. **Merge PR 44 and cut the tools tag.** The integrator merges; a signed tag is the owner's.
+2. **Each adopter recomposes onto this platform tree, removes `composed/policies/v4.0.0/`, and
+   cuts a signed composed tag.** The composer does not prune (measured in PR 44's body). Proof 4
+   passes only after that.
+3. **The adopter pin bump past this retirement is a forced major** that each adopter's own gate
+   refuses (PR 44's body, "A retirement is a major for adopters"). That needs an owner decision
+   before the pin bump.
