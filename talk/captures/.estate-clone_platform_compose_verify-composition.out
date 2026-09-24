@@ -1,25 +1,25 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 11.208s
+Ran 11 tests in 11.532s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 8.451s
+Ran 9 tests in 8.172s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .............................
 ----------------------------------------------------------------------
-Ran 29 tests in 24.974s
+Ran 29 tests in 25.311s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 1.684s
+Ran 16 tests in 1.718s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)
@@ -3698,6 +3698,7 @@ OK HEADER.yaml: carries the recorded ungoverned namespaces, and stripping it lea
 OK ungoverned_price/_ramp: workload share x the EOL feed's own ramp from since, bounded at the whole uncaged residual; no since or no as_of ramps nothing (1.0)
 OK ungoverned[]: the real tuppence-reset prices at 7401336.68 GBP -- 3 of 4 institution workloads (share 0.75) x ramp 1.0384 from since 2026-08-25 (the first signed tag naming it) as of 2026-09-08, of a 9503915.17 residual
 OK ungoverned[] (eco-system ticket 122): a renamed ungoverned Namespace keeps the ramp its workloads carried (since 2024-09-01, ramp 3.0), the old name closes as left-repo and not as governed, a copy beside the original starts its own ramp, and a governed shadow of the old name does not drop the carried age
+OK ungoverned[] (eco-system ticket 139): a since later than as_of holds the ramp at its start (1.0), keeps as_of the newest signed input, and names both dates in a limit
 OK (source, id): a control added from a second controls parent is a hole keyed on its own source; the header encodes `source:id` only off the baseline's catalogue and round-trips as recorded
 OK (source, id): a bare id resolves against the baseline's catalogue only (bare cc-1 is unknown there), and fixture-nist2:aa-2 is a different control from aa-2
 OK resolve_claims: a claim resolves on (source, id) through its source href -- cc-1 under fixture-nist2's href fills fixture-nist2:cc-1; the same id under fixture-nist's href is unknown there and fills nothing
