@@ -357,3 +357,83 @@ def test_a_tree_with_no_record_directory_reads_as_no_records(grader: ModuleType,
     _fixture_git(repo, "commit", "-q", "-m", "plant")
     served, records = grader.records_at_served_ref(repo)
     assert served is not None and records == []
+
+
+# -- one format, one reader, copied into every adopter gate (eco-system ticket 132) ---------------
+#
+# The adopter gates now read the same records. The reader is defined once, in the hub module,
+# between two marker lines. Each gate carries that block byte for byte, and the check grades every
+# served copy against the hub's own on every run, so the two readers cannot drift apart quietly.
+
+
+def _hub_block(grader: ModuleType) -> str:
+    block = grader.reader_block(GRADER.read_text())
+    assert block is not None
+    return block
+
+
+def test_the_reader_is_one_marked_block_in_the_hub_module(grader: ModuleType) -> None:
+    block = _hub_block(grader)
+    assert block.startswith(grader.READER_BEGIN)
+    assert block.rstrip("\n").endswith(grader.READER_END)
+    for name in ("RECORD_KIND", "def acceptance_from_text", "def acceptance_for",
+                 "def acceptance_records_at"):
+        assert name in block
+
+
+def test_a_gate_carrying_the_block_byte_for_byte_has_not_drifted(grader: ModuleType) -> None:
+    gate = "#!/usr/bin/env python3\nimport yaml\n\n" + _hub_block(grader) + "\n\ndef main():\n    pass\n"
+    assert grader.reader_drift(gate) is None
+
+
+def test_a_gate_without_the_block_has_drifted_and_says_so(grader: ModuleType) -> None:
+    got = grader.reader_drift("#!/usr/bin/env python3\ndef main():\n    pass\n")
+    assert got is not None and "carries no" in got
+
+
+def test_a_gate_whose_copy_differs_by_one_character_has_drifted_and_names_the_line(
+        grader: ModuleType) -> None:
+    block = _hub_block(grader)
+    changed = block.replace('RECORD_KIND = "major-acceptance"', 'RECORD_KIND = "major-acceptence"')
+    assert changed != block
+    got = grader.reader_drift("import yaml\n" + changed)
+    assert got is not None and "differs" in got and "major-acceptence" in got
+
+
+def test_a_drifted_reader_is_a_fail_even_when_every_major_is_accepted(grader: ModuleType) -> None:
+    finding = _carrying(["5.0.0"], [("accepted-majors/platform-5.0.0.yaml", _record())])
+    finding["reader_drift"] = "carries a major-acceptance reader that differs from the hub's"
+    status, lines = grader.grade([finding])
+    assert status == "FAIL"
+    fail = next(m for k, m in lines if k == "FAIL")
+    assert "driftwood" in fail and "differs" in fail
+
+
+def test_the_records_are_read_at_the_ref_named_not_at_head(grader: ModuleType,
+                                                           tmp_path: Path) -> None:
+    # The gate grades a pull request's head, which is not the commit the repository serves.
+    repo = tmp_path / "tuppence"
+    (repo / "accepted-majors").mkdir(parents=True)
+    _fixture_git(repo, "init", "-q", "-b", "main")
+    (repo / "accepted-majors" / "platform-5.0.0.yaml").write_text(_record(party="tuppence"))
+    _fixture_git(repo, "add", "accepted-majors/platform-5.0.0.yaml")
+    _fixture_git(repo, "commit", "-q", "-m", "accept")
+    accepted = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD"], capture_output=True,
+                              text=True, check=True).stdout.strip()
+    _fixture_git(repo, "rm", "-q", "accepted-majors/platform-5.0.0.yaml")
+    _fixture_git(repo, "commit", "-q", "-m", "withdraw")
+    assert [p for p, _ in grader.acceptance_records_at(repo, accepted)] == [
+        "accepted-majors/platform-5.0.0.yaml"]
+    assert grader.acceptance_records_at(repo, "HEAD") == []
+
+
+def test_a_ref_that_does_not_resolve_is_an_error_not_an_empty_directory(grader: ModuleType,
+                                                                        tmp_path: Path) -> None:
+    repo = tmp_path / "ludlow"
+    repo.mkdir()
+    _fixture_git(repo, "init", "-q", "-b", "main")
+    (repo / "party.yaml").write_text("party: ludlow\n")
+    _fixture_git(repo, "add", "party.yaml")
+    _fixture_git(repo, "commit", "-q", "-m", "plant")
+    with pytest.raises(ValueError, match="f" * 12):
+        grader.acceptance_records_at(repo, "f" * 40)

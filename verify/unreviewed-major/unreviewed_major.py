@@ -59,6 +59,14 @@ signs its tree signs the record with it (ADR-0012). What this check does NOT ver
 in `accepted_by` is the person who merged the record. The record's authority is the reviewed merge
 that put it at the served commit, which this check does not re-grade.
 
+ONE READER, FOUR COPIES (eco-system ticket 132). Each adopter's own gate reads the same records at
+the head of the pull request it grades, and admits a composed major only when every major that pull
+request adds is accepted. The format, the matching rule and the tree read are defined ONCE, in the
+marked block below (`# >>> major-acceptance reader >>>`). Each gate carries that block byte for
+byte. This check reads each gate script at the commit its repository serves and fails the adopter
+whose copy differs, naming the first line that does. So the gate and this report cannot disagree
+about what counts as an acceptance without this report saying so.
+
 The line it prints for an unaccepted major is about what is CARRIED and what record it did or did
 not find, both observed this run.
 
@@ -194,6 +202,13 @@ def identity_constants(unit_dir: Path, script: Path | None) -> tuple[str, str] |
 
 # ---------------------------------------------------------------- the acceptance record
 
+# >>> major-acceptance reader >>>
+# Eco-system ticket 132. This block is the ONE definition of the major acceptance record: its
+# format, the rule a record must meet to count, and how a record is read out of a tree. It is
+# defined in the hub, in verify/unreviewed-major/unreviewed_major.py, and every adopter gate
+# carries a byte-for-byte copy between these two marker lines. The hub check compares each served
+# copy with this one on every run and fails the adopter whose copy differs. Change it here first,
+# then copy it into each gate; never edit a copy alone.
 RECORD_DIR = "accepted-majors"
 RECORD_KIND = "major-acceptance"
 PUBLISHER = "platform"
@@ -251,6 +266,67 @@ def acceptance_for(records: list[tuple[str, str]], adopter: str, version: str,
     return None, near
 
 
+def acceptance_records_at(repo: Path, ref: str) -> list[tuple[str, str]]:
+    """Every file under accepted-majors/ in `repo`'s tree at `ref`, as (path, text), sorted by
+    path. Only a committed tree is read: a working-tree or staged file is not a record. A ref that
+    does not resolve raises ValueError, because an unreadable tree is not an empty directory."""
+    listed = subprocess.run(["git", "-C", str(repo), "ls-tree", "-r", "--name-only", ref, "--",
+                             f"{RECORD_DIR}/"], capture_output=True, text=True)
+    if listed.returncode != 0:
+        raise ValueError(f"could not list {RECORD_DIR}/ at {ref[:12]} in {repo}: "
+                         f"{listed.stderr.strip()[:160]}")
+    records: list[tuple[str, str]] = []
+    for path in sorted(p for p in listed.stdout.splitlines() if p.strip()):
+        shown = subprocess.run(["git", "-C", str(repo), "show", f"{ref}:{path}"],
+                               capture_output=True, text=True)
+        if shown.returncode != 0:
+            raise ValueError(f"could not read {path} at {ref[:12]} in {repo}: "
+                             f"{shown.stderr.strip()[:160]}")
+        records.append((path, shown.stdout))
+    return records
+# <<< major-acceptance reader <<<
+
+
+READER_BEGIN = "# >>> major-acceptance reader >>>"
+READER_END = "# <<< major-acceptance reader <<<"
+
+
+def reader_block(source: str) -> str | None:
+    """The marked reader block in a source file, marker lines included, or None when the file
+    does not carry exactly one complete block."""
+    lines = source.splitlines(keepends=True)
+    begins = [i for i, line in enumerate(lines) if line.rstrip("\n") == READER_BEGIN]
+    ends = [i for i, line in enumerate(lines) if line.rstrip("\n") == READER_END]
+    if len(begins) != 1 or len(ends) != 1 or ends[0] < begins[0]:
+        return None
+    block = "".join(lines[begins[0]:ends[0] + 1])
+    return block if block.endswith("\n") else block + "\n"
+
+
+def reader_drift(gate_source: str) -> str | None:
+    """None when an adopter gate carries this module's reader block byte for byte; otherwise why
+    it does not, naming the first line that differs."""
+    own = reader_block(Path(__file__).read_text())
+    if own is None:
+        return "cannot be compared, because the hub module itself carries no complete reader block"
+    theirs = reader_block(gate_source)
+    if theirs is None:
+        return (f"carries no complete major-acceptance reader block (one {READER_BEGIN!r} line and "
+                f"one {READER_END!r} line)")
+    if theirs == own:
+        return None
+    mine, its = own.splitlines(), theirs.splitlines()
+    for n, (a, b) in enumerate(zip(mine, its), start=1):
+        if a != b:
+            return (f"carries a major-acceptance reader that differs from the hub's at block line "
+                    f"{n}: the gate has {b.strip()[:100]!r} where the hub has {a.strip()[:100]!r}")
+    return (f"carries a major-acceptance reader that differs from the hub's in length: "
+            f"{len(its)} lines against the hub's {len(mine)}")
+
+
+GATE_BASENAMES = ("adopter-gate.py", "adopter_gate.py")
+
+
 # ---------------------------------------------------------------- the report
 
 def grade(findings: list[dict]) -> tuple[str, list[tuple[str, str]]]:
@@ -274,8 +350,17 @@ def grade(findings: list[dict]) -> tuple[str, list[tuple[str, str]]]:
     lines: list[tuple[str, str]] = []
     majors = 0
     unlooked = 0
+    drifted = 0
     for finding in findings:
         adopter = finding["adopter"]
+        if finding.get("reader_drift"):
+            # Ticket 132: a gate that reads the record differently from this check can admit what
+            # this check calls unaccepted, or refuse what it calls accepted. Observed, so FAIL.
+            drifted += 1
+            lines.append(("FAIL", (
+                f"{adopter}'s adopter gate {finding['reader_drift']}. The hub module "
+                f"verify/unreviewed-major/unreviewed_major.py defines the reader; the gate must "
+                f"carry it byte for byte")))
         if finding.get("skip"):
             unlooked += 1
             lines.append(("SKIP", f"{adopter} {finding['skip']}"))
@@ -344,7 +429,7 @@ def grade(findings: list[dict]) -> tuple[str, list[tuple[str, str]]]:
                 f"window carries ({', '.join(finding['window'])}), each read from platform's "
                 f"signed evidence at {finding['tag']} and verified under {adopter}'s own identity "
                 f"constant")))
-    if majors:
+    if majors or drifted:
         return "FAIL", lines
     if unlooked:
         return "SKIP", lines
@@ -364,23 +449,33 @@ def records_at_served_ref(unit_dir: Path) -> tuple[str | None, list[tuple[str, s
     if head.returncode != 0:
         return None, []
     served = head.stdout.strip()
-    listed = _git(unit_dir, "ls-tree", "-r", "--name-only", served, "--", f"{RECORD_DIR}/")
-    records: list[tuple[str, str]] = []
-    for path in sorted(p for p in listed.stdout.splitlines() if p.strip()):
-        shown = _git(unit_dir, "show", f"{served}:{path}")
+    try:
+        return served, acceptance_records_at(unit_dir, served)
+    except ValueError:
+        return served, []
+
+
+def gate_reader_drift(unit_dir: Path) -> str | None:
+    """Ticket 132: whether the adopter gate this repository serves reads the acceptance record the
+    way this check does. Read at HEAD, like everything else here. A repository serving no gate
+    script has no reader to drift, and says nothing here."""
+    for basename in GATE_BASENAMES:
+        shown = _git(unit_dir, "show", f"HEAD:.github/scripts/{basename}")
         if shown.returncode == 0:
-            records.append((path, shown.stdout))
-    return served, records
+            drift = reader_drift(shown.stdout)
+            return None if drift is None else f".github/scripts/{basename} {drift}"
+    return None
 
 
 def look(estate: Path, unit: str, platform_dir: Path) -> dict:
     """One adopter, measured. Every read below is of a served document: the adopter's composed
     evidence at the commit it serves, and platform's evidence at the tag that adopter pins."""
     finding: dict = {"adopter": unit, "tag": None, "window": [], "computed": {}, "skip": None,
-                      "unread": [], "served": None, "records": []}
+                      "unread": [], "served": None, "records": [], "reader_drift": None}
     unit_dir = estate / unit
     # Ticket 129: the acceptance records, read at the same served commit as everything else here.
     finding["served"], finding["records"] = records_at_served_ref(unit_dir)
+    finding["reader_drift"] = gate_reader_drift(unit_dir)
 
     pin_text = _git(unit_dir, "show", "HEAD:gitops/platform/platform-pin.yaml")
     if pin_text.returncode != 0:
@@ -416,7 +511,7 @@ def look(estate: Path, unit: str, platform_dir: Path) -> dict:
         return finding
 
     script = next((unit_dir / ".github" / "scripts" / b
-                   for b in ("adopter-gate.py", "adopter_gate.py")
+                   for b in GATE_BASENAMES
                    if (unit_dir / ".github" / "scripts" / b).is_file()), None)
     identity = identity_constants(unit_dir, script)
     if identity is None:
@@ -594,6 +689,10 @@ def selfcheck() -> int:
           grade([carrying(["5.0.0"], [(here, rec(version="4.0.0"))])])[0], "FAIL")
     check("a record for another publisher accepts nothing here",
           grade([carrying(["5.0.0"], [(here, rec(publisher="nist"))])])[0], "FAIL")
+    check("the hub's own reader block has not drifted from itself",
+          reader_drift(Path(__file__).read_text()), None)
+    check("a gate with no reader block has drifted",
+          (reader_drift("def main():\n    pass\n") or "").startswith("carries no"), True)
     status_mixed, lines_mixed = grade([carrying(["4.0.0", "5.0.0"], [(here, rec())])])
     check("an accepted 5.0.0 does not accept the 4.0.0 still in the window",
           (status_mixed, [k for k, m in lines_mixed if "4.0.0 in the composed" in m]),
