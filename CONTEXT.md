@@ -625,7 +625,9 @@ that a rewritten entry cites stay as the record of the decision at the time.
   rename keeps its ramp; a governed namespace of the old name does not count as still holding it), read off tag history so it survives a close and a reopen — as of the
   composition's own as-of, the newest signed input (every pinned envelope's publish date and
   every edge's own `since`, ticket 84; the grader reads the same rule since ticket 138), and
-  bounded at the whole residual. What cannot be read (no signed tag names it,
+  bounded at the whole residual. A `since` later than that as-of (a tag cut after the newest
+  signed input; a tag date is history, not an input) holds the ramp at its start and names both
+  dates in a limit (ticket 139). What cannot be read (no signed tag names it,
   no feed prices the residual) is a named limit on the price, never an invented date or a zero.
   Never refused. A closed one says why: governed, or left the repo. The **proposer** may open a PR
   to govern it. The live case is tuppence's

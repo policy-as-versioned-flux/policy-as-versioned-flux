@@ -372,3 +372,15 @@ from the last baseline. A header from an older composer cannot prove that for an
 `status: withdrawn`, so its removal stays the adopter's for that one run. This changes no
 decision above. The decisions and their reasons are in ticket 126.
 
+
+## Note, 2026-09-24 (eco-system ticket 139, delegated): a `since` later than `as_of` holds the ramp at its start
+
+Point 4 ramps an ungoverned Namespace from `since` to the composition's `as_of`. `since` is read
+off the adopter's signed tags. `as_of` is the newest signed input the tree carries, each pinned
+envelope's `published_at` and each edge's `since` (ticket 84). So the first tag that names a
+Namespace can be cut after `as_of`. tuppence's `openbao` is that case: since 2026-09-24, as of
+2026-09-08. `as_of` stays as it is. A tag date is history, not an input: counting it would move
+every price on the artefact whenever the adopter tags, and one tree over the same parents would
+compose to two dates. The ramp then holds at its value on the `since` day, and the price names
+both dates in a limit. A supersede line already treats a later tag day the same way. No decision
+above changes. The reasons are in ticket 139.

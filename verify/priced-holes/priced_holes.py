@@ -28,7 +28,8 @@ What it observes, on the estate's committed files only:
         exposure total, and whose `since` is the date of the first signed tag whose header names
         the namespace, or names as ungoverned a Namespace a workload now in it has left
         (eco-system ticket 122; re-read here from the adopter clone's tags and tagged trees), or
-        null with a named limit;
+        null with a named limit; a `since` later than `as_of` holds the ramp at its start and
+        must say so in a limit (eco-system ticket 139: a tag date is history, not an input);
      d3. every closed `ungoverned[]` entry says why in `closed_by`, `governed` or `left-repo`, and
         the recount agrees (eco-system ticket 122);
      e. the regime entry's `holes[]` lines each carry the adopter's status for that control, and
@@ -105,9 +106,12 @@ def close(a: float, b: float) -> bool:
 # --------------------------------------------------------------------------
 def expected_ramp(since: str | None, as_of: str | None) -> float:
     """The EOL feed's own ramp (platform/feeds/to_fair_scenario.py:eol_ramp): 1.0 up to
-    `since`, then +1x per year past it, capped at +4x. 1.0 where either date is unknown."""
+    `since`, then +1x per year past it, capped at +4x. 1.0 where either date is unknown.
+    An `as_of` before `since` holds the ramp at its value on the since day (eco-system ticket
+    139): the window is read as `since` to `max(since, as_of)`, never backwards."""
     if not since or not as_of:
         return 1.0
+    as_of = max(since, as_of)
     days = (datetime.date.fromisoformat(as_of) - datetime.date.fromisoformat(since)).days
     if days <= 0:
         return 1.0
@@ -275,6 +279,13 @@ def check_doc(doc: dict, ctx: dict) -> None:
         if p["since"] is None and not any("no signed composed artefact names" in str(lim)
                                           for lim in p.get("limits") or []):
             out("FAIL", f"{at}: since is null and no limit says so")
+        # Eco-system ticket 139. as_of is the newest signed input the composition's tree carries;
+        # a tag date is history, not an input, so the first tag naming a Namespace can be cut
+        # after it. The ramp then holds at its start, and the price says so with both dates.
+        if p["since"] and p["as_of"] and str(p["since"]) > str(p["as_of"]) \
+                and not any("precedes since" in str(lim) for lim in p.get("limits") or []):
+            out("FAIL", f"{at}: since {p['since']} is later than as_of {p['as_of']} and no limit "
+                        f"says the ramp holds at its start")
         if "as_of" in ctx and p["as_of"] != ctx["as_of"]:
             out("FAIL", f"{at}: as_of {p['as_of']!r} but the newest signed input, a pinned feed's "
                         f"published_at or an edge's since, is {ctx['as_of']!r}")
@@ -768,6 +779,13 @@ def selfcheck() -> None:
     _grade(doc, ctx, "a null since with no limit naming it fails", True)
     doc["ungoverned"][0]["price"]["limits"] = ["no signed composed artefact names reset: ramp held at 1.0"]
     _grade(doc, ctx, "a null since with the limit named passes", False)
+
+    doc, ctx = _good()
+    doc["ungoverned"][0]["price"].update(since="2026-09-24", as_of="2026-09-08", ramp=1.0, amount=150.0)
+    ctx.update(since={"reset": "2026-09-24"}, as_of="2026-09-08")
+    _grade(doc, ctx, "a since later than as_of with no limit naming it fails (ticket 139)", True)
+    doc["ungoverned"][0]["price"]["limits"] = ["as_of 2026-09-08 precedes since 2026-09-24: ramp held at its start"]
+    _grade(doc, ctx, "a since later than as_of with the ramp at its start and the limit named passes", False)
 
     doc, ctx = _good()
     doc["ungoverned"][0]["status"] = "new"        # reopened: keeps the since the first signed tag carries
