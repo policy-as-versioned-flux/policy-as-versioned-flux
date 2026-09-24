@@ -78,8 +78,9 @@ the sibling scratch workspace with every parent at its pinned tag:
 
 - The layout tests failed 3 of 3 against origin/main's `cut-release.yml` (driftwood, measured by
   swapping in that file) and pass after, in each adopter. `.github/tests` runs 4 tests OK in each.
-  `tests/test_platform_tools.py`, now identical to main, passes 5 (driftwood), 7 (tuppence) and
-  5 (ludlow) with 1 skipped, and passes in full with `PAVF_REAL_ESTATE` set to the workspace.
+  `tests/test_platform_tools.py`, now identical to main, runs 2 (driftwood), 4 (tuppence) and
+  2 (ludlow) tests OK with 1 skipped, and passes in full with `PAVF_REAL_ESTATE` set to the
+  workspace.
 - Every `run:` step of each edited workflow, except sign and push, ran in the sibling scratch
   workspace and exited 0. That covers the tools check, pin reading, `verify-pinned-checkouts.py`,
   the verify and the tag guard. The tag guard ran in `<adopter>/` at the adopter's HEAD.
@@ -137,6 +138,15 @@ PRs, so the heading now says 2026-09-24.
 
 Minor: the Measured paragraph did not name the commit it measured. It now names the PR heads, and
 every figure in it was re-run at those heads.
+
+Second review, blocking: the Measured paragraph gave `tests/test_platform_tools.py` counts of 5,
+7 and 5. Those were the first-push counts, when the file still held the three layout tests. At
+96f40bf, 28999e1 and c758f22, `python -m unittest discover -s tests -p test_platform_tools.py`
+in each adopter worktree prints `Ran 2 tests`, `Ran 4 tests` and `Ran 2 tests`, each
+`OK (skipped=1)`. Fix: the paragraph now gives 2, 4 and 2. No code changed.
+
+Second review, minor: the review-round comment on each adopter PR read "head ." with no SHA.
+Fix: a new comment on each PR names the head commit and the measured counts.
 
 ### What remains
 
