@@ -1,7 +1,7 @@
 # 130 — The composed root machinery has no delivery route
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -316,3 +316,22 @@ All on each adopter's pushed head, in the workspace above.
 5. **Not owed here:** the recompose commit reaches a tag only when an adopter next cuts one. The
    composed-set keeps pointing at `v2.0.0`, whose objects are the same; only `HEADER.yaml`,
    `evidence.json` and `HANDBOOK.md` differ.
+
+## Answer
+
+Resolved 2026-09-24 by platform PR 38 and the adopter moves driftwood 39, tuppence 35 and
+ludlow 32, with each adopter's v2.0.0 tag cut and published between them.
+
+1. **The route.** Platform tools v3.3.0 writes `composed/kustomization.yaml`, which lists every
+   object the composer renders at the `composed/` root. Each adopter's `composed-set.yaml` serves
+   it through a `composed-machinery` Kustomization.
+2. **No gap.** The inline Deny orphan guard left `composed-set.yaml` in the same commit that
+   moved the set to v2.0.0 and to the array 4.0.0 and 5.0.0. The array keeps 4.0.0 because every
+   workload still claims it: with 5.0.0 alone, those workloads match no cage.
+3. **The check.** `render_composed.py reach` refuses an object that no served Kustomization
+   reaches. It read 26 faults before each move and 0 after it, with 26 objects delivered.
+4. The deny register's `policy-version-orphan-guard` and `governed-namespace-requires-claim` rows
+   move to `converted`, because no Deny copy of either is left.
+
+What a cluster does with the move is for the next scheduled drift sample on each adopter to read.
+No run was dispatched to stand in for it.
