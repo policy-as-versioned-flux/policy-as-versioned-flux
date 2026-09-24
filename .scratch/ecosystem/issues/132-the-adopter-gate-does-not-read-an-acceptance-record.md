@@ -38,7 +38,7 @@ touched (ticket 131 owns it).
 * driftwood PR 42: https://github.com/policy-as-versioned-driftwood/driftwood/pull/42
 * tuppence PR 39: https://github.com/policy-as-versioned-tuppence/tuppence/pull/39
 * ludlow PR 36: https://github.com/policy-as-versioned-ludlow/ludlow/pull/36
-* hub: this ticket's record, the reader block, the drift check and two fold-agreement cases.
+* hub PR 114: https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/114 (this record, the reader block, the drift check and two fold-agreement cases)
 
 ### What changed
 
