@@ -41,7 +41,7 @@ What this ticket owes:
 A clock's observation no longer changes the comparison identity, and an adopter's
 `compose-check` and pre-tag verify stay green across a lane commit.
 
-## Build, 2026-09-22
+## Build, 2026-09-24
 
 Built on 2026-09-24 with ticket 133, in one platform PR:
 [platform#39](https://github.com/policy-as-versioned-platform/platform/pull/39), branch
@@ -51,14 +51,17 @@ this branch's PR.
 ### What changed
 
 - `compose/comparison_history.py` `identity()` leaves out the files under each
-  `OBSERVATION_LANE` that the adopter's own `.github/workflows/*.yml` declare. It reads the
-  value at top level, job and step `env:`, quoted or unquoted, split on spaces, as the
-  workflows' own shell loops read it.
+  `OBSERVATION_LANE` that the adopter's own `.github/workflows/*.yml` declare. It reads what
+  the hub grades and no more: a workflow with a `schedule:` trigger, its top-level and job
+  `env:` merged as the job sees them. Quoted or unquoted, split on spaces, as the workflows'
+  own shell loops read it. (Narrowed in the fix round below. The first build also read step
+  env and every workflow.)
 - A YAML file inside a lane stays in the identity. The composer reads every `*.yaml` in the
   tree for Namespaces and workloads (`_namespace_facts`), so a lane YAML file is a declaration.
 - The sorted lane list is part of the digest. A changed declaration starts a new comparison.
   Before, `.github/` was hidden from the identity, so a lane edit changed nothing.
-- A declared lane path that is absolute, contains `..`, or sits in `composed/` refuses by name.
+- A declared lane path outside ADR-0024's observation list refuses by name. So does one that
+  is absolute or contains `..`. (The list check is from the fix round below.)
 - Migration: `v330_identity()` restates the v3.3.0 formula. It reads each non-YAML lane file
   from the commit that last wrote `composed/HEADER.yaml`. When the recorded `after:` equals
   that value, the record is the same comparison. Verify accepts it as recorded. A fresh
@@ -147,9 +150,105 @@ leaves the lanes out and depth no longer matters.
    the second pass equals the first. The comment is stale. Not changed: ticket 130's builder
    holds the adopter repos.
 
+### Fix round, 2026-09-24
+
+The review passed but found a hole. The platform reader took `OBSERVATION_LANE` from every
+workflow and from job and step env, scheduled or not, with no ADR-0024 list. The hub's
+`verify/schedules/lane.py` `declared_lane()` reads only scheduled jobs, top-level and job env,
+inside `schedules.py` `ALLOW_LIST`. So an adopter could take a source file out of the identity
+by declaring it in a dispatched job, and no hub check would see it.
+
+What changed, in the same two PRs:
+
+- Platform `observation_lanes()` now reads a workflow only when its `on:` (or YAML 1.1's
+  `True` key) has a `schedule:` entry with a `cron`. It reads each job's env as top level
+  merged under job level, as `schedules.py` `_env()` does. It never reads a step env.
+- Every declared path must sit inside `OBSERVATION_PATHS`, the platform's copy of ADR-0024
+  point 3's list (`talk/truth.log`, `drift/samples.jsonl`, `talk/captures`, `observations`).
+  Otherwise compose refuses and names the path, the workflow and the list. A prefix that is
+  not a directory boundary (`observations-of-mine/x.jsonl`) is outside it.
+- The hub's `verify/schedules/lane.py` now grades the copy. `check_platform_copy()` reads
+  `compose/comparison_history.py` on platform `origin/main`, parses `OBSERVATION_PATHS` with
+  `ast`, and fails unless it equals `schedules.ALLOW_LIST`. `schedules.py` says beside
+  `ALLOW_LIST` that the two change together. Its selfcheck covers equal, missing file,
+  unparseable file, missing constant, one path added, one path dropped and a non-literal.
+- `compose/README.md` no longer says the after-state hashes every non-hidden source file. It
+  names the lane rule, the list and the hub check.
+- The `COMPOSER_READS` comment no longer says the composer reads `.yml`. Measured:
+  `_namespace_facts` globs `root.rglob("*.yaml")` only. `.yml` stays in the tuple on purpose,
+  and the comment now says why.
+
+Decisions in the fix round:
+
+5. Read exactly what the hub grades, no wider and no narrower. (delegated) A declaration the
+   hub does not grade is not a promise any check holds, so it cannot take a file out of the
+   identity. A dispatched job or a step env declares nothing here.
+6. Refuse a scheduled path outside the list; do not drop it. (delegated) The hub's
+   `declared_lane()` drops such a path silently and `schedules.py` fails it. The composer has
+   no second checker behind it, so it refuses by name.
+7. Do not copy the hub's fallback. (delegated) With nothing declared, `declared_lane()` grades
+   against the whole ADR list. The composer excludes nothing then. An exclusion must be
+   stated. A clock that writes an undeclared path turns compose-check red, which is the loud
+   failure decision 1 chose.
+8. The platform carries its own copy of the list, and the hub grades it. (delegated) The
+   composer runs in the adopter's CI with no hub checkout, so it cannot import the hub's list.
+   The hub already reads every unit's `origin/main`, so the drift check lives there, beside the
+   list it compares with. It reads platform `main`, which is what the next tools release cuts.
+
+Tests, red first. Platform, `.venv/bin/python -m pytest compose/test_comparison_history.py
+-n0 -q`, with the new tests and the first build's `comparison_history.py`: 6 failed, 29
+passed, 7 subtests passed. The six are the three cases of "a declaration the hub does not
+grade excludes nothing" (a dispatched job, a push job, a step env in a scheduled job, each
+declaring `party.yaml notes.txt` or `notes.txt`; each changed the identity away from the
+baseline) and the three cases of "a scheduled lane outside the ADR-0024 list refuses by name"
+(top level `drift/samples.jsonl party.yaml`, job env `notes.txt`, `observations-of-mine/x.jsonl`;
+each composed instead of refusing). With the fix: 29 passed, 13 subtests passed. The existing
+fixtures that declared a lane with no `schedule:` trigger now carry one. The changed-declaration
+test now adds `talk/truth.log` instead of widening to `drift`, which is outside the list.
+
+With kyverno 1.18.2, `python -m unittest` in `compose/`: test_portable_observations 8 OK,
+test_floor_change 9 OK, test_priority_classes 16 OK, test_machinery_delivery 5 OK,
+test_comparison_history 29 OK. `composition.py --selfcheck` from the platform worktree exited
+0 with "SKIP: .estate-clone/{driftwood,nist,ico,feeds} absent", so it proved nothing here.
+Ticket 136 owns its failure against driftwood's main.
+
+Hub: `lane.py selfcheck` exit 0 and `schedules.py selfcheck` exit 0. `platform_copy()` against
+platform `origin/main` today returns FAIL ("carries no OBSERVATION_PATHS"), and against this
+branch's file returns PASS. `mypy verify/schedules/lane.py` reports the same 4 errors in
+`schedules.py` with and without this change, none in `lane.py`.
+
+Recompose, again on fresh clones (`recompose-134b` in the scratchpad), parents at the same
+pins as above, kyverno 1.18.2, tools at this branch:
+
+| adopter | origin/main | composed/ change | pass 2 == pass 1 | verify recomposed, after a lane commit | verify not recomposed, after a lane commit | v3.3.0 verify after a lane commit |
+| --- | --- | --- | --- | --- | --- | --- |
+| driftwood | b5eb409 | HEADER.yaml `after:` only, 1324a548 to 5ac37fc6 | yes | exit 0 | exit 0 | exit 1 |
+| tuppence | 8d71d47 | HEADER.yaml `after:` only, 0014c055 to 7c112557 | yes | exit 0 | exit 0 | exit 1 |
+| ludlow | 194accc | HEADER.yaml `after:` only, 3e6d5ae3 to c2abbaf0 | yes | exit 0 | exit 0 | exit 1 |
+
+The `after:` values match the first build's, so narrowing the reader changed nothing for the
+three adopters. Every lane they declare sits in a scheduled workflow's top-level env and
+inside the list. A compose after the lane commit changed no file on any of the three.
+
+Driftwood's main moved to b5eb409 since the first build. That commit is a real clock's lane
+commit ("drift sample: five facts on an ephemeral cluster", `drift/samples.jsonl` only). Under
+v3.3.0, verify at driftwood's main already exits 1 with "comparison history does not match
+current source inputs". Under this branch it exits 0 without a recompose. This is the failure
+the ticket names, live on one adopter today.
+
+Findings from the fix round:
+
+5. The hub's `schedules.py` `_allowed()` and `lane.py` `in_lane()` accept
+   `observations/../party.yaml`, because they test a string prefix. The platform refuses any
+   path with `..`. Not changed here.
+6. The hub now holds three copies of the list: `schedules.py` `ALLOW_LIST`,
+   `map_surface.py` `LANE_PATHS`, and the platform's. Only the platform's is graded against
+   `ALLOW_LIST`. Not changed here.
+
 ### What remains
 
-- The platform PR merges.
+- The platform PR merges first. Until it does, the hub's lane check fails on the missing
+  `OBSERVATION_PATHS`, so the hub PR merges after it.
 - Waits on the owner: a signed tools release tag that carries this change.
 - Then each adopter moves `.github/platform-tools-pin.yaml`, recomposes once from a full clone,
   and merges the two-line diff. The first lane commit after that is the live proof for Done:

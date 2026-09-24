@@ -30,7 +30,7 @@ What this ticket owes:
 A recompose is a fixed point from the committed artefact, and a stale working-tree "before" can
 no longer hide a delta.
 
-## Build, 2026-09-22
+## Build, 2026-09-24
 
 Built on 2026-09-24 with ticket 134, in one platform PR:
 [platform#39](https://github.com/policy-as-versioned-platform/platform/pull/39), branch
