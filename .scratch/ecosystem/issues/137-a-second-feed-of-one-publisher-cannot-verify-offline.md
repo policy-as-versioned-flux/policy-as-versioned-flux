@@ -1,7 +1,7 @@
 # 137 — A second feed of one publisher cannot verify offline
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -130,3 +130,16 @@ release and the recompose below.
   longer produced by a re-render", one per stale `party.yaml` (ico/v3, feeds/v1, feeds/v2).
 - After that recompose, tuppence's own signed tree re-verifies with feeds absent. The truth run
   can grade it then.
+
+## Answer
+
+Resolved 2026-09-24 by platform PR 41, shipped in tools v3.4.0, and tuppence's recompose under
+v3.4.x (PRs 39 and 40).
+
+1. `compose()` keeps a parent tree per feed edge, so each feed of an absent publisher reads its
+   own vendored tree and is checked against its own digests.
+2. **Measured on tuppence at f1c2619** (tools v3.4.1), which pins feeds/threat-register@v1 and
+   feeds/cve@v2: verify exits 0 byte for byte with every parent present, with the feeds clone
+   absent, and with the feeds and ico clones absent.
+3. That head is tuppence's served main, not a signed tag. Its next tag carries the same tree, and
+   its cut-release pre-tag verify runs the same check.

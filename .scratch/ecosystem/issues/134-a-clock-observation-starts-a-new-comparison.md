@@ -1,7 +1,7 @@
 # 134 — A clock observation starts a new comparison
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -253,3 +253,19 @@ Findings from the fix round:
 - Then each adopter moves `.github/platform-tools-pin.yaml`, recomposes once from a full clone,
   and merges the two-line diff. The first lane commit after that is the live proof for Done:
   compose-check and the pre-tag verify stay green across it.
+
+## Answer
+
+Resolved 2026-09-24 by platform PR 39, shipped in tools v3.4.0, and hub PR 117.
+
+1. `identity()` leaves out the paths each adopter declares in `OBSERVATION_LANE`, read only from
+   scheduled jobs' top-level and job env and only inside the ADR-0024 list. A path outside the
+   list refuses by name. The platform carries its own copy of the list, and the hub's
+   `verify/schedules/lane.py` fails if it drifts from `schedules.ALLOW_LIST`.
+2. **The live proof.** ludlow's `157701b` is a real scheduled drift-sample commit that touches
+   only `drift/samples.jsonl`, on top of its v3.4.0 recompose. At `157701b`, verify exits 0
+   ("re-renders byte-for-byte") and the recompose-and-diff shows no drift. Before ticket 134, the
+   same shape refused with "comparison history does not match current source inputs" (driftwood
+   run 35975270740 and ticket 131).
+3. A v3.3.0 control on the same commit refused for an earlier reason, the vendored layout that
+   ticket 136 changed, so it does not isolate this ticket. The proof rests on item 2.

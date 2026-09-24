@@ -1,7 +1,7 @@
 # 133 — A first recompose is not a fixed point
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -83,3 +83,16 @@ to pass one in each (`diff -rq` on `composed/`).
 
 Same route as ticket 134: the platform merge, then the owner's signed tools tag, then three
 pin moves, each with one recompose.
+
+## Answer
+
+Resolved 2026-09-24 by platform PR 39, shipped in tools v3.4.0.
+
+1. In a git work tree, a fresh compose reads `composed/HEADER.yaml` and `evidence.json` at HEAD,
+   not from the working tree, so a half-written `composed/` can no longer be the "before".
+   Verify still reads the files on disk. Outside git, the old read stays, for fixtures.
+2. Tests at the `compose()` seam: two recomposes in a row from a committed artefact give the same
+   deltas as one, and a stale working-tree "before" no longer hides a delta.
+3. **Measured, 2026-09-24.** Each adopter recomposed under v3.4.x from origin/main's committed
+   `composed/`, and a second pass was byte-identical. The recompose-and-diff on driftwood
+   (2ac5505), tuppence (f1c2619) and ludlow (157701b) exits 0 with no drift.
