@@ -3,13 +3,16 @@
   ok   kube-system, flux-system and kyverno each carry posture.acme.io/tier: infra
 2. entitlement: platform/party.yaml roles[] includes 'platform'
   ok   platform/party.yaml carries the platform role
-3. the substrate is outside the cage by match condition, over 6 served bodies
+3. the substrate is outside the cage by match condition, over 9 served bodies
   ok   every served body skips an unclaimed pod, and no substrate Namespace is governed
 4. a claiming pod in the substrate falls closed -- the rung each served body gives it:
      platform/distribution/policies/v4.0.0/cage-tier.yaml: 'baseline'
      platform/distribution/policies/v5.0.0/cage-tier.yaml: 'isolated'
      platform/graded/policies/cage-tier.yaml: 'isolated'
      driftwood/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
+     driftwood/composed/policies/v5.0.0/cage-tier.yaml: 'isolated'
      ludlow/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
+     ludlow/composed/policies/v5.0.0/cage-tier.yaml: 'isolated'
      tuppence/composed/policies/v4.0.0/cage-tier.yaml: 'baseline'
+     tuppence/composed/policies/v5.0.0/cage-tier.yaml: 'isolated'
 FAIL: a pod that claims a policy version in kube-system, flux-system or kyverno is not caged at 'isolated' under 4 served bodies: driftwood/composed/policies/v4.0.0/cage-tier.yaml=baseline, ludlow/composed/policies/v4.0.0/cage-tier.yaml=baseline, platform/distribution/policies/v4.0.0/cage-tier.yaml=baseline, tuppence/composed/policies/v4.0.0/cage-tier.yaml=baseline -- `infra` is read by none of them, so it is their ungoverned else-branch; this closes when every line that serves it is retired (eco-system ticket 113)

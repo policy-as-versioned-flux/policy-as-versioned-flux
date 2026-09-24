@@ -10,9 +10,9 @@ PASS: the supply-shock headline lives in this overlay as clearing-house-supply-s
 PASS: every scenario's proposition and world model exist in the vendored world layer
 PASS: every scenario's proposition carries a prior belief in the reference map
 SKIP: the overlay with its six scenarios loads, and the emitter could not price it: CANNOT LOOK: ludlow's twin cannot price a forward-intel payload today, and the instruments it is missing are named rather than defaulted (ADR-0020): perspective 'ludlow' declares 'plan-administration-fees' as its cash flow and puts no priced valuation on it (grade 3, outside the pricing threshold of 2), because party.yaml publishes no signed size: for the amount to derive from; the one causal edge
-PASS: every one of the 4 pins on party.yaml resolves to exactly one dated signal
+FAIL: every one of the 5 pins on party.yaml resolves to exactly one dated signal; no row for: feeds/feed/eol/v2, platform/implementations//3.3.0; rows for pins this party does not carry: platform/implementations//2.0.1
 PASS: every signal is dated and names a scenario that exists, and every scenario is either bound by a pin or declared unbound with a reason
 PASS: the lookup carries no price: binding a pin to a signal is not pricing it
 SKIP: no valuation in this overlay carries an amount, so there was no priced figure to re-derive from the signed party artefact: party.yaml for this party publishes no `size:` block and every valuation here is graded outside the pricing threshold
-TOTAL: 14 pass, 0 fail, 2 could-not-look
-SKIP: the overlay with its six scenarios loads, and the emitter could not price it: CANNOT LOOK: ludlow's twin cannot price a forward-intel payload today, and the instruments it is missing are named rather than defaulted (ADR-0020): perspective 'ludlow' declares 'plan-administration-fees' as its cash flow and puts no priced valuation on it (grade 3, outside the pricing threshold of 2), because party.yaml publishes no signed size: for the amount to derive from; the one causal edge
+TOTAL: 13 pass, 1 fail, 2 could-not-look
+FAIL: 1 standing-scenario check(s) observed false

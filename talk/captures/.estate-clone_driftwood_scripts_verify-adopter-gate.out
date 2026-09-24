@@ -1,11 +1,11 @@
 
 == setup: a real clone of platform at the tag this repository pins ==
-this repository pins platform v2.0.1
-the served artefact: platform's own evidence for policy 2.0.1 at v2.0.1
+this repository pins platform v3.3.0
+the served artefact: platform's own evidence for policy 2.0.1 at v3.3.0
   bundle shape legacy; the publisher's own computed bump for it is 'none'
 
 == A: ADR-0001's pin is load-bearing -- verify-commit refuses a pin naming the wrong commit ==
-REFUSED: platform-pin.yaml pins commit cccccccccccccccccccccccccccccccccccccccc, but the checked-out tag resolves to 533dccb0a823001b396fd60ab08014bf75065a37 -- refusing, the pin is not decorative
+REFUSED: platform-pin.yaml pins commit cccccccccccccccccccccccccccccccccccccccc, but the checked-out tag resolves to 38089a68769453db9ea3faf0ee637ae93f309980 -- refusing, the pin is not decorative
 OK  A: the real resolved commit is accepted and a wrong one is refused, naming both
 
 == B: a pull request that moves nothing composes 'none' and reads no evidence at all ==
@@ -24,7 +24,7 @@ OK  B: nothing moved, nothing was verified, composed 'none', exit 0
   - 2.0.1: publisher declared 'patch', computed 'none'
   - composed bump 'none' is weaker than the publisher's declared 'patch' -- printed, never lowers what this institution treats as the obligation
 OK: composed bump is 'none'
-OK  C: real cosign ACCEPTED platform's own published signature for policy 2.0.1 at v2.0.1, under this repository's own identity constant, and the gate composed the publisher's own 'none'
+OK  C: real cosign ACCEPTED platform's own published signature for policy 2.0.1 at v3.3.0, under this repository's own identity constant, and the gate composed the publisher's own 'none'
 
 == D: the REAL REFUSE -- the same real bundle with one signature byte changed ==
 REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's own identity constant -- Flag --new-bundle-format has been deprecated, this will be the only supported format in future versions
@@ -53,8 +53,8 @@ ok  G: this gate verifies platform's real published bundle with NO network (exit
 
 == I: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm ==
 ok  I[genuine]: the copied gate with the real committed root ACCEPTS, cold (exit 0) -- the copy mechanism is sound
-ok  I[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.C0nezXpMvv/gate-absent-roo
-ok  I[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.C0nezXpMvv/gate-absent-roo
+ok  I[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.IlE15V5rlN/gate-absent-roo
+ok  I[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.IlE15V5rlN/gate-absent-roo
 ok  I[wrong-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  I[wrong-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  I[corrupt-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
@@ -73,7 +73,7 @@ OK splice_body: an empty starting body gets no leading separator
 selfcheck ok: read_pin parses the real pin shape; verify_pinned_commit matches and refuses for real against a real git repo; read_policy_array_at/diff_arrays/fetch_tag detect an add and a retirement against real git tags, fetching a tag missing from a real clone for real; verify_evidence refuses a missing file, a garbage bundle (real cosign call), and -- where a local cosign signing flow is reachable offline -- a real, validly key-signed bundle presented to identity-pinned verification (real cosign call, real refusal, since a key-signed bundle carries no certificate); EXPECTED_PLATFORM_IDENTITY_REGEXP matches real identity shapes and refuses a renamed workflow path; compose() satisfies every acceptance criterion as a pure function; render_markdown never emits a percentage. NOT provable outside a live GitHub Actions run: a real Fulcio-certificate keyless signature bound to platform's own ambient OIDC identity -- no ambient credential and no interactive browser login exist in this sandbox (same class of limit cs-13 and cs-27 already disclosed for their own signing steps).
 OK  H: adopter-gate.py --selfcheck passed
 
-PASS: driftwood's adopter gate, against platform's REAL PUBLISHED evidence for policy 2.0.1 at v2.0.1 --
+PASS: driftwood's adopter gate, against platform's REAL PUBLISHED evidence for policy 2.0.1 at v3.3.0 --
       the pin is load-bearing (A), a movement of nothing composes 'none' and verifies nothing (B), real
       cosign ACCEPTS platform's own signature and the gate composes the publisher's own 'none' (C),
       real cosign REFUSES the same bundle with one signature byte changed (D), the same valid bundle is
