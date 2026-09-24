@@ -1,7 +1,7 @@
 # 135 — A lifted app gets no verdict from the bottom rung
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -179,3 +179,21 @@ runs.
 - A scheduled truth run must grade this check PASS on main after the merge. That needs the clock,
   not the owner.
 - Nothing waits on the owner.
+
+## Answer
+
+Resolved 2026-09-24 by hub PR 119. The check was stale; the cage is not broken.
+
+1. **Why run 314 failed.** Platform tools v3.3.0 (ticket 111) added PriorityClass files beside
+   each version's policies. The check asked `cage-baseline-4-0-0` for a kyverno verdict it can
+   never give once the set also carries those objects, and it applied the set in a different
+   shape from the one each adopter's ResourceSet serves.
+2. **What it asks now.** `served_set()` reads each adopter's `composed-set.yaml` at its pin,
+   renders every route the ResourceSet serves, and applies every served policy. The claimed
+   version's policies and the orphan guard must each pass, and the PriorityClass the cage writes
+   must be one the set serves.
+3. **It cannot go quietly green.** A composed set or served file that does not parse is a named
+   FAIL, the planner's exit code is read, and a PASS that graded fewer apps than have landed is
+   refused. The review found the crash-to-PASS path, and it is closed.
+4. **Measured by the integrator** against each adopter's current main: exit 0, three lifted apps
+   admitted and caged at CREATE by the set their adopter serves at v2.0.0.
