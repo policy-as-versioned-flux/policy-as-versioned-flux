@@ -49,6 +49,7 @@ candidates point at one place, the earliest by (round, key) is credited and the 
 
 from __future__ import annotations
 
+import re
 import importlib.util
 import json
 import os
@@ -1125,7 +1126,11 @@ def test_a_namespace_reaches_the_cluster_only_in_a_tag_whose_header_names_it(tmp
         repo_doc = next(d for d in yaml.safe_load_all(sync.read_text()) if d and d.get("kind") == "GitRepository")
         assert set(repo_doc["spec"]["ref"]) == {"tag", "commit"}, (adopter, repo_doc["spec"]["ref"])
         workflow = (ESTATE / adopter / ".github" / "workflows" / "cut-release.yml").read_text()
-        assert workflow.index(" verify . ") < workflow.index("create the signed annotated tag"), adopter
+        # Ticket 131 moved the parents beside the adopter, so the call became `verify <adopter>`.
+        # The property is the order: the byte-for-byte re-render runs before the tag is created.
+        verify_call = re.search(rf"platform-tools\.py\b[^\n]*\sverify (\.|{adopter}) ", workflow)
+        assert verify_call, (adopter, "cut-release.yml runs no platform-tools verify")
+        assert verify_call.start() < workflow.index("create the signed annotated tag"), adopter
 
     trees = _fixture_estate(comp, tmp_path)
     work = tmp_path / "fixture-adopter14"
