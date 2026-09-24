@@ -1,7 +1,7 @@
 # 138 — The grader and the composer disagree on as-of
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -38,7 +38,7 @@ What this ticket owes:
 The grader and the composer derive one `as_of` for tuppence, and the check grades tuppence's
 ungoverned prices without these two lines.
 
-## Build, 2026-09-22
+## Build, 2026-09-24
 
 ### Diagnosis: the grader is stale, the composer is right
 
@@ -115,3 +115,20 @@ ungoverned prices without these two lines.
 
 - Merge platform PR 42, then hub PR 124. No tools release, no recompose and nothing for the owner.
 - The next truth run on hub main should grade `verify-priced-holes.sh` PASS for tuppence.
+
+## Answer
+
+Resolved 2026-09-24 by hub PR 124 and platform PR 42. The grader was stale; the composer was right.
+
+1. The composer prices as of `_composition_as_of`: the newest of every edge's own `since` (ticket
+   84, ADR-0006's 2026-09-08 note) and every pinned envelope's `published_at`. The hub's `_as_of()`
+   read the envelopes only, so on tuppence it missed the cve@v2 edge's `since` of 2026-09-08.
+2. `_as_of()` now uses the composer's rule and reads the adopter's vendored envelope first. Four
+   tests plant a second feed of one publisher with a later `since`; two run the composer's own
+   function beside the grader and require one date.
+3. Platform PR 42 corrects the two composer docstrings that still said "newest pinned feed".
+4. **Measured:** `verify-priced-holes.sh` exits 0 on the real estate; tuppence's two ungoverned
+   prices read PASS as of 2026-09-08. A planted later `since` turns both lines FAIL again.
+
+The review named one more edge, now ticket 139: a Namespace first named by a tag cut after the
+newest signed input is priced over a negative window.
