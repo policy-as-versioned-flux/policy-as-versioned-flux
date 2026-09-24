@@ -47,6 +47,7 @@ Usage:
 """
 from __future__ import annotations
 
+import ast
 import dataclasses
 import os
 import re
@@ -335,6 +336,55 @@ def refresh(root: str, network: bool) -> tuple[bool, str, bool]:
     return network, "; ".join(parts), shallow
 
 
+# --- the platform composer's copy of the list (eco-system ticket 134) ------------------------
+# The platform's compose/comparison_history.py leaves the declared lane out of the comparison
+# identity, so it reads OBSERVATION_LANE exactly as declared_lane() does: scheduled jobs only,
+# top-level and job env, inside ADR-0024's list. It runs in each adopter's CI with no hub
+# checkout, so it carries its own copy of S.ALLOW_LIST. This grade is what keeps the two from
+# drifting: the copy on platform main must equal the list here, or the lane check fails.
+PLATFORM_UNIT = "platform"
+PLATFORM_COPY = "compose/comparison_history.py"
+PLATFORM_CONSTANT = "OBSERVATION_PATHS"
+
+
+def platform_copy(text: str | None) -> tuple[str, str]:
+    """Grade the platform composer's copy of ADR-0024's list against S.ALLOW_LIST."""
+    where = f"{PLATFORM_UNIT}@{S.DEFAULT_BRANCH}: {PLATFORM_COPY}"
+    if text is None:
+        return ("FAIL", f"{where} is missing, so nothing states which lane the comparison "
+                        f"identity leaves out")
+    try:
+        tree = ast.parse(text)
+    except SyntaxError as error:
+        return ("FAIL", f"{where} does not parse ({error})")
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(
+                isinstance(t, ast.Name) and t.id == PLATFORM_CONSTANT for t in node.targets):
+            try:
+                value = ast.literal_eval(node.value)
+            except ValueError:
+                return ("FAIL", f"{where} {PLATFORM_CONSTANT} is not a literal list")
+            if isinstance(value, (list, tuple)) and tuple(value) == tuple(S.ALLOW_LIST):
+                return ("PASS", f"{where} {PLATFORM_CONSTANT} equals ADR-0024's list here")
+            return ("FAIL", f"{where} {PLATFORM_CONSTANT} is {value!r}, and ADR-0024's list "
+                            f"here is {tuple(S.ALLOW_LIST)!r}: the copies have drifted")
+    return ("FAIL", f"{where} carries no {PLATFORM_CONSTANT}, so its comparison identity is "
+                    f"not held to ADR-0024's list")
+
+
+def check_platform_copy() -> None:
+    for unit, root, _remote in S.units():
+        if unit != PLATFORM_UNIT:
+            continue
+        try:
+            text: str | None = _git(root, "show", f"origin/{S.DEFAULT_BRANCH}:{PLATFORM_COPY}")
+        except (subprocess.SubprocessError, OSError):
+            text = None
+        out(*platform_copy(text))
+        return
+    out("SKIP", f"no {PLATFORM_UNIT} checkout, so its copy of ADR-0024's list was not compared")
+
+
 # --- the check ------------------------------------------------------------------------
 def check() -> int:
     network = True
@@ -370,6 +420,7 @@ def check() -> int:
                     print(f"NOTE: {msg}")
                 else:
                     out(status, msg)
+    check_platform_copy()
     if "FAIL" in LINES:
         return 1
     if "SKIP" in LINES:
@@ -610,6 +661,16 @@ jobs:
     assert in_lane("observations/x.jsonl", lane) and in_lane("talk/captures/a.out", lane)
     assert not in_lane("observations-of-mine/x", lane) and not in_lane("party.yaml", lane)
 
+    # the platform composer's copy of ADR-0024's list (ticket 134): equal passes, anything else
+    # fails and says why
+    same = f"{PLATFORM_CONSTANT} = {tuple(S.ALLOW_LIST)!r}\n"
+    assert platform_copy(same)[0] == "PASS", platform_copy(same)
+    for bad in (None, "x = (\n", "OTHER = ()\n",
+                f"{PLATFORM_CONSTANT} = {tuple(S.ALLOW_LIST) + ('party.yaml',)!r}\n",
+                f"{PLATFORM_CONSTANT} = {tuple(S.ALLOW_LIST[:-1])!r}\n",
+                f"{PLATFORM_CONSTANT} = tuple(ALLOW)\n"):
+        assert platform_copy(bad)[0] == "FAIL", (bad, platform_copy(bad))
+
     print("ok  the lane grader bites: a clock's declaration on main or on the observations "
           "branch fails and names the commit, a clock's merge fails, a clock's observations "
           "pass, an orphan root commit is graded, a human's declaration and a clock-authored "
@@ -617,7 +678,8 @@ jobs:
           "identity is named not graded, a shallow checkout is deepened or is a could-not-look, "
           "a fetch is reported per ref as done, absent on origin or failed and an unreachable "
           "origin never reads as fetched, the ref's and the checkout's copies of one workflow "
-          "are graded as a union, and identities and lanes parse from the workflows")
+          "are graded as a union, identities and lanes parse from the workflows, and the "
+          "platform composer's copy of ADR-0024's list must equal this one")
 
 
 def main(argv: list[str]) -> int:

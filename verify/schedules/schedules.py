@@ -89,6 +89,10 @@ from truth_manifest import parse_truth  # noqa: E402
 # talk/captures/ and there is no top-level captures/ anywhere in the estate, so
 # the old entry made the two halves of the cage disagree -- a workflow naming the
 # REAL path would have been failed by this checker (review, 2026-08-28).
+# The platform composer carries a copy as OBSERVATION_PATHS in its
+# compose/comparison_history.py (eco-system ticket 134), because it runs in each
+# adopter's CI with no hub checkout. lane.py fails when that copy on platform
+# main differs from this one, so change both together.
 ALLOW_LIST = ("talk/truth.log", "drift/samples.jsonl", "talk/captures", "observations")
 
 # A clock that ran longer ago than this has stopped. One day is the declared
