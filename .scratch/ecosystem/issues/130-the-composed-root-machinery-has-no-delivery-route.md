@@ -286,8 +286,8 @@ All on each adopter's pushed head, in the workspace above.
   no drift in `composed/`; tier-check bound.
 - `pytest tests/test_composed_reach.py -n0 -q`: 13 passed on each.
 - `render_composed.py selfcheck`: ok, 26 objects at `v2.0.0`. `drift/five-facts.py selfcheck`: ok.
-- CI on the pushed heads: `compose-check` passed on all three PRs (`gh pr checks`). The
-  `shift-left` job was still pending when this was written.
+- CI on the pushed heads: `compose-check` and `shift-left` passed on all three PRs
+  (`gh pr checks`). `shift-left` runs the new `reach` step.
 
 ### Decisions
 
