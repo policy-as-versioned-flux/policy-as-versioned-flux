@@ -1,7 +1,7 @@
 # 132 — The adopter gate does not read an acceptance record
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -157,3 +157,21 @@ the adopters land. The adopter PRs touch no workflow file, so the merging app ca
   own CLI, in the flag shape `shift-left.yml` uses. No live CI run has yet graded a new accepted
   major, because none is proposed. The adopter PRs themselves move no policy version, so their own
   shift-left runs compose `none` and do not exercise the admission.
+
+## Answer
+
+Resolved 2026-09-24 by driftwood PR 42, tuppence PR 39, ludlow PR 36 and hub PR 114.
+
+1. Each adopter gate reads `accepted-majors/` at the head it grades and admits a composed major
+   only when every major it adds is accepted for that adopter, for platform, at that exact
+   version. It still prints the bump as major, beside the record it admitted it on.
+2. The reader is defined once, in the hub's `verify/unreviewed-major/unreviewed_major.py`
+   between its `major-acceptance reader` markers. Each gate carries an exact copy, and the hub
+   check fails any adopter whose served copy differs.
+3. **Measured.** Over each adopter's own v3.3.0 rollout, the gate exits 0 with
+   `acceptance.admitted: true` on `accepted-majors/platform-5.0.0.yaml`, and exits 1 with the
+   record removed. On the hub, 5.0.0 grades PASS for all three adopters. 4.0.0 still grades FAIL,
+   because the owner accepted 5.0.0 only.
+
+The three adopter PRs also moved each tools pin to platform v3.4.0, re-derived tuppence's and
+ludlow's twin signals, and recomposed once.
