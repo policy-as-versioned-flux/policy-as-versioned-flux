@@ -2,18 +2,26 @@ ok: platform checked out at v2.0.1 (533dccb0a823), the tag every planted pin nam
 ok: case 'standing' driftwood: exit 0, composed 'none' -- OK: composed bump is 'none'
 ok: case 'standing' ludlow: exit 0, composed 'none' -- 
 ok: case 'standing' tuppence: exit 0, composed 'none' -- PASS: composed bump 'none' does not exceed major; v2.0.1 may be adopted
-ok: case 'arrival' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major
-ok: case 'arrival' ludlow: exit 1, composed 'major' -- REFUSE: composed bump is major -- ['4.0.0']
-ok: case 'arrival' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1 without human review
+ok: case 'arrival' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major, and not every major it brings is accepted -- 4.0.0 is a major, and no accepted-majors/ 
+ok: case 'arrival' ludlow: exit 1, composed 'major' -- REFUSE: composed bump is major -- ['4.0.0'] -- not every major it brings is accepted -- 4.0.0 is a major, and no accepte
+ok: case 'arrival' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1: not every major it brings is accepted -- 4.0.0 is a major, and
 ok: case 'quiet' driftwood: exit 0, composed 'none' -- OK: composed bump is 'none'
 ok: case 'quiet' ludlow: exit 0, composed 'none' -- PASS: declared=patch composed=none
 ok: case 'quiet' tuppence: exit 0, composed 'none' -- PASS: composed bump 'none' does not exceed major; v2.0.1 may be adopted
-ok: case 'retirement' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major
-ok: case 'retirement' ludlow: exit 1, composed 'major' -- REFUSE: composed bump is major -- ['2.0.1']
-ok: case 'retirement' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1 without human review
+ok: case 'retirement' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major, and not every major it brings is accepted -- retired 2.0.1: a retirement is a forced ma
+ok: case 'retirement' ludlow: exit 1, composed 'major' -- REFUSE: composed bump is major -- ['2.0.1'] -- not every major it brings is accepted -- retired 2.0.1: a retirement is a
+ok: case 'retirement' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1: not every major it brings is accepted -- retired 2.0.1: a reti
+ok: case 'accepted' driftwood: exit 0, composed 'major' -- OK: composed bump is 'major', admitted: every major this pull request adds is accepted by a record in accepted-majors/ (
+ok: case 'accepted' ludlow: exit 0, composed 'major' -- PASS: declared=patch composed=major, admitted: every major this pull request adds is accepted by a record in accepted-ma
+ok: case 'accepted' tuppence: exit 0, composed 'major' -- PASS: composed bump is major, admitted: every major this pull request adds is accepted by a record in accepted-majors/ (
+ok: case 'misaddressed' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major, and not every major it brings is accepted -- 4.0.0 is a major, and no accepted-majors/ 
+ok: case 'misaddressed' ludlow: exit 1, composed 'major' -- REFUSE: composed bump is major -- ['4.0.0'] -- not every major it brings is accepted -- 4.0.0 is a major, and no accepte
+ok: case 'misaddressed' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1: not every major it brings is accepted -- 4.0.0 is a major, and
+PASS: case 'accepted': 3 gates (driftwood, ludlow, tuppence) each answered adopt with composed bump 'major'
 PASS: case 'arrival': 3 gates (driftwood, ludlow, tuppence) each answered refuse with composed bump 'major'
+PASS: case 'misaddressed': 3 gates (driftwood, ludlow, tuppence) each answered refuse with composed bump 'major'
 PASS: case 'quiet': 3 gates (driftwood, ludlow, tuppence) each answered adopt with composed bump 'none'
 PASS: case 'retirement': 3 gates (driftwood, ludlow, tuppence) each answered refuse with composed bump 'major'
 PASS: case 'standing': 3 gates (driftwood, ludlow, tuppence) each answered adopt with composed bump 'none'
-SUMMARY: on 4 planted movements of a composed window (arrival, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- each run through the flag shape its own shift-left.yml uses, against platform's real signed evidence with real cosign -- returned the same verdict and the same composed bump, and each was the verdict ADR-0011's reading gives that movement
-PASS: on 4 planted movements of a composed window (arrival, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- each run through the flag shape its own shift-left.yml uses, against platform's real signed evidence with real cosign -- returned the same verdict and the same composed bump, and each was the verdict ADR-0011's reading gives that movement
+SUMMARY: on 6 planted movements of a composed window (accepted, arrival, misaddressed, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- each run through the flag shape its own shift-left.yml uses, against platform's real signed evidence with real cosign -- returned the same verdict and the same composed bump, and each was the verdict ADR-0011's reading gives that movement
+PASS: on 6 planted movements of a composed window (accepted, arrival, misaddressed, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- each run through the flag shape its own shift-left.yml uses, against platform's real signed evidence with real cosign -- returned the same verdict and the same composed bump, and each was the verdict ADR-0011's reading gives that movement

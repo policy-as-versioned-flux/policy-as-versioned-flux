@@ -14,10 +14,11 @@ REFUSED: the committed bundle for policy version 2.0.0 at 2.0.0.json.bundle is n
 ok  D2: a present-but-malformed bundle is refused by name before cosign, and the refusal says why it stops there
 
 == Scenario E: the REAL, unmodified, currently-committed platform-pin.yaml -- a genuine two-document YAML stream (GitRepository + Kustomization) -- verified end to end with REAL cosign against platform's REAL committed evidence bundles ==
-FAIL: composed bump is major -- refusing to adopt v3.3.0 without human review
+FAIL: composed bump is major -- refusing to adopt v3.3.0: not every major it brings is accepted -- no --adopter-dir and --head-ref, so no acceptance record could be read
 ok  platform checked out at v3.3.0, resolved commit matches the pinned commit field (38089a68769453db9ea3faf0ee637ae93f309980)
 declared (platform tag (none) -> v3.3.0): no predecessor
 composed (this institution, over what this pull request moves -- added ['4.0.0', '5.0.0'], retired []; window at the head is ['4.0.0', '5.0.0']): major
+acceptance: no --adopter-dir and --head-ref, so no acceptance record could be read
    E: the real state composes a major, so the gate refuses for human review -- that is the designed answer, and every element below still had to verify
 ok  E: real cosign verify-blob ACCEPTED platform's real committed evidence for 4.0.0, 5.0.0
 ok  E: against the real, currently-committed platform-pin.yaml the gate reached its DESIGNED composed-major refusal, exit 1 -- and everything ahead of that refusal succeeded for real: the checkout at v3.3.0, the commit match, the identity constants read out of shift-left.yml, and every composed element's real signature verified by real cosign. That is what this scenario observed; it is not a pass, and it is not reported as one
@@ -46,7 +47,7 @@ ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none')
   setup: tagged policy/v4.0.0 in the throwaway clone (the real repo waits on CI to sign it)
   setup: tagged policy/v5.0.0 in the throwaway clone (the real repo waits on CI to sign it)
 ok  'v2.0.0' is not a policy tag -- not this gate's subject, skipped
-signed: /tmp/tmp.2CtkdPpOTL/clone/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.NJ3LdV1NNk/clone/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -56,7 +57,7 @@ signed: /tmp/tmp.2CtkdPpOTL/clone/computed-semver/evidence/9.0.0.json.bundle
 GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
 GATE: passed for policy/v9.0.0
 committed: signed release-gate evidence for v2.0.0, policy/v9.0.0
-committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit ac989741d874c34129e4b32594651ae61fece29b
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit ce00f7432ab88e1d5ea11b6105140fcfec932211
 tagged v2.0.0
 tagged policy/v9.0.0
 ok  'v3.0.0' is not a policy tag -- not this gate's subject, skipped
@@ -67,7 +68,7 @@ tagged v3.0.0
 ok  one real gated release (9.0.0, real evidence), plus three real array-level releases (unchanged, retired, returned), real tags v2.0.0/v2.1.0/v3.0.0/v4.0.0
 
 == Scenario A: real PASS -- the pin moves (v2.0.0 -> v2.1.0) and the array does not, so this bump adds and retires nothing and composes 'none' (eco-system ticket 99) ==
-ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (d8713dc8612fed114bb05c94ea80bd1d836571c3)
+ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (7909625da986fbb70c599a0b1a584aec0c4fc496)
 declared (platform tag v2.0.0 -> v2.1.0): minor
 composed (this institution, over what this pull request moves -- added [], retired []; window at the head is ['9.0.0']): none
 this pull request adds and retires no policy version, so it composes 'none' -- whether a major already stands in the window is reported continuously by the hub's verify-unreviewed-major-in-window.sh, not by this gate (eco-system ticket 99)
@@ -76,7 +77,7 @@ PASS: composed bump 'none' does not exceed major; v2.1.0 may be adopted
 ok  A: a bump that adds and retires nothing composes none and passes, folding no standing version
 
 == Scenario A2: real PASS -- 9.0.0 ARRIVES in the array (v3.0.0 -> v4.0.0), and the arrival's bump is RE-READ out of the publisher's own real committed evidence, never recomputed ==
-ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (7d29b51735817a7d670ddd631ec692e0b24fa15f)
+ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (d44c83e1d44cdd032df6912e72781781a80e83c3)
 declared (platform tag v3.0.0 -> v4.0.0): major
 composed (this institution, over what this pull request moves -- added ['9.0.0'], retired []; window at the head is ['9.0.0']): patch
 NOTE: composed bump ('patch') is weaker than the publisher's tag ('major') -- informational only, this institution's obligation is never lowered by a local view
@@ -88,11 +89,12 @@ ok  A2-render: rendered a real evidence summary to markdown, no percentage anywh
 ok  A-render: a no-movement bump renders as no movement, no percentage anywhere
 
 == Scenario B: real FAIL -- 9.0.0 retires with nothing replacing it, composed forced major ==
-FAIL: composed bump is major -- refusing to adopt v3.0.0 without human review
-ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (e787c045ae95b331eda1de564cd09b1ae5e1407c)
+FAIL: composed bump is major -- refusing to adopt v3.0.0: not every major it brings is accepted -- no --adopter-dir and --head-ref, so no acceptance record could be read
+ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (7bdd81b80b3e3d1dcefc8e2164ed71082de6ff65)
 declared (platform tag v2.1.0 -> v3.0.0): major
 composed (this institution, over what this pull request moves -- added [], retired ['9.0.0']; window at the head is []): major
 RETIRED, reaching this institution as major: 9.0.0
+acceptance: no --adopter-dir and --head-ref, so no acceptance record could be read
 ok  B: real refusal -- a composed major fails the required check for real (non-zero exit), retirement named, nothing silent
 
 == Scenario G: how offline this gate's signature check actually is -- measured on this run, through the gate itself ==
@@ -105,8 +107,8 @@ ok  G: this gate verifies platform's real published bundle with NO network (exit
 
 == Scenario H: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm ==
 ok  H[genuine]: the copied gate with the real committed root ACCEPTS, cold (exit 0) -- the copy mechanism is sound
-ok  H[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.2CtkdPpOTL/gate-absent-roo
-ok  H[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.2CtkdPpOTL/gate-absent-roo
+ok  H[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.NJ3LdV1NNk/gate-absent-roo
+ok  H[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.NJ3LdV1NNk/gate-absent-roo
 ok  H[wrong-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  H[wrong-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  H[corrupt-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: structure error: tag
@@ -118,6 +120,23 @@ ok  H[wrong-fulcio-root,warm]: REFUSED, exit 1, on the trust material and not th
 ok  H[ct-window-closed,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
 ok  H[ct-window-closed,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1
     (warm = this machine's own HOME, whose ~/.sigstore is warm on a laptop that has ever run cosign online and cold on a CI runner; either way the doctored root, not a cached one, is what refused)
+
+== Scenario J: the real v3.3.0 rollout (pull request 36) -- an accepted major is admitted, and only an accepted one ==
+the rollout: base 79603fdd5e55 (v2.0.1), head 81ef938a2634 (v3.3.0)
+declared (platform tag v2.0.1 -> v3.3.0): major
+composed (this institution, over what this pull request moves -- added ['5.0.0'], retired []; window at the head is ['4.0.0', '5.0.0']): major
+acceptance: 5.0.0 is a major, accepted for tuppence by chrisns (owner); recorded by the integrator on the owner's instruction of 2026-09-23 on 2026-09-23 (accepted-majors/platform-5.0.0.yaml at 81ef938a2634)
+PASS: composed bump is major, admitted: every major this pull request adds is accepted by a record in accepted-majors/ (eco-system ticket 132); v3.3.0 may be adopted
+ok  J[accepted]: the real rollout composes major (5.0.0 added, its evidence verified by real cosign), and the gate admits it on accepted-majors/platform-5.0.0.yaml at 81ef938a2634
+composed (this institution, over what this pull request moves -- added ['5.0.0'], retired []; window at the head is ['4.0.0', '5.0.0']): major
+acceptance: 5.0.0 is a major, and no accepted-majors/ record at 25598b942c70 accepts it for tuppence
+ok  J[removed]: the same rollout with its record removed REFUSES, exit 1, naming 5.0.0
+composed (this institution, over what this pull request moves -- added ['5.0.0'], retired []; window at the head is ['4.0.0', '5.0.0']): major
+acceptance: 5.0.0 is a major, and no accepted-majors/ record at 827621342f1f accepts it for tuppence
+ok  J[other-version]: the same rollout with its record naming 5.0.1 REFUSES, exit 1, naming 5.0.0
+composed (this institution, over what this pull request moves -- added ['5.0.0'], retired []; window at the head is ['4.0.0', '5.0.0']): major
+acceptance: 5.0.0 is a major, and no accepted-majors/ record at aa4d2c2dc52c accepts it for tuppence; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for ludlow, not for tuppence
+ok  J[other-party]: the same rollout with its record naming ludlow REFUSES, exit 1, naming 5.0.0
 
 PASS: adopter-gate.py checks out the tag under review (never the default branch), refuses a
 resolved-commit disagreement with the pinned commit field, and refuses -- with the real cosign
@@ -134,3 +153,5 @@ retirement still forces a real non-zero-exit FAIL naming the version. The weaker
 note prints and never downgrades. Eco-system ticket 105: the gate verifies platform's real bundle
 with a cold TUF cache and egress blocked, exit 0, through its own CLI (G), and a wrong, corrupt,
 retired or absent trust root refuses on the trust material and never on the network, cold and warm (H).
+Eco-system ticket 132: the real v3.3.0 rollout composes major and is admitted on its own acceptance
+record, and refuses when that record is removed or names another version or party (J).

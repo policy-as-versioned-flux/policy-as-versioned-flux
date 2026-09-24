@@ -20,11 +20,11 @@ PASS: ADOPTER_GATE_IDENTITY_REGEXP matches only policy-as-versioned-platform/pla
 -- building the matching throwaway ludlow repo: base pins v0.1.0, head pins v1.0.0 --
 
 B1. retirement -> composed MAJOR -> the pull request check must fail (no cosign needed: the retired version has no evidence to look up)
-REFUSE: composed bump is major -- ['2.0.0']
+REFUSE: composed bump is major -- ['2.0.0'] -- not every major it brings is accepted -- retired 2.0.0: a retirement is a forced major, and an acceptance record accepts a version the window carries, so none can admit it
 OK: retirement of 2.0.0 correctly refused the pull request check, comment names it
 
 B2. resolved-commit mismatch -> refuse (ADR-0001's pin made load-bearing, bug #2)
-REFUSE: platform tag 'v1.0.0' resolves to 'ec4812a4d7be721bc5f72edf2ed6c5453c3ce892', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
+REFUSE: platform tag 'v1.0.0' resolves to 'a6e8fde1e4013234bcc13700804aa0558961e158', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
 OK: a pin naming the wrong commit for a real tag is refused, real git rev-parse caught it
 
 B3. composed weaker than the publisher's tag (unchanged array, major tag jump) -> informational, exit 0, never lowers
@@ -34,11 +34,11 @@ OK: composed=none against declared=major (v0.1.0 -> v1.0.0) passes, prints infor
 
 == Part C: a bundle this gate cannot read, and a missing one -- refused by name, before cosign ==
 -- a CHANGED version whose evidence file exists but whose bundle is not a real Sigstore bundle --
-REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit b609710e9e75d381012e4c1f8f8de81c0139f8af) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
+REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit 262a883acfc05acb22eee0de0e32dc1daae1105e) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
 OK: a bundle whose shape this gate cannot read is refused by name, and no cosign call is made without pinned trust material
 
 -- a CHANGED version with no committed evidence file at all --
-REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit 344fd9d5230e24afe828cdd5e6f7e9da780b3887
+REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit 10ba4b4e33a91872f72dcbe0f0d0b87a6635b85b
 OK: a changed version with no committed evidence file is refused before cosign is even invoked
 
 == Part D: splice_body via the REAL CLI, with backslash-bearing evidence -- the exact re.sub() hazard ==
@@ -88,8 +88,8 @@ OK: without the committed trust material the identical bytes cannot be verified 
 
 -- E6: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm --
 OK: E6[genuine] -- the copied gate with the real committed root ACCEPTS, cold (exit 0); the copy mechanism is sound
-OK: E6[absent-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.AQnXCt0Xxp/ga
-OK: E6[absent-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.AQnXCt0Xxp/ga
+OK: E6[absent-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.2Vv5zqIqAi/ga
+OK: E6[absent-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.2Vv5zqIqAi/ga
 OK: E6[wrong-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
 OK: E6[wrong-rekor-key,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
 OK: E6[corrupt-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
@@ -102,6 +102,17 @@ OK: E6[ct-window-closed,cold] -- REFUSED, exit 1, on the trust material and not 
 OK: E6[ct-window-closed,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify signed certificate timestamp: only able to verify 0 SCT entries; unable to meet threshold of 1)
     (warm = this machine's own HOME, whose ~/.sigstore is warm on a laptop that has ever run cosign online and cold on a CI runner; either way the doctored root, not a cached one, is what refused)
 
+== Part J: the real v3.3.0 rollout (pull request 33) -- an accepted major is admitted, and only an accepted one ==
+the rollout: base f299fd1475cd, head c017bb701ee4 (platform v3.3.0)
+PASS: declared=major composed=major, admitted: every major this pull request adds is accepted by a record in accepted-majors/ (eco-system ticket 132) -- 5.0.0 is a major, accepted for ludlow by chrisns (owner); recorded by the integrator on the owner's instruction of 2026-09-23 on 2026-09-23 (accepted-majors/platform-5.0.0.yaml at c017bb701ee4)
+OK: J[accepted] -- the real rollout composes major (5.0.0 added), and the gate admits it on accepted-majors/platform-5.0.0.yaml at c017bb701ee4
+REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at b7a1195992ed accepts it for ludlow
+OK: J[removed] -- the same rollout with its record removed REFUSES, exit 1, naming 5.0.0
+REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at e9aa999fbbad accepts it for ludlow
+OK: J[other-version] -- the same rollout with its record naming 5.0.1 REFUSES, exit 1, naming 5.0.0
+REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at 7cdc7935f99d accepts it for ludlow; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for tuppence, not for ludlow
+OK: J[other-party] -- the same rollout with its record naming tuppence REFUSES, exit 1, naming 5.0.0
+
 PASS: verify-adopter-gate.sh -- identity regexp (match/reject/rename-breaks-it), resolved-commit refusal,
       retirement-forces-major, composed-major fails the check, weaker-than-declared is informational-only,
       a bundle shape this gate cannot read is refused by name and a missing evidence file before that,
@@ -112,6 +123,8 @@ PASS: verify-adopter-gate.sh -- identity regexp (match/reject/rename-breaks-it),
       (E3), REFUSES it under a foreign identity constant (E4), cannot verify it at all without the committed
       trust material (E5), still refuses the pre-2026-09-06 --trusted-root invocation on the flag (E1), and
       REFUSES on the trust material and never on the network when the committed root is wrong, corrupt,
-      retired or absent, cold and warm (E6, eco-system ticket 105).
+      retired or absent, cold and warm (E6, eco-system ticket 105). Eco-system ticket 132: the real v3.3.0
+      rollout composes major and is admitted on its own acceptance record, and refuses when that record is
+      removed or names another version or party (J).
       Out of reach here and dated 2026-09-06: SIGNING new evidence (Fulcio keyless needs a live Actions
       credential). Verifying what platform already signed is not, and is proved above.

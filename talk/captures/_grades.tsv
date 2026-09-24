@@ -1,8 +1,8 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-24T13:21Z run=324 hub=06acf2c enact=development units=[driftwood=f0e9279@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=d1c1844@main ludlow=3f8c526@main nist=f83126f@main platform=82d5377@main tuppence=d18018d@main] pass=84 [observed=27 self=43 simulated=4 meta=10] fail=11 skip=25 [never=10 waits=15] excluded=8 total=128 ceiling=109
-.estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      or absent trust root refuses on the trust material and never on the network, cold and warm (I).
+# TRUTH 2026-09-24T14:19Z run=326 hub=1297397 enact=development units=[driftwood=2ac5505@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=d1c1844@main ludlow=368db4e@main nist=f83126f@main platform=0ceb549@v3.4.0 tuppence=6c0c38a@main] pass=84 [observed=27 self=43 simulated=4 meta=10] fail=8 skip=28 [never=10 waits=18] excluded=8 total=128 ceiling=109
+.estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      acceptance record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
 .estate-clone/driftwood/twin/verify-twin-sweep-moved.sh	SKIP	SKIP: the moved path has not fired live yet: observations/twin-sweep.jsonl carries no line with "moved": true (the step is proven offline above; the live firing
@@ -17,7 +17,7 @@
 .estate-clone/ico/verify-penalty-feed.sh	PASS	PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the four published 
 .estate-clone/insurer/verify-insurer-party.sh	PASS	PASS: insurer party artefact
 .estate-clone/insurer/verify-insurer-quote.sh	SKIP	SKIP: 3 of 18 checks could not be looked at (reasons above)
-.estate-clone/ludlow/twin/verify-twin-scenarios.sh	FAIL	FAIL: 1 standing-scenario check(s) observed false
+.estate-clone/ludlow/twin/verify-twin-scenarios.sh	SKIP	SKIP: the overlay with its six scenarios loads, and the emitter could not price it: CANNOT LOOK: ludlow's twin cannot price a forward-intel payload today, and t
 .estate-clone/ludlow/verify-adopter-gate.sh	PASS	      credential). Verifying what platform already signed is not, and is proved above.
 .estate-clone/ludlow/verify-certificate-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only policy-as-versioned-ludlow/ludlow's propose-tier.yml on main; the release and proposal identities do not ov
 .estate-clone/ludlow/verify-reconcile.sh	FAIL	FAIL: FAIL: a fact of the five-fact sample was observed false
@@ -73,9 +73,9 @@
 .estate-clone/platform/wardley/verify-wardley.sh	PASS	planted violation is refused -- and the map update is a signed, tamper-evident commit.
 .estate-clone/platform/wargamer/verify-wargamer.sh	PASS	the version cross-check gate -- and never merged. The war-gamer proposes; a human disposes.
 .estate-clone/tuppence/reset/verify-reach-secrets.sh	EXCLUDED	
-.estate-clone/tuppence/scripts/verify-adopter-gate.sh	PASS	retired or absent trust root refuses on the trust material and never on the network, cold and warm (H).
+.estate-clone/tuppence/scripts/verify-adopter-gate.sh	PASS	record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/tuppence/scripts/verify-identity-regexp.sh	PASS	    the release and proposal identities do not overlap in either direction
-.estate-clone/tuppence/twin/verify-twin-scenarios.sh	FAIL	FAIL: 1 standing-scenario check(s) observed false
+.estate-clone/tuppence/twin/verify-twin-scenarios.sh	SKIP	SKIP: the overlay with its six scenarios loads, and the emitter could not price it: CANNOT LOOK: tuppence's twin cannot price a forward-intel payload today, and
 .estate-clone/tuppence/verify-reconcile.sh	FAIL	FAIL: FAIL: a fact of the five-fact sample was observed false
 .estate-clone/tuppence/verify-twin-overlay.sh	SKIP	SKIP: the emitter could not look: CANNOT LOOK: tuppence's twin cannot price a forward-intel payload today, and the instruments it is missing are named rather th
 verify/a-fall-blocks/verify-a-fall-blocks.sh	PASS	PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, tha
@@ -91,13 +91,13 @@ verify/e2e/verify-e2e-step1-regulator-publishes.sh	PASS	PASS: ico's newest penal
 verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh	PASS	PASS: a SYNTHETIC pin bump (penalty-schema v3 -> v4, made here on a throwaway copy of driftwood, not driftwood's own merged history) re-prices driftwood's price
 verify/e2e/verify-e2e-step3-price-crosses-band-pr-opens.sh	PASS	PASS: a SYNTHETIC residual placed either side of driftwood's own signed appetite band of 40,000 GBP (20,000.00 -> 58,269.23 GBP, not driftwood's real priced pos
 verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh	FAIL	FAIL: the scheduled lane sample observes a step-4 fact false: FAIL: a fact of the five-fact sample was observed false
-verify/e2e/verify-e2e-step5-twin-forecasts.sh	FAIL	FAIL: step 5 is false where an adopter's own checks are: ludlow/twin/verify-twin-scenarios.sh observed false: FAIL: 1 standing-scenario check(s) observed false
+verify/e2e/verify-e2e-step5-twin-forecasts.sh	SKIP	SKIP: the twin did not play a dated signal forward for every adopter: driftwood/twin/verify-twin-sweep-moved.sh could not look: SKIP: the moved path has not fir
 verify/e2e/verify-e2e-step6-provenance.sh	PASS	PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 18 lines the 8 release-shipping units declare in their own party.yam
-verify/e2e/verify-e2e-step7-honesty.sh	PASS	PASS: steps 1-6 each report one honest verdict (verdicts: PASS PASS PASS FAIL FAIL PASS PASS)
+verify/e2e/verify-e2e-step7-honesty.sh	PASS	PASS: steps 1-6 each report one honest verdict (verdicts: PASS PASS PASS FAIL SKIP PASS PASS)
 verify/every-green/verify-every-green.sh	PASS	PASS: none of the 128 discovered verify scripts prints the SKIP verdict token and then reaches exit 0; the prose-worded could-not-look is not graded here (see t
 verify/feed-contract/verify-feed-contract.sh	SKIP	SKIP: insurer pins driftwood/feed/exposure@v1.1.0: the tree of v1.1.0 carries no exposure section in composed/HEADER.yaml -- the tag resolves, but not to the co
 verify/feed-contract/verify-untagged-pin-is-priced.sh	PASS	PASS: every adopter feed pin resolves to a tag that verifies under its publisher's own identity pins, or is priced as a hole under the adopter's own perspective
-verify/fold-agreement/verify-fold-agreement.sh	PASS	PASS: on 4 planted movements of a composed window (arrival, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- eac
+verify/fold-agreement/verify-fold-agreement.sh	PASS	PASS: on 6 planted movements of a composed window (accepted, arrival, misaddressed, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, 
 verify/handbook/verify-handbook-is-a-compose-time-render.sh	PASS	PASS: 6 served ref(s) across 3 adopter(s) (driftwood@origin/main, driftwood@v2.0.0, ludlow@origin/main, ludlow@v2.0.0, tuppence@origin/main, tuppence@v2.0.0) ea
 verify/lifted-apps/verify-lifted-apps.sh	PASS	PASS: 3 lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml 
 verify/local-clock/verify-local-clock.sh	SKIP	SKIP: no .local-clock/last-run.json on this machine -- the local clock has not run here, or this is not the owner's machine
@@ -118,7 +118,7 @@ verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Reno
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
 verify/schedules/verify-schedules.sh	FAIL	FAIL: 5 schedule/cage check(s) observed false: insurer/fetch.yml ludlow/propose-tier.yml ludlow/twin-sweep.yml tuppence/propose-tier.yml tuppence/twin-sweep.yml
-verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=f0e9279 ludlow=3f8c526 tuppence=d18018d]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
+verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=2ac5505 ludlow=157701b tuppence=6c0c38a]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
 verify/supersede/verify-supersede.sh	PASS	PASS: every adopter feed pin at its served commit is either at the newest major its publisher's real remote carries a tag for, or priced as behind by a supersed
 verify/tier-binding/verify-tier-binding.sh	PASS	PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform
 verify/trust-root/verify-the-committed-trust-root-is-dated.sh	PASS	PASS: every log platform's evidence names at each adopter's pin is carried by that adopter's own committed trust root inside the key's validFor window -- the ag
@@ -129,4 +129,4 @@ verify/twin-evals/verify-derived-forecast.sh	SKIP	SKIP: no *.forecast.yaml has r
 verify/twin-evals/verify-scenario-registration.sh	PASS	PASS: 18 of 18 scenario-library entries on refs/remotes/origin/main name a resolution question -- a proposition the world layer carries, a horizon after their o
 verify/twin-evals/verify-twin-evals.sh	PASS	PASS: 7 harness-mechanism metrics, 7 of them not measurable at their corpus size (verify-corpus-size.sh grades that) (the label twin/evolution_judge.py declares
 verify/twin-per-adopter/verify-twin-per-adopter.sh	PASS	PASS: every party claiming the adopter role carries a twin overlay of its own, each with six scenario files, an emitter, and the same vendored world layer pinne
-verify/unreviewed-major/verify-unreviewed-major-in-window.sh	FAIL	FAIL: 3 line(s) observed false: a major carried in an adopter's composed window with no record in its own tree accepting it, or evidence at an adopter's own pin
+verify/unreviewed-major/verify-unreviewed-major-in-window.sh	FAIL	FAIL: 3 line(s) observed false: a major carried in an adopter's composed window with no record in its own tree accepting it, evidence at an adopter's own pin th
