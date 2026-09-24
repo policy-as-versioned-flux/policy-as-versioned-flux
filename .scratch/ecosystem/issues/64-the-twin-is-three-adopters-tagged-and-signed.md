@@ -321,3 +321,10 @@ workflow lint, schedule containment checks and PR CI passed. Integration preserv
 clock code over merged compiler-tools main; local scans found zero secrets and commits are signed.
 Actual scheduled observations remain outstanding. Existing priced/deployed completion limits
 above remain unchanged.
+
+
+**Correction, 2026-09-24.** `verify/e2e/verify-e2e-step5-twin-forecasts.sh` grades FAIL from truth
+run 314, because ludlow's and tuppence's `twin/verify-twin-scenarios.sh` went FAIL. Their
+`twin/signals.yaml` was not re-derived when the platform implementations pin moved to 3.3.0, so it
+has no signal row for the new pin. The re-derive lands with each adopter's next pin PR, which
+recomposes anyway (ticket 134's tools release).
