@@ -245,3 +245,10 @@ them`.
 
 - `api` and `datastore` (ticket 13 item 1 held them; `datastore`'s Crossplane claims are ticket 13 item 3's sequencing, after the Pod slice runs end to end).
 - The incumbent org's `fleet` and `policy` repositories still declare the old workloads; nothing in the eco-system reads them, and retiring them is ticket 13's own remaining surface, not this one's.
+
+
+**Correction, 2026-09-24.** `verify/lifted-apps/verify-lifted-apps.sh` grades FAIL from truth run
+314. After each adopter moved to platform tools v3.3.0 and its composed set to v2.0.0, the check
+finds no `cage-baseline-4-0-0` verdict for ledger, storefront or reports. Whether the served set
+fails to cage them or the check asks a question the new composition no longer answers is ticket
+135's to establish and fix.
