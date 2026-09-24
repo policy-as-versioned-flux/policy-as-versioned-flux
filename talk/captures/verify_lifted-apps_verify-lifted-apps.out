@@ -1,5 +1,5 @@
 [1;36m==>[0m 0. the grader can fail
-  ok   selfcheck: the grader fails fifteen ways a lift can look done and not be (the served path read from the adopter's own gotk-sync.yaml among them), could-not-looks (naming the pull request) when one has not landed, counts both residuals and the pinned trees it could not read, accepts a glob pattern and a ./ entry, and parses the kyverno verdict per policy by name (a skipped 9.9.9 pod at exit 0 is not admitted)
+  ok   selfcheck: the grader fails fifteen ways a lift can look done and not be (the served path read from the adopter's own gotk-sync.yaml among them), could-not-looks (naming the pull request) when one has not landed, counts both residuals and the pinned trees it could not read, accepts a glob pattern and a ./ entry, parses the kyverno verdict per policy by name (a skipped 9.9.9 pod at exit 0 is not admitted), and grades the set the adopter's composed-set.yaml serves at its pin (a PriorityClass in a version directory gives no verdict and is admitted; nine ways that set can leave the app unadmitted or uncaged all fail by name; a planner that dies, or grades fewer apps than have landed, fails)
 [1;36m==>[0m 0b. what this check cannot see
   ??   blind spot: whether the container the served manifest names actually STARTS is a cluster fact. These three images set no USER, so each served pod names a numeric runAsUser and mounts the paths its process writes; that reasoning is checked by nobody here. The live half is the adopters' own drift-sample lane, which has never had a persistent cluster on a citable run
   ??   blind spot: whether the image digest each served manifest pins still resolves in ghcr.io. Reading a package needs `read:packages`, which the gate holds by design not at all (2026-09-06: the hub's own credential was refused it), so the digest is graded only against the register
@@ -7,13 +7,13 @@
   ??   blind spot: whether any adopter's composed set admits the workload at UPDATE. Every composed policy and the orphan guard declare CREATE+UPDATE; `kyverno apply` evaluates CREATE only, and no UPDATE-scoped evaluation exists anywhere in this estate
 [1;36m==>[0m 1. every registered lift, against the adopters' own served trees and their own gotk-sync.yaml
   PASS  ledger -> tuppence
-          listed by gitops/apps/kustomization.yaml at the checked-out tree (8d71d47), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by tuppence at apps/ledger; bumped by renovate's maven manager behind dependencyDashboardApproval; lifted from policy-as-versioned-flux/ledger@036bb972dd733eb12c00791415b145648d453e18
+          listed by gitops/apps/kustomization.yaml at the checked-out tree (d18018d), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by tuppence at apps/ledger; bumped by renovate's maven manager behind dependencyDashboardApproval; lifted from policy-as-versioned-flux/ledger@036bb972dd733eb12c00791415b145648d453e18
           pinned tree: v1.0.0 (9862d84) does not list ledger.yaml in gitops/apps/kustomization.yaml (it lists ['namespace.yaml', 'version-configmap.yaml', 'nist-pin-configmap.yaml', 'risk-appetite-configmap.yaml']); the lift is listed at the checkout and not in the tree the GitRepository pins
   PASS  storefront -> driftwood
-          listed by gitops/apps/kustomization.yaml at the checked-out tree (b5eb409), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by driftwood at apps/storefront; bumped by renovate's npm manager behind dependencyDashboardApproval; lifted from policy-as-versioned-flux/storefront@a97344e4ba767564192240278492456ef76b8b2d
+          listed by gitops/apps/kustomization.yaml at the checked-out tree (f0e9279), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by driftwood at apps/storefront; bumped by renovate's npm manager behind dependencyDashboardApproval; lifted from policy-as-versioned-flux/storefront@a97344e4ba767564192240278492456ef76b8b2d
           pinned tree: v1.0.0 (92034b0) does not list storefront.yaml in gitops/apps/kustomization.yaml (it lists ['namespace.yaml', 'version-configmap.yaml', 'nist-pin-configmap.yaml']); the lift is listed at the checkout and not in the tree the GitRepository pins
   PASS  reports -> ludlow
-          listed by gitops/apps/kustomization.yaml at the checked-out tree (194accc), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by ludlow at apps/reports; bumped by renovate's pip_requirements manager behind dependencyDashboardApproval; lifted from policy-as-versioned-flux/reports@b809e063514dedee5a1df8701d71d3a1856d5693
+          listed by gitops/apps/kustomization.yaml at the checked-out tree (3f8c526), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by ludlow at apps/reports; bumped by renovate's pip_requirements manager behind dependencyDashboardApproval; lifted from policy-as-versioned-flux/reports@b809e063514dedee5a1df8701d71d3a1856d5693
           pinned tree: v1.0.0 (7bd9973) does not list reports.yaml in gitops/apps/kustomization.yaml (it lists ['namespace.yaml', 'version-configmap.yaml', 'nist-pin-configmap.yaml', 'risk-appetite-configmap.yaml']); the lift is listed at the checkout and not in the tree the GitRepository pins
   LIMIT  3 of 3 lifted apps are still served an image built and published by the incumbent org policy-as-versioned-flux: the source and the served manifest moved, the image build did not (it needs a workflow job and a registry under the adopter's own organisation -- ticket 33, waits on the owner)
   LIMIT  3 of 3 lifts are listed at main and not in the tree the GitRepository pins (v1.0.0): ledger->tuppence, storefront->driftwood, reports->ludlow; 0 of 3 pinned trees could not be read: a cluster reconciling that pin is served none of these until the adopter cuts a tag and moves its own ref.tag+commit, which no renovate customManager bumps
@@ -26,68 +26,8 @@
   ok   tuppence's own served-workloads.py names gitops/apps/ledger.yaml
   ok   driftwood's own served-workloads.py names gitops/apps/storefront.yaml
   ok   ludlow's own served-workloads.py names gitops/apps/reports.yaml
-[1;36m==>[0m 3. the adopter's own composed policy set plus orphan guard, run over the served workload (kyverno 1.18.2; CREATE only, baseline dial, no namespaceObject)
-  FAIL ledger: tuppence's composed set does not admit tuppence/gitops/apps/ledger.yaml -- policy cage-baseline-4-0-0 produced no verdict at all (no row in the kyverno table) (pass: 8, fail: 0, warn: 0, error: 0, skip: 0)
-             name: tmp
-         hostIPC: false
-         hostNetwork: false
-         hostPID: false
-         preemptionPolicy: Never
-         priority: -10
-         priorityClassName: cage-baseline-4-0-0
-         securityContext:
-           runAsNonRoot: true
-           runAsUser: 1000
-         volumes:
-         - emptyDir: {}
-           name: tmp
-       
-       ---
-       
-       
-       Mutation:
-       Mutation has been applied successfully.
-       pass: 8, fail: 0, warn: 0, error: 0, skip: 0 
-  FAIL storefront: driftwood's composed set does not admit driftwood/gitops/apps/storefront.yaml -- policy cage-baseline-4-0-0 produced no verdict at all (no row in the kyverno table) (pass: 8, fail: 0, warn: 0, error: 0, skip: 0)
-         hostNetwork: false
-         hostPID: false
-         preemptionPolicy: Never
-         priority: -10
-         priorityClassName: cage-baseline-4-0-0
-         securityContext:
-           runAsNonRoot: true
-           runAsUser: 101
-         volumes:
-         - emptyDir: {}
-           name: cache
-         - emptyDir: {}
-           name: run
-       
-       ---
-       
-       
-       Mutation:
-       Mutation has been applied successfully.
-       pass: 8, fail: 0, warn: 0, error: 0, skip: 0 
-  FAIL reports: ludlow's composed set does not admit ludlow/gitops/apps/reports.yaml -- policy cage-baseline-4-0-0 produced no verdict at all (no row in the kyverno table) (pass: 8, fail: 0, warn: 0, error: 0, skip: 0)
-             name: tmp
-         hostIPC: false
-         hostNetwork: false
-         hostPID: false
-         preemptionPolicy: Never
-         priority: -10
-         priorityClassName: cage-baseline-4-0-0
-         securityContext:
-           runAsNonRoot: true
-           runAsUser: 1000
-         volumes:
-         - emptyDir: {}
-           name: tmp
-       
-       ---
-       
-       
-       Mutation:
-       Mutation has been applied successfully.
-       pass: 8, fail: 0, warn: 0, error: 0, skip: 0 
-FAIL: a served workload is not admitted by its own adopter's composed policy set at CREATE, or that adopter's own gate cannot discover it
+[1;36m==>[0m 3. the set each adopter serves (gitops/composed/composed-set.yaml at its pin, every route its ResourceSet renders), run over the served workload (kyverno 1.18.2; CREATE only, baseline dial, no namespaceObject)
+  ok   ledger: the set tuppence serves (gitops/composed/composed-set.yaml at v2.0.0@d5a4bfe, 17 policies across every route its ResourceSet renders) admits tuppence/gitops/apps/ledger.yaml at CREATE only, baseline dial, no namespaceObject -- pass: 10, fail: 0, warn: 0, error: 0, skip: 8; each policy of its claimed version and the orphan guard has a Pass row of its own (cage-netpol-4-0-0 cage-tier-4-0-0 posture-trust-boundary-4-0-0 require-nonroot-4-0-0 stamp-posture-4-0-0 policy-version-orphan-guard), every other row is Pass or Skip, and the cage writes priorityClassName cage-baseline-4-0-0, which the set serves
+  ok   storefront: the set driftwood serves (gitops/composed/composed-set.yaml at v2.0.0@c26d95c, 17 policies across every route its ResourceSet renders) admits driftwood/gitops/apps/storefront.yaml at CREATE only, baseline dial, no namespaceObject -- pass: 10, fail: 0, warn: 0, error: 0, skip: 8; each policy of its claimed version and the orphan guard has a Pass row of its own (cage-netpol-4-0-0 cage-tier-4-0-0 posture-trust-boundary-4-0-0 require-nonroot-4-0-0 stamp-posture-4-0-0 policy-version-orphan-guard), every other row is Pass or Skip, and the cage writes priorityClassName cage-baseline-4-0-0, which the set serves
+  ok   reports: the set ludlow serves (gitops/composed/composed-set.yaml at v2.0.0@ab89691, 17 policies across every route its ResourceSet renders) admits ludlow/gitops/apps/reports.yaml at CREATE only, baseline dial, no namespaceObject -- pass: 10, fail: 0, warn: 0, error: 0, skip: 8; each policy of its claimed version and the orphan guard has a Pass row of its own (cage-netpol-4-0-0 cage-tier-4-0-0 posture-trust-boundary-4-0-0 require-nonroot-4-0-0 stamp-posture-4-0-0 policy-version-orphan-guard), every other row is Pass or Skip, and the cage writes priorityClassName cage-baseline-4-0-0, which the set serves
+PASS: 3 lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml reconciles; admitted and caged at CREATE under the baseline dial by the set that adopter's gitops/composed/composed-set.yaml serves at its pin, every version and the machinery route (kyverno apply, no namespaceObject), onto a PriorityClass that set carries; discovered by that adopter's own served-workloads.py; bumped by that adopter's own renovate manager behind dashboard approval; 3 of 3 are not in the tree the GitRepository pins (v1.0.0) and 0 of 3 pinned trees could not be read; the hub carries no working copy of any of them

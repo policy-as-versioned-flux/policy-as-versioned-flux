@@ -6,18 +6,18 @@ E2E step 5 twin forecasts
   ok  driftwood/twin/signals.yaml (the pin -> standing-scenario table)
   ok  driftwood/verify-twin-overlay.sh: PASS: driftwood's twin emits one forward-intel feed from its own overlay, labelled and unpicked
   ok  driftwood/twin/verify-twin-scenarios.sh: PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
-  ok  driftwood's scheduled sweep (`5 7 * * *`) has appended 19 dated observation(s); the most recent swept_at is 2026-09-23T12:43:07Z
+  ok  driftwood's scheduled sweep (`5 7 * * *`) has appended 20 dated observation(s); the most recent swept_at is 2026-09-24T12:40:58Z
   ok  ludlow/twin/orgs/ludlow/meta.yaml (the adopter's own overlay)
   ok  ludlow/twin/world/ (the world layer, vendored)
   ok  ludlow/twin/emit-forward-intel.py (the forward-intel emitter)
   ok  ludlow: 6 standing scenarios in ludlow/twin/orgs/ludlow/scenarios
   ok  ludlow/twin/signals.yaml (the pin -> standing-scenario table)
-  ok  ludlow's scheduled sweep (`an unparsed schedule`) has appended 13 dated observation(s); the most recent swept_at is 2026-09-23T12:49:25Z
+  ok  ludlow's scheduled sweep (`an unparsed schedule`) has appended 14 dated observation(s); the most recent swept_at is 2026-09-24T12:47:24Z
   ok  tuppence/twin/orgs/tuppence/meta.yaml (the adopter's own overlay)
   ok  tuppence/twin/world/ (the world layer, vendored)
   ok  tuppence/twin/emit-forward-intel.py (the forward-intel emitter)
   ok  tuppence: 6 standing scenarios in tuppence/twin/orgs/tuppence/scenarios
   ok  tuppence/twin/signals.yaml (the pin -> standing-scenario table)
-  ok  tuppence's scheduled sweep (`an unparsed schedule`) has appended 13 dated observation(s); the most recent swept_at is 2026-09-23T12:46:35Z
+  ok  tuppence's scheduled sweep (`an unparsed schedule`) has appended 14 dated observation(s); the most recent swept_at is 2026-09-24T12:45:17Z
   ok  the twin's own evals scored the artefacts: PASS: 7 harness-mechanism metrics, 7 of them not measurable at their corpus size (verify-corpus-size.sh grades that) (the label twin/evolution_judge.py declares for the corpus behind these scores, and the one this run asserted the harness spent; harness-mechanism means each heuristic is scored against the corpus it was fitted on, so the number grades the harness, not the twin's judgement -- a held-out corpus is not built yet), exactly the set twin/skill-thresholds.yaml declares, none below its threshold where measurable and none fallen, three real-firm beats, identical bytes on this architecture, and every published feed envelope binding to one dated signal
 FAIL: step 5 is false where an adopter's own checks are: ludlow/twin/verify-twin-scenarios.sh observed false: FAIL: 1 standing-scenario check(s) observed false

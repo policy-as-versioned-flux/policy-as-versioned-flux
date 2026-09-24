@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-24T12:30Z run=317 hub=abdf7d2 enact=development units=[driftwood=b5eb409@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=d1c1844@main ludlow=194accc@main nist=f83126f@main platform=38089a6@v3.3.0 tuppence=8d71d47@main] pass=82 [observed=25 self=43 simulated=4 meta=10] fail=13 skip=25 [never=10 waits=15] excluded=8 total=128 ceiling=109
+# TRUTH 2026-09-24T13:21Z run=324 hub=06acf2c enact=development units=[driftwood=f0e9279@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=d1c1844@main ludlow=3f8c526@main nist=f83126f@main platform=82d5377@main tuppence=d18018d@main] pass=84 [observed=27 self=43 simulated=4 meta=10] fail=11 skip=25 [never=10 waits=15] excluded=8 total=128 ceiling=109
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      or absent trust root refuses on the trust material and never on the network, cold and warm (I).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -27,7 +27,7 @@
 .estate-clone/nist/scripts/verify-cert-identity-regexp.sh	PASS	OK: EXPECTED_IDENTITY_REGEXP anchors org/repo/workflow and allows only main + release/<major>.<minor>.x
 .estate-clone/platform/access/verify-access.sh	EXCLUDED	
 .estate-clone/platform/break-glass/verify-break-glass.sh	PASS	verify-break-glass: done (offline; rides on the access plane — see ../access/verify-access.sh for the live IAP checks)
-.estate-clone/platform/compose/verify-composition.sh	FAIL	FAIL: composition.py --selfcheck
+.estate-clone/platform/compose/verify-composition.sh	PASS	[1;36m==>[0m PASS: the composition seam holds
 .estate-clone/platform/compose/verify-fresh.sh	PASS	PASS: verify-fresh.sh grades render-at-ref against the page served at the same ref: a fresh render passes, a hand-edited page fails, an artefact that moved unde
 .estate-clone/platform/computed-semver/verify-cage-engine.sh	PASS	PASS: published cage fixture compatibility -- passed
 .estate-clone/platform/computed-semver/verify-comparison-window.sh	PASS	selfcheck ok: a prerelease sorts below its own release and above the version beneath it (ticket 43's degraded publish); window_below filters and sorts ascending
@@ -99,7 +99,7 @@ verify/feed-contract/verify-feed-contract.sh	SKIP	SKIP: insurer pins driftwood/f
 verify/feed-contract/verify-untagged-pin-is-priced.sh	PASS	PASS: every adopter feed pin resolves to a tag that verifies under its publisher's own identity pins, or is priced as a hole under the adopter's own perspective
 verify/fold-agreement/verify-fold-agreement.sh	PASS	PASS: on 4 planted movements of a composed window (arrival, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- eac
 verify/handbook/verify-handbook-is-a-compose-time-render.sh	PASS	PASS: 6 served ref(s) across 3 adopter(s) (driftwood@origin/main, driftwood@v2.0.0, ludlow@origin/main, ludlow@v2.0.0, tuppence@origin/main, tuppence@v2.0.0) ea
-verify/lifted-apps/verify-lifted-apps.sh	FAIL	FAIL: a served workload is not admitted by its own adopter's composed policy set at CREATE, or that adopter's own gate cannot discover it
+verify/lifted-apps/verify-lifted-apps.sh	PASS	PASS: 3 lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml 
 verify/local-clock/verify-local-clock.sh	SKIP	SKIP: no .local-clock/last-run.json on this machine -- the local clock has not run here, or this is not the owner's machine
 verify/map-surface/verify-map-surface.sh	PASS	PASS: every pass/fail figure .scratch/ecosystem/map.md quotes is a figure talk/truth.log records, every check it names is one talk/verify-all.sh discovers, ever
 verify/misuse/verify-misuse.sh	PASS	PASS: three misuse catalogues load through one loader and every row names a mechanism (misuse_catalogues_load_and_every_row_names_a_mechanism); eco-system rows:
@@ -118,7 +118,7 @@ verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Reno
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
 verify/schedules/verify-schedules.sh	FAIL	FAIL: 5 schedule/cage check(s) observed false: insurer/fetch.yml ludlow/propose-tier.yml ludlow/twin-sweep.yml tuppence/propose-tier.yml tuppence/twin-sweep.yml
-verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=b5eb409 ludlow=194accc tuppence=8d71d47]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
+verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=f0e9279 ludlow=3f8c526 tuppence=d18018d]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
 verify/supersede/verify-supersede.sh	PASS	PASS: every adopter feed pin at its served commit is either at the newest major its publisher's real remote carries a tag for, or priced as behind by a supersed
 verify/tier-binding/verify-tier-binding.sh	PASS	PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform
 verify/trust-root/verify-the-committed-trust-root-is-dated.sh	PASS	PASS: every log platform's evidence names at each adopter's pin is carried by that adopter's own committed trust root inside the key's validFor window -- the ag
