@@ -22,27 +22,36 @@
 #   * the version it claims is measured against the ADOPTER'S OWN composed artefact
 #     (`composed/orphan-guard.yaml`'s allowed array), never a constant held in this repository;
 #   * the last word on admission belongs to the estate's own engine: step 3 runs the real
-#     `kyverno apply` over the adopter's own `composed/policies/v<claimed>/` PLUS its
-#     `composed/orphan-guard.yaml` against the served manifest. What that proves is narrower than
-#     "admitted" and the ok line says so: the CLI evaluates CREATE only (every composed policy
-#     declares CREATE+UPDATE; no UPDATE-scoped evaluation exists anywhere in this estate), and
-#     it evaluates `namespaceObject` as null even when namespace.yaml is passed, so the cage it
-#     writes is the BASELINE dial (500m/256Mi), not the isolated dial (100m/64Mi, drop ALL) the
-#     governed Namespace declares. And exit 0 is not admission: a pod claiming a version the set
-#     does not carry is SKIPPED by every policy and kyverno exits 0 with `skip: 6` (review F2),
-#     so the summary line is parsed and `skip: 0` is required, and the `--table` output is
-#     parsed so that EVERY policy in the set, by its own metadata.name, has a Pass row (tidy
-#     2026-09-08, R2-7: `pass >= <policy files>` compared rule verdicts to files -- 8 to 6 --
-#     and would have admitted a set with one policy silent and another passing twice);
+#     `kyverno apply` over THE SET THE ADOPTER SERVES, read the way its own
+#     `gitops/composed/composed-set.yaml` serves it (ticket 135): the ResourceSet's version array
+#     ranged into one route per version, plus the composed-machinery route, each read from the
+#     tree that file's GitRepository pins (ref.tag, checked against ref.commit), never from the
+#     checkout. Only policy objects are asked for a verdict. A served PriorityClass gives none;
+#     it is graded by whether the class the cage WRITES onto the pod is one the set serves,
+#     because Kubernetes refuses a pod naming a PriorityClass that does not exist. Run 314 went
+#     red because platform v3.3.0 put the cage's PriorityClasses in each version directory and
+#     this check asked `cage-baseline-4-0-0` for a verdict it can never give.
+#     What that proves is narrower than "admitted" and the ok line says so: the CLI evaluates
+#     CREATE only (every composed policy declares CREATE+UPDATE; no UPDATE-scoped evaluation
+#     exists anywhere in this estate), and it evaluates `namespaceObject` as null even when
+#     namespace.yaml is passed, so the cage it writes is the BASELINE dial (500m/256Mi), not the
+#     isolated dial (100m/64Mi, drop ALL) the governed Namespace declares. And exit 0 is not
+#     admission (review F2): the `--table` output is parsed so that every policy of the CLAIMED
+#     version, and the orphan guard, each has a Pass row by its own metadata.name (R2-7), and
+#     every other row is a Pass or a Skip. The other versions' policies skip a pod that does not
+#     claim them, by design, so the summary's skip count is printed and not required to be 0;
 #   * the stack's Renovate manager must POINT AT the lifted stack manifest, not merely be named
 #     in `enabledManagers`, and its bumps must sit behind dependencyDashboardApproval.
 #
 #   PASS (exit 0)  every registered lift is listed at the checkout on the path its own
-#                  gotk-sync.yaml reconciles, is re-labelled, is admitted at CREATE under the
-#                  baseline dial, is discovered by its adopter's own gate, and is bumped there
+#                  gotk-sync.yaml reconciles, is re-labelled, is admitted and caged at CREATE
+#                  under the baseline dial by the set its adopter serves, is discovered by its
+#                  adopter's own gate, and is bumped there
 #   FAIL (exit 1)  a landed lift is wrong in any of those ways; the same app landed in two
-#                  adopters; a working copy of a lifted app is in the hub; kyverno refuses or
-#                  skips a served workload; the register disagrees with the tree
+#                  adopters; a working copy of a lifted app is in the hub; kyverno refuses a
+#                  served workload, or a policy of its claimed version skips it or is silent;
+#                  the cage writes a PriorityClass the served set does not carry, or none; the
+#                  served set cannot be read at its pin; the register disagrees with the tree
 #   SKIP (exit 3)  a registered lift has not landed in its adopter yet -- the line names the pull
 #                  request each waits on -- or there is no estate clone to read at all
 #
@@ -74,10 +83,10 @@ G() {
 }
 
 # ------------------------------------------------------------------ the kyverno verdict, parsed
-# summary_admits <summary line> <kyverno exit> -> 0 admitted, 1 not; KV_WHY says why.
-# Exit 0 from `kyverno apply` means the CLI ran, not that the workload was admitted: a policy
-# whose matchConditions exclude the pod is a SKIP, and a pod claiming a version the set does not
-# carry is skipped by every policy in it.
+# summary_admits <summary line> <kyverno exit> -> 0 when the CLI ran and nothing failed or
+# errored; 1 with KV_WHY. Exit 0 from `kyverno apply` means the CLI ran, not that the workload
+# was admitted. A SKIP is not judged here: the other versions' policies skip a pod that claims
+# this one, by design, so whether the RIGHT policies spoke is table_admits' question.
 summary_admits() {
   local line="$1" rc="$2" pass fail err skip
   KV_WHY=""
@@ -89,16 +98,17 @@ summary_admits() {
   skip=$(printf '%s' "$line" | sed -nE 's/.*skip: ([0-9]+).*/\1/p')
   [ -n "$pass" ] && [ -n "$fail" ] && [ -n "$err" ] && [ -n "$skip" ] || { KV_WHY="summary line not parseable: $line"; return 1; }
   if [ "$fail" -gt 0 ] || [ "$err" -gt 0 ]; then KV_WHY="fail: $fail, error: $err"; return 1; fi
-  if [ "$skip" -gt 0 ]; then
-    KV_WHY="skip: $skip -- $skip of the policies did not match the workload at all (a version the set does not carry is skipped, not admitted)"; return 1; fi
   return 0
 }
 
-# table_admits <kyverno --table output> <policy name>... -> 0 when every named policy has a
-# row whose RESULT is Pass and no row says otherwise; 1 with KV_WHY naming the policy. The
-# summary's `pass:` counts RULE verdicts, so it cannot say whether each POLICY spoke (R2-7).
+# table_admits <kyverno --table output> <policy name>... -> 0 when every NAMED policy has a row
+# whose RESULT is Pass and no row of any policy says anything but Pass or Skip; 1 with KV_WHY
+# naming the policy. The summary's `pass:` counts RULE verdicts, so it cannot say whether each
+# POLICY spoke (R2-7). The names are the claimed version's policies and the orphan guard: a
+# policy of the claimed version that skips the pod, or gives no row, has not caged it (a
+# version the set does not carry is skipped, not admitted -- review F2).
 table_admits() {
-  local table="$1" name result rows; shift
+  local table="$1" name result rows other; shift
   rows="$(printf '%s\n' "$table" | sed 's/\x1b\[[0-9;]*m//g' | grep -E '^│ *[0-9]+ *│')"
   [ -n "$rows" ] || { KV_WHY="kyverno --table printed no policy rows"; return 1; }
   for name in "$@"; do
@@ -109,34 +119,74 @@ table_admits() {
       *)    KV_WHY="policy $name: $result"; return 1 ;;
     esac
   done
+  other="$(printf '%s\n' "$rows" | awk -F'│' '{gsub(/ /,"",$3); gsub(/ /,"",$6); if ($6!="Pass" && $6!="Skip") print $3": "$6}' | sort -u | tr '\n' ',' | sed 's/,$//')"
+  [ -z "$other" ] || { KV_WHY="policy $other"; return 1; }
   return 0
 }
 
-# kyverno_run <policy dir> <orphan guard> <served manifest> -> summary_admits over a real apply,
-# then table_admits over a second apply with --table (the CLI prints one or the other);
-# KV_LINE is the summary line, KV_FILES the policy-file count, KV_NAMES the policies' own
-# metadata.names (space-separated, read from the files), KV_OUT the whole summary output.
+# class_served <kyverno summary output> <served class names, comma-separated> -> 0 when the
+# pod the cage mutated names a priorityClassName and the served set carries that class; 1 with
+# KV_WHY. KV_CLASS is the class written. Kubernetes' Priority admission refuses a pod whose
+# priorityClassName names no PriorityClass, so a class the set does not serve is a refusal at
+# CREATE, and no class at all is a pod the cage never touched.
+class_served() {
+  local out="$1" classes=",$2,"
+  KV_CLASS="$(printf '%s\n' "$out" | sed -nE 's/^ *priorityClassName: *"?([^" ]+)"? *$/\1/p' | tail -1)"
+  if [ -z "$KV_CLASS" ]; then
+    KV_WHY="no policy in the served set wrote a priorityClassName onto the pod, so nothing caged it"; return 1; fi
+  case "$classes" in
+    *",$KV_CLASS,"*) return 0 ;;
+  esac
+  KV_WHY="the cage writes priorityClassName $KV_CLASS, which the served set does not carry, so Kubernetes refuses the pod at CREATE (it serves: ${2:--})"
+  return 1
+}
+
+# kyverno_run <policy dir> <served manifest> <must-pass names, comma> <served classes, comma>
+# -> summary_admits over a real apply of every policy the served set carries, then
+# table_admits over a second apply with --table (the CLI prints one or the other), then
+# class_served over the mutated pod. KV_LINE is the summary line, KV_FILES the policy count,
+# KV_OUT the whole summary output.
 kyverno_run() {
-  local policies="$1" guard="$2" served="$3" rc table
-  KV_LINE=""; KV_OUT=""; KV_FILES=0; KV_NAMES=""
-  [ -f "$guard" ] || { KV_WHY="$guard is missing: the set was applied without its orphan guard, which is the one policy that refuses a version the array does not declare"; return 1; }
-  KV_FILES=$(( $(ls "$policies"/*.yaml 2>/dev/null | wc -l | tr -d ' ') + 1 ))
-  KV_NAMES="$("$PY" - "$policies"/*.yaml "$guard" <<'NAMES'
-import sys, yaml
-names = []
-for path in sys.argv[1:]:
-    for doc in yaml.safe_load_all(open(path)):
-        if isinstance(doc, dict) and (doc.get("metadata") or {}).get("name"):
-            names.append(str(doc["metadata"]["name"]))
-print(" ".join(names))
-NAMES
-)"
-  KV_OUT="$(kyverno apply "$policies"/*.yaml "$guard" --resource "$served" 2>&1)"; rc=$?
+  local policies="$1" served="$2" must="$3" classes="$4" rc table
+  KV_LINE=""; KV_OUT=""; KV_FILES=0; KV_CLASS=""
+  KV_FILES=$(ls "$policies"/*.yaml 2>/dev/null | wc -l | tr -d ' ')
+  [ "$KV_FILES" -gt 0 ] || { KV_WHY="the served set carries no policy at all"; return 1; }
+  KV_OUT="$(kyverno apply "$policies"/*.yaml --resource "$served" 2>&1)"; rc=$?
   KV_LINE="$(printf '%s\n' "$KV_OUT" | grep -E '^pass: ' | tail -1 | sed 's/ *$//')"
-  summary_admits "$KV_LINE" "$rc" || return 1
-  table="$(kyverno apply "$policies"/*.yaml "$guard" --resource "$served" --table 2>&1)"
+  if ! summary_admits "$KV_LINE" "$rc"; then
+    local failed
+    failed="$(printf '%s\n' "$KV_OUT" | sed -nE 's/.*policy ([^ ]+) -> resource [^ ]+ failed.*/\1/p' | sort -u | tr '\n' ',' | sed 's/,$//')"
+    [ -z "$failed" ] || KV_WHY="$KV_WHY; failed: $failed"
+    return 1
+  fi
+  table="$(kyverno apply "$policies"/*.yaml --resource "$served" --table 2>&1)"
   # shellcheck disable=SC2086
-  table_admits "$table" $KV_NAMES
+  table_admits "$table" $(printf '%s' "$must" | tr ',' ' ') || return 1
+  class_served "$KV_OUT" "$classes"
+}
+
+# cage_grade <estate root> <register> -> one line per landed lift: what the set its adopter
+# serves does to the served workload. 0 when every one is admitted and caged, 1 otherwise.
+cage_grade() {
+  local estate="$1" reg="$2" work bad=0 app unit pin policies served must classes err
+  work="$(mktemp -d)"
+  while IFS=$'\t' read -r app unit pin policies served must classes err; do
+    [ -n "${app:-}" ] || continue
+    CAGE_GRADED=$((CAGE_GRADED + 1))
+    if [ "$err" != "-" ]; then
+      echo "  FAIL $app: ${unit}'s served set cannot grade ${served#"$estate/"} -- $err"
+      bad=1; continue
+    fi
+    if kyverno_run "$policies" "$served" "$must" "$classes"; then
+      echo "  ok   $app: the set ${unit} serves (gitops/composed/composed-set.yaml at $pin, ${KV_FILES} policies across every route its ResourceSet renders) admits ${served#"$estate/"} at CREATE only, baseline dial, no namespaceObject -- ${KV_LINE}; each policy of its claimed version and the orphan guard has a Pass row of its own (${must//,/ }), every other row is Pass or Skip, and the cage writes priorityClassName ${KV_CLASS}, which the set serves"
+    else
+      echo "  FAIL $app: the set ${unit} serves (${pin}) does not admit and cage ${served#"$estate/"} -- ${KV_WHY} (${KV_LINE:-no summary line})"
+      printf '%s\n' "$KV_OUT" | tail -20 | sed 's/^/       /'
+      bad=1
+    fi
+  done < <("$PY" "$HERE/lifted_apps.py" --estate-root "$estate" --register "$reg" --kyverno-plan "$work")
+  rm -rf "$work"
+  return "$bad"
 }
 
 # ----------------------------------------------------------------------------------- the fixture
@@ -167,6 +217,40 @@ spec:
   - expression: object.spec.?securityContext.?runAsNonRoot.orValue(false) == true
     message: pods on policy-version 4.0.0 must set spec.securityContext.runAsNonRoot=true
 YAML
+  # The cage, in the shape platform v3.3.0 serves it (ticket 111): a MutatingPolicy that writes
+  # the rung's priorityClassName, and the PriorityClass itself in the SAME version directory.
+  # The class is a served object, not a policy: run 314 asked it for a verdict (ticket 135).
+  cat >"$a/composed/policies/v4.0.0/cage-tier.yaml" <<'YAML'
+apiVersion: policies.kyverno.io/v1alpha1
+kind: MutatingPolicy
+metadata: {name: cage-tier-4-0-0}
+spec:
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ['']
+      apiVersions: [v1]
+      operations: [CREATE, UPDATE]
+      resources: [pods]
+  matchConditions:
+  - name: only-this-policy-version
+    expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '4.0.0'
+  mutations:
+  - patchType: ApplyConfiguration
+    applyConfiguration:
+      expression: 'Object{spec: Object.spec{priorityClassName: "cage-baseline-4-0-0", priority: -10}}'
+YAML
+  cat >"$a/composed/policies/v4.0.0/cage-baseline.yaml" <<'YAML'
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata: {name: cage-baseline-4-0-0}
+value: -10
+preemptionPolicy: Never
+globalDefault: false
+YAML
+  # A second served version, whose policies skip a pod that claims 4.0.0.
+  mkdir -p "$a/composed/policies/v5.0.0"
+  sed 's/4\.0\.0/5.0.0/g; s/4-0-0/5-0-0/g' "$a/composed/policies/v4.0.0/require-nonroot.yaml" >"$a/composed/policies/v5.0.0/require-nonroot.yaml"
+  printf 'resources:\n  - orphan-guard.yaml\n' >"$a/composed/kustomization.yaml"
   cat >"$a/composed/orphan-guard.yaml" <<'YAML'
 apiVersion: policies.kyverno.io/v1alpha1
 kind: ValidatingPolicy
@@ -184,7 +268,7 @@ spec:
     expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != ''
   variables:
   - name: allowed
-    expression: '[''4.0.0'']'
+    expression: '[''4.0.0'', ''5.0.0'']'
   - name: claimed
     expression: object.metadata.labels['policy-as-versioned.dev/policy-version']
   validations:
@@ -254,6 +338,10 @@ YAML
 JSON
   G -C "$a" add -A
   G -C "$a" commit -qm "ticket 33: the lift"
+  # The composed set, pinned to its own tag at the checkout (ticket 130's shape: gotk-sync.yaml
+  # still pins v1.0.0 while composed-set.yaml pins v2.0.0).
+  G -C "$a" tag v2.0.0
+  composed_set "$a" "4.0.0 5.0.0"
   cat >"$t/register.yaml" <<'YAML'
 lifts:
 - app: ledger
@@ -269,6 +357,62 @@ lifts:
   pull_request: https://example.invalid/pull/1
   identity: '<groupId>com\.mycompany</groupId>\s*<artifactId>ledger</artifactId>'
 YAML
+}
+
+# composed_set <adopter> <versions> -> write gitops/composed/composed-set.yaml pinning v2.0.0
+# at the commit it resolves to, with the ResourceSet shape all three adopters serve.
+composed_set() {
+  local a="$1" versions="$2" sha v
+  sha="$(G -C "$a" rev-parse 'v2.0.0^{commit}')"
+  mkdir -p "$a/gitops/composed"
+  {
+    cat <<YAML
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata: {name: tuppence-composed, namespace: flux-system}
+spec:
+  url: https://example.invalid/planted/tuppence
+  ref: {tag: v2.0.0, commit: $sha}
+---
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
+metadata: {name: composed-set, namespace: flux-system}
+spec:
+  inputs:
+    - versions:
+YAML
+    for v in $versions; do printf '        - { version: "%s" }\n' "$v"; done
+    [ -n "$versions" ] || printf '        []\n'
+    cat <<'YAML'
+  resourcesTemplate: |
+    << range $v := (index (inputs) "versions") >>
+    ---
+    apiVersion: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    metadata: {name: composed-v<< $v.version | slugify >>, namespace: flux-system}
+    spec:
+      sourceRef: {kind: GitRepository, name: tuppence-composed}
+      path: ./composed/policies/v<< $v.version >>
+    << end >>
+    ---
+    apiVersion: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    metadata: {name: composed-machinery, namespace: flux-system}
+    spec:
+      sourceRef: {kind: GitRepository, name: tuppence-composed}
+      path: ./composed
+YAML
+  } >"$a/gitops/composed/composed-set.yaml"
+}
+
+# recut_composed <fixture dir> [versions] -> commit the adopter's working tree, move v2.0.0 to
+# it, and re-pin composed-set.yaml there: a planted change to the SERVED set.
+recut_composed() {
+  local a="$1/estate/tuppence"
+  G -C "$a" add -A
+  G -C "$a" commit -qm "planted: recut the composed tag"
+  G -C "$a" tag -f v2.0.0 HEAD >/dev/null
+  composed_set "$a" "${2:-4.0.0 5.0.0}"
 }
 
 # Move the fixture's pin to the checkout: the tree v1.0.0 names now carries the lift.
@@ -391,47 +535,94 @@ selfcheck() {
   [ "$rc" = 1 ] && grep -q 'but the tag resolves to' "$t/out.txt" || {
     echo "FAIL: selfcheck: a tag+commit pair that disagree graded $rc (want 1, naming the mismatch)"; cat "$t/out.txt"; good=0; }
 
-  # The kyverno verdict is parsed, not trusted (review F2): the exact shape the review measured.
-  summary_admits "pass: 1, fail: 0, warn: 0, error: 0, skip: 6" 0 && {
-    echo "FAIL: selfcheck: 'pass: 1 ... skip: 6' at exit 0 was taken as admission"; good=0; }
+  # The kyverno verdict is parsed, not trusted (review F2).
   summary_admits "pass: 8, fail: 0, warn: 0, error: 0, skip: 0" 0 || {
     echo "FAIL: selfcheck: a full pass was refused: $KV_WHY"; good=0; }
+  summary_admits "pass: 8, fail: 1, warn: 0, error: 0, skip: 0" 0 && {
+    echo "FAIL: selfcheck: 'fail: 1' at exit 0 was taken as admission"; good=0; }
   summary_admits "pass: 8, fail: 0, warn: 0, error: 0, skip: 0" 1 && {
     echo "FAIL: selfcheck: a non-zero kyverno exit was taken as admission"; good=0; }
-  # ...and per POLICY by name (R2-7): a table where one policy is silent, or one row is not
-  # Pass, is not admission however the rule count adds up.
+  # ...and per POLICY by name (R2-7): a table where a named policy is silent or skips, or any
+  # row is neither Pass nor Skip, is not admission however the rule count adds up. A PriorityClass
+  # is never a name here (ticket 135): the plan names policies only.
   local tbl
-  tbl="$(printf '│ 1  │ a-4-0-0 │      │ ns/Pod/x │ Pass   │        │\n│ 2  │ guard   │      │ ns/Pod/x │ Pass   │        │\n')"
-  table_admits "$tbl" a-4-0-0 guard || { echo "FAIL: selfcheck: a table with every policy passing was refused: $KV_WHY"; good=0; }
+  tbl="$(printf '│ 1  │ a-4-0-0 │      │ ns/Pod/x │ Pass   │        │\n│ 2  │ guard   │      │ ns/Pod/x │ Pass   │        │\n│ 3  │ a-5-0-0 │      │ ns/Pod/x │ Skip   │        │\n')"
+  table_admits "$tbl" a-4-0-0 guard || { echo "FAIL: selfcheck: a table with every named policy passing and another version skipping was refused: $KV_WHY"; good=0; }
   table_admits "$tbl" a-4-0-0 b-4-0-0 guard && { echo "FAIL: selfcheck: a policy with no row in the table was taken as admitted"; good=0; }
-  tbl="$(printf '│ 1  │ a-4-0-0 │      │ ns/Pod/x │ Skip   │        │\n│ 2  │ guard   │      │ ns/Pod/x │ Pass   │        │\n')"
-  table_admits "$tbl" a-4-0-0 guard && { echo "FAIL: selfcheck: a Skip row in the table was taken as admission"; good=0; }
-  # ...and against the real engine over the planted set: the 4.0.0 pod is admitted, the 9.9.9
-  # pod is skipped by the version-scoped policy and refused by the guard.
+  table_admits "$tbl" a-4-0-0 a-5-0-0 guard && { echo "FAIL: selfcheck: a Skip row of a named policy was taken as admission"; good=0; }
+  tbl="$(printf '│ 1  │ a-4-0-0 │      │ ns/Pod/x │ Pass   │        │\n│ 2  │ guard   │      │ ns/Pod/x │ Pass   │        │\n│ 3  │ a-5-0-0 │      │ ns/Pod/x │ Fail   │        │\n')"
+  table_admits "$tbl" a-4-0-0 guard && { echo "FAIL: selfcheck: a Fail row of an unnamed policy was taken as admission"; good=0; }
+
+  # ...and against the real engine over the set the planted adopter SERVES (ticket 135): its
+  # composed-set.yaml at v2.0.0, both versions, the machinery route, a PriorityClass in the
+  # version directory. This is run 314's shape, and it is admitted and caged.
   rm -rf "$t"; t="$(mktemp -d)"; plant "$t"
-  local a="$t/estate/tuppence"
-  kyverno_run "$a/composed/policies/v4.0.0" "$a/composed/orphan-guard.yaml" "$a/gitops/apps/ledger.yaml" || {
-    echo "FAIL: selfcheck: the real kyverno refused the planted 4.0.0 pod: $KV_WHY"; printf '%s\n' "$KV_OUT" | tail -5; good=0; }
-  [ "$KV_FILES" = 2 ] || { echo "FAIL: selfcheck: counted $KV_FILES policy files (want 2: one composed policy plus the guard)"; good=0; }
-  [ "$KV_NAMES" = "require-nonroot-4-0-0 policy-version-orphan-guard" ] || { echo "FAIL: selfcheck: read policy names '$KV_NAMES' (want the two the planted files declare)"; good=0; }
-  sed 's/"4\.0\.0"/"9.9.9"/' "$a/gitops/apps/ledger.yaml" >"$t/ledger-999.yaml"
-  if kyverno_run "$a/composed/policies/v4.0.0" "$a/composed/orphan-guard.yaml" "$t/ledger-999.yaml"; then
+  CAGE_GRADED=0
+  cage_grade "$t/estate" "$t/register.yaml" >"$t/cage.txt" 2>&1 || {
+    echo "FAIL: selfcheck: the set the planted adopter serves (a PriorityClass in its version directory, run 314's shape) did not admit and cage the planted 4.0.0 pod"; cat "$t/cage.txt"; good=0; }
+  grep -q 'priorityClassName cage-baseline-4-0-0, which the set serves' "$t/cage.txt" || {
+    echo "FAIL: selfcheck: the ok line does not name the class the cage wrote"; cat "$t/cage.txt"; good=0; }
+  grep -q '4 policies across every route' "$t/cage.txt" || {
+    echo "FAIL: selfcheck: expected the 4 policies the planted set serves (cage-tier and require-nonroot at 4.0.0, require-nonroot at 5.0.0, the orphan guard) and not its PriorityClass"; cat "$t/cage.txt"; good=0; }
+  # The 9.9.9 pod through the real engine: the claimed version's policies skip it and the guard
+  # refuses it. (The plan names it first: 9.9.9 is not in the array.)
+  local w="$t/w" pr
+  "$PY" "$HERE/lifted_apps.py" --estate-root "$t/estate" --register "$t/register.yaml" --kyverno-plan "$w" >"$t/plan.tsv"
+  pr="$(cut -f4 "$t/plan.tsv")"
+  sed 's/"4\.0\.0"/"9.9.9"/' "$t/estate/tuppence/gitops/apps/ledger.yaml" >"$t/ledger-999.yaml"
+  if kyverno_run "$pr" "$t/ledger-999.yaml" "$(cut -f6 "$t/plan.tsv")" "$(cut -f7 "$t/plan.tsv")"; then
     echo "FAIL: selfcheck: the real kyverno over a 9.9.9 pod was taken as admission ($KV_LINE)"; good=0
   fi
-  printf '%s' "$KV_LINE" | grep -q 'skip: 1' || { echo "FAIL: selfcheck: expected the version-scoped policy to skip the 9.9.9 pod, got: $KV_LINE"; good=0; }
-  if kyverno_run "$a/composed/policies/v4.0.0" "$a/composed/no-such-guard.yaml" "$a/gitops/apps/ledger.yaml"; then
-    echo "FAIL: selfcheck: an apply without the orphan guard was taken as admission"; good=0
-  fi
+  # Each of these is a way the SERVED set can leave the lifted app unadmitted or uncaged.
+  for case in class-not-served uncaged other-version-refuses pin-not-checkout version-not-served no-guard no-composed-set composed-pin-mismatch; do
+    rm -rf "$t"; t="$(mktemp -d)"; plant "$t"; a="$t/estate/tuppence"
+    case "$case" in
+      class-not-served) desc="the cage writes a PriorityClass the served set does not carry"
+                        want="cage-baseline-4-0-0, which the served set does not carry"
+                        rm "$a/composed/policies/v4.0.0/cage-baseline.yaml"; recut_composed "$t" ;;
+      uncaged)          desc="no served policy writes a priorityClassName"
+                        want="nothing caged it"
+                        rm "$a/composed/policies/v4.0.0/cage-tier.yaml"; recut_composed "$t" ;;
+      other-version-refuses) desc="a policy of ANOTHER served version refuses the pod"
+                        want="failed: require-nonroot-5-0-0"
+                        sed -i.bak '/matchConditions:/,/orValue/d; s/validationActions: \[Audit\]/validationActions: [Deny]/; s/expression: object.spec.*/expression: "false"/' "$a/composed/policies/v5.0.0/require-nonroot.yaml"
+                        rm -f "$a/composed/policies/v5.0.0/require-nonroot.yaml.bak"; recut_composed "$t" ;;
+      pin-not-checkout) desc="the set at the PIN refuses the pod while the checkout would admit it"
+                        want="require-nonroot-4-0-0"
+                        cp "$a/composed/policies/v4.0.0/require-nonroot.yaml" "$t/keep.yaml"
+                        sed -i.bak 's/runAsNonRoot.orValue(false) == true/runAsNonRoot.orValue(false) == false/' "$a/composed/policies/v4.0.0/require-nonroot.yaml"
+                        rm -f "$a/composed/policies/v4.0.0/require-nonroot.yaml.bak"; recut_composed "$t"
+                        cp "$t/keep.yaml" "$a/composed/policies/v4.0.0/require-nonroot.yaml" ;;
+      version-not-served) desc="composed-set.yaml does not serve the version the pod claims"
+                        want="claims 4.0.0"
+                        composed_set "$a" "5.0.0" ;;
+      no-guard)         desc="the machinery route does not serve the orphan guard"
+                        want="carries no orphan-guard.yaml"
+                        printf 'resources: []\n' >"$a/composed/kustomization.yaml"; recut_composed "$t" ;;
+      no-composed-set)  desc="the adopter serves no composed set at all"
+                        want="has no gitops/composed/composed-set.yaml"
+                        rm "$a/gitops/composed/composed-set.yaml" ;;
+      composed-pin-mismatch) desc="composed-set.yaml's tag and commit disagree"
+                        want="but the tag resolves to"
+                        sed -i.bak -E 's/commit: [0-9a-f]+/commit: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef/' "$a/gitops/composed/composed-set.yaml" ;;
+    esac
+    CAGE_GRADED=0
+    if cage_grade "$t/estate" "$t/register.yaml" >"$t/cage.txt" 2>&1; then
+      echo "FAIL: selfcheck: planted cage case '${case}' (${desc}) was admitted"; cat "$t/cage.txt"; good=0
+    elif ! grep -qF -- "$want" "$t/cage.txt"; then
+      echo "FAIL: selfcheck: planted cage case '${case}' failed without naming it (want '${want}')"; cat "$t/cage.txt"; good=0
+    fi
+  done
 
   rm -rf "$t"
   [ "$good" = 1 ] || return 1
-  echo "  ok   selfcheck: the grader fails fifteen ways a lift can look done and not be (the served path read from the adopter's own gotk-sync.yaml among them), could-not-looks (naming the pull request) when one has not landed, counts both residuals and the pinned trees it could not read, accepts a glob pattern and a ./ entry, and parses the kyverno verdict per policy by name (a skipped 9.9.9 pod at exit 0 is not admitted)"
+  echo "  ok   selfcheck: the grader fails fifteen ways a lift can look done and not be (the served path read from the adopter's own gotk-sync.yaml among them), could-not-looks (naming the pull request) when one has not landed, counts both residuals and the pinned trees it could not read, accepts a glob pattern and a ./ entry, parses the kyverno verdict per policy by name (a skipped 9.9.9 pod at exit 0 is not admitted), and grades the set the adopter's composed-set.yaml serves at its pin (a PriorityClass in a version directory gives no verdict and is admitted; eight ways that set can leave the app unadmitted or uncaged all fail by name)"
 }
 
 case "${1:-}" in
   --selfcheck)
     selfcheck || exit 1
-    echo "PASS: selfcheck: an unlisted served manifest, a wrong Flux path, a missing gotk-sync.yaml, a tag+commit mismatch, an orphan version claim, a surviving incumbent label, a missing stack manifest, four broken renovate shapes, four hub copies and a second adopter all fail; an unlanded lift could-not-looks and names its pull request; a pinned tree without the lift, and a pinned tag this clone cannot read, are counted limits on one line; a skipped kyverno verdict at exit 0, and a policy with no row of its own in the kyverno table, are not admission"
+    echo "PASS: selfcheck: an unlisted served manifest, a wrong Flux path, a missing gotk-sync.yaml, a tag+commit mismatch, an orphan version claim, a surviving incumbent label, a missing stack manifest, four broken renovate shapes, four hub copies and a second adopter all fail; an unlanded lift could-not-looks and names its pull request; a pinned tree without the lift, and a pinned tag this clone cannot read, are counted limits on one line; a skipped kyverno verdict at exit 0, and a policy with no row of its own in the kyverno table, are not admission; the set an adopter serves is read from its composed-set.yaml at its pin, a PriorityClass in a version directory is not asked for a verdict (run 314), and a class the set does not serve, no cage at all, another version refusing, a refusal only at the pin, an unserved version, no orphan guard, no composed set and a tag+commit mismatch all fail"
     exit 0 ;;
 esac
 
@@ -465,7 +656,8 @@ say "2. the same discovery the adopters' own shift-left gates run"
 # .github/scripts/served-workloads.py, which its shift-left job feeds to ci-check.py. If the two
 # ever disagree, the gate is grading a different set from the one the cluster is served.
 plan_missing=0
-while IFS=$'\t' read -r app unit policies guard served; do
+PLAN_WORK="$(mktemp -d)"
+while IFS=$'\t' read -r app unit _pin _policies served _rest; do
   [ -n "${app:-}" ] || continue
   script="$ESTATE/$unit/.github/scripts/served-workloads.py"
   if [ ! -f "$script" ]; then
@@ -479,29 +671,21 @@ while IFS=$'\t' read -r app unit policies guard served; do
     echo "  FAIL $unit's own served-workloads.py does not name $rel, so its shift-left gate never grades it"
     plan_missing=1
   fi
-done < <("$PY" "$HERE/lifted_apps.py" --estate-root "$ESTATE" --register "$REG" --kyverno-plan)
+done < <("$PY" "$HERE/lifted_apps.py" --estate-root "$ESTATE" --register "$REG" --kyverno-plan "$PLAN_WORK")
+rm -rf "$PLAN_WORK"
 
-say "3. the adopter's own composed policy set plus orphan guard, run over the served workload (kyverno $(kyverno version 2>/dev/null | awk '/^Version/{print $2}'); CREATE only, baseline dial, no namespaceObject)"
+say "3. the set each adopter serves (gitops/composed/composed-set.yaml at its pin, every route its ResourceSet renders), run over the served workload (kyverno $(kyverno version 2>/dev/null | awk '/^Version/{print $2}'); CREATE only, baseline dial, no namespaceObject)"
 if ! command -v kyverno >/dev/null 2>&1; then
   echo "FAIL: the kyverno CLI is not on this runner, so no served workload was put through any adopter's composed policy set. A gate that has lost its instrument goes red; it does not shrug"
   exit 1
 fi
 kyverno_bad=0
-graded=0
-while IFS=$'\t' read -r app unit policies guard served; do
-  [ -n "${app:-}" ] || continue
-  graded=$((graded + 1))
-  if kyverno_run "$policies" "$guard" "$served"; then
-    echo "  ok   $app: ${unit}'s own composed set plus orphan guard admits ${served#"$ESTATE/"} at CREATE only, baseline dial, no namespaceObject -- ${KV_LINE}; every one of the ${KV_FILES} policies has a Pass row of its own (${KV_NAMES})"
-  else
-    echo "  FAIL $app: ${unit}'s composed set does not admit ${served#"$ESTATE/"} -- ${KV_WHY} (${KV_LINE:-no summary line})"
-    printf '%s\n' "$KV_OUT" | tail -20 | sed 's/^/       /'
-    kyverno_bad=1
-  fi
-done < <("$PY" "$HERE/lifted_apps.py" --estate-root "$ESTATE" --register "$REG" --kyverno-plan)
+CAGE_GRADED=0
+cage_grade "$ESTATE" "$REG" || kyverno_bad=1
+graded=$CAGE_GRADED
 
 if [ "$kyverno_bad" = 1 ] || [ "$plan_missing" = 1 ]; then
-  echo "FAIL: a served workload is not admitted by its own adopter's composed policy set at CREATE, or that adopter's own gate cannot discover it"
+  echo "FAIL: a served workload is not admitted and caged at CREATE by the set its own adopter serves, or that adopter's own gate cannot discover it"
   exit 1
 fi
 if [ "$structural" = 1 ]; then
@@ -513,5 +697,5 @@ if [ "$structural" = 3 ]; then
   echo "SKIP: ${graded} of ${total} lifts have landed in their adopter; the rest are proposed and unmerged, and the rows above name the pull request each one waits on"
   exit 3
 fi
-echo "PASS: ${graded} lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml reconciles; admitted at CREATE under the baseline dial by that adopter's own composed set plus orphan guard (kyverno apply, no namespaceObject); discovered by that adopter's own served-workloads.py; bumped by that adopter's own renovate manager behind dashboard approval; ${pinned_absent:-?} of ${total} are not in the tree the GitRepository pins (${pinned_tags:-unread}) and ${pinned_unread:-?} of ${total} pinned trees could not be read; the hub carries no working copy of any of them"
+echo "PASS: ${graded} lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml reconciles; admitted and caged at CREATE under the baseline dial by the set that adopter's gitops/composed/composed-set.yaml serves at its pin, every version and the machinery route (kyverno apply, no namespaceObject), onto a PriorityClass that set carries; discovered by that adopter's own served-workloads.py; bumped by that adopter's own renovate manager behind dashboard approval; ${pinned_absent:-?} of ${total} are not in the tree the GitRepository pins (${pinned_tags:-unread}) and ${pinned_unread:-?} of ${total} pinned trees could not be read; the hub carries no working copy of any of them"
 exit 0

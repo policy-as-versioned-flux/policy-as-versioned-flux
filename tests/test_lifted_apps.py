@@ -35,7 +35,11 @@ What these tests hold down:
  11. a copy of a lifted app inside the HUB FAILS, wherever it is parked (F4): at the lifted
      path, under any `<app>/` directory, or by the stack manifest's identity;
  12. the residuals (whose registry still publishes the image; how many lifts the pinned tree
-     does not list) are NUMBERS the report prints, not sentences in a document that go stale.
+     does not list) are NUMBERS the report prints, not sentences in a document that go stale;
+ 13. the kyverno plan is the set the adopter SERVES (ticket 135): read from its own
+     gitops/composed/composed-set.yaml at the tag that file pins, every version in its array plus
+     the machinery route; only policies must give a verdict, and a served PriorityClass is not
+     one (run 314 asked `cage-baseline-4-0-0` for a verdict it can never give).
 """
 
 from __future__ import annotations
@@ -139,6 +143,56 @@ spec:
   prune: true
 """
 
+REQUIRE_NONROOT = """\
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+metadata: {name: require-nonroot-4-0-0}
+spec: {}
+"""
+
+CAGE_BASELINE = """\
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata: {name: cage-baseline-4-0-0}
+value: -10
+"""
+
+# The adopter's ResourceSet, in the shape all three adopters serve at v2.0.0 (ticket 130): one
+# Kustomization per version in the array, and composed-machinery for the composed/ root.
+TEMPLATE = """\
+<< range $v := (index (inputs) "versions") >>
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: composed-v<< $v.version | slugify >>
+  namespace: flux-system
+spec:
+  sourceRef: {kind: GitRepository, name: tuppence-composed}
+  path: ./composed/policies/v<< $v.version >>
+<< end >>
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata: {name: composed-machinery, namespace: flux-system}
+spec:
+  sourceRef: {kind: GitRepository, name: tuppence-composed}
+  path: ./composed
+"""
+
+
+def _composed_set(commit: str, versions: tuple[str, ...], template: str | None) -> str:
+    repo = {"apiVersion": "source.toolkit.fluxcd.io/v1", "kind": "GitRepository",
+            "metadata": {"name": "tuppence-composed", "namespace": "flux-system"},
+            "spec": {"url": "https://example.invalid/planted/tuppence",
+                     "ref": {"tag": "v2.0.0", "commit": commit}}}
+    rs = {"apiVersion": "fluxcd.controlplane.io/v1", "kind": "ResourceSet",
+          "metadata": {"name": "composed-set", "namespace": "flux-system"},
+          "spec": {"inputs": [{"versions": [{"version": v} for v in versions]}],
+                   "resourcesTemplate": TEMPLATE if template is None else template}}
+    return yaml.safe_dump_all([repo, rs], sort_keys=False)
+
+
 # The fixture's own git runs no hook: the owner's global core.hooksPath runs a rate-limited
 # network scan on every commit, fixture commits included (estate-clone hazards, note 5).
 NO_HOOKS = Path(tempfile.mkdtemp(prefix="lifted-apps-no-hooks-"))
@@ -163,14 +217,21 @@ def _kustomization(resources: list[str]) -> str:
 def _estate(tmp_path: Path, *, served: str = SERVED, resources: list[str] | None = None,
             renovate: dict | None = None, stack: bool = True, flux_path: str = "./gitops/apps",
             sync: bool = True, pinned_has_lift: bool = False, tag: str = "v1.0.0",
-            extra_sync: str = "") -> Path:
+            extra_sync: str = "", composed_set: bool = True,
+            versions: tuple[str, ...] = ("4.0.0",), composed_commit: str | None = None,
+            template: str | None = None) -> Path:
     """One adopter, as a real git repository: v1.0.0 is tagged BEFORE the lift lands (the shape
     all three real adopters have today) unless pinned_has_lift moves the tag to the checkout."""
     estate = tmp_path / "estate"
     a = estate / "tuppence"
     (a / "composed" / "policies" / "v4.0.0").mkdir(parents=True)
-    (a / "composed" / "policies" / "v4.0.0" / "require-nonroot.yaml").write_text("{}\n")
+    (a / "composed" / "policies" / "v4.0.0" / "require-nonroot.yaml").write_text(REQUIRE_NONROOT)
+    # platform v3.3.0 serves the cage's PriorityClasses inside each version directory (ticket
+    # 111). They are served OBJECTS, not policies: run 314 asked cage-baseline-4-0-0 for a
+    # verdict it can never give (ticket 135).
+    (a / "composed" / "policies" / "v4.0.0" / "cage-baseline.yaml").write_text(CAGE_BASELINE)
     (a / "composed" / "orphan-guard.yaml").write_text(ORPHAN_GUARD)
+    (a / "composed" / "kustomization.yaml").write_text(_kustomization(["orphan-guard.yaml"]))
     (a / "gitops" / "apps").mkdir(parents=True)
     (a / "gitops" / "flux-system").mkdir(parents=True)
     (a / "gitops" / "apps" / "namespace.yaml").write_text(
@@ -192,6 +253,14 @@ def _estate(tmp_path: Path, *, served: str = SERVED, resources: list[str] | None
     _git(a, "commit", "-qm", "ticket 33: the lift")
     if pinned_has_lift:
         _git(a, "tag", "-f", "v1.0.0", "HEAD")
+    # The composed set is pinned to its own tag, cut at the checkout (the shape ticket 130 left:
+    # composed-set.yaml pins v2.0.0 while gotk-sync.yaml still pins v1.0.0).
+    _git(a, "tag", "v2.0.0", "HEAD")
+    if composed_set:
+        (a / "gitops" / "composed").mkdir(parents=True)
+        (a / "gitops" / "composed" / "composed-set.yaml").write_text(
+            _composed_set(_git(a, "rev-parse", "v2.0.0^{commit}") if composed_commit is None
+                          else composed_commit, versions, template))
     commit = _git(a, "rev-parse", "v1.0.0^{commit}")
     if sync:
         (a / "gitops" / "flux-system" / "gotk-sync.yaml").write_text(
@@ -505,14 +574,103 @@ def test_no_estate_at_all_is_a_could_not_look(tmp_path):
     assert report.exit_code == 3, report.text()
 
 
-def test_the_kyverno_plan_names_the_orphan_guard(tmp_path):
-    plan = lifted_apps.kyverno_plan(_estate(tmp_path), _register(tmp_path))
-    assert len(plan) == 1
-    app, adopter, policies, guard, served = plan[0]
-    assert (app, adopter) == ("ledger", "tuppence")
-    assert policies.endswith("composed/policies/v4.0.0")
-    assert guard.endswith("composed/orphan-guard.yaml")
-    assert served.endswith("gitops/apps/ledger.yaml")
+# --------------------------------------------------------------------------- ticket 135: the served set
+
+def _plan(tmp_path: Path, **kw):
+    into = tmp_path / "into"
+    rows = lifted_apps.kyverno_plan(_estate(tmp_path, **kw), _register(tmp_path), into)
+    assert len(rows) == 1
+    return rows[0], into
+
+
+def test_the_kyverno_plan_asks_only_policies_for_a_verdict(tmp_path):
+    # Run 314: platform v3.3.0 put the cage's PriorityClasses in each version directory, and
+    # the check asked `cage-baseline-4-0-0` for a verdict. A PriorityClass is served, not
+    # evaluated; it is graded by whether the class the cage writes exists.
+    row, into = _plan(tmp_path)
+    assert row.error is None, row.error
+    assert (row.app, row.adopter) == ("ledger", "tuppence")
+    assert row.must_pass == ("require-nonroot-4-0-0", "policy-version-orphan-guard")
+    assert "cage-baseline-4-0-0" not in row.must_pass
+    assert row.classes == ("cage-baseline-4-0-0",)
+    written = sorted(p.read_text() for p in Path(row.policy_dir).glob("*.yaml"))
+    assert len(written) == 2 and not any("PriorityClass" in t for t in written)
+    assert row.served.endswith("gitops/apps/ledger.yaml")
+    assert row.pin.startswith("v2.0.0@")
+
+
+def test_the_set_is_read_at_the_tag_composed_set_pins_not_at_the_checkout(tmp_path):
+    estate = _estate(tmp_path)
+    a = estate / "tuppence"
+    (a / "composed" / "policies" / "v4.0.0" / "require-nonroot.yaml").write_text(
+        REQUIRE_NONROOT.replace("require-nonroot-4-0-0", "only-at-the-checkout"))
+    row = lifted_apps.kyverno_plan(estate, _register(tmp_path), tmp_path / "into")[0]
+    assert row.error is None, row.error
+    assert "require-nonroot-4-0-0" in row.must_pass
+    assert "only-at-the-checkout" not in row.must_pass
+
+
+def _recut(a: Path, versions: tuple[str, ...] = ("4.0.0",)) -> None:
+    """Commit the adopter's working tree, move v2.0.0 to it, and re-pin composed-set.yaml."""
+    _git(a, "add", "-A")
+    _git(a, "commit", "-qm", "recut the composed tag")
+    _git(a, "tag", "-f", "v2.0.0", "HEAD")
+    (a / "gitops" / "composed" / "composed-set.yaml").write_text(
+        _composed_set(_git(a, "rev-parse", "v2.0.0^{commit}"), versions, None))
+
+
+def test_every_served_version_is_applied_and_only_the_claimed_one_must_pass(tmp_path):
+    estate = _estate(tmp_path)
+    a = estate / "tuppence"
+    (a / "composed" / "policies" / "v5.0.0").mkdir()
+    (a / "composed" / "policies" / "v5.0.0" / "require-nonroot.yaml").write_text(
+        REQUIRE_NONROOT.replace("4-0-0", "5-0-0"))
+    _recut(a, ("4.0.0", "5.0.0"))
+    row = lifted_apps.kyverno_plan(estate, _register(tmp_path), tmp_path / "into")[0]
+    assert row.error is None, row.error
+    assert row.versions == ("4.0.0", "5.0.0")
+    assert row.must_pass == ("require-nonroot-4-0-0", "policy-version-orphan-guard")
+    names = sorted(yaml.safe_load(p.read_text())["metadata"]["name"]
+                   for p in Path(row.policy_dir).glob("*.yaml"))
+    assert names == ["policy-version-orphan-guard", "require-nonroot-4-0-0",
+                     "require-nonroot-5-0-0"]
+
+
+def test_a_served_version_the_pinned_tree_does_not_carry_is_named(tmp_path):
+    # v5.0.0 is in the array and the pinned tree does not carry it: Flux's Kustomization for it
+    # never becomes Ready, and the check says so rather than applying less than is served.
+    row, _ = _plan(tmp_path, versions=("4.0.0", "5.0.0"))
+    assert row.error is not None and "composed/policies/v5.0.0" in row.error
+
+
+def test_a_claimed_version_the_composed_set_does_not_serve_is_named(tmp_path):
+    row, _ = _plan(tmp_path, versions=())
+    assert row.error is not None
+    assert "claims 4.0.0" in row.error and "serves []" in row.error
+
+
+def test_an_adopter_that_serves_no_composed_set_is_named(tmp_path):
+    row, _ = _plan(tmp_path, composed_set=False)
+    assert row.error is not None and "gitops/composed/composed-set.yaml" in row.error
+
+
+def test_a_composed_pin_whose_tag_and_commit_disagree_is_named(tmp_path):
+    row, _ = _plan(tmp_path, composed_commit="deadbeef" * 5)
+    assert row.error is not None and "resolves to" in row.error
+
+
+def test_a_template_expression_this_check_does_not_render_is_named_not_guessed(tmp_path):
+    row, _ = _plan(tmp_path, template=TEMPLATE.replace("<< $v.version >>", "<< $v.other >>"))
+    assert row.error is not None and "$v.other" in row.error
+
+
+def test_a_served_set_without_its_orphan_guard_is_named(tmp_path):
+    estate = _estate(tmp_path)
+    a = estate / "tuppence"
+    (a / "composed" / "kustomization.yaml").write_text(_kustomization([]))
+    _recut(a)
+    row = lifted_apps.kyverno_plan(estate, _register(tmp_path), tmp_path / "into")[0]
+    assert row.error is not None and "orphan-guard.yaml" in row.error
 
 
 # --------------------------------------------------------------------------- tidy 2026-09-08 (R2-1..3)
