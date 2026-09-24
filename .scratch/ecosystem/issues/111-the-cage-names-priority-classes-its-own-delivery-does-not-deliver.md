@@ -1,7 +1,7 @@
 # 111 — The cage names priority classes its own delivery does not deliver
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -294,3 +294,24 @@ Also named, not built: the platform machinery (orphan cage, governed-namespace c
 `composed/policies/v*/`. No adopter pins a platform tree that carries the machinery cages today
 (their implementations pin is `v2.0.1`), so nothing is refused on a cluster yet. The day an
 adopter's implementations pin moves past `v3.0.0`, those objects need a delivery route too.
+
+## Answer
+
+Resolved 2026-09-24. Fact 6 reads true on a scheduled sample for all three adopters, with the
+priority classes delivered by the route this ticket chose.
+
+1. **Delivery.** The composer writes each version's PriorityClasses into the adopter's composed
+   set (platform PR 30, in tools v3.3.0) and refuses a set that names a class it does not carry
+   (`undelivered-priority-class`, `unreadable-priority-class`). Ticket 130 delivered the
+   machinery at the `composed/` root.
+2. **The rollout.** Each adopter moved to tools v3.3.0, cut v2.0.0, and moved its composed set to
+   it with the versions 4.0.0 and 5.0.0.
+3. **Scheduled samples, 2026-09-24,** each reading `fact_6_the_bottom_rung_is_admitted_and_runs`
+   true, the workload on `cage-isolated-5-0-0` (priority -10000) with the cage's `waf-sidecar`:
+   driftwood run 35995156466 (11:49Z), tuppence run 36006834728 (13:38Z), ludlow run
+   36010939303 (14:12Z). No run was dispatched to stand in for them.
+4. **The second mismatch** this ticket named (installed versions ranged from platform's array,
+   not from what the adopter composed) is closed by ticket 130's `reach` check, which refuses an
+   array that is not the tag's version directories.
+
+The same samples read fact 4 false for a new reason, ticket 140.
