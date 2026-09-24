@@ -35,7 +35,7 @@ No price carries a `since` later than its `as_of`, or the record says why that i
 ## Build, 2026-09-22
 
 Built 2026-09-24 on platform branch `ticket-139-since-after-as-of` (platform PR 43, on origin/main
-7402f3c) and hub branch `ticket-139-ungoverned-namespace-born` (hub PR linked from platform PR 43).
+7402f3c) and hub branch `ticket-139-ungoverned-namespace-born` (hub PR 125).
 
 ### How the case arises, measured on tuppence
 
