@@ -113,5 +113,5 @@ ungoverned prices without these two lines.
 
 ### What remains
 
-- Merge the platform PR, then the hub PR. No tools release, no recompose and nothing for the owner.
+- Merge platform PR 42, then hub PR 124. No tools release, no recompose and nothing for the owner.
 - The next truth run on hub main should grade `verify-priced-holes.sh` PASS for tuppence.
