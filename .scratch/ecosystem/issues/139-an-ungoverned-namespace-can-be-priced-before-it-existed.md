@@ -1,7 +1,7 @@
 # 139 — An ungoverned Namespace can be priced before it existed
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -32,7 +32,7 @@ What this ticket owes:
 
 No price carries a `since` later than its `as_of`, or the record says why that is correct.
 
-## Build, 2026-09-22
+## Build, 2026-09-24
 
 Built 2026-09-24 on platform branch `ticket-139-since-after-as-of` (platform PR 43, on origin/main
 7402f3c) and hub branch `ticket-139-ungoverned-namespace-born` (hub PR 125).
@@ -128,3 +128,20 @@ Built 2026-09-24 on platform branch `ticket-139-since-after-as-of` (platform PR 
 
 The platform tools release is a signed tag. This build did not cut it. The task names the
 integrator for it; if the tag must be the owner's, step 2 waits on the owner. Nothing else waits.
+
+## Answer
+
+Resolved 2026-09-24 by platform PR 43 (in tools v3.4.1), tuppence PR 40 and hub PR 125.
+
+1. **The rule stays.** A composition's `as_of` is its newest signed input: each envelope's
+   `published_at` and each edge's `since`. A tag date is history, not an input. Counting it
+   would move every price whenever the adopter tags, and one tree would compose to two dates.
+2. **So a `since` later than `as_of` is correct, and the price now says so.** The composer
+   reads the ramp over `since` to `max(since, as_of)` and adds a limit that names both dates.
+   The grader reads the same window and fails a later `since` that carries no such limit.
+3. **Measured.** Recomposing driftwood and ludlow under v3.4.1 is byte-identical. tuppence gains
+   one limit on `openbao`; its amount (2,375,978.79 GBP) and ramp (1.0) do not move. The hub
+   grader passes on tuppence at PR 40's head, and fails by name on the old evidence.
+
+Review: one round, pass. The platform README still describes the old ramp wording; recorded,
+not fixed.
