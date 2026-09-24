@@ -41,6 +41,14 @@ would pass three gates that had broken in the same direction.
               refusal by itself; the fold reads the evidence, never the version number.
   retirement  2.0.1 leaves the window -- a retirement reaches the institution as a major and the
               gate refuses.
+  accepted    4.0.0 enters the window, and the head commits accepted-majors/platform-4.0.0.yaml
+              naming the gate's own party, platform and 4.0.0 (eco-system ticket 132). The composed
+              bump is still major, and the gate adopts, because every major it adds is accepted.
+  misaddressed  the same arrival, with a record for the gate's own party that names 4.0.1. A
+              record for another version counts for nothing, so the gate refuses.
+
+  The record in the last two cases is a planted fixture in a throwaway repository, not an
+  acceptance. Its format is the one verify/unreviewed-major/unreviewed_major.py defines.
 
 WHAT THIS DOES NOT GRADE. Whether any one gate's verdict is RIGHT beyond these four planted
 movements; each repository's own `verify-adopter-gate.sh` grades its own gate in depth, and this
@@ -300,12 +308,24 @@ VALUE_FLAGS = (PLATFORM_DIR_FLAGS | ADOPTER_DIR_FLAGS | BASE_REF_FLAGS | HEAD_RE
                | IDENTITY_FLAGS | ISSUER_FLAGS)
 
 CASES = {
-    # name: (base window, head window, base pin tag, head pin tag, verdict, composed)
+    # name: (base window, head window, base pin tag, head pin tag, verdict, composed
+    #        [, the version an acceptance record at the head names, for the gate's own party])
     "standing": (["4.0.0"], ["4.0.0"], "v2.0.1", "v2.0.1", "adopt", "none"),
     "arrival": (["2.0.1"], ["2.0.1", "4.0.0"], "v2.0.0", "v2.0.1", "refuse", "major"),
     "quiet": (["2.0.0"], ["2.0.0", "2.0.1"], "v2.0.0", "v2.0.1", "adopt", "none"),
     "retirement": (["2.0.1", "4.0.0"], ["4.0.0"], "v2.0.0", "v2.0.1", "refuse", "major"),
+    "accepted": (["2.0.1"], ["2.0.1", "4.0.0"], "v2.0.0", "v2.0.1", "adopt", "major", "4.0.0"),
+    "misaddressed": (["2.0.1"], ["2.0.1", "4.0.0"], "v2.0.0", "v2.0.1", "refuse", "major", "4.0.1"),
 }
+
+RECORD_TEMPLATE = """# A planted fixture in a throwaway repository (fold_agreement.py). Not an acceptance.
+kind: major-acceptance
+party: {party}
+publisher: platform
+version: {version}
+accepted_by: fold-agreement fixture
+accepted_on: 2026-09-22
+"""
 
 PIN_TEMPLATE = """apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
@@ -374,13 +394,24 @@ def _write_state(repo: Path, window: list[str], tag: str, commit: str) -> None:
     (repo / "composed" / "evidence.json").write_text(json.dumps({"members": members}, indent=2))
 
 
-def plant(adopter_repo: Path, case: tuple, tag_commits: dict[str, str]) -> dict[str, str]:
+def plant(adopter_repo: Path, case: tuple, tag_commits: dict[str, str],
+          party: str = "") -> dict[str, str]:
     base_window, head_window, base_tag, head_tag = case[0], case[1], case[2], case[3]
+    record_version = case[6] if len(case) > 6 else None
     adopter_repo.mkdir(parents=True, exist_ok=True)
     _git(adopter_repo, "init", "-q", "-b", "main")
     _write_state(adopter_repo, base_window, base_tag, tag_commits[base_tag])
     base_sha = _commit(adopter_repo, "base")
     _write_state(adopter_repo, head_window, head_tag, tag_commits[head_tag])
+    if record_version is not None:
+        # Ticket 132: the record lands with the pull request that adds the major, as the real
+        # v3.3.0 rollout's did, so it is in the head's tree and not the base's.
+        if not party:
+            raise ValueError("a case that plants an acceptance record needs the gate's own party")
+        records = adopter_repo / "accepted-majors"
+        records.mkdir(parents=True, exist_ok=True)
+        (records / f"platform-{record_version}.yaml").write_text(
+            RECORD_TEMPLATE.format(party=party, version=record_version))
     head_sha = _commit(adopter_repo, "head")
     return {"base_sha": base_sha, "head_sha": head_sha, "base_tag": base_tag, "head_tag": head_tag}
 
@@ -587,7 +618,7 @@ def run(estate: Path) -> tuple[str, list[tuple[str, str]]]:
                 workdir = root / name / unit
                 workdir.mkdir(parents=True)
                 adopter_repo = workdir / "repo"
-                planted = plant(adopter_repo, case, tag_commits)
+                planted = plant(adopter_repo, case, tag_commits, party=unit)
                 _git(platform_dir, "checkout", "--quiet", head_tag)
                 try:
                     result, reason = run_gate(unit, estate / unit, planted, platform_dir,

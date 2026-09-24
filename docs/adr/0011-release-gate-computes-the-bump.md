@@ -93,7 +93,8 @@ the window. Ticket 129 gives it that input (delegated, ADR-0025).
 **The record.** One YAML file per accepted major, under `accepted-majors/` in the adopter's own
 repository, read at the commit that repository serves. It carries `kind: major-acceptance`, the
 `party` accepting, the `publisher`, the exact `version`, `accepted_by` and `accepted_on` (an ISO
-date). `verify/unreviewed-major/unreviewed_major.py` documents the format and holds the only reader.
+date). `verify/unreviewed-major/unreviewed_major.py` documents the format and holds the reader.
+Since ticket 132 each adopter gate carries a byte-for-byte copy of it (see the 2026-09-22 note).
 
 **Why there.** The adopter is the risk-bearer (ADR-0015), so the acceptance is its own. The record
 lands only by a reviewed pull request, the unit of adoption (ADR-0002). The tag that signs the
@@ -112,6 +113,32 @@ still observed false, and the line names any record that named the version and d
 **What it does not verify.** That the name in `accepted_by` is the person who merged the record.
 The record's authority is the reviewed merge, which this check does not re-grade. The check writes
 no acceptance. Each one is the owner's decision, per institution.
+
+## Note, 2026-09-22 (eco-system ticket 132: the adopter gate reads the acceptance record too)
+
+Ticket 129 taught the hub's standing report to read a major acceptance record. Each adopter's own
+gate did not, so every pull request that added an accepted major still went red on "composed bump
+is major" and was merged over. Ticket 132 closes that (delegated, ADR-0025).
+
+**The rule.** The gate reads `accepted-majors/` at the head it grades. A composed major is admitted
+only when the pull request retires nothing and every major version it adds is accepted by a record
+for that adopter, for `platform`, at that exact version. One unaccepted major refuses the lot. A
+retirement still refuses: a record accepts a version the window carries, and a retired version is
+not carried. The composed bump is never lowered. Every output still says `major`, and prints the
+admission and the record beside it.
+
+**This is not the override "No override" bans.** No bump is recomputed or weakened, no workload is
+carved out, and nothing expires. The gate always refused a major "without human review". The record
+is the durable output of that review: an owner's authorisation (ADR-0025), landed by a reviewed pull
+request in the adopter's own tree (ADR-0002), and signed with that tree (ADR-0012). It names one
+party, one publisher and one exact version.
+
+**One format.** The reader is defined once, in `verify/unreviewed-major/unreviewed_major.py`, between
+the lines `# >>> major-acceptance reader >>>` and `# <<< major-acceptance reader <<<`. Each adopter
+gate carries that block byte for byte. The hub check reads each gate at the commit its repository
+serves and fails the adopter whose copy differs. `verify/fold-agreement` plants an accepted arrival
+and a record naming another version, and requires all three gates to adopt the first and refuse the
+second.
 
 ## Note, 2026-09-05 (eco-system ticket 99: the adopter gate grades the change, not the window)
 

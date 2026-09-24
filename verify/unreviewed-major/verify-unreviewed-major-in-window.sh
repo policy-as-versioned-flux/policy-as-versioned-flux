@@ -5,7 +5,9 @@
 # THE NAME OF THIS SCRIPT AND ITS DIRECTORY IS HISTORICAL: they are named for the fact ticket 99
 # was about. This check cannot see a review. Since ticket 129 it reads an acceptance record, one
 # file per accepted major under accepted-majors/ in the adopter's own tree at the commit it serves
-# (the format is in unreviewed_major.py), and grades a carried major accepted or not.
+# (the format is in unreviewed_major.py), and grades a carried major accepted or not. Since ticket
+# 132 each adopter gate reads the same records through a byte-for-byte copy of the hub's reader, and
+# this check fails an adopter whose served copy differs.
 #
 # This is the property tuppence's adopter gate was protecting when it folded its whole supported
 # window instead of what a pull request moves. That reading broke -- a major in the window refused
@@ -56,7 +58,7 @@ case $rc in
      if [ "$n" -eq 0 ]; then
        echo "FAIL: unreviewed_major.py exited $rc without reporting on a single adopter: $(tail -1 "$log")"
      else
-       echo "FAIL: $n line(s) observed false: a major carried in an adopter's composed window with no record in its own tree accepting it, or evidence at an adopter's own pin that did not verify -- each named above"
+       echo "FAIL: $n line(s) observed false: a major carried in an adopter's composed window with no record in its own tree accepting it, evidence at an adopter's own pin that did not verify, or an adopter gate whose acceptance reader is not the hub's byte for byte -- each named above"
      fi;;
 esac
 rm -f "$log"; exit "$rc"

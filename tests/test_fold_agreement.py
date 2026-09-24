@@ -308,3 +308,47 @@ def test_a_failed_planting_names_the_commits_own_reason_not_rev_parses(grader: M
     message = str(caught.value)
     assert "the hook refused, and this is the sentence that matters" in message
     assert "nothing was planted" in message
+
+
+# -- the acceptance record, planted for the gate's own party (eco-system ticket 132) --------------
+
+
+def _show(grader: ModuleType, repo: Path, ref: str, path: str) -> str | None:
+    shown = grader._git(repo, "show", f"{ref}:{path}")
+    return shown.stdout if shown.returncode == 0 else None
+
+
+def test_the_accepted_case_plants_a_record_for_the_gates_own_party_at_the_head_only(
+        grader: ModuleType, tmp_path: Path) -> None:
+    import yaml
+    tags = {"v2.0.0": "a" * 40, "v2.0.1": "b" * 40}
+    planted = grader.plant(tmp_path / "repo", grader.CASES["accepted"], tags, party="ludlow")
+    path = "accepted-majors/platform-4.0.0.yaml"
+    assert _show(grader, tmp_path / "repo", planted["base_sha"], path) is None
+    text = _show(grader, tmp_path / "repo", planted["head_sha"], path)
+    assert text is not None
+    doc = yaml.safe_load(text)
+    assert (doc["kind"], doc["party"], doc["publisher"], doc["version"]) == (
+        "major-acceptance", "ludlow", "platform", "4.0.0")
+    assert grader.CASES["accepted"][4:6] == ("adopt", "major")
+
+
+def test_the_misaddressed_case_plants_a_record_for_another_version_and_still_refuses(
+        grader: ModuleType, tmp_path: Path) -> None:
+    import yaml
+    tags = {"v2.0.0": "a" * 40, "v2.0.1": "b" * 40}
+    planted = grader.plant(tmp_path / "repo", grader.CASES["misaddressed"], tags, party="tuppence")
+    listed = grader._git(tmp_path / "repo", "ls-tree", "-r", "--name-only", planted["head_sha"],
+                         "--", "accepted-majors/").stdout.split()
+    assert len(listed) == 1
+    doc = yaml.safe_load(_show(grader, tmp_path / "repo", planted["head_sha"], listed[0]) or "")
+    assert doc["party"] == "tuppence" and doc["version"] != "4.0.0"
+    assert grader.CASES["misaddressed"][4:6] == ("refuse", "major")
+
+
+def test_a_case_with_no_record_plants_no_record_directory(grader: ModuleType, tmp_path: Path) -> None:
+    tags = {"v2.0.0": "a" * 40, "v2.0.1": "b" * 40}
+    planted = grader.plant(tmp_path / "repo", grader.CASES["arrival"], tags, party="driftwood")
+    listed = grader._git(tmp_path / "repo", "ls-tree", "-r", "--name-only", planted["head_sha"],
+                         "--", "accepted-majors/").stdout.split()
+    assert listed == []
