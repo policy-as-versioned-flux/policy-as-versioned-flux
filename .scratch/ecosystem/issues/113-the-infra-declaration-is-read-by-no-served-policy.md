@@ -1,7 +1,7 @@
 # 113 — The `infra` declaration is read by no served policy
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -295,3 +295,26 @@ All with kyverno 1.18.2 (`kyverno version` printed 1.18.2).
 3. **The adopter pin bump past this retirement is a forced major** that each adopter's own gate
    refuses (PR 44's body, "A retirement is a major for adopters"). That needs an owner decision
    before the pin bump.
+
+## Answer
+
+Resolved 2026-09-24 by Phase B, on the owner's instruction of 2026-09-24 ("do that", given the
+trade in chat): policy 4.0.0 retires and 5.0.0 is the one served line.
+
+1. **Fact 1, recorded as a decision.** `infra` is a role declaration, not a rung, and no served
+   body names it (the 2026-09-22 build, decision 1).
+2. **Fact 2 is false now.** Every adopter moved its workload claims to 5.0.0 (driftwood 44,
+   tuppence 42, ludlow 39). Platform retired 4.0.0 in PR 44 and cut tools v4.0.0. Each adopter
+   moved its pins to v4.0.0 (driftwood 45, tuppence 43, ludlow 40), cut v3.0.0, and moved its
+   composed set to v3.0.0 with the array 5.0.0 alone (driftwood 46, tuppence 45, ludlow 42).
+   `verify-infra-declaration.sh` proof 4 passes on the estate: every served body cages a claiming
+   substrate pod at `isolated`.
+3. **Fact 3 was re-aimed** by the 2026-09-22 build, and proof 3 still passes.
+4. **Item 4** was built on 2026-09-22 (`rendered()` in `tier_binding.py`).
+
+**What the owner set aside, recorded.** Ticket 75 Q3 records the owner's 2022 rule of three
+coexisting policy lines. With 4.0.0 retired, one line is served, so
+`verify-coexistence.sh` reads a could-not-look. The owner chose this with the trade in front of
+them. Two gates changed to live with one line: the release gate's flip check runs against a
+planted two-line window (platform PR 44), and each adopter gate refuses any retirement, which the
+integrator merged over on the owner's authorisation.
