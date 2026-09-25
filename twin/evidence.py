@@ -47,6 +47,19 @@ STRENGTHENED, WEAKENED = "strengthened", "weakened"
 # Collections whose objects carry an evidence grade, and are therefore regradeable.
 GRADED_COLLECTIONS = ("edges", "claims")
 
+# The pricing thresholds a party may declare on its own signed party artefact (ADR-0032 point 2;
+# eco-system ticket 141). `appetite.pricing_threshold` on `party.yaml` is 2 or 3 and nothing
+# else: grade 4 is an expert's say-so and grade 5 a model's, and neither may price for anybody.
+# Absent means the ladder's own default. The set is spelled here beside the ladder rather than in
+# `evidence-ladder.yaml` because it is not a property of a rung: it is the range within which a
+# risk-bearer may move the gate for its own money, and the platform's party schema
+# (`party/schema.json`) closes the same enum on the signing side.
+DECLARABLE_THRESHOLDS = (2, 3)
+DECLARATION_FIELD = "appetite.pricing_threshold"
+# Where a threshold came from, carried by every artefact that gated on one.
+LADDER_DEFAULT = "the ladder's published default"
+PARTY_DECLARATION = f"the party's signed declaration ({DECLARATION_FIELD})"
+
 
 class EvidenceError(RuntimeError):
     """The ladder does not say what it must, or a grade moved without a record."""
@@ -111,6 +124,11 @@ def threshold(path: Path | None = None) -> int:
     return int(ladder(path)["pricing_threshold"])
 
 
+# The same function under a name no keyword argument shadows: `may_price(grade, threshold=3)`
+# takes a party's declaration under the name a reader expects, and reads the ladder through this.
+_published_threshold = threshold
+
+
 def admission_threshold(path: Path | None = None) -> int:
     """The grade a causal path to cash flow must hold to admit an impact to the £ (ticket 29).
 
@@ -127,9 +145,105 @@ def rung(grade: int) -> dict[str, Any]:
     raise EvidenceError(f"grade {grade!r} is not on the ladder")
 
 
-def may_price(grade: int, path: Path | None = None) -> bool:
-    """The whole use-gate. Only a grade at or inside the published threshold prices anything."""
-    return int(grade) <= threshold(path)
+def may_price(grade: int, path: Path | None = None, *, threshold: int | None = None) -> bool:
+    """The whole use-gate. Only a grade at or inside the threshold in force prices anything.
+
+    The threshold in force is the ladder's published default unless the caller passes the one a
+    party declared on its own signed artefact (`declared_threshold`). Passed explicitly, never
+    read from ambient state: a gate that looked a declaration up for itself would price one
+    party's valuation against another party's choice the first time two overlays shared a
+    process. A caller that has no declaration passes nothing and gets the ladder.
+    """
+    if threshold is None:
+        return int(grade) <= _published_threshold(path)
+    return int(grade) <= check_threshold(threshold)
+
+
+def check_threshold(value: Any) -> int:
+    """A threshold a caller supplies is one a party may declare, or it is refused by name.
+
+    `bool` excluded explicitly, as everywhere a grade is read: `True == 1` in Python, so a
+    threshold of `true` would otherwise mean the strongest rung.
+    """
+    if isinstance(value, bool) or not isinstance(value, int) or value not in DECLARABLE_THRESHOLDS:
+        raise EvidenceError(
+            f"pricing threshold {value!r} is not one a party may declare; {DECLARATION_FIELD} "
+            f"admits {', '.join(str(t) for t in DECLARABLE_THRESHOLDS)} and nothing else "
+            "(ADR-0032 point 2: grade 4 is an expert's say-so and grade 5 a model's, and neither "
+            "may price)"
+        )
+    return int(value)
+
+
+def declared_threshold(party: Any, where: str = "party.yaml") -> int:
+    """The pricing threshold a party's signed artefact declares, or the ladder's default.
+
+    Reads `appetite.pricing_threshold` off a parsed `party.yaml` (ADR-0032 point 2; eco-system
+    ticket 141). The declaration governs both of this party's thresholds, the use-gate and the
+    path admission gate: a party that prices on published work prices on it end to end, and a
+    valuation admitted at grade 3 through a path refused at grade 3 would be a boundary nobody
+    chose.
+
+    Absent means the ladder's own default, so every overlay that does not declare behaves exactly
+    as it did before the declaration existed. Present and outside `DECLARABLE_THRESHOLDS`, or
+    not an integer, it is refused by name rather than clamped: the platform's party schema
+    refuses the same values on the signing side, and a reader that quietly corrected a signed
+    file would be reading a file nobody signed.
+    """
+    if party is None:
+        return threshold()
+    if not isinstance(party, dict):
+        raise EvidenceError(f"{where}: a party artefact is a mapping, got {type(party).__name__}")
+    appetite = party.get("appetite")
+    if appetite is None:
+        return threshold()
+    if not isinstance(appetite, dict):
+        raise EvidenceError(f"{where}: appetite is not a mapping, so no declaration can be read from it")
+    if "pricing_threshold" not in appetite:
+        return threshold()
+    try:
+        return check_threshold(appetite["pricing_threshold"])
+    except EvidenceError as exc:
+        raise EvidenceError(f"{where}: {exc}") from None
+
+
+def applied(pricing: int | None = None, admission: int | None = None) -> dict[str, Any]:
+    """The thresholds a gate actually applied, and where each came from.
+
+    Carried beside `pin()` in every artefact that gates: the pin says what the ladder published,
+    this says what was applied to this party's money and why. Where nothing was declared the two
+    agree and `basis` says so; where a party declared, a reader can see that a grade-3 price
+    rests on the party's signed choice and not on a ladder that moved.
+    """
+    pricing_applied = threshold() if pricing is None else check_threshold(pricing)
+    admission_applied = admission_threshold() if admission is None else check_threshold(admission)
+    # The basis is read off the values, not off how the caller spelled them: the only way the
+    # thresholds in force differ from the ladder's is a party's signed declaration, and a party
+    # that declares the ladder's own number is pricing at the ladder's number.
+    moved = pricing_applied != threshold() or admission_applied != admission_threshold()
+    return {
+        "pricing_threshold": pricing_applied,
+        "path_admission_threshold": admission_applied,
+        "basis": PARTY_DECLARATION if moved else LADDER_DEFAULT,
+    }
+
+
+def weakest(*grades: int | None) -> int | None:
+    """The weakest grade among those a figure rests on: the one operation on grades this system
+    admits (ADR-0024 point 6, the ordinal-arithmetic ruling; ADR-0032 point 3).
+
+    An order statistic, not arithmetic: a price that rests on a grade-2 path and a grade-3
+    valuation rests on grade 3, and no sum, mean or weight of the two is ever taken. `None`
+    inputs are skipped rather than treated as a grade, because a path with no graded hop has no
+    grade to be weakest; all-`None` returns `None` for the same reason.
+    """
+    held = [int(g) for g in grades if g is not None and not isinstance(g, bool)]
+    if not held:
+        return None
+    for g in held:
+        if g not in EVIDENCE_GRADES:
+            raise EvidenceError(f"grade {g!r} is not on the ladder, so nothing can rest on it")
+    return max(held)
 
 
 def pin(path: Path | None = None) -> dict[str, Any]:
@@ -147,19 +261,28 @@ def pin(path: Path | None = None) -> dict[str, Any]:
     }
 
 
-def published() -> dict[str, Any]:
-    """The ladder as it goes into an artefact: the rungs, their admission criteria, the gate."""
+def published(pricing: int | None = None, admission: int | None = None) -> dict[str, Any]:
+    """The ladder as it goes into an artefact: the rungs, their admission criteria, the gate.
+
+    `pricing` and `admission` are the thresholds the caller applied (eco-system ticket 141): a
+    body that prices passes the ones in force for its party, and then carries `applied`, both
+    figures and their basis, beside the ladder's own pin, with the rules worded for what was
+    applied. A traversal that passes neither publishes the ladder alone, exactly as before.
+    """
     doc = ladder()
+    in_force = applied(pricing, admission)
+    record = {"applied": in_force} if pricing is not None or admission is not None else {}
     return {
         "pin": pin(),
+        **record,
         "rule": (
-            f"only grades 1-{doc['pricing_threshold']} may price a scored forecast; a weaker path "
-            "is reported as an unpriced structural blast radius"
+            f"only grades 1-{in_force['pricing_threshold']} may price a scored forecast; a weaker "
+            "path is reported as an unpriced structural blast radius"
         ),
         "admission_rule": (
             f"an impact enters the £ only through a causal path to a declared cash flow whose "
-            f"weakest hop is graded 1-{doc['path_admission_threshold']}; the boundary is derived "
-            "from the graph and nobody can declare something priceable"
+            f"weakest hop is graded 1-{in_force['path_admission_threshold']}; the boundary is "
+            "derived from the graph and nobody can declare something priceable"
         ),
         "grades": [
             {
