@@ -1,7 +1,7 @@
 # 140 — Fact 4 counts a defaulted false as a difference
 
 Type: task
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -129,3 +129,17 @@ PriorityClasses. Only the scheduled drift-sample clock can supply that, after ea
 workflow was dispatched. The check to run after the next scheduled line lands: fact 4
 `observed: true`, `objects_unequal: []`, and `objects_read_through_omitted_zero` naming the 9
 PriorityClasses. Nothing waits on the owner.
+
+## Answer
+
+Resolved 2026-09-25 by driftwood PR 43, tuppence PR 41 and ludlow PR 38.
+
+1. `scripts/render_composed.py` `compare()` reads an absent field as equal only when a table
+   (`API_OMITTED_ZERO`, keyed by group, kind and field, with the Go `omitempty` tag as its reason)
+   says the API server omits that zero, and only for a declared value of that zero's own type.
+   Today the table holds PriorityClass `globalDefault: false`. A declared `true` that is absent
+   live, or a changed value, is still a difference.
+2. Fact 4 names every object it read through the rule (`objects_read_through_omitted_zero`).
+3. **The scheduled samples, 2026-09-25,** each read fact 4 true with 0 objects unequal and 5
+   read through the rule (the 5.0.0 PriorityClasses Phase B left): driftwood run 36131807139,
+   tuppence run 36144143886, ludlow run 36148474351. Fact 6 stays true on all three.
