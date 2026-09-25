@@ -78,7 +78,7 @@ that a rewritten entry cites stay as the record of the decision at the time.
   selects the spec**. The spec is a **tier** on one ladder: **baseline, restricted, quarantine,
   isolated, infra**. The rung names are shared; each **actor class** has its own **dial table**
   that says what a rung means for it, so a pod's dials and the twin agent's dials differ under one
-  rung name (2026-09-25, ticket 30). The mea-culpa's two ends survive as rungs: continuous, corrective guidance is
+  rung name (2026-09-25, ticket 30; ADR-0031). The mea-culpa's two ends survive as rungs: continuous, corrective guidance is
   the loose end; the **bottom rung is `isolated`** (the quarantine cage plus no ingress, no egress,
   first eviction) and it replaces every earlier deny or refusal, so nothing is ever refused, only
   caged. A "locked door" is therefore the bottom rung reached by the £, not a separate mechanism.
@@ -433,7 +433,8 @@ that a rewritten entry cites stay as the record of the decision at the time.
 - **Pricing threshold** (added 2026-09-25, ticket 30) — The weakest evidence grade a price may
   rest on. The estate default is grade 2; an adopter may declare grade 3, published work not
   observed here, on its own signed party artefact. Every price shows the weakest grade it rests
-  on. A synthetic record never raises a grade: it evidences machinery, never the world.
+  on. A synthetic record never raises a grade: it evidences machinery, never the world
+  (ADR-0032).
   _Avoid_: evidence floor (a floor is a tier bound).
 
 - **Obligation** (added 2026-08-28) — A regime an adopter declares it answers to, by name, in its

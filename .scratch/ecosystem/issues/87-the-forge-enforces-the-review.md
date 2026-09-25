@@ -326,3 +326,10 @@ word `estate` meant a directory in one function and a name-to-remote map in anot
 Done, re-read: rulesets are non-empty on nine repositories and the check asserts them over a
 fixed nine. §6 now carries the dated state. The check stays red on four `main` branches until
 the owner creates a push identity a ruleset can let through.
+
+**2026-09-25, correction from eco-system ticket 30.** This ticket says `pavc-other-hand` has no
+`workflows` permission (lines 28-30 and 269-270). Read live on 2026-09-25 with
+`gh api orgs/policy-as-versioned-<org>/installations`: the installation grants `workflows: write`
+on eight of the nine orgs (driftwood, tuppence, ludlow, flux, platform, feeds, ico, insurer). Only
+the nist installation lacks it. Ticket 30 also decided (ADR-0031) that the push identity this
+ticket waits on serves writer jobs only: the twin code runs in a read-only job and never holds it.

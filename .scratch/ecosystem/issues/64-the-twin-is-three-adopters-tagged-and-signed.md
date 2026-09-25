@@ -328,3 +328,10 @@ run 314, because ludlow's and tuppence's `twin/verify-twin-scenarios.sh` went FA
 `twin/signals.yaml` was not re-derived when the platform implementations pin moved to 3.3.0, so it
 has no signal row for the new pin. The re-derive lands with each adopter's next pin PR, which
 recomposes anyway (ticket 134's tools release).
+
+## Correction, 2026-09-25 (eco-system ticket 30)
+
+The "Not done" line "No twin-sweep workflow for tuppence or ludlow" is stale. Both adopters carry
+`.github/workflows/twin-sweep.yml` on `origin/main`, and their `observations/twin-sweep.jsonl`
+records scheduled sweeps up to 2026-09-25, each `could_not_look` with emitter exit 3. The
+instruments those sweeps name as missing now belong to eco-system ticket 144.

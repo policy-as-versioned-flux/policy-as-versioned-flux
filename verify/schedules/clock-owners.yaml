@@ -58,13 +58,13 @@ hub/truth.yml:
 
 # The clocks now record the existing emitter's refusal before returning non-green.
 tuppence/twin-sweep.yml:
-  ticket: 30
+  ticket: 144
   owns: >-
     the overlay lacks a signed size valuation and carries a grade-3 causal edge beyond its
     admitted threshold; the clock records could-not-look and supplies neither instrument
 
 ludlow/twin-sweep.yml:
-  ticket: 30
+  ticket: 144
   owns: >-
     the same missing signed size valuation and inadmissible causal edge as tuppence;
     the observation clock does not invent values or a feed publishing contract

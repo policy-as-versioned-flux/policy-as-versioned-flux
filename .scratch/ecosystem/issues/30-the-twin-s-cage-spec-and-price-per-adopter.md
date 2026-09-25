@@ -1,7 +1,7 @@
 # 30 — The twin's cage, spec and price per adopter
 
 Type: grilling (HITL)
-Status: open
+Status: resolved
 Blocked by: 09, 12
 
 ## Question
@@ -250,3 +250,62 @@ is **delegated** (ADR-0025).
     scripts instead of `python3 *`. Reason: the guard's patterns are "a net, not a proof"
     (`twin/enact_guard.py:29-33`); the script already makes the real push under the owner's `gh`
     after the read-back.
+
+## Grilling round 4, 2026-09-25
+
+Four questions (Q15 to Q18). The owner answered "agree" on 2026-09-25, with no reason. Each item
+is **delegated** (ADR-0025).
+
+15. **Each rung's reduction is derived from the misuse paths it closes** (Q15(a)). After items 7
+    and 8 the pin and the split hold at every rung. Four paths remain: the writer job pushes a
+    looser declaration (closed at `isolated` only, because the writer keeps the same token at
+    every rung it runs); the writer merges or tags through REST (`isolated`); a misleading proposal
+    PR is merged by a human (`quarantine`); a model step writes a wrong binding or forecast
+    (`restricted`, about £0 on price, because model claims are grade 5 and not price-eligible). A
+    rung's reduction is the share of the scenario's loss its closed paths carry. Every run cost is
+    £0 in cash and stays out of selection. Reason: it prices only what each rung removes. The
+    pod reductions are "evidenced by nothing but this comment"; an empty table refuses as a missing
+    instrument.
+16. **One new check grades the twin agent's cage on each adopter's served `origin/main`**
+    (Q16(a)): the selected rung is on the ladder, the sweep's jobs match that rung's dial row, and
+    the local-clock child holds no push capability. The schedule checker's blind spots are fixed
+    with it. Reason: the observation cage and the twin agent's cage are two subjects with two dial
+    tables; grading only that a price line exists grades a stand-in for the workflow that runs.
+17. **Five tickets graduate, and ticket 30 resolves** (Q17). Ticket 30's definition of done, a
+    check wired into the truth surface, moves to ticket 142: a resolved grilling ticket must not
+    name a check that does not exist yet. Stale records are corrected on this branch: ticket 87
+    (the app's `workflows` permission) and ticket 64 (twin sweeps for tuppence and ludlow). The
+    clock-owner rows for tuppence's and ludlow's sweeps move from 30 to 144.
+18. **Two ADRs are written**: ADR-0031, the twin agent's cage, and ADR-0032, the pricing threshold
+    (Q18). Each is hard to reverse, surprising without context, and the result of a real trade.
+
+## Answer
+
+Resolved 2026-09-25 in four grilling rounds, all answered "agree" by the owner with no reason, so
+every decision is **delegated** under ADR-0025. Decisions 1 to 18 are recorded above, round by
+round. The architecture is ADR-0031; the evidence rule is ADR-0032.
+
+- **The caged subject** is the twin agent: every act of an adopter's twin with nobody at the
+  keyboard, on the GitHub sweep and on the local clock. A skill a human runs is the human's act.
+- **Propose-only is the loosest rung that exists today.** An act rung may come later; for a
+  significant decision about a person, no rung is looser than propose-only (Article 22).
+- **One ladder, a dial table per actor class.** The twin agent's four rows take away, in order,
+  the model step, the proposals and the writes. At `isolated` the twin still runs.
+- **The spec.** The twin code is pinned by hub commit in the adopter's `twin/PIN.yaml`. The sweep
+  splits into a read-only twin job and a writer job with no twin code. Every download is pinned
+  by hash. The local-clock child holds no push capability.
+- **The price.** The platform prices the twin agent's cage from a dial table whose reductions are
+  derived from the misuse paths each rung closes, and a scenario whose loss magnitude comes from
+  the adopter's own prices. The adopter's selection policy selects the rung. The twin never prices
+  or selects its own cage.
+- **The pricing prerequisites.** An adopter may declare that it prices on grade 3, published work
+  not observed here; a synthetic record never raises a grade. tuppence's and ludlow's sizes copy
+  their comparable firms' published figures and real dates.
+
+Round 1 item 5 was reversed in round 2 on evidence: it rested on a citation that did not support
+it.
+
+Graduated: 141 (an adopter declares the grade it prices on), 142 (the twin cage check and the
+schedule checker's blind spots, carrying this ticket's definition of done), 143 (the sweep split),
+144 (the twins price on published comparable evidence), 145 (the platform prices the twin agent's
+cage).
