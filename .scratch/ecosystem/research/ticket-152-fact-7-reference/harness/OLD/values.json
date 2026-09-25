@@ -1,0 +1,27 @@
+{
+ "apiVersion": "cli.kyverno.io/v1alpha1",
+ "kind": "Value",
+ "metadata": {
+  "name": "values"
+ },
+ "namespaces": [
+  {
+   "apiVersion": "v1",
+   "kind": "Namespace",
+   "metadata": {
+    "name": "cage-probe-control",
+    "labels": {
+     "app.kubernetes.io/managed-by": "drift-five-facts"
+    }
+   }
+  }
+ ],
+ "namespaceSelector": [
+  {
+   "name": "cage-probe-control",
+   "labels": {
+    "app.kubernetes.io/managed-by": "drift-five-facts"
+   }
+  }
+ ]
+}
