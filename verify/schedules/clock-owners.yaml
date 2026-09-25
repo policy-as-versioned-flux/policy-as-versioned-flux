@@ -19,12 +19,6 @@
 # Delete an entry when its clock has been green for a scheduled run; the entry is not evidence
 # of anything, and a clock that is green never reads this file.
 
-driftwood/twin-sweep.yml:
-  ticket: 72
-  owns: >-
-    the sweep runs under `bash -e` and dies before it records; the twin's re-render on a feed
-    bump is ticket 72's
-
 tuppence/propose-tier.yml:
   ticket: 110
   owns: >-
