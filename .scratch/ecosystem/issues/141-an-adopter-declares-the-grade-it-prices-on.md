@@ -109,11 +109,13 @@ payload's new top-level field is `rests_on_grade`.
    as the party having acted; every channel alone holds grade 3 or 4, so reading the declaration
    there would let one uncorroborated machine channel price on its own, which the corroboration
    table exists to refuse (decision ticket 18 Q3).
-5. *The weakest grade*: `rests_on_grade` on each priced impact is the weaker of the path's worst
-   hop and the valuation; on a credit, the weakest of the impact, the claim and the corroborated
-   enactment; on an exposure entry, the weaker of the valuation and the admitting path. The
-   `gating` block carries `applied` (both thresholds and their basis) only in the bodies that
-   price and expose; blast and propagation bodies are byte-identical to before.
+5. *The weakest grade* (amended 2026-09-26 after review, see the fixer's comment below):
+   `rests_on_grade` on each priced impact is the weakest of the propagation path's worst hop, the
+   valuation and the admitting path's worst hop; on a credit, the weakest of the impact, the
+   claim and the corroborated enactment; on an exposure entry, the weaker of the valuation and
+   the admitting path. The `gating` block carries `applied` (both thresholds and their basis)
+   only in the bodies that price and expose; blast and propagation bodies are byte-identical to
+   before.
 6. *Forward-intel payload and the prices[] line*: the payload schema is closed and lives in each
    adopter repo, so the field is a payload MAJOR that ticket 144 cuts (top-level
    `rests_on_grade`, an integer 1-5, equal to the hub's priced impact). Platform reads it off the

@@ -15,10 +15,14 @@ Today the estate marks a record synthetic in two places, and this module reads b
   `twin/blob.py` calls the substrate synthetic by definition (decision ticket 07 Q4), and the
   fixtures' `ABSENT_SUBSTRATE` is the empty blob, size 0, which deliberately resolves to nothing
   and marks nothing.
-* a `signal` whose `provenance` carries `synthetic`, `planted` or `injected` set true. The feed
-  envelope stamp `injected: true` (ticket 92, the local clock's world simulator) never becomes a
-  signal at all, because `twin/feed_signal.py` refuses it at lookup; a signal authored by hand
-  with the same stamp in its provenance is refused here for the same reason.
+* a `signal` whose `provenance` carries `synthetic`, `planted` or `injected` set true. "True"
+  is read the way YAML 1.1 reads it (`TRUTHY`: the boolean, the integer 1, and the strings
+  `true`, `yes`, `on`, `y` and `1` in any case, quoted or not), so an author cannot slip a marked
+  record past the rule by quoting the stamp. Any other value, a word such as `maybe` included,
+  marks nothing. The feed envelope stamp `injected: true` (ticket 92, the local clock's world
+  simulator) never becomes a signal at all, because `twin/feed_signal.py` refuses it at lookup;
+  a signal authored by hand with the same stamp in its provenance is refused here for the same
+  reason.
 
 ## What it means for a grade to rest on one
 
@@ -49,7 +53,23 @@ from .blob import BlobRef
 
 MARKERS = ("synthetic", "planted", "injected")
 
+# The spellings YAML 1.1 reads as true, so a quoted stamp (`synthetic: 'yes'`) marks a record
+# exactly as the unquoted one PyYAML already turns into True does.
+TRUTHY = frozenset({"true", "yes", "on", "y", "1"})
+
 _WORDS = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+
+
+def is_stamped(value: Any) -> bool:
+    """Whether a provenance stamp reads true: the boolean, the integer 1, or a `TRUTHY` string in
+    any case. Everything else, `None` and the empty string included, reads as not stamped."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int):
+        return value == 1
+    if isinstance(value, str):
+        return value.strip().lower() in TRUTHY
+    return False
 
 
 def _words(text: Any) -> set[str]:
@@ -81,8 +101,8 @@ def is_synthetic_record(signal: dict[str, Any]) -> str | None:
     provenance = signal.get("provenance")
     if isinstance(provenance, dict):
         for marker in MARKERS:
-            if provenance.get(marker) is True or str(provenance.get(marker, "")).lower() == "true":
-                return f"its provenance is stamped {marker}: true"
+            if is_stamped(provenance.get(marker)):
+                return f"its provenance is stamped {marker}: {provenance.get(marker)!r}"
     return None
 
 

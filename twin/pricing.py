@@ -41,8 +41,9 @@ anybody. So an amount at grade 3 prices only for a party that declared 3, and th
 the valuation's grade itself rather than trusting the loader. Every overlay that declares nothing
 prices exactly as before, the real-firm backtest corpus included.
 
-Each priced impact carries `rests_on_grade`, the weaker of the path's worst hop and the valuation
-it scales; each credited mitigation carries the weakest of the impact, the claim and the
+Each priced impact carries `rests_on_grade`, the weakest of the propagation path's worst hop, the
+valuation it scales and the admitting path's worst hop (the third gate is a precondition of the
+price, so the price rests on it); each credited mitigation carries the weakest of the impact, the claim and the
 corroborated enactment. It is an order statistic, the one operation on grades ADR-0024 point 6
 admits, and it is never summed, averaged or weighted. The `gating` block records the thresholds
 applied and their basis beside the ladder's pin.
@@ -286,10 +287,15 @@ def impacts(
                 "component": component,
                 "depth": path["depth"],
                 "worst_evidence_grade": grade,
-                # The weakest grade this price rests on: the weaker of the path's worst hop and
-                # the valuation it scales (ADR-0032 point 3; the one order statistic ADR-0024
-                # point 6 admits on grades). Every price shows it.
-                "rests_on_grade": evidence.weakest(grade, valuation_grade),
+                # The weakest grade this price rests on: the weakest of the propagation path's
+                # worst hop, the valuation it scales, and the admitting path's worst hop (None
+                # when the perspective named the component as its own cash flow, which is the
+                # one route to the £ that rests on a declaration and no path). ADR-0032 point 3;
+                # the one order statistic ADR-0024 point 6 admits on grades. Every price shows
+                # it, and `verbs.exposure` folds the same three.
+                "rests_on_grade": evidence.weakest(
+                    grade, valuation_grade, verdict.get("worst_evidence_grade")
+                ),
                 "sign": path["sign"],
                 "admitted_because": verdict["basis"],
                 "valuation": {

@@ -1424,9 +1424,10 @@ records it as `Overlay.pricing_threshold`. One declaration governs both gates, t
 path admission. `twin price` and `twin exposure` then re-check each valuation's grade against that
 same number rather than trusting the loader, so an amount at grade 3 prices only for a party that
 declared 3, and every overlay that declares nothing prices exactly as it did. Every price carries
-`rests_on_grade`, the weakest grade it rests on (the weaker of the path's worst hop and the
-valuation; for a credit, the impact, the claim and the corroborated enactment), the one order
-statistic ADR-0024 point 6 admits; the `gating` block carries `applied`, the thresholds in force
+`rests_on_grade`, the weakest grade it rests on (the weakest of the propagation path's worst hop,
+the valuation and the admitting path's worst hop; for a credit, the impact, the claim and the
+corroborated enactment; for an exposure entry, the valuation and the admitting path), the one
+order statistic ADR-0024 point 6 admits; the `gating` block carries `applied`, the thresholds in force
 and their basis, beside the ladder's pin. And a synthetic record never raises a grade (ADR-0032
 point 4): `twin/synthetic.py` refuses a price through any edge, valuation or claim whose evidence
 chain includes a record marked synthetic, planted or injected, by name, whatever grade the file

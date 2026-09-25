@@ -1,5 +1,5 @@
 {
-  "authorised_by": "eco-system decision ticket 30, decision 6 (ADR-0032), built by eco-system ticket 141: every price shows the weakest grade it rests on (rests_on_grade) and the gating block records the thresholds applied, which changes the priced-impact and scenario-exposure bytes",
+  "authorised_by": "eco-system ticket 141 (ADR-0032, decided by eco-system grilling ticket 30 decision 6): every price shows the weakest grade it rests on (rests_on_grade) and the gating block records the thresholds applied, which changes the priced-impact and scenario-exposure bytes; re-cited on 2026-09-26 in the eco-system namespace",
   "capabilities_digest": "a955d233adb40c7d246378f6e7f4140a600196de43a748f31ef2dd069c8c4a65",
   "digests": {
     "blast-radius": "07391716d1b63424e6eb2a10f002da882f27ded0f4c0e8a376932e24f542aa72",

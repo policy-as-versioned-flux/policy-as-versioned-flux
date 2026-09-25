@@ -303,7 +303,17 @@ def test_what_marks_a_record_synthetic() -> None:
     assert synthetic.is_synthetic_record({"substrate": "sha256:" + "a" * 64 + ":1024"})
     assert synthetic.is_synthetic_record({"provenance": {"observed_by": "fixture"}}) is None
     for marker in synthetic.MARKERS:
-        assert marker in synthetic.is_synthetic_record({"provenance": {marker: True}})
+        why = synthetic.is_synthetic_record({"provenance": {marker: True}})
+        assert why is not None and marker in why
+    # A stamp spelled any way YAML 1.1 reads as true marks the record; an author cannot slip a
+    # marked record past the rule by quoting the stamp. A stamp that reads false marks nothing.
+    truthy: tuple[object, ...] = ("yes", "Yes", "YES", "on", "y", "true", "True", "1", 1)
+    for stamp in truthy:
+        why = synthetic.is_synthetic_record({"provenance": {"synthetic": stamp}})
+        assert why is not None and "synthetic" in why, stamp
+    falsy: tuple[object, ...] = (False, "no", "off", "false", "n", "0", 0, "", None, "maybe")
+    for stamp in falsy:
+        assert synthetic.is_synthetic_record({"provenance": {"synthetic": stamp}}) is None, stamp
     assert synthetic.marker_in("the planted-signal walk") == "planted"
     assert synthetic.marker_in("nothing of the kind") is None
     assert synthetic.marker_in("synthetically") is None  # word boundaries, not substrings
@@ -403,3 +413,57 @@ def test_an_enactment_observed_only_through_a_synthetic_record_does_not_corrobor
     assert result["reason"] == pricing.RESTS_ON_SYNTHETIC
     assert "enacted-pins-reconciled" in result["detail"]
     assert "credit" not in result
+
+
+def test_a_quoted_stamp_marks_the_record_as_the_bare_one_does(pocket: Path) -> None:
+    """`synthetic: 'yes'` (a quoted string, which PyYAML leaves as text) marks the record exactly
+    as `synthetic: true` does, so an author cannot slip a marked record past the rule by quoting
+    the stamp. The regrade names the signal by id and carries no marker word, so only the record
+    leg can catch it. The control stamps `synthetic: 'no'` on the same record and prices."""
+    _rewrite(pocket, GRADE_3_EDGE, "evidence_grade: 3", "evidence_grade: 2")
+    regrade = """\
+id: database-slows-orders-strengthened
+subject: database-slows-orders
+from_grade: 3
+to_grade: 2
+regraded_on: '2026-03-02'
+by_role: model-steward
+reason: The drill showed the slowdown reaching the order service, so the mechanism is observed.
+evidence: The incident drill incident-drill-2026, run twice in the rehearsal environment.
+"""
+    _plant(pocket, {
+        "orgs/pocket/signals/incident-drill-2026.yaml":
+            SYNTHETIC_SIGNAL.replace("synthetic: true", "synthetic: 'yes'"),
+        "orgs/pocket/regrades/database-slows-orders-strengthened.yaml": regrade,
+    }, "strengthen the edge on a drill whose stamp is quoted")
+    entry = next(r for r in _price(pocket, REFUSED_ORIGIN)["register"] if r["component"] == "customer-portal")
+    assert entry["reason"] == pricing.RESTS_ON_SYNTHETIC
+    assert "incident-drill-2026" in entry["detail"] and "'yes'" in entry["detail"]
+    # The control: the same record stamped `synthetic: 'no'` is not a synthetic record.
+    _rewrite(pocket, "orgs/pocket/signals/incident-drill-2026.yaml", "synthetic: 'yes'", "synthetic: 'no'")
+    fixtures.git(pocket, "add", "-A")
+    fixtures.git(pocket, "commit", "-q", "-m", "the stamp reads false")
+    body = _price(pocket, REFUSED_ORIGIN)
+    assert "customer-portal" in {i["component"] for i in body["impacts"]}
+    assert not any(r["reason"] == pricing.RESTS_ON_SYNTHETIC for r in body["register"])
+
+
+# -- the citation that authorises a golden re-bless names its namespace --------------------------
+
+
+def test_the_authorising_citation_admits_both_ticket_namespaces_and_only_as_themselves() -> None:
+    """`twin verify --bless-goldens` and `--rehash` refuse without a cited ticket. The twin's own
+    decision tickets are two digits (`.scratch/twin/issues/NN`); eco-system tickets run to three
+    (`.scratch/ecosystem/issues/NNN`). The words carry the namespace, so an eco-system ticket is
+    cited as one and a three-digit number is never read as a twin decision ticket."""
+    from twin.cli import _cites
+
+    assert _cites("eco-system ticket 141 (ADR-0032): every price shows the grade it rests on")
+    assert _cites("eco-system ticket 30 decision 6")
+    assert _cites("decision ticket 22 — demo-slice closes its own checklist")
+    assert _cites("Decision Ticket 9: reason")
+    assert not _cites("decision ticket 141 - three digits are not a twin decision ticket")
+    assert not _cites("ticket 141")
+    assert not _cites("ADR-0032 alone")
+    assert not _cites("")
+    assert not _cites(None)
