@@ -31,3 +31,5 @@ Build the archive half of [ADR-0036](../../../docs/adr/0036-the-incumbent-org-en
 Graduated 2026-09-25 from ticket 35, round 1 Q2, Q5 and Q6 with amendments A2 and A5. Definition of done includes wiring its check into `talk/verify-all.sh`.
 
 Facts on 2026-09-25: the incumbent org held 16 repos, only `apps` archived. Eight repos held 42 open Renovate pull requests. fleet's `sunset escalator` ran daily and runs governance-agent's script. An unauthenticated `GET /repos/policy-as-versioned-flux/apps` returned `archived: true`. The GitHub documentation does not say whether a package stays pullable after its repo is archived. That is why the first archive is a probe.
+
+**Condition sharpened, 2026-09-25.** The fleet, policy and governance-agent row needs a `verify-reconcile.sh` PASS on a sample taken under the re-registered fact 7 question. The grader skips facts 6 and 7 on a sample older than the current registration, so a pre-registration sample can print PASS on five facts with the cage not scored (reported by the session that grills ticket 152). Such a PASS does not meet the row.
