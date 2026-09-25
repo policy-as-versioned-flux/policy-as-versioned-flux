@@ -212,3 +212,41 @@ Five questions (Q6 to Q10), put in chat after the facts above. The owner answere
 
 CONTEXT.md: the **Synthetic incident record** entry from round 1 is replaced by **Pricing
 threshold**.
+
+## Grilling round 3, 2026-09-25
+
+Four questions (Q11 to Q14). The owner answered "agree" on 2026-09-25, with no reason. Each item
+is **delegated** (ADR-0025).
+
+11. **The twin agent's dial table has four rungs** (Q11(a)). Every rung keeps the code pinned by
+    hub commit (item 7) and every download pinned by hash (item 9).
+
+    | Rung | Writes | Model step | Local clock |
+    |---|---|---|---|
+    | baseline (propose-only, the loosest today) | the writer job appends an observation line, pushes a proposal branch and opens a PR | local clock at grade 5, no override; GitHub only where a measured permission holds (none today) | runs |
+    | restricted | as baseline | none: lookup and deterministic render only | does not run |
+    | quarantine | an observation line only; no proposal | none | does not run |
+    | isolated | nothing; the twin job runs and writes only to its job log; the writer job does not run | none | does not run |
+
+    Reason: the £ tightens one step at a time, first the model, then proposals, then writes. A
+    two-rung table stops proposals and the scoring series together. At `isolated` the twin still
+    runs, as a pod does.
+12. **The twin agent's scenario takes its loss magnitude from the adopter's own prices and its
+    frequency from the threat register** (Q12(a)). The worst act the writer job can do without a
+    review is to push a looser declaration. The loss magnitude is the gap between the residual at
+    the loosest rung and at the selected rung, over the window until the gate detects it. The
+    frequency is a row feeds publishes in the threat register, the same class as the pod frequency
+    today. Reason: the harm is derived from figures the adopter already signs. The detection window
+    is only as short as the item-8 checker fixes make it: today the gate does not detect a REST
+    merge.
+13. **Sizes copy the comparable firm's published figures and their real date** (Q13(a), under the
+    Q4 delegation). tuppence copies Starling's, ludlow copies Anthem's; the share-of-turnover figure
+    comes from the same filing. A stale `as_of` widens the price to the cap, as designed. Reason:
+    nothing is invented and no date is false. **This rule is fixed before its effect is computed**,
+    because a size change is one of ticket 74's three movers and must not be tuned to cause a
+    crossing.
+14. **The local-clock child holds no push capability** (Q14(b)). No credential helper, no
+    `GH_TOKEN`, `--strict-mcp-config`, a clock-only settings file, and Bash limited to named
+    scripts instead of `python3 *`. Reason: the guard's patterns are "a net, not a proof"
+    (`twin/enact_guard.py:29-33`); the script already makes the real push under the owner's `gh`
+    after the read-back.
