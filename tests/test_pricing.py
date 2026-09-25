@@ -162,7 +162,10 @@ def test_identical_claims_score_differently_by_corroborated_enactment(repo: Mode
     intel = Overlay.load(repo, "intel")
     claim = {
         "component": "a-component", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
-        "evidence_grade": 2, "basis": "identical claim, planted for the worked example",
+        # Not "planted": since eco-system ticket 141 a claim whose basis says its evidence is
+        # planted, synthetic or injected is refused a price by name (ADR-0032 point 4), and this
+        # worked example is about enactment state alone.
+        "evidence_grade": 2, "basis": "identical claim, authored for the worked example",
     }
     priced = [{"component": "a-component",
                "price": {"attenuated": {"min": 100.0, "mode": 200.0, "max": 300.0}}}]
@@ -190,7 +193,7 @@ def test_a_claim_against_an_option_with_no_enactment_claims_at_all_is_also_refus
     intel = Overlay.load(repo, "intel")
     claim = {
         "component": "a-component", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
-        "evidence_grade": 2, "basis": "planted",
+        "evidence_grade": 2, "basis": "authored for this test",
     }
     priced = [{"component": "a-component",
                "price": {"attenuated": {"min": 100.0, "mode": 200.0, "max": 300.0}}}]
