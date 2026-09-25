@@ -720,9 +720,15 @@ def exposure(
         # Derived first, and for every component in the scenario rather than only the valued ones:
         # whether an impact could enter the £ at all is a fact about the graph, not about whether
         # somebody happened to put a number on it.
-        verdicts = [admission_mod.admit(graph, perspective, c) for c in components]
+        # Both gates at the threshold in force for this party (eco-system ticket 141): the
+        # ladder's default, or the declaration the loader was handed. One number for both.
+        threshold = overlay.pricing_threshold
+        verdicts = [
+            admission_mod.admit(graph, perspective, c, threshold=threshold) for c in components
+        ]
         admissible = {v["component"] for v in verdicts if v["admitted"]}
         basis_of = {v["component"]: v.get("basis") for v in verdicts}
+        path_grade_of = {v["component"]: v.get("worst_evidence_grade") for v in verdicts}
         admitted: list[dict[str, Any]] = []
         register: list[dict[str, Any]] = []
         for component in components:
@@ -731,13 +737,14 @@ def exposure(
                 continue
             grade = int(valuation["evidence_grade"])
             held = {"component": component, "evidence_grade": grade, "basis": valuation["basis"]}
-            if not evidence.may_price(grade):
-                # No figure, anywhere. The schema refuses one at this grade, so the register is a
-                # list of names and reasons rather than a price with a null field.
+            if not evidence.may_price(grade, threshold=threshold) or "amount" not in valuation:
+                # No figure, anywhere. The schema refuses one at this grade for this party, so
+                # the register is a list of names and reasons rather than a price with a null
+                # field.
                 register.append(
                     {**held, "reason": (
-                        f"evidence grade {grade} is outside the published threshold, so this is "
-                        "reported beside the figure and never inside it"
+                        f"evidence grade {grade} is outside the pricing threshold in force "
+                        f"({threshold}), so this is reported beside the figure and never inside it"
                     )}
                 )
             elif component not in admissible:
@@ -758,7 +765,10 @@ def exposure(
                 # see which figures took it (build ticket 29, the named limit in twin/admission.py).
                 admitted.append(
                     {**held, "declared_value": float(valuation["amount"]),
-                     "admitted_because": basis_of[component]}
+                     "admitted_because": basis_of[component],
+                     # The weakest grade this figure rests on (ADR-0032 point 3): the valuation's
+                     # own, or the weaker of it and the admitting path's worst hop.
+                     "rests_on_grade": evidence.weakest(grade, path_grade_of[component])}
                 )
         entries.append(
             {
@@ -815,7 +825,11 @@ def exposure(
                     "costs them. No severity distribution is sampled anywhere (24-25)"
                 ),
             },
-            "gating": evidence.published(),
+            # The ladder, and beside its pin the thresholds applied to this party's money with
+            # their basis (eco-system ticket 141).
+            "gating": evidence.published(
+                pricing=overlay.pricing_threshold, admission=overlay.pricing_threshold
+            ),
             "prefilter": {
                 "applied": False,
                 "note": (
