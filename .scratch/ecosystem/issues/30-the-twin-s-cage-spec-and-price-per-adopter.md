@@ -173,3 +173,42 @@ ludlow b8e14f7, platform 557c153); the local clones lag.
 Stale records found: `verify/schedules/clock-owners.yaml` still maps driftwood's green sweep to
 ticket 72; ticket 64 `:230` says tuppence and ludlow have no twin-sweep; tuppence's and ludlow's
 `twin-sweep.py` records a loader `ModelError` (exit 1) as a moved render.
+
+## Grilling round 2, 2026-09-25
+
+Five questions (Q6 to Q10), put in chat after the facts above. The owner answered "agree" on
+2026-09-25, with no reason. Each item is **delegated** (ADR-0025).
+
+6. **Round 1 item 5 is reversed: an adopter may declare that it prices on grade 3** (Q6(c)). The
+   estate default pricing threshold stays 2. An adopter may declare grade 3, "published work, not
+   observed here", on its own signed `party.yaml`. Every price shows the weakest grade it rests
+   on. A synthetic record never raises a grade (twin ticket 12). tuppence's and ludlow's
+   comparable-firm anchors then price at grade 3. driftwood's edge drops to grade 3 and gets a
+   comparable-firm anchor; its rung responses drop to grade 3 or cite a real source. The cost is a
+   platform party-schema release. Reason: nothing is invented, and the adopter signs the trade as
+   it signs its appetite. Keeping round 1 broke twin ticket 12's rule; grade 2 only removed the one
+   working twin price.
+7. **The twin package is pinned by hub commit** (Q7(a)). Each adopter's `twin/PIN.yaml` names a
+   hub commit; the sweep checks out that commit; the adopter moves it by a reviewed PR. The signed
+   `twin/v0.1.0` tag replaces the commit when it is cut. Reason: today another party's `main` runs
+   with each adopter's write token (NORTH-STAR §2).
+8. **The sweep splits into a read-only twin job and a writer job with no twin code** (Q8(b)). The
+   twin job holds `contents: read` and hands its observation line and proposal to the writer as an
+   artifact. The writer job has no hub checkout and only inline shell. The checker's blind spots
+   are fixed as well (REST merge, release and ref forms, `git update-ref`, tag pushes, and the
+   "nothing it runs is opaque" PASS line). Ticket 87's App, when the owner creates it, serves writer
+   jobs only, never twin code. Reason: the twin code never holds a write token, with no new
+   identity.
+9. **The network dial is declared, and every download is pinned by hash** (Q9(a)). No egress tool.
+   Reason: a marketplace egress action is third-party code the checker cannot read; a self-hosted
+   runner is a host nobody runs; after item 8 the twin job holds no write token.
+10. **The platform prices the twin agent's cage; the adopter's selection policy selects the rung**
+    (Q10(c)). Platform publishes a dial table for the twin-agent class, with a reduction and a cost
+    per rung, and a scenario for a scheduled agent that misuses its credential. The proposer
+    proposes; a human merges. The twin never prices its own cage. A new `prices[]` kind carries the
+    line, because the tier fold would otherwise fold it into a Namespace. Reason: a self-priced
+    cage rests on grade 3 at best and fails closed to `isolated`; a declared rung with no price
+    breaks "the £ selects the spec".
+
+CONTEXT.md: the **Synthetic incident record** entry from round 1 is replaced by **Pricing
+threshold**.

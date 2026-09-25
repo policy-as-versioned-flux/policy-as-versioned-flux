@@ -430,10 +430,11 @@ that a rewritten entry cites stay as the record of the decision at the time.
   **relevant revenue**, and the date they were true. Signed by the adopter alone. Stale facts widen a
   price to the publisher's **widening target**; they never refuse one.
 
-- **Synthetic incident record** (added 2026-09-25, ticket 30) — A dated incident in a fictional
-  adopter's own history, authored in that adopter's repository and marked synthetic. It may carry
-  a causal edge to grade 2, the pricing threshold; an unmarked one, or a grade 2 with no record, may
-  not. _Avoid_: calling it an observation or a measurement.
+- **Pricing threshold** (added 2026-09-25, ticket 30) — The weakest evidence grade a price may
+  rest on. The estate default is grade 2; an adopter may declare grade 3, published work not
+  observed here, on its own signed party artefact. Every price shows the weakest grade it rests
+  on. A synthetic record never raises a grade: it evidences machinery, never the world.
+  _Avoid_: evidence floor (a floor is a tier bound).
 
 - **Obligation** (added 2026-08-28) — A regime an adopter declares it answers to, by name, in its
   party artefact. Only a declared obligation is priced. A declared obligation with no price in any
