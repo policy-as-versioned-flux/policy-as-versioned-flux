@@ -220,7 +220,8 @@ that a rewritten entry cites stay as the record of the decision at the time.
   is a priced verdict the £ selects and only the **proposer** turns.
   See [ADR-0016](docs/adr/0016-a-subclass-never-restates-a-mutate.md).
 
-- **Baseline** — The named subset of a catalogue's controls that a party claims apply to it. A
+- **Baseline** — The named subset of a catalogue's controls that a party claims apply to it. It is
+  not the `baseline` rung of the cage ladder (see **Tier**). A
   **regulator** publishes baselines by name, as OSCAL profiles, signed and versioned like any other
   artefact it publishes (NIST's own are LOW, MODERATE and HIGH, at 149, 287 and 370 controls). An
   **adopter** selects one by name, in the party artefact it signs, because selection is the
@@ -490,11 +491,21 @@ that a rewritten entry cites stay as the record of the decision at the time.
   declared at: baseline, restricted, quarantine or isolated. `infra` is not a rung; it is a role
   declaration beside the ladder (see **Infra tier**, ticket 113). Declared on the signed
   Namespace manifest, rendered onto every pod in it, chosen by the **selection policy** against the
-  price.
+  price. Write "the `baseline` rung" for the loosest rung, never "baseline" alone. A **Baseline**
+  is also an OSCAL profile of catalogue controls (2026-09-25, ticket 152).
 
 - **Isolated** (added 2026-08-28, ticket 09) — The bottom rung of the cage ladder. The workload
   runs with the quarantine cage, no ingress, no egress, and is evicted first. It replaces every
   earlier deny or refusal; nothing is ever refused, only caged.
+
+- **Reference workload** (added 2026-09-25, ticket 152) — The workload that a cage-behaviour
+  sample runs beside the bottom-rung workload, in the same cluster, read before and after it. The
+  cage does not select it: it claims no version, in a Namespace that declares nothing. It must
+  reach what the bottom-rung workload must not reach. It shows that the cluster network works. So
+  a silent bottom-rung workload reads as a cage that holds, not as a broken network. If the
+  reference workload reaches nothing too, the sample is a **could-not-look**, never a pass.
+  _Avoid_: control, control workload, control pod. In this estate a **control** is a catalogue
+  control such as `ac-6` (see **Control claim**).
 
 - **Floor** (added 2026-08-28, ticket 09) — A tighten-only lower bound on the tier an adopter
   declares in its overlay. Selection clamps to the floor in ladder order. Lowering or removing a
