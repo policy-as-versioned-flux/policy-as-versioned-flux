@@ -132,3 +132,8 @@ The 41 re-grills were answered on 2026-08-28. The record is [REGRILL-ANSWERS.md]
 14. The second identity is a machine identity for the assistant (delegated, 2026-09-02; ticket 88).
 15. No date, venue or recipient for the talk (owner-reasoned, 2026-09-02).
 16. The estate is the deliverable and the talk markets it (delegated, 2026-09-02).
+
+> Update 2026-09-25: [ticket 35](.scratch/ecosystem/issues/35-scanner-notification-spine-oscal-cronjob-api-and-datastore.md) closed the last of §6's working parts. Where §6 says "explicitly retired", read **dropped**: the glossary keeps "retire" for a policy version.
+
+17. The incumbent org ends: its app repos transfer into their adopters' orgs, and every other repo except the hub is archived when its register row passes (delegated, with the owner's authorisations to archive and to transfer, 2026-09-25; ticket 35, ADR-0036).
+18. A CVE is priced from the adopter's own scan, against a KEV-scoped feed (delegated, 2026-09-25; ticket 35, ADR-0035).

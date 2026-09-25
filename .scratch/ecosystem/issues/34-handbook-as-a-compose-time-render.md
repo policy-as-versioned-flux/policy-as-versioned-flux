@@ -318,3 +318,7 @@ The repair sequence is software release, adopter platform pin upgrades, fresh co
 publisher checkouts present, reviewed merges, then a recorded gate that measures those served
 artifacts. Until that evidence lands, this paragraph acknowledges the regression; it does not
 turn the failed check into a pass or claim the rollout is complete.
+
+## Comments
+
+**Correction, 2026-09-25 (ticket 35).** The Answer (line 55) calls it the "archived `handbook-generator` repository". It was not archived on 2026-09-25. Ticket 156's register archives it when `verify/handbook` passes.

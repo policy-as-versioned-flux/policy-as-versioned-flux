@@ -87,3 +87,18 @@ The ValidatingPolicy→report mapping was proven live (KiND + Kyverno 1.18.2 + C
   string-equality against the component-definition `Check_Id`s. The collection shim strips the
   version suffix from `results[].policy` (the version dimension is already carried by the report's
   `policy-version` context), so one component-definition maps all coexisting versions.
+
+## Note, 2026-09-25 (eco-system ticket 35): collection is a lane step, and the criterion narrows
+
+The Consequences above wire collection as a `CronJob` or Flux `Kustomization`. Ticket 35 changes
+that shape, delegated under [ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md).
+The adopter's cluster is the drift lane's ephemeral KinD, which lives for one run. So collection is a
+step in that lane. After the facts, the step runs `result2oscal.py` from the platform tag the lane
+pins, over the PolicyReports on the cluster. Its assessment-results is an **Observation**, not a
+signed feed, because nothing prices from it. The `c2p-collector` image is dropped: platform owns the
+glue, as this ADR says.
+
+The acceptance criterion above asks for both planes. Until eco-system ticket 151 lands the cloud
+plane, the live half covers one plane, and only the pods the lane runs. The component-definition
+maps two Check_Ids today. The step prints that count, and records a could-not-look when no
+PolicyReport exists before the cluster is deleted. Built by eco-system ticket 155.

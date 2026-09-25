@@ -1,7 +1,7 @@
 # 35 — scanner, notification spine, OSCAL CronJob, api and datastore
 
 Type: grilling (HITL)
-Status: claimed
+Status: resolved
 Blocked by: 16, 21, 33
 
 ## Question
@@ -106,6 +106,30 @@ The owner answered the whole round with "agree". Q1 to Q8 are **delegated** unde
 7. **Q7, the OSCAL document. Delegated.** It is an observation, not a signed feed. The hub check prints the mapped and served policy counts and grades the join. Reason: nothing prices from it. Revisit if an insurer quotes from it.
 8. **Q8, fact 7. Delegated.** A new grilling ticket, 152, re-registers fact 7. It is not decided here, and it relates to ticket 27. It blocks ticket 151 and the fleet and policy archive rows.
 9. **Q9, the transfer. Owner-authorised, 2026-09-25, "agree" to option (a).** The assistant transfers ledger to tuppence, storefront to driftwood, reports to ludlow and api to driftwood with the owner's `gh` login. After each first build in the new org, it makes the new package public. The four old packages stay in the incumbent org.
+
+## Answer
+
+Resolved 2026-09-25. The owner confirmed the shared understanding with "yes" after round 2. Every architectural decision is **delegated** under ADR-0025. The two authorisations are the owner's: archiving (round 1 Q6) and the transfer (round 2 Q9). This ticket is round 2 of ticket 13, and ticket 13's remaining surface closes with it.
+
+1. **The vulnerability scanner.** trivy-operator is dropped. The scan is lifted as an `inventory` proposal kind on each adopter's `propose-tier` clock, priced against a KEV-scoped CVE feed. Recorded as [ADR-0035](../../../docs/adr/0035-a-cve-is-priced-from-the-adopters-own-scan-against-a-kev-scoped-feed.md). Built by ticket 153.
+2. **The Flux notification spine.** Dropped. The drift lane's facts 3 to 5 observe the reconcile more strictly than a commit status would, and a Receiver cannot reach an ephemeral cluster. A new version is broadcast as a Renovate pull request in each adopter. The record corrections are ticket 156 item 4.
+3. **The OSCAL CronJob.** Dropped as a CronJob. Collection is lifted as a step in each adopter's drift lane, and its output is an observation, not a signed feed. ADR-0009 carries a dated note. Built by ticket 155.
+4. **api.** Transferred into driftwood beside storefront. Built by ticket 154.
+5. **datastore.** Placed in tuppence by ticket 13 item 3. The build is ticket 151, which waits on ticket 152 and then on e2e step 4.
+6. **Per-repo archiving.** The incumbent org ends: app repos transfer and the rest are archived, each when its register row passes. Recorded as [ADR-0036](../../../docs/adr/0036-the-incumbent-org-ends-app-repos-transfer-and-the-rest-are-archived.md). Built by tickets 154 and 156.
+7. **The glossary.** **Incumbent org** and **Drop** are terms. **Lift** names the incumbent org. The posture line on sunset points at **Supersede**. Two older uses of "dropped" now say "removed".
+
+Consequences recorded in this change: ADR-0004 and ADR-0009 carry dated notes. NORTH-STAR §8 gains item 17, because §6 says "explicitly retired". Ticket 33 gets a dated correction on two stale claims, and ticket 34 on one. The map gains the ticket 35 line and the six graduated tickets, and its "Not yet specified" line on the scanner, spine and CronJob closes.
+
+Graduated:
+- [151 — The cloud plane lands in tuppence](151-the-cloud-plane-lands-in-tuppence.md)
+- [152 — Fact 7 cannot pass as registered](152-fact-7-cannot-pass-as-registered.md)
+- [153 — A CVE is priced from the adopter's own scan](153-a-cve-is-priced-from-the-adopters-own-scan.md)
+- [154 — One repo per app, in its adopter's org](154-one-repo-per-app-in-its-adopters-org.md)
+- [155 — The lane runs the served workloads, and collects their evidence](155-the-lane-runs-the-served-workloads.md)
+- [156 — The incumbent org register](156-the-incumbent-org-register.md)
+
+No check is named as this ticket's own. It is a decision ticket, and each graduated ticket wires its own check into `talk/verify-all.sh`.
 
 ## Comments
 
