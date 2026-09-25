@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: matched, namespace: default, labels: {caged: "true"}}
+spec: {containers: [{name: app, image: nginx}]}
+---
+apiVersion: v1
+kind: Pod
+metadata: {name: unmatched, namespace: default}
+spec: {containers: [{name: app, image: nginx}]}

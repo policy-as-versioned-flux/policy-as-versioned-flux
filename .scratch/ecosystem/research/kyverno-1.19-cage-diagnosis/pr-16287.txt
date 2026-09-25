@@ -1,0 +1,59 @@
+##### PR #16287: fix(cli): surface GeneratingPolicy CEL errors when metadata.uid is missing
+merged_at: 2026-07-08T08:01:44Z  base: main
+## Summary
+
+Fixes #16282 — `kyverno apply` now reports CEL evaluation failures for `GeneratingPolicy` instead of silent all-zero output when test resources omit `metadata.uid`.
+
+## Explanation
+
+CLI test fixtures often omit `metadata.uid` (the API server assigns it in real clusters). If a policy reads `object.metadata.uid`, the CLI used to show `pass: 0, fail: 0, warn: 0, error: 0, skip: 0` with exit 0 and no message — the same as “policy didn’t match.” This PR fixes that by counting `error`/`skip`/`warn` for GPOL, printing generate errors in apply output, and fixing `kyverno test` for Generation rules with no generated resources.
+
+**Type:** bug fix (existing behavior correction)
+
+## Related issue
+
+Fixes #16282
+
+## Milestone of this PR
+
+<!-- /milestone if needed -->
+
+## Documentation (required for features)
+
+My PR contains new or altered behavior to Kyverno.
+- [ ] I have sent the draft PR to add or update [the documentation](https://github.com/kyverno/website) and the link is:
+
+Not needed — CLI bug fix only.
+
+## What type of PR is this
+
+/kind bug
+
+## Proposed Changes
+
+- Count `error`, `skip`, `warn` for `GeneratingPolicy` in `addGenerateResponse`
+- Print generate-policy errors in default `apply` output
+- Fix `kyverno test` when Generation rules have no generated resources
+- Add unit test + `test/cli/test-generating-policy/missing-metadata-uid/` fixture
+
+### Proof Manifests
+
+See `test/cli/test-generating-policy/missing-metadata-uid/` — reproduces issue #16282.
+<img width="1082" height="721" alt="Screenshot From 2026-06-21 09-28-42" src="https://github.com/user-attachments/assets/3e5a7a7a-8363-4453-8973-0f3edff44281" />
+---
+<img width="1343" height="571" alt="Screenshot From 2026-06-21 09-28-58" src="https://github.com/user-attachments/assets/48f4c1b4-3f6d-4843-9862-f512b3488a87" />
+
+**Error case (no uid):** `error: 1`, exit 1, message `no such key: uid`  
+**Pass case (with uid):** `pass: 1`, ConfigMap generated, exit 0  
+**CLI test:** `kubectl-kyverno test ./test/cli/test-generating-policy/missing-metadata-uid` → 2 passed
+
+## Checklist
+
+- [x] I have read the [contributing guidelines](https://github.com/kyverno/kyverno/blob/main/CONTRIBUTING.md).
+- [x] I have read the [AI Usage Policy](https://github.com/kyverno/community/blob/main/AI_USAGE_POLICY.md). If I used AI assistance, I have disclosed it in my commit(s) (e.g., via `Co-authored-by` or `Assisted-by` trailer).
+- [x] I have read the [PR documentation guide](https://github.com/kyverno/kyverno/blob/main/.github/pr_documentation.md) and followed the process including adding proof manifests to this PR.
+- [x] This is a bug fix and I have added unit tests that prove my fix is effective.
+- [x] This is a feature and I have added CLI tests that are applicable.
+- [ ] My PR needs to be cherry picked to a specific release branch which is <replace>.
+- [ ] My PR contains new or altered behavior to Kyverno and
+  - [ ] CLI support should be added and my PR doesn't contain that functionality.

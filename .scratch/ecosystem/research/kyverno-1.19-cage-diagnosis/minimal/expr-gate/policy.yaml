@@ -1,0 +1,25 @@
+apiVersion: policies.kyverno.io/v1alpha1
+kind: GeneratingPolicy
+metadata:
+  name: gen-min
+spec:
+  evaluation:
+    synchronize:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  generate:
+  - expression: 'object.metadata.?labels[''caged''].orValue('''') == ''true'' ? generator.Apply(string(object.metadata.namespace),
+      [dyn({"apiVersion": dyn("v1"), "kind": dyn("ConfigMap"), "metadata": dyn({"name":
+      dyn("made"), "namespace": dyn(string(object.metadata.namespace))}), "data":
+      dyn({"k": dyn("v")})})]) : generator.Apply(string(object.metadata.namespace),
+      [])'

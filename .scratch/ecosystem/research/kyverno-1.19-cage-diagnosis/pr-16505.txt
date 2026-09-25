@@ -1,0 +1,116 @@
+##### PR #16505: feat(gpol): add auditAnnotations support to GeneratingPolicy
+merged_at: 2026-07-09T07:23:52Z  base: main
+## Summary
+
+Implement `auditAnnotations` support for `GeneratingPolicy` — the CEL-based equivalent of ClusterPolicy's `reportProperties` on generate rules. Evaluated annotation values are surfaced as `results[].properties` entries in `ClusterPolicyReport` / `PolicyReport`.
+
+**Closes:** #16503  
+**Parity analysis:** #16304  
+**API PR:** kyverno/api#108
+
+---
+
+## Background
+
+### How `reportProperties` works in ClusterPolicy generate rules
+
+`Rule.ReportProperties` (`map[string]string`) is a rule-level field shared by all rule types. The generate engine path in `pkg/engine/background.go` passes it as the last argument to every `engineapi.RulePass/RuleSkip/RuleError` call. Those land in `ruleResult.Properties()` → `ToPolicyReportResult` → `ReportResult.Properties`.
+
+Limitation: variable substitution in `reportProperties` does **not** run for generate rules (only in validate/mutate handler paths), so values are always static strings.
+
+### This PR: CEL expressions via `auditAnnotations`
+
+`auditAnnotations` follows the exact same pattern already used by `ValidatingPolicy` (`pkg/cel/policies/vpol`) and `ImageValidatingPolicy` (`pkg/cel/policies/ivpol`): each annotation is an `{ key, valueExpression }` pair where `valueExpression` is a full CEL expression evaluated against the admission request context. This is a strict upgrade over static `reportProperties`.
+
+---
+
+## Changes
+
+### `pkg/cel/policies/gpol/compiler/compiler.go`
+
+Added compilation of `spec.auditAnnotations` using the existing `compiler.CompileAuditAnnotations` helper, storing compiled programs in `Policy.auditAnnotations`.
+
+### `pkg/cel/policies/gpol/compiler/policy.go`
+
+- Added `auditAnnotations map[string]cel.Program` to `Policy` struct.
+- Added `evaluateAuditAnnotations(ctx, data)` method mirroring vpol's implementation — evaluates each CEL program and returns `map[string]string`, skipping blank/null results.
+- Introduced `EvaluationResult` struct to carry `GeneratedResources`, `Exceptions`, and `AuditAnnotations` together (replaces the old 3-tuple return from `Evaluate`).
+- `Policy.Evaluate` now returns `(*EvaluationResult, error)`.
+
+### `pkg/cel/policies/gpol/engine/engine.go`
+
+Passes `result.AuditAnnotations` into `engineapi.RulePass(...)` so the map becomes rule response properties and flows through to `results[].properties` in generated policy reports.
+
+### `pkg/cel/policies/gpol/validate.go`
+
+Includes `auditAnnotation.ValueExpression` strings in the HTTP expression scan enforced for namespaced policies.
+
+### Unit tests
+
+| File | New tests |
+|---|---|
+| `compiler_test.go` | Valid `auditAnnotation` compiles; invalid expression fails |
+| `policy_test.go` | Annotation appears in `EvaluationResult.AuditAnnotations`; eval error propagates |
+| `engine_test.go` | End-to-end: `result.Properties()["triggeredBy"]` contains the evaluated value |
+
+### Chainsaw E2E test
+
+`test/conformance/chainsaw/generating-policies/reports/audit-annotations/`
+
+- Creates a `GeneratingPolicy` with two `auditAnnotations` (`namespace` and `env`)
+- Triggers via a namespace with `env: staging` label
+- Asserts the generated `ConfigMap` exists
+- Asserts the `ClusterPolicyReport` contains `properties.namespace` and `properties.env` with the correct evaluated values
+
+---
+
+## Example
+
+```yaml
+apiVersion: policies.kyverno.io/v1beta1
+kind: GeneratingPolicy
+metadata:
+  name: generate-network-policy
+spec:
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE"]
+      resources: ["namespaces"]
+  generate:
+    - expression: generator.apply(object.metadata.name, [networkPolicy])
+  auditAnnotations:
+    - key: namespace
+      valueExpression: "object.metadata.name"
+    - key: env
+      valueExpression: >-
+        has(object.metadata.labels) && 'env' in object.metadata.labels
+          ? object.metadata.labels['env']
+          : 'unknown'
+```
+
+Resulting `ClusterPolicyReport` entry:
+```yaml
+results:
+- policy: generate-network-policy
+  result: pass
+  properties:
+    namespace: my-namespace
+    env: production
+    generated-resources: /v1, Kind=NetworkPolicy Name=default-deny Namespace=my-namespace
+    process: admission review
+```
+
+---
+
+## Testing
+
+```bash
+# unit tests
+go test ./pkg/cel/policies/gpol/...
+
+# E2E (requires running cluster with Kyverno installed)
+chainsaw test test/conformance/chainsaw/generating-policies/reports/audit-annotations/
+```
+

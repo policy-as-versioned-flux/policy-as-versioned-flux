@@ -1,0 +1,60 @@
+diff --color -ru variants/b-string-tier/distribution/policies/v5.0.0/cage-netpol.yaml variants/f-v1-on-b/distribution/policies/v5.0.0/cage-netpol.yaml
+--- variants/b-string-tier/distribution/policies/v5.0.0/cage-netpol.yaml	2026-09-25 18:23:27
++++ variants/f-v1-on-b/distribution/policies/v5.0.0/cage-netpol.yaml	2026-09-25 18:31:57
+@@ -2,7 +2,7 @@
+ # matchConstraints.objectSelector, which Kyverno flattens into one shared
+ # ValidatingWebhookConfiguration (last-reconciled-wins) and silently breaks
+ # multi-version coexistence.
+-apiVersion: policies.kyverno.io/v1alpha1
++apiVersion: policies.kyverno.io/v1
+ kind: GeneratingPolicy
+ metadata:
+   name: cage-netpol-5-0-0
+diff --color -ru variants/b-string-tier/distribution/policies/v5.0.0/cage-tier.yaml variants/f-v1-on-b/distribution/policies/v5.0.0/cage-tier.yaml
+--- variants/b-string-tier/distribution/policies/v5.0.0/cage-tier.yaml	2026-09-25 18:23:27
++++ variants/f-v1-on-b/distribution/policies/v5.0.0/cage-tier.yaml	2026-09-25 18:31:57
+@@ -2,7 +2,7 @@
+ # matchConstraints.objectSelector, which Kyverno flattens into one shared
+ # ValidatingWebhookConfiguration (last-reconciled-wins) and silently breaks
+ # multi-version coexistence.
+-apiVersion: policies.kyverno.io/v1alpha1
++apiVersion: policies.kyverno.io/v1
+ kind: MutatingPolicy
+ metadata:
+   name: cage-tier-5-0-0
+diff --color -ru variants/b-string-tier/distribution/policies/v5.0.0/posture-trust-boundary.yaml variants/f-v1-on-b/distribution/policies/v5.0.0/posture-trust-boundary.yaml
+--- variants/b-string-tier/distribution/policies/v5.0.0/posture-trust-boundary.yaml	2026-09-25 18:23:27
++++ variants/f-v1-on-b/distribution/policies/v5.0.0/posture-trust-boundary.yaml	2026-09-25 18:31:57
+@@ -2,7 +2,7 @@
+ # matchConstraints.objectSelector, which Kyverno flattens into one shared
+ # ValidatingWebhookConfiguration (last-reconciled-wins) and silently breaks
+ # multi-version coexistence.
+-apiVersion: policies.kyverno.io/v1alpha1
++apiVersion: policies.kyverno.io/v1
+ kind: ValidatingPolicy
+ metadata:
+   name: posture-trust-boundary-5-0-0
+diff --color -ru variants/b-string-tier/distribution/policies/v5.0.0/require-nonroot.yaml variants/f-v1-on-b/distribution/policies/v5.0.0/require-nonroot.yaml
+--- variants/b-string-tier/distribution/policies/v5.0.0/require-nonroot.yaml	2026-09-25 18:23:27
++++ variants/f-v1-on-b/distribution/policies/v5.0.0/require-nonroot.yaml	2026-09-25 18:31:57
+@@ -51,7 +51,7 @@
+ # multi-version coexistence. Only pods that CLAIM 5.0.0 are judged here; a pod
+ # on 4.0.0 (or unversioned) is out of scope, so both declared versions admit
+ # side by side.
+-apiVersion: policies.kyverno.io/v1alpha1
++apiVersion: policies.kyverno.io/v1
+ kind: ValidatingPolicy
+ metadata:
+   name: require-nonroot-5-0-0
+diff --color -ru variants/b-string-tier/distribution/policies/v5.0.0/stamp-posture.yaml variants/f-v1-on-b/distribution/policies/v5.0.0/stamp-posture.yaml
+--- variants/b-string-tier/distribution/policies/v5.0.0/stamp-posture.yaml	2026-09-25 18:23:27
++++ variants/f-v1-on-b/distribution/policies/v5.0.0/stamp-posture.yaml	2026-09-25 18:31:57
+@@ -2,7 +2,7 @@
+ # matchConstraints.objectSelector, which Kyverno flattens into one shared
+ # ValidatingWebhookConfiguration (last-reconciled-wins) and silently breaks
+ # multi-version coexistence.
+-apiVersion: policies.kyverno.io/v1alpha1
++apiVersion: policies.kyverno.io/v1
+ kind: MutatingPolicy
+ metadata:
+   name: stamp-posture-5-0-0

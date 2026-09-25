@@ -1,0 +1,47 @@
+--- variants/b-string-tier/graded/tests/cage-netpol/kyverno-test.yaml	2026-09-25 18:23:27
++++ variants/x-fixture-noskip/graded/tests/cage-netpol/kyverno-test.yaml	2026-09-25 18:31:06
+@@ -1,33 +1,18 @@
+-# The generate half, offline: PER-TIER REACH (ADR-0022, ticket 26). Reach is
+-# generated from the tier cage-tier clobbered onto the pod, not one flat egress
+-# lockdown for everybody. baseline reaches normally and generates NOTHING (skip
+-# — the matchConditions gate, not prose, is what leaves it alone); restricted
+-# and quarantine get same-namespace ingress + DNS-only egress; isolated gets
+-# policyTypes Ingress AND Egress with no rules — nothing in, nothing out, and
+-# the pod still runs. An uncaged pod triggers nothing.
+-#
+-# Since the 2026-08-28 repair every caged non-baseline pod generates ALL THREE
+-# restricting rungs at once (see the policy header), so each of the three
+-# triggers below is expected to produce each of the three NetworkPolicies —
+-# that is what makes a tier move a pure label change with nothing created or
+-# deleted in its path. Each result entry therefore lists all three triggers.
+ apiVersion: cli.kyverno.io/v1alpha1
+ kind: Test
+ metadata:
+   name: cage-netpol
+ policies:
+-  - ../../policies/cage-netpol.yaml
++- ../../policies/cage-netpol.yaml
+ resources:
+-  - resources.yaml
++- resources.yaml
+ results:
+-  - policy: cage-netpol
+-    rule: cage-netpol
+-    kind: NetworkPolicy
+-    resources: [caged-restricted, caged-quarantine, caged-isolated]
+-    generatedResource: generated-all.yaml
+-    result: pass
+-  - policy: cage-netpol
+-    rule: cage-netpol
+-    kind: NetworkPolicy
+-    resources: [caged-baseline, healthy]
+-    result: skip
++- policy: cage-netpol
++  rule: cage-netpol
++  kind: NetworkPolicy
++  resources:
++  - caged-restricted
++  - caged-quarantine
++  - caged-isolated
++  generatedResource: generated-all.yaml
++  result: pass

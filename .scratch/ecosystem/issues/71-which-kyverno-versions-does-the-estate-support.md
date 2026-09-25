@@ -80,3 +80,20 @@ decision below is labelled delegated.
 4. **Q4 (a). ADR-0003 is amended, and the bodies move to `v1` in the same new line as the 1.19
    fix.** One new line carries both changes, and the engine computes the bump. The amendment
    corrects the three false statements.
+
+**2026-09-25, the 1.19 diagnosis that Q3 asked for.** The capture and its evidence are in
+`.scratch/ecosystem/research/kyverno-1.19-cage-diagnosis/`. One agent diagnosed and a second
+agent tried to refute. The second agent confirmed the classification and corrected two claims.
+
+- The cage-tier failure is a policy defect. `string(variables.tier)` compiles on 1.18.2 and 1.19.1,
+  passes 13/0 on both, and gives the same mutated output as the tagged body.
+- The cage-netpol failure is not a policy behaviour change. The generated NetworkPolicies are
+  the same on both engines. Kyverno 1.19 (upstream PR #16505) returns no result when a
+  GeneratingPolicy's `matchConditions` do not match. So the fixture's two `result: skip` rows read
+  "Fail / Not found". On 1.18.2 those rows were a real "generates nothing" check. No body change
+  measured makes them green on 1.19.1, and a PolicyException masks the gate.
+- The fixture has a gap on both engines: no row tests the `is-caged` gate alone.
+- Moving the five bodies to `policies.kyverno.io/v1` changed no result on either engine.
+
+This changes the shape of the Q3 ticket. The body needs a one-token fix. The fixture needs a
+"generates nothing" check that does not depend on how the engine reports a miss.

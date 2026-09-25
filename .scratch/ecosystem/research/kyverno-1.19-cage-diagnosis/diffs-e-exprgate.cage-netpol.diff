@@ -1,0 +1,22 @@
+--- variants/b-string-tier/distribution/policies/v5.0.0/cage-netpol.yaml	2026-09-25 18:23:27
++++ variants/e-exprgate/distribution/policies/v5.0.0/cage-netpol.yaml	2026-09-25 18:30:44
+@@ -25,13 +25,6 @@
+       - UPDATE
+       resources:
+       - pods
+-  matchConditions:
+-  - name: is-caged
+-    expression: object.metadata.?labels['posture.acme.io/caged'].orValue('') == 'true'
+-  - name: tier-restricts-reach
+-    expression: object.metadata.?labels['posture.acme.io/tier'].orValue('baseline') != 'baseline'
+-  - name: only-this-policy-version
+-    expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '5.0.0'
+   variables:
+   - name: nsName
+     expression: string(object.metadata.namespace)
+@@ -42,4 +35,4 @@
+   - name: reach
+     expression: "{'isolated': {'ingress': dyn([]), 'egress': dyn([])},\n 'other':    {'ingress': dyn([dyn({\"from\": dyn([dyn({\"podSelector\": dyn({})})])})]),\n              'egress':  dyn([dyn({\n                \"to\": dyn([dyn({\"namespaceSelector\": dyn({\"matchLabels\": dyn({\"kubernetes.io/metadata.name\": dyn(\"kube-system\")})})})]),\n                \"ports\": dyn([dyn({\"protocol\": dyn(\"UDP\"), \"port\": dyn(53)})])})])}}"
+   generate:
+-  - expression: "generator.Apply(variables.nsName, variables.rungs.map(t, dyn({\n  \"apiVersion\": dyn(\"networking.k8s.io/v1\"),\n  \"kind\": dyn(\"NetworkPolicy\"),\n  \"metadata\": dyn({\"name\": dyn(\"cage-reach-\" + t), \"namespace\": dyn(variables.nsName),\n               \"labels\": dyn({\"app.kubernetes.io/managed-by\": dyn(\"kyverno\"),\n                              \"posture.acme.io/cage\": dyn(\"reach\"),\n                              \"posture.acme.io/tier\": dyn(t)})}),\n  \"spec\": dyn({\n    \"podSelector\": dyn({\"matchLabels\": dyn({\"posture.acme.io/caged\": dyn(\"true\"),\n                                            \"posture.acme.io/tier\": dyn(t)})}),\n    \"policyTypes\": dyn([\"Ingress\", \"Egress\"]),\n    \"ingress\": dyn(variables.reach[t == 'isolated' ? 'isolated' : 'other'].ingress),\n    \"egress\": dyn(variables.reach[t == 'isolated' ? 'isolated' : 'other'].egress)})})\n))"
++  - expression: "((object.metadata.?labels['posture.acme.io/caged'].orValue('') == 'true') && (object.metadata.?labels['posture.acme.io/tier'].orValue('baseline') != 'baseline') && (object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '5.0.0'))\n? generator.Apply(variables.nsName, variables.rungs.map(t, dyn({\n  \"apiVersion\": dyn(\"networking.k8s.io/v1\"),\n  \"kind\": dyn(\"NetworkPolicy\"),\n  \"metadata\": dyn({\"name\": dyn(\"cage-reach-\" + t), \"namespace\": dyn(variables.nsName),\n               \"labels\": dyn({\"app.kubernetes.io/managed-by\": dyn(\"kyverno\"),\n                              \"posture.acme.io/cage\": dyn(\"reach\"),\n                              \"posture.acme.io/tier\": dyn(t)})}),\n  \"spec\": dyn({\n    \"podSelector\": dyn({\"matchLabels\": dyn({\"posture.acme.io/caged\": dyn(\"true\"),\n                                            \"posture.acme.io/tier\": dyn(t)})}),\n    \"policyTypes\": dyn([\"Ingress\", \"Egress\"]),\n    \"ingress\": dyn(variables.reach[t == 'isolated' ? 'isolated' : 'other'].ingress),\n    \"egress\": dyn(variables.reach[t == 'isolated' ? 'isolated' : 'other'].egress)})})\n))\n: generator.Apply(variables.nsName, [])"

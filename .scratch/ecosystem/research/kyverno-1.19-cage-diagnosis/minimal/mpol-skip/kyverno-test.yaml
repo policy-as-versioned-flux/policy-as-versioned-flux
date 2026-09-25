@@ -1,0 +1,8 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata: {name: mut-min}
+policies: [policy.yaml]
+resources: [resources.yaml]
+results:
+- {policy: mut-min, rule: mut-min, kind: Pod, resources: [matched], patchedResources: patched.yaml, result: pass}
+- {policy: mut-min, rule: mut-min, kind: Pod, resources: [unmatched], result: skip}
