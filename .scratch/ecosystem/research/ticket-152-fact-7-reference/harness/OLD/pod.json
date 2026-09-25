@@ -1,0 +1,27 @@
+{
+ "apiVersion": "v1",
+ "kind": "Pod",
+ "metadata": {
+  "name": "cage-probe",
+  "namespace": "cage-probe-control",
+  "labels": {
+   "policy-as-versioned.dev/policy-version": "5.0.0"
+  }
+ },
+ "spec": {
+  "securityContext": {
+   "runAsNonRoot": true,
+   "runAsUser": 65532
+  },
+  "containers": [
+   {
+    "name": "app",
+    "image": "ghcr.io/acme/coraza-waf:cage",
+    "imagePullPolicy": "IfNotPresent",
+    "securityContext": {
+     "readOnlyRootFilesystem": true
+    }
+   }
+  ]
+ }
+}

@@ -192,3 +192,18 @@ later ticket wants those ten, item 2 is the road, and this ADR is what it supers
   first refusal above, and it is not this ticket's to fix.
 - **Ticket 98's scan grades no adopter cage.** The served versions exist only at a tag; the version
   on disk is not served. Also not this ticket's to fix, and named so it is not rediscovered.
+
+## Correction and amendment, 2026-09-25 (ticket 152)
+
+**Delegated** (ADR-0025): the owner answered each round of ticket 152 with "agree". The reasons are the assistant's.
+
+- **Decision 2 described 4.0.0's fallback, which no adopter served on 2026-09-10.** It says that the Namespace which is not governed makes the cage put its pod on the loosest rung. That was 4.0.0's rule. On 2026-09-10 the lanes served 3.0.0, whose cage the API server refused (Context, above). Platform commit `60c02f8` (ticket 63, 2026-09-04) had already made 5.0.0 fall every Namespace without a tier to `isolated`. The adopters served 4.0.0 and 5.0.0 together from 2026-09-24, and the probe claims the newest `cage-tier` on the cluster. So from the first sample that day, the control landed on `isolated` beside the fall-closed pod, and fact 7 read null.
+- **Decision 2 stands.** The instrument still names no rung. The comparison pod is now the **reference workload**: an unclaimed pod in a Namespace that declares nothing, which the cage does not select (ticket 119, decision 2). From here on, this ADR's "control workload" means the reference workload (CONTEXT.md).
+- **What "derived" now guarantees.** The fall-closed rung is what the cage stamped, and the instrument checks that it is the ladder's bottom: the pod's priority equals the lowest `cage-` PriorityClass on the cluster, and the NetworkPolicy that selects it has no rules and declares both policy types. If either check fails, facts 6 and 7 both read could-not-look. It does not guarantee that the cage's fallback is the rung the owner intended.
+- **The road not taken.** A reference pod in a Namespace that the sampler creates at run time and that declares the `baseline` rung. It would buy a looser cage by choosing a Namespace, which ADR-0022 calls an exemption, in a place the binding check cannot see.
+- **Decision 3 stands.** The reference workload brackets the silence, as the control did.
+- **Decision 4 changes in one way.** A sample older than the newest registration reads could-not-look on facts 6 and 7, not "not scored". Otherwise a sample from before a re-registration can print PASS on five facts.
+- **Decision 5 stands.** Ticket 161's `verify-cage-probe.sh` proves the served documents offline. It is not a cluster proof.
+- **Decision 6 gains one rule.** A cage fact that is null on the three newest samples taken since the newest registration is a fall, and `grade` reports FAIL.
+
+The new section is `.scratch/ecosystem/research/ticket-152-fact-7-reference/cage-behaviour-sample.draft.yaml`. Ticket 161 builds it.

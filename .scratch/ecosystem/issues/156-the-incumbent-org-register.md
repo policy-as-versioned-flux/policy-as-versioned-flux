@@ -20,7 +20,7 @@ Build the archive half of [ADR-0036](../../../docs/adr/0036-the-incumbent-org-sh
    | c2p-collector | dropped: platform owns the `result2oscal` glue (ADR-0009) | ticket 155's OSCAL check passes |
    | datastore, cloud | lifted (ticket 151) | ticket 151's check passes |
    | governance-agent | dropped: platform's wargamer replaces it | with fleet |
-   | policy, fleet | dropped: platform and the adopters' lanes replace them | one adopter's `verify-reconcile.sh` passes, after ticket 152 |
+   | policy, fleet | dropped: platform and the adopters' lanes replace them | one adopter's `verify-reconcile.sh` passes, after ticket 161 |
 
 2. **The check.** `verify/incumbent-org/verify-incumbent-org.sh` reads the register. The archived flags, the transferred repos' new owners and an anonymous GHCR pull of each served incumbent image are read in `truth.yml`'s `clocks` job with `github.token` and passed in, as `CLOCK_VERDICT` is. The unauthenticated API limit is 60 requests an hour per address, and hosted runners share addresses. It FAILs on a repo archived or transferred before its row passes. A row that passes and is not acted on yet is a counted LIMIT. A transferred repo passes when the API names its new owner as the adopter org.
 3. **The archives.** Archive each repo with the owner's `gh` login when its row passes, as the owner authorised on 2026-09-25 (ticket 35 round 1 Q6). Record each archive in this ticket. This ticket is the archive log that ticket 35 round 1 Q6 refers to. After readiness-collector is archived, pull its image anonymously again and record the result. After ticket 154, no archived repo has an image the estate serves (ADR-0036 decision 3).

@@ -1,0 +1,20 @@
+# kyverno 1.18.2, 2026-09-25, ludlow origin/main b8e14f7, run from the research folder:
+# $KYVERNO apply $PROVE/ludlow/composed/policies/v5.0.0/cage-tier.yaml --resource harness/RA/pod.json --resource harness/SANE-quirk/ns.json --remove-color -o out.yaml
+# ns.json declares posture.acme.io/tier: baseline. What out.yaml carries, one line per document:
+Pod cage-probe tier=isolated priorityClassName=cage-isolated-5-0-0
+Pod cage-probe tier=isolated priorityClassName=cage-isolated-5-0-0
+Namespace cage-probe-fallclosed tier=baseline priorityClassName=None
+# CLI log:
+
+Applying 1 policy rule(s) to 2 resource(s)...
+
+
+Mutation:
+Mutation has been applied successfully.
+
+Mutation:
+Mutation has been applied successfully.
+
+Mutation:
+Mutation has been applied successfully.
+pass: 2, fail: 0, warn: 0, error: 0, skip: 0 

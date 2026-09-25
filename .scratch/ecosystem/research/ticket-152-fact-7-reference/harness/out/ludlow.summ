@@ -1,0 +1,31 @@
+== ludlow F: tier=isolated caged=true version=5.0.0 pc=cage-isolated-5-0-0 prio=-10000 preempt=Never hostNet=False
+   ctr app {"cpu": "100m", "memory": "64Mi"} {"allowPrivilegeEscalation": false, "capabilities": {"drop": ["ALL"]}, "privileged": false, "readOnlyRootFilesystem": true, "runAsNonRoot": true}
+   ctr waf-sidecar {"cpu": "250m", "memory": "256Mi"} {"allowPrivilegeEscalation": false, "capabilities": {"drop": ["ALL"]}, "privileged": false, "readOnlyRootFilesystem": true, "runAsNonRoot": true}
+   gen.yaml docs=3 unique NPs=3
+   NP cage-probe-fallclosed/cage-reach-isolated podSelector={"matchLabels": {"posture.acme.io/caged": "true", "posture.acme.io/tier": "isolated"}} types=['Ingress', 'Egress'] ingress=[] egress=[] SELECTS_POD=True
+   NP cage-probe-fallclosed/cage-reach-quarantine podSelector={"matchLabels": {"posture.acme.io/caged": "true", "posture.acme.io/tier": "quarantine"}} types=['Ingress', 'Egress'] ingress=[{"from": [{"podSelector": {}}]}] egress=[{"ports": [{"port": 53, "protocol": "UDP"}], "to": [{"namespaceSelector": {"matchLabels": {"kubernetes.io/metadata.name": "kube-system"}}}]}] SELECTS_POD=False
+   NP cage-probe-fallclosed/cage-reach-restricted podSelector={"matchLabels": {"posture.acme.io/caged": "true", "posture.acme.io/tier": "restricted"}} types=['Ingress', 'Egress'] ingress=[{"from": [{"podSelector": {}}]}] egress=[{"ports": [{"port": 53, "protocol": "UDP"}], "to": [{"namespaceSelector": {"matchLabels": {"kubernetes.io/metadata.name": "kube-system"}}}]}] SELECTS_POD=False
+== ludlow OLD: tier=isolated caged=true version=5.0.0 pc=cage-isolated-5-0-0 prio=-10000 preempt=Never hostNet=False
+   ctr app {"cpu": "100m", "memory": "64Mi"} {"allowPrivilegeEscalation": false, "capabilities": {"drop": ["ALL"]}, "privileged": false, "readOnlyRootFilesystem": true, "runAsNonRoot": true}
+   ctr waf-sidecar {"cpu": "250m", "memory": "256Mi"} {"allowPrivilegeEscalation": false, "capabilities": {"drop": ["ALL"]}, "privileged": false, "readOnlyRootFilesystem": true, "runAsNonRoot": true}
+   gen.yaml docs=3 unique NPs=3
+   NP cage-probe-control/cage-reach-isolated podSelector={"matchLabels": {"posture.acme.io/caged": "true", "posture.acme.io/tier": "isolated"}} types=['Ingress', 'Egress'] ingress=[] egress=[] SELECTS_POD=True
+   NP cage-probe-control/cage-reach-quarantine podSelector={"matchLabels": {"posture.acme.io/caged": "true", "posture.acme.io/tier": "quarantine"}} types=['Ingress', 'Egress'] ingress=[{"from": [{"podSelector": {}}]}] egress=[{"ports": [{"port": 53, "protocol": "UDP"}], "to": [{"namespaceSelector": {"matchLabels": {"kubernetes.io/metadata.name": "kube-system"}}}]}] SELECTS_POD=False
+   NP cage-probe-control/cage-reach-restricted podSelector={"matchLabels": {"posture.acme.io/caged": "true", "posture.acme.io/tier": "restricted"}} types=['Ingress', 'Egress'] ingress=[{"from": [{"podSelector": {}}]}] egress=[{"ports": [{"port": 53, "protocol": "UDP"}], "to": [{"namespaceSelector": {"matchLabels": {"kubernetes.io/metadata.name": "kube-system"}}}]}] SELECTS_POD=False
+== ludlow RA: tier=baseline caged=true version=5.0.0 pc=cage-baseline-5-0-0 prio=-10 preempt=Never hostNet=False
+   ctr app {"cpu": "500m", "memory": "256Mi"} {"allowPrivilegeEscalation": false, "privileged": false, "readOnlyRootFilesystem": true, "runAsNonRoot": false}
+   gen.yaml docs=0 unique NPs=0
+== ludlow RB: tier=None caged=None version=None pc=None prio=None preempt=None hostNet=None
+   ctr app null {"readOnlyRootFilesystem": true}
+   gen.yaml docs=0 unique NPs=0
+== ludlow RC: tier=baseline caged=true version=5.0.0 pc=cage-baseline-5-0-0 prio=-10 preempt=Never hostNet=False
+   ctr app {"cpu": "500m", "memory": "256Mi"} {"allowPrivilegeEscalation": false, "privileged": false, "readOnlyRootFilesystem": true, "runAsNonRoot": false}
+   gen.yaml docs=0 unique NPs=0
+== ludlow SANE-govnoclaim: tier=isolated caged=true version=None pc=cage-isolated prio=-10000 preempt=Never hostNet=False
+   ctr app {"cpu": "100m", "memory": "64Mi"} {"allowPrivilegeEscalation": false, "capabilities": {"drop": ["ALL"]}, "privileged": false, "readOnlyRootFilesystem": true, "runAsNonRoot": true}
+   ctr waf-sidecar {"cpu": "250m", "memory": "256Mi"} {"allowPrivilegeEscalation": false, "capabilities": {"drop": ["ALL"]}, "privileged": false, "readOnlyRootFilesystem": true, "runAsNonRoot": true}
+   gen.yaml docs=1 unique NPs=1
+   NP cage-probe-fallclosed/cage-reach-bottom-rung-isolated podSelector={"matchLabels": {"posture.acme.io/caged": "true", "posture.acme.io/tier": "isolated"}} types=['Ingress', 'Egress'] ingress=[] egress=[] SELECTS_POD=True
+== ludlow SANE-RA-nonsobj: tier=baseline caged=true version=5.0.0 pc=cage-baseline-5-0-0 prio=-10 preempt=Never hostNet=False
+   ctr app {"cpu": "500m", "memory": "256Mi"} {"allowPrivilegeEscalation": false, "privileged": false, "readOnlyRootFilesystem": true, "runAsNonRoot": false}
+   gen.yaml docs=0 unique NPs=0

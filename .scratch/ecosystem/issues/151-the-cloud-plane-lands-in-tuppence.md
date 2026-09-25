@@ -2,7 +2,7 @@
 
 Type: task (AFK)
 Status: open
-Blocked by: 152
+Blocked by: 157, 161
 
 ## Question
 
@@ -23,3 +23,5 @@ The trigger is `verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh` PASS on a c
 Facts on 2026-09-25: `datastore` holds `README.md`, `claims.yaml` and `kustomization.yaml`, with Crossplane v2 managed resources (`s3.aws.m.upbound.io`, RDS) under the label `mycompany.com/policy-version`. `cloud` holds a README and six harvested OSCAL files: the 800-53r5 catalogue, and the RDS and S3 baseline profiles and component-definitions. The Crossplane v2 setup is in fleet (`infrastructure/crossplane*/`, `verify-crossplane.sh`), and the RDS and S3 policies are in the incumbent policy repo's `cloud/`. [corrected 2026-09-25: the first version said `cloud` holds the Crossplane setup, which is its README's claim, not its content]
 
 **Second blocker, reported 2026-09-25 by the session that grills ticket 152.** Ticket 152 alone cannot give step 4 a PASS. On the 2026-09-25 samples, fact 2 is `null` on driftwood's and tuppence's composed source, and on driftwood falsifier 2 is not looked at on platform and nist either. Step 4 grades driftwood by default (`verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh:46`). No open ticket owns fact 2 yet. This ticket stays blocked until step 4 passes, whatever unblocks it.
+
+**Blockers renamed, 2026-09-25.** Ticket 152 resolved as a grilling ticket and graduated the build to ticket 161. Fact 2 and driftwood's falsifier 2 went to ticket 157. Step 4 needs both, so this ticket is blocked by 157 and 161, and then by step 4's first PASS.

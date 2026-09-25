@@ -1,0 +1,31 @@
+{
+ "apiVersion": "cli.kyverno.io/v1alpha1",
+ "kind": "Value",
+ "metadata": {
+  "name": "values"
+ },
+ "namespaces": [
+  {
+   "apiVersion": "v1",
+   "kind": "Namespace",
+   "metadata": {
+    "name": "cage-probe-fallclosed",
+    "labels": {
+     "app.kubernetes.io/managed-by": "drift-five-facts",
+     "policy-as-versioned.dev/governed": "true",
+     "posture.acme.io/tier": "baseline"
+    }
+   }
+  }
+ ],
+ "namespaceSelector": [
+  {
+   "name": "cage-probe-fallclosed",
+   "labels": {
+    "app.kubernetes.io/managed-by": "drift-five-facts",
+    "policy-as-versioned.dev/governed": "true",
+    "posture.acme.io/tier": "baseline"
+   }
+  }
+ ]
+}
