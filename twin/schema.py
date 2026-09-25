@@ -203,10 +203,17 @@ def valuation(value: Any, where: str) -> None:
     """What a perspective says a component is worth to it, and what backs that claim.
 
     Closed like everything else, and **graded**: the £ boundary is the same use-gate the causal
-    layer runs on. Only a valuation evidenced at the published threshold carries an `amount`;
+    layer runs on. Only a valuation evidenced at the threshold in force carries an `amount`;
     anything weaker is a register entry with no figure at all, reported beside the number and
     never inside it (decision ticket 09, Q4). That is what stops reputation becoming
     "reputation damage = £X" — the rejected shadow price.
+
+    Two halves since eco-system ticket 141 (ADR-0032). This validator holds the shape and the
+    one refusal that is true for every party: an amount at a grade no party may declare a
+    threshold at (4, an expert's say-so; 5, a model's) never loads. The tie between the grade and
+    the amount at grades 2 and 3 depends on which threshold is in force for the party whose money
+    this is, so `validate()` applies it per perspective (`valuation_tie`) with the threshold the
+    loader was handed, the ladder's default where nothing was declared.
     """
     if not isinstance(value, dict):
         raise SchemaError(f"{where}: expected a valuation mapping, got {value!r}")
@@ -240,23 +247,50 @@ def valuation(value: Any, where: str) -> None:
 
     # Imported here rather than at module scope: `twin.evidence` reads this module's grade tuple,
     # so importing it eagerly would close a cycle.
-    from .evidence import may_price
+    from .evidence import DECLARABLE_THRESHOLDS
 
     grade = int(value["evidence_grade"])
-    if may_price(grade) and "amount" not in value:
+    if grade > max(DECLARABLE_THRESHOLDS) and "amount" in value:
         raise SchemaError(
-            f"{where}: evidence grade {grade} admits a figure and none is declared. A valuation "
-            "inside the threshold and carrying no amount is a gap, not a register entry."
-        )
-    if not may_price(grade) and "amount" in value:
-        raise SchemaError(
-            f"{where}: evidence grade {grade} is outside the pricing threshold, so this valuation "
-            "may not carry an amount. It is a register entry — reported beside the number, never "
-            "inside it — because inventing comparability the evidence does not support is the "
-            "move decision ticket 09 rejected."
+            f"{where}: evidence grade {grade} is outside every pricing threshold a party may "
+            f"declare (ADR-0032 admits {', '.join(str(t) for t in DECLARABLE_THRESHOLDS)}), so "
+            "this valuation may not carry an amount for anybody. It is a register entry — "
+            "reported beside the number, never inside it — because inventing comparability the "
+            "evidence does not support is the move decision ticket 09 rejected."
         )
     if "amount" in value:
         amount(value["amount"], f"{where}.amount")
+
+
+def valuation_tie(value: dict[str, Any], where: str, threshold: int) -> None:
+    """The grade-amount tie, against the threshold in force for the party whose money this is.
+
+    A valuation inside the threshold must carry an amount, because a gap is not a register
+    entry; one outside it may not, because the amount would be the shadow price. Applied by
+    `validate()` after the shape has passed, with the party's declared threshold where the loader
+    was handed one (eco-system ticket 141) and the ladder's default otherwise, so an overlay that
+    declares nothing loads exactly as it did before the declaration existed, and an amount at
+    grade 3 loads only for a party whose signed artefact says it prices on grade 3.
+    """
+    from .evidence import may_price
+
+    grade = int(value["evidence_grade"])
+    if may_price(grade, threshold=threshold) and "amount" not in value:
+        raise SchemaError(
+            f"{where}: evidence grade {grade} admits a figure and none is declared. A valuation "
+            f"inside the threshold ({threshold}) and carrying no amount is a gap, not a register "
+            "entry."
+        )
+    if not may_price(grade, threshold=threshold) and "amount" in value:
+        raise SchemaError(
+            f"{where}: evidence grade {grade} is outside the pricing threshold ({threshold}) in "
+            "force for this party, so this valuation may not carry an amount. It is a register "
+            "entry — reported beside the number, never inside it — because inventing "
+            "comparability the evidence does not support is the move decision ticket 09 rejected."
+            + (" A party that prices on published work declares appetite.pricing_threshold: 3 on "
+               "its own signed party.yaml (ADR-0032) and hands it to the loader."
+               if grade == 3 else "")
+        )
 
 
 def mitigation(value: Any, where: str) -> None:
@@ -1069,7 +1103,15 @@ REFINEMENTS: dict[str, Callable[[dict[str, Any], str], None]] = {
 }
 
 
-def validate(kind: str, doc: dict[str, Any], where: str) -> None:
+def validate(kind: str, doc: dict[str, Any], where: str, *,
+             pricing_threshold: int | None = None) -> None:
+    """Validate one document of `kind`.
+
+    `pricing_threshold` is the threshold in force for the party whose overlay this is (eco-system
+    ticket 141): the loader hands it through from the party's signed declaration, and only a
+    `perspective` reads it, for the grade-amount tie on each of its valuations. Absent, the
+    ladder's default applies, so every caller that passes nothing gets exactly the gate it had.
+    """
     schema = SCHEMAS.get(kind)
     if schema is None:
         raise SchemaError(f"{where}: no schema for {kind!r}")
@@ -1077,6 +1119,12 @@ def validate(kind: str, doc: dict[str, Any], where: str) -> None:
     refine = REFINEMENTS.get(kind)
     if refine is not None:
         refine(doc, where)
+    if kind == "perspective":
+        from .evidence import check_threshold, threshold as ladder_threshold
+
+        in_force = ladder_threshold() if pricing_threshold is None else check_threshold(pricing_threshold)
+        for key, value in doc["values"].items():
+            valuation_tie(value, f"{where}.values.{key}", in_force)
 
 
 # Which schema a file gets, by the collection directory it sits in.

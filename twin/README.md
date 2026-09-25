@@ -1408,11 +1408,29 @@ employer's, because that would be exactly the unstated firm's-£ the design refu
 per-component spread between them is in the artefact rather than left to whoever runs the diff.
 
 **The use-gate reaches here too — one rule, three jobs.** A valuation carries its own evidence
-grade, and only a valuation inside the published threshold carries a figure at all. Anything weaker
+grade, and only a valuation inside the threshold in force carries a figure at all. Anything weaker
 is a **register entry**: named beside the number, with no amount, because the schema refuses one at
 that grade. That is what stops a perspective declaring "reputation damage = £X", which is the
 shadow price decision ticket 09 explicitly rejected. The gate lives at the source rather than in the
 output: a grade-5 valuation carrying an amount does not load.
+
+**The threshold in force is the party's** (eco-system ticket 141, ADR-0032). The ladder's default
+is grade 2. A party may declare `appetite.pricing_threshold: 3` on its own signed `party.yaml`,
+"published work, not observed here"; only 2 and 3 can be declared, and 4 and 5 never price for
+anybody. The declaration never lives in the model repository: the emitter reads it off the party
+artefact with `evidence.declared_threshold(party)` and hands it to
+`Overlay.load(repo, org, pricing_threshold=...)`, which validates every valuation against it and
+records it as `Overlay.pricing_threshold`. One declaration governs both gates, the use-gate and
+path admission. `twin price` and `twin exposure` then re-check each valuation's grade against that
+same number rather than trusting the loader, so an amount at grade 3 prices only for a party that
+declared 3, and every overlay that declares nothing prices exactly as it did. Every price carries
+`rests_on_grade`, the weakest grade it rests on (the weaker of the path's worst hop and the
+valuation; for a credit, the impact, the claim and the corroborated enactment), the one order
+statistic ADR-0024 point 6 admits; the `gating` block carries `applied`, the thresholds in force
+and their basis, beside the ladder's pin. And a synthetic record never raises a grade (ADR-0032
+point 4): `twin/synthetic.py` refuses a price through any edge, valuation or claim whose evidence
+chain includes a record marked synthetic, planted or injected, by name, whatever grade the file
+declares.
 
 **And a second gate, derived rather than declared.** A well-graded valuation still enters the
 figure only when a causal path runs from the component to a cash flow that perspective declared,
@@ -1461,17 +1479,24 @@ evidence-graded, and the £ stays perspectival right down into the price: in the
 operator prices the same shock at `160000` and the staff council at `20000`, and the spread of
 `140000` is in the artefact rather than left to whoever runs the diff.
 
-Three gates, asking different questions. The **path** must be graded inside the pricing threshold.
-The **valuation** must be too, which the schema already guarantees at the source. And **admission**
-must hold — a graded causal path has to reach a cash flow the perspective declared. Anything that
+Three gates, asking different questions. The **path** must be graded inside the pricing threshold
+in force for the party (the ladder's 2, or the 3 its signed `party.yaml` declares; eco-system
+ticket 141). The **valuation** must be too, which the schema guarantees at the source for the
+threshold the loader was handed and the gate re-checks itself. And **admission** must hold — a
+graded causal path has to reach a cash flow the perspective declared. Before any of them, a
+**synthetic record never raises a grade**: an impact whose path or valuation rests on a record
+marked synthetic, planted or injected is refused by name (`RESTS_ON_SYNTHETIC`). Anything that
 fails one of them is a register entry with a falsifiable reason and **no figure at all**. Not a
-zero: zero is a price, and "we cannot price this" is not.
+zero: zero is a price, and "we cannot price this" is not. Every impact that prices carries
+`rests_on_grade`, the weakest grade it rests on.
 
 The pocket org demonstrates the gate in both directions on purpose. A shock at `order-service`
 prices, because `orders-slow-the-portal` is grade 2. The same shock at `shared-database` prices
 **nothing** under either eye, because every route out of it crosses `database-slows-orders` at
-grade 3. Both are worksheet lines, because a gate asserted only where it passes is asserted only
-where nothing could go wrong.
+grade 3 — and prices under a party that declared 3, resting on grade 3, which
+`tests/test_pricing_threshold.py` asserts beside the planted synthetic case that stays refused
+either way. Both are worksheet lines, because a gate asserted only where it passes is asserted
+only where nothing could go wrong.
 
 **Mitigation credit is a causal claim, and is gated like one.** A response may declare what it
 removes from an impact, and that claim carries a grade. This closes the classic unfalsifiability

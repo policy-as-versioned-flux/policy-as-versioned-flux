@@ -430,11 +430,13 @@ that a rewritten entry cites stay as the record of the decision at the time.
   **relevant revenue**, and the date they were true. Signed by the adopter alone. Stale facts widen a
   price to the publisher's **widening target**; they never refuse one.
 
-- **Pricing threshold** (added 2026-09-25, ticket 30) — The weakest evidence grade a price may
-  rest on. The estate default is grade 2; an adopter may declare grade 3, published work not
-  observed here, on its own signed party artefact. Every price shows the weakest grade it rests
-  on. A synthetic record never raises a grade: it evidences machinery, never the world
-  (ADR-0032).
+- **Pricing threshold** (added 2026-09-25, ticket 30; built by ticket 141) — The weakest
+  evidence grade a price may rest on. The estate default is grade 2; an adopter may declare grade
+  3, published work not observed here, on its own signed party artefact
+  (`appetite.pricing_threshold`, 2 or 3 and nothing else). One declaration governs both of the
+  twin's thresholds for that party. Every price shows the weakest grade it rests on
+  (`rests_on_grade`, an order statistic). A synthetic record never raises a grade: it evidences
+  machinery, never the world (ADR-0032).
   _Avoid_: evidence floor (a floor is a tier bound).
 
 - **Obligation** (added 2026-08-28) — A regime an adopter declares it answers to, by name, in its

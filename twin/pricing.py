@@ -30,6 +30,32 @@ differently.
 A component that fails any of them is a **register entry**, named with its reason and carrying no
 figure at all. Not a zero: zero is a price, and "we cannot price this" is not.
 
+## The threshold is the party's, and every price shows the weakest grade it rests on
+
+Eco-system ticket 141, ADR-0032. The two thresholds the gates compare against are not read from
+the ladder here: they are the ones in force for the party whose money this is, carried by the
+loaded overlay (`Overlay.pricing_threshold`). That is the ladder's default unless the party
+declared `appetite.pricing_threshold: 3` on its own signed `party.yaml` and its emitter handed
+the declaration to `Overlay.load(...)`. Only 2 and 3 can be declared; 4 and 5 never price for
+anybody. So an amount at grade 3 prices only for a party that declared 3, and the gate re-checks
+the valuation's grade itself rather than trusting the loader. Every overlay that declares nothing
+prices exactly as before, the real-firm backtest corpus included.
+
+Each priced impact carries `rests_on_grade`, the weaker of the path's worst hop and the valuation
+it scales; each credited mitigation carries the weakest of the impact, the claim and the
+corroborated enactment. It is an order statistic, the one operation on grades ADR-0024 point 6
+admits, and it is never summed, averaged or weighted. The `gating` block records the thresholds
+applied and their basis beside the ladder's pin.
+
+## A synthetic record never raises a grade
+
+ADR-0032 point 4, twin ticket 12. A record marked synthetic, planted or injected evidences
+detection machinery, never the world. `twin/synthetic.py` says what such a record is and whether
+an edge, a valuation or a claim rests on one; an impact whose primary path or valuation does, and
+a mitigation claim whose own evidence or whose enactment record does, is a register entry
+(`RESTS_ON_SYNTHETIC`) whatever grade the file declares. Refused first, by name, because the
+grade a synthetic record raised may sit inside the threshold and pass every other gate.
+
 ## Mitigation credit is a causal claim, and is gated like one
 
 A response may declare what it removes from an impact. That claim carries an evidence grade and is
@@ -69,7 +95,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from . import admission, corroboration, evidence, options as options_mod, propagate as propagate_mod
+from . import (
+    admission, corroboration, evidence, options as options_mod, propagate as propagate_mod,
+    synthetic,
+)
 from .artefact import ArtefactError
 from .canon import walk_keys
 from .pert import Triple, quantise
@@ -84,6 +113,10 @@ NO_VALUATION = "this-perspective-declares-no-valuation-for-this-component"
 VALUATION_TOO_WEAK = "the-valuation-is-graded-outside-the-pricing-threshold"
 NOT_ADMITTED = "no-graded-causal-path-reaches-a-declared-cash-flow"
 DIRECTIONAL_ONLY = "the-path-carries-a-direction-and-no-magnitude"
+# ADR-0032 point 4 (eco-system ticket 141): a synthetic record never raises a grade. An edge, a
+# valuation or a claim whose evidence chain includes a record marked synthetic, planted or
+# injected is refused a price whatever grade it declares; `twin/synthetic.py` is the rule.
+RESTS_ON_SYNTHETIC = "the-evidence-chain-includes-a-record-marked-synthetic"
 
 # Why a response earned no credit.
 CLAIMS_NONE = "this-response-claims-no-mitigation"
@@ -97,6 +130,9 @@ BODY_KEYS = options_mod.BODY_KEYS | frozenset(
         "valuation", "influence", "price", "depth", "worst_evidence_grade", "admitted_because",
         "reason", "detail", "evidence_grade", "component", "mitigation", "credit", "reduction",
         "claims", "reduces", "no_severity_slot",
+        # The weakest grade a figure rests on (ADR-0032 point 3) and the thresholds applied to
+        # reach it, with their basis (eco-system ticket 141).
+        "rests_on_grade", "applied",
         "traversal", "follows", "max_depth", "max_paths", "truncated", "known_limits",
         "truncated_by_depth", "truncated_by_path_count", "gated_at_grade",
         "structural_edges_do_not_propagate", "paths_are_not_aggregated",
@@ -132,16 +168,45 @@ def _register(component: str, reason: str, detail: str, **extra: Any) -> dict[st
     return {"component": component, "reason": reason, "detail": detail, **extra}
 
 
+def _synthetic_reason(overlay: "Overlay", path: dict[str, Any], component: str,
+                      valuation: dict[str, Any] | None) -> str | None:
+    """Why this impact's evidence chain includes a synthetic record, or None.
+
+    Every hop on the primary path is a graded edge with a regrade chain and a note; the valuation
+    has a basis. `twin/synthetic.py` reads each of them. Checked before the gates below rather
+    than after, so a synthetic record is refused by name even where the grade it raised would
+    have priced.
+    """
+    for hop in path["path"]:
+        edge_id = str(hop["edge"])
+        note = (overlay.edges.get(edge_id) or {}).get("note")
+        why = synthetic.rests_on(overlay, edge_id, (note,))
+        if why:
+            return f"hop {edge_id!r}: {why}"
+    if valuation is not None:
+        why = synthetic.rests_on(overlay, f"valuation of {component}", (valuation.get("basis"),))
+        if why:
+            return why
+    return None
+
+
 def impacts(
-    graph: "Graph", perspective: dict[str, Any], origin: str
+    graph: "Graph", perspective: dict[str, Any], origin: str, overlay: "Overlay"
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     """Price every impact a shock at `origin` causes, under one perspective's eye.
 
     Returns the priced impacts, the register of refusals, and the traversal that produced both.
     Both lists come back: a refusal is an answer, so an impact that cannot be priced is reported
     with the reason rather than dropped.
+
+    `overlay` is required, not defaulted, for two reasons that each refuse a silent default. It
+    carries the pricing threshold in force for this party (`Overlay.pricing_threshold`: the
+    ladder's default, or the party's signed declaration the loader was handed; eco-system ticket
+    141), which governs both gates here, so the same number the loader validated the valuations
+    against is the one this gate prices against. And it carries the signals and regrades the
+    synthetic-record rule reads (ADR-0032 point 4).
     """
-    threshold = evidence.threshold()
+    threshold = evidence.check_threshold(overlay.pricing_threshold)
     propagation = propagate_mod.propagate(graph, origin, threshold=threshold)
     declared = {str(k): v for k, v in (perspective.get("values") or {}).items()}
 
@@ -152,7 +217,7 @@ def impacts(
         path = next((p for p in reached["paths"] if p["primary"]), None)
         if path is None:
             continue
-        verdict = admission.admit(graph, perspective, component)
+        verdict = admission.admit(graph, perspective, component, threshold=threshold)
 
         if path["directional_only"]:
             register.append(_register(
@@ -163,16 +228,27 @@ def impacts(
             ))
             continue
         grade = path["worst_evidence_grade"]
-        if grade is None or not evidence.may_price(int(grade)):
+        valuation = declared.get(component)
+        # A synthetic record never raises a grade (ADR-0032 point 4). Refused first, by name,
+        # because the grade it raised may sit inside the threshold and pass every gate below.
+        synthetic_why = _synthetic_reason(overlay, path, component, valuation)
+        if synthetic_why:
             register.append(_register(
-                component, PATH_TOO_WEAK,
-                f"the weakest hop on this path is graded {grade}, outside the published pricing "
-                "threshold. The mechanism may be real; that it operates here is not evidenced, "
-                "and a number resting on it would be false precision",
+                component, RESTS_ON_SYNTHETIC,
+                f"{synthetic_why}. A synthetic record evidences detection machinery, never the "
+                "world, so no grade resting on one prices, whatever the grade says",
                 depth=path["depth"], worst_evidence_grade=grade,
             ))
             continue
-        valuation = declared.get(component)
+        if grade is None or not evidence.may_price(int(grade), threshold=threshold):
+            register.append(_register(
+                component, PATH_TOO_WEAK,
+                f"the weakest hop on this path is graded {grade}, outside the pricing threshold "
+                f"in force ({threshold}). The mechanism may be real; that it operates here is not "
+                "evidenced, and a number resting on it would be false precision",
+                depth=path["depth"], worst_evidence_grade=grade,
+            ))
+            continue
         if valuation is None:
             register.append(_register(
                 component, NO_VALUATION,
@@ -183,11 +259,14 @@ def impacts(
             ))
             continue
         valuation_grade = int(valuation["evidence_grade"])
-        if not evidence.may_price(valuation_grade) or "amount" not in valuation:
+        # Re-checked here against the threshold in force, never trusted to the loader: an
+        # amount at grade 3 prices only for a party that declared 3, and the gate says so itself.
+        if not evidence.may_price(valuation_grade, threshold=threshold) or "amount" not in valuation:
             register.append(_register(
                 component, VALUATION_TOO_WEAK,
-                f"the valuation is graded {valuation_grade}, so the schema refuses it an amount. "
-                "There is nothing to scale",
+                f"the valuation is graded {valuation_grade}, outside the pricing threshold in "
+                f"force ({threshold}), so it carries no amount this party may scale. There is "
+                "nothing to multiply",
                 depth=path["depth"], evidence_grade=valuation_grade,
             ))
             continue
@@ -207,6 +286,10 @@ def impacts(
                 "component": component,
                 "depth": path["depth"],
                 "worst_evidence_grade": grade,
+                # The weakest grade this price rests on: the weaker of the path's worst hop and
+                # the valuation it scales (ADR-0032 point 3; the one order statistic ADR-0024
+                # point 6 admits on grades). Every price shows it.
+                "rests_on_grade": evidence.weakest(grade, valuation_grade),
                 "sign": path["sign"],
                 "admitted_because": verdict["basis"],
                 "valuation": {
@@ -246,16 +329,41 @@ def _credit(
                           "is not an average reduction"}
     reduces = str(claim["component"])
     grade = int(claim["evidence_grade"])
+    threshold = evidence.check_threshold(overlay.pricing_threshold)
+    option_id = str(option["option"])
     held = {"claims": True, "reduces": reduces, "evidence_grade": grade,
             "reduction": Triple.of(claim["reduction"]).moments(), "basis": str(claim["basis"])}
-    if not evidence.may_price(grade):
+    # A synthetic record never raises a grade (ADR-0032 point 4): a mitigation claim whose own
+    # evidence is a synthetic drill earns nothing, whatever grade it declares.
+    synthetic_why = synthetic.rests_on(overlay, f"mitigation claim of {option_id}", (claim.get("basis"),))
+    if synthetic_why:
+        return {**held, "reason": RESTS_ON_SYNTHETIC,
+                "detail": f"{synthetic_why}. A synthetic record evidences detection machinery, "
+                          "never the world, so the claim that this removes part of the impact "
+                          f"at {reduces!r} earns nothing whatever its grade says"}
+    if not evidence.may_price(grade, threshold=threshold):
         return {**held, "reason": CLAIM_TOO_WEAK,
                 "detail": f"the claim that this removes part of the impact at {reduces!r} is "
-                          f"graded {grade}, outside the published pricing threshold. 'The incident "
-                          "did not happen because of our control' is a causal claim like any "
-                          "other, and an unevidenced one earns nothing rather than a default"}
-    option_id = str(option["option"])
+                          f"graded {grade}, outside the pricing threshold in force ({threshold}). "
+                          "'The incident did not happen because of our control' is a causal "
+                          "claim like any other, and an unevidenced one earns nothing rather "
+                          "than a default"}
+    # The enactment half is graded by corroboration across channels at the ladder's own
+    # threshold, never at the party's declaration: a declaration widens what a party may price
+    # about the world (published work, ADR-0032), not what counts as the party having acted.
+    # Every channel alone holds grade 3 or 4, so a declaration of 3 read here would let one
+    # uncorroborated channel price on its own, which is exactly what the corroboration table
+    # exists to refuse (decision ticket 18 Q3).
     action_state = corroboration.state(overlay, option_id)
+    # And an enactment observed only through a synthetic record is not an enactment observed:
+    # the claim that binds the record is refused before the corroborated grade is trusted.
+    for enactment in corroboration.claims_for(overlay, option_id):
+        synthetic_why = synthetic.rests_on(overlay, str(enactment["id"]))
+        if synthetic_why:
+            return {**held, "reason": RESTS_ON_SYNTHETIC,
+                    "detail": f"{synthetic_why}. A synthetic record evidences detection "
+                              f"machinery, never the world, so it does not corroborate that "
+                              f"{option_id!r} was enacted, and the claim earns nothing"}
     if not action_state["may_price"]:
         return {**held, "reason": NOT_ENACTED,
                 "detail": f"the claim that this removes part of the impact at {reduces!r} is "
@@ -272,6 +380,11 @@ def _credit(
     reduction = Triple.of(claim["reduction"])
     return {
         **held,
+        # The weakest grade this credit rests on (ADR-0032 point 3): the impact it is a fraction
+        # of, the claim itself, and the corroborated enactment that lets it count.
+        "rests_on_grade": evidence.weakest(
+            impact.get("rests_on_grade"), grade, action_state.get("evidence_grade")
+        ),
         # Point-wise against the attenuated price, which is the figure the published schedule
         # says is the impact. Scaling the un-attenuated one would credit a control for removing
         # part of a number this system does not report as the impact.
@@ -296,7 +409,7 @@ def price(graph: "Graph", perspective: dict[str, Any], origin: str,
     would be a silent way to skip the gate — exactly the default this module's own culture refuses
     everywhere else.
     """
-    priced, register, traversal = impacts(graph, perspective, origin)
+    priced, register, traversal = impacts(graph, perspective, origin, overlay)
     admitted = options_mod.prefilter(perspective, responses)
     choice_set = admitted.priced()
     for entry in choice_set["priced"]:
@@ -321,7 +434,11 @@ def price(graph: "Graph", perspective: dict[str, Any], origin: str,
                 "sampled spread, and re-sampling it here would report one uncertainty twice"
             ),
         },
-        "gating": evidence.published(),
+        # The ladder, and beside its pin the thresholds actually applied to this party's money
+        # with their basis: the ladder's default, or the party's signed declaration.
+        "gating": evidence.published(
+            pricing=overlay.pricing_threshold, admission=overlay.pricing_threshold
+        ),
         "traversal": traversal,
         "impacts": priced,
         # A refusal is an answer. Every reached component appears in one list or the other, and

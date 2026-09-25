@@ -48,15 +48,21 @@ class DirectionError(ModelError):
     """The world layer referenced an overlay."""
 
 
-def _collection(repo: ModelRepo, tree: str, prefix: str, subdir: str) -> dict[str, dict[str, Any]]:
-    """Load and validate one collection. Every object is typed by the directory it sits in."""
+def _collection(repo: ModelRepo, tree: str, prefix: str, subdir: str,
+                pricing_threshold: int | None = None) -> dict[str, dict[str, Any]]:
+    """Load and validate one collection. Every object is typed by the directory it sits in.
+
+    `pricing_threshold` is the one a party declared on its signed artefact, if any (eco-system
+    ticket 141): it reaches the schema so that a valuation's grade-amount tie is enforced at the
+    source against the threshold in force for this party, not against the ladder's default.
+    """
     kind = COLLECTION_KINDS[subdir]
     out: dict[str, dict[str, Any]] = {}
     for path in repo.list_tree(tree, subdir):
         if not path.endswith((".yaml", ".yml")):
             continue
         doc = repo.read_yaml_at(tree, path)
-        validate(kind, doc, f"{prefix}/{path}")
+        validate(kind, doc, f"{prefix}/{path}", pricing_threshold=pricing_threshold)
         ident = str(doc["id"])
         if ident in out:
             raise ModelError(f"{prefix}/{subdir}: duplicate id {ident!r}")
@@ -150,9 +156,22 @@ class Overlay:
     # Every move of a control between enforcement rungs (build ticket 67). Held beside `regrades`
     # rather than inside it: a regrade moves what we believe, a move changes what a control does.
     enforcement_moves: dict[str, dict[str, Any]]
+    # The pricing threshold in force for this org's money (eco-system ticket 141, ADR-0032): the
+    # ladder's default, or the one the party declared on its signed `party.yaml` and the loader
+    # was handed. It governs both gates, the use-gate and path admission, and it is recorded here
+    # so that every reader of this overlay prices against the same number the loader validated
+    # its valuations against. It is not read from the model repository: a declaration is signed
+    # on the party artefact, and an overlay file that could set its own threshold would be an
+    # author marking its own valuations priceable.
+    pricing_threshold: int
 
     @classmethod
-    def load(cls, repo: ModelRepo, org: str) -> "Overlay":
+    def load(cls, repo: ModelRepo, org: str, *, pricing_threshold: int | None = None) -> "Overlay":
+        """Load one org's overlay. `pricing_threshold` is the party's declaration, read off its
+        signed artefact by `evidence.declared_threshold(party)`; absent, the ladder's default
+        applies and the overlay loads exactly as it did before a declaration existed."""
+        in_force = evidence.threshold() if pricing_threshold is None \
+            else evidence.check_threshold(pricing_threshold)
         enforce_direction(repo)
         base = f"{ORGS}/{org}"
         if not repo.exists(f"{base}/meta.yaml"):
@@ -172,8 +191,11 @@ class Overlay:
         except RepoError as exc:
             raise ModelError(f"{base}/meta.yaml: world_ref {world_ref!r} — {exc}") from None
 
-        loaded = {name: _collection(repo, ref.tree, base, name) for name in OVERLAY_COLLECTIONS}
-        overlay = cls(org=org, ref=ref, world=world, **loaded)
+        loaded = {
+            name: _collection(repo, ref.tree, base, name, pricing_threshold=in_force)
+            for name in OVERLAY_COLLECTIONS
+        }
+        overlay = cls(org=org, ref=ref, world=world, pricing_threshold=in_force, **loaded)
         overlay._check_references()
         return overlay
 
