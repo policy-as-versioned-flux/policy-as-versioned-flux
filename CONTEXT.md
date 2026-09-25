@@ -563,9 +563,18 @@ that a rewritten entry cites stay as the record of the decision at the time.
   **summary**, which is a human's paraphrase, is not derivable from the artefact, and therefore
   lives outside `composed/` (`.claude/skills/handbook-summaries/`).
 
-- **Lift** (added 2026-08-28, ticket 13) — Moving a mechanism or application from the original org
-  into an eco-system party by re-label and re-pin, graded green by the truth surface before the
-  original repo is archived.
+- **Lift** (added 2026-08-28, ticket 13; reworded 2026-09-25, ticket 35) — Moving a mechanism or
+  application from the **incumbent org** into an eco-system party by re-label and re-pin, graded
+  green by the truth surface before the incumbent repo is archived. Contrast **drop**.
+
+- **Incumbent org** (added 2026-09-25, ticket 35) — The original GitHub org
+  `policy-as-versioned-flux`, whose repos existed before the eco-system. The hub is the one repo in
+  it that stays live. Every other repo is archived once its lift or drop grades green.
+  _Avoid_: original org, legacy org.
+
+- **Drop** (added 2026-09-25, ticket 35) — A recorded decision, with its reason, that an incumbent
+  mechanism is not carried into the eco-system. The pair is lift or drop. _Avoid_: retire, which
+  means a **policy version** leaving the array.
 
 - **Exposure** (added 2026-08-28, ticket 14) — The aggregate annual loss summary an adopter
   publishes under its own perspective in its composed artefact, built from its priced risks; the
@@ -812,6 +821,10 @@ stray `|` inside its own prose is named and red rather than dropped in silence.
   `sunset:` date; on that date a machine opens a retirement PR that a human must merge — nothing
   timed ever changes an admission verdict on its own. See
   [ADR-0010](docs/adr/0010-sunset-scheduled-proposals-not-application.md).
+  **Superseded 2026-08-28 (ticket 13 D5); this pointer added 2026-09-25 (ticket 35).** No
+  consumer-side `sunset:` field exists. A version retires by **Supersede**. The adopter's scheduled
+  proposer opens the retirement pull request (ticket 84). The rule that nothing timed changes an
+  admission verdict on its own still holds.
 
 - **Install/fleet layer = ControlPlane Flux Operator** (`FluxInstance` + `ResourceSet` matrix);
   thesis stays vanilla-Flux-expressible. See
