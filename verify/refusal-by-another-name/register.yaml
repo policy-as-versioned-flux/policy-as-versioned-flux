@@ -36,8 +36,11 @@
 
 accepted:
   - policy: cage-tier*
+    # 2026-09-25: cage-tier-4-0-0 leaves this list. Policy 4.0.0 retired on 2026-09-24 (ticket
+    # 113, Phase B, owner-instructed): platform tools v4.0.0 no longer serves it and every adopter
+    # serves v3.0.0 with policy 5.0.0 alone, so the row named a policy nothing serves and
+    # refusal_scan.py graded it "named but not found", which is this row's own staleness guard.
     policies:
-      - cage-tier-4-0-0
       - cage-tier-5-0-0
     operation: UPDATE
     fields:
