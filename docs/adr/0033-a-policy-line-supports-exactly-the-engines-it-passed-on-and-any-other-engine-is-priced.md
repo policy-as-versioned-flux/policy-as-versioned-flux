@@ -80,4 +80,4 @@ README calls the field "not a runtime support range". This ADR makes it one.
   So the adopters' declarations must land before the pricing does.
 - On 2026-09-25 only point 1's field and a grader for one engine exist. The grader requires
   `tested_engines.kyverno == [running version]`, so a second engine reads could-not-look. Points 2
-  to 6 wait on the build tickets that ticket 71 charters.
+  to 6 wait on eco-system tickets 146 to 150.

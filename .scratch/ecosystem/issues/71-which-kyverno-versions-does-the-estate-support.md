@@ -1,7 +1,7 @@
 # 71 — Which kyverno versions does the estate support?
 
 Type: grilling (HITL)
-Status: open
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -164,3 +164,46 @@ the five owner-only decisions for the day. Two questions here are owner-only:
 - **An authorisation to report upstream.** A Kyverno GeneratingPolicy returns no result on a
   `matchConditions` miss, but ValidatingPolicy and MutatingPolicy return a skip. A report to
   kyverno/kyverno is public and is made under the owner's identity.
+
+**2026-09-25, round 4 decided.** The owner answered round 4: "I ageee with your recommendations".
+That gives no reason, so each decision is delegated.
+
+13. **Q13 (a). The build is five tickets.** 146 is the grader for many engines, the engine table
+    and the check on the estate's own pins. 147 is the adopter's engine declaration and the
+    engine drift fact. 148 is the price of an unsupported pairing. 149 is the new line. 150 is the
+    live proof on one adopter. 146 and 147 run first. 148 and 149 run next. 150 runs last. The
+    reason for the order: if composition prices before the adopters declare, all three adopters
+    get the `undeclared-engine` price and the gate records a fall.
+14. **Q14 (a). This ticket is resolved.** Each part of the build has a ticket with a Done line, so
+    this ticket holds no work.
+
+**Two notes from grilling ticket 152, recorded in 147 and 150.** No adopter moves to 1.19.1 while a
+served cage-tier body that it composes does not compile there. Ticket 161 reads the adopter's
+engine version from the file that ticket 147 names.
+
+**On 2026-09-25 the owner also said:** "You have explicit permission to merge your own PRs.
+Remember this".
+
+## Answer
+
+Resolved 2026-09-25 in four grilling rounds. The owner answered each round with an agreement and no
+reason, so every decision is **delegated** under ADR-0025. Decisions 1 to 14 are recorded above,
+round by round. The architecture is
+[ADR-0033](../../../docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md).
+ADR-0003 has a dated amendment.
+
+- **What a line supports.** Exactly the engines in its `tested_engines`, each an exact version. No
+  range, and no neighbouring patch.
+- **Who owns the engine.** The adopter. Its engine install file in its own gitops is its declared
+  engine. The drift sample checks the running engine against it.
+- **The price.** An unsupported pairing makes every control that the line claims a hole, under an
+  `unsupported-engine` delta. It is never refused. No declaration is priced the same way.
+- **The grading.** One run grades every cell of the matrix. An engine bump is not a policy
+  version. The estate's own pins must name a supported engine of every served line.
+- **1.19.** The cage-tier failure is a one-token policy defect. The cage-netpol failure is a
+  Kyverno reporting change, not a behaviour change. A new line carries the fix, the `v1` move and
+  a fixture that compares generated documents.
+
+The build is tickets 146 to 150. Two authorisations are held for the owner: the signed tag for
+the new line, with the platform tools tag that ticket 148 needs, and a public upstream report to
+kyverno/kyverno.
