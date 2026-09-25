@@ -190,6 +190,16 @@ that a rewritten entry cites stay as the record of the decision at the time.
   policy version applies to it. The original's signature elegance: **one string** served as both
   the dependency pin *and* the engine's workload selector.
 
+- **Supported engine** (added 2026-09-25, ticket 71) — An exact engine version, such as Kyverno
+  `1.18.2`, on which a published policy line's cage fixtures passed. A line supports exactly the
+  engines it passed on. No range is inferred, and no neighbouring patch is inferred: `1.18.3` is
+  unsupported until the line passes on it. _Avoid_: compatible range, "works on 1.18".
+
+- **Declared engine** (added 2026-09-25, ticket 71) — The engine version an adopter states that its
+  own cluster runs. The adopter owns it, because the adopter installs its own engine. Composition
+  reads the declared engine. The drift sample observes the running engine, which is a different
+  fact.
+
 - **Compliance / measurable** — The ability to answer "which part of the estate is on which policy
   version, and is it actually passing?" In the original this was a proxy ("a GitHub PR search
   away" — i.e. *bump acceptance*). See open question on proxy-vs-ground-truth.
