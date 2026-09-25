@@ -27,6 +27,10 @@ prices on grade 3: "published work, not observed here". Build that declaration e
 The hub default stays 2 for every overlay that does not declare, including the real-firm backtest
 corpus.
 
+5. **`data_subjects` becomes optional in the size block** (decided 2026-09-25, delegated; see
+   ticket 144's Comments). Neither comparable filing discloses it, and nothing in the estate reads
+   it today. A converter that needs it refuses by name when it is absent (ADR-0020).
+
 ## Notes
 
 Ticket 144 needs this before tuppence, ludlow and driftwood can price on their comparable-firm
