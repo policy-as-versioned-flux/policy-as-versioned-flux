@@ -454,3 +454,9 @@ Nothing. Both branches are pushed and both pull requests are open; the integrato
 * No `kyverno` CLI in the estate can evaluate an UPDATE, so nothing offline proves that an
   UPDATE-scoped policy MATCHES what its manifest says it matches. That is asserted structurally and
   said so, in the script, in the manifest row and here.
+
+**Correction, 2026-09-25.** `verify/refusal-by-another-name/verify-refusal-by-another-name.sh`
+graded FAIL in truth run 335. The cause was a stale register row, not a defect in what this
+ticket built: Phase B retired policy 4.0.0 on 2026-09-24 (ticket 113), and the `cage-tier*` row
+still named `cage-tier-4-0-0`, which nothing serves now. The check's own "named but not found"
+guard caught it. Hub PR 133 drops the name, and the full script exits 0 again.
