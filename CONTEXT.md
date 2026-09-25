@@ -569,7 +569,8 @@ that a rewritten entry cites stay as the record of the decision at the time.
 
 - **Incumbent org** (added 2026-09-25, ticket 35) — The original GitHub org
   `policy-as-versioned-flux`, whose repos existed before the eco-system. The hub is the one repo in
-  it that stays live. Every other repo is archived once its lift or drop grades green.
+  it that stays live. An app repo is transferred into its adopter's org. Every other repo is
+  archived once its lift or drop grades green.
   _Avoid_: original org, legacy org.
 
 - **Drop** (added 2026-09-25, ticket 35) — A recorded decision, with its reason, that an incumbent
