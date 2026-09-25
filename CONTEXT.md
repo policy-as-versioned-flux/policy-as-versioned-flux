@@ -76,7 +76,9 @@ that a rewritten entry cites stay as the record of the decision at the time.
   **There is no gate. Everything is always caged.** A workload, a human, a device, a model action
   and the twin itself each run inside a cage. The **cage spec** is the only variable, and the **£
   selects the spec**. The spec is a **tier** on one ladder: **baseline, restricted, quarantine,
-  isolated, infra**. The mea-culpa's two ends survive as rungs: continuous, corrective guidance is
+  isolated, infra**. The rung names are shared; each **actor class** has its own **dial table**
+  that says what a rung means for it, so a pod's dials and the twin agent's dials differ under one
+  rung name (2026-09-25, ticket 30; ADR-0031). The mea-culpa's two ends survive as rungs: continuous, corrective guidance is
   the loose end; the **bottom rung is `isolated`** (the quarantine cage plus no ingress, no egress,
   first eviction) and it replaces every earlier deny or refusal, so nothing is ever refused, only
   caged. A "locked door" is therefore the bottom rung reached by the £, not a separate mechanism.
@@ -92,8 +94,9 @@ that a rewritten entry cites stay as the record of the decision at the time.
   An unknown or unlabelled tier fails closed to `isolated`. The cage mutation is **tighten-only**: a
   tightened rule and the default cage never contradict. This *cage-tier* axis is independent of
   *adoption cadence* (ADR-0002). The tier is declared on the signed **governed namespace**
-  manifest and rendered onto every pod in it; the **twin** computes it under the org's
-  perspective and the **proposer** enacts it as a PR (re-grill 21). See ADR-0003 for the engine and
+  manifest and rendered onto every pod in it; the **twin** prices the scenario under the org's
+  perspective, the adopter's **selection policy** selects the tier (ADR-0021), and the
+  **proposer** enacts it as a PR (re-grill 21). See ADR-0003 for the engine and
   ADR-0022 for the ladder.
 
 - **The "why" / rationale** — Risk/threat-model metadata that travels *with* each policy version,
@@ -405,10 +408,14 @@ that a rewritten entry cites stay as the record of the decision at the time.
   corpus; the incumbent heuristic is refused because it is graded on the corpus it was fitted on.
   So today the sentence reads exactly as it did before the amendment, and the difference is that a
   check observes it rather than a person keeping it. On every sweep it plays its **standing
-  scenarios**. The twin **computes a cage tier** under the org's perspective; the **proposer**
+  scenarios**. The twin **prices the scenario** a cage tier is selected from, under the org's
+  perspective; it never selects the tier (ADR-0021); the **proposer**
   enacts it as a PR (re-grill 21). The twin acts inside a priced cage of its own; propose-only is
   the outermost setting, with an Article 22 floor for significant decisions about people
-  (re-grill 37). One £, many perspectives: no perspective is privileged (re-grill 33).
+  (re-grill 37). **Outermost** means the loosest rung that exists today: a rung where the twin
+  acts may come later, and for a significant decision about a person no rung is looser than
+  propose-only (2026-09-25, ticket 30). The cage binds the **twin agent**, the adopter's twin
+  acting with nobody at the keyboard, on any host; a skill a human runs is the human's act. One £, many perspectives: no perspective is privileged (re-grill 33).
 
 ---
 
@@ -422,6 +429,13 @@ that a rewritten entry cites stay as the record of the decision at the time.
   so a price is proportionate to it: turnover, customers, data subjects, headcount, optionally
   **relevant revenue**, and the date they were true. Signed by the adopter alone. Stale facts widen a
   price to the publisher's **widening target**; they never refuse one.
+
+- **Pricing threshold** (added 2026-09-25, ticket 30) — The weakest evidence grade a price may
+  rest on. The estate default is grade 2; an adopter may declare grade 3, published work not
+  observed here, on its own signed party artefact. Every price shows the weakest grade it rests
+  on. A synthetic record never raises a grade: it evidences machinery, never the world
+  (ADR-0032).
+  _Avoid_: evidence floor (a floor is a tier bound).
 
 - **Obligation** (added 2026-08-28) — A regime an adopter declares it answers to, by name, in its
   party artefact. Only a declared obligation is priced. A declared obligation with no price in any
