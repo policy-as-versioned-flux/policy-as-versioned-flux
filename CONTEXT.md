@@ -225,7 +225,7 @@ that a rewritten entry cites stay as the record of the decision at the time.
   a removal is priced, never refused (ADR-0026, 2026-09-04): the regulator's **control weight**
   prices a control whether or not the adopter selected it, so a removal hides nothing from the
   pound, and it prints as a **delta** under the adopter's own signature. A control the adopter
-  cannot meet is caged and priced, not dropped. A baseline control that nothing implements is a
+  cannot meet is caged and priced, not removed. A baseline control that nothing implements is a
   **hole**; a composition **prices** every hole, new or pre-existing, and a new hole moves the
   tier, never refuses (rewritten 2026-08-28, ticket 15; ADR-0026 supersedes ADR-0013 and ADR-0017
   on this point, ticket 39, 2026-09-04). A control the adopter adds is an ordinary new hole until
@@ -563,9 +563,20 @@ that a rewritten entry cites stay as the record of the decision at the time.
   **summary**, which is a human's paraphrase, is not derivable from the artefact, and therefore
   lives outside `composed/` (`.claude/skills/handbook-summaries/`).
 
-- **Lift** (added 2026-08-28, ticket 13) — Moving a mechanism or application from the original org
-  into an eco-system party by re-label and re-pin, graded green by the truth surface before the
-  original repo is archived.
+- **Lift** (added 2026-08-28, ticket 13; reworded 2026-09-25, ticket 35) — Moving a mechanism or
+  application from the **incumbent org** into an eco-system party by re-label and re-pin, graded
+  green by the truth surface before the incumbent repo is archived. Contrast **Drop**.
+
+- **Incumbent org** (added 2026-09-25, ticket 35) — The original GitHub org
+  `policy-as-versioned-flux`, whose repos existed before the eco-system. The hub is the one repo in
+  it that stays live. An app repo is transferred into its adopter's org. Every other repo is
+  archived once its lift or drop grades green.
+  _Avoid_: original org, legacy org.
+
+- **Drop** (added 2026-09-25, ticket 35) — A recorded decision, with its reason, that an incumbent
+  mechanism is not carried into the eco-system. The pair is lift or drop. It is not a control
+  removed from a baseline (see **Hole**) and not a publisher left (see **Switching cost**).
+  _Avoid_: retire, which means a **policy version** leaving the array.
 
 - **Exposure** (added 2026-08-28, ticket 14) — The aggregate annual loss summary an adopter
   publishes under its own perspective in its composed artefact, built from its priced risks; the
@@ -651,7 +662,7 @@ that a rewritten entry cites stay as the record of the decision at the time.
   commit compared with the composed set's recorded parent. Nothing is installed from it.
 
 - **Switching cost** (added 2026-08-28, ticket 19) — The annual £ an adopter would bear if it
-  dropped one publisher: the holes and price moves that open when that publisher's edges are
+  left one publisher: the holes and price moves that open when that publisher's edges are
   removed. Computed by the adopter's composition, never stated by the publisher, and carried as a
   **price** with a perspective and currency.
 
@@ -812,6 +823,10 @@ stray `|` inside its own prose is named and red rather than dropped in silence.
   `sunset:` date; on that date a machine opens a retirement PR that a human must merge — nothing
   timed ever changes an admission verdict on its own. See
   [ADR-0010](docs/adr/0010-sunset-scheduled-proposals-not-application.md).
+  **Superseded 2026-08-28 (ticket 13 D5); this pointer added 2026-09-25 (ticket 35).** No
+  consumer-side `sunset:` field exists. A version retires by **Supersede**. The adopter's scheduled
+  proposer opens the retirement pull request (ticket 84). The rule that nothing timed changes an
+  admission verdict on its own still holds.
 
 - **Install/fleet layer = ControlPlane Flux Operator** (`FluxInstance` + `ResourceSet` matrix);
   thesis stays vanilla-Flux-expressible. See

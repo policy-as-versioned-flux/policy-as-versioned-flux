@@ -252,3 +252,9 @@ them`.
 finds no `cage-baseline-4-0-0` verdict for ledger, storefront or reports. Whether the served set
 fails to cage them or the check asks a question the new composition no longer answers is ticket
 135's to establish and fix.
+
+## Comments
+
+**Correction, 2026-09-25 (ticket 35).** Two claims under `## Waits on the owner` are stale.
+- Item 1 says a build job in the adopter "the merging app cannot merge". On 2026-09-25 `pavc-other-hand` held `workflows:write` in all three adopter orgs. The build now moves by repo transfer instead (ADR-0036, ticket 154).
+- Item 2 says "reading the archived flag needs a credential the gate does not hold". An unauthenticated `GET https://api.github.com/repos/policy-as-versioned-flux/apps` returns `archived: true`. Item 3's `read:packages` limit does not stop an anonymous pull: all four pinned digests returned HTTP 200 on 2026-09-25. Ticket 154 corrects the BLIND lines in `verify/lifted-apps`.

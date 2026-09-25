@@ -93,3 +93,12 @@ assistant's decision with the reason above, and not re-asked. Record:
   later. OSCAL is framework-agnostic, so the mechanism ports.
 - Measurability (was D4.1) is settled in ADR-0008/ADR-0009: OSCAL (via C2P) composes with Kyverno
   PolicyReports + the Flux source revision + Renovate PR state on one dashboard.
+
+## Note, 2026-09-25 (eco-system ticket 35): the cloud plane has a ticket
+
+The sequencing note above says that ticket 13 files a Crossplane item on ticket 09. Nobody filed it,
+and no build ticket existed. Eco-system ticket 151 now carries the build, including the dials a
+Crossplane CR takes on the ladder. "After the Pod slice runs end to end once" is measured as
+`verify-e2e-step4-flux-reconciles-cage.sh` PASS on a citable truth run. That step cannot pass until
+fact 7 is re-registered (eco-system ticket 152). Delegated under
+[ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md).

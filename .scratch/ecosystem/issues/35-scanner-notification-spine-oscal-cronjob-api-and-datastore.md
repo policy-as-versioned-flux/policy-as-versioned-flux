@@ -1,7 +1,7 @@
 # 35 — scanner, notification spine, OSCAL CronJob, api and datastore
 
 Type: grilling (HITL)
-Status: open
+Status: resolved
 Blocked by: 16, 21, 33
 
 ## Question
@@ -11,6 +11,125 @@ Lift or retire trivy-operator, the Flux Alert/Provider/Receiver spine and the OS
 ## Notes
 
 Graduated 2026-08-28 from ticket 13's resolution. Definition of done includes wiring its check into `talk/verify-all.sh`.
+
+## Facts found (2026-09-25, before round 1)
+
+- Blockers 16, 21 and 33 are `resolved`, read from each file's `Status:` line. The whole ticket is on the frontier.
+- The incumbent org has 16 repos. Only `apps` is archived. The 14 live repos other than the hub are api, c2p-collector, cloud, datastore, fleet, governance-agent, handbook-generator, ledger, policy, pr-gate-action, readiness-collector, renovate-config, reports and storefront. [`gh repo list policy-as-versioned-flux --json name,isArchived,pushedAt`]
+- fleet's `sunset escalator` still runs every day. The newest run was 2026-09-25T13:15Z, `success`. It checks out `governance-agent` and runs its `sunset-escalator.sh` (`fleet/.github/workflows/sunset-escalator.yml:47-71`). The `weekly governance nag` ran 2026-09-21 in fleet and in policy. Eight incumbent repos hold 42 open pull requests between them, all opened by Renovate between 2026-07-16 and 2026-08-22: storefront 10, reports 9, ledger 5, api 4, c2p-collector 4, fleet 4, policy 3, readiness-collector 3. [`gh run list -R policy-as-versioned-flux/fleet`; `gh pr list` per repo; corrected 2026-09-25 by the round-2 fact check, which counted 42 where the first count said 39]
+- Each drift lane run appends three sample lines, one per source: the adopter's own composed source, platform and nist. On 2026-09-25, ludlow (14:36Z) recorded facts 1 to 6 true on all three sources. driftwood (11:54Z) and tuppence (13:57Z) recorded facts 1 and 3 to 6 true on every source, but fact 2 is `null` on their own composed source: "nothing checked a signature at this source boundary". Fact 7 is `null` on every line, and every line's verdict is COULD-NOT-LOOK. So ticket 13 item 2's condition for fleet, "after ticket 16's fan-out reconciles in an adopter", is met by ludlow alone, and no check on the truth surface grades it: each adopter's `verify-reconcile.sh` and `verify-e2e-step4` SKIP with "the lane sample cannot stand in" (run 343). Ticket 86's resolution says fact 7 cannot pass as registered under 5.0.0, and that re-registering it is a new ticket. [all three lines of each run in `drift/samples.jsonl` at each adopter's `origin/main`; `talk/captures/_grades.tsv`; corrected 2026-09-25: the first version read only the last line, which is the nist source]
+- The drift lane does not run the lifted apps. `drift-sample.yml` names no file under `gitops/apps`. Each adopter's `gotk-sync.yaml` still pins its own `v1.0.0`, whose tree does not list the lifted workload. tuppence's `v2.0.0` tree does list `gitops/apps/ledger.yaml`. [`git show origin/main:gitops/flux-system/gotk-sync.yaml`; `git ls-tree v2.0.0`]
+- The three served manifests pin images that the incumbent org published: `ghcr.io/policy-as-versioned-flux/{ledger,storefront,reports}@sha256:…`. Each incumbent `release.yml` publishes to `ghcr.io/${{ github.repository }}`.
+- The cve converter prices one entry per feed, the headline. Its own docstring says composition "has no cve id or component of its own to name". So every subscriber pays the same CVE price, whatever it runs. [`platform/feeds/to_fair_scenario.py:27-35`]
+- The CVE feed is illustrative. Its entries carry ids such as `CVE-2024-1234-envoy` and the source line "illustrative, shape-accurate". `feeds/fetch/cve.py` reads a committed fixture. Its written upgrade path is "`trivy image --format json` over the estate's running images, joined to the FIRST EPSS daily CSV". [`feeds/cve/v2/feed.json`; `feeds/fetch/cve.py:7-10`]
+- The CISA Known Exploited Vulnerabilities catalogue held 1,725 entries at `catalogVersion` 2026.09.25, 1.75 MB of JSON. It lists CVE-2021-44228, "Apache Log4j2 Remote Code Execution Vulnerability". The FIRST EPSS API gives CVE-2021-44228 an `epss` of 0.99999 on 2026-09-25. [`curl https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json`; `curl https://api.first.org/data/v1/epss?cve=CVE-2021-44228`]
+- OSCAL collection runs only offline. `platform/oscal/result2oscal.py` reads three hand-written PolicyReports in `fixtures/policyreports.yaml`. No adopter file names `result2oscal`, assessment-results or a PolicyReport. The adopters name OSCAL only as the nist catalogue they pin (`gotk-sync-nist.yaml`, and `nist-pin-configmap.yaml`'s `oscalVersion: "1.2.2"`). The component-definition maps two Check_Ids, `require-nonroot` and `governed-namespace-requires-claim`. Each adopter's composed set serves 4 ValidatingPolicy, 6 MutatingPolicy, 2 GeneratingPolicy and 5 PriorityClass documents. ADR-0009 wires collection "as a `CronJob` / Flux `Kustomization`" (`docs/adr/0009-oscal-attestation-via-c2p.md:47-48`). [corrected 2026-09-25: the first version said no adopter file names OSCAL]
+- No Flux `Alert`, `Provider` or `Receiver` exists in any unit. In `docs/`, seven lines give the notification spine a job: `PRD.md:110`, `:149`, `:188` and `:212`, `adr/0001-transport-signed-git-tags-gitsign.md:44`, `modern-reference-transport.md:73` and `references.md:48`. In the superseded talk-spec, five files do: `spec.md:184`, `the-whole-model.md:202`, `issues/02-architecture-and-flux-role.md:36-38`, `issues/08-research-enforcement-engines.md:37` and `research/08-enforcement-engines.md:192`. Hub research notes 20, 21 and 22 also do. [corrected 2026-09-25: the first version listed six places]
+- The cloud plane has no build ticket. ADR-0004's sequencing note says ticket 13 files a Crossplane item on ticket 09. Ticket 09 has no such item.
+- Ticket 33 says "reading the archived flag needs a credential the gate does not hold". That is false. An unauthenticated `GET https://api.github.com/repos/policy-as-versioned-flux/apps` returns `archived: true`.
+- The GitHub archive documentation does not say whether a GHCR package stays pullable after its repo is archived. Anonymous `tags/list` on `ghcr.io/policy-as-versioned-flux/ledger` and `/readiness-collector` returned HTTP 200 on 2026-09-25, before any archive.
+- The incumbent `governance-agent` is superseded by platform's `wargamer/`. The wargamer is new code (platform commit `7a36bf7`, 2026-07-31) that its `README.md:1` calls "the governance-agent evolved". That is not a lift by re-label and re-pin. The handbook generator's `verify.sh` was retired by ticket 34 (`platform/compose/README.md:400`). Ticket 34's Answer calls handbook-generator "the archived handbook-generator repository". It is not archived. `renovate-config` is the Renovate app's org-inherited config for the incumbent org. No unit is in that org or names it. `pr-gate-action` is named by no unit. Each adopter's `shift-left.yml` does its job. `docs/shift-left-dev-workflow.md:11` and `docs/SHOW-AND-TELL.md:131` still present it as live. [corrected 2026-09-25]
+- The owner's words on app repos, 2026-07-16: "i'm not sure about the apps being a single repo, we should consider seperating these to one repo/app rather than a monorepo". The incumbent `apps` monorepo was archived that day. Ticket 33 lifted each app into its adopter's own repo, under `apps/<app>/`. [`.scratch/drift-review-2026-08-27/evidence/OWNER_BRIEF.md:25`; DECISION_AUDIT P169]
+
+## Grilling round 1 (put 2026-09-25, answered 2026-09-25)
+
+The owner answered the whole round with one word: "agree". Under ADR-0025 point 3, Q1 to Q5 and Q7 are **delegated**: the assistant's decisions, with the assistant's reasons. Q6 is an authorisation, which only the owner can give. The owner was asked "give your answer to Q6", with option (a) stated in full. The answer "agree" is recorded as the owner's authorisation of Q6 (a), within the bound that (a) states. By the three sessions' own count, it was the fourth owner decision of 2026-09-25 across sessions 30, 71 and 35.
+
+1. **Q1, the vulnerability scanner. Delegated.** Drop trivy-operator. Lift the scan. A scheduled job in each adopter runs `trivy image` on the digests that its served manifests pin. The job writes an image inventory to an observation branch, and opens a pull request when the inventory changes. Composition prices the CVE feed entries that the inventory names. Reason: a scan result changes a price, and an **Observation** never changes priced evidence. So the inventory is a **Declaration** and reaches main only by a reviewed pull request. The scan needs no cluster, and each org verifies itself (re-grill 4). A publisher-side scan makes the feeds org depend on its subscribers. trivy-operator gives continuous scans on a cluster that lives for one run, with five known KinD quirks (three, corrected by A1 below).
+2. **Q2, the Flux notification spine. Delegated.** Drop it. Correct the four live claims in `docs/`, and put a dated note on the two superseded talk-spec files. Reason: fact 3 already records the applied revision, and facts 4 and 5 are stricter. A commit status would be a second, weaker report of the same fact. A Receiver cannot reach an ephemeral cluster. The eco-system broadcasts a new version as a Renovate pull request in each adopter.
+3. **Q3, OSCAL collection. Delegated.** A step in each adopter's drift lane, after the facts, reads the PolicyReports on the lane cluster. It runs `result2oscal.py` from the platform tag the lane pins. It appends the assessment-results next to the sample, as an observation. There is no CronJob, because the cluster lives for one run. The `c2p-collector` image is dropped, because platform owns the glue (ADR-0009). Limit: the document names only the pods the lane runs. Today these are the two cage probe pods.
+4. **Q4, the cloud plane. Delegated.** Graduate one build ticket, number 151, when this ticket resolves. It carries the datastore claims, the RDS and S3 policies as platform members (ADR-0017), the dials for a Crossplane CR, and an admission check. It stays blocked until all seven `verify/e2e/verify-e2e-step*.sh` scripts pass on one citable truth run. Reason: a sequencing rule with no ticket is a deferral in practice, and the seven steps make the trigger a grade.
+5. **Q5, the archive register and order. Delegated.** One register row per incumbent repo, with its disposition and the check whose PASS lets it be archived:
+
+   | repo | disposition | archive when |
+   |---|---|---|
+   | readiness-collector | dropped (ticket 13) | now. It is the first archive and the GHCR probe |
+   | pr-gate-action | dropped. The adopter gate replaces it | now |
+   | renovate-config | dropped. No eco-system repo extends it | now |
+   | handbook-generator | lifted (ticket 34) | `verify/handbook` passes |
+   | governance-agent | lifted as platform's wargamer. Its escalator was dropped by D5 | `verify-wargamer.sh` and `verify/supersede` pass |
+   | ledger, storefront, reports | lifted (ticket 33) | `verify/lifted-apps` passes and the GHCR probe passes |
+   | c2p-collector | dropped by Q3 | the lane's OSCAL check passes |
+   | api | round 2 | its lift or drop is graded |
+   | datastore, cloud | ticket 151 | ticket 151's check passes |
+   | policy, fleet | superseded by platform and the adopter lanes | last, together |
+
+   The probe: after readiness-collector is archived, pull its image anonymously again. If the pull fails, the three app repos wait until their image builds move. A hub check, `verify/incumbent-org/`, reads the register and the unauthenticated archived flag. It FAILS when a repo is archived before its condition holds. A repo whose condition holds and that is not archived yet is a counted LIMIT, not a FAIL. Ticket 33's credential claim gets a dated correction.
+6. **Q6, archiving. Owner-authorised, 2026-09-25, "agree" to option (a).** The assistant archives each incumbent repo with the owner's `gh` login, only when that repo's register row passes, and records each archive in this ticket. An archive can be reversed.
+7. **Q7, the glossary. Delegated.** `CONTEXT.md`'s posture line "Sunset = scheduled proposal" gets a dated pointer to **Supersede**. **Incumbent org** and **Drop** become terms. "Retire" keeps one meaning: a policy version leaves the array. In new text a mechanism is lifted or dropped. Old tickets stay as the record.
+
+### Round 1 amendments (2026-09-25, after an adversarial check)
+
+Two read-only agents checked round 1 on 2026-09-25. One re-derived every fact. The other tried to refute every call. Their findings changed six of the assistant's delegated calls. Under ADR-0025 point 5 the assistant decides, records and continues. Each amendment below is delegated, with its reason. The fact corrections are in the bullets above, each marked "corrected 2026-09-25".
+
+- **A1, to Q1.** The scan runs as a proposal kind, `inventory`, on each adopter's `propose-tier` clock. It is not a new clock. Reason: ADR-0024 point 1 lists the adopter clocks, and `verify/schedules/schedules.py` derives the required clocks. A new workflow would not be required, so a scan that stopped would not make the gate red. A proposal kind also gets the dedupe key and the rejection ledger. "Changed" means the sorted set of vulnerability ids per image. The scanner version and the database date are recorded and do not open a pull request. The pull request carries the composed re-render at the platform tag the adopter pins, because the adopter gate refuses a priced input without it. Correction: trivy-operator has three recorded KinD quirks, not five. A fourth, image mode missing npm lockfile-only trees, applies to `trivy image` too, and storefront's line names it as a limit.
+- **A2, to Q2.** Correct all seven `docs/` lines and put a dated note on the five talk-spec files and on hub research notes 20, 21 and 22. `references.md:48` keeps its link with a "not used" note. Reason: the first count missed five places.
+- **A3, to Q3.** ADR-0009 gets a dated note when this ticket resolves. The note says that collection is a lane step and not a CronJob, and that the acceptance criterion is narrowed to one plane until ticket 151. The lane step prints how many served policies the component-definition maps (two of twelve today) and how many PolicyReports it read. It records a could-not-look when no PolicyReport exists before the cluster is deleted. Reason: Q3 departs from an accepted ADR, and the join it grades covers two Check_Ids.
+- **A4, to Q4.** Ticket 151's trigger is `verify-e2e-step4-flux-reconciles-cage.sh` PASS on a citable truth run. It is not "all seven steps". Reason: steps 2 and 3 are class `simulation`, and step 4 waits on fact 7, which cannot pass as registered. So ticket 151 is blocked by the new ticket that re-registers fact 7 (round 2).
+- **A5, to Q5.** Every register row names the check whose PASS allows the archive, or says "none: the owner's authorisation alone". The drops get their own reasons. readiness-collector: ticket 13 decided that readiness is answered by price and that the collector's counts are not lifted. pr-gate-action: each adopter's `shift-left.yml` verifies the pin's trust chain, and no unit names the action. renovate-config: it configures Renovate only inside the incumbent org, and it goes with that org. governance-agent is superseded by the wargamer, not lifted. It is archived together with fleet, because fleet's escalator runs its script every day. fleet and policy wait for one adopter's `verify-reconcile.sh` PASS, which waits on fact 7. The archived flags and the GHCR probe are read in `truth.yml`'s `clocks` job with `github.token` and passed in as `CLOCK_VERDICT` is, because the unauthenticated limit is 60 requests an hour per address. Ticket 34's "archived handbook-generator" gets a dated correction, and so do `docs/shift-left-dev-workflow.md:11` and `docs/SHOW-AND-TELL.md:131`.
+- **A6, to Q7.** **Drop** collided with two older uses in the glossary: "caged and priced, not dropped" for a control, and a publisher that is "dropped". Both now say "removed". The **Drop** entry says what it is not. NORTH-STAR §6 says "explicitly retired". It gets a dated §8 line when this ticket resolves.
+
+## Facts found (2026-09-25, before round 2)
+
+- trivy v0.69.3, checksum-verified, `--image-src remote --scanners vuln`, database `UpdatedAt` 2026-09-25T13:09Z, over the three served digests and the incumbent api digest:
+
+  | image | base | distinct vuln ids | critical | in CVE feed v2 | in CISA KEV | EPSS percentile > 0.9 |
+  |---|---|---|---|---|---|---|
+  | ledger@sha256:9709e107… | alpine 3.23.5 | 39 | 2 | 0 | 2 (CVE-2021-44228, CVE-2021-45046) | 4 |
+  | storefront@sha256:ef53f41d… | alpine 3.21.3 | 141 | 3 | 0 | 0 | 3 |
+  | reports@sha256:36dc3d7d… | debian 13.6 | 133 | 3 | 0 | 0 | 2 |
+  | api@sha256:1b2107c1… | alpine 3.20.10, EOSL | 8, all HIGH, all Go stdlib 1.26.5 | 0 | 0 | 0 | 0 |
+
+  287 distinct ids, of which 282 are CVE ids and 278 have an EPSS score. ledger carries log4j-core 2.14.1. The first ledger scan stopped at trivy's default timeout with `context deadline exceeded` while it analysed a layer. It passed with `--timeout 20m`.
+- One NVD request, `https://services.nvd.nist.gov/rest/json/cves/2.0?hasKev&resultsPerPage=2000`, returned all 1,725 KEV CVEs, 18.6 MB. Every one carries a CVSS metric: 1,627 v3.1, 94 v4.0, 4 v3.0.
+- KEV added 9 entries in the last 7 days, 43 in 30 days on 15 distinct days, and 96 in 90 days (`dateAdded`, catalogue 2026.09.25).
+- EPSS on the 1,725 KEV ids, against 2026-09-25: 7 moved by more than 0.10 since 2026-09-24, 67 since 2026-09-18 and 67 since 2026-08-25. feeds' `cve/rule.yaml` releases when any cvss or epss number moves by more than 5%, so an EPSS-driven rule releases every day. [EPSS daily files from `epss.empiricalsecurity.com`]
+- FIRST EPSS held 379,145 rows on 2026-09-25. 37,915 are above percentile 0.9.
+- fair.py does not refuse a sum of ALEs. Ticket 84 D5 chose one headline entry per feed because PERT triples do not add. [fair.py:293-294; to_fair_scenario.py:34-35; issues/84:260-261]
+- The Mend `renovate` app is installed on all repos (`repository_selection: all`) in the tuppence, driftwood and ludlow orgs. `pavc-other-hand` is installed on all repos in each adopter org with `contents`, `pull_requests` and `workflows` write. Ticket 33's "a new workflow job … which the merging app cannot merge" is stale. [`gh api orgs/policy-as-versioned-<org>/installations`, 2026-09-25]
+- No adopter's Renovate config bumps an image digest under `gitops/apps/`.
+- GitHub keeps a container package in the old account when its repo is transferred, and a first publish is private by default (GitHub Packages documentation, as the round-2 skeptic read it).
+- Ticket 86's resolution: fact 7 cannot pass as registered under 5.0.0, and re-registering it is a new ticket. Ticket 27's question does not cover it. Session 30 confirmed that ticket 30 does not own it.
+
+## Grilling round 2 (put 2026-09-25, answered 2026-09-25)
+
+The owner answered the whole round with "agree". Q1 to Q8 are **delegated** under ADR-0025 point 3. Q9 is the owner's authorisation of option (a). By the sessions' own count it was the fifth owner decision of 2026-09-25. Session 71 released that slot.
+
+**Correction made after the answer, 2026-09-25.** Q4 option (b) and Q9 option (c) said that the merging app cannot merge a workflow change. That was stale: `pavc-other-hand` holds `workflows:write` in all three adopter orgs. Q4's call stands on its other reasons: one repo per app, and the history moves with the repo. The owner was told of the correction in the same session, and the authorisation stands unless the owner withdraws it.
+
+1. **Q1, the CVE feed. Delegated.** The feed is scoped to KEV. The feeds fetch reads the CISA KEV catalogue, the NVD `hasKev` query and the EPSS daily file, which is three requests. A release happens when KEV membership changes or when an entry's severity band changes. The EPSS readings are recorded on the observation branch every run and go into each release at their dated value. They are not a release trigger. `component` is KEV's vendor and product. `cvss`, `severity` and `published` come from NVD. The payload schema does not change. Reason: a reviewer can read a release of one to four entries, and there are about 15 a month. The feed prices ledger's log4j, which is the one real dependency that §4 step 3 needs. Revisit trigger: widen by a listed rule of reviewable size.
+2. **Q2, pricing an inventory. Delegated.** The cve line prices the headline of the intersection of the inventory and the feed: one entry, as ticket 84 D5 decided. A scanned CVE that the feed does not carry is a named absence, counted on the line, with no amount. A cve subscription with no inventory is an **instrument fault**. Each adopter's first inventory lands before the composer requires one. Reason: the other option priced a CVE nobody observed, which is the shape ADR-0020 rejects.
+3. **Q3, the inventory format. Delegated.** Trimmed JSON for each served image: the digest, the scanner version, the database date, and a sorted list of vulnerability id, package, installed version, fixed version and severity. trivy is pinned to one release by checksum, with `--timeout` set. Reason: the pull request diff then shows only the ids added and removed.
+4. **Q4, where each app's source lives. Delegated.** Each incumbent app repo is transferred into its adopter's org, with its history, open pull requests and `release.yml`. The adopter repo drops `apps/<app>/` and keeps `gitops/apps/<app>.yaml`. A reviewed pull request re-points each served manifest to the image the adopter org builds. A digest manager is added to the adopter's Renovate config. `verify/lifted-apps` is rewritten to read the app repo. Reason: one repo per app, and the history moves with the repo. The owner's words of 2026-07-16 are context, not the authority.
+5. **Q5, api. Delegated.** api is lifted into driftwood beside storefront, by transfer. Its README's "the good citizen" gets a dated correction. Reason: same adopter, same ladder and same perspective, so any difference between the two comes from what each runs. It adds the Go stack and a real case of decay.
+6. **Q6, the lane runs the served workloads. Delegated.** Each adopter moves its own pin to its newest signed tag by a reviewed pull request. The lane reconciles `./gitops/apps`. A new fact 8, in its own registered section, records per served workload whether it runs in its cage. A control copy runs outside the governed namespace, and the runner size is a recorded ceiling. Reason: the control stops a runner memory limit from reading as "does not fit the cage", and a separate section does not restart facts 6 and 7.
+7. **Q7, the OSCAL document. Delegated.** It is an observation, not a signed feed. The hub check prints the mapped and served policy counts and grades the join. Reason: nothing prices from it. Revisit if an insurer quotes from it.
+8. **Q8, fact 7. Delegated.** A new grilling ticket, 152, re-registers fact 7. It is not decided here, and it relates to ticket 27. It blocks ticket 151 and the fleet and policy archive rows.
+9. **Q9, the transfer. Owner-authorised, 2026-09-25, "agree" to option (a).** The assistant transfers ledger to tuppence, storefront to driftwood, reports to ludlow and api to driftwood with the owner's `gh` login. After each first build in the new org, it makes the new package public. The four old packages stay in the incumbent org.
+
+## Answer
+
+Resolved 2026-09-25. The owner confirmed the shared understanding with "yes" after round 2. Every architectural decision is **delegated** under ADR-0025. The two authorisations are the owner's: archiving (round 1 Q6) and the transfer (round 2 Q9). This ticket is round 2 of ticket 13, and ticket 13's remaining surface closes with it.
+
+1. **The vulnerability scanner.** trivy-operator is dropped. The scan is lifted as an `inventory` proposal kind on each adopter's `propose-tier` clock, priced against a KEV-scoped CVE feed. Recorded as [ADR-0035](../../../docs/adr/0035-a-cve-is-priced-from-the-adopters-own-scan-against-a-kev-scoped-feed.md). Built by ticket 153.
+2. **The Flux notification spine.** Dropped. The drift lane's facts 3 to 5 observe the reconcile more strictly than a commit status would, and a Receiver cannot reach an ephemeral cluster. A new version is broadcast as a Renovate pull request in each adopter. The record corrections are ticket 156 item 4.
+3. **The OSCAL CronJob.** Dropped as a CronJob. Collection is lifted as a step in each adopter's drift lane, and its output is an observation, not a signed feed. ADR-0009 carries a dated note. Built by ticket 155.
+4. **api.** Transferred into driftwood beside storefront. Built by ticket 154.
+5. **datastore.** Placed in tuppence by ticket 13 item 3. The build is ticket 151, which waits on ticket 152 and then on e2e step 4.
+6. **Per-repo archiving.** The incumbent org ends: app repos transfer and the rest are archived, each when its register row passes. Recorded as [ADR-0036](../../../docs/adr/0036-the-incumbent-org-ends-app-repos-transfer-and-the-rest-are-archived.md). Built by tickets 154 and 156.
+7. **The glossary.** **Incumbent org** and **Drop** are terms. **Lift** names the incumbent org. The posture line on sunset points at **Supersede**. Two older uses of "dropped" now say "removed".
+
+Consequences recorded in this change: ADR-0004 and ADR-0009 carry dated notes. NORTH-STAR §8 gains item 17, because §6 says "explicitly retired". Ticket 33 gets a dated correction on two stale claims, and ticket 34 on one. The map gains the ticket 35 line and the six graduated tickets, and its "Not yet specified" line on the scanner, spine and CronJob closes.
+
+Graduated:
+- [151 — The cloud plane lands in tuppence](151-the-cloud-plane-lands-in-tuppence.md)
+- [152 — Fact 7 cannot pass as registered](152-fact-7-cannot-pass-as-registered.md)
+- [153 — A CVE is priced from the adopter's own scan](153-a-cve-is-priced-from-the-adopters-own-scan.md)
+- [154 — One repo per app, in its adopter's org](154-one-repo-per-app-in-its-adopters-org.md)
+- [155 — The lane runs the served workloads, and collects their evidence](155-the-lane-runs-the-served-workloads.md)
+- [156 — The incumbent org register](156-the-incumbent-org-register.md)
+
+No check is named as this ticket's own. It is a decision ticket, and each graduated ticket wires its own check into `talk/verify-all.sh`.
 
 ## Comments
 
