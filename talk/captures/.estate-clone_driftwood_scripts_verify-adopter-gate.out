@@ -53,8 +53,8 @@ ok  G: this gate verifies platform's real published bundle with NO network (exit
 
 == I: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm ==
 ok  I[genuine]: the copied gate with the real committed root ACCEPTS, cold (exit 0) -- the copy mechanism is sound
-ok  I[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.r3eatXfEN5/gate-absent-roo
-ok  I[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.r3eatXfEN5/gate-absent-roo
+ok  I[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.6uWbH6QEsJ/gate-absent-roo
+ok  I[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.6uWbH6QEsJ/gate-absent-roo
 ok  I[wrong-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  I[wrong-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  I[corrupt-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob refused evidence for 2.0.1 against the institution's :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
@@ -78,15 +78,15 @@ OK: composed bump is 'major', admitted: every major this pull request adds is ac
 OK  J[accepted]: the real rollout composes major (5.0.0 added), and the gate admits it on accepted-majors/platform-5.0.0.yaml at 2fff19d609a1
 }
   - 5.0.0: publisher declared 'major', computed 'major'
-  - acceptance: 5.0.0 is a major, and no accepted-majors/ record at d0e675acd3dd accepts it for driftwood
+  - acceptance: 5.0.0 is a major, and no accepted-majors/ record at 4e3601bf51df accepts it for driftwood
 OK  J[removed]: the same rollout with its record removed REFUSES, exit 1, naming 5.0.0
 }
   - 5.0.0: publisher declared 'major', computed 'major'
-  - acceptance: 5.0.0 is a major, and no accepted-majors/ record at d4e68f027b1a accepts it for driftwood
+  - acceptance: 5.0.0 is a major, and no accepted-majors/ record at 0de36446c2e6 accepts it for driftwood
 OK  J[other-version]: the same rollout with its record naming 5.0.1 REFUSES, exit 1, naming 5.0.0
 }
   - 5.0.0: publisher declared 'major', computed 'major'
-  - acceptance: 5.0.0 is a major, and no accepted-majors/ record at e1b83cffd1ef accepts it for driftwood; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for tuppence, not for driftwood
+  - acceptance: 5.0.0 is a major, and no accepted-majors/ record at 57d594a3c278 accepts it for driftwood; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for tuppence, not for driftwood
 OK  J[other-party]: the same rollout with its record naming tuppence REFUSES, exit 1, naming 5.0.0
 
 == H: the gate's own selfcheck -- its pure logic, on planted inputs ==

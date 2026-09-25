@@ -24,7 +24,7 @@ REFUSE: composed bump is major -- ['2.0.0'] -- not every major it brings is acce
 OK: retirement of 2.0.0 correctly refused the pull request check, comment names it
 
 B2. resolved-commit mismatch -> refuse (ADR-0001's pin made load-bearing, bug #2)
-REFUSE: platform tag 'v1.0.0' resolves to '75947909c53f158e6e9b8b8072c2962249d4c270', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
+REFUSE: platform tag 'v1.0.0' resolves to '5bd650440092ab49871e0eded95e8495428e8f5a', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
 OK: a pin naming the wrong commit for a real tag is refused, real git rev-parse caught it
 
 B3. composed weaker than the publisher's tag (unchanged array, major tag jump) -> informational, exit 0, never lowers
@@ -34,11 +34,11 @@ OK: composed=none against declared=major (v0.1.0 -> v1.0.0) passes, prints infor
 
 == Part C: a bundle this gate cannot read, and a missing one -- refused by name, before cosign ==
 -- a CHANGED version whose evidence file exists but whose bundle is not a real Sigstore bundle --
-REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit 6cd171808b2bd25798bc1ae3b380e841e1f2e11a) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
+REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit 3fbc39a25f535b4a52074896a5805d09c183db59) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
 OK: a bundle whose shape this gate cannot read is refused by name, and no cosign call is made without pinned trust material
 
 -- a CHANGED version with no committed evidence file at all --
-REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit 4dd2217aeae24ecfb08a3ac2e077352ea391bf4f
+REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit a69a066996a7979d052814bfaa75b0abd73a1d8a
 OK: a changed version with no committed evidence file is refused before cosign is even invoked
 
 == Part D: splice_body via the REAL CLI, with backslash-bearing evidence -- the exact re.sub() hazard ==
@@ -88,8 +88,8 @@ OK: without the committed trust material the identical bytes cannot be verified 
 
 -- E6: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm --
 OK: E6[genuine] -- the copied gate with the real committed root ACCEPTS, cold (exit 0); the copy mechanism is sound
-OK: E6[absent-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.shapMPeHTb/ga
-OK: E6[absent-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.shapMPeHTb/ga
+OK: E6[absent-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.yv1fekZCGN/ga
+OK: E6[absent-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.yv1fekZCGN/ga
 OK: E6[wrong-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
 OK: E6[wrong-rekor-key,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
 OK: E6[corrupt-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
@@ -106,11 +106,11 @@ OK: E6[ct-window-closed,warm] -- REFUSED, exit 1, on the trust material and not 
 the rollout: base f299fd1475cd, head c017bb701ee4 (platform v3.3.0)
 PASS: declared=major composed=major, admitted: every major this pull request adds is accepted by a record in accepted-majors/ (eco-system ticket 132) -- 5.0.0 is a major, accepted for ludlow by chrisns (owner); recorded by the integrator on the owner's instruction of 2026-09-23 on 2026-09-23 (accepted-majors/platform-5.0.0.yaml at c017bb701ee4)
 OK: J[accepted] -- the real rollout composes major (5.0.0 added), and the gate admits it on accepted-majors/platform-5.0.0.yaml at c017bb701ee4
-REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at 5e09ddd9426f accepts it for ludlow
+REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at 92db4de2e45b accepts it for ludlow
 OK: J[removed] -- the same rollout with its record removed REFUSES, exit 1, naming 5.0.0
-REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at 14e660edc9fe accepts it for ludlow
+REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at 618c38621fc4 accepts it for ludlow
 OK: J[other-version] -- the same rollout with its record naming 5.0.1 REFUSES, exit 1, naming 5.0.0
-REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at d434492ce13b accepts it for ludlow; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for tuppence, not for ludlow
+REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at 144c3f6951d7 accepts it for ludlow; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for tuppence, not for ludlow
 OK: J[other-party] -- the same rollout with its record naming tuppence REFUSES, exit 1, naming 5.0.0
 
 PASS: verify-adopter-gate.sh -- identity regexp (match/reject/rename-breaks-it), resolved-commit refusal,

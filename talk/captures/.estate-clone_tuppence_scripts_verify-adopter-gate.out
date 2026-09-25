@@ -47,7 +47,7 @@ ok  F: an unchanged pin (old_tag == new_tag) classifies as a real no-op ('none')
   setup: tagged policy/v4.0.0 in the throwaway clone (the real repo waits on CI to sign it)
   setup: tagged policy/v5.0.0 in the throwaway clone (the real repo waits on CI to sign it)
 ok  'v2.0.0' is not a policy tag -- not this gate's subject, skipped
-signed: /tmp/tmp.u89co57KB6/clone/computed-semver/evidence/9.0.0.json.bundle
+signed: /tmp/tmp.qNSQi3r26v/clone/computed-semver/evidence/9.0.0.json.bundle
 ## Publisher gate
 
 | tag | declared | computed | outcome | reason |
@@ -57,7 +57,7 @@ signed: /tmp/tmp.u89co57KB6/clone/computed-semver/evidence/9.0.0.json.bundle
 GATE: cut-release.yml must cut policy/v9.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
 GATE: passed for policy/v9.0.0
 committed: signed release-gate evidence for v2.0.0, policy/v9.0.0
-committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 1816c8eb1d65f96b1054a7873fa872c60e253eae
+committed: versions.yaml array element(s) for policy/v9.0.0 now point at evidence commit 7fb5881f6d3a7775a0e447efa5fc1d1615312918
 tagged v2.0.0
 tagged policy/v9.0.0
 ok  'v3.0.0' is not a policy tag -- not this gate's subject, skipped
@@ -68,7 +68,7 @@ tagged v3.0.0
 ok  one real gated release (9.0.0, real evidence), plus three real array-level releases (unchanged, retired, returned), real tags v2.0.0/v2.1.0/v3.0.0/v4.0.0
 
 == Scenario A: real PASS -- the pin moves (v2.0.0 -> v2.1.0) and the array does not, so this bump adds and retires nothing and composes 'none' (eco-system ticket 99) ==
-ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (5ef21e19050122a9397727145fa6c833913dd19f)
+ok  platform checked out at v2.1.0, resolved commit matches the pinned commit field (8262f5514fef73f3ca42c1b9391f30fa39397e29)
 declared (platform tag v2.0.0 -> v2.1.0): minor
 composed (this institution, over what this pull request moves -- added [], retired []; window at the head is ['9.0.0']): none
 this pull request adds and retires no policy version, so it composes 'none' -- whether a major already stands in the window is reported continuously by the hub's verify-unreviewed-major-in-window.sh, not by this gate (eco-system ticket 99)
@@ -77,7 +77,7 @@ PASS: composed bump 'none' does not exceed major; v2.1.0 may be adopted
 ok  A: a bump that adds and retires nothing composes none and passes, folding no standing version
 
 == Scenario A2: real PASS -- 9.0.0 ARRIVES in the array (v3.0.0 -> v4.0.0), and the arrival's bump is RE-READ out of the publisher's own real committed evidence, never recomputed ==
-ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (aa81513a0c13af70db2e1c14f283facb454aa035)
+ok  platform checked out at v4.0.0, resolved commit matches the pinned commit field (db3e446c42e59737984a49711ba993bef20e4628)
 declared (platform tag v3.0.0 -> v4.0.0): major
 composed (this institution, over what this pull request moves -- added ['9.0.0'], retired []; window at the head is ['9.0.0']): patch
 NOTE: composed bump ('patch') is weaker than the publisher's tag ('major') -- informational only, this institution's obligation is never lowered by a local view
@@ -90,7 +90,7 @@ ok  A-render: a no-movement bump renders as no movement, no percentage anywhere
 
 == Scenario B: real FAIL -- 9.0.0 retires with nothing replacing it, composed forced major ==
 FAIL: composed bump is major -- refusing to adopt v3.0.0: not every major it brings is accepted -- no --adopter-dir and --head-ref, so no acceptance record could be read
-ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (a1d3f222accef4c69f35c7af908ee382cc13b452)
+ok  platform checked out at v3.0.0, resolved commit matches the pinned commit field (fa35029f2085a49e4945ad738d38314c9a46dc67)
 declared (platform tag v2.1.0 -> v3.0.0): major
 composed (this institution, over what this pull request moves -- added [], retired ['9.0.0']; window at the head is []): major
 RETIRED, reaching this institution as major: 9.0.0
@@ -107,8 +107,8 @@ ok  G: this gate verifies platform's real published bundle with NO network (exit
 
 == Scenario H: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm ==
 ok  H[genuine]: the copied gate with the real committed root ACCEPTS, cold (exit 0) -- the copy mechanism is sound
-ok  H[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.u89co57KB6/gate-absent-roo
-ok  H[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.u89co57KB6/gate-absent-roo
+ok  H[absent-root,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.qNSQi3r26v/gate-absent-roo
+ok  H[absent-root,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: no committed Sigstore trust root at /tmp/tmp.qNSQi3r26v/gate-absent-roo
 ok  H[wrong-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  H[wrong-rekor-key,warm]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1
 ok  H[corrupt-rekor-key,cold]: REFUSED, exit 1, on the trust material and not the network -- REFUSED: cosign verify-blob failed for policy version 2.0.1 evidence (identity ' :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: structure error: tag
@@ -129,13 +129,13 @@ acceptance: 5.0.0 is a major, accepted for tuppence by chrisns (owner); recorded
 PASS: composed bump is major, admitted: every major this pull request adds is accepted by a record in accepted-majors/ (eco-system ticket 132); v3.3.0 may be adopted
 ok  J[accepted]: the real rollout composes major (5.0.0 added, its evidence verified by real cosign), and the gate admits it on accepted-majors/platform-5.0.0.yaml at 81ef938a2634
 composed (this institution, over what this pull request moves -- added ['5.0.0'], retired []; window at the head is ['4.0.0', '5.0.0']): major
-acceptance: 5.0.0 is a major, and no accepted-majors/ record at 9c5f1940550d accepts it for tuppence
+acceptance: 5.0.0 is a major, and no accepted-majors/ record at d6a2b8d3face accepts it for tuppence
 ok  J[removed]: the same rollout with its record removed REFUSES, exit 1, naming 5.0.0
 composed (this institution, over what this pull request moves -- added ['5.0.0'], retired []; window at the head is ['4.0.0', '5.0.0']): major
-acceptance: 5.0.0 is a major, and no accepted-majors/ record at b70e38a81bad accepts it for tuppence
+acceptance: 5.0.0 is a major, and no accepted-majors/ record at 612e694baa7a accepts it for tuppence
 ok  J[other-version]: the same rollout with its record naming 5.0.1 REFUSES, exit 1, naming 5.0.0
 composed (this institution, over what this pull request moves -- added ['5.0.0'], retired []; window at the head is ['4.0.0', '5.0.0']): major
-acceptance: 5.0.0 is a major, and no accepted-majors/ record at e37d8c4bf1ba accepts it for tuppence; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for ludlow, not for tuppence
+acceptance: 5.0.0 is a major, and no accepted-majors/ record at 1eb6b55aaf96 accepts it for tuppence; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for ludlow, not for tuppence
 ok  J[other-party]: the same rollout with its record naming ludlow REFUSES, exit 1, naming 5.0.0
 
 PASS: adopter-gate.py checks out the tag under review (never the default branch), refuses a
