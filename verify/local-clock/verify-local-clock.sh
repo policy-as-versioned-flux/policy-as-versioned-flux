@@ -27,7 +27,15 @@
 #     logged out, --push must refuse BEFORE the model is called (the stub touches a file when
 #     it runs). The fixture's config signs every commit with a throwaway SSH key and names an
 #     owner, as the real clones do: the proposal must be unsigned and authored as the clock,
-#     and a model that signs anyway or names a person must be refused.
+#     and a model that signs anyway or names a person must be refused;
+#   * ticket 142 item 3 (ticket 30 decision 14): the child holds no push capability. A stand-in
+#     child that tries an adopter push from inside python3 (subprocess.run), an https push and
+#     an ssh push must fail each at the transport, before any credential is consulted, with
+#     origin unmoved; no remote or credential helper may be reachable; gh must be logged out;
+#     and the child must be started --restricted, --strict-mcp-config, with a clock-only
+#     --settings file that still registers the enact_guard hook for every tool, and with named
+#     scripts in place of Bash(python3 *). What the stub cannot measure is the sandbox those
+#     settings turn on, which needs the real binary; that is named, not assumed.
 #
 # The model and gh here are stand-ins (stub-claude.sh, stub-gh.sh) over throwaway repositories,
 # and the verdict lines say so: this half proves what the clock DOES, not that it has run.
@@ -204,14 +212,68 @@ git -C "$UNIT" config --unset core.hooksPath; git -C "$UNIT" config --unset core
 push_refused remoteurl remote.origin.url
 [ -z "$(git -C "$LOCAL_CLOCK_HOME/evil.git" for-each-ref)" ] || fail "evil.git received a push"
 git -C "$UNIT" remote set-url origin "$ORIGIN"   # the owner's repair by hand
-# 1d3. a write to the GLOBAL config is refused too: for this one run the global file is a
-# throwaway copy of the owner's (GIT_CONFIG_GLOBAL), so the stub's `git config --global`
-# lands there and nowhere else, and the clock -- which reads whatever global git reads --
-# sees the key appear
+# 1d3. a write to the GLOBAL config is refused too. Ticket 142: the child's global is the
+# clock-only file the clock writes under the run directory (GIT_CONFIG_GLOBAL for the child
+# only), so the stub's `git config --global` lands THERE, the clock reads the file back and
+# refuses the key by name, and neither the owner's file nor the clock's own global (a throwaway
+# copy here, so that fact is measured rather than assumed) is reached.
 cp "${HOME}/.gitconfig" "$TMP/gitconfig.copy" 2>/dev/null || : >"$TMP/gitconfig.copy"
 GIT_CONFIG_GLOBAL="$TMP/gitconfig.copy" LOCAL_CLOCK_STUB=globalcfg bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/globalcfg.out" 2>&1 && fail "a global config write was admitted"
 grep '^fail' "$TMP/globalcfg.out" | head -1 | grep -Fq 'local-clock.probe' || fail "the global write was refused for the wrong reason: $(grep '^fail' "$TMP/globalcfg.out" | head -1)"
 grep -q 'local-clock' "${HOME}/.gitconfig" 2>/dev/null && fail "the stub wrote to the owner's real global config"
+grep -q 'local-clock' "$TMP/gitconfig.copy" && fail "the child reached the clock's own global config: its GIT_CONFIG_GLOBAL was not the clock-only file"
+grid="$(run_id "$TMP/globalcfg.out")"
+grep -q 'probe = yes' "$LOCAL_CLOCK_HOME/runs/$grid/classify-driftwood.cage/gitconfig" || fail "the child's write did not land in the clock-only config"
+# 1d4. ticket 142 item 3: THE CHILD HOLDS NO PUSH CAPABILITY. A stand-in child tries every push
+# a model could make -- an adopter push from inside python3 (subprocess.run), an https push, an
+# ssh push -- plus the remote helper, the keychain helper and gh, and records what happened.
+# Each must fail before any credential is consulted, and the fixture origin must be unmoved.
+# The stub runs plain `git`, `python3` and `gh` from PATH, as a model would. A file-path origin
+# needs no credential at all, which is why the refusal has to come from the transport layer:
+# `transport 'file' not allowed` is GIT_ALLOW_PROTOCOL=none doing the work.
+LOCAL_CLOCK_STUB=pushprobe bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify >"$TMP/pushprobe.out" 2>&1 || fail "the pushprobe run did not exit 0: $(grep -E '^fail' "$TMP/pushprobe.out" | head -1)"
+grep -q '^ok .*committed on local-clock/classify-' "$TMP/pushprobe.out" || fail "the pushprobe run did not end as a normal claim: $(grep -E '^(fail|skip)' "$TMP/pushprobe.out" | head -1)"
+probe="$LOCAL_CLOCK_HOME/push-probe.out"
+[ -s "$probe" ] || fail "the stand-in child left no push-probe.out"
+grep -q "^push origin (python3 subprocess): rc 128 fatal: transport 'file' not allowed" "$probe" || fail "the adopter push from inside python3 was not refused at the transport: $(grep '^push origin' "$probe")"
+grep -q "^push https (python3 subprocess): rc 128 fatal: transport 'https' not allowed" "$probe" || fail "the https push from inside python3 was not refused at the transport: $(grep '^push https' "$probe")"
+grep -q "^push ssh: fatal: transport 'ssh' not allowed" "$probe" || fail "the ssh push was not refused at the transport: $(grep '^push ssh' "$probe")"
+grep -q "^ls-remote origin: fatal: transport 'file' not allowed" "$probe" || fail "the child could still read origin over a transport: $(grep '^ls-remote' "$probe")"
+grep -q "^remote-https: git: 'remote-https' is not a git command" "$probe" || fail "git-remote-https is reachable by the child: $(grep '^remote-https' "$probe")"
+grep -q "^credential-osxkeychain: git: 'credential-osxkeychain' is not a git command" "$probe" || fail "the keychain credential helper is reachable by the child: $(grep '^credential-osxkeychain' "$probe")"
+grep -q "^env GH_TOKEN[:] local-clock-holds-no-token$" "$probe" || fail "GH_TOKEN in the child is not the decoy: $(grep '^env GH_TOKEN' "$probe")"
+grep -q "^env GITHUB_TOKEN[:] unset$" "$probe" || fail "GITHUB_TOKEN reached the child"
+grep -q "^env SSH_AUTH_SOCK: unset$" "$probe" || fail "SSH_AUTH_SOCK reached the child"
+grep -q "^env GIT_ALLOW_PROTOCOL: none$" "$probe" || fail "GIT_ALLOW_PROTOCOL is not none in the child"
+grep -q "^env GIT_EXEC_PATH entries: 0$" "$probe" || fail "the child's GIT_EXEC_PATH is not an empty directory: $(grep '^env GIT_EXEC_PATH' "$probe")"
+grep '^credential.helper:' "$probe" | grep -Eq 'osxkeychain|store|gcloud|manager|cache' && fail "a credential helper reaches the child: $(grep '^credential.helper' "$probe")"
+grep '^gh auth token' "$probe" | grep -Eq 'gh[a-z]_[A-Za-z0-9]{20,}|github_pat_' && fail "a real gh credential reached the child"
+grep '^gh auth status' "$probe" | grep -Eq 'Logged in to' && fail "gh in the child reads as logged in: $(grep '^gh auth status' "$probe")"
+[ -z "$(git -C "$ORIGIN" for-each-ref 'refs/heads/probe*')" ] || fail "a probe push from the child reached the origin"
+[ "$(git -C "$ORIGIN" rev-parse main)" = "$SERVED" ] || fail "the child moved origin's main"
+# ... and the flags the clock passed the child, read from the stand-in's record of its argv
+argv="$LOCAL_CLOCK_HOME/claude-argv"
+for flag in --restricted --strict-mcp-config --mcp-config --settings --allowedTools --disallowedTools; do
+  grep -qx -- "$flag" "$argv" || fail "the child was not started with $flag"
+done
+allowed="$(grep -A1 -x -- '--allowedTools' "$argv" | tail -1)"
+case ",$allowed," in *",Bash(python3 *),"*) fail "Bash(python3 *) is still in the child's allowed tools";; esac
+for named in 'Bash(python3 .claude/skills/classify-and-judge/assets/validate_claim.py *)' 'Bash(python3 .claude/skills/derive-probability/assets/validate_forecast.py *)' 'Bash(python3 -m twin.derived_forecast inputs *)' 'Bash(python3 -m twin.market_signals moves *)'; do
+  case ",$allowed," in *",$named,"*) ;; *) fail "the named script $named is not in the child's allowed tools";; esac
+done
+settings="$(grep -A1 -x -- '--settings' "$argv" | tail -1)"
+mcp="$(grep -A1 -x -- '--mcp-config' "$argv" | tail -1)"
+"$PY" - "$settings" "$mcp" "$ROOT" <<'PY' || fail "the clock-only settings or mcp file is not what the child must be started with"
+import json, sys
+settings, mcp, hub = json.load(open(sys.argv[1])), json.load(open(sys.argv[2])), sys.argv[3]
+hooks = settings["hooks"]["PreToolUse"]
+assert any(h["matcher"] == ".*" and any("twin/enact_guard.py" in c["command"] and hub in c["command"] for c in h["hooks"]) for h in hooks), hooks
+assert settings["sandbox"]["enabled"] is True and settings["sandbox"]["network"]["allowedDomains"] == [], settings["sandbox"]
+assert settings["sandbox"]["network"]["strictAllowlist"] is True and settings["sandbox"]["allowUnsandboxedCommands"] is False
+assert "~/.ssh" in settings["sandbox"]["filesystem"]["denyRead"] and "~/.git-credentials" in settings["sandbox"]["filesystem"]["denyRead"]
+assert "Bash(gh *)" in settings["permissions"]["deny"] and "Bash(python3 -c *)" in settings["permissions"]["deny"]
+assert mcp == {"mcpServers": {}}, mcp
+PY
 # 1e. the twocommits branch under --push: read the ORIGIN -- nothing landed, gh never asked
 n_gh="$(grep -c 'pr create' "$LOCAL_CLOCK_GH_LOG" 2>/dev/null || echo 0)"
 env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION LOCAL_CLOCK_STUB=twocommits LOCAL_CLOCK_STUB_KEY="$KEY" LOCAL_CLOCK_GH_STUB=ok \
@@ -348,13 +410,13 @@ bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step classify --dry-run >
 grep -q '^dry .*would run' "$TMP/dry.out" || fail "the dry run did not print the command it would run"
 left_nothing "$TMP/dry.out" dry
 n_runs="$(ls -d "$TMP"/.local-clock/runs/*/ | wc -l | tr -d ' ')"
-[ "$n_runs" -eq 25 ] || fail "25 runs were started (live, push, signed, asowner, twocommits, history, tag, amend, merge, signoff, signoff2, coauthor, bodysig, replace-push, hooks-push, remoteurl-push, globalcfg, twocommits-push, rehearsal, leak, dirty, example, misnamed, nothing, dry; the refused --push and the nested clock started none) and $n_runs run directories exist: run ids collided or a refusal started a run"
+[ "$n_runs" -eq 26 ] || fail "26 runs were started (live, push, signed, asowner, twocommits, history, tag, amend, merge, signoff, signoff2, coauthor, bodysig, replace-push, hooks-push, remoteurl-push, globalcfg, pushprobe, twocommits-push, rehearsal, leak, dirty, example, misnamed, nothing, dry; the refused --push and the nested clock started none) and $n_runs run directories exist: run ids collided or a refusal started a run"
 # the derive step (ticket 93's seam) is recorded as skipped by name until its skill ships, and
 # its row declares where its files go, what they are named and which validator checks them
 LOCAL_CLOCK_STUB=nothing bash "$ROOT/talk/local-clock.sh" --adopter driftwood --step derive >"$TMP/derive.out" 2>&1
 grep -q 'derive-driftwood' "$TMP/derive.out" || fail "the derive step is not in the steps table"
 bash "$ROOT/talk/local-clock.sh" --list-steps | grep -E '^derive ' | grep -q 'assets/validate_' || fail "the derive row names no validator: ticket 93 has no seam to fill"
-echo "PASS: offline, with stub-claude.sh and stub-gh.sh standing in over a throwaway adopter and a throwaway bare origin (a fixture, not the clock having run) -- the proposal is cut from origin/main with local main 1 behind, is one commit, unsigned, authored and committed as the clock although the config signs as the owner, --push lands it on the origin with main unmoved and asks gh for that PR, --push with gh logged out refuses before any model call, a signed or person-authored proposal, a two-commit branch hiding either behind a clean tip, a git replace standing a clean double before a signed commit, a hook or fsmonitor or remote written into the unit's config (the hook never ran, evil.git got nothing), an amended base or merge-shaped commit, a trailer naming a person, a tag the child made and a nested clock are each refused, a rehearsal is stamped, marked, counted by the scan and refused by the validator, a declaration, unfinished work, a file that is not a *.claim.yaml or a claim without the headless mark is refused with the model's PR body deleted, and a nothing run or a dry run leaves no worktree or branch"
+echo "PASS: offline, with stub-claude.sh and stub-gh.sh standing in over a throwaway adopter and a throwaway bare origin (a fixture, not the clock having run) -- the proposal is cut from origin/main with local main 1 behind, is one commit, unsigned, authored and committed as the clock although the config signs as the owner, --push lands it on the origin with main unmoved and asks gh for that PR, --push with gh logged out refuses before any model call, a signed or person-authored proposal, a two-commit branch hiding either behind a clean tip, a git replace standing a clean double before a signed commit, a hook or fsmonitor or remote written into the unit's config (the hook never ran, evil.git got nothing), a write to the child's own global config (the owner's and the clock's were never reached), an amended base or merge-shaped commit, a trailer naming a person, a tag the child made and a nested clock are each refused, the child holds no push capability (an adopter push from inside python3, an https push and an ssh push each fail at the transport before any credential is consulted, no remote or credential helper is reachable, gh is logged out and holds a decoy, origin is unmoved) and is started --restricted with --strict-mcp-config, a clock-only --settings file that registers the enact_guard hook for every tool and sandboxes Bash with no network, and named scripts instead of Bash(python3 *), a rehearsal is stamped, marked, counted by the scan and refused by the validator, a declaration, unfinished work, a file that is not a *.claim.yaml or a claim without the headless mark is refused with the model's PR body deleted, and a nothing run or a dry run leaves no worktree or branch"
 
 # --- the real machine: the script, README, marker, leak scan, truth log, template --------------
 unset LOCAL_CLOCK_CLAUDE LOCAL_CLOCK_HOME LOCAL_CLOCK_ESTATE LOCAL_CLOCK_GH LOCAL_CLOCK_GH_LOG

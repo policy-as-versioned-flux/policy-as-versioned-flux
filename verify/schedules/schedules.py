@@ -44,6 +44,14 @@ file that is missing, malformed, stale, or written by a different run or reposit
 `binding_fault`) is a could-not-look that says so by name -- never a silent fall back to a
 credential the gate is not supposed to have.
 
+WHAT IS GRADED (eco-system ticket 142, 2026-09-25). Every unit is read at its SERVED ref:
+`refs/remotes/origin/main` after a best-effort fetch, the branch GitHub actually runs a clock
+from and a composition actually reads. Until ticket 142 this file read each `.estate-clone/<unit>`
+WORKING TREE, which lagged origin/main by two to seven commits on the day it was measured, so the
+gate was grading yesterday's workflow text. The INFO line per unit names the sha it graded. A
+unit whose origin/main cannot be read is a named could-not-look (SKIP) for that unit, never a
+silent fall back to the working tree.
+
 Not graded here, on purpose (2026-09-03, ticket 92): the LOCAL clock, `talk/local-clock.sh`,
 the third clock ADR-0024 point 6 adds. It is a launchd job on the owner's machine, not a
 workflow, so there is no YAML for questions 2 to 4 to parse, and its lane is a gitignored run
@@ -119,6 +127,10 @@ RED_GATE_EXITS_NONZERO = {"truth.yml": "failure"}
 # this run and past a second one still in flight without paging the API.
 RUN_SCAN_LIMIT = 10
 
+# How many merged pull requests the collector reads per unit, newest first, so lane.py can ask
+# who merged a commit GitHub committed (ticket 142). The hub held 137 on 2026-09-25, the largest.
+MERGED_SCAN_LIMIT = 500
+
 # The clock verdict file (ticket 56). Written by `clocks`, read by `check` when CLOCK_VERDICT
 # names it. Facts only: no verdict, no credential.
 VERDICT_SCHEMA = "clock-verdict/v1"
@@ -156,8 +168,113 @@ _ADD = re.compile(r"git\s+(?:-C\s+\S+\s+)?add\b([^\n]*)")
 # (review, 2026-08-28).
 _STAGES_EVERYTHING = re.compile(
     r"git\s+(?:-C\s+\S+\s+)?commit\b[^\n]*(?:\s-[A-Za-z]*a|\s--all\b)")
-_SIGNED_ARTEFACT = re.compile(r"git\s+tag\b|gh\s+release\s+(?:create|upload)|"
-                              r"gh\s+pr\s+merge\b|/git/refs/tags")
+
+# Every shape a clock could use to mint or merge a signed artefact (eco-system ticket 142, from
+# ticket 30's facts of 2026-09-25). Until then this was ONE regex over four shapes -- `git tag`,
+# `gh release create|upload`, `gh pr merge` and the literal `/git/refs/tags` -- and it missed a
+# merge by REST (`gh api -X PUT .../pulls/N/merge`, `curl -X PUT .../merge`), a release or a ref
+# minted by REST (`gh api .../releases`, `gh api .../git/refs`), a GraphQL mutation, `git
+# update-ref`, and a tag pushed by refspec (`git push origin v1.2.3`, `refs/tags/...`, `--tags`).
+# Each entry is (pattern, what it does). The REST shapes are graded separately below, because
+# the same path is a read or a write depending on the method and the body flags.
+_SIGNED_ARTEFACT: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"\bgit\b(?:\s+-C\s+\S+)?\s+tag\b"), "makes a tag"),
+    (re.compile(r"\bgit\b(?:\s+-C\s+\S+)?\s+update-ref\b"), "moves a ref directly"),
+    (re.compile(r"\bgh\s+release\s+(?:create|upload|edit|delete|delete-asset)\b"),
+     "makes or changes a release"),
+    (re.compile(r"\bgh\s+pr\s+merge\b"), "merges a pull request"),
+    (re.compile(r"\bgh\s+pr\s+[^\n]*--auto\b"), "merges a pull request on a delay"),
+    # a tag reaches origin by refspec: the tags namespace, every tag, the `tag <name>` form, or
+    # a version-shaped refspec (`v1.2.3`, `twin/v0.1.0`, `HEAD:v1.2.3`)
+    (re.compile(r"\bgit\b(?:\s+-C\s+\S+)?\s+push\b[^\n]*(?:--tags\b|--follow-tags\b|refs/tags/"
+                r"|\stag\s+\S+|[\s:](?:\S*/)?v?\d+\.\d+\.\d+(?:\S*)?(?=\s|$))"),
+     "pushes a tag"),
+    (re.compile(r"\b(?:mergePullRequest|enablePullRequestAutoMerge|createRef|updateRef|"
+                r"deleteRef|createRelease)\b"), "runs a GraphQL mutation that merges or mints"),
+)
+# A REST call (`gh api` or `curl`), read as one command with its `\`-continued lines joined and
+# comment lines dropped. The merge endpoints are a disposal whatever the method: GET on
+# /pulls/N/merge only asks whether it was merged, and a clock has no business there either, so
+# the path alone is the fault (errs closed). The releases and git-data refs collections are a
+# read on GET and a mint on a write, so those need the method or a body flag as well: `gh api`
+# turns POST on `-f`/`-F`/`--field`/`--raw-field`/`--input`, curl on `-d`/`--data*`/`--json`/
+# `-F`/`--form`/`-T`/`--upload-file` (curl's `-f` is --fail, not a body, so the flags are per
+# tool and case-sensitive).
+_COMMENT_LINE = re.compile(r"(?m)^\s*#[^\n]*\n?")
+_CONTINUED = re.compile(r"\\\n\s*")
+_REST_LINE = re.compile(r"\b(?:gh\s+api|curl)\b[^\n]*")
+_REST_DISPOSES = re.compile(r"/pulls/[^/\s\"']+/merge\b|/merges\b")
+_REST_MINTS = re.compile(r"/(?:releases|git/refs)(?=[/\s\"'?]|$)")
+_REST_METHOD = re.compile(r"(?:^|\s)(?:-X|--method|--request)[=\s]*[\"']?(?:POST|PUT|PATCH|DELETE)\b"
+                          r"|(?:^|\s)-X(?:POST|PUT|PATCH|DELETE)\b", re.I)
+_REST_BODY = {
+    "gh api": re.compile(r"(?:^|\s)(?:-f|-F|--field|--raw-field|--input)(?:[=\s]|$)"),
+    "curl": re.compile(r"(?:^|\s)(?:-d|--data(?:-\w+)?|--json|-F|--form|-T|--upload-file)(?:[=\s]|$)"),
+}
+
+
+def signed_artefact_hits(script: str) -> list[str]:
+    """Every way this shell could mint or merge a signed artefact, each named."""
+    text = _CONTINUED.sub(" ", _COMMENT_LINE.sub("", script or ""))
+    hits: list[str] = []
+    for pattern, what in _SIGNED_ARTEFACT:
+        found = pattern.search(text)
+        if found:
+            hits.append(f"{what} ({found.group(0).strip()[:80]!r})")
+    for found in _REST_LINE.finditer(text):
+        line = found.group(0)
+        tool = "gh api" if line.startswith("gh") else "curl"
+        if _REST_DISPOSES.search(line):
+            hits.append(f"merges through the REST API ({line.strip()[:80]!r})")
+        elif _REST_MINTS.search(line) and (_REST_METHOD.search(line)
+                                           or _REST_BODY[tool].search(line)):
+            hits.append(f"mints a release or a ref through the REST API ({line.strip()[:80]!r})")
+    return hits
+
+
+# What a `run:` step executes that is NOT inline shell this checker can read: a program from the
+# checkout (`python3 x.py`, `python3 -m pkg`, a heredoc `python3 -`, `bash x.sh`, `./x`), a
+# package fetched to run (`npx renovate`), or node. Read per line, after a leading `if`/`!` and
+# any `VAR=value` prefixes. This is what the PASS line used to call "nothing it runs is opaque to
+# this checker" while every twin-sweep ran hub Python under `contents: write` (ticket 142).
+_PROGRAM = re.compile(
+    r"(?m)(?:^|(?<=[;&|]))\s*(?:(?:if|then|else|do|!|-)\s+)*(?:[A-Za-z_][\w]*=\S*\s+)*"
+    r"(?P<call>(?:python3?|bash|sh|npx|node)\s+[^\n|;&]*|\./[^\s|;&]+[^\n|;&]*)")
+
+
+def _program_name(call: str) -> str:
+    """The program a call runs, without its arguments: `python3 x.py`, `python3 -m pkg.mod`,
+    `python3 - (heredoc)`, `python3 -c (inline)`, `bash x.sh`, `npx renovate@1`, `./x`."""
+    words = call.split()
+    head = words[0]
+    if head.startswith("./"):
+        return head
+    rest = [w for w in words[1:] if w]
+    if head.startswith("python"):
+        if rest and rest[0] == "-m" and len(rest) > 1:
+            return f"{head} -m {rest[1]}"
+        if rest and rest[0] == "-":
+            return f"{head} - (heredoc)"
+        if rest and rest[0].startswith("-c"):
+            return f"{head} -c (inline)"
+        return f"{head} {rest[0]}" if rest else head
+    if head == "npx":
+        rest = [w for w in rest if not w.startswith("-")]
+        return f"npx {rest[0]}" if rest else head
+    return f"{head} {rest[0]}" if rest else head
+
+
+def called_programs(job: dict) -> list[str]:
+    """The programs the job's `run:` steps execute, in order, each named once."""
+    seen: list[str] = []
+    for step in job.get("steps") or []:
+        text = _CONTINUED.sub(" ", _COMMENT_LINE.sub("", str(step.get("run") or "")))
+        for found in _PROGRAM.finditer(text):
+            name = _program_name(found.group("call"))[:60]
+            if name not in seen:
+                seen.append(name)
+    return seen
+
 
 LINES: list[str] = []
 
@@ -167,15 +284,72 @@ def out(status: str, msg: str) -> None:
     print(f"{status}: {msg}")
 
 
+# --- the served ref: what a unit IS, read where GitHub reads it (ticket 142) ------------------
+FETCH_TIMEOUT = 20
+
+
+class Served:
+    """One unit's committed tree at `refs/remotes/origin/main`, the ref a scheduled run is
+    started from and a composition reads. Every read below is `git show <sha>:<path>` or
+    `git ls-tree <sha>`, never a path on disk: the working tree is nobody's artefact."""
+
+    def __init__(self, root: str, sha: str, how: str) -> None:
+        self.root, self.sha, self.how = root, sha, how
+
+    def _git(self, *args: str) -> str | None:
+        done = subprocess.run(["git", "-C", self.root, *args], capture_output=True, text=True,
+                              check=False, timeout=30)
+        return done.stdout if done.returncode == 0 else None
+
+    def show(self, path: str) -> str | None:
+        """The file's text at the served ref, or None when the ref does not carry it."""
+        return self._git("show", f"{self.sha}:{path}")
+
+    def ls(self, directory: str) -> list[str]:
+        """Basenames directly under `directory` at the served ref; [] when it is not there."""
+        raw = self._git("ls-tree", "--name-only", self.sha, f"{directory.rstrip('/')}/") or ""
+        return sorted(os.path.basename(line) for line in raw.splitlines() if line)
+
+    def isdir(self, path: str) -> bool:
+        raw = self._git("ls-tree", "-d", "--name-only", self.sha, f"{path.rstrip('/')}") or ""
+        return path.rstrip("/") in [line.rstrip("/") for line in raw.splitlines()]
+
+
+def served(root: str) -> tuple[Served | None, str]:
+    """(the served tree, how it was reached). A best-effort fetch of origin/main first, so a kept
+    clone grades today's tip; a fetch that fails is said so and the last-fetched ref stands,
+    dated by the run; no origin/main at all is (None, why) and the caller names it as a
+    could-not-look. Never the working tree."""
+    ref = f"refs/remotes/origin/{DEFAULT_BRANCH}"
+    try:
+        done = subprocess.run(["git", "-C", root, "fetch", "--quiet", "origin",
+                               f"+refs/heads/{DEFAULT_BRANCH}:{ref}"],
+                              capture_output=True, text=True, check=False, timeout=FETCH_TIMEOUT)
+        if done.returncode == 0:
+            how = "fetched now"
+        else:
+            first = (done.stderr.strip().splitlines() or [f"fetch exit {done.returncode}"])[0]
+            how = f"fetch FAILED ({first[:80]}); as last fetched"
+    except (subprocess.SubprocessError, OSError) as e:
+        how = f"fetch FAILED ({str(e).splitlines()[0][:80]}); as last fetched"
+    done = subprocess.run(["git", "-C", root, "rev-parse", "--verify", "-q", ref],
+                          capture_output=True, text=True, check=False, timeout=30)
+    sha = done.stdout.strip() if done.returncode == 0 else ""
+    if not sha:
+        return None, f"no {ref} in the checkout at {root} ({how})"
+    return Served(root, sha, how), how
+
+
 # --- what each repository is --------------------------------------------------
-def required_clocks(unit: str, root: str) -> dict[str, str]:
-    """{workflow file: why} -- derived from the repository, not declared here."""
+def required_clocks(unit: str, tree: Served) -> dict[str, str]:
+    """{workflow file: why} -- derived from the repository AT ITS SERVED REF, not declared here."""
     need: dict[str, str] = {}
-    party_path = os.path.join(root, "party.yaml")
-    party = {}
-    if os.path.exists(party_path):
-        with open(party_path) as fh:
-            party = yaml.safe_load(fh) or {}
+    try:
+        party = yaml.safe_load(tree.show("party.yaml") or "") or {}
+    except yaml.YAMLError:
+        party = {}
+    if not isinstance(party, dict):
+        party = {}
     roles = party.get("roles") or []
     # forward-intel is the twin's own feed; the twin-sweep clock publishes it, so
     # a party whose only publication is forward-intel needs no separate fetch.
@@ -192,7 +366,7 @@ def required_clocks(unit: str, root: str) -> dict[str, str]:
     if "adopter" in roles:
         need["renovate-run.yml"] = f"{unit} is an adopter, and Renovate's PR starts every re-price"
         need["propose-tier.yml"] = f"{unit} is an adopter, and the price moves with the date"
-    if os.path.isdir(os.path.join(root, "twin")):
+    if tree.isdir("twin"):
         need["twin-sweep.yml"] = f"{unit} carries a twin overlay under twin/"
     return need
 
@@ -213,21 +387,21 @@ def units() -> list[tuple[str, str, str]]:
     return found
 
 
-def workflows(root: str) -> tuple[dict[str, dict], dict[str, str]]:
-    """({filename: parsed workflow}, {filename: parse error}). A workflow GitHub
-    cannot parse is a clock that does not exist, so the error is carried out and
-    reported rather than swallowed or crashed on."""
-    directory = os.path.join(root, ".github", "workflows")
+def workflows(tree: Served) -> tuple[dict[str, dict], dict[str, str]]:
+    """({filename: parsed workflow}, {filename: parse error}), read at the served ref. A
+    workflow GitHub cannot parse is a clock that does not exist, so the error is carried out
+    and reported rather than swallowed or crashed on."""
     parsed: dict[str, dict] = {}
     broken: dict[str, str] = {}
-    if not os.path.isdir(directory):
-        return parsed, broken
-    for name in sorted(os.listdir(directory)):
+    for name in tree.ls(".github/workflows"):
         if not name.endswith((".yml", ".yaml")):
             continue
+        text = tree.show(f".github/workflows/{name}")
+        if text is None:
+            broken[name] = "the served ref names it and does not carry it"
+            continue
         try:
-            with open(os.path.join(directory, name)) as fh:
-                doc = yaml.safe_load(fh)
+            doc = yaml.safe_load(text)
         except yaml.YAMLError as e:
             broken[name] = str(e).splitlines()[-1].strip()
             continue
@@ -447,11 +621,37 @@ def _is_cage_step(step: dict) -> bool:
 def signed_artefact_faults(job: dict) -> list[str]:
     faults = []
     for step in job.get("steps") or []:
-        hit = _SIGNED_ARTEFACT.search(step.get("run") or "")
-        if hit:
-            faults.append(f"step {step.get('name') or '(unnamed)'!r} can run {hit.group(0)!r} "
-                          f"-- a clock may not mint or merge a signed artefact")
+        for hit in signed_artefact_hits(step.get("run") or ""):
+            faults.append(f"step {step.get('name') or '(unnamed)'!r} {hit} -- a clock may not "
+                          f"mint or merge a signed artefact")
     return faults
+
+
+def caged_line(doc: dict, job: dict) -> str:
+    """The PASS sentence for a scheduled job with no fault, saying exactly what was read.
+
+    Until ticket 142 it ended "nothing it runs is opaque to this checker" for every clean job,
+    while `cage_faults`' own docstring names the ceiling: only inline `run:` shell is read, and
+    a called program is invisible. Every twin-sweep ran hub Python under `contents: write` and
+    read PASS with that sentence. Decided (ticket 142, delegated): NARROW the sentence rather
+    than widen the fault, and derive the clause from the job -- name each program it runs and
+    the permission it runs under. Widening would have turned every scheduled job that runs a
+    script red at once (the three twin sweeps, three propose-tier jobs, three renovate runs,
+    the publishers' fetches and the hub's own truth gate: 14 jobs on 2026-09-25) with no ticket
+    owning any of them, and would have pre-empted ticket 142 item 1, whose twin-cage check is
+    what grades the twin job's `contents: read` once ticket 143 has split the sweep. What a
+    called program lands is graded after the fact by verify-lane.sh, and this line says so."""
+    programs = called_programs(job)
+    held = "contents: write" if _job_can_write(doc, job) else "no contents: write"
+    if not programs:
+        return ("caged -- no inline shell step in this job stages a declaration or mints a "
+                "signed artefact, and every step is inline shell or an inert `uses:` action "
+                "this checker read in full")
+    return (f"caged as far as this checker reads -- no inline shell step stages a declaration "
+            f"or mints a signed artefact; {len(programs)} program(s) it runs from its checkout "
+            f"are not read here ({'; '.join(programs)}), so what they write is bounded by the "
+            f"job's permission ({held}) and by verify-lane.sh's read of what landed, not by "
+            f"this line")
 
 
 def ruleset_state(remote: str) -> tuple[str, str]:
@@ -653,6 +853,39 @@ class Offline:
     def recording_history(self, remote: str) -> dict:
         raise CouldNotLook(self.unreachable)
 
+    def merged_by(self, remote: str, sha: str) -> dict:
+        """Who merged the pull request whose merge commit is `sha` (ticket 142): {"pr",
+        "merged_by", "is_bot", "merged_at"}. A commit GitHub committed on a squash or rebase
+        does not say who merged it, so lane.py asks here."""
+        raise CouldNotLook(self.unreachable)
+
+
+def merged_pulls(remote: str) -> dict[str, dict]:
+    """{merge commit sha: who merged it}, for the newest MERGED_SCAN_LIMIT merged pull requests
+    of `remote`. One GraphQL-backed call per unit; `mergedBy.login` reads `app/<name>` for an
+    App (observed 2026-09-25: `app/pavc-other-hand`) and the login for a person."""
+    raw = _gh("pr", "list", "--repo", remote, "--state", "merged",
+              "--limit", str(MERGED_SCAN_LIMIT), "--json", "number,mergeCommit,mergedBy,mergedAt")
+    found: dict[str, dict] = {}
+    for pr in json.loads(raw or "[]"):
+        sha = str((pr.get("mergeCommit") or {}).get("oid") or "")
+        if not sha:
+            continue
+        who = pr.get("mergedBy") or {}
+        found[sha] = {"pr": pr.get("number"), "merged_by": str(who.get("login") or ""),
+                      "is_bot": bool(who.get("is_bot")), "merged_at": str(pr.get("mergedAt") or "")}
+    return found
+
+
+def _merge_reading(merges: dict | None, remote: str, sha: str, where: str) -> dict:
+    if merges is None:
+        raise CouldNotLook(f"{where} carries no merged-pull-request readings for {remote}")
+    hit = merges.get(sha)
+    if hit is None:
+        raise CouldNotLook(f"no merged pull request on {remote} among the newest "
+                           f"{MERGED_SCAN_LIMIT} names {sha[:9]} as its merge commit ({where})")
+    return hit
+
 
 class Gh(Offline):
     """`gh`, in a process that holds a credential. Never the gate job (ticket 56)."""
@@ -661,6 +894,16 @@ class Gh(Offline):
 
     def __init__(self) -> None:
         super().__init__("gh is authenticated")
+        self._merges: dict[str, dict[str, dict]] = {}
+
+    def merged_by(self, remote: str, sha: str) -> dict:
+        if remote not in self._merges:
+            try:
+                self._merges[remote] = merged_pulls(remote)
+            except (subprocess.SubprocessError, OSError, ValueError) as e:
+                raise CouldNotLook(f"gh could not list the merged pull requests of {remote}: "
+                                   f"{str(e).splitlines()[0]}") from e
+        return _merge_reading(self._merges[remote], remote, sha, "gh pr list")
 
     def ruleset_state(self, remote: str) -> tuple[str, str]:
         return ruleset_state(remote)
@@ -780,6 +1023,14 @@ class Verdict(Offline):
             raise CouldNotLook("clock verdict carries no readable recording history for "
                                + remote + ": " + str(self.recordings.get("error") or "absent"))
         return self.recordings
+
+    def merged_by(self, remote: str, sha: str) -> dict:
+        entry = self._unit(remote)
+        if entry.get("merges_error"):
+            raise CouldNotLook(f"the clock verdict file records that the merged pull requests "
+                               f"of {remote} could not be read ({entry['merges_error']})")
+        return _merge_reading(entry.get("merges"), remote, sha,
+                              f"the clock verdict file collected at {self.collected_at}")
 
 
 def observer(offline: bool = False) -> Offline:
@@ -926,9 +1177,18 @@ def check(offline: bool = False) -> int:
 
     now = dt.datetime.now(dt.timezone.utc)
     for unit, root, remote in units():
-        need = required_clocks(unit, root) if unit != "hub" else {
+        # The SERVED ref, never the working tree (ticket 142). A unit whose origin/main cannot
+        # be read is one named could-not-look; nothing of it is graded from what is on disk.
+        tree, how = served(root)
+        if tree is None:
+            out("SKIP", f"{unit}: {how} -- the served ref is what GitHub runs a clock from, "
+                        f"and the working tree is not a stand-in for it, so none of this "
+                        f"unit's clocks is graded here")
+            continue
+        print(f"INFO: {unit}: graded at origin/{DEFAULT_BRANCH}@{tree.sha[:9]} ({how})")
+        need = required_clocks(unit, tree) if unit != "hub" else {
             "truth.yml": "the hub owns the daily truth surface (ticket 03)"}
-        found, broken = workflows(root)
+        found, broken = workflows(tree)
         for name, why in sorted(broken.items()):
             out("FAIL", f"{unit}/{name}: GitHub cannot parse this workflow, so whatever clock "
                         f"it declares does not run ({why})")
@@ -974,16 +1234,14 @@ def check(offline: bool = False) -> int:
                 for fault in faults:
                     out("FAIL", f"{unit}/{workflow} job {job_name}: {fault}")
                 if not faults:
-                    out("PASS", f"{unit}/{workflow} job {job_name}: caged -- no shell step in "
-                                f"this job stages a declaration or mints a signed artefact, and "
-                                f"nothing it runs is opaque to this checker")
+                    out("PASS", f"{unit}/{workflow} job {job_name}: {caged_line(doc, job)}")
 
         # 3b. live: the server-side half of the cage, observed on the remote.
         # Every unit gets a line here (eco-system ticket 83). This block used to emit nothing
         # when it could not look -- neither PASS nor FAIL nor SKIP -- and a question that emits
         # nothing is a fourth outcome the gate cannot count: eight server-side questions simply
         # vanished from the offline run. A could-not-look is a SKIP, said out loud, per unit.
-        declared = os.path.isdir(os.path.join(root, ".github", "rulesets"))
+        declared = tree.isdir(".github/rulesets")
         out(*ruleset_line(unit, remote, live, unreachable, declared, source))
 
         # 4. live: did each clock run inside its period?
@@ -1004,29 +1262,35 @@ def check(offline: bool = False) -> int:
                 continue
             try:
                 state, _remote_schedule = source.remote_crons(remote, workflow)
+                # Two readings of the same ref: origin/main as fetched into this checkout
+                # (`found`, above) and the copy GitHub's API serves for the default branch.
+                # They differ only when the fetch is stale or GitHub has moved on since.
                 if state == "absent":
-                    out("SKIP", f"{unit}/{workflow}: not on {remote}@{DEFAULT_BRANCH} yet -- "
-                                f"it lives on the local ecosystem/thin-slice branch until the "
-                                f"owner merges, so no scheduled run can have happened")
+                    out("SKIP", f"{unit}/{workflow}: GitHub serves no such file on "
+                                f"{remote}@{DEFAULT_BRANCH} while origin/{DEFAULT_BRANCH}@"
+                                f"{tree.sha[:9]} as fetched here carries it -- the two readings "
+                                f"of the served ref disagree, so whether a scheduled run could "
+                                f"have happened is not observed")
                     continue
                 if state == "unparsed":
                     out("FAIL", f"{unit}/{workflow}: the copy on {remote}@{DEFAULT_BRANCH} "
                                 f"does not parse, so GitHub runs no clock from it at all" + owns)
                     continue
                 if state == "untimed":
-                    # Two very different worlds, and the old code called both SKIP
-                    # with a reason that becomes false after the merge. The LOCAL
-                    # copy decides which one this is.
+                    # Two very different worlds, and the old code called both SKIP with a
+                    # reason that becomes false after the merge. The FETCHED copy decides.
                     if crons(found.get(workflow) or {}):
-                        out("SKIP", f"{unit}/{workflow}: the copy on {remote}@{DEFAULT_BRANCH} "
-                                    f"carries no `schedule:` while the local "
-                                    f"ecosystem/thin-slice copy does -- GitHub runs the default "
-                                    f"branch's copy and nothing else, so this clock starts when "
-                                    f"the owner merges")
+                        out("SKIP", f"{unit}/{workflow}: the copy GitHub serves on "
+                                    f"{remote}@{DEFAULT_BRANCH} carries no `schedule:` while "
+                                    f"origin/{DEFAULT_BRANCH}@{tree.sha[:9]} as fetched here "
+                                    f"does -- the two readings of the served ref disagree, and "
+                                    f"GitHub runs its own copy and nothing else")
                     else:
-                        out("FAIL", f"{unit}/{workflow}: neither {remote}@{DEFAULT_BRANCH} nor "
-                                    f"the local copy carries a `schedule:` -- the clock was "
-                                    f"removed from the branch GitHub actually runs" + owns)
+                        out("FAIL", f"{unit}/{workflow}: neither {remote}@{DEFAULT_BRANCH} as "
+                                    f"GitHub serves it nor origin/{DEFAULT_BRANCH}@"
+                                    f"{tree.sha[:9]} as fetched here carries a `schedule:` -- "
+                                    f"the clock was removed from the branch GitHub actually "
+                                    f"runs" + owns)
                     continue
                 run = source.last_run(remote, workflow)
             except CouldNotLook as e:
@@ -1100,8 +1364,18 @@ def collect() -> dict:
             entry["reachable"] = False
             entry["unreachable_reason"] = str(e).splitlines()[0]
             continue
-        need = required_clocks(unit, root) if unit != "hub" else {"truth.yml": ""}
-        found, _broken = workflows(root)
+        # who merged each merged pull request, for lane.py's read of a commit GitHub committed
+        # (ticket 142): a fact, recorded per unit, with its own failure named per unit
+        try:
+            entry["merges"] = merged_pulls(remote)
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
+            entry["merges_error"] = str(e).splitlines()[0]
+        tree, how = served(root)
+        entry["served"] = {"sha": tree.sha if tree else "", "how": how}
+        if tree is None:
+            continue
+        need = required_clocks(unit, tree) if unit != "hub" else {"truth.yml": ""}
+        found, _broken = workflows(tree)
         for workflow in sorted(need):
             if workflow not in found:
                 continue
@@ -1314,17 +1588,118 @@ jobs:
     faults = cage_faults(sideways, sideways["jobs"]["observe"])
     assert any("feed.json" in f for f in faults), faults
 
-    # a clock that can cut a tag or a release, or merge a PR
-    for line in ("git tag -s v1.0.0", "gh release create v1.0.0", "gh pr merge 4 --merge"):
+    # a clock that can cut a tag or a release, or merge a PR -- every shape ticket 30's facts
+    # of 2026-09-25 found missing, probed BOTH WAYS: the write is a fault, its read twin is not
+    def can_mint(line: str) -> bool:
         minting = wf(f"""
 on:
   schedule: [{{cron: "5 7 * * *"}}]
 jobs:
   cut:
     steps:
-      - run: {line}
+      - run: |
+          {line}
 """)
-        assert signed_artefact_faults(minting["jobs"]["cut"]), line
+        return bool(signed_artefact_faults(minting["jobs"]["cut"]))
+
+    for line in (
+            "git tag -s v1.0.0", "git -C unit tag v2",
+            "gh release create v1.0.0", "gh release upload v1 file", "gh release edit v1 --draft=false",
+            "gh pr merge 4 --merge", "gh pr merge 4 --squash", "gh pr edit 4 --auto",
+            # a merge by REST, in every method spelling, and by curl
+            "gh api -X PUT repos/o/r/pulls/4/merge", "gh api --method PUT repos/o/r/pulls/4/merge",
+            "gh api -XPUT repos/o/r/pulls/4/merge -f merge_method=squash",
+            "gh api repos/o/r/pulls/4/merge", "gh api --method=put /repos/o/r/pulls/4/merge",
+            "curl -X PUT -H 'Authorization: Bearer $T' https://api.github.com/repos/o/r/pulls/4/merge",
+            'curl --request PUT "https://api.github.com/repos/o/r/pulls/${N}/merge"',
+            "gh api -X POST repos/o/r/merges -f base=main -f head=x",
+            # a release or a ref minted by REST
+            "gh api repos/o/r/releases -f tag_name=v1 -f name=v1",
+            "gh api --method POST repos/o/r/releases --input body.json",
+            "gh api repos/o/r/git/refs -f ref=refs/tags/v1 -f sha=$SHA",
+            "gh api -X PATCH repos/o/r/git/refs/heads/main -f sha=$SHA",
+            "curl -d '{\"ref\":\"refs/tags/v1\"}' https://api.github.com/repos/o/r/git/refs",
+            "curl -X POST https://api.github.com/repos/o/r/releases --data @body.json",
+            "curl -X DELETE https://api.github.com/repos/o/r/git/refs/tags/v1",
+            # a continuation line carries the method
+            "gh api \\\n            -X PUT \\\n            repos/o/r/pulls/4/merge",
+            # a ref moved directly, and a tag pushed by refspec
+            "git update-ref refs/heads/main $SHA", "git -C unit update-ref -d refs/tags/v1",
+            "git push origin v1.2.3", "git push -q origin twin/v0.1.0", "git push origin HEAD:v1.2.3",
+            "git push origin refs/tags/v1.2.3", "git push --tags origin", "git push origin --follow-tags",
+            "git push origin tag v1.2.3", "git -C unit push origin twin/v0.1.0",
+            # GraphQL
+            "gh api graphql -f query='mutation { mergePullRequest(input: {pullRequestId: \"x\"}) { clientMutationId } }'",
+            "gh api graphql -f query='mutation { createRef(input: {repositoryId: \"r\", name: "
+            "\"refs/tags/v1\", oid: \"s\"}) { ref { id } } }'",
+    ):
+        assert can_mint(line), f"not caught: {line!r}"
+    for line in (
+            "git push origin main", "git push origin HEAD:${GITHUB_REF_NAME}", "git push origin observations",
+            "git push -u origin wargamer/retune-x", "git push origin HEAD:refs/heads/fetch/policy-2.0.0",
+            "git describe --tags --always", "git update-index --refresh",
+            "gh release list", "gh release view v1", "gh release download v1 -p '*.tgz'",
+            "gh pr create --base main --title x", "gh pr view 4", "gh pr list --state merged",
+            "gh api repos/o/r/pulls/4", "gh api repos/o/r/pulls/4/files", "gh api repos/o/r/pulls/4/commits",
+            "gh api repos/o/r/releases/latest", "gh api repos/o/r/releases --jq '.[0].tag_name'",
+            "gh api repos/o/r/git/refs/tags/v1", "gh api repos/o/r/git/ref/tags/v1",
+            "gh api repos/o/r/rulesets", "gh api repos/o/r/contents/.github/workflows/x.yml --jq .content",
+            "gh run list --repo o/r --workflow x.yml --json conclusion",
+            'curl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v1/gitsign"',
+            'curl -fsSL -o kyverno.tgz "https://github.com/kyverno/kyverno/releases/download/v1/x.tgz"',
+            "curl -f -o x https://github.com/o/r/releases/download/v1/x",
+            "curl -s https://api.github.com/repos/o/r/releases/latest | jq -r .tag_name",
+            "curl -s https://api.github.com/repos/o/r/git/refs/tags/v1",
+            "# gh api -X PUT repos/o/r/pulls/4/merge is what a merge would look like",
+            "echo 'the rulesets are applied by the owner with gh api'",
+            "python3 twin/emit-forward-intel.py", "npx --yes renovate@44.37.1",
+    ):
+        assert not can_mint(line), f"wrongly caught: {line!r}"
+
+    # the programs a job runs from its checkout are enumerated, and the PASS line names them
+    # rather than calling them readable (ticket 142)
+    sweeping = wf("""
+on:
+  schedule: [{cron: "5 7 * * *"}]
+permissions: {contents: write}
+env: {OBSERVATION_LANE: "observations"}
+jobs:
+  sweep:
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          # a comment naming python3 x.py is not a program
+          pip install pyyaml
+          python3 twin/emit-forward-intel.py --check; feed_rc=$?
+          python3 .github/scripts/rederive-signals.py
+          if python3 -m unittest discover -s tests; then echo ok; fi
+          python3 - >> observations/twin-sweep.jsonl <<'PY'
+          print("{}")
+          PY
+          bash scripts/render.sh && ./drift/five-facts.py sample
+          KIND_VERSION=1 npx --yes renovate@44.37.1
+          echo done
+      - name: the observation cage -- never a declaration
+        run: |
+          git reset -q
+          for p in ${OBSERVATION_LANE}; do git add -A -- "$p"; done
+          for f in $(git diff --cached --name-only); do
+            case "$f" in observations/*) ;; *) exit 1 ;; esac
+          done
+          git commit -m x
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+""")
+    programs = called_programs(sweeping["jobs"]["sweep"])
+    assert programs == ["python3 twin/emit-forward-intel.py", "python3 .github/scripts/rederive-signals.py",
+                        "python3 -m unittest", "python3 - (heredoc)", "bash scripts/render.sh",
+                        "./drift/five-facts.py", "npx renovate@44.37.1"], programs
+    assert _program_name('python3 -c "import x"') == "python3 -c (inline)"
+    line = caged_line(sweeping, sweeping["jobs"]["sweep"])
+    assert line.startswith("caged as far as this checker reads") and "7 program(s)" in line, line
+    assert "contents: write" in line and "verify-lane.sh" in line and "opaque" not in line, line
+    assert called_programs(caged["jobs"]["sweep"]) == [], called_programs(caged["jobs"]["sweep"])
+    assert caged_line(caged, caged["jobs"]["sweep"]).startswith("caged -- no inline shell step"), \
+        caged_line(caged, caged["jobs"]["sweep"])
 
     # an UNSCHEDULED workflow that cuts a tag is exactly what cut-release.yml is
     dispatch = wf("""
@@ -1421,6 +1796,81 @@ jobs:
     # ...and no CLOCK_VERDICT at all, with --offline, is the plain offline source
     assert not observer(offline=True).live
 
+    # who merged (ticket 142): read from the verdict file when it carries the readings, and a
+    # named could-not-look for a unit with none, a unit whose listing failed, or a commit no
+    # merged pull request names; offline is a could-not-look too
+    merged = verdict_file(fresh, {
+        "feeds": {"remote": "org/feeds", "reachable": True, "ruleset": {}, "workflows": {},
+                  "merges": {"a" * 40: {"pr": 7, "merged_by": "app/github-actions",
+                                        "is_bot": True, "merged_at": inside}}},
+        "ico": {"remote": "org/ico", "reachable": True, "ruleset": {}, "workflows": {},
+                "merges_error": "HTTP 403"},
+        "nist": {"remote": "org/nist", "reachable": True, "ruleset": {}, "workflows": {}}})
+    who = Verdict(merged)
+    assert who.merged_by("org/feeds", "a" * 40)["merged_by"] == "app/github-actions"
+    for remote, sha, want in (("org/feeds", "b" * 40, "no merged pull request"),
+                              ("org/ico", "a" * 40, "HTTP 403"),
+                              ("org/nist", "a" * 40, "no merged-pull-request readings"),
+                              ("org/nowhere", "a" * 40, "carries no entry")):
+        try:
+            who.merged_by(remote, sha)
+            raise AssertionError(f"{remote}: who merged must be a could-not-look here")
+        except CouldNotLook as e:
+            assert want in str(e), (remote, e)
+    try:
+        Offline("no network").merged_by("org/feeds", "a" * 40)
+        raise AssertionError("offline must be a could-not-look")
+    except CouldNotLook:
+        pass
+
+    # the served ref is what is read (ticket 142): a unit's working tree carries a twin/ overlay
+    # and a workflow that origin/main does not, and neither is graded; the unit's own copy of a
+    # workflow on origin/main is; no origin/main at all is (None, why), never the working tree
+    import shutil
+    with tempfile.TemporaryDirectory() as tmp:
+        def git(*args):
+            subprocess.run(["git", "-c", "commit.gpgsign=false", "-c", "core.hooksPath=" + tmp,
+                            *args], check=True, capture_output=True, text=True,
+                           env=dict(os.environ, GIT_AUTHOR_NAME="s", GIT_AUTHOR_EMAIL="s@s",
+                                    GIT_COMMITTER_NAME="s", GIT_COMMITTER_EMAIL="s@s"))
+        origin = os.path.join(tmp, "unit.git")
+        git("init", "-q", "--bare", "-b", DEFAULT_BRANCH, origin)
+        clone = os.path.join(tmp, "unit")
+        git("init", "-q", "-b", DEFAULT_BRANCH, clone)
+        git("-C", clone, "remote", "add", "origin", origin)
+        os.makedirs(os.path.join(clone, ".github", "workflows"))
+        with open(os.path.join(clone, "party.yaml"), "w") as fh:
+            fh.write("roles: [adopter]\n")
+        with open(os.path.join(clone, ".github", "workflows", "fetch.yml"), "w") as fh:
+            fh.write("on: {schedule: [{cron: '5 7 * * *'}]}\njobs: {a: {steps: []}}\n")
+        git("-C", clone, "add", "party.yaml", ".github")
+        git("-C", clone, "commit", "-q", "-m", "served")
+        git("-C", clone, "push", "-q", "origin", DEFAULT_BRANCH)
+        # the working tree moves on: a twin overlay and a second workflow, unpushed
+        os.makedirs(os.path.join(clone, "twin"))
+        with open(os.path.join(clone, "twin", "signals.yaml"), "w") as fh:
+            fh.write("x: 1\n")
+        with open(os.path.join(clone, ".github", "workflows", "twin-sweep.yml"), "w") as fh:
+            fh.write("on: {schedule: [{cron: '5 8 * * *'}]}\njobs: {b: {steps: []}}\n")
+        git("-C", clone, "add", "twin", ".github")
+        git("-C", clone, "commit", "-q", "-m", "not served")
+        tree, how = served(clone)
+        assert tree is not None and how == "fetched now", how
+        assert tree.sha == subprocess.run(["git", "-C", origin, "rev-parse", DEFAULT_BRANCH],
+                                          capture_output=True, text=True).stdout.strip()
+        assert not tree.isdir("twin") and tree.isdir(".github/workflows"), "read the working tree"
+        assert sorted(workflows(tree)[0]) == ["fetch.yml"], workflows(tree)
+        assert sorted(required_clocks("unit", tree)) == ["propose-tier.yml", "renovate-run.yml"]
+        assert tree.show("twin/signals.yaml") is None and tree.show("party.yaml") == "roles: [adopter]\n"
+        # origin gone: the last-fetched ref stands, and the how says the fetch failed
+        shutil.rmtree(origin)
+        tree, how = served(clone)
+        assert tree is not None and how.startswith("fetch FAILED") and "as last fetched" in how, how
+        # no origin/main at all: None, with why
+        git("-C", clone, "update-ref", "-d", f"refs/remotes/origin/{DEFAULT_BRANCH}")
+        tree, how = served(clone)
+        assert tree is None and "no refs/remotes/origin/main" in how, how
+
     # a verdict file is bound to the run that wrote it: one from another run, or from another
     # repository, is refused and falls back to offline rather than being graded from (round 2).
     # It narrows the window on a forged file; it is not a trust boundary (see `binding_fault`).
@@ -1495,7 +1945,14 @@ jobs:
     print("ok  the cage bites: a declaration staged beside a push to main fails, a push to "
           "main with no declared OBSERVATION_LANE or no cage step fails, a declaration pushed "
           "to any branch without opening a pull request fails, a proposer that pushes its own "
-          "branch behind a PR passes, a scheduled job that can tag/release/merge fails, an "
+          "branch behind a PR passes, a scheduled job that can tag/release/merge fails in "
+          "every shape (git tag, gh release, gh pr merge, a REST merge by gh api or curl in "
+          "any method spelling, a release or ref minted by REST, a GraphQL mutation, git "
+          "update-ref, a tag pushed by refspec) while each shape's read twin passes, the "
+          "programs a job runs from its checkout are named in its PASS line instead of being "
+          "called readable, every unit is read at origin/main as fetched and never from the "
+          "working tree, who merged a commit GitHub committed is read from the verdict file or "
+          "is a named could-not-look, an "
           "unscheduled cut-release is not judged at all, the server-side ruleset question "
           "answers with a named could-not-look rather than with silence, a clock verdict file "
           "lets the liveness half grade with no credential and every gap in it is a named "

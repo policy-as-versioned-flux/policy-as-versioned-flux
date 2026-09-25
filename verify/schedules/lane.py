@@ -21,6 +21,23 @@ scheduled identity has landed there.
                                    unit declares none.
     a violation                    a scheduled-identity commit that touches any path outside the
                                    lane, or that is a merge. A clock appends; it never merges.
+    a merge GitHub committed       (eco-system ticket 142, from ticket 30's facts of 2026-09-25)
+                                   a merge made through the REST API or the web is committed by
+                                   `GitHub <noreply@github.com>`, so the committer never names a
+                                   scheduled identity and the rule above graded such a merge as
+                                   a reviewed proposal. Who merged is read another way:
+                                   - a MERGE commit GitHub wrote carries the merging account as
+                                     its AUTHOR (observed: every pavc-other-hand merge on every
+                                     unit is authored `pavc-other-hand[bot]`, committed GitHub).
+                                     A scheduled or automation author is a FAIL, offline, from
+                                     the commit alone. `app/pavc-other-hand` is the reviewed
+                                     second hand (ticket 88, owner-instructed) and is a NOTE.
+                                   - a SQUASH or REBASE GitHub wrote keeps the proposal's author,
+                                     so who merged is not in the commit at all. For one authored
+                                     by a scheduled identity the merged pull requests are asked
+                                     (`mergedBy`: the clock verdict file the collector wrote, or
+                                     an authenticated `gh`); a bot merger is a FAIL, a person a
+                                     NOTE, and no source is a named could-not-look, never clean.
     out of scope                   a human's commit, whatever it touches; a bot-authored commit a
                                    human merged; automation identities no scheduled workflow
                                    configures (platform's release bot writes evidence to main from
@@ -68,6 +85,15 @@ REFS = (S.DEFAULT_BRANCH, OBSERVATIONS_BRANCH)
 # GitHub's own Actions identity. Renovate commits as it; so does any action that leaves the
 # default committer in place. Never configured in a workflow, so it cannot be parsed out of one.
 ALWAYS_SCHEDULED = frozenset({"41898282+github-actions[bot]@users.noreply.github.com"})
+
+# The committer GitHub itself writes on a merge, squash or rebase made through the API or the
+# web (ticket 142). It says a person or a token merged through GitHub; it never says which.
+WEB_FLOW = "noreply@github.com"
+# The reviewed second hand (ticket 88; ticket 75 Q6 and Q14, owner-instructed): merges as the App
+# `pavc-other-hand`. Its author email on a merge commit, and its login in a pull request's
+# `mergedBy`, as GitHub spells each.
+OTHER_HAND_EMAIL = re.compile(r"\+pavc-other-hand\[bot\]@users\.noreply\.github\.com$")
+OTHER_HAND_LOGINS = frozenset({"app/pavc-other-hand", "pavc-other-hand[bot]"})
 
 # `git config user.email X`, `git -C dir config user.email X`, `-c user.email=X`, quoted or not.
 _USER_EMAIL = re.compile(r"""user\.email\s*(?:=|\s)\s*["']?([^"'\s]+)""")
@@ -120,6 +146,26 @@ def workflows_on_ref(root: str, ref: str) -> dict[str, dict]:
             continue
         if isinstance(doc, dict):
             found[os.path.basename(path)] = doc
+    return found
+
+
+def _working_tree_workflows(root: str) -> dict[str, dict]:
+    """The workflow files as the checkout's working tree holds them: the second copy the union
+    below grades. A file that does not parse is skipped here; schedules.py fails it."""
+    found: dict[str, dict] = {}
+    directory = os.path.join(root, ".github", "workflows")
+    if not os.path.isdir(directory):
+        return found
+    for name in sorted(os.listdir(directory)):
+        if not name.endswith((".yml", ".yaml")):
+            continue
+        try:
+            with open(os.path.join(directory, name)) as fh:
+                doc = yaml.safe_load(fh)
+        except (OSError, yaml.YAMLError):
+            continue
+        if isinstance(doc, dict):
+            found[name] = doc
     return found
 
 
@@ -184,9 +230,22 @@ def _automation(email: str) -> bool:
     return email.endswith(".invalid") or "[bot]" in email
 
 
+def _bot_login(login: str) -> bool:
+    return login.startswith("app/") or login.endswith("[bot]")
+
+
+def _no_source(sha: str) -> dict:
+    raise S.CouldNotLook("no source for who merged was given")
+
+
 def grade_ref(root: str, label: str, ref: str, identities: set[str],
-              lane: tuple[str, ...]) -> list[tuple[str, str]]:
-    """(status, message) lines for one ref. Pure over the repository at `root`."""
+              lane: tuple[str, ...], merger=None) -> list[tuple[str, str]]:
+    """(status, message) lines for one ref. Pure over the repository at `root`, plus `merger`:
+    a callable that answers who merged the pull request whose merge commit is a given sha (the
+    shape schedules.py's `merged_by` returns) or raises `S.CouldNotLook`. It is asked only for
+    a squash or rebase GitHub wrote of a scheduled identity's commit; none given is a
+    could-not-look for those, never a pass."""
+    merger = merger or _no_source
     lines: list[tuple[str, str]] = []
     try:
         history = commits(root, ref)
@@ -194,8 +253,51 @@ def grade_ref(root: str, label: str, ref: str, identities: set[str],
         return [("SKIP", f"{label}: could not read {ref} ({str(e).splitlines()[0]})")]
     graded = 0
     human_merged = 0
+    other_hand = 0
+    merged_by_people: dict[str, int] = {}
     other_bots: dict[str, int] = {}
     for c in history:
+        if c.committer == WEB_FLOW and c.committer not in identities:
+            # GitHub committed it: a merge, squash or rebase made through the API or the web.
+            if c.parents > 1:
+                # the merging account is the merge commit's author
+                if c.author in identities or (_automation(c.author)
+                                              and not OTHER_HAND_EMAIL.search(c.author)):
+                    lines.append(("FAIL", f"{label}: {c.sha[:9]} is a MERGE onto {ref} made "
+                                          f"through GitHub by {c.author} ({c.subject!r}) -- a "
+                                          f"merge made with a scheduled or automation "
+                                          f"identity's token is disposal with nobody at the "
+                                          f"keyboard; a clock appends, it never merges"))
+                elif OTHER_HAND_EMAIL.search(c.author):
+                    other_hand += 1
+                continue                       # a person's merge: out of scope
+            if c.author not in identities:
+                continue                       # a person's own squash or rebase: out of scope
+            # a squash or rebase of a clock's proposal: the commit does not say who merged
+            try:
+                who = merger(c.sha)
+            except S.CouldNotLook as e:
+                lines.append(("SKIP", f"{label}: {c.sha[:9]} authored by scheduled identity "
+                                      f"{c.author} ({c.subject!r}) was squashed or rebased onto "
+                                      f"{ref} by GitHub, which does not record who merged, and "
+                                      f"the merged pull requests could not be read ({e}) -- a "
+                                      f"merge by a scheduled token would look exactly like "
+                                      f"this, so it is not graded either way"))
+                continue
+            login = str(who.get("merged_by") or "")
+            if login in OTHER_HAND_LOGINS:
+                other_hand += 1
+            elif who.get("is_bot") or _bot_login(login):
+                lines.append(("FAIL", f"{label}: {c.sha[:9]} authored by scheduled identity "
+                                      f"{c.author} ({c.subject!r}) reached {ref} through pull "
+                                      f"request #{who.get('pr')} merged by {login or '(unnamed)'}"
+                                      f" at {who.get('merged_at') or '?'} -- a merge made with "
+                                      f"a scheduled or automation identity's token is disposal "
+                                      f"with nobody at the keyboard; a clock appends, it never "
+                                      f"merges"))
+            else:
+                merged_by_people[login or "(unnamed)"] = merged_by_people.get(login or "(unnamed)", 0) + 1
+            continue
         if c.committer not in identities:
             if c.author in identities:
                 human_merged += 1
@@ -231,8 +333,18 @@ def grade_ref(root: str, label: str, ref: str, identities: set[str],
                                   f"verify-schedules' question, not this one's"))
     if human_merged:
         lines.append(("NOTE", f"{label}: {human_merged} commit(s) authored by a scheduled "
-                              f"identity reached the ref through a human's merge, squash or "
-                              f"rebase -- a reviewed proposal, not graded"))
+                              f"identity reached the ref through a human's own merge, squash or "
+                              f"rebase (the person is the committer) -- a reviewed proposal, "
+                              f"not graded"))
+    for login, n in sorted(merged_by_people.items()):
+        lines.append(("NOTE", f"{label}: {n} commit(s) authored by a scheduled identity were "
+                              f"squashed or rebased onto the ref by GitHub for a pull request "
+                              f"merged by {login} -- a reviewed proposal, not graded"))
+    if other_hand:
+        lines.append(("NOTE", f"{label}: {other_hand} merge(s) made through GitHub by "
+                              f"pavc-other-hand, the reviewed second hand (ticket 88, "
+                              f"owner-instructed) -- a human's act by the owner's instruction, "
+                              f"not graded"))
     for email, n in sorted(other_bots.items()):
         lines.append(("NOTE", f"{label}: {n} commit(s) committed by automation identity {email}, "
                               f"which no scheduled workflow configures -- outside this lane "
@@ -385,6 +497,23 @@ def check_platform_copy() -> None:
     out("SKIP", f"no {PLATFORM_UNIT} checkout, so its copy of ADR-0024's list was not compared")
 
 
+# --- who merged: the source is opened only when a commit needs it (ticket 142) ----------------
+class _Merger:
+    """Who merged, for one unit, from schedules.py's observer: the clock verdict file when
+    CLOCK_VERDICT names one, else an authenticated `gh`, else a could-not-look. Opened lazily so
+    a run whose refs carry no squash or rebase of a clock's commit asks nothing of anyone."""
+
+    source: S.Offline | None = None
+
+    def __init__(self, remote: str) -> None:
+        self.remote = remote
+
+    def __call__(self, sha: str) -> dict:
+        if _Merger.source is None:
+            _Merger.source = S.observer()
+        return _Merger.source.merged_by(self.remote, sha)
+
+
 # --- the check ------------------------------------------------------------------------
 def check() -> int:
     network = True
@@ -396,9 +525,11 @@ def check() -> int:
                         f"-- a first-parent walk of {visible} visible commit(s) is not the lane's "
                         f"history, so nothing here is graded")
             continue
-        local, _broken = S.workflows(root)
         main_ref = f"origin/{S.DEFAULT_BRANCH}"
         on_ref = workflows_on_ref(root, main_ref)
+        # the checkout's own copy, read from its working tree by this file's reader (schedules.py
+        # reads only the served ref since ticket 142; the union here is deliberate, see above)
+        local = _working_tree_workflows(root)
         # The union of the two copies, not a merge by filename: a clock whose checkout copy has
         # moved on is still graded by the identity and lane the ref's own copy configured.
         identities = scheduled_identities(unit, on_ref, local)
@@ -415,7 +546,8 @@ def check() -> int:
                             f"that creates it has not landed a commit, so there is nothing to "
                             f"grade and nothing to clear")
                 continue
-            for status, msg in grade_ref(root, f"{unit}@{ref}", full, identities, lane):
+            for status, msg in grade_ref(root, f"{unit}@{ref}", full, identities, lane,
+                                         _Merger(remote)):
                 if status == "NOTE":
                     print(f"NOTE: {msg}")
                 else:
@@ -528,6 +660,81 @@ def selfcheck() -> None:
         run(repo, "merge", "-q", "--no-ff", "-m", "clock merged", "side", who=bot)
         assert any("MERGE" in m for m in fails(repo)), fails(repo)
 
+        # --- a merge GitHub committed (ticket 142): `GitHub <noreply@github.com>` is the
+        # committer of every merge, squash or rebase made through the API or the web, so the
+        # committer never names the credential that merged. On a fresh repository:
+        actions = "41898282+github-actions[bot]@users.noreply.github.com"
+        hand = "324560547+pavc-other-hand[bot]@users.noreply.github.com"
+
+        def as_(root, author, committer, *args):
+            env = dict(os.environ, GIT_AUTHOR_NAME=author, GIT_AUTHOR_EMAIL=author,
+                       GIT_COMMITTER_NAME="GitHub" if committer == WEB_FLOW else committer,
+                       GIT_COMMITTER_EMAIL=committer)
+            subprocess.run(["git", "-C", root, "-c", "commit.gpgsign=false", *args],
+                           capture_output=True, text=True, check=True, env=env)
+
+        def never_asked(sha):
+            raise AssertionError(f"who merged {sha[:9]} was asked, and the commit already says")
+
+        def merged_by(login, is_bot):
+            return lambda sha: {"pr": 7, "merged_by": login, "is_bot": is_bot,
+                                "merged_at": "2026-09-25T10:00:00Z"}
+
+        def graded(root, merger, ref="main"):
+            return [(s, m) for s, m in grade_ref(root, "x", ref, ids, lane, merger)]
+
+        gh = os.path.join(tmp, "gh")
+        os.makedirs(gh)
+        run(gh, "init", "-q", "-b", "main")
+        commit(gh, "party.yaml", "roles: [adopter]")
+        # (a) a MERGE commit GitHub wrote for the sweep's own credential, whose author is the
+        #     Actions identity. A FAIL from the commit alone, and nobody is asked who merged.
+        run(gh, "checkout", "-q", "-b", "sweep/observe")
+        commit(gh, "observations/twin-sweep.jsonl", "{}", who=bot)
+        run(gh, "checkout", "-q", "main")
+        as_(gh, actions, WEB_FLOW, "merge", "-q", "--no-ff", "-m", "Merge pull request #7", "sweep/observe")
+        hit = [m for s, m in graded(gh, never_asked) if s == "FAIL"]
+        assert len(hit) == 1 and "MERGE onto main made through GitHub by " + actions in hit[0], hit
+        run(gh, "reset", "-q", "--hard", "HEAD~1")
+        # (b) the same merge made by the reviewed second hand: a NOTE naming it, not graded
+        as_(gh, hand, WEB_FLOW, "merge", "-q", "--no-ff", "-m", "Merge pull request #7", "sweep/observe")
+        assert [s for s, _ in graded(gh, never_asked)] == ["PASS", "NOTE"], graded(gh, never_asked)
+        assert any("second hand" in m for s, m in graded(gh, never_asked) if s == "NOTE")
+        run(gh, "reset", "-q", "--hard", "HEAD~1")
+        # (c) the same merge made by a person through the web: out of scope, no line
+        as_(gh, human, WEB_FLOW, "merge", "-q", "--no-ff", "-m", "Merge pull request #7", "sweep/observe")
+        assert [s for s, _ in graded(gh, never_asked)] == ["PASS"], graded(gh, never_asked)
+        run(gh, "reset", "-q", "--hard", "HEAD~1")
+        # (d) a SQUASH GitHub wrote of the clock's proposal: the author is the clock, the
+        #     committer GitHub, and who merged is not in the commit. No source: a named SKIP,
+        #     never clean. A bot merger: FAIL. The second hand: NOTE. A person: NOTE.
+        write(gh, "observations/twin-sweep.jsonl", "{}\n")
+        run(gh, "add", "--", "observations/twin-sweep.jsonl")
+        as_(gh, bot, WEB_FLOW, "commit", "-q", "-m", "twin sweep: observe (#7)")
+        no_source = graded(gh, None)
+        assert [s for s, _ in no_source] == ["SKIP", "PASS"], no_source
+        assert "does not record who merged" in no_source[0][1] and "not graded either way" in no_source[0][1]
+        hit = [m for s, m in graded(gh, merged_by("app/github-actions", True)) if s == "FAIL"]
+        assert len(hit) == 1 and "pull request #7 merged by app/github-actions" in hit[0], hit
+        hit = [m for s, m in graded(gh, merged_by("renovate[bot]", False)) if s == "FAIL"]
+        assert len(hit) == 1 and "merged by renovate[bot]" in hit[0], hit
+        by_hand = graded(gh, merged_by("app/pavc-other-hand", True))
+        assert [s for s, _ in by_hand] == ["PASS", "NOTE"] and "second hand" in by_hand[1][1], by_hand
+        by_person = graded(gh, merged_by("someone", False))
+        assert [s for s, _ in by_person] == ["PASS", "NOTE"] and "merged by someone" in by_person[1][1], by_person
+        # (e) a squash of a PERSON's commit by GitHub is out of scope, and a squash a person made
+        #     locally (the person is the committer) is the NOTE it always was, with nobody asked
+        run(gh, "reset", "-q", "--hard", "HEAD~1")
+        write(gh, "composed/evidence.json", "{}\n")
+        run(gh, "add", "--", "composed/evidence.json")
+        as_(gh, human, WEB_FLOW, "commit", "-q", "-m", "compose (#8)")
+        assert [s for s, _ in graded(gh, never_asked)] == ["PASS"], graded(gh, never_asked)
+        write(gh, "observations/x.jsonl", "{}\n")
+        run(gh, "add", "--", "observations/x.jsonl")
+        as_(gh, bot, human, "commit", "-q", "-m", "squashed by hand")
+        assert [s for s, _ in graded(gh, never_asked)] == ["PASS", "NOTE"], graded(gh, never_asked)
+        assert any("the person is the committer" in m for s, m in graded(gh, never_asked))
+
         # a shallow checkout (actions/checkout's default) is deepened when it can be, and is a
         # could-not-look when it cannot -- never a thin walk graded as the whole lane
         for name, network in (("deep", True), ("thin", False)):
@@ -601,7 +808,7 @@ jobs:
       - run: git config user.email "local-bot@policy-as-versioned-x.invalid"
 """)
         on_ref = workflows_on_ref(wfclone, "origin/main")
-        local, _broken = S.workflows(wfclone)
+        local = _working_tree_workflows(wfclone)
         assert set(on_ref) == set(local) == {"clock.yml"}, (on_ref.keys(), local.keys())
         both = scheduled_identities("x", on_ref, local)
         assert both == ALWAYS_SCHEDULED | {"ref-bot@policy-as-versioned-x.invalid",
@@ -672,7 +879,11 @@ jobs:
         assert platform_copy(bad)[0] == "FAIL", (bad, platform_copy(bad))
 
     print("ok  the lane grader bites: a clock's declaration on main or on the observations "
-          "branch fails and names the commit, a clock's merge fails, a clock's observations "
+          "branch fails and names the commit, a clock's merge fails, a merge GitHub committed "
+          "for a scheduled or automation token fails from the commit's author alone, one by the "
+          "reviewed second hand or a person is not graded, a squash or rebase GitHub wrote of a "
+          "clock's commit is graded by who merged the pull request (a bot fails, a person or "
+          "the second hand is noted) and is a named could-not-look with no source, a clock's observations "
           "pass, an orphan root commit is graded, a human's declaration and a clock-authored "
           "commit a human merged or squashed are not graded, an unscheduled automation "
           "identity is named not graded, a shallow checkout is deepened or is a could-not-look, "

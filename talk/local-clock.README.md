@@ -57,7 +57,48 @@ classify step is many turns. `LOCAL_CLOCK_MAX_TURNS` (default 80) is the cap.
   (`.local-clock/runs/<run>/<step>-<adopter>.system.md`); the worktree it made is removed
   again before it exits.
 - `--list-steps` -- print the steps table and exit.
+- `--list-tools` -- print the child's allowed and disallowed tools and exit (ticket 142: Bash
+  is limited to `git`, a few read-only commands and the named scripts the skills run, never
+  `python3 *`).
 - `--help` -- the usage text.
+
+## What the child cannot do (ticket 142 item 3; ticket 30 decision 14)
+
+The model runs as a child process of this script, and that child holds **no push
+capability**. This is done by its environment, not by a pattern over its commands, because on
+2026-09-25 the guard was measured admitting an adopter push made inside `python3 -c
+'subprocess.run([...])'`. Measured on this machine the same day, every route a push could
+authenticate by, and how each is closed for the child only:
+
+| route | measured | closed by |
+|---|---|---|
+| `credential.helper = osxkeychain` in `/opt/homebrew/etc/gitconfig` (git's system file here); every estate remote is https | present | `GIT_CONFIG_NOSYSTEM=1`; the child's whole global config is a clock-only file (`GIT_CONFIG_GLOBAL`) with an empty `credential.helper` and `protocol.allow = never`; `GIT_EXEC_PATH` at an empty directory, so `git-remote-https` and `git-credential-osxkeychain` are not found by any git on the machine; `GIT_ALLOW_PROTOCOL=none`, which refuses every transport before a helper is looked up and which `-c protocol.allow=always` cannot override |
+| the ssh agent (`SSH_AUTH_SOCK`) and the key files under `~/.ssh` | present | `SSH_AUTH_SOCK` unset; `GIT_SSH_COMMAND` at a script that refuses with a reason; `GIT_ALLOW_PROTOCOL=none` |
+| `GH_TOKEN` / `GITHUB_TOKEN` | unset | unset again for the child; `GH_TOKEN` set to a token-shaped string GitHub refuses, because gh reads the login keychain only when no token is in its environment (with an empty `GH_CONFIG_DIR` and no variable, `gh auth token` still printed the keyring token) |
+| gh's own login in the keychain | present | `GH_CONFIG_DIR` at an empty directory and the decoy above; `Bash(gh *)` disallowed; the sandbox below |
+| `~/.git-credentials` | present | never read: `credential.helper` is empty and `git credential-store` is a builtin the child cannot point at a transport it has |
+| user, project and local Claude Code settings, and MCP servers | the hub's `.claude/settings.json` and whatever the user scope holds | `--restricted` (only managed settings and the clock-only `--settings` file apply; file tools are confined to the hub and the worktree), `--strict-mcp-config` with an `--mcp-config` that names no server |
+
+The clock-only settings file registers the `PreToolUse` `twin/enact_guard.py` hook for every
+tool (under `--restricted` the hub's own settings file is ignored, so the hook must live there),
+denies the code-running Bash shapes, and turns on Claude Code's OS sandbox for Bash with no
+network domain allowed (`strictAllowlist`) and `~/.ssh`, `~/.git-credentials`, `~/.config/gh`
+and `~/.gitconfig` unreadable to subprocesses. That sandbox is the one thing here the stub
+harness cannot measure, because it cannot run the real binary; the first live run is its
+measurement, and a child that cannot run commands under it fails the step rather than running
+them unsandboxed (`allowUnsandboxedCommands: false`).
+
+What this does not close, named: the child runs as your user, and macOS lets your user read the
+login keychain and `~/.ssh`. Only a separate user account for the clock, or the sandbox holding,
+removes that. The clock's own `--push` runs after the child, in this script's own environment,
+with every credential you have.
+
+The child's Bash is limited to `git`, `ls`, `cat`, `head`, `wc`, each step's validator by name,
+and the two named read-only programs the skills run (`python3 -m twin.derived_forecast inputs`,
+`python3 -m twin.market_signals moves`). `talk/local-clock.sh --list-tools` prints the lists.
+`verify/local-clock/verify-local-clock.sh` proves the environment with the stub model: a
+stand-in child that tries an adopter push from inside `python3` (`subprocess.run`), an https
+push and an ssh push fails each one before any credential is consulted, and origin is unmoved.
 
 ## What it writes
 
