@@ -76,7 +76,9 @@ that a rewritten entry cites stay as the record of the decision at the time.
   **There is no gate. Everything is always caged.** A workload, a human, a device, a model action
   and the twin itself each run inside a cage. The **cage spec** is the only variable, and the **£
   selects the spec**. The spec is a **tier** on one ladder: **baseline, restricted, quarantine,
-  isolated, infra**. The mea-culpa's two ends survive as rungs: continuous, corrective guidance is
+  isolated, infra**. The rung names are shared; each **actor class** has its own **dial table**
+  that says what a rung means for it, so a pod's dials and the twin agent's dials differ under one
+  rung name (2026-09-25, ticket 30). The mea-culpa's two ends survive as rungs: continuous, corrective guidance is
   the loose end; the **bottom rung is `isolated`** (the quarantine cage plus no ingress, no egress,
   first eviction) and it replaces every earlier deny or refusal, so nothing is ever refused, only
   caged. A "locked door" is therefore the bottom rung reached by the £, not a separate mechanism.
@@ -408,7 +410,10 @@ that a rewritten entry cites stay as the record of the decision at the time.
   scenarios**. The twin **computes a cage tier** under the org's perspective; the **proposer**
   enacts it as a PR (re-grill 21). The twin acts inside a priced cage of its own; propose-only is
   the outermost setting, with an Article 22 floor for significant decisions about people
-  (re-grill 37). One £, many perspectives: no perspective is privileged (re-grill 33).
+  (re-grill 37). **Outermost** means the loosest rung that exists today: a rung where the twin
+  acts may come later, and for a significant decision about a person no rung is looser than
+  propose-only (2026-09-25, ticket 30). The cage binds the **twin agent**, the adopter's twin
+  acting with nobody at the keyboard, on any host; a skill a human runs is the human's act. One £, many perspectives: no perspective is privileged (re-grill 33).
 
 ---
 
@@ -422,6 +427,11 @@ that a rewritten entry cites stay as the record of the decision at the time.
   so a price is proportionate to it: turnover, customers, data subjects, headcount, optionally
   **relevant revenue**, and the date they were true. Signed by the adopter alone. Stale facts widen a
   price to the publisher's **widening target**; they never refuse one.
+
+- **Synthetic incident record** (added 2026-09-25, ticket 30) — A dated incident in a fictional
+  adopter's own history, authored in that adopter's repository and marked synthetic. It may carry
+  a causal edge to grade 2, the pricing threshold; an unmarked one, or a grade 2 with no record, may
+  not. _Avoid_: calling it an observation or a measurement.
 
 - **Obligation** (added 2026-08-28) — A regime an adopter declares it answers to, by name, in its
   party artefact. Only a declared obligation is priced. A declared obligation with no price in any
