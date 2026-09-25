@@ -1,27 +1,27 @@
 [1;36m==>[0m 0. the five-fact sample: the composed set in force, from signed sources (graded first, cluster-free)
-   five-fact sample 2026-09-24T14:12:53Z on cluster dsample-36010939303 (run 36010939303), 3 sources
+   five-fact sample 2026-09-25T14:36:38Z on cluster dsample-36148474351 (run 36148474351), 3 sources
      the cage facts (6, 7) ARE scored on this sample: registered by 7fb633820b6c at 2026-09-10T18:30:33+01:00 on refs/remotes/origin/main, and the sample is later
      ludlow-composed      true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
-     ludlow-composed      ?     fact_2_tag_signature_verified_at_the_source_boundary: nothing checked a signature at this source boundary: the GitRepository declares no spec.verify (Flux speaks OpenPGP and SSH only) and carries no verdict from the identity-pinned gitsign-verifying controller (ticket 41). Not looked at, and a thing not looked at is never a pass
-     ludlow-composed      true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming ludlow-composed applied ab89691912d4
-     ludlow-composed      FALSE fact_4_rendered_objects_byte_equal_to_an_offline_render: 0 of 26 rendered objects are absent from the cluster and 9 are live but unequal to the offline render
-     ludlow-composed      true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 26 rendered objects appear in a Flux inventory
+     ludlow-composed      true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v3.0.0 was verified at the source boundary against ludlow's own pinned identity ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+     ludlow-composed      true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming ludlow-composed applied 45b3fbd21d28
+     ludlow-composed      true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 17 rendered objects are live and equal to the offline render
+     ludlow-composed      true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 17 rendered objects appear in a Flux inventory
      ludlow-composed      true  fact_6_the_bottom_rung_is_admitted_and_runs: the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-5-0-0 (priority -10000), carrying 2 container(s) including waf-sidecar injected by the cage
      ludlow-composed      ?     fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches: the cage in force put the fall-closed workload and the control on the SAME rung (isolated), so it has no bottom rung distinct from its loosest one and there was no bottom rung to look at
      nist                 true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      nist                 true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
      nist                 true  fact_3_last_applied_revision_equals_the_pinned_commit: nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524
-     nist                 FALSE fact_4_rendered_objects_byte_equal_to_an_offline_render: 0 of 26 rendered objects are absent from the cluster and 9 are live but unequal to the offline render
-     nist                 true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 26 rendered objects appear in a Flux inventory
+     nist                 true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 17 rendered objects are live and equal to the offline render
+     nist                 true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 17 rendered objects appear in a Flux inventory
      nist                 true  fact_6_the_bottom_rung_is_admitted_and_runs: the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-5-0-0 (priority -10000), carrying 2 container(s) including waf-sidecar injected by the cage
      nist                 ?     fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches: the cage in force put the fall-closed workload and the control on the SAME rung (isolated), so it has no bottom rung distinct from its loosest one and there was no bottom rung to look at
      platform             true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
-     platform             true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v3.3.0 was verified at the source boundary against platform's own pinned identity ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
-     platform             true  fact_3_last_applied_revision_equals_the_pinned_commit: platform is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 38089a687694 vs pin 38089a687694
-     platform             FALSE fact_4_rendered_objects_byte_equal_to_an_offline_render: 0 of 26 rendered objects are absent from the cluster and 9 are live but unequal to the offline render
-     platform             true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 26 rendered objects appear in a Flux inventory
+     platform             true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v4.0.0 was verified at the source boundary against platform's own pinned identity ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+     platform             true  fact_3_last_applied_revision_equals_the_pinned_commit: platform is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 557c1538fe02 vs pin 557c1538fe02
+     platform             true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 17 rendered objects are live and equal to the offline render
+     platform             true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 17 rendered objects appear in a Flux inventory
      platform             true  fact_6_the_bottom_rung_is_admitted_and_runs: the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-5-0-0 (priority -10000), carrying 2 container(s) including waf-sidecar injected by the cage
      platform             ?     fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches: the cage in force put the fall-closed workload and the control on the SAME rung (isolated), so it has no bottom rung distinct from its loosest one and there was no bottom rung to look at
      FALSIFIER: the_cage_puts_the_control_and_the_fall_closed_workload_on_the_same_rung -- recorded UNMEASURED, which is not a pass
-   FAIL: a fact of the five-fact sample was observed false
-FAIL: FAIL: a fact of the five-fact sample was observed false
+   SKIP: a fact could not be looked at, and a fact not looked at is never a pass
+SKIP: no local kind cluster 'ludlow' to observe here, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass

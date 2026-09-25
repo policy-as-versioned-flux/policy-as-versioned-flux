@@ -1,0 +1,21 @@
+pin: driftwood propose-tier.yml ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/propose-tier\.yml@refs/heads/main$ (first read in .github/workflows/propose-tier.yml)
+pin: driftwood cut-release.yml ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+pin: feeds cut-release.yml ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in gitops/flux-system/gotk-sync-feeds.yaml)
+pin: ico cut-release.yml ^https://github\.com/policy-as-versioned-ico/ico/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in gitops/flux-system/gotk-sync-ico.yaml)
+pin: insurer cut-release.yml ^https://github\.com/policy-as-versioned-insurer/insurer/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in gitops/flux-system/gotk-sync-insurer.yaml)
+pin: ludlow propose-tier.yml ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/propose-tier\.yml@refs/heads/main$ (first read in .github/workflows/propose-tier.yml)
+pin: ludlow cut-release.yml ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+pin: nist cut-release.yml ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in gitops/flux-system/gotk-sync-nist.yaml)
+pin: platform cut-release.yml ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+pin: tuppence propose-tier.yml ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/propose-tier\.yml@refs/heads/main$ (first read in .github/workflows/propose-tier.yml)
+pin: tuppence cut-release.yml ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+FAIL: driftwood: main is admitted by the cut-release.yml, propose-tier.yml pin and lacks ['pull_request']
+PASS: feeds: 3 active ruleset(s) on policy-as-versioned-feeds/feeds; 6 pinned branch(es) reviewed; 3 tag(s) held; bypass lists not shown to this token, so not graded
+PASS: hub: 3 active ruleset(s) on policy-as-versioned-flux/policy-as-versioned-flux; 0 pinned branch(es) reviewed; 0 tag(s) held; bypass lists not shown to this token, so not graded
+PASS: ico: 3 active ruleset(s) on policy-as-versioned-ico/ico; 6 pinned branch(es) reviewed; 3 tag(s) held; bypass lists not shown to this token, so not graded
+PASS: insurer: 3 active ruleset(s) on policy-as-versioned-insurer/insurer; 6 pinned branch(es) reviewed; 1 tag(s) held; bypass lists not shown to this token, so not graded
+FAIL: ludlow: main is admitted by the cut-release.yml, propose-tier.yml pin and lacks ['pull_request']
+PASS: nist: 3 active ruleset(s) on policy-as-versioned-nist/nist; 6 pinned branch(es) reviewed; 2 tag(s) held; bypass lists not shown to this token, so not graded
+FAIL: platform: main is admitted by the cut-release.yml pin and lacks ['pull_request']
+FAIL: tuppence: main is admitted by the cut-release.yml, propose-tier.yml pin and lacks ['pull_request']
+FAIL: 4 forge protection(s) observed missing: driftwood: main is admitted by the cut-release.yml, propose-tier.yml pin and lacks ['pull_request']
