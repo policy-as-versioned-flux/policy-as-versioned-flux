@@ -100,5 +100,6 @@ glue, as this ADR says.
 
 The acceptance criterion above asks for both planes. Until eco-system ticket 151 lands the cloud
 plane, the live half covers one plane, and only the pods the lane runs. The component-definition
-maps two Check_Ids today. The step prints that count, and records a could-not-look when no
+maps two Check_Ids today. One of them, `governed-namespace-requires-claim`, is served as a
+MutatingPolicy, and no live PolicyReport result for it has been observed. The step prints that count, and records a could-not-look when no
 PolicyReport exists before the cluster is deleted. Built by eco-system ticket 155.

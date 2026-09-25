@@ -100,5 +100,6 @@ The sequencing note above says that ticket 13 files a Crossplane item on ticket 
 and no build ticket existed. Eco-system ticket 151 now carries the build, including the dials a
 Crossplane CR takes on the ladder. "After the Pod slice runs end to end once" is measured as
 `verify-e2e-step4-flux-reconciles-cage.sh` PASS on a citable truth run. That step cannot pass until
-fact 7 is re-registered (eco-system ticket 152). Delegated under
+fact 7 is re-registered (eco-system ticket 152) and fact 2 is observed true on driftwood's own
+composed source, which no sample had recorded by 2026-09-25. Delegated under
 [ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md).

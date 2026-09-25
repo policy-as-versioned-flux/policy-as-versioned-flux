@@ -116,7 +116,7 @@ Resolved 2026-09-25. The owner confirmed the shared understanding with "yes" aft
 3. **The OSCAL CronJob.** Dropped as a CronJob. Collection is lifted as a step in each adopter's drift lane, and its output is an observation, not a signed feed. ADR-0009 carries a dated note. Built by ticket 155.
 4. **api.** Transferred into driftwood beside storefront. Built by ticket 154.
 5. **datastore.** Placed in tuppence by ticket 13 item 3. The build is ticket 151, which waits on ticket 152 and then on e2e step 4.
-6. **Per-repo archiving.** The incumbent org ends: app repos transfer and the rest are archived, each when its register row passes. Recorded as [ADR-0036](../../../docs/adr/0036-the-incumbent-org-ends-app-repos-transfer-and-the-rest-are-archived.md). Built by tickets 154 and 156.
+6. **Per-repo archiving.** The incumbent org ends: app repos transfer and the rest are archived, each when its register row passes. Recorded as [ADR-0036](../../../docs/adr/0036-the-incumbent-org-shrinks-to-the-hub-app-repos-transfer-and-the-rest-are-archived.md). Built by tickets 154 and 156.
 7. **The glossary.** **Incumbent org** and **Drop** are terms. **Lift** names the incumbent org. The posture line on sunset points at **Supersede**. Two older uses of "dropped" now say "removed".
 
 Consequences recorded in this change: ADR-0004 and ADR-0009 carry dated notes. NORTH-STAR §8 gains item 17, because §6 says "explicitly retired". Ticket 33 gets a dated correction on two stale claims, and ticket 34 on one. The map gains the ticket 35 line and the six graduated tickets, and its "Not yet specified" line on the scanner, spine and CronJob closes.
@@ -134,3 +134,14 @@ No check is named as this ticket's own. It is a decision ticket, and each gradua
 ## Comments
 
 **2026-09-02, review.** Ordering from the review: composition prices exactly two feed names and reads no workload, image, SBOM or dependency, so lifting the apps (ticket 33) cannot make a feed re-price anything until the cve and eol converters exist. Ticket 84 item 1 carries the converters. Put 84 before or with 33, and restate 33's definition of done as a price check. Record: REVIEW-2026-09-02.md, legacy/L1 (refuted as stated, ordering survives).
+
+**Correction, 2026-09-25, after a read-only review of the merged resolution (hub PR 137).**
+- Round 1 facts: hub research note 15 also gives the notification spine a job (15:129 and :311). Ticket 156 item 4 now lists it.
+- Round 2 facts: the NVD response was 18.7 MB. Every entry carries a CVSS v3.x metric (1,720 v3.1, 5 v3.0 only), and 94 also carry v4.0. The first version gave the split by newest version as if it were a count of each.
+- Round 2 facts and Q1: "releases every day" rests on the one daily comparison measured, 2026-09-24 to 2026-09-25. A release holds one to eight entries, not one to four: in the 365 days to 2026-09-25, 130 of 143 addition days added four or fewer, and the most was eight.
+- Amendment A1: the count of trivy-operator's KinD quirks has no source in this repository. The image-mode lockfile quirk does not apply to the served storefront image, which ships `node_modules` (414 npm packages found). storefront's line names no such limit.
+- ADR-0035 decision 1 now scans every image the served manifests name. driftwood's `checkout-svc` runs `nginx` with no digest, which the first version would never have scanned.
+- Ticket 153's order put the composer's instrument-fault rule before the first inventory, and its step 1 waited on ticket 137's fix, which was already on tools v3.4.0. Both are corrected there.
+- Q6 says each archive is recorded "in this ticket". The archive log is ticket 156.
+- ADR-0036 is renamed to "The incumbent org shrinks to the hub", because the hub stays live in that org. Its record of the Q9 authorisation now states the stale option.
+
