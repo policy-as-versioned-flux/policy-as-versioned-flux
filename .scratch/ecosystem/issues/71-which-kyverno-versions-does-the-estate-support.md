@@ -55,7 +55,8 @@ decision below is labelled delegated.
   `./engine`. Each adopter's `drift-sample.yml` installs Kyverno 1.18.2 itself. No adopter declares
   its engine version, and `party/schema.json` has `additionalProperties: false`.
 - Every served body is `policies.kyverno.io/v1alpha1`. The `install.yaml` of Kyverno 1.18.2 and of
-  1.19.1 both serve `v1`, mark `v1alpha1` deprecated, and store `v1beta1`, for all five policy kinds.
+  1.19.1 both serve `v1`, mark `v1alpha1` deprecated, and store `v1beta1`, for each policy kind
+  that has a `v1alpha1`.
 - ADR-0003 says the bodies are `v1`, that the build is all-`ValidatingPolicy`, and that the engine
   is bumped by a Renovate PR. All three are false.
 - `.github/scripts/cut-release-update-array-commit.sh` rebuilds only quoted scalar keys. An element
@@ -130,3 +131,36 @@ delegated.
    The reason: a changed verdict on a new engine is a failed cell, and a failed cell cannot join
    the tested set, so behaviour stays guarded. An engine bump that cut a policy version would add
    versions with unchanged bytes, and each would need every adopter's acceptance.
+
+**2026-09-25, round 3 decided.** The owner answered round 3 with a bare "agree". Each decision is
+delegated.
+
+9. **Q9 (a). ADR-0033 records the claim and the price, and ADR-0003 gets a dated amendment.** Both
+   are written on this branch. ADR-0003 chose the engine and the API. ADR-0033 decides the engine
+   version window, so it is a separate record. The amendment corrects the three false statements
+   and points to ADR-0033.
+10. **Q10 (a). The new line's fixture compares generated documents.** For each trigger, the grader
+    runs `kyverno apply -o` and compares the generated documents with an expected set in the
+    fixture. For an unmatched trigger the expected set is empty. The `result: skip` rows leave
+    `kyverno-test.yaml`. A new trigger tests the `is-caged` gate alone: a pod that is not caged, at
+    a tier that restricts reach. The reason: the check reads the served behaviour, which is the
+    same on both engines, and not how the engine reports a miss.
+11. **Q11 (a). "The running engine equals the declared engine" is a drift fact.** The drift sample
+    records it, and a false fact is a red, as with the existing facts. The reason: a declaration
+    that nothing checks is a proxy. Composition prices the declared engine, and the drift fact
+    proves that the price describes the real cluster.
+12. **Q12 (a). The new line carries three changes only.** They are `string(variables.tier)` in
+    cage-tier, all five bodies at `policies.kyverno.io/v1`, and the Q10 fixture. Its
+    `tested_engines` is `[1.18.2, 1.19.1]`. The engine computes the bump. The diagnosis predicts no
+    behaviour change, so a patch is expected, but the engine decides. 5.0.0 stays served, because
+    it still supports 1.18.2.
+
+**Held for the owner, 2026-09-26 at the earliest.** On 2026-09-25 the three grilling sessions used
+the five owner-only decisions for the day. Two questions here are owner-only:
+
+- **An authorisation to build and cut.** The owner's instruction of 2026-09-23 left the grilling
+  tickets, and all work that they block, with the owner. The new line needs a signed
+  `policy/v5.0.x` tag.
+- **An authorisation to report upstream.** A Kyverno GeneratingPolicy returns no result on a
+  `matchConditions` miss, but ValidatingPolicy and MutatingPolicy return a skip. A report to
+  kyverno/kyverno is public and is made under the owner's identity.
