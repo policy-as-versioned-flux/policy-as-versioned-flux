@@ -94,8 +94,9 @@ that a rewritten entry cites stay as the record of the decision at the time.
   An unknown or unlabelled tier fails closed to `isolated`. The cage mutation is **tighten-only**: a
   tightened rule and the default cage never contradict. This *cage-tier* axis is independent of
   *adoption cadence* (ADR-0002). The tier is declared on the signed **governed namespace**
-  manifest and rendered onto every pod in it; the **twin** computes it under the org's
-  perspective and the **proposer** enacts it as a PR (re-grill 21). See ADR-0003 for the engine and
+  manifest and rendered onto every pod in it; the **twin** prices the scenario under the org's
+  perspective, the adopter's **selection policy** selects the tier (ADR-0021), and the
+  **proposer** enacts it as a PR (re-grill 21). See ADR-0003 for the engine and
   ADR-0022 for the ladder.
 
 - **The "why" / rationale** — Risk/threat-model metadata that travels *with* each policy version,
@@ -407,7 +408,8 @@ that a rewritten entry cites stay as the record of the decision at the time.
   corpus; the incumbent heuristic is refused because it is graded on the corpus it was fitted on.
   So today the sentence reads exactly as it did before the amendment, and the difference is that a
   check observes it rather than a person keeping it. On every sweep it plays its **standing
-  scenarios**. The twin **computes a cage tier** under the org's perspective; the **proposer**
+  scenarios**. The twin **prices the scenario** a cage tier is selected from, under the org's
+  perspective; it never selects the tier (ADR-0021); the **proposer**
   enacts it as a PR (re-grill 21). The twin acts inside a priced cage of its own; propose-only is
   the outermost setting, with an Article 22 floor for significant decisions about people
   (re-grill 37). **Outermost** means the loosest rung that exists today: a rung where the twin
