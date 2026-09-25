@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-25T15:33Z run=339 hub=50ff6ab enact=development units=[driftwood=155db9e@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=32ea73d@main ludlow=b8e14f7@main nist=f83126f@main platform=557c153@v4.0.0 tuppence=5deffe6@main] pass=85 [observed=29 self=43 simulated=4 meta=9] fail=5 skip=31 [never=9 waits=22] excluded=8 total=129 ceiling=110
+# TRUTH 2026-09-25T16:29Z run=343 hub=a7b617d enact=development units=[driftwood=155db9e@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=32ea73d@main ludlow=b8e14f7@main nist=f83126f@main platform=557c153@v4.0.0 tuppence=5deffe6@main] pass=87 [observed=30 self=43 simulated=4 meta=10] fail=2 skip=32 [never=10 waits=22] excluded=8 total=129 ceiling=110
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      acceptance record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -46,7 +46,7 @@
 .estate-clone/platform/distribution/verify-infra-declaration.sh	PASS	PASS: the platform declares kube-system, flux-system and kyverno at infra, entitled by the platform role; every served cage-tier body skips their unclaimed pods
 .estate-clone/platform/distribution/verify-orphan-guard.sh	PASS	PASS: the orphan pair refuses nothing and leaves nothing uncaged. The guard is Audit and reports 9.9.9 by name; the SERVED 5.0.0 cage-tier does not match that p
 .estate-clone/platform/distribution/verify-render-version-tree.sh	PASS	      versions coexist, each judging only its own claim.
-.estate-clone/platform/distribution/verify-retirement.sh	FAIL	SKIP: distribution/versions.yaml declares 1 version(s) of which one CUT version (5.0.0) -- an uncut element has no tag and no served cage, so the orphan pair al
+.estate-clone/platform/distribution/verify-retirement.sh	SKIP	SKIP: distribution/versions.yaml declares 1 version(s) of which one CUT version (5.0.0) -- an uncut element has no tag and no served cage, so the orphan pair al
 .estate-clone/platform/engine/verify-engine.sh	SKIP	SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — Kyverno and flux-operator are pinned Flux H
 .estate-clone/platform/eud/verify-eud.sh	EXCLUDED	
 .estate-clone/platform/fair/verify-fair-tail.sh	PASS	bounded PERT at the same shock, and a malformed severity spec refuses.
@@ -85,7 +85,7 @@ verify/can-record/verify-can-record.sh	PASS	PASS: every recorded TRUTH line was 
 verify/cited-truth/verify-cited-truth.sh	PASS	PASS: every TRUTH line quoted in .scratch/ecosystem/issues/*.md resolves to a line talk/truth.log records, every gate-proof citation names a commit whose tree c
 verify/demo/verify-demo.sh	PASS	PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck
 verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh	SKIP	SKIP: 10 served copies of a declared Deny are still in the estate, each awaiting a named tag: posture-trust-boundary (10 copies) awaits ticket 84's next declare
-verify/derived-status/verify-derived-status.sh	FAIL	FAIL: 1 fault(s) -- a ticket's Status: is typed rather than derived (ticket 59), or a ticket number names more than one file (ticket 117)
+verify/derived-status/verify-derived-status.sh	PASS	PASS: every ticket number in .scratch/ecosystem/issues/ names exactly one file, every ticket carries one Status: line from the tracker's own vocabulary with not
 verify/disclaimer/verify-disclaimer.sh	PASS	PASS: all eight parties say they are a demonstration on their signed artefact and their README, the two regulators carry the long form, nist attributes NIST's p
 verify/e2e/verify-e2e-step1-regulator-publishes.sh	PASS	PASS: ico's newest penalty-schema envelope validates and its tag is on the real remote
 verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh	PASS	PASS: a SYNTHETIC pin bump (penalty-schema v3 -> v4, made here on a throwaway copy of driftwood, not driftwood's own merged history) re-prices driftwood's price
@@ -114,7 +114,7 @@ verify/provenance/verify-provenance.sh	SKIP	SKIP: the offline proof holds; 2 liv
 verify/provenance/verify-release-evidence-reaches-main.sh	PASS	the branch and the tags in one atomic push, and the tag each adopter pins carries every bundle (ticket 53).
 verify/real-signature/verify-a-real-signature-is-checked.sh	PASS	PASS: every adopter gate in this estate accepted platform's own published signature, refused the same evidence with one byte of that signature changed, and refu
 verify/record/verify-record-states-the-purpose.sh	PASS	PASS: NORTH-STAR states the purpose, the audience, the (absent) date and what done is, claims the artefact half of attestation and records the actor half as she
-verify/refusal-by-another-name/verify-refusal-by-another-name.sh	FAIL	FAIL: an instance this estate really produced was NOT caught by the check built to catch it
+verify/refusal-by-another-name/verify-refusal-by-another-name.sh	PASS	PASS: every mutation the estate SERVES was graded four ways -- every name written into a reference field is one its own release ships, every priority trio is wh
 verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Renovate raised threat-register v1 -> v2, Chris Nesbitt-Smith merged it, and party.yaml and composed/ moved together -- step 2 happened for
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
