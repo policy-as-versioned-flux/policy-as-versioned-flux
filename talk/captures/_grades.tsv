@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-24T15:43Z run=332 hub=2aaad57 enact=development units=[driftwood=2ac5505@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=d1c1844@main ludlow=157701b@main nist=f83126f@main platform=bfd5361@v3.4.1 tuppence=f1c2619@main] pass=85 [observed=28 self=43 simulated=4 meta=10] fail=7 skip=28 [never=10 waits=18] excluded=8 total=128 ceiling=109
+# TRUTH 2026-09-25T11:01Z run=335 hub=f1c26a3 enact=development units=[driftwood=e391d36@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=32ea73d@main ludlow=8b656b5@main nist=f83126f@main platform=557c153@v4.0.0 tuppence=034513f@main] pass=86 [observed=29 self=43 simulated=4 meta=10] fail=7 skip=27 [never=9 waits=18] excluded=8 total=128 ceiling=109
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      acceptance record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -16,7 +16,7 @@
 .estate-clone/ico/verify-certificate-identity-regexp.sh	PASS	and rejects every foreign org/repo/path and unanchored variant tried.
 .estate-clone/ico/verify-penalty-feed.sh	PASS	PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the four published 
 .estate-clone/insurer/verify-insurer-party.sh	PASS	PASS: insurer party artefact
-.estate-clone/insurer/verify-insurer-quote.sh	SKIP	SKIP: 3 of 18 checks could not be looked at (reasons above)
+.estate-clone/insurer/verify-insurer-quote.sh	SKIP	SKIP: 3 of 19 checks could not be looked at (reasons above)
 .estate-clone/ludlow/twin/verify-twin-scenarios.sh	SKIP	SKIP: the overlay with its six scenarios loads, and the emitter could not price it: CANNOT LOOK: ludlow's twin cannot price a forward-intel payload today, and t
 .estate-clone/ludlow/verify-adopter-gate.sh	PASS	      credential). Verifying what platform already signed is not, and is proved above.
 .estate-clone/ludlow/verify-certificate-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only policy-as-versioned-ludlow/ludlow's propose-tier.yml on main; the release and proposal identities do not ov
@@ -40,13 +40,13 @@
 .estate-clone/platform/computed-semver/verify-release-integrity.sh	PASS	selfcheck ok: rule 1 refuses a hand-edited HEAD copy of a released tree against its real tag, and refuses a missing tag rather than trusting HEAD; rule 2 refuse
 .estate-clone/platform/computed-semver/verify-witness-set.sh	PASS	committed corpus, witness manifest regenerates byte-identical
 .estate-clone/platform/currency-controller/verify-currency.sh	SKIP	SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — a pod admitted under a version that is late
-.estate-clone/platform/distribution/verify-coexistence.sh	SKIP	SKIP: offline proof holds; live tail could not look: distribution/versions.yaml declares 2 of the 3 coexisting lines the owner's 2022 rule needs (ticket 75 Q3, 
+.estate-clone/platform/distribution/verify-coexistence.sh	SKIP	SKIP: offline proof holds; live tail could not look: distribution/versions.yaml declares 1 of the 3 coexisting lines the owner's 2022 rule needs (ticket 75 Q3, 
 .estate-clone/platform/distribution/verify-declared-versions-admit.sh	SKIP	SKIP: kind cluster 'driftwood' is not listed by kind get clusters
 .estate-clone/platform/distribution/verify-governed-namespace-guard.sh	PASS	PASS: a governed namespace's unclaimed pod is CAGED on the bottom rung, not denied -- isolated tier, cage-isolated PriorityClass with its integer priority and p
-.estate-clone/platform/distribution/verify-infra-declaration.sh	FAIL	FAIL: a pod that claims a policy version in kube-system, flux-system or kyverno is not caged at 'isolated' under 4 served bodies: driftwood/composed/policies/v4
-.estate-clone/platform/distribution/verify-orphan-guard.sh	PASS	PASS: the orphan pair refuses nothing and leaves nothing uncaged. The guard is Audit and reports 9.9.9 by name; the SERVED 4.0.0 cage-tier does not match that p
+.estate-clone/platform/distribution/verify-infra-declaration.sh	PASS	PASS: the platform declares kube-system, flux-system and kyverno at infra, entitled by the platform role; every served cage-tier body skips their unclaimed pods
+.estate-clone/platform/distribution/verify-orphan-guard.sh	PASS	PASS: the orphan pair refuses nothing and leaves nothing uncaged. The guard is Audit and reports 9.9.9 by name; the SERVED 5.0.0 cage-tier does not match that p
 .estate-clone/platform/distribution/verify-render-version-tree.sh	PASS	      versions coexist, each judging only its own claim.
-.estate-clone/platform/distribution/verify-retirement.sh	SKIP	SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — retiring a version (one array deletion) pru
+.estate-clone/platform/distribution/verify-retirement.sh	FAIL	SKIP: distribution/versions.yaml declares 1 version(s) of which one CUT version (5.0.0) -- an uncut element has no tag and no served cage, so the orphan pair al
 .estate-clone/platform/engine/verify-engine.sh	SKIP	SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — Kyverno and flux-operator are pinned Flux H
 .estate-clone/platform/eud/verify-eud.sh	EXCLUDED	
 .estate-clone/platform/fair/verify-fair-tail.sh	PASS	bounded PERT at the same shock, and a malformed severity spec refuses.
@@ -84,7 +84,7 @@ verify/branch-refs/verify-branch-refs.sh	SKIP	SKIP: driftwood/twin-sweep.yml che
 verify/can-record/verify-can-record.sh	PASS	PASS: every recorded TRUTH line was ADDED by a clock commit naming the same run; truth.yml's guard runs before the gate, the record step and the cage consult it
 verify/cited-truth/verify-cited-truth.sh	PASS	PASS: every TRUTH line quoted in .scratch/ecosystem/issues/*.md resolves to a line talk/truth.log records, every gate-proof citation names a commit whose tree c
 verify/demo/verify-demo.sh	PASS	PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck
-verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh	SKIP	SKIP: 13 served copies of a declared Deny are still in the estate, each awaiting a named tag: posture-trust-boundary (13 copies) awaits ticket 84's next declare
+verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh	SKIP	SKIP: 10 served copies of a declared Deny are still in the estate, each awaiting a named tag: posture-trust-boundary (10 copies) awaits ticket 84's next declare
 verify/derived-status/verify-derived-status.sh	PASS	PASS: every ticket number in .scratch/ecosystem/issues/ names exactly one file, every ticket carries one Status: line from the tracker's own vocabulary with not
 verify/disclaimer/verify-disclaimer.sh	PASS	PASS: all eight parties say they are a demonstration on their signed artefact and their README, the two regulators carry the long form, nist attributes NIST's p
 verify/e2e/verify-e2e-step1-regulator-publishes.sh	PASS	PASS: ico's newest penalty-schema envelope validates and its tag is on the real remote
@@ -95,10 +95,10 @@ verify/e2e/verify-e2e-step5-twin-forecasts.sh	SKIP	SKIP: the twin did not play a
 verify/e2e/verify-e2e-step6-provenance.sh	PASS	PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 18 lines the 8 release-shipping units declare in their own party.yam
 verify/e2e/verify-e2e-step7-honesty.sh	PASS	PASS: steps 1-6 each report one honest verdict (verdicts: PASS PASS PASS FAIL SKIP PASS PASS)
 verify/every-green/verify-every-green.sh	PASS	PASS: none of the 128 discovered verify scripts prints the SKIP verdict token and then reaches exit 0; the prose-worded could-not-look is not graded here (see t
-verify/feed-contract/verify-feed-contract.sh	SKIP	SKIP: insurer pins driftwood/feed/exposure@v1.1.0: the tree of v1.1.0 carries no exposure section in composed/HEADER.yaml -- the tag resolves, but not to the co
+verify/feed-contract/verify-feed-contract.sh	SKIP	SKIP: ludlow pins feeds/feed/eol@v2: waiting for tag eol/v2.0.0 on feeds (cut by cut-release.yml after merge)
 verify/feed-contract/verify-untagged-pin-is-priced.sh	PASS	PASS: every adopter feed pin resolves to a tag that verifies under its publisher's own identity pins, or is priced as a hole under the adopter's own perspective
 verify/fold-agreement/verify-fold-agreement.sh	PASS	PASS: on 6 planted movements of a composed window (accepted, arrival, misaddressed, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, 
-verify/handbook/verify-handbook-is-a-compose-time-render.sh	PASS	PASS: 6 served ref(s) across 3 adopter(s) (driftwood@origin/main, driftwood@v2.0.0, ludlow@origin/main, ludlow@v2.0.0, tuppence@origin/main, tuppence@v2.0.0) ea
+verify/handbook/verify-handbook-is-a-compose-time-render.sh	PASS	PASS: 6 served ref(s) across 3 adopter(s) (driftwood@origin/main, driftwood@v3.0.0, ludlow@origin/main, ludlow@v3.0.0, tuppence@origin/main, tuppence@v3.0.0) ea
 verify/lifted-apps/verify-lifted-apps.sh	PASS	PASS: 3 lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml 
 verify/local-clock/verify-local-clock.sh	SKIP	SKIP: no .local-clock/last-run.json on this machine -- the local clock has not run here, or this is not the owner's machine
 verify/map-surface/verify-map-surface.sh	PASS	PASS: every pass/fail figure .scratch/ecosystem/map.md quotes is a figure talk/truth.log records, every check it names is one talk/verify-all.sh discovers, ever
@@ -113,12 +113,12 @@ verify/provenance/verify-provenance.sh	SKIP	SKIP: the offline proof holds; 2 liv
 verify/provenance/verify-release-evidence-reaches-main.sh	PASS	the branch and the tags in one atomic push, and the tag each adopter pins carries every bundle (ticket 53).
 verify/real-signature/verify-a-real-signature-is-checked.sh	PASS	PASS: every adopter gate in this estate accepted platform's own published signature, refused the same evidence with one byte of that signature changed, and refu
 verify/record/verify-record-states-the-purpose.sh	PASS	PASS: NORTH-STAR states the purpose, the audience, the (absent) date and what done is, claims the artefact half of attestation and records the actor half as she
-verify/refusal-by-another-name/verify-refusal-by-another-name.sh	PASS	PASS: every mutation the estate SERVES was graded four ways -- every name written into a reference field is one its own release ships, every priority trio is wh
+verify/refusal-by-another-name/verify-refusal-by-another-name.sh	FAIL	FAIL: an instance this estate really produced was NOT caught by the check built to catch it
 verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Renovate raised threat-register v1 -> v2, Chris Nesbitt-Smith merged it, and party.yaml and composed/ moved together -- step 2 happened for
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
 verify/schedules/verify-schedules.sh	FAIL	FAIL: 5 schedule/cage check(s) observed false: insurer/fetch.yml ludlow/propose-tier.yml ludlow/twin-sweep.yml tuppence/propose-tier.yml tuppence/twin-sweep.yml
-verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=12275fe ludlow=24614e0 tuppence=326e6e7]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
+verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=e391d36 ludlow=8b656b5 tuppence=034513f]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
 verify/supersede/verify-supersede.sh	PASS	PASS: every adopter feed pin at its served commit is either at the newest major its publisher's real remote carries a tag for, or priced as behind by a supersed
 verify/tier-binding/verify-tier-binding.sh	PASS	PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform
 verify/trust-root/verify-the-committed-trust-root-is-dated.sh	PASS	PASS: every log platform's evidence names at each adopter's pin is carried by that adopter's own committed trust root inside the key's validFor window -- the ag
@@ -129,4 +129,4 @@ verify/twin-evals/verify-derived-forecast.sh	SKIP	SKIP: no *.forecast.yaml has r
 verify/twin-evals/verify-scenario-registration.sh	PASS	PASS: 18 of 18 scenario-library entries on refs/remotes/origin/main name a resolution question -- a proposition the world layer carries, a horizon after their o
 verify/twin-evals/verify-twin-evals.sh	PASS	PASS: 7 harness-mechanism metrics, 7 of them not measurable at their corpus size (verify-corpus-size.sh grades that) (the label twin/evolution_judge.py declares
 verify/twin-per-adopter/verify-twin-per-adopter.sh	PASS	PASS: every party claiming the adopter role carries a twin overlay of its own, each with six scenario files, an emitter, and the same vendored world layer pinne
-verify/unreviewed-major/verify-unreviewed-major-in-window.sh	FAIL	FAIL: 3 line(s) observed false: a major carried in an adopter's composed window with no record in its own tree accepting it, evidence at an adopter's own pin th
+verify/unreviewed-major/verify-unreviewed-major-in-window.sh	PASS	PASS: no party claiming the adopter role carries a policy version whose publisher-signed evidence, verified in this run under that party's own identity constant

@@ -1,7 +1,7 @@
 OK: party.yaml parses, roles include insurer, 3 publishes[] entry(ies) each with a real path and a valid-JSON payload_schema
-NOTE: driftwood/feed:exposure@v1.1.0: no Flux/Renovate pin exists for this kind in this estate today -- declared version not checked here; the signed tag it names is checked against the real remote by verify-feed-contract.sh
-NOTE: tuppence/feed:exposure@v1.1.0: no Flux/Renovate pin exists for this kind in this estate today -- declared version not checked here; the signed tag it names is checked against the real remote by verify-feed-contract.sh
-NOTE: ludlow/feed:exposure@v1.1.0: no Flux/Renovate pin exists for this kind in this estate today -- declared version not checked here; the signed tag it names is checked against the real remote by verify-feed-contract.sh
+NOTE: driftwood/feed:exposure@v2.0.0: no Flux/Renovate pin exists for this kind in this estate today -- declared version not checked here; the signed tag it names is checked against the real remote by verify-feed-contract.sh
+NOTE: tuppence/feed:exposure@v2.0.0: no Flux/Renovate pin exists for this kind in this estate today -- declared version not checked here; the signed tag it names is checked against the real remote by verify-feed-contract.sh
+NOTE: ludlow/feed:exposure@v2.0.0: no Flux/Renovate pin exists for this kind in this estate today -- declared version not checked here; the signed tag it names is checked against the real remote by verify-feed-contract.sh
 NOTE: baseline mirror not checked: this party does not adopt, so it selects no baseline and has no nist pin ConfigMap
 FACT: can_publish=true
 FACT: verification_key_present=true

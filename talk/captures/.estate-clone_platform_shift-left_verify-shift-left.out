@@ -1,161 +1,5 @@
 == a compliant change passes across its ±1 supported window ==
-fixtures/workload-compliant.yaml: targets 4.0.0, checking supported window ['4.0.0', '5.0.0']
---- kyverno apply @ v4.0.0 ---
-Applying 5 policy rule(s) to 1 resource(s)...
-
-policy cage-tier-4-0-0 applied to default/Pod/checkout-svc:
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    policy-as-versioned.dev/policy-version: 4.0.0
-    posture.acme.io/caged: "true"
-    posture.acme.io/tier: baseline
-    posture.acme.io/version: 4.0.0
-  name: checkout-svc
-  namespace: default
-spec:
-  containers:
-  - image: nginx
-    name: c
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-    securityContext:
-      allowPrivilegeEscalation: false
-      privileged: false
-      readOnlyRootFilesystem: true
-      runAsNonRoot: false
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  preemptionPolicy: Never
-  priority: -10
-  priorityClassName: cage-baseline-4-0-0
-  securityContext:
-    runAsNonRoot: true
-
----
-
-
-Mutation:
-Mutation has been applied successfully.
-policy cage-tier-4-0-0 applied to default/Pod/checkout-svc:
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    policy-as-versioned.dev/policy-version: 4.0.0
-    posture.acme.io/caged: "true"
-    posture.acme.io/tier: baseline
-    posture.acme.io/version: 4.0.0
-  name: checkout-svc
-  namespace: default
-spec:
-  containers:
-  - image: nginx
-    name: c
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-    securityContext:
-      allowPrivilegeEscalation: false
-      privileged: false
-      readOnlyRootFilesystem: true
-      runAsNonRoot: false
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  preemptionPolicy: Never
-  priority: -10
-  priorityClassName: cage-baseline-4-0-0
-  securityContext:
-    runAsNonRoot: true
-
----
-
-
-Mutation:
-Mutation has been applied successfully.
-policy stamp-posture-4-0-0 applied to default/Pod/checkout-svc:
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    policy-as-versioned.dev/policy-version: 4.0.0
-    posture.acme.io/caged: "true"
-    posture.acme.io/tier: baseline
-    posture.acme.io/version: 4.0.0
-  name: checkout-svc
-  namespace: default
-spec:
-  containers:
-  - image: nginx
-    name: c
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-    securityContext:
-      allowPrivilegeEscalation: false
-      privileged: false
-      readOnlyRootFilesystem: true
-      runAsNonRoot: false
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  preemptionPolicy: Never
-  priority: -10
-  priorityClassName: cage-baseline-4-0-0
-  securityContext:
-    runAsNonRoot: true
-
----
-
-
-Mutation:
-Mutation has been applied successfully.
-policy stamp-posture-4-0-0 applied to default/Pod/checkout-svc:
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    policy-as-versioned.dev/policy-version: 4.0.0
-    posture.acme.io/caged: "true"
-    posture.acme.io/tier: baseline
-    posture.acme.io/version: 4.0.0
-  name: checkout-svc
-  namespace: default
-spec:
-  containers:
-  - image: nginx
-    name: c
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-    securityContext:
-      allowPrivilegeEscalation: false
-      privileged: false
-      readOnlyRootFilesystem: true
-      runAsNonRoot: false
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  preemptionPolicy: Never
-  priority: -10
-  priorityClassName: cage-baseline-4-0-0
-  securityContext:
-    runAsNonRoot: true
-
----
-
-
-Mutation:
-Mutation has been applied successfully.
-pass: 7, fail: 0, warn: 0, error: 0, skip: 0
+fixtures/workload-compliant.yaml: targets 5.0.0, checking supported window ['5.0.0']
 --- kyverno apply @ v5.0.0 ---
 Applying 5 policy rule(s) to 1 resource(s)...
 
@@ -477,7 +321,7 @@ Generate:
 Generation completed successfully.
 pass: 7, fail: 0, warn: 0, error: 0, skip: 0
 
-shift-left: fixtures/workload-compliant.yaml is compliant across its supported window ['4.0.0', '5.0.0']
+shift-left: fixtures/workload-compliant.yaml is compliant across its supported window ['5.0.0']
 
 == an unversioned workload is out of scope, passes trivially ==
 fixtures/workload-unversioned.yaml: unversioned (no policy-as-versioned.dev/policy-version label) -- out of scope, pass
@@ -485,7 +329,9 @@ fixtures/workload-unversioned.yaml: unversioned (no policy-as-versioned.dev/poli
 == a version the array doesn't declare is refused, not silently skipped ==
 
 == an Audit->Deny flip is caught pre-merge (must fail CI) ==
-fixtures/workload-flip.yaml: targets 4.0.0, checking supported window ['4.0.0', '5.0.0']
+NOTHING-TO-FLIP: distribution/versions.yaml declares 1 major line(s) (5.0.0), so no served target has a +/-1 neighbour. The flip beat runs against the planted window shift-left/fixtures/flip-window.yaml, which is not served.
+window read from: shift-left/fixtures/flip-window.yaml
+fixtures/workload-flip.yaml: targets 5.0.0, checking supported window ['4.0.0', '5.0.0']
 --- kyverno apply @ v4.0.0 ---
 Applying 5 policy rule(s) to 1 resource(s)...
 
@@ -644,7 +490,7 @@ Mutation has been applied successfully.policy require-nonroot-4-0-0 -> resource 
 1 -  pods on policy-version 4.0.0 must set readOnlyRootFilesystem=true on every container
 
 pass: 6, fail: 1, warn: 0, error: 0, skip: 0
-FAIL @ v4.0.0
+FAIL @ v4.0.0 (Audit->Deny flip: passes today's Audit, would be denied on promotion)
 --- kyverno apply @ v5.0.0 ---
 Applying 5 policy rule(s) to 1 resource(s)...
 
@@ -967,6 +813,6 @@ Generation completed successfully.
 pass: 7, fail: 0, warn: 0, error: 0, skip: 0
 
 shift-left: fixtures/workload-flip.yaml would be denied somewhere in its supported window ['4.0.0', '5.0.0']
-(non-zero above is expected -- the flip was caught)
+(non-zero above is expected -- the flip was caught at a neighbour of 5.0.0)
 
 shift-left: all offline proofs passed

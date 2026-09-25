@@ -20,6 +20,13 @@ Validated Git signature: true
 Validated Rekor entry: true
 Validated Certificate claims: true
 OK gitsign verified: v2.0.0
+tlog index: 2943155505
+gitsign: Signature made using certificate ID 0xbee6cbb70d4f37895139e97fa4f7f1b219e4f40b | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true
+OK gitsign verified: v3.0.0
 
 == 2. synthetic RE2-equivalent shapes (identities we can't/shouldn't real-sign) ==
 regexp under test: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
