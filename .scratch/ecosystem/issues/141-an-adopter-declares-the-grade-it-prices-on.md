@@ -42,8 +42,9 @@ anchors. The release cut and the adopter tags wait for the owner's authorisation
 have all the approvals you need to deliver". That authorises feature branches and pull requests
 in the hub and the estate repos; it does not authorise a merge, a push to any main, a tag, a
 release or a workflow dispatch, which the integrator does. Two pull requests build this ticket:
-platform `ticket-141-party-declares-pricing-threshold` (the party schema) and hub
-`ticket-141-declared-pricing-threshold` (the twin). The platform PR merges first. A platform tools
+platform `ticket-141-party-declares-pricing-threshold` (the party schema,
+policy-as-versioned-platform/platform PR #45) and hub `ticket-141-declared-pricing-threshold`
+(the twin, policy-as-versioned-flux PR #141). The platform PR merges first. A platform tools
 release (`cut-release.yml`) and the three adopters' pin moves are needed before ticket 144 can
 put the declaration on a signed `party.yaml`.
 
