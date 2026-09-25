@@ -291,7 +291,7 @@ The review blocked on one finding and raised four minor ones. All five are answe
 
 1. **Blocking: "all nine" was asserted, never derived.** A facts file naming two repositories
    graded PASS, and so did a repository whose checkout the gate never read. Fix: `forge_review.py`
-   now holds the nine as a fixed map, `ESTATE`, of name to remote. `collect` asks the forge about
+   now holds the nine as a fixed map, `ESTATE_REMOTES`, of name to remote. `collect` asks the forge about
    exactly those nine. `grade` walks the nine, not the facts file. A repository the facts file
    does not name, or names with a different remote, is a SKIP by name. A unit whose clone is
    missing, has another origin, or cannot be read by `git grep` is left out of the pin map, and
@@ -317,6 +317,11 @@ The review blocked on one finding and raised four minor ones. All five are answe
    how to do a backfill there. A normal cut-release on a release branch pushes tags only.
 5. **Minor: this section's heading reads 2026-09-22.** The workflow that runs this build sets that
    heading, so it stays. The build happened on 2026-09-24 and 2026-09-25, as the first line says.
+
+This round ran the repo's /code-review skill on 4c6ec7d, both axes in turn, because this session
+has no subagent tool. Spec found nothing. Standards found two judgement calls, both fixed: the
+word `estate` meant a directory in one function and a name-to-remote map in another (now
+`ESTATE_REMOTES` and `remotes`), and the hub's checkout was set in two places (now one).
 
 Done, re-read: rulesets are non-empty on nine repositories and the check asserts them over a
 fixed nine. §6 now carries the dated state. The check stays red on four `main` branches until

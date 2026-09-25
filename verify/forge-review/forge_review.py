@@ -51,7 +51,7 @@ ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 HUB_REMOTE = "policy-as-versioned-flux/policy-as-versioned-flux"
 # The nine repositories the ticket names, held fixed. The check grades exactly these: a facts file
 # or a clone that carries fewer is a could-not-look by name, never a pass over the ones it did carry.
-ESTATE: dict[str, str] = {
+ESTATE_REMOTES: dict[str, str] = {
     "hub": HUB_REMOTE,
     "platform": "policy-as-versioned-platform/platform",
     "driftwood": "policy-as-versioned-driftwood/driftwood",
@@ -142,10 +142,10 @@ def scan(root: str) -> list[Pattern] | None:
 
 
 def cloned(estate: str) -> dict[str, str]:
-    """name -> checkout directory, for the hub and each of the nine units whose clone under
-    `estate` exists and whose origin is the remote ESTATE names. Anything else is left out."""
-    dirs = {"hub": ROOT}
-    for unit, remote in ESTATE.items():
+    """unit name -> checkout directory, for each unit whose clone under the directory `estate`
+    exists and whose origin is the remote ESTATE_REMOTES names. Anything else is left out."""
+    dirs: dict[str, str] = {}
+    for unit, remote in ESTATE_REMOTES.items():
         d = os.path.join(estate, unit)
         if unit == "hub" or not os.path.isdir(d):
             continue
@@ -163,11 +163,10 @@ def cloned(estate: str) -> dict[str, str]:
 def patterns_by_repo(root: str, estate: str) -> dict[str, list[Pattern]]:
     """name -> the pins that name that repository. A name is present only when its own checkout
     was read, so `grade` can say by name which of the nine it could not read pins from."""
-    dirs = cloned(estate)
-    dirs["hub"] = root
-    by_remote = {v: k for k, v in ESTATE.items()}
+    dirs = {"hub": root, **cloned(estate)}
+    by_remote = {v: k for k, v in ESTATE_REMOTES.items()}
     found: dict[str, list[Pattern]] = {}
-    pins: dict[str, list[Pattern]] = {k: [] for k in ESTATE}
+    pins: dict[str, list[Pattern]] = {k: [] for k in ESTATE_REMOTES}
     for name, d in dirs.items():
         got = scan(d)
         if got is None:
@@ -198,7 +197,7 @@ def collect(root: str, estate: str) -> dict:
                  "run_id": os.environ.get("GITHUB_RUN_ID", ""),
                  "repository": os.environ.get("GITHUB_REPOSITORY", ""), "repos": {}}
     pats = patterns_by_repo(root, estate)
-    for name, remote in ESTATE.items():
+    for name, remote in ESTATE_REMOTES.items():
         entry: dict = {"remote": remote}
         doc["repos"][name] = entry
         try:
@@ -270,15 +269,15 @@ def binding_fault(doc: dict, env: dict) -> str:
 
 
 def grade(doc: dict, pats: dict[str, list[Pattern]], env: dict,
-          estate: dict[str, str] | None = None) -> list[tuple[str, str]]:
-    """Grades exactly the repositories `estate` names (the nine by default). One the facts file
+          remotes: dict[str, str] | None = None) -> list[tuple[str, str]]:
+    """Grades exactly the repositories `remotes` names (the nine by default). One the facts file
     does not carry, or whose checkout the gate did not read pins from, is a SKIP by name."""
     fault = binding_fault(doc, env)
     if fault:
         return [("SKIP", f"the forge facts file cannot be graded: {fault}")]
     lines: list[tuple[str, str]] = []
     facts = doc.get("repos") or {}
-    for name, remote in sorted((ESTATE if estate is None else estate).items()):
+    for name, remote in sorted((ESTATE_REMOTES if remotes is None else remotes).items()):
         if name not in pats:
             lines.append(("SKIP", f"{name}: the gate's checkout carries no readable clone of "
                                   f"{remote}, so the pins it serves were not read"))
@@ -390,7 +389,7 @@ def selfcheck() -> int:
         (facts(main, rel, dict(tags, enforcement="evaluate")), 1, "a tag ruleset not in force"),
     ]
     for doc, want, what in cases:
-        got = _exit(grade(doc, {"x": [pin]}, env={}, estate={"x": "policy-as-versioned-x/x"}))
+        got = _exit(grade(doc, {"x": [pin]}, env={}, remotes={"x": "policy-as-versioned-x/x"}))
         if got != want:
             print(f"selfcheck: {what} graded exit {got}, wanted {want}", file=sys.stderr)
             return 1

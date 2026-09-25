@@ -232,7 +232,7 @@ def _nine(fr):
 
 
 def test_the_estate_is_the_nine_the_ticket_names(fr):
-    assert fr.ESTATE == NINE_REMOTES
+    assert fr.ESTATE_REMOTES == NINE_REMOTES
 
 
 def test_the_fixed_nine_match_the_clones_where_they_exist(fr):
