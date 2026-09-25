@@ -205,3 +205,93 @@ def test_two_review_rules_on_one_branch_count_as_the_strictest(fr):
     weak = {"type": "pull_request", "parameters": {"required_approving_review_count": 0}}
     lines = _grade(fr, _facts(fr, [weak, *MAIN_REVIEWED], REVIEWED))
     assert not [l for l in lines if l[0] == "FAIL"], lines
+
+
+# --- review round: the nine are a fixed set, never whatever the facts file or the clone carries --
+
+NINE_REMOTES = {
+    "hub": "policy-as-versioned-flux/policy-as-versioned-flux",
+    "platform": "policy-as-versioned-platform/platform",
+    "driftwood": "policy-as-versioned-driftwood/driftwood",
+    "tuppence": "policy-as-versioned-tuppence/tuppence",
+    "ludlow": "policy-as-versioned-ludlow/ludlow",
+    "nist": "policy-as-versioned-nist/nist",
+    "ico": "policy-as-versioned-ico/ico",
+    "feeds": "policy-as-versioned-feeds/feeds",
+    "insurer": "policy-as-versioned-insurer/insurer",
+}
+
+
+def _nine(fr):
+    """Facts and pins for all nine, every one protected: the shape that must pass."""
+    one = _facts(fr, MAIN_REVIEWED, REVIEWED)["repos"]["platform"]
+    repos = {n: dict(one, remote=r) for n, r in NINE_REMOTES.items()}
+    pats = {n: [] for n in NINE_REMOTES}
+    pats["platform"] = [fr.parse_pattern(PIN)]
+    return {"collector": "test", "repos": repos}, pats
+
+
+def test_the_estate_is_the_nine_the_ticket_names(fr):
+    assert fr.ESTATE == NINE_REMOTES
+
+
+def test_the_fixed_nine_match_the_clones_where_they_exist(fr):
+    estate = os.path.join(ROOT, ".estate-clone")
+    if not os.path.isdir(estate):
+        pytest.skip("no .estate-clone to compare against")
+    for unit, remote in NINE_REMOTES.items():
+        d = os.path.join(estate, unit)
+        if unit == "hub" or not os.path.isdir(d):
+            continue
+        url = subprocess.run(["git", "-C", d, "remote", "get-url", "origin"],
+                             capture_output=True, text=True).stdout.strip()
+        assert url.removesuffix(".git").endswith(remote), (unit, url)
+
+
+def test_all_nine_protected_is_a_pass_with_nine_pass_lines(fr):
+    facts, pats = _nine(fr)
+    lines = fr.grade(facts, pats, env={})
+    assert fr._exit(lines) == 0, lines
+    assert len([l for l in lines if l[0] == "PASS"]) == 9
+
+
+def test_a_facts_file_naming_fewer_repositories_skips_each_absent_one_by_name(fr):
+    facts, pats = _nine(fr)
+    for gone in ["platform", "driftwood", "tuppence", "ludlow", "nist", "ico", "insurer"]:
+        del facts["repos"][gone]
+    lines = fr.grade(facts, pats, env={})
+    assert fr._exit(lines) == 3, lines
+    skipped = " ".join(l[1] for l in lines if l[0] == "SKIP")
+    assert "platform" in skipped and "insurer" in skipped, lines
+
+
+def test_a_facts_file_naming_the_wrong_remote_for_a_unit_is_not_graded_as_it(fr):
+    facts, pats = _nine(fr)
+    facts["repos"]["nist"]["remote"] = "policy-as-versioned-nist/elsewhere"
+    lines = fr.grade(facts, pats, env={})
+    assert fr._exit(lines) == 3, lines
+    assert any(l[0] == "SKIP" and l[1].startswith("nist:") for l in lines), lines
+
+
+def test_a_repository_whose_checkout_was_not_read_is_a_could_not_look(fr):
+    facts, pats = _nine(fr)
+    del pats["platform"]
+    lines = fr.grade(facts, pats, env={})
+    assert fr._exit(lines) == 3, lines
+    assert any(l[0] == "SKIP" and l[1].startswith("platform:") for l in lines), lines
+
+
+def test_patterns_by_repo_leaves_out_a_unit_with_no_clone_or_the_wrong_remote(fr, tmp_path):
+    estate = tmp_path / "estate"
+    hooks = tmp_path / "nohooks"
+    hooks.mkdir()
+    for unit, url in [("platform", "https://github.com/policy-as-versioned-platform/platform"),
+                      ("nist", "https://github.com/policy-as-versioned-nist/elsewhere")]:
+        d = estate / unit
+        d.mkdir(parents=True)
+        subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "init", "-q", str(d)], check=True)
+        subprocess.run(["git", "-C", str(d), "remote", "add", "origin", url], check=True)
+    (estate / "ico").mkdir()  # a directory that is not a checkout
+    got = fr.patterns_by_repo(ROOT, str(estate))
+    assert "platform" in got and "hub" in got
+    assert "nist" not in got and "ico" not in got and "feeds" not in got, sorted(got)

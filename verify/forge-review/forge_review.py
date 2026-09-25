@@ -49,6 +49,19 @@ from urllib.parse import quote
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 HUB_REMOTE = "policy-as-versioned-flux/policy-as-versioned-flux"
+# The nine repositories the ticket names, held fixed. The check grades exactly these: a facts file
+# or a clone that carries fewer is a could-not-look by name, never a pass over the ones it did carry.
+ESTATE: dict[str, str] = {
+    "hub": HUB_REMOTE,
+    "platform": "policy-as-versioned-platform/platform",
+    "driftwood": "policy-as-versioned-driftwood/driftwood",
+    "tuppence": "policy-as-versioned-tuppence/tuppence",
+    "ludlow": "policy-as-versioned-ludlow/ludlow",
+    "nist": "policy-as-versioned-nist/nist",
+    "ico": "policy-as-versioned-ico/ico",
+    "feeds": "policy-as-versioned-feeds/feeds",
+    "insurer": "policy-as-versioned-insurer/insurer",
+}
 ESTATE_ORG = re.compile(r"^policy-as-versioned-[a-z0-9-]+$")
 
 REVIEW_RULES = {"pull_request", "non_fast_forward", "deletion"}
@@ -105,14 +118,18 @@ def admitted(p: Pattern, live: list[str]) -> list[str]:
                          f"@refs/heads/{b}")]
 
 
-def scan(root: str) -> list[Pattern]:
-    """Every anchored identity pattern in the files `root` tracks at HEAD, fixtures excluded."""
+def scan(root: str) -> list[Pattern] | None:
+    """Every anchored identity pattern in the files `root` tracks at HEAD, fixtures excluded.
+    None when `root` could not be read, which is not the same as a checkout serving no pin."""
     try:
-        out = subprocess.run(["git", "-C", root, "grep", "--cached", "-I", "-o", "-E", "-e",
-                              GREP_ERE,
-                              "--"], capture_output=True, text=True, timeout=60).stdout
+        done = subprocess.run(["git", "-C", root, "grep", "--cached", "-I", "-o", "-E", "-e",
+                               GREP_ERE,
+                               "--"], capture_output=True, text=True, timeout=60)
     except (OSError, subprocess.SubprocessError):
-        return []
+        return None
+    if done.returncode not in (0, 1):  # git grep exits 1 for "no match"
+        return None
+    out = done.stdout
     seen: dict[tuple[str, str], Pattern] = {}
     for line in out.splitlines():
         path, text = line.split(":", 1)
@@ -124,30 +141,42 @@ def scan(root: str) -> list[Pattern]:
     return list(seen.values())
 
 
-def estate_repos(estate: str) -> dict[str, str]:
-    """name -> owner/repo for the hub and every unit checkout under `estate`."""
-    repos = {"hub": HUB_REMOTE}
-    for unit in sorted(os.listdir(estate)) if os.path.isdir(estate) else []:
+def cloned(estate: str) -> dict[str, str]:
+    """name -> checkout directory, for the hub and each of the nine units whose clone under
+    `estate` exists and whose origin is the remote ESTATE names. Anything else is left out."""
+    dirs = {"hub": ROOT}
+    for unit, remote in ESTATE.items():
         d = os.path.join(estate, unit)
+        if unit == "hub" or not os.path.isdir(d):
+            continue
         try:
             url = subprocess.run(["git", "-C", d, "remote", "get-url", "origin"],
                                  capture_output=True, text=True, timeout=10).stdout.strip()
         except (OSError, subprocess.SubprocessError):
             continue
-        m = re.match(r"^https://github\.com/([^/]+/[^/.]+?)(\.git)?$", url)
-        if m and ESTATE_ORG.match(m.group(1).split("/")[0]):
-            repos[unit] = m.group(1)
-    return repos
+        m = re.match(r"^https://github\.com/([^/]+/[^/]+?)(\.git)?$", url)
+        if m and m.group(1) == remote:
+            dirs[unit] = d
+    return dirs
 
 
 def patterns_by_repo(root: str, estate: str) -> dict[str, list[Pattern]]:
-    repos = estate_repos(estate)
-    by_remote = {v: k for k, v in repos.items()}
-    found: dict[str, list[Pattern]] = {k: [] for k in repos}
-    for name in repos:
-        for p in scan(root if name == "hub" else os.path.join(estate, name)):
-            if p.repo in by_remote and all(q.text != p.text for q in found[by_remote[p.repo]]):
-                found[by_remote[p.repo]].append(p)
+    """name -> the pins that name that repository. A name is present only when its own checkout
+    was read, so `grade` can say by name which of the nine it could not read pins from."""
+    dirs = cloned(estate)
+    dirs["hub"] = root
+    by_remote = {v: k for k, v in ESTATE.items()}
+    found: dict[str, list[Pattern]] = {}
+    pins: dict[str, list[Pattern]] = {k: [] for k in ESTATE}
+    for name, d in dirs.items():
+        got = scan(d)
+        if got is None:
+            continue
+        found[name] = pins[name]
+        for p in got:
+            owner = by_remote.get(p.repo)
+            if owner and all(q.text != p.text for q in pins[owner]):
+                pins[owner].append(p)
     return found
 
 
@@ -169,7 +198,7 @@ def collect(root: str, estate: str) -> dict:
                  "run_id": os.environ.get("GITHUB_RUN_ID", ""),
                  "repository": os.environ.get("GITHUB_REPOSITORY", ""), "repos": {}}
     pats = patterns_by_repo(root, estate)
-    for name, remote in estate_repos(estate).items():
+    for name, remote in ESTATE.items():
         entry: dict = {"remote": remote}
         doc["repos"][name] = entry
         try:
@@ -240,13 +269,28 @@ def binding_fault(doc: dict, env: dict) -> str:
     return ""
 
 
-def grade(doc: dict, pats: dict[str, list[Pattern]], env: dict) -> list[tuple[str, str]]:
+def grade(doc: dict, pats: dict[str, list[Pattern]], env: dict,
+          estate: dict[str, str] | None = None) -> list[tuple[str, str]]:
+    """Grades exactly the repositories `estate` names (the nine by default). One the facts file
+    does not carry, or whose checkout the gate did not read pins from, is a SKIP by name."""
     fault = binding_fault(doc, env)
     if fault:
         return [("SKIP", f"the forge facts file cannot be graded: {fault}")]
     lines: list[tuple[str, str]] = []
-    for name, repo in sorted((doc.get("repos") or {}).items()):
-        remote = repo.get("remote", name)
+    facts = doc.get("repos") or {}
+    for name, remote in sorted((ESTATE if estate is None else estate).items()):
+        if name not in pats:
+            lines.append(("SKIP", f"{name}: the gate's checkout carries no readable clone of "
+                                  f"{remote}, so the pins it serves were not read"))
+        repo = facts.get(name)
+        if repo is None:
+            lines.append(("SKIP", f"{name}: the forge facts file does not name {remote}, so "
+                                  f"the forge was not looked at for it"))
+            continue
+        if repo.get("remote") != remote:
+            lines.append(("SKIP", f"{name}: the forge facts file reads {repo.get('remote')} "
+                                  f"where the estate names {remote}"))
+            continue
         if repo.get("error"):
             lines.append(("SKIP", f"{name}: could not read the forge for {remote}: "
                                   f"{repo['error']}"))
@@ -346,7 +390,7 @@ def selfcheck() -> int:
         (facts(main, rel, dict(tags, enforcement="evaluate")), 1, "a tag ruleset not in force"),
     ]
     for doc, want, what in cases:
-        got = _exit(grade(doc, {"x": [pin]}, env={}))
+        got = _exit(grade(doc, {"x": [pin]}, env={}, estate={"x": "policy-as-versioned-x/x"}))
         if got != want:
             print(f"selfcheck: {what} graded exit {got}, wanted {want}", file=sys.stderr)
             return 1

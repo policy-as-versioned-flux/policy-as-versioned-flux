@@ -284,3 +284,40 @@ only visible to an admin token, so in CI the PASS line says they were not graded
   the verify family asserts it, but the assertion is red on four, and §6 cannot carry "enforced"
   until they close.
 
+
+### Review round, 2026-09-25
+
+The review blocked on one finding and raised four minor ones. All five are answered here.
+
+1. **Blocking: "all nine" was asserted, never derived.** A facts file naming two repositories
+   graded PASS, and so did a repository whose checkout the gate never read. Fix: `forge_review.py`
+   now holds the nine as a fixed map, `ESTATE`, of name to remote. `collect` asks the forge about
+   exactly those nine. `grade` walks the nine, not the facts file. A repository the facts file
+   does not name, or names with a different remote, is a SKIP by name. A unit whose clone is
+   missing, has another origin, or cannot be read by `git grep` is left out of the pin map, and
+   `grade` prints a SKIP by name for it. The wrapper's PASS line now counts the PASS lines instead
+   of saying "nine". Red first: 7 new tests, 5 failed on the old code, then 27 passed. A test also
+   holds `ESTATE` to the remotes of the clones under `.estate-clone`. The reviewer's two plants,
+   rerun on a facts file collected live today: two repositories only now exits 3 with a SKIP
+   naming each missing one; platform's checkout dropped now prints a SKIP naming platform. The
+   live check still reads 5 PASS and 4 FAIL, the same four `main` branches.
+2. **Minor: three SKIP texts were undeclared.** The manifest row now declares the local
+   no-gh path, the unasked branch, and the facts file from another run. `truth_manifest.judge`
+   reads all three as declared. Two new texts stay undeclared on purpose: a facts file missing one
+   of the nine, and a gate checkout missing one. Both jobs clone all nine under `set -e`, so
+   either is a broken pipeline and should grade FAIL. The row's note says so.
+3. **Minor: NORTH-STAR §6 still said ticket 87 protects `main`.** This PR adds a dated
+   correction to the bullet. It names the four repositories where `main` carries a review, the
+   five where it does not, and the four the check reads red. Measured with `gh api
+   repos/<r>/rules/branches/main` on all nine on 2026-09-25. The comment above says the ticket 97
+   build would add this correction. It did not, so this build added it.
+4. **Minor: the README missed platform's backfill push.** Platform's cut-release has a
+   `backfill_evidence_only` mode that pushes an evidence commit to the branch it runs on. On a
+   `release/**` branch the pull request rule now refuses that push. The README says so and says
+   how to do a backfill there. A normal cut-release on a release branch pushes tags only.
+5. **Minor: this section's heading reads 2026-09-22.** The workflow that runs this build sets that
+   heading, so it stays. The build happened on 2026-09-24 and 2026-09-25, as the first line says.
+
+Done, re-read: rulesets are non-empty on nine repositories and the check asserts them over a
+fixed nine. §6 now carries the dated state. The check stays red on four `main` branches until
+the owner creates a push identity a ruleset can let through.

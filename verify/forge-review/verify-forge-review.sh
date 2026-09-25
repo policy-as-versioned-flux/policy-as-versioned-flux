@@ -50,7 +50,8 @@ log="$tmp/check.out"
 "$PY" "$HERE/forge_review.py" check --facts "$facts" --estate "$ESTATE" >"$log" 2>&1; rc=$?
 cat "$log"
 case $rc in
-  0) echo "PASS: every branch an estate identity pin admits is protected by a reviewed-PR ruleset on the forge, all nine repositories carry the floor, and every release tag is held ($(grep -c '^PASS:' "$log") repositories)";;
+  0) n="$(grep -c '^PASS:' "$log")"
+     echo "PASS: every branch an estate identity pin admits is protected by a reviewed-PR ruleset on the forge, all $n repositories forge_review.py holds as the estate carry the floor, and every release tag is held";;
   3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
   *) if grep -q '^FAIL:' "$log"; then
        echo "FAIL: $(grep -c '^FAIL:' "$log") forge protection(s) observed missing: $(grep -m1 '^FAIL:' "$log" | cut -c7-)"

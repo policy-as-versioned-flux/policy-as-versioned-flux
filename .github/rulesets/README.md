@@ -28,6 +28,12 @@ clock and every release push in the estate uses `GITHUB_TOKEN`. So:
 - Release branches carry `creation`, so nobody can create a branch the pins accept. To cut a
   maintenance branch, the owner lifts `release-branches-are-reviewed` on that one repository,
   creates the branch, and puts the ruleset back.
+- The same rule refuses one more push. Platform's cut-release has a backfill mode
+  (`backfill_evidence_only`) that pushes an evidence commit straight to the branch it runs on.
+  Dispatched on a `release/<M>.<m>.x` branch, that push is now refused, because the branch
+  needs a pull request. A backfill there goes through a pull request, or the owner lifts the
+  ruleset for that run. A normal cut-release on a release branch pushes tags only and is not
+  affected.
 
 Closing the gap needs one push identity that can be a bypass actor, such as a GitHub App
 installed on every organisation, used by the clock and release lanes and by nothing else. Then
