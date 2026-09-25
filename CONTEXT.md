@@ -198,7 +198,13 @@ that a rewritten entry cites stay as the record of the decision at the time.
 - **Declared engine** (added 2026-09-25, ticket 71) — The engine version an adopter states that its
   own cluster runs. The adopter owns it, because the adopter installs its own engine. Composition
   reads the declared engine. The drift sample observes the running engine, which is a different
-  fact.
+  fact. The declaration is the adopter's own engine install pin, not a separate statement.
+
+- **Unsupported pairing** (added 2026-09-25, ticket 71) — An adopter whose declared engine is not a
+  supported engine of a line it composes. On that engine the line's control claims do not count,
+  so every control the line claims is a **hole**, and the evidence document shows an
+  `unsupported-engine` **delta** that names the pairing. An adopter with no declared engine is
+  priced the same way, under an `undeclared-engine` delta. Never refused.
 
 - **Compliance / measurable** — The ability to answer "which part of the estate is on which policy
   version, and is it actually passing?" In the original this was a proxy ("a GitHub PR search

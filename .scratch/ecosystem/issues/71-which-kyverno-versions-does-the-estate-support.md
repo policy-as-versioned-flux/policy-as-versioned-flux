@@ -97,3 +97,36 @@ agent tried to refute. The second agent confirmed the classification and correct
 
 This changes the shape of the Q3 ticket. The body needs a one-token fix. The fixture needs a
 "generates nothing" check that does not depend on how the engine reports a miss.
+
+**2026-09-25, round 2 decided.** The owner answered round 2 with a bare "agree". Each decision is
+delegated.
+
+5. **Q5 (b). The adopter's engine install pin is its declaration.** Each adopter's gitops carries
+   the manifest that installs Kyverno at an exact version. Composition reads the version from that
+   file. The drift sample installs from that file and stops using its own `KYVERNO_VERSION`. The
+   reason: a separate statement and the install are two files, and they drift apart.
+6. **Q6 (a). An unsupported pairing is priced, never refused.** On an engine that is not a
+   supported engine of a composed line, the line's control claims do not count, so every control
+   the line claims is a hole. The evidence document shows an `unsupported-engine` delta that names
+   the pairing. An adopter with no declared engine gets the same price under an
+   `undeclared-engine` delta. The reason: this prices the worst case, the cage not loading, and
+   claims nothing about the cage working. ADR-0026 retired refusals for holes. The glossary gains
+   **Unsupported pairing**.
+7. **Q7 (a). One grader run grades every cell of the matrix.** A cell is one line on one engine.
+   The caller supplies one binary for each engine. A listed cell with no binary reads
+   could-not-look, which is red. The platform keeps one table of engine versions, with a pinned
+   checksum for each CLI and each `install.yaml`. The reason: one report shows a missing column. A
+   CI matrix splits the verdict, and a job that does not run looks like a pass.
+8. **Q8 (a). The engine bump route has four rules.**
+   1. To add an engine to a cut line changes metadata only. The same PR must pass the new cells.
+      The policy version does not change.
+   2. To remove an engine from a line narrows its support. The policy version does not change. An
+      adopter that declares that engine gets the `unsupported-engine` delta at its next
+      composition.
+   3. The estate's own engine pins must name a supported engine of every served line: the hub
+      truth CLI, the platform release CLI and the platform in-cluster engine. A gate check asserts
+      this. An adopter's declared engine can be any version, because Q6 prices it.
+   4. No Renovate. ADR-0003's route becomes "a reviewed PR that the gate grades".
+   The reason: a changed verdict on a new engine is a failed cell, and a failed cell cannot join
+   the tested set, so behaviour stays guarded. An engine bump that cut a policy version would add
+   versions with unchanged bytes, and each would need every adopter's acceptance.
