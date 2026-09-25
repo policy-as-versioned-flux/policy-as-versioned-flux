@@ -160,3 +160,72 @@ the local estate clones (`PAVC_ESTATE_CLONE`) selfcheck ok, with driftwood's rea
 carrying `rests_on_grade: null` because its served payload (schema 2.0.0) does not state it.
 `verify/twin-evals/verify-twin-evals.sh` on the hub branch: exit 0, every line PASS or NOT
 MEASURABLE as before, `cross_architecture_determinism` 12 artefacts byte-identical on arm64.
+
+**2026-09-26, review findings addressed.** Owner-instructed: the owner wrote on 2026-09-25,
+"i'm afk you have all the approvals you need to deliver". That authorises this push to the same
+two feature branches and nothing more. The reviewer returned two blocking and three minor
+findings on hub PR #141 and none on platform PR #45. The platform branch is unchanged. One hub
+commit (`6528c680`) builds the following, and the earlier measurement paragraph is superseded by
+the one after this.
+
+*Blocking 1, the invariant suite main runs.* Invariant 59
+`mitigation_credit_is_gated_on_corroborated_enactment_not_just_claimed_evidence` (a harness
+guard in `twin/invariants/harness.py`, not hash-pinned in the manifest) planted a claim whose
+basis read "planted for the harness guard", and the synthetic-record net refused both of its
+options with `RESTS_ON_SYNTHETIC`. Decision (delegated, ADR-0025): the plant is reworded to
+"authored for the harness guard", as the builder had already reworded `tests/test_pricing.py`,
+rather than narrowing leg 3 so a claim's basis stops counting. Reason: leg 3 is the rule's answer
+to the honest case (a claim whose basis says it rests on the synthetic drill), and narrowing it
+would make the gate less safe to spare one test string a rewording. The marker-word net stays
+uniform across an edge note, a valuation basis and a claim basis. The first record's `--only`
+line measured four invariants and was read as the suite; the full suite is what main runs and is
+what is measured below.
+
+*Blocking 2, the typecheck main runs.* `tests/test_pricing_threshold.py` binds the result of
+`is_synthetic_record` before the `in`. The check re-run is main's own command, `python -m mypy
+twin tests conftest.py --ignore-missing-imports --warn-unused-ignores`, not the six-module proxy
+the first record cited.
+
+*Minor 1, accepted: a price rests on its admitting path.* `pricing.impacts` folds
+`verdict["worst_evidence_grade"]` (the admitting path's worst hop, `None` when the perspective
+named the component as its own cash flow) into `rests_on_grade`, the same three legs
+`verbs.exposure` already folded. Decision 5 above is amended. Reason: admission is the third
+gate and a precondition of the price, so the price rests on it, and the fold can only weaken a
+stated grade, never strengthen it. Measured: no golden digest moved (all twelve unchanged), so
+no fixture had an admitting path weaker than its propagation path and valuation.
+
+*Minor 2, accepted: the citation names its namespace.* `twin/cli.py` `_cites` admits
+`eco-system ticket NNN` (up to three digits) beside `decision ticket NN` (two digits, the twin's
+own `.scratch/twin/issues`), and a three-digit number is never read as a twin decision ticket.
+The golden-digests citation now reads "eco-system ticket 141 (ADR-0032, decided by eco-system
+grilling ticket 30 decision 6) ...", and only `authorised_by` changed. The refusal messages and
+the `--authorise` help name both forms. A test in `tests/test_pricing_threshold.py` covers both
+namespaces. `_cites` checks the form of a citation, not that the ticket exists, and its
+docstring says so.
+
+*Minor 3, accepted: a quoted stamp marks a record.* `twin/synthetic.py` reads a provenance stamp
+the way YAML 1.1 reads a boolean (`TRUTHY`: true, yes, on, y and 1 in any case, quoted or not,
+and the integer 1), and the module docstring states the limit: any other value marks nothing. A
+planted test stamps `synthetic: 'yes'` on the pocket org's drill and the price goes red through
+the record leg alone (the regrade names the signal by id and carries no marker word); the
+control stamps `synthetic: 'no'` and prices.
+
+*Nothing is less safe.* Each change removes a price (minor 3), lowers a stated grade (minor 1),
+or changes a test string, a citation form or a test. No gate is loosened.
+
+**What was measured, 2026-09-26.** On a throwaway merge of the hub branch at `6528c680` onto
+`origin/main` at `0c1249d0`: `./bin/twin verify` in full, the check main's `invariants` job
+runs: 71 passed, 2 failed, 2 skipped. The two are 44 `drift_window_is_actually_being_sampled`
+and 45 `flux_coverage_floor_is_still_reachable`, which fail identically on pristine
+`origin/main` at `0c1249d0` today (measured with `--only` on an unmerged worktree; they are the
+probe reds, and main's own CI run of 2026-09-25 showed 45 alone because the newest drift sample
+was then under a day old). Invariant 59 passes. `tests/test_invariant_suite.py::
+test_the_suite_is_green` fails on the same two and nothing else. Main's typecheck command over
+`twin tests conftest.py`: no issues in 202 files. `tests/test_pricing_threshold.py` (44 tests)
+with the six pricing-side files (`test_pricing.py test_evidence_ladder.py test_perspective.py
+test_admission.py test_use_gating.py test_corroboration.py`): 183 passed. The nine schema-side
+files: 292 passed. `tests/test_seam1_cli.py`: 44 passed. `verify/twin-evals/
+verify-twin-evals.sh`: exit 0, every line PASS or NOT MEASURABLE. `TWIN_CI_ARCH_MATRIX=1 twin
+verify --only cross_architecture_determinism`: 12 artefacts byte-identical on arm64.
+`identical_pins_identical_bytes` passes with the twelve goldens unchanged. Not run, per the
+brief: the full pytest suite and `talk/verify-all.sh`.
