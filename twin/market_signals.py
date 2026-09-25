@@ -31,14 +31,23 @@ the other half: the live signal-source path itself excludes a quarantined id **b
 "never ingested... at any lag" hold in the one pipeline that actually ingests, not only in an
 audit that assumes a pipeline agrees with it.
 
-`ponytail:` no CLI verb — same reasoning `twin/ingest.py` (build ticket 53) and
+`ponytail:` no CLI verb for the RUN — same reasoning `twin/ingest.py` (build ticket 53) and
 `twin/benchmark.py` (build ticket 57) already gave: this is a typed function exercised at seam 2,
 and a real venue adapter (a future ticket, not this one) is what would give a CLI invocation
 something live to point at.
+
+One CLI verb for the READ, `moves` (eco-system ticket 142, 2026-09-25): print every consecutive
+dated move in a served `market-moves` envelope, as `move_statement` phrases it. The
+classify-and-judge skill used to derive the moves with an inline `python3 - <<'PY'` heredoc, and
+the local clock's child may now run only NAMED scripts (ticket 30 decision 14), which a heredoc
+can never be. The verb reads a file and prints sentences; it binds, prices and writes nothing.
 """
 
 from __future__ import annotations
 
+import argparse
+import json
+import os
 from dataclasses import dataclass
 from typing import Any, Iterable
 
@@ -164,6 +173,49 @@ def move_statement(move: PriceMove) -> str:
         f"{move.venue} price for {move.question_id!r} moved from {move.from_level:.2f} to "
         f"{move.to_level:.2f} ({move.direction}) between {move.from_date} and {move.to_date}"
     )
+
+
+def moves_from_envelope(envelope: dict[str, Any]) -> list[PriceMove]:
+    """The moves a served `market-moves` envelope carries: `payload.markets.<id>.venue` and
+    `.observations[] {date, price_level}`, exactly the shape the classify-and-judge skill read
+    inline until ticket 142."""
+    markets = (envelope.get("payload") or {}).get("markets") or {}
+    observations = [
+        PriceObservation(market_id, market["venue"], point["date"], point["price_level"])
+        for market_id, market in markets.items()
+        for point in market.get("observations") or []
+    ]
+    return price_moves(observations)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="python3 -m twin.market_signals",
+        description="print the dated MOVES a served market-moves envelope carries -- never a level",
+    )
+    sub = parser.add_subparsers(dest="cmd", required=True)
+    moves = sub.add_parser("moves", help="one line per consecutive dated move: date, delta, statement")
+    moves.add_argument("--feeds", default=os.path.join(".estate-clone", "feeds"),
+                       help="the feeds publisher's checkout (default .estate-clone/feeds)")
+    moves.add_argument("--major", default="1", help="the pinned major of market-moves (default 1)")
+    args = parser.parse_args(argv)
+    path = os.path.join(args.feeds, "market-moves", f"v{args.major}", "feed.json")
+    try:
+        with open(path) as fh:
+            envelope = json.load(fh)
+    except (OSError, ValueError) as exc:
+        print(f"not ok  cannot read the served market-moves envelope at {path}: {exc}")
+        return 2
+    found = moves_from_envelope(envelope)
+    for move in found:
+        print(f"{move.to_date} {move.delta:+.2f} {move_statement(move)}")
+    print(f"ok  {len(found)} move(s) derived from {path} (version {envelope.get('version', '?')}); "
+          f"a level is never a probability: {BIAS_CITATION}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
 
 
 def market_signal_run(

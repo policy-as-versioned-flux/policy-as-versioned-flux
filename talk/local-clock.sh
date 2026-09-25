@@ -135,8 +135,33 @@ ALL_ADOPTERS="driftwood tuppence ludlow"
 # The child's tools. No `gh` at all: a pull request is opened by THIS script under the owner's
 # own session, after it has read what the model committed. No Task: a subagent's tool calls are
 # the runner's business (twin/enact_guard.py docstring), and this run has one job.
-ALLOWED_TOOLS="Read,Glob,Grep,Write,Edit,Bash(git *),Bash(python3 *),Bash(ls *),Bash(cat *),Bash(head *),Bash(wc *)"
-DISALLOWED_TOOLS="Task,WebFetch,WebSearch,NotebookEdit,Bash(gh *),Bash(curl *),Bash(launchctl *)"
+#
+# Ticket 142 item 3 (ticket 30 decision 14, delegated): Bash is limited to NAMED SCRIPTS, never
+# `python3 *`. Measured 2026-09-25: under TWIN_ENACT_MODE=operations the guard admitted an
+# adopter push made inside `python3 -c 'subprocess.run([...push...])'`, because the guard
+# reads a command string and a python program is not one. The named programs are the two the
+# skills actually run besides their validators: `python3 -m twin.derived_forecast inputs`
+# (derive-probability step 0) and `python3 -m twin.market_signals moves` (classify-and-judge
+# step 1, which used to be a `python3 - <<'PY'` heredoc that no named-script rule can admit).
+# Each row's validator is added from the STEPS table below, so a new row needs no edit here.
+# This is the tool-permission net; the CAPABILITY is removed in run_step (see "the child holds
+# no push capability" there), because a permission rule is a pattern and the environment is not.
+NAMED_PROGRAMS=("python3 -m twin.derived_forecast inputs" "python3 -m twin.market_signals moves")
+ALLOWED_TOOLS="Read,Glob,Grep,Write,Edit,Bash(git *),Bash(ls *),Bash(cat *),Bash(head *),Bash(wc *)"
+DISALLOWED_TOOLS="Task,WebFetch,WebSearch,NotebookEdit,Bash(gh *),Bash(curl *),Bash(wget *),Bash(ssh *),Bash(launchctl *),Bash(python3 -c *),Bash(python -c *),Bash(python3 - *),Bash(python *)"
+# The token-shaped string the child is handed as GH_TOKEN. Not a credential: gh takes it, uses
+# it, and is refused by GitHub ("Bad credentials", measured 2026-09-25). It is there because gh
+# consults the login keychain only when no token is in the environment: with GH_CONFIG_DIR at an
+# empty directory and GH_TOKEN unset, `gh auth status` said "not logged in" and `gh auth token`
+# still printed the owner's keyring token (measured). A child can `env -u GH_TOKEN`, so this is a
+# net over the keyring path, named as such; the sandbox in the clock-only settings is what makes
+# a token the child might still reach unable to push anywhere.
+NO_TOKEN="local-clock-holds-no-token"
+for row in "${STEPS[@]}"; do
+  IFS='|' read -r _n s _p _g v _d <<<"$row"
+  ALLOWED_TOOLS="$ALLOWED_TOOLS,Bash(python3 .claude/skills/$s/$v *)"
+done
+for prog in "${NAMED_PROGRAMS[@]}"; do ALLOWED_TOOLS="$ALLOWED_TOOLS,Bash($prog *)"; done
 
 usage() {
   cat <<EOF
@@ -158,6 +183,8 @@ usage: talk/local-clock.sh [--adopter UNIT ...] [--step NAME ...] [--inject FILE
   --dry-run        make the worktrees and render the prompts, but call no model; report
                    every step as skipped
   --list-steps     print the steps table and exit
+  --list-tools     print the child's allowed and disallowed tools (named scripts, never
+                   python3 *) and exit
   --help           this
 
 environment (all optional): LOCAL_CLOCK_CLAUDE (the claude binary; a stub for tests),
@@ -177,6 +204,7 @@ while [ $# -gt 0 ]; do
     --push) PUSH=1;;
     --dry-run) DRY=1;;
     --list-steps) for row in "${STEPS[@]}"; do IFS='|' read -r n s p g v d <<<"$row"; printf '%-10s /%-22s %-32s %-16s %-28s %s\n' "$n" "$s" "$p" "$g" "$v" "$d"; done; exit 0;;
+    --list-tools) echo "allowed:    $ALLOWED_TOOLS"; echo "disallowed: $DISALLOWED_TOOLS"; exit 0;;
     --help|-h) usage; exit 0;;
     *) echo "FAIL: unknown flag $1 (see --help)"; exit 2;;
   esac
@@ -282,6 +310,91 @@ unit_refs() {  # unit branch -- EVERY ref (heads, tags, remotes, replace, notes,
 unit_config() {  # wt -- every config entry git reads there (system, global, local, worktree), with its file
   cgit -C "$1" config --list --show-origin 2>/dev/null | grep -v '^command line:' || true
 }
+# THE CHILD HOLDS NO PUSH CAPABILITY (ticket 142 item 3; ticket 30 decision 14, delegated).
+# Measured on this machine, 2026-09-25, before this was written: /opt/homebrew/etc/gitconfig
+# (git's SYSTEM file here) names credential.helper=osxkeychain; every estate remote is https;
+# SSH_AUTH_SOCK is set and the agent holds a key; ~/.ssh holds key files; ~/.git-credentials
+# exists; gh is logged in through the login keychain; GH_TOKEN and GITHUB_TOKEN are unset. Each
+# route is closed for the child ONLY, by its environment, not by a pattern over its commands:
+#   GIT_ALLOW_PROTOCOL=none   git refuses EVERY transport before it looks up a helper or a
+#                             credential ("transport 'https' not allowed", measured for https,
+#                             ssh and a local path; `-c protocol.allow=always` and GIT_CONFIG_*
+#                             cannot override the variable, measured)
+#   GIT_EXEC_PATH=<empty dir> the remote helpers and credential helpers that live in git's
+#                             libexec (git-remote-https, git-credential-osxkeychain) are not
+#                             found by ANY git binary on the machine ("'remote-https' is not a
+#                             git command", measured for /opt/homebrew/bin/git and /usr/bin/git);
+#                             every command the child needs is a builtin
+#   GIT_CONFIG_NOSYSTEM=1     the system file with osxkeychain is not read
+#   GIT_CONFIG_GLOBAL=<file>  the child's whole global config is the clock-only file written
+#                             below: an empty credential.helper, protocol.allow=never, signing
+#                             off, and the owner's core.hooksPath carried over so the owner's
+#                             commit hooks still run. The owner's ~/.gitconfig (signing key,
+#                             insteadOf) is not read by the child at all
+#   GIT_SSH_COMMAND=<script>  refuses with a named reason should a transport ever be reached
+#   SSH_AUTH_SOCK unset       no agent; GIT_ASKPASS/SSH_ASKPASS unset: nothing prompts
+#   GIT_TERMINAL_PROMPT=0     no credential prompt on a tty that has nobody at it
+#   GH_CONFIG_DIR=<empty dir> gh has no hosts file; GH_TOKEN=$NO_TOKEN keeps it off the keyring
+#   --restricted              user, project and local settings files are ignored (only the
+#                             clock-only --settings file and managed settings apply), file tools
+#                             are confined to the working directories, bypassPermissions refused
+#   --strict-mcp-config       no MCP server but those in the clock-only --mcp-config, which has none
+#   --settings <file>         registers the PreToolUse enact_guard hook for every tool (the hub's
+#                             own .claude/settings.json is ignored under --restricted, so the
+#                             hook must be here), denies the code-running Bash shapes, and turns
+#                             on Claude Code's OS sandbox for Bash with NO network domain allowed
+#                             and strictAllowlist, so a credential the child might still reach
+#                             (the login keychain through `gh auth token` with the variable
+#                             unset, the key files, ~/.git-credentials) cannot be used to push
+#                             from inside the child. The sandbox is documented for Claude Code
+#                             2.1.219 and later (2.1.282 here) and is NOT measured by the stub
+#                             harness, which cannot run the real binary; the first live run is.
+# What this does NOT close, named: the child runs as the owner's user, and macOS lets that user
+# read the login keychain and ~/.ssh. A different user account for the clock, or the sandbox
+# above holding, is what removes that; the environment cannot. The clock's own --push, which
+# runs AFTER the child in this script's own environment, keeps every credential it always had.
+make_cage() {  # tag wt unit -- the child's environment on disk: config, ssh refusal, mcp, settings
+  local tag="$1" wt="$2" unit="$3" cage="$RUN_DIR/$tag.cage" hooks
+  mkdir -p "$cage/no-git-core" "$cage/no-gh" || return 1
+  hooks="$(git config --global --get core.hooksPath 2>/dev/null || true)"
+  {
+    echo "# the child's ENTIRE global git config for run $RUN_ID step $tag (talk/local-clock.sh,"
+    echo "# ticket 142): read with GIT_CONFIG_NOSYSTEM=1, so nothing else configures its git"
+    printf '[credential]\n\thelper =\n[protocol]\n\tallow = never\n[commit]\n\tgpgsign = false\n[tag]\n\tgpgsign = false\n'
+    [ -n "$hooks" ] && printf '[core]\n\thooksPath = %s\n' "$hooks"
+  } >"$cage/gitconfig" || return 1
+  cp "$cage/gitconfig" "$cage/gitconfig.as-written" || return 1
+  printf '#!/bin/sh\necho "local-clock: ssh is refused for the headless child (ticket 142 item 3); the clock pushes after it, under the owner" >&2\nexit 255\n' >"$cage/no-ssh.sh" || return 1
+  chmod +x "$cage/no-ssh.sh" || return 1
+  echo '{"mcpServers": {}}' >"$cage/mcp.json" || return 1
+  CAGE="$cage" HUB="$HUB" WT="$wt" UNIT="$unit" RUN_DIR="$RUN_DIR" "$PY" - <<'PY' || return 1
+import json, os
+cage, hub = os.environ["CAGE"], os.environ["HUB"]
+settings = {
+    "hooks": {"PreToolUse": [{"matcher": ".*", "hooks": [
+        {"type": "command", "command": f'python3 "{hub}/twin/enact_guard.py"'}]}]},
+    "permissions": {
+        "defaultMode": "acceptEdits",
+        "deny": ["Bash(gh *)", "Bash(curl *)", "Bash(wget *)", "Bash(ssh *)", "Bash(scp *)",
+                 "Bash(launchctl *)", "Bash(python3 -c *)", "Bash(python -c *)", "Bash(python3 - *)",
+                 "Bash(python *)", "Bash(security *)", "WebFetch", "WebSearch", "Task"]},
+    "sandbox": {
+        "enabled": True, "failIfUnavailable": True, "allowUnsandboxedCommands": False,
+        "network": {"allowedDomains": [], "strictAllowlist": True},
+        "filesystem": {
+            "allowWrite": [os.environ["WT"], os.environ["UNIT"], os.environ["RUN_DIR"]],
+            "denyRead": ["~/.ssh", "~/.git-credentials", "~/.config/gh", "~/.gitconfig"]}},
+}
+with open(os.path.join(cage, "settings.json"), "w") as fh:
+    json.dump(settings, fh, indent=2)
+    fh.write("\n")
+PY
+}
+cage_config_changed() {  # cage -- the keys the child wrote into its own global config, or nothing
+  diff <(git config --file "$1/gitconfig.as-written" --list 2>/dev/null) \
+       <(git config --file "$1/gitconfig" --list 2>/dev/null) \
+    | grep -E '^[<>] ' | sed -E 's/^[<>] //' | cut -d= -f1 | sort -u | tr '\n' ' ' || true
+}
 # THE VALIDATOR MUST NOT BE THE TREE THE CHILD CAN WRITE TO (ticket 93 review, F5). The child's
 # cwd is this hub and `Edit` is in ALLOWED_TOOLS, so a model can overwrite
 # .claude/skills/<skill>/assets/<validator>.py with a three-line stub that passes anything, or
@@ -372,7 +485,7 @@ run_step() {  # step skill paths pattern validator adopter
   local judge="$RUN_DIR/$tag.judge" judge_before judge_after
 
   if [ "$DRY" = 1 ]; then
-    echo "dry   $tag: would run  $CLAUDE -p \"/$skill $adopter\" --max-turns $MAX_TURNS --append-system-prompt \"\$(cat $prompt)\"  (worktree $wt on $branch; prompt kept at $prompt)"
+    echo "dry   $tag: would run  $CLAUDE -p \"/$skill $adopter\" --max-turns $MAX_TURNS --restricted --strict-mcp-config --settings <clock-only> --allowedTools \"$ALLOWED_TOOLS\" --append-system-prompt \"\$(cat $prompt)\"  (worktree $wt on $branch; prompt kept at $prompt; the child's environment holds no push capability, see make_cage)"
     cleanup_or_fail "$step" "$adopter" "$unit" "$wt" "$branch" skip "dry run"; return $?
   fi
 
@@ -384,8 +497,13 @@ run_step() {  # step skill paths pattern validator adopter
     record --step "$step" --adopter "$adopter" --status fail --reason "could not make the pristine judge copy" --base "$base"; return 1
   fi
   judge_before="$(judge_digest "$skill")"
+  local cage="$RUN_DIR/$tag.cage"
+  if ! make_cage "$tag" "$wt" "$unit"; then
+    echo "fail  $tag: could not write the child's cage under $cage (its clock-only git config, ssh refusal, mcp and settings files) -- a child started without them holds the owner's credentials, so it is not started"
+    record --step "$step" --adopter "$adopter" --status fail --reason "could not write the child's cage" --base "$base"; return 1
+  fi
 
-  echo "run   $tag: /$skill $adopter on $branch (worktree $wt, max $MAX_TURNS turns)"
+  echo "run   $tag: /$skill $adopter on $branch (worktree $wt, max $MAX_TURNS turns; the child holds no push capability: cage at $cage)"
   # Every branch and tag of the unit but the step's own, before the child: after it, any ref
   # that appeared or moved is refused and named. The guard admits `git tag -a` (the owner's
   # global tag.gpgsign would sign it) and `git update-ref refs/heads/main HEAD` (which moves
@@ -405,7 +523,14 @@ run_step() {  # step skill paths pattern validator adopter
   # commits as the clock, unsigned. The owner's global git config names the owner and signs
   # commits and tags with the owner's SSH key; a model with nobody at the keyboard may do
   # neither, and the clock reads the whole branch back below.
+  # The child's environment holds no push capability: see make_cage, above, for what each of
+  # these closes and how it was measured. The order is env -u (unset) first, then the values.
   env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION \
+    -u SSH_AUTH_SOCK -u SSH_AGENT_PID -u GITHUB_TOKEN -u GH_ENTERPRISE_TOKEN -u GITHUB_ENTERPRISE_TOKEN \
+    -u GIT_ASKPASS -u SSH_ASKPASS -u GIT_CONFIG_PARAMETERS -u GIT_DIR -u GIT_WORK_TREE \
+    GH_TOKEN="$NO_TOKEN" GH_CONFIG_DIR="$cage/no-gh" \
+    GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL="$cage/gitconfig" GIT_TERMINAL_PROMPT=0 \
+    GIT_EXEC_PATH="$cage/no-git-core" GIT_ALLOW_PROTOCOL=none GIT_SSH_COMMAND="$cage/no-ssh.sh" \
     TWIN_ENACT_MODE=operations \
     GIT_AUTHOR_NAME="$CLOCK_AUTHOR_NAME" GIT_AUTHOR_EMAIL="$CLOCK_AUTHOR_EMAIL" \
     GIT_COMMITTER_NAME="$CLOCK_AUTHOR_NAME" GIT_COMMITTER_EMAIL="$CLOCK_AUTHOR_EMAIL" \
@@ -416,6 +541,9 @@ run_step() {  # step skill paths pattern validator adopter
     LOCAL_CLOCK_TITLE_FILE="$title" LOCAL_CLOCK_BODY_FILE="$body" \
     "$CLAUDE" -p "/$skill $adopter" \
       --max-turns "$MAX_TURNS" --output-format json \
+      --restricted --tools "Bash,Read,Edit,Write,Glob,Grep" \
+      --strict-mcp-config --mcp-config "$cage/mcp.json" \
+      --settings "$cage/settings.json" \
       --permission-mode acceptEdits \
       --allowedTools "$ALLOWED_TOOLS" --disallowedTools "$DISALLOWED_TOOLS" \
       --add-dir "$wt" \
@@ -432,6 +560,14 @@ run_step() {  # step skill paths pattern validator adopter
   if [ "$judge_after" != "$judge_before" ]; then
     echo "fail  $tag: the child changed the hub's own twin package or /$skill while it ran -- the validator and the rules it imports are what decide whether this file is proposable, and a file judged by a tree its author edited is not checked. The copy taken before the child ($judge) is what judged below; repair the hub by hand (git status; git checkout -- twin .claude/skills/$skill). Branch kept at $wt, never pushed."
     refuse "$step" "$adopter" "$branch" "$title" "$body" "child edited the hub's twin package or /$skill during the run" --base "$base"; return 1
+  fi
+  # The child's own global config is the clock-only file (GIT_CONFIG_GLOBAL): a `git config
+  # --global` the child runs lands there and nowhere else, and any key it wrote is refused by
+  # name, as a write to the unit's config is below. The owner's ~/.gitconfig is never reached.
+  changed_keys="$(cage_config_changed "$cage")"
+  if [ -n "$changed_keys" ]; then
+    echo "fail  $tag: the child wrote its own global git config ($cage/gitconfig): $changed_keys-- a credential helper, a protocol allowance or a hook written there would run under the child's next git. The owner's ~/.gitconfig was not reached (the child's global is this file). Branch kept at $wt, never pushed."
+    refuse "$step" "$adopter" "$branch" "$title" "$body" "child wrote its global config: $changed_keys" --base "$base"; return 1
   fi
   config_after="$(unit_config "$wt")"
   if [ "$config_after" != "$config_before" ]; then

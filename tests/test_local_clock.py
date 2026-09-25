@@ -955,7 +955,11 @@ def test_a_trailer_on_line_two_or_a_value_that_merely_contains_the_clock_is_refu
 
 
 def test_a_write_to_the_global_config_is_refused_without_touching_the_owners_file(tmp_path: Path) -> None:
-    # the clock reads whatever global git reads; for this run that is a throwaway copy
+    # Ticket 142 item 3: the child's global config is the clock-only file the clock writes under
+    # the run directory (GIT_CONFIG_GLOBAL, for the child only). The stub's `git config
+    # --global` lands there, the clock reads the file back and refuses the key by name, and
+    # neither the owner's file nor the clock's own global -- a throwaway copy here, so that fact
+    # is measured -- is reached.
     unit = tmp_path / "estate" / "driftwood"
     _fixture_adopter(unit)
     real = Path.home() / ".gitconfig"
@@ -967,20 +971,55 @@ def test_a_write_to_the_global_config_is_refused_without_touching_the_owners_fil
                           env=env, capture_output=True, text=True, timeout=120)
     assert done.returncode == 1, done.stdout + done.stderr
     fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
-    assert fail_lines and "local-clock.probe" in fail_lines[0], done.stdout
-    # git writes the key in section form: [local-clock] / probe = yes
-    assert "[local-clock]" in copy.read_text() and "probe = yes" in copy.read_text(), copy.read_text()[-200:]
+    assert fail_lines and "local-clock.probe" in fail_lines[0] and "its own global" in fail_lines[0], done.stdout
+    cage = tmp_path / ".local-clock" / "runs" / _run_id(done.stdout) / "classify-driftwood.cage"
+    assert "[local-clock]" in (cage / "gitconfig").read_text() and "probe = yes" in (cage / "gitconfig").read_text()
+    assert "[local-clock]" not in copy.read_text(), "the child reached the clock's own global config"
     assert not real.exists() or "[local-clock]" not in real.read_text(), "the stub wrote the owner's real global config"
 
 
 def test_the_fixture_bypasses_the_owners_global_hook_and_the_clock_does_not() -> None:
     # R2: the fixture's git carries -c core.hooksPath=<empty dir>; the clock's own git and the
     # config it snapshots still read the real global (its hooksPath is only overridden by the
-    # clock's -c for its own commands, never removed from what the child sees)
+    # clock's -c for its own commands). Ticket 142: the CHILD's global is the clock-only file,
+    # set on the child's `env` line and nowhere else; the clock's own cgit sets none.
     assert GIT[1:] == ["-c", f"core.hooksPath={NO_HOOKS}"] and NO_HOOKS.is_dir() and not any(NO_HOOKS.iterdir())
     text = CLOCK.read_text()
-    assert "GIT_CONFIG_GLOBAL" not in text, "the clock must read the real global config"
+    cgit_line = next(l for l in text.splitlines() if l.startswith("cgit() {"))
+    assert "GIT_CONFIG_GLOBAL" not in cgit_line, "the clock's own git must read the real global config"
+    assert 'GIT_CONFIG_GLOBAL="$cage/gitconfig"' in text, "the child's global must be the clock-only file"
     assert 'core.hooksPath="$NO_HOOKS"' in text, "the clock's own git runs no hooks"
+
+
+def test_the_child_holds_no_push_capability(tmp_path: Path) -> None:
+    # Ticket 142 item 3 (ticket 30 decision 14). Measured 2026-09-25: under operations the guard
+    # admitted an adopter push made inside `python3 -c 'subprocess.run([...])'`. The stand-in
+    # child tries that push, an https push and an ssh push, from PATH's own git and python3, and
+    # every one must fail at the transport with origin unmoved. verify-local-clock.sh reads the
+    # same probe file; this is the suite's copy of that reading.
+    unit = tmp_path / "estate" / "driftwood"
+    origin = _fixture_adopter(unit)
+    served = _git(origin, "rev-parse", "main")
+    done = subprocess.run(["bash", str(CLOCK), "--adopter", "driftwood", "--step", "classify"],
+                          env=_clock_env(tmp_path, "pushprobe"), capture_output=True, text=True, timeout=120)
+    assert done.returncode == 0, done.stdout + done.stderr
+    probe = (tmp_path / ".local-clock" / "push-probe.out").read_text()
+    assert "push origin (python3 subprocess): rc 128 fatal: transport 'file' not allowed" in probe, probe
+    assert "push https (python3 subprocess): rc 128 fatal: transport 'https' not allowed" in probe, probe
+    assert "push ssh: fatal: transport 'ssh' not allowed" in probe, probe
+    assert "remote-https: git: 'remote-https' is not a git command" in probe, probe
+    assert "env SSH_AUTH_SOCK: unset" in probe and "env GITHUB_TOKEN" + ": unset" in probe, probe
+    assert not re.search(r"gh[a-z]_[A-Za-z0-9]{20,}|github_pat_", probe), "a real gh credential reached the child"
+    assert _git(origin, "rev-parse", "main") == served and not _git(origin, "for-each-ref", "refs/heads/probe*")
+    argv = (tmp_path / ".local-clock" / "claude-argv").read_text().splitlines()
+    for flag in ("--restricted", "--strict-mcp-config", "--mcp-config", "--settings"):
+        assert flag in argv, argv
+    allowed = argv[argv.index("--allowedTools") + 1].split(",")
+    assert "Bash(python3 *)" not in allowed and "Bash(python3 -m twin.market_signals moves *)" in allowed, allowed
+    settings = json.loads(Path(argv[argv.index("--settings") + 1]).read_text())
+    assert any(h["matcher"] == ".*" and any("twin/enact_guard.py" in c["command"] for c in h["hooks"])
+               for h in settings["hooks"]["PreToolUse"]), settings
+    assert settings["sandbox"]["enabled"] is True and settings["sandbox"]["network"]["allowedDomains"] == []
 
 
 # --- tidy (2026-09-06): whitespace before the trailer's colon, lower case -----------------------
