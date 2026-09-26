@@ -63,7 +63,11 @@ nothing else changed. `compose/composition.py` `price_twin` carries `rests_on_gr
 payload predates the field; `compose/handbook.py` prints the grade beside the twin line or names
 its absence. No release is cut here.
 
-**What the hub PR builds.** `twin/evidence.py`: `DECLARABLE_THRESHOLDS = (2, 3)`,
+**What the hub PR builds.** *(Superseded in part on 2026-09-26, see the two review-round
+comments below: `tests/test_pricing_threshold.py` holds 49 tests, the golden citation reads
+"eco-system ticket 141 (ADR-0032, decided by eco-system grilling ticket 30 decision 6) ...", and
+the synthetic-record rule reads the admitting path and runs in `twin exposure` too.)*
+`twin/evidence.py`: `DECLARABLE_THRESHOLDS = (2, 3)`,
 `declared_threshold(party)` (reads `appetite.pricing_threshold` off a parsed `party.yaml`, absent
 means the ladder's 2, anything else refused by name), `check_threshold`, `may_price(grade,
 threshold=...)`, `applied(...)` and `published(pricing=..., admission=...)` (the thresholds in
@@ -229,3 +233,91 @@ verify-twin-evals.sh`: exit 0, every line PASS or NOT MEASURABLE. `TWIN_CI_ARCH_
 verify --only cross_architecture_determinism`: 12 artefacts byte-identical on arm64.
 `identical_pins_identical_bytes` passes with the twelve goldens unchanged. Not run, per the
 brief: the full pytest suite and `talk/verify-all.sh`.
+
+**2026-09-26, second review round addressed.** Owner-instructed: the owner wrote on 2026-09-25,
+"i'm afk you have all the approvals you need to deliver". That authorises this push to the same
+two feature branches and nothing more. The reviewer returned one blocking and four minor
+findings; all five are addressed, with one hub code commit (`3c96ca77`), the hub record commit
+after it, and one platform commit (`e291139`) on PR #45's branch. The measurement paragraph
+after this supersedes the one above.
+
+*Blocking, the admitting path.* `pricing._synthetic_reason` read the propagation path and the
+valuation and never `verdict["path"]`, the path `admission.admit` returns as the one that admits
+the figure to the declared cash flow. Decision 5 (amended) says the price rests on that path and
+folds its worst hop into `rests_on_grade`, so a grade raised on it by a synthetic record was a
+grade the price rested on, and the reviewer's plant priced through it (`reporting-service` at
+9000.0, admitted over an edge strengthened 3 to 2 on a signal stamped `synthetic: true`).
+`twin/synthetic.py` gains `path_rests_on(overlay, hops, label)`, which reads a whole path of
+hops the way `rests_on` reads one edge, and `twin/pricing.py` reads both paths through it, the
+admitting one labelled "admitting-path hop" in the refusal. The reviewer's plant and its control
+are in `tests/test_pricing_threshold.py`: the plant is refused `RESTS_ON_SYNTHETIC` naming the
+admitting hop and the drill under the default and under 3, the control (the same regrade citing
+dated incident records) prices 9000.0 resting on grade 2. `twin/pricing.py`'s docstring and
+`twin/README.md` now say "propagation path, admitting path or valuation" where they said "path
+or valuation".
+
+*Minor 1, accepted: `twin exposure` applies the same net.* Decision (delegated, ADR-0025):
+`verbs.exposure` reads each valued component's basis and its admitting path through the same
+two functions, first and by name, and a hit is a register entry whose reason starts with
+`RESTS_ON_SYNTHETIC` and carries no figure. Reason: an exposure figure carries `rests_on_grade`
+folded from exactly those two subjects, so the subjects a figure shows its grade from and the
+subjects it can be refused on are one set; the alternative, stating that point 4 stops at
+`price`, would leave `twin exposure` admitting 400000 on the valuation `twin price` refuses,
+which is the inconsistency the reviewer planted. Two plants with controls: the portal's basis
+rewritten onto the drill (register entry, `order-service` still admitted, `declared_exposure`
+250000.0) and the reporting service admitted over the drill-strengthened edge (register entry
+naming the admitting hop; the control admits 30000.0 resting on grade 2). The `scenario-exposure`
+golden digest is unchanged, so no fixture figure rested on a marked record. `twin/synthetic.py`'s
+docstring gains a section naming which subjects each kind of figure rests on.
+
+*Minor 2, accepted: a precondition for ticket 144 the record had not named.* Under
+`Overlay.load(..., pricing_threshold=3)` the tie's gap rule refuses a grade-3 valuation with no
+amount ("admits a figure and none is declared"). At `origin/main` tuppence's
+`values.payment-fee-income` (`twin/orgs/tuppence/perspectives/tuppence.yaml`, 5deffe6) and
+ludlow's `values.plan-administration-fees` (b8e14f7) are grade 3 with no amount, so both served
+overlays refuse to load under a declaration of 3 until ticket 144 puts amounts on them from the
+comparable filings (driftwood's `checkout-revenue` is grade 2 with an amount and `brand-trust`
+grade 5 with none, so it loads under either). That is the pre-existing tie rule and not a defect
+here, and no figure is invented for it (ADR-0020); it is a hard precondition for 144 beside the
+platform release and the pin moves, and the merge order below names it.
+
+*Minor 3, accepted: the handbook selfcheck measures the twin branch.* `compose/handbook.py
+--selfcheck` had no `prices[]` entry of kind `twin`, so its 47 PASS lines never reached the
+branch PR #45 added. Seven planted checks now render one at `prices[4]`: `rests_on_grade: 3`
+prints "rests on evidence grade 3" and names no absence; null, a boolean, a string, a float and a
+missing field each name `prices[4].rests_on_grade` absent and print no sentence; a feed line
+carrying the field prints nothing, because only the twin's price rests on a graded chain. 54
+checks PASS. The check bites: with the branch skipped the stated-grade check fails, and with the
+bool guard dropped the boolean check fails (both broken on purpose in the worktree and restored).
+The sentence now names the three subjects the hub folds: the propagation path, the valuation and
+the path that admits the figure to the cash flow.
+
+*Minor 4, accepted: the record matches the artefact.* A supersession note now heads the first
+"What the hub PR builds" paragraph (49 tests, the re-cited golden, the admitting path).
+
+*Nothing is less safe.* Each change removes a figure (a price or an exposure figure that rested
+on a marked record), adds a check to a selfcheck, or changes a record. No gate is loosened and
+no golden moved. The synthetic-record prose legs remain a net, not a proof, as the module says.
+
+**What was measured, 2026-09-26, second round.** On a throwaway merge of hub `3c96ca77` onto
+`origin/main` at `0c1249d0` (worktree `build/141/fix2-merge`, merge `a1e49b92`): `./bin/twin
+verify` in full: 71 passed, 2 failed, 2 skipped, the two being 44
+`drift_window_is_actually_being_sampled` and 45 `flux_coverage_floor_is_still_reachable`, which
+fail with the same messages on a pristine `origin/main` worktree at `0c1249d0` today (measured
+with `--only`, worktree removed after). Main's typecheck command (`python -m mypy twin tests
+conftest.py --ignore-missing-imports --warn-unused-ignores`): no issues in 202 files.
+`tests/test_pricing_threshold.py` (49 tests) with `test_pricing.py test_evidence_ladder.py
+test_perspective.py test_admission.py test_use_gating.py test_corroboration.py
+test_seam1_cli.py`: 232 passed. With `twin/pricing.py`, `twin/synthetic.py` and `twin/verbs.py`
+stashed back to the previous head, the three plants fail and the two controls pass (3 failed, 2
+passed), so the refusals are attributable to the fix. `twin verify --only
+identical_pins_identical_bytes --only grade_5_only_path_never_prices --only
+mitigation_credit_is_gated_on_corroborated_enactment_not_just_claimed_evidence --only
+prefilter_precedes_pricing --only ruin_class_absent_not_priced`: 5 passed, 12 artefacts
+identical to the committed goldens. `verify/twin-evals/verify-twin-evals.sh`: exit 0, every
+line PASS or NOT MEASURABLE, `cross_architecture_determinism` 12 artefacts byte-identical on
+arm64. `tests/test_invariant_suite.py::test_the_suite_is_green`: fails naming the same two probe
+reds and nothing else. On the platform branch at `e291139` over `origin/main` 557c153 (a
+fast-forward): `compose/handbook.py --selfcheck` 54 checks PASS; `party/party_artefact.py
+--selfcheck` selfcheck ok; `PAVC_ESTATE_CLONE=... compose/composition.py --selfcheck` selfcheck
+ok. Not run, per the brief: the full pytest suite and `talk/verify-all.sh`.
