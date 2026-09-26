@@ -1,7 +1,7 @@
 # 146 — One grader run grades every engine a line names
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -311,3 +311,28 @@ ticket and is carried here: platform `distribution/render-governed-namespace-gua
 `distribution/verify-governed-namespace-guard.sh` still say that the kyverno CLI cannot evaluate
 `namespaceSelector` offline. The review measured on 1.18.2 that `kyverno test` and `kyverno apply`
 evaluate it against a Namespace that a Values file declares.
+
+## Answer
+
+Resolved 2026-09-26 by the integrator. Platform PR 47 merged as cb680f22 and hub PR 146 as
+ef0edb98, both as `pavc-other-hand`, after review round 2 approved. The owner authorised the
+delivery on 2026-09-26: "Authorised" (owner-instructed).
+
+Truth run 358 on hub `main` (`talk/truth.log`, 2026-09-26T12:32Z, hub ef0edb9, platform
+cb680f2@main) records pass=88 and no fall. It measured each Done clause as follows:
+
+- `.estate-clone/platform/computed-semver/verify-cage-engine.sh` PASS. Its recorded capture grades
+  two cells, policy 5.0.0 and the machinery, on 1.18.2 from the engine table, and both pass. Each
+  body is read by `git archive` at `refs/tags/policy/v5.0.0` or at the graded platform commit.
+- `verify/estate-engines/verify-estate-engines.sh` PASS: "all 5 of the estate's own engine pins
+  name a row of the platform engine table and a supported engine of every served line and of the
+  machinery". Its selfcheck fails on each planted unsupported pin.
+- `.estate-clone/platform/verify-cut-release-tags.sh` PASS, with case 9: "the array rewrite keeps
+  a nested tested_engines it finds before the cut".
+- The platform unit tests in `computed-semver/test_engine_compatibility.py` cover a second listed
+  engine with no binary (could-not-look), and a candidate that passes or fails a cell (PASS or
+  FAIL). They ran on the fixer's head, 1dba561, which platform `main` carries.
+
+What stays open elsewhere: the table has one row, 1.18.2, until ticket 148 or ticket 149 adds
+1.19.1. The two UPDATE-only holds are graded on compiling only, because the offline CLI evaluates
+every resource as a CREATE.
