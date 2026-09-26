@@ -7,7 +7,9 @@ control (the last since eco-system ticket 124, ADR-0026 point 5), and that each 
 
 - `deltas[]` — one entry per new/closed hole, per baseline widening, per removed control, per
   baseline narrowing, per new/closed ungoverned namespace, each under the adopter's own perspective and currency, priced where a pinned
-  instrument names a price and a named absence (`amount: null`) where none does;
+  instrument names a price and a named absence (`amount: null`) where none does. The whitelist
+  also admits ticket 148's `unsupported-engine` and `undeclared-engine`, whose amounts
+  `verify/engine-pairing/` grades;
 - `holes[]` keyed `(source, control_id)` across every controls parent, with `perspective`,
   `currency`, `amount` and `priced_by`;
 - a `price` on every open `ungoverned[]` entry: workload share (re-counted from the adopter's own
