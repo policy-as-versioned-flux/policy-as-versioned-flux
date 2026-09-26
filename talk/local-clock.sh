@@ -485,7 +485,7 @@ run_step() {  # step skill paths pattern validator adopter
   local judge="$RUN_DIR/$tag.judge" judge_before judge_after
 
   if [ "$DRY" = 1 ]; then
-    echo "dry   $tag: would run  $CLAUDE -p \"/$skill $adopter\" --max-turns $MAX_TURNS --restricted --strict-mcp-config --settings <clock-only> --allowedTools \"$ALLOWED_TOOLS\" --append-system-prompt \"\$(cat $prompt)\"  (worktree $wt on $branch; prompt kept at $prompt; the child's environment holds no push capability, see make_cage)"
+    echo "dry   $tag: would run  $CLAUDE -p \"/$skill $adopter\" --max-turns $MAX_TURNS --restricted --strict-mcp-config --settings <clock-only> --allowedTools \"$ALLOWED_TOOLS\" --append-system-prompt \"\$(cat $prompt)\"  (worktree $wt on $branch; prompt kept at $prompt; the child's inherited environment reaches no push credential, see make_cage)"
     cleanup_or_fail "$step" "$adopter" "$unit" "$wt" "$branch" skip "dry run"; return $?
   fi
 
@@ -503,7 +503,7 @@ run_step() {  # step skill paths pattern validator adopter
     record --step "$step" --adopter "$adopter" --status fail --reason "could not write the child's cage" --base "$base"; return 1
   fi
 
-  echo "run   $tag: /$skill $adopter on $branch (worktree $wt, max $MAX_TURNS turns; the child holds no push capability: cage at $cage)"
+  echo "run   $tag: /$skill $adopter on $branch (worktree $wt, max $MAX_TURNS turns; the child's inherited environment reaches no push credential: cage at $cage)"
   # Every branch and tag of the unit but the step's own, before the child: after it, any ref
   # that appeared or moved is refused and named. The guard admits `git tag -a` (the owner's
   # global tag.gpgsign would sign it) and `git update-ref refs/heads/main HEAD` (which moves
@@ -523,7 +523,7 @@ run_step() {  # step skill paths pattern validator adopter
   # commits as the clock, unsigned. The owner's global git config names the owner and signs
   # commits and tags with the owner's SSH key; a model with nobody at the keyboard may do
   # neither, and the clock reads the whole branch back below.
-  # The child's environment holds no push capability: see make_cage, above, for what each of
+  # The child's inherited environment reaches no push credential: see make_cage, above, for what each of
   # these closes and how it was measured. The order is env -u (unset) first, then the values.
   env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION \
     -u SSH_AUTH_SOCK -u SSH_AGENT_PID -u GITHUB_TOKEN -u GH_ENTERPRISE_TOKEN -u GITHUB_ENTERPRISE_TOKEN \

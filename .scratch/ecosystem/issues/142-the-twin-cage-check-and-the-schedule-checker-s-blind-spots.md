@@ -121,7 +121,7 @@ rerun read 8h: a transient in the API listing, recorded, not a change. Lane: one
 unit for the second hand's merges; hub@main's scheduled-commit count moved 88 to 89 because
 origin/main gained a truth record between the runs; verdict unchanged (PASS, exit 0).
 
-**Item 3, `talk/local-clock.sh`: the child holds no push capability.** Measured on this machine
+**Item 3, `talk/local-clock.sh`: the child's inherited environment reaches no push credential.** Measured on this machine
 2026-09-25 before writing: `/opt/homebrew/etc/gitconfig` (git's system file here) sets
 `credential.helper = osxkeychain`; every estate remote is https; `SSH_AUTH_SOCK` is set and the
 agent holds a key; `~/.ssh` holds key files; `~/.git-credentials` exists; gh is logged in through
@@ -183,3 +183,12 @@ ticket 77, which reads `resolved`, so the FAIL line says "either the fix has not
 scheduled run yet, or this red is a new one wearing an old ticket's name" (a re-own or a new
 ticket is the integrator's call); tickets 143 and 145 are referenced by the clock-owner rows for
 tuppence and ludlow through ticket 144, unchanged.
+
+**2026-09-26, integrator, before merge (delegated).** The round-1 reviewer showed that a child can
+rebuild its own environment (`env -u GIT_ALLOW_PROTOCOL GIT_EXEC_PATH=... git -c
+credential.helper=osxkeychain push ...`) and reach the owner's keychain. So the item-3 cage removes
+the push route from the environment the child inherits; it does not yet remove the capability.
+The PASS line and the clock's own lines now say exactly that, and name the limit. What would hold
+against a rebuilt environment: the Claude Code sandbox the clock-only settings enable (configured,
+not yet measured: the first live run measures it), or a separate OS user for the child. Item 3
+stays open on that point until one of them is measured.
