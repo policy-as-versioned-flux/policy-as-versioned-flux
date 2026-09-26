@@ -10,6 +10,18 @@ What it observes, per adopter, on `.estate-clone/<adopter>/composed/evidence.jso
      or null where that party declares no customer count;
   3. exactly one `source: twin` entry when that adopter publishes a forward-intel feed, carrying
      policy_version, curve_hash and tail — and NO twin entry when it publishes no such feed;
+  3b. at most one `agent-cage` entry (eco-system ticket 145, ADR-0031), priced by the platform for
+     the subject `twin-agent`: its gap re-derives from this document's own twin line, its window
+     equals the interval of the cron in the hub's OWN .github/workflows/truth.yml, its frequency
+     equals the row the estate's feeds tree serves at the register version the party pins, its
+     amount is always the PERT-mean frequency times the PERT-mean magnitude (any other
+     annualisation is refused by name), its reach is what the adopter's SERVED tree gives
+     (the scheduled twin-sweep.yml's token, the pull-request gate's binding and recompose
+     steps, the grades the document's own prices rest on), its residuals re-derive from that
+     reach through the four paths' closures, and its rung is what the adopter's own
+     selection-policy package picks (the estate leg check_agent_cage); an adopter with no such
+     line is a named wait only where PRICE_KINDS at the platform tag it pins, read with
+     `git show` off the estate's platform clone, does not carry the kind;
   4. the regime entry's (source: ico, kind: feed) holes[] amounts sum to its total, and the entry's own
      amount equals the sum of the lines the adopter has not implemented (status neither
      `covered` nor `closed`), so implementing a control reduces it (eco-system ticket 121);
@@ -54,6 +66,7 @@ Usage:
 """
 from __future__ import annotations
 
+import ast
 import glob
 import importlib.util
 import json
@@ -75,8 +88,36 @@ ISO4217 = re.compile(r"^[A-Z]{3}$")
 # `supersede` (eco-system ticket 84): the surcharge on a feed line whose pin sits behind a newer
 # tagged major, carried beside the line under the same perspective and currency, never summed
 # into the exposure; verify/supersede/ grades its arithmetic.
-KINDS = {"feed", "twin", "premium", "switching", "reliability", "supersede"}
+# `agent-cage` (eco-system ticket 145, ADR-0031): the PLATFORM's price of the twin agent's cage,
+# for a subject that is not a pod (`subject: twin-agent`), carried beside the exposure; its
+# `proposed_tier` is the twin agent's rung and never folds into a Namespace. Leg 3b grades it.
+KINDS = {"feed", "twin", "premium", "switching", "reliability", "supersede", "agent-cage"}
 SOURCES = {"ico", "feeds", "twin", "insurer", "platform"}   # plus any party name in the estate
+LADDER = ("baseline", "restricted", "quarantine", "isolated")
+AGENT_CAGE_KIND, AGENT_CAGE_SUBJECT = "agent-cage", "twin-agent"
+AGENT_TABLE_PREFIX = "platform-twin-agent-table@"
+# The four misuse paths of eco-system ticket 30 decision 15 and the loosest rung that closes
+# each (ADR-0031; platform/graded/cage.py TWIN_AGENT_PATHS). Leg 3b re-derives every residual
+# on the line from the line's own `reach` through these closures, so a residual is measured
+# rather than believed, and a `closes` map that disagrees with the decision is a FAIL.
+AGENT_PATHS = {
+    "writer-pushes-a-looser-declaration": "isolated",
+    "writer-merges-or-tags-through-rest": "isolated",
+    "misleading-proposal-merged-by-a-human": "quarantine",
+    "model-step-writes-a-wrong-binding-or-forecast": "restricted",
+}
+AGENT_MISUSE_THREAT = "scheduled-agent-misuses-write-credential"
+# The hub's own truth gate: its schedule is the detection window the scenario runs over
+# (ticket 30 decision 12), and this check runs from the checkout that serves it.
+ROOT = os.path.dirname(os.path.dirname(HERE))
+TRUTH_WORKFLOW = os.path.join(".github", "workflows", "truth.yml")
+# The adopter's served sweep, whose token the two writer paths reach with (the file ticket 30,
+# ticket 143 and verify/schedules all name), and the shape of a pull-request step that
+# recomposes the party artefact and exits non-zero on drift against composed/.
+SWEEP_WORKFLOW = ".github/workflows/twin-sweep.yml"
+DRIFT_TEST = re.compile(r"(status --porcelain|diff --exit-code|diff --quiet)[^\n]*-- composed/")
+NONZERO_EXIT = re.compile(r"\bexit\s+[1-9]")
+PRICE_KINDS_LINE = re.compile(r"^PRICE_KINDS\s*=\s*(\(.*?\))\s*$", re.M)
 AMOUNT_KEYS = ("amount", "total", "new_price", "old_price")
 # The statuses of a regime line the adopter has implemented (eco-system ticket 121).
 IMPLEMENTED = ("covered", "closed")
@@ -105,6 +146,22 @@ def amount_of(entry):
 
 def close(a, b):
     return math.isclose(a, b, rel_tol=1e-9, abs_tol=1e-6)
+
+
+def close_rel(a, b):
+    """Proportionate to what it compares: leg 3b's frequency (of order 1e-4 events a year), its
+    magnitude, its amount (of order 1 GBP) and its residuals. close()'s absolute 1e-6 admitted a
+    0.6 % drift at the register's mode (review of eco-system ticket 145, round 2)."""
+    return math.isclose(float(a), float(b), rel_tol=1e-6, abs_tol=0.0)
+
+
+def _triple(t):
+    return (isinstance(t, list) and len(t) == 3
+            and all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in t))
+
+
+def _pert(t):
+    return (float(t[0]) + 4.0 * float(t[1]) + float(t[2])) / 6.0
 
 
 # --------------------------------------------------------------------------
@@ -225,6 +282,179 @@ def check_doc(doc, ctx):
     else:
         out("PASS", f"{who}: publishes no forward-intel feed yet, so no twin entry is expected "
                     f"(named absence, not a silent pass)")
+
+    # 3b: the twin agent's cage line (eco-system ticket 145; ADR-0031). At most one, priced by
+    # the PLATFORM for the subject it names -- the twin never prices its own cage -- and, when
+    # priced, carrying the derivation the rung can be re-derived from: residuals at every rung
+    # under a named twin-agent table, what each misuse path reaches, the rungs that close them,
+    # the scenario (the gap read off THIS document's twin line, over a window with a source) and
+    # the register row's frequency. Check 3 counts `source: twin` lines and stays honest: this
+    # line's source is `platform`. An unpriced line was printed by leg 1 as a named SKIP; here it
+    # may propose no rung.
+    agents = [e for e in prices if e.get("kind") == AGENT_CAGE_KIND]
+    if len(agents) > 1:
+        out("FAIL", f"{who}: {len(agents)} `agent-cage` prices[] entries; the twin agent has one "
+                    f"cage and one line (eco-system ticket 145)")
+    for e in agents:
+        at = f"{who} prices[{prices.index(e)}] agent-cage"
+        if e.get("subject") != AGENT_CAGE_SUBJECT:
+            out("FAIL", f"{at}: names subject {e.get('subject')!r}, not {AGENT_CAGE_SUBJECT!r}; a "
+                        f"kind for a subject that is not a pod names its subject on the line")
+        if e.get("source") != "platform":
+            out("FAIL", f"{at}: priced by {e.get('source')!r}; the platform prices the twin agent's "
+                        f"cage and the twin never prices its own (ADR-0031 decision 5)")
+        if amount_of(e) is None:
+            if e.get("proposed_tier") is not None:
+                out("FAIL", f"{at}: could not be priced yet proposes rung {e.get('proposed_tier')!r}")
+            continue
+        missing = [f for f in ("proposed_tier", "residuals", "residual_basis", "reach", "closes",
+                               "scenario", "lef", "lef_from", "policy_version", "window")
+                   if e.get(f) in (None, {}, [], "")]
+        if missing:
+            out("FAIL", f"{at}: priced, but carries no {', '.join(missing)} -- the rung cannot be "
+                        f"re-derived from the line (ADR-0021)")
+            continue
+        tier, residuals = e["proposed_tier"], e["residuals"]
+        if tier not in LADDER:
+            out("FAIL", f"{at}: proposes rung {tier!r}, which is not on the ladder {list(LADDER)}")
+            continue
+        if not isinstance(residuals, dict) or set(residuals) != set(LADDER):
+            out("FAIL", f"{at}: residuals cover {sorted(residuals) if isinstance(residuals, dict) else residuals!r}, "
+                        f"not every rung {list(LADDER)}")
+            continue
+        if residuals.get(tier) is None:
+            out("FAIL", f"{at}: selected {tier!r}, a rung whose residual could not be derived")
+            continue
+        if not str(e["residual_basis"]).startswith(AGENT_TABLE_PREFIX):
+            out("FAIL", f"{at}: residual_basis {e['residual_basis']!r} names no twin-agent table "
+                        f"({AGENT_TABLE_PREFIX}<version>); pod reductions never price the twin agent")
+        if e.get("lef_from") != "threat-register":
+            out("FAIL", f"{at}: frequency comes from {e.get('lef_from')!r}, not the threat register "
+                        f"(ticket 30 decision 12)")
+        # Everything below is MEASURED against something other than the line's own labels:
+        # the gap against this document's twin line, the window against the cron in the hub's
+        # own truth.yml, the frequency against the row the estate's feeds tree serves at the
+        # version the party pins, the amount against the product of the two, the reach against
+        # the adopter's served tree, the residuals against that reach through the four paths'
+        # closures. The first cut read `window_days` and `lef` off the line and graded them
+        # against themselves: a line priced at ten times the row's frequency, or over a
+        # thirty-day window, with its amount recomputed to match, was green (review of eco-system
+        # ticket 145, round 1 finding 1); the second ran the amount measurement only when the
+        # line's own `annualised_by` said `expectation` and believed the line's `reach` (round 2).
+        # `bad` collects what is false, `waits` what could not be looked at; the PASS below is
+        # printed only when both are empty.
+        bad, waits = [], []
+        sc = e["scenario"]
+        twin = twins[0] if len(twins) == 1 else None
+        tres = (twin or {}).get("residuals") or {}
+        loosest, selected = sc.get("loosest_pod_tier"), sc.get("selected_pod_tier")
+        window_days = sc.get("window_days")
+        if twin is None or loosest not in tres or selected not in tres:
+            bad.append(f"its gap reads rungs {loosest!r} and {selected!r} off a twin line this "
+                       f"document does not carry residuals for")
+        elif selected != twin.get("proposed_tier"):
+            bad.append(f"its gap is read at pod rung {selected!r}, but the twin line selected "
+                       f"{twin.get('proposed_tier')!r}")
+        elif not close(float(sc.get("gap", -1)), float(tres[loosest]) - float(tres[selected])):
+            bad.append(f"gap {sc.get('gap')} is not the twin line's {loosest} residual "
+                       f"({tres[loosest]}) minus its {selected} residual ({tres[selected]})")
+        elif not (_triple(sc.get("lm")) and isinstance(window_days, (int, float))
+                  and all(close_rel(x, float(sc["gap"]) * float(window_days) / 365.25)
+                          for x in sc["lm"])):
+            bad.append(f"loss magnitude {sc.get('lm')} is not the gap {sc.get('gap')} times the "
+                       f"window ({window_days} day(s) of 365.25)")
+        elif not sc.get("window_source"):
+            bad.append("the detection window names no source")
+        # The amount, ALWAYS: the PERT-mean frequency times the PERT-mean magnitude, the one
+        # annualisation the composer writes (`annualised_by: expectation`, fair.expected_ale).
+        # Any other label is refused by name rather than switching this measurement off: a
+        # simulated mean is not re-derivable here (fair.simulate rounds each year's count to an
+        # integer and resolves no event at this frequency), and the composer never writes one.
+        if sc.get("annualised_by") != "expectation":
+            bad.append(f"annualised by {sc.get('annualised_by')!r}, which this seam cannot re-derive; "
+                       f"the composer annualises the line by `expectation` (E[events a year] x "
+                       f"E[loss per event] over the PERT means, fair.expected_ale) and by nothing else")
+        if not _triple(e.get("lef")):
+            bad.append(f"frequency {e.get('lef')!r} is not a lo, mode, hi triple")
+        elif _triple(sc.get("lm")) and not close_rel(amount_of(e), _pert(e["lef"]) * _pert(sc["lm"])):
+            bad.append(f"amount {amount_of(e)} is not the PERT-mean frequency ({_pert(e['lef']):.6g}) "
+                       f"times the PERT-mean magnitude ({_pert(sc['lm']):.6g}), "
+                       f"{_pert(e['lef']) * _pert(sc['lm']):.6g}, whatever the line says it was "
+                       f"annualised by")
+        # the window, against the served gate's own schedule (ticket 30 decision 12)
+        gw = ctx.get("gate_window") or {}
+        if gw.get("days") is None:
+            waits.append(f"the window ({window_days} day(s)) could not be compared with the gate's "
+                         f"schedule: {gw.get('why') or 'no gate window was read'}")
+        elif not (isinstance(window_days, (int, float)) and close(float(window_days), float(gw["days"]))):
+            bad.append(f"the window is {window_days} day(s), but the hub's own {gw['source']} cron "
+                       f"{gw['cron']!r} fires every {gw['days']:g} day(s); the loss runs until the "
+                       f"gate detects it, and the gate runs on that schedule")
+        # the frequency, against the row the estate serves at the register version the party pins
+        reg = ctx.get("agent_register") or {}
+        if reg.get("version") is not None and e.get("register_version") != reg["version"]:
+            bad.append(f"priced at threat-register@{e.get('register_version')}, but {who}'s party.yaml "
+                       f"pins threat-register@{reg['version']}")
+        elif reg.get("lef") is None:
+            waits.append(f"the frequency {e.get('lef')} could not be compared with the pinned "
+                         f"register: {reg.get('why') or 'no register row was read'}")
+        elif not (_triple(e.get("lef"))
+                  and all(close_rel(a, b) for a, b in zip(e["lef"], reg["lef"]))):
+            bad.append(f"frequency {e.get('lef')} is not the row {reg['path']} serves for "
+                       f"{who} ({reg['lef']}); the line is priced at a frequency the pinned register "
+                       f"does not publish")
+        # the reach, against what the adopter's SERVED tree gives (the scheduled sweep's token,
+        # the pull-request gate's binding and recompose steps, the grades this document's own
+        # prices rest on), and the residuals re-derived from that reach through the four paths'
+        # closures. The line's own `reach` used to be believed here (review round 2, finding 2):
+        # a reach hand-written to 0.0 over a served sweep holding `contents: write` was green.
+        reach, closes = e["reach"], e["closes"]
+        served = ctx.get("agent_reach") or {}
+        derived, basis = served.get("reach"), served.get("basis") or {}
+        if not isinstance(reach, dict) or set(reach) != set(AGENT_PATHS):
+            bad.append(f"reach names {sorted(reach) if isinstance(reach, dict) else reach!r}, not the four "
+                       f"paths of ticket 30 decision 15 {sorted(AGENT_PATHS)}")
+        elif not isinstance(closes, dict) or any(sorted(closes.get(r) or []) != _agent_closes(r)
+                                                 for r in LADDER):
+            bad.append(f"closes {closes!r} is not the decision's: each path closes at "
+                       f"{AGENT_PATHS} and a tighter rung keeps every closure of the looser ones")
+        elif derived is None:
+            waits.append(f"the reach {reach} could not be compared with {who}'s served tree: "
+                         f"{served.get('why') or 'no reach was derived off it'}")
+        else:
+            differs = [p for p in AGENT_PATHS
+                       if (reach.get(p) is None) != (derived.get(p) is None)
+                       or (reach.get(p) is not None and float(reach[p]) != float(derived[p]))]
+            for p in differs:
+                bad.append(f"reach at {p!r} is {reach.get(p)!r} on the line, but {who}'s served tree "
+                           f"gives {derived.get(p)!r}: {basis.get(p)}")
+            if not differs:
+                expected = _rederive_agent_residuals(amount_of(e), derived)
+                for r in LADDER:
+                    got, want = residuals.get(r), expected[r]
+                    if (got is None) != (want is None) or (got is not None and not close_rel(got, want)):
+                        bad.append(f"residual at {r!r} is {got!r}, but the served reach {derived} through "
+                                   f"the paths open at {r!r} gives {want!r} (amount times the largest "
+                                   f"open reach; None where an open path could not be derived)")
+        for msg in bad:
+            out("FAIL", f"{at}: {msg}")
+        for msg in waits:
+            out("SKIP", f"{at}: {msg}")
+        if bad or waits:
+            continue
+        same = residuals["restricted"] == residuals["baseline"]
+        out("PASS", f"{at}: the platform prices the twin agent's cage under {e['residual_basis']} "
+                    f"at rung {tier!r} (policy {e['policy_version']}): a gap of "
+                    f"{float(sc['gap']):,.2f} {e.get('currency')} re-derived from this document's "
+                    f"twin line between pod rungs {loosest!r} and {selected!r}, over "
+                    f"{window_days:g} day(s), the interval of the cron {gw['cron']!r} in the hub's own "
+                    f"{gw['source']}, at the frequency {reg['lef']} the estate serves at {reg['path']} "
+                    f"for threat-register@{reg['version']}, the amount their PERT-mean product; "
+                    f"the reach {derived} is what {who}'s served tree gives ({served.get('read')}) "
+                    f"and every residual re-derives from it: restricted "
+                    f"{'carries' if same else 'does not carry'} baseline's residual "
+                    f"({residuals['restricted']!r} against {residuals['baseline']!r}) and isolated "
+                    f"{residuals['isolated']!r}")
 
     # 4: the regime entry's holes partition it. The regime entry is ico's `kind: feed`
     # price. ico's switching and supersede prices are not regime entries and carry no
@@ -347,6 +577,303 @@ def _policy_version(estate, adopter):
             with open(p) as fh:
                 return fh.read().strip(), f"{owner}/{POLICY_PACKAGE}/VERSION"
     return None, None
+
+
+def _agent_register(estate, parties, adopter, adopter_doc):
+    """The threat-register version this adopter pins, and the frequency row the twin agent's
+    cage is priced at, read off the estate's feeds tree at that version path (as
+    _regime_weights reads ico's weights). `lef` is None with `why` naming what was not there:
+    no pin, no file at the version, or a payload with no row (the row arrives with the
+    register's major 4)."""
+    for edge in adopter_doc.get("inherits") or []:
+        if edge.get("kind") != "feed" or edge.get("party") != "feeds" \
+                or edge.get("name") != "threat-register":
+            continue
+        pub = parties.get("feeds") or {}
+        path = next((r.get("path") for r in pub.get("publishes") or []
+                     if r.get("name") == "threat-register"), "threat-register")
+        version = str(edge.get("version"))
+        feed = os.path.join(estate, "feeds", str(path), version, "feed.json")
+        rel = os.path.relpath(feed, estate)
+        if not os.path.exists(feed):
+            return {"version": version, "path": rel, "lef": None,
+                    "why": f"the estate's feeds clone serves no {rel}"}
+        try:
+            with open(feed) as fh:
+                doc = json.load(fh)
+        except (OSError, ValueError) as exc:
+            return {"version": version, "path": rel, "lef": None, "why": f"{rel} does not parse: {exc}"}
+        row = (((((doc.get("payload") or {}).get("institutions") or {}).get(adopter) or {})
+                .get("threats") or {}).get(AGENT_MISUSE_THREAT))
+        lef = (row or {}).get("lef") if isinstance(row, dict) else None
+        if not (isinstance(lef, list) and len(lef) == 3
+                and all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in lef)):
+            return {"version": version, "path": rel, "lef": None,
+                    "why": (f"{rel} publishes no institutions.{adopter}.threats.{AGENT_MISUSE_THREAT} "
+                            f"row with a three-point lef (the row arrives with the register's major 4)")}
+        return {"version": version, "path": rel, "lef": [float(x) for x in lef], "why": None}
+    return {"version": None, "path": None, "lef": None,
+            "why": f"{adopter} pins no feeds threat-register feed"}
+
+
+def _cron_interval_days(cron):
+    """The interval, in days, of a five-field cron that fires on a fixed hourly, daily or
+    weekly schedule. None for any other shape: an interval this check cannot derive is a
+    named could-not-look, never a guess."""
+    fields = str(cron).split()
+    if len(fields) != 5:
+        return None
+    minute, hour, dom, month, dow = fields
+    if not minute.isdigit() or dom != "*" or month != "*":
+        return None
+    if hour == "*" and dow == "*":
+        return 1.0 / 24.0
+    if hour.isdigit() and dow == "*":
+        return 1.0
+    if hour.isdigit() and dow.isdigit():
+        return 7.0
+    return None
+
+
+def _gate_window(root=ROOT):
+    """The detection window the hub's own truth gate gives (ticket 30 decision 12): the
+    interval of the one `schedule: cron` in .github/workflows/truth.yml, in days, read off
+    the file in THIS checkout. `days` is None with `why` when the file, the trigger or the
+    cron's shape does not yield one number."""
+    path = os.path.join(root, TRUTH_WORKFLOW)
+    try:
+        doc = load_yaml(path)
+    except (OSError, yaml.YAMLError) as exc:
+        return {"days": None, "cron": None, "source": TRUTH_WORKFLOW,
+                "why": f"{TRUTH_WORKFLOW} could not be read: {exc}"}
+    on = doc.get("on", doc.get(True))          # YAML 1.1 reads a bare `on` as True
+    crons = [s.get("cron") for s in ((on.get("schedule") if isinstance(on, dict) else None) or [])
+             if isinstance(s, dict) and s.get("cron")]
+    if len(crons) != 1:
+        return {"days": None, "cron": None, "source": TRUTH_WORKFLOW,
+                "why": f"{TRUTH_WORKFLOW} declares {len(crons)} schedule cron(s), not one, so the "
+                       f"gate's interval is not one number"}
+    days = _cron_interval_days(crons[0])
+    return {"days": days, "cron": crons[0], "source": TRUTH_WORKFLOW,
+            "why": (None if days is not None else
+                    f"cron {crons[0]!r} in {TRUTH_WORKFLOW} is not a fixed hourly, daily or weekly "
+                    f"schedule this check can derive an interval from")}
+
+
+def _agent_closes(rung):
+    return sorted(p for p, at in AGENT_PATHS.items() if LADDER.index(at) <= LADDER.index(rung))
+
+
+def _rederive_agent_residuals(amount, reach):
+    """The residual at each rung from the line's own reach: `amount` times the largest reach
+    among the paths still open at that rung (doors onto one loss do not add), 0.0 where every
+    path is closed, None where an open path's reach could not be derived -- platform/graded/
+    cage.py twin_agent_residuals, restated here so the seam measures the line's residuals
+    rather than believes them."""
+    out = {}
+    for rung in LADDER:
+        open_paths = [p for p in AGENT_PATHS if p not in _agent_closes(rung)]
+        if any(reach.get(p) is None for p in open_paths):
+            out[rung] = None
+        else:
+            out[rung] = float(amount) * max((float(reach[p]) for p in open_paths), default=0.0)
+    return out
+
+
+# --------------------------------------------------------------------------
+# the twin agent's reach, read off the adopter's SERVED tree (eco-system ticket 145, decision
+# 15). platform/compose/composition.py _twin_agent_reach derives the same four figures at
+# composition time; restated here, as _rederive_agent_residuals restates cage.py, so the seam
+# measures the line's `reach` against the tree rather than believes it.
+# --------------------------------------------------------------------------
+def _workflow_triggers(doc):
+    """The `on:` block as a mapping, whatever shape it was written in (YAML 1.1 reads a bare
+    `on` as True; `on: [pull_request]` and `on: pull_request` are the list and string forms)."""
+    on = doc.get("on", doc.get(True))
+    if isinstance(on, dict):
+        return on
+    if isinstance(on, list):
+        return {str(t): {} for t in on}
+    if isinstance(on, str):
+        return {on: {}}
+    return {}
+
+
+def _grants_contents_write(perms):
+    """True/False when a `permissions` block decides `contents`, None when it says nothing
+    about it (the enclosing scope or the repository default then applies)."""
+    if perms == "write-all":
+        return True
+    if perms == "read-all":
+        return False
+    if isinstance(perms, dict):
+        return perms.get("contents") == "write" if "contents" in perms else False
+    return None
+
+
+def _served_sweep(adopter_dir):
+    """The served twin sweep and what its token can do, read off the file: its schedule and
+    which of its jobs run with an effective `contents: write` (a job-level block overrides the
+    workflow's; a job declaring none inherits it). `write_jobs` empty is a could-not-look with
+    `why` naming what the file did or did not say."""
+    path = os.path.join(adopter_dir, SWEEP_WORKFLOW)
+    res = {"file": SWEEP_WORKFLOW, "crons": [], "write_jobs": [], "why": ""}
+    if not os.path.exists(path):
+        res["why"] = f"no {SWEEP_WORKFLOW} is served, so there is no scheduled twin sweep to read"
+        return res
+    try:
+        doc = load_yaml(path)
+    except (OSError, yaml.YAMLError) as exc:
+        res["why"] = f"{SWEEP_WORKFLOW} does not parse ({str(exc).splitlines()[-1].strip()})"
+        return res
+    if not isinstance(doc, dict):
+        res["why"] = f"{SWEEP_WORKFLOW} is not a workflow mapping"
+        return res
+    res["crons"] = [s.get("cron") for s in (_workflow_triggers(doc).get("schedule") or [])
+                    if isinstance(s, dict) and s.get("cron")]
+    if not res["crons"]:
+        res["why"] = f"{SWEEP_WORKFLOW} declares no `schedule:` trigger, so it is not the scheduled agent"
+        return res
+    top = _grants_contents_write(doc.get("permissions"))
+    jobs = doc.get("jobs") if isinstance(doc.get("jobs"), dict) else {}
+    for name, job in jobs.items():
+        if not isinstance(job, dict):
+            continue
+        own = _grants_contents_write(job.get("permissions"))
+        if own is True or (own is None and top is True):
+            res["write_jobs"].append(str(name))
+    if not res["write_jobs"]:
+        res["why"] = (f"{SWEEP_WORKFLOW} is scheduled but no job of its {len(jobs)} runs with a declared "
+                      f"`contents: write`: the token's scope falls to the repository's default workflow "
+                      f"permission, which this check cannot read, and a token minted another way is "
+                      f"not in the file")
+    return res
+
+
+def _run_blocks(doc):
+    """Every step's `run` block across a workflow's jobs, with whole comment lines stripped, as
+    (job, step, text). A step is what a job DOES; the raw file text also holds comments, and a
+    comment that names the drift test is not a drift test (review round 2, finding 4)."""
+    jobs = doc.get("jobs") if isinstance(doc.get("jobs"), dict) else {}
+    for jname, job in jobs.items():
+        if not isinstance(job, dict):
+            continue
+        for step in job.get("steps") or []:
+            if not isinstance(step, dict) or not isinstance(step.get("run"), str):
+                continue
+            lines = [ln for ln in step["run"].splitlines() if not ln.lstrip().startswith("#")]
+            yield str(jname), str(step.get("name") or "?"), "\n".join(lines)
+
+
+def _served_pull_request_gate(adopter_dir):
+    """The pull-request workflow steps that (a) run shift-left/tier_binding.py and (b)
+    recompose the party artefact and exit non-zero on drift against composed/, read off the
+    steps' own `run` blocks (comment lines stripped) by what each step does, not by a job's
+    name: a compose invocation, then a drift TEST on `-- composed/` (`status --porcelain`,
+    `diff --exit-code` or `diff --quiet`; a plain `diff` piped to a pager prints, it does not
+    test), then a literal non-zero exit after it, all in one step. The third value names what was looked at."""
+    workflows = sorted(glob.glob(os.path.join(adopter_dir, ".github", "workflows", "*.yml"))
+                       + glob.glob(os.path.join(adopter_dir, ".github", "workflows", "*.yaml")))
+    binding, recompose, looked = [], [], 0
+    for w in workflows:
+        try:
+            doc = load_yaml(w)
+        except (OSError, yaml.YAMLError):
+            continue
+        if not isinstance(doc, dict) or "pull_request" not in _workflow_triggers(doc):
+            continue
+        looked += 1
+        name = os.path.basename(w)
+        for job, _step, text in _run_blocks(doc):
+            where = f"{name} job {job}"
+            if "tier_binding.py" in text and where not in binding:
+                binding.append(where)
+            m = DRIFT_TEST.search(text)
+            if (m and re.search(r"\bcompose\b", text[:m.start()]) and NONZERO_EXIT.search(text[m.end():])
+                    and where not in recompose):
+                recompose.append(where)
+    return binding, recompose, f"{looked} pull-request workflow(s) read under .github/workflows"
+
+
+def _agent_reach(adopter_dir, prices):
+    """What each misuse path can still land, as a fraction of the scenario's loss, DERIVED off
+    the adopter's served tree and the document's own prices: `reach` per path (None where it
+    could not be derived), `basis` naming what each figure was read off, `read` one sentence
+    for the PASS. Nothing here is typed; the line's own `reach` is graded against this."""
+    p1, p2, p3, p4 = AGENT_PATHS
+    reach, basis = {}, {}
+    if not os.path.isdir(adopter_dir):
+        return {"reach": None, "basis": {}, "read": None,
+                "why": f"{adopter_dir} is not a directory in the estate clone"}
+    sweep = _served_sweep(adopter_dir)
+    if sweep["write_jobs"]:
+        reach[p1] = reach[p2] = 1.0
+        basis[p1] = (f"{sweep['file']} is scheduled ({', '.join(sweep['crons'])}) and its job(s) "
+                     f"{', '.join(sweep['write_jobs'])} run with contents: write, so a looser "
+                     f"declaration the token pushes to main is served whole until the gate reads it")
+        basis[p2] = (f"the same contents: write token on {sweep['file']} ({', '.join(sweep['write_jobs'])}) "
+                     f"can merge a pull request through REST, the same gap by another door")
+    else:
+        reach[p1] = reach[p2] = None
+        basis[p1] = f"{sweep['why']}; what the writer job's token can push could not be derived"
+        basis[p2] = f"{sweep['why']}; what the writer job's token can merge or tag through REST could not be derived"
+    binding, recompose, looked = _served_pull_request_gate(adopter_dir)
+    if binding and recompose:
+        reach[p3] = 0.0
+        basis[p3] = (f"{', '.join(binding)} runs shift-left/tier_binding.py on every pull request and "
+                     f"{', '.join(recompose)} recomposes the party artefact and exits non-zero on drift "
+                     f"against composed/, so a proposal a human merges through the gate serves none "
+                     f"of the gap")
+    else:
+        reach[p3] = None
+        missing = [what for what, found in (("runs shift-left/tier_binding.py", binding),
+                                            ("recomposes the party artefact and exits non-zero on "
+                                             "drift against composed/", recompose)) if not found]
+        basis[p3] = (f"{looked}; no pull-request step {' or '.join(missing)}, so what a merged "
+                     f"proposal can serve past the pull-request gate could not be derived")
+    above = [f"{e.get('source')}/{e.get('name') or e.get('kind')}" for e in prices
+             if isinstance(e.get("rests_on_grade"), int) and not isinstance(e.get("rests_on_grade"), bool)
+             and e["rests_on_grade"] >= 4]
+    if above:
+        reach[p4] = None
+        basis[p4] = (f"{', '.join(above)} rests on a grade above 3; what a model's claim reaches in it "
+                     f"could not be derived")
+    else:
+        reach[p4] = 0.0
+        basis[p4] = ("no priced line in this document rests on a grade above 3, so a wrong binding or "
+                     "forecast a model step writes reaches no figure it prices")
+    read = (f"{sweep['file']}: " + (f"cron {', '.join(repr(c) for c in sweep['crons'])}, job(s) "
+                                    f"{', '.join(sweep['write_jobs'])} with contents: write"
+                                    if sweep["write_jobs"] else sweep["why"])
+            + "; pull-request gate: " + (f"binding in {', '.join(binding)}" if binding else "no binding step")
+            + ", " + (f"recompose with a drift test in {', '.join(recompose)}" if recompose
+                      else "no recompose step with a drift test")
+            + "; " + (f"{', '.join(above)} above grade 3" if above else "no priced line above grade 3"))
+    return {"reach": reach, "basis": basis, "read": read, "why": None}
+
+
+def _kinds_at_pin(estate, pin):
+    """The composer's PRICE_KINDS at the platform tag an adopter pins, read with `git show` off
+    the estate's platform clone (clone-estate.sh makes a full clone, tags included), never off
+    that clone's working tree. (kinds, why): kinds is None, with why, where the tag, the file
+    or the line could not be read. This is what makes "composed under a tag that predates the
+    kind" a derivation rather than an assertion (review round 2, finding 5)."""
+    if not pin:
+        return None, "the party pins no platform implementations version"
+    repo = os.path.join(estate, "platform")
+    r = subprocess.run(["git", "-C", repo, "show", f"{pin}:compose/composition.py"],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        why = (r.stderr.strip().splitlines() or ["no reason given"])[-1]
+        return None, f"git show {pin}:compose/composition.py in the estate's platform clone failed ({why})"
+    m = PRICE_KINDS_LINE.search(r.stdout)
+    if not m:
+        return None, f"{pin}:compose/composition.py declares no PRICE_KINDS line"
+    try:
+        kinds = ast.literal_eval(m.group(1))
+    except (ValueError, SyntaxError) as exc:
+        return None, f"{pin}:compose/composition.py's PRICE_KINDS does not parse ({exc})"
+    return tuple(str(k) for k in kinds), None
 
 
 def _regime_weights(estate, parties, adopter_doc):
@@ -641,6 +1168,111 @@ def check_engine_agreement(estate, parties):
                     "nothing here observed that they agree")
 
 
+def check_agent_cage(estate, parties, adopters):
+    """Eco-system ticket 145 (ADR-0031 decisions 5 and 6), on each adopter's committed
+    evidence: the twin agent's rung is what the adopter's OWN selection-policy package picks
+    over the residuals the line carries and the party's own signed band and floor (the
+    two-implementations guard, as leg 9 applies it to the pod line); and platform's own
+    tier fold, run over the document with and without the line, moves the Namespace tier
+    not at all. An adopter whose evidence carries no such line is a NAMED could-not-look
+    naming the pin only where PRICE_KINDS at the platform tag it pins, read with `git show`
+    off the estate's platform clone, does not carry the kind: never a FAIL against an adopter
+    that has done nothing wrong, and never a PASS. Where that tag's composer does write the
+    line, a document without it was not composed by it: a FAIL."""
+    wargamer_dir = os.path.join(estate, "platform", "wargamer")
+    if wargamer_dir not in sys.path:
+        sys.path.insert(0, wargamer_dir)
+    try:
+        import wargamer                                          # noqa: PLC0415
+    except Exception as exc:                                     # noqa: BLE001
+        wargamer, fold_why = None, f"platform/wargamer/wargamer.py could not be imported ({exc})"
+    else:
+        fold_why = None
+    for name in adopters:
+        ev = os.path.join(estate, name, "composed", "evidence.json")
+        if not os.path.exists(ev):
+            continue                                  # run() names the missing document
+        try:
+            with open(ev) as fh:
+                prices = json.load(fh).get("prices") or []
+        except (OSError, ValueError):
+            continue                                  # run() names the unreadable document
+        agents = [e for e in prices if e.get("kind") == AGENT_CAGE_KIND]
+        if not agents:
+            pin = _platform_pin(estate, name)
+            kinds, why = _kinds_at_pin(estate, pin)
+            if kinds is None:
+                out("SKIP", f"{name}'s evidence carries no `agent-cage` line, and whether platform "
+                            f"{pin or 'an unrecorded pin'} writes one could not be read: {why}")
+            elif AGENT_CAGE_KIND in kinds:
+                out("FAIL", f"{name}'s evidence carries no `agent-cage` line, yet the platform it pins, "
+                            f"{pin}, writes one: PRICE_KINDS at {pin}:compose/composition.py in the "
+                            f"estate's platform clone is {kinds}; this document was not composed by "
+                            f"the composer at the pin (eco-system ticket 145)")
+            else:
+                out("SKIP", f"{name}'s evidence carries no `agent-cage` line: it was composed under "
+                            f"platform {pin}, whose PRICE_KINDS at {pin}:compose/composition.py in "
+                            f"the estate's platform clone is {kinds}, which predates the kind "
+                            f"(eco-system ticket 145). It waits on the owner's next signed platform "
+                            f"tag carrying it and on this adopter's pin moving to it; nothing here "
+                            f"may be re-rendered from an untagged branch")
+            continue
+        e = agents[0]
+        if amount_of(e) is None or e.get("proposed_tier") not in LADDER:
+            continue                                  # leg 1 printed the named SKIP; leg 3b the shape
+        doc = parties.get(name) or {}
+        tol = (doc.get("appetite") or {}).get("tolerance")
+        floor = (doc.get("overlay") or {}).get("floor")
+        pkg = os.path.join(estate, name, POLICY_PACKAGE, "selection_policy.py")
+        if not (isinstance(tol, dict) and "amount" in tol) or not os.path.exists(pkg):
+            out("FAIL", f"{name}: its agent-cage line names selection policy "
+                        f"{e.get('policy_version')!r} but the party signs no appetite.tolerance or "
+                        f"ships no {POLICY_PACKAGE}/selection_policy.py that could have picked "
+                        f"(ADR-0021)")
+            continue
+        try:
+            spec = importlib.util.spec_from_file_location(f"_sp_agent_{name}", pkg)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            candidates = {r: {"amount": v, "currency": e.get("currency")}
+                          for r, v in (e.get("residuals") or {}).items() if v is not None}
+            theirs = mod.select(candidates, {"amount": float(tol["amount"]),
+                                             "currency": str(tol["currency"])}, floor)["tier"]
+        except Exception as exc:                                 # noqa: BLE001
+            out("FAIL", f"{name}: its own {POLICY_PACKAGE} package could not re-pick the twin-agent "
+                        f"rung from the line's residuals: {exc}")
+            continue
+        if theirs != e["proposed_tier"]:
+            out("FAIL", f"{name}: the agent-cage line proposes {e['proposed_tier']!r} but {name}'s own "
+                        f"{POLICY_PACKAGE} package picks {theirs!r} over the same residuals and band "
+                        f"(ADR-0021: the package named is the package that picked)")
+            continue
+        if wargamer is None:
+            out("SKIP", f"{name}: the twin-agent rung re-derives ({theirs!r}), but whether it folds "
+                        f"into the Namespace could not be looked at: {fold_why}")
+            continue
+        try:
+            with_line = wargamer.select_party_tier(prices, current=None, floor=floor)
+            without = wargamer.select_party_tier([p for p in prices if p is not e],
+                                                 current=None, floor=floor)
+        except ValueError as exc:
+            out("FAIL", f"{name}: platform's tier fold refused this document: {exc}")
+            continue
+        if (with_line["tier"], with_line["lines"]) != (without["tier"], without["lines"]):
+            keys = sorted(set(without["lines"]) | set(with_line["lines"]))
+            moved = {k: (without["lines"].get(k), with_line["lines"].get(k)) for k in keys
+                     if without["lines"].get(k) != with_line["lines"].get(k)}
+            out("FAIL", f"{name}: the agent-cage line moves the Namespace fold: tier "
+                        f"{without['tier']!r} without it, {with_line['tier']!r} with it; lines that "
+                        f"differ (without, with): {moved}; a rung for the twin agent never folds "
+                        f"into a Namespace (ADR-0031 decision 6)")
+            continue
+        out("PASS", f"{name}: the twin-agent rung {theirs!r} is what {name}'s own {POLICY_PACKAGE} "
+                    f"package picks over the line's residuals and its signed band (floor "
+                    f"{floor!r}), and platform's tier fold gives the Namespace {without['tier']!r} "
+                    f"with the line and without it")
+
+
 def _policy_versions_named(estate, name):
     """The selection-policy versions this party's composed evidence attributes a tier to."""
     ev = os.path.join(estate, name, "composed", "evidence.json")
@@ -909,6 +1541,8 @@ def run(estate):
     if not adopters:
         out("FAIL", f"no adopter party in {estate}")
     check_ordinal_and_aggregate(estate, adopters)
+    check_agent_cage(estate, parties, adopters)
+    gate_window = _gate_window()
     for name in adopters:
         ev = os.path.join(estate, name, "composed", "evidence.json")
         if not os.path.exists(ev):
@@ -924,6 +1558,9 @@ def run(estate):
         publishes = parties[name].get("publishes") or []
         check_doc(doc, {
             "regime_weights": _regime_weights(estate, parties, parties[name]),
+            "agent_register": _agent_register(estate, parties, name, parties[name]),
+            "agent_reach": _agent_reach(os.path.join(estate, name), doc.get("prices") or []),
+            "gate_window": gate_window,
             "adopter": name,
             "parties": set(parties),
             "customers": customers,
@@ -959,6 +1596,20 @@ def _good():
     ctx = {"adopter": "driftwood", "parties": {"driftwood", "ico", "nist", "platform"},
            "customers": {"driftwood": 100}, "forward_intel": True,
            "regime_weights": {"version": "v3", "available": True},
+           # eco-system ticket 145: what the estate serves for the agent-cage line to be
+           # measured against -- the pinned register's row and the hub gate's own schedule
+           "agent_register": {"version": "v4", "path": "feeds/threat-register/v4/feed.json",
+                              "lef": [8e-5, 8e-5, 3e-4], "why": None},
+           "gate_window": {"days": 1.0, "cron": "47 5 * * *", "source": TRUTH_WORKFLOW, "why": None},
+           # ...and what the adopter's served tree gives for the reach (the shape _agent_reach
+           # returns over a scheduled sweep with contents: write and a pull-request gate with
+           # both steps; the reader itself is exercised on planted trees below)
+           "agent_reach": {"reach": {"writer-pushes-a-looser-declaration": 1.0,
+                                     "writer-merges-or-tags-through-rest": 1.0,
+                                     "misleading-proposal-merged-by-a-human": 0.0,
+                                     "model-step-writes-a-wrong-binding-or-forecast": 0.0},
+                           "basis": {p: "fixture" for p in AGENT_PATHS},
+                           "read": "fixture tree", "why": None},
            "policy_version": "1.0.0", "policy_version_source": "driftwood/selection-policy/VERSION"}
     return doc, ctx
 
@@ -989,6 +1640,120 @@ def _grade(doc, ctx, label, want_fail, want_skip=False):
     if want_skip:
         assert "SKIP" in LINES, f"{label}: expected a SKIP, got {LINES}"
     print(f"ok  {label}")
+
+
+SWEEP_FIXTURE = """name: twin sweep
+on:
+  schedule:
+    - cron: '5 7 * * *'
+permissions:
+  contents: write
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo sweep
+"""
+GATE_FIXTURE = """name: shift-left
+on: [pull_request]
+jobs:
+  compose-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: recompose
+        run: |
+          python3 platform-tools.py compose driftwood --out driftwood
+          drift="$(git -C driftwood status --porcelain -- composed/)"
+          if [ -n "$drift" ]; then
+            echo "::error::drift"
+            exit 1
+          fi
+      - name: bind
+        run: |
+          python3 platform-tools/shift-left/tier_binding.py check
+"""
+
+
+def _selfcheck_readers():
+    """The two readers behind leg 3b's reach and check_agent_cage's wait, on planted trees: a
+    served tree that says less derives less, a comment is not a step, a drift test that exits
+    zero is no gate, and the pinned tag's PRICE_KINDS decides the wait."""
+    import shutil
+    import tempfile
+    p1, p2, p3, p4 = AGENT_PATHS
+    tmp = tempfile.mkdtemp(prefix="pound-seam-selfcheck-")
+    try:
+        def tree(sweep=SWEEP_FIXTURE, gate=GATE_FIXTURE):
+            d = os.path.join(tmp, "adopter")
+            shutil.rmtree(d, ignore_errors=True)
+            os.makedirs(os.path.join(d, ".github", "workflows"))
+            if sweep is not None:
+                with open(os.path.join(d, SWEEP_WORKFLOW), "w") as fh:
+                    fh.write(sweep)
+            with open(os.path.join(d, ".github", "workflows", "shift-left.yml"), "w") as fh:
+                fh.write(gate)
+            return d
+
+        full = _agent_reach(tree(), [])
+        assert full["reach"] == {p1: 1.0, p2: 1.0, p3: 0.0, p4: 0.0}, full
+        assert "'5 7 * * *'" in full["read"] and "job(s) sweep" in full["read"] \
+            and "shift-left.yml job compose-check" in full["basis"][p3], full
+        ro = _agent_reach(tree(sweep=SWEEP_FIXTURE.replace("contents: write", "contents: read")), [])
+        assert ro["reach"] == {p1: None, p2: None, p3: 0.0, p4: 0.0} and "no job of its 1" in ro["basis"][p1], ro
+        gone = _agent_reach(tree(sweep=None), [])
+        assert gone["reach"][p1] is None and "no .github/workflows/twin-sweep.yml is served" in gone["basis"][p1], gone
+        unscheduled = _agent_reach(tree(sweep=SWEEP_FIXTURE.replace("schedule:", "workflow_dispatch:\n  x:")
+                                        .replace("    - cron: '5 7 * * *'", "")), [])
+        assert unscheduled["reach"][p1] is None and "no `schedule:`" in unscheduled["basis"][p1], unscheduled
+        commented = GATE_FIXTURE.replace('          drift="$(git', '          # drift="$(git') \
+                                .replace('            exit 1', '            # exit 1')
+        assert 'status --porcelain -- composed/' in commented
+        c = _agent_reach(tree(gate=commented), [])
+        assert c["reach"][p3] is None and "recomposes the party artefact" in c["basis"][p3], c
+        z = _agent_reach(tree(gate=GATE_FIXTURE.replace("exit 1", "exit 0")), [])
+        assert z["reach"][p3] is None, ("a drift test that exits zero is no gate", z)
+        nb = _agent_reach(tree(gate=GATE_FIXTURE.replace("tier_binding.py", "tier_bindings.txt")), [])
+        assert nb["reach"][p3] is None and "runs shift-left/tier_binding.py" in nb["basis"][p3], nb
+        push_only = _agent_reach(tree(gate=GATE_FIXTURE.replace("on: [pull_request]", "on: [push]")), [])
+        assert push_only["reach"][p3] is None and "0 pull-request workflow(s)" in push_only["basis"][p3], push_only
+        g5 = _agent_reach(tree(), [{"source": "twin", "kind": "twin", "rests_on_grade": 5}])
+        assert g5["reach"][p4] is None and "twin/twin rests on a grade above 3" in g5["basis"][p4], g5
+        assert _agent_reach(os.path.join(tmp, "absent"), [])["reach"] is None
+        print("ok  _agent_reach: a scheduled sweep with contents: write and a pull-request gate with "
+              "both steps derive (1.0, 1.0, 0.0, 0.0); a read-only, unscheduled or absent sweep, a "
+              "commented-out or zero-exit drift test, a missing binding step, a push-only gate and a "
+              "grade-5 line each derive None by name")
+
+        # the pinned tag's PRICE_KINDS, read with git show off a tagged clone built with plumbing
+        # (no commit hook, no signature, so the owner's global git config cannot reach it)
+        repo = os.path.join(tmp, "platform")
+        os.makedirs(repo)
+        env = dict(os.environ, GIT_AUTHOR_NAME="selfcheck", GIT_AUTHOR_EMAIL="selfcheck@example.invalid",
+                   GIT_COMMITTER_NAME="selfcheck", GIT_COMMITTER_EMAIL="selfcheck@example.invalid")
+
+        def git(*args, stdin=None):
+            r = subprocess.run(["git", "-C", repo, "-c", "commit.gpgsign=false", "-c", "tag.gpgsign=false",
+                                *args], input=stdin, capture_output=True, text=True, env=env)
+            assert r.returncode == 0, (args, r.stderr)
+            return r.stdout.strip()
+
+        git("init", "-q")
+        for tag, kinds in (("v4.0.0", '("feed", "twin", "supersede")'),
+                           ("v5.0.0", '("feed", "twin", "supersede", "agent-cage")')):
+            blob = git("hash-object", "-w", "--stdin", stdin=f"# fixture\nPRICE_KINDS = {kinds}\nX = 1\n")
+            sub = git("mktree", stdin=f"100644 blob {blob}\tcomposition.py\n")
+            top = git("mktree", stdin=f"040000 tree {sub}\tcompose\n")
+            commit = git("commit-tree", top, "-m", tag, "--no-gpg-sign")
+            git("tag", tag, commit)
+        assert _kinds_at_pin(tmp, "v4.0.0") == (("feed", "twin", "supersede"), None)
+        assert _kinds_at_pin(tmp, "v5.0.0")[0] == ("feed", "twin", "supersede", "agent-cage")
+        none, why = _kinds_at_pin(tmp, "v9.9.9")
+        assert none is None and "git show v9.9.9:compose/composition.py" in why, why
+        assert _kinds_at_pin(tmp, None) == (None, "the party pins no platform implementations version")
+        print("ok  _kinds_at_pin: PRICE_KINDS is read at the pinned tag with git show (v4.0.0 without "
+              "the kind, v5.0.0 with it), and a tag the clone does not hold is a could-not-look by name")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def selfcheck():
@@ -1138,6 +1903,212 @@ def selfcheck():
     doc, ctx = _good()
     doc["prices"].append(_switching("feeds", 10.0, could_not_look="no lef"))
     _grade(doc, ctx, "a price that carries both an amount and a could_not_look fails", True)
+
+    # --- eco-system ticket 145: the twin agent's cage line (leg 3b) ---
+    def _agent(**over):
+        """An `agent-cage` price shaped as composition.py price_twin_agent writes one, over the
+        _good() document's twin line (residuals 100 at baseline, 10 at isolated; selected isolated)."""
+        lef = [8e-5, 8e-5, 3e-4]
+        lm = 90.0 * 1.0 / 365.25
+        amount = (lef[0] + 4 * lef[1] + lef[2]) / 6 * lm
+        line = {"source": "platform", "kind": "agent-cage", "subject": "twin-agent", "name": "twin-agent",
+                "perspective": "driftwood", "currency": "GBP", "amount": amount,
+                "per_customer": {"amount": amount / 100, "currency": "GBP"},
+                "proposed_tier": "baseline", "old_tier": "baseline", "changed": False,
+                "residual_basis": "platform-twin-agent-table@1.0.0",
+                "residuals": {"baseline": amount, "restricted": amount, "quarantine": amount, "isolated": 0.0},
+                "reach": {"writer-pushes-a-looser-declaration": 1.0,
+                          "writer-merges-or-tags-through-rest": 1.0,
+                          "misleading-proposal-merged-by-a-human": 0.0,
+                          "model-step-writes-a-wrong-binding-or-forecast": 0.0},
+                "closes": {r: _agent_closes(r) for r in LADDER},
+                "scenario": {"gap": 90.0, "loosest_pod_tier": "baseline", "selected_pod_tier": "isolated",
+                             "window_days": 1.0, "window_source": "fixture truth.yml cron",
+                             "lm": [lm, lm, lm], "annualised_by": "expectation"},
+                "lef": lef, "lef_from": "threat-register", "register_version": "v4",
+                "policy_version": "1.0.0", "window": {"days": 1.0}}
+        line.update(over)
+        return line
+
+    def _with_agent(**over):
+        doc, ctx = _good()
+        doc["prices"][1].update(residuals={"baseline": 100.0, "restricted": 40.0,
+                                           "quarantine": 20.0, "isolated": 10.0},
+                                proposed_tier="isolated")
+        doc["prices"].append(_agent(**over))
+        return doc, ctx
+
+    _grade(*_with_agent(), "a priced agent-cage line with a re-derivable gap, magnitude, amount and "
+                            "rung passes leg 3b", False)
+    doc, ctx = _with_agent()
+    doc["prices"].append(_agent())
+    _grade(doc, ctx, "two agent-cage lines fail: one cage, one line", True)
+    _grade(*_with_agent(subject="namespace"), "an agent-cage line whose subject is not the twin "
+                                               "agent fails", True)
+    _grade(*_with_agent(source="twin"), "an agent-cage line priced by the twin fails: the twin never "
+                                         "prices its own cage", True)
+    _grade(*_with_agent(residual_basis="platform-cage-tiers@1.0.0"),
+           "an agent-cage line priced under the pod table fails", True)
+    _grade(*_with_agent(scenario=dict(_agent()["scenario"], gap=50.0)),
+           "a gap that is not the twin line's loosest minus selected residual fails", True)
+    _grade(*_with_agent(scenario=dict(_agent()["scenario"], selected_pod_tier="baseline", gap=0.0)),
+           "a gap read at a pod rung the twin line did not select fails", True)
+    _grade(*_with_agent(scenario=dict(_agent()["scenario"], lm=[1.0, 1.0, 1.0])),
+           "a magnitude that is not the gap times the window fails", True)
+    _grade(*_with_agent(amount=1.0, per_customer={"amount": 0.01, "currency": "GBP"}),
+           "an amount that is not the PERT-mean frequency times the magnitude fails", True)
+    _grade(*_with_agent(residuals={"baseline": 1.0, "restricted": 0.5, "quarantine": 0.5, "isolated": 0.0},
+                        amount=1.0, per_customer={"amount": 0.01, "currency": "GBP"},
+                        scenario=dict(_agent()["scenario"], annualised_by="simulation")),
+           "a restricted residual below baseline's fails: a model claim never prices", True)
+
+    # --- review finding 1: the line's labels are not the measurement. Each plant below keeps
+    # the line self-consistent (amount, magnitude and residuals recomputed from its own lef and
+    # window) and is red only because the seam reads the register the estate serves and the
+    # cron in the hub's own truth.yml. Before the fix both were green. ---
+    def _consistent(lef=None, window_days=None):
+        """An agent line whose amount, magnitude and residuals all follow from the lef and
+        window it carries, so only a read of something OUTSIDE the line can refuse it."""
+        base = _agent()
+        lef = lef or base["lef"]
+        window_days = window_days if window_days is not None else base["scenario"]["window_days"]
+        lm = 90.0 * window_days / 365.25
+        amount = (lef[0] + 4 * lef[1] + lef[2]) / 6 * lm
+        return _agent(lef=lef, amount=amount, per_customer={"amount": amount / 100, "currency": "GBP"},
+                      residuals={"baseline": amount, "restricted": amount, "quarantine": amount, "isolated": 0.0},
+                      scenario=dict(base["scenario"], window_days=window_days, lm=[lm, lm, lm]),
+                      window={"days": window_days})
+
+    _grade(*_with_agent(**_consistent(lef=[8e-4, 8e-4, 3e-3])),
+           "plant c: a line priced at ten times the pinned register's frequency, with its amount "
+           "and residuals recomputed to match, fails against the row the estate serves", True)
+    _grade(*_with_agent(**_consistent(window_days=30.0)),
+           "plant d: a line priced over a thirty-day window, with its magnitude, amount and "
+           "residuals recomputed to match, fails against the cron in the hub's own truth.yml", True)
+    # --- review round 2. The blocking finding: the amount was re-derived only when the line's
+    # own `annualised_by` said `expectation`; under any other label an amount a thousand times
+    # the product was green. Then the reach: the line's own `reach` was believed, so a reach
+    # hand-written to 0.0 over a served sweep holding contents: write was green. Then the
+    # tolerance: close()'s absolute 1e-6 admitted a 0.6 % drift at the register's mode. ---
+    base_reach = _agent()["reach"]
+    big = _agent()["amount"] * 1000
+    _grade(*_with_agent(amount=big, per_customer={"amount": big / 100, "currency": "GBP"},
+                        residuals=_rederive_agent_residuals(big, base_reach),
+                        scenario=dict(_agent()["scenario"], annualised_by="simulation")),
+           "plant e: an amount a thousand times the PERT-mean product, its residuals recomputed to "
+           "match, labelled `annualised_by: simulation` with lef and window untouched, fails: the "
+           "amount is always re-derived and the label is refused by name", True)
+    _grade(*_with_agent(amount=big, per_customer={"amount": big / 100, "currency": "GBP"},
+                        residuals=_rederive_agent_residuals(big, base_reach)),
+           "plant e control: the same amount under `expectation` fails on the product", True)
+    _grade(*_with_agent(scenario=dict(_agent()["scenario"], annualised_by="simulation")),
+           "a line whose amount IS the product but is labelled `simulation` still fails: the label "
+           "names an annualisation this seam cannot re-derive and the composer never writes", True)
+    zero = {p: 0.0 for p in AGENT_PATHS}
+    _grade(*_with_agent(reach=zero, residuals=_rederive_agent_residuals(_agent()["amount"], zero)),
+           "plant f: a reach hand-written to 0.0 on every path, residuals recomputed to match, over "
+           "a served tree whose sweep holds contents: write fails against the derived reach", True)
+    f2 = dict(base_reach, **{"writer-pushes-a-looser-declaration": 0.0,
+                             "writer-merges-or-tags-through-rest": 0.0})
+    _grade(*_with_agent(reach=f2, residuals=_rederive_agent_residuals(_agent()["amount"], f2)),
+           "plant f2: the two token paths hand-written to 0.0 fail against the served sweep", True)
+    under = dict(base_reach, **{"writer-pushes-a-looser-declaration": None})
+    _grade(*_with_agent(reach=under, residuals=_rederive_agent_residuals(_agent()["amount"], under),
+                        proposed_tier="isolated"),
+           "a line that leaves a path underived where the served tree derives it fails: the document "
+           "and the tree it is served from disagree", True)
+    doc, ctx = _with_agent()
+    ctx["agent_reach"] = {"reach": None, "basis": {}, "read": None,
+                          "why": "fixture: the adopter directory could not be read"}
+    _grade(doc, ctx, "a served tree the reach could not be derived off is a SKIP by name", False,
+           want_skip=True)
+    doc, ctx = _with_agent()
+    ctx["agent_reach"] = dict(ctx["agent_reach"],
+                              reach=dict(base_reach, **{"misleading-proposal-merged-by-a-human": None}))
+    _grade(doc, ctx, "a served gate without the recompose step makes the line's 0.0 on the proposal "
+                     "path a FAIL: the tree gives none", True)
+    _grade(*_with_agent(**_consistent(lef=[x + 5e-7 for x in _agent()["lef"]])),
+           "plant l: each frequency point nudged by 5e-7 (0.6 % at the mode), amount and residuals "
+           "recomputed, fails at the relative tolerance", True)
+    _selfcheck_readers()
+    _grade(*_with_agent(register_version="v3"),
+           "a line priced at a register version the party does not pin fails", True)
+    doc, ctx = _with_agent()
+    ctx["agent_register"] = {"version": "v4", "path": "feeds/threat-register/v4/feed.json", "lef": None,
+                             "why": "feeds/threat-register/v4/feed.json publishes no institutions.driftwood"
+                                    ".threats.scheduled-agent-misuses-write-credential row with a three-point lef"}
+    _grade(doc, ctx, "a pinned register tree that carries no row is a SKIP by name, never a FAIL and "
+                     "never a PASS", False, want_skip=True)
+    doc, ctx = _with_agent()
+    ctx["gate_window"] = {"days": None, "cron": "47 5 * * 1-5", "source": TRUTH_WORKFLOW,
+                          "why": "cron '47 5 * * 1-5' is not a fixed hourly, daily or weekly schedule"}
+    _grade(doc, ctx, "a gate cron this check cannot derive an interval from is a SKIP by name", False,
+           want_skip=True)
+    # review finding 4: a None baseline beside a numeric restricted is the composer's own
+    # legitimate output when the model path's reach could not be derived (a priced line resting
+    # on a grade above 3); it re-derives from the line's reach and is not a FAIL
+    amt = _agent()["amount"]
+    doc, ctx = _with_agent(reach={"writer-pushes-a-looser-declaration": 1.0,
+                                  "writer-merges-or-tags-through-rest": 1.0,
+                                  "misleading-proposal-merged-by-a-human": 0.0,
+                                  "model-step-writes-a-wrong-binding-or-forecast": None},
+                           residuals={"baseline": None, "restricted": amt, "quarantine": amt, "isolated": 0.0},
+                           proposed_tier="restricted")
+    # ...and the served tree agrees: a priced line in the document rests on a grade above 3
+    ctx["agent_reach"] = dict(ctx["agent_reach"],
+                              reach=dict(ctx["agent_reach"]["reach"],
+                                         **{"model-step-writes-a-wrong-binding-or-forecast": None}))
+    _grade(doc, ctx,
+           "a None baseline beside a numeric restricted, consistent with a model path the served "
+           "document leaves underived, is not a FAIL: the residuals re-derive from the served reach "
+           "and the rung selected is one with a residual", False)
+    _grade(*_with_agent(reach={"writer-pushes-a-looser-declaration": 1.0,
+                               "writer-merges-or-tags-through-rest": 1.0,
+                               "misleading-proposal-merged-by-a-human": 0.0,
+                               "model-step-writes-a-wrong-binding-or-forecast": None},
+                        residuals={"baseline": None, "restricted": amt, "quarantine": amt, "isolated": 0.0}),
+           "...while selecting the rung whose residual could not be derived fails", True)
+    _grade(*_with_agent(reach={"writer-pushes-a-looser-declaration": 1.0,
+                               "writer-merges-or-tags-through-rest": 1.0,
+                               "misleading-proposal-merged-by-a-human": 0.0,
+                               "model-step-writes-a-wrong-binding-or-forecast": None}),
+           "...but a numeric baseline over a model path that could not be derived fails: the residual "
+           "cannot be stated", True)
+    _grade(*_with_agent(reach={"writer-pushes-a-looser-declaration": 0.5,
+                               "writer-merges-or-tags-through-rest": 0.5,
+                               "misleading-proposal-merged-by-a-human": 0.0,
+                               "model-step-writes-a-wrong-binding-or-forecast": 0.0}),
+           "residuals that do not follow from the line's own reach fail", True)
+    _grade(*_with_agent(reach={"writer-pushes-a-looser-declaration": 1.0,
+                               "writer-merges-or-tags-through-rest": 1.0,
+                               "some-fifth-path": 0.0,
+                               "model-step-writes-a-wrong-binding-or-forecast": 0.0}),
+           "a reach naming a path that is not one of the decision's four fails", True)
+    _grade(*_with_agent(closes={"baseline": [], "restricted": ["p4"], "quarantine": ["p3", "p4"],
+                                "isolated": ["p1", "p2", "p3", "p4"]}),
+           "a closes map that is not the decision's closures fails", True)
+    # the two readers, on their own: the cron shapes, and the hub's own served truth.yml
+    assert _cron_interval_days("47 5 * * *") == 1.0 and _cron_interval_days("5 * * * *") == 1.0 / 24 \
+        and _cron_interval_days("0 9 * * 1") == 7.0, "fixed daily, hourly and weekly crons derive"
+    assert all(_cron_interval_days(c) is None for c in ("*/15 * * * *", "47 5 1 * *", "47 5 * * 1-5",
+                                                           "47 5,17 * * *", "bad")), \
+        "any other shape is a could-not-look, never a guess"
+    gw = _gate_window()
+    assert gw["days"] == 1.0 and gw["cron"] and gw["why"] is None, (
+        "the hub's own truth.yml gives one daily cron", gw)
+    print(f"ok  the hub's own {gw['source']} cron {gw['cron']!r} derives a {gw['days']:g}-day window")
+    _grade(*_with_agent(proposed_tier="paranoid"), "an off-ladder twin-agent rung fails", True)
+    _grade(*_with_agent(residuals={"baseline": 1.0}), "residuals that do not cover every rung fail", True)
+    _grade(*_with_agent(lef_from="editorial"), "a frequency not from the threat register fails", True)
+    _grade(*_with_agent(amount=None, per_customer=None, proposed_tier="baseline",
+                        could_not_look="missing instrument: fixture"),
+           "an unpriced agent-cage line that still proposes a rung fails", True)
+    _grade(*_with_agent(amount=None, per_customer=None, proposed_tier=None,
+                        could_not_look="missing instrument: threat-register@v2 publishes no row"),
+           "an unpriced agent-cage line naming why is a SKIP, never a FAIL", False, want_skip=True)
+    doc, ctx = _with_agent()
+    del doc["prices"][-1]["residuals"]
+    _grade(doc, ctx, "a priced agent-cage line with no residuals fails: the rung cannot be re-derived", True)
 
     LINES.clear()
     print("ok  selfcheck: labelling, per-customer, twin edge, hole partition, mixed sums, "
