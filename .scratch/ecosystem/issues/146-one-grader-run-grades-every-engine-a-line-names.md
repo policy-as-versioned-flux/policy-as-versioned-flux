@@ -98,7 +98,7 @@ line supports. The cut script keeps a `tested_engines` that it finds before a cu
 
 **2026-09-26, owner-instructed: built as two pull requests.** On 2026-09-26 the owner answered
 "Authorised" to a list that began "build eco-system tickets 146 to 150". This ticket is built as a
-platform pull request (branch `ticket-146-engine-cells` in `policy-as-versioned-platform/platform`)
+platform pull request (policy-as-versioned-platform/platform#47, branch `ticket-146-engine-cells`)
 and this hub pull request. Nothing here reaches an adopter, and no tag is cut. The platform pull
 request must merge first. Until it does, the hub gate's `verify/estate-engines/` check reads no
 engine table on platform `main` and fails by name.
@@ -183,9 +183,10 @@ What the two pull requests build, item by item:
 1.18.2 (darwin_arm64, checksum verified), on a scratch estate of every repository's `origin/main`
 with platform at the branch head.
 
-- Grader tests: 18 pass (`python3 -m unittest test_engine_compatibility`). They include a second
+- Grader tests: 19 pass (`python3 -m unittest test_engine_compatibility`). They include a second
   listed engine with no binary (could-not-look), a candidate graded on its declaring commit
-  (pass), and a candidate that fails a cell (FAIL, exit 1).
+  (pass), a candidate that fails a cell (FAIL, exit 1), and a named engine directory with no
+  binary (could-not-look, never the CLI on PATH).
 - The real grade before the scope moved: 5.0.0 reads could-not-look, naming the retired scope.
   Under the new scope, on 1.18.2: cage-tier 13, cage-netpol 11, require-nonroot 6, stamp-posture 5
   and posture-trust-boundary 5 assertions pass, and all seven machinery bodies pass.
