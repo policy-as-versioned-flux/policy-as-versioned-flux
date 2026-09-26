@@ -1,25 +1,25 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 11.407s
+Ran 11 tests in 8.643s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 8.153s
+Ran 9 tests in 6.135s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .............................
 ----------------------------------------------------------------------
-Ran 29 tests in 24.864s
+Ran 29 tests in 18.749s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 1.685s
+Ran 16 tests in 1.298s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)
@@ -42,7 +42,7 @@ OK unobserved pin: a real signed tag flattened onto its commit by a second fetch
 OK closed pin: composing against the insurer's real signed tag closes the hole, prints one closed-untagged-pin delta, and the next composition retains the closure transition so its handbook replays
 OK untagged pin: every object the engine applies is byte-identical across untagged, recorded and unobserved -- signature state lives in the evidence, never the enforced render -- and the handbook, which nothing applies, names the hole as untagged-pin `insurer/quote-driftwood@v2` with its premium while open and explicitly records its closure
 OK prices[]: the one summing helper refuses a list that crosses a perspective or a currency -- no number in this estate is a lie by addition
-OK prices[]: driftwood's own forward-intel feed prices as one source:twin entry -- perspective driftwood, GBP, tail bounded-pert, curve sha256:70e5e, policy version 1.1.0
+OK prices[]: driftwood's own forward-intel feed prices as one source:twin entry -- perspective driftwood, GBP, tail bounded-pert, curve sha256:70e5e, policy version 1.1.0, rests on grade None (as the served payload states it, or null where the payload predates the field)
 OK prices[]: an adopter with no forward-intel feed simply has no twin entry -- a missing twin feed is never a refusal (ticket 25)
 OK prices[]: an ico pin at v3 carries the published control weights as a per-hole breakdown -- 4 holes, weights sum to 1.0, and the entry amount IS the sum of the hole amounts (a hole partitions the regime, it never adds to it)
 OK prices[]: implementing the weighted control pl-2 takes its 536153.12 line off the regime entry, 1787177.08 -> 1251023.95; the partition still sums to 1787177.08 (eco-system ticket 121)

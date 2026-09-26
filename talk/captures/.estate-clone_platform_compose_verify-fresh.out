@@ -3,7 +3,7 @@
   ok   render() returns a non-empty page from an artefact
   ok   render() is a pure function of its inputs (same bytes from another cwd, another environment, a moment later)
   ok   render() gives the same bytes from a separate process under an emptied environment, a random PYTHONHASHSEED and a fresh cwd
-  ok   the page carries no wall-clock date (2026-09-25 does not appear)
+  ok   the page carries no wall-clock date (2026-09-26 does not appear)
   ok   changing a parent's sha changes the render
   ok   changing a price amount changes the render
   ok   changing a limit's status changes the render
@@ -23,6 +23,13 @@
   ok   a price with no amount and no could_not_look reason is refused
   ok   a premium or switching entry renders `—` for the tier it never proposes, and a feed entry with none is named absent
   ok   ...a feed entry with no proposed_tier is named absent, not dashed
+  ok   a twin line whose payload states rests_on_grade prints the grade sentence and names no absence for it
+  ok   a twin line whose rests_on_grade is null names `prices[4].rests_on_grade` absent and prints no grade sentence
+  ok   a twin line whose rests_on_grade is a boolean names `prices[4].rests_on_grade` absent and prints no grade sentence
+  ok   a twin line whose rests_on_grade is a string names `prices[4].rests_on_grade` absent and prints no grade sentence
+  ok   a twin line whose rests_on_grade is a float names `prices[4].rests_on_grade` absent and prints no grade sentence
+  ok   a twin line with no rests_on_grade field at all names it absent and prints no grade sentence
+  ok   the grade sentence is the twin's alone: a feed line carrying the field prints none and names no absence, because only the twin's price rests on a graded chain
   ok   the price's perspective and currency are both on the page
   ok   a price with no currency is refused, never rendered
   ok   a price with no perspective is refused, never rendered
@@ -47,9 +54,9 @@
   ok   a list field that is not a list is refused, not counted
   ok   an artefact with no HEADER.yaml is refused
   ok   an artefact with a refused composition is refused
-PASS: handbook render seam: 47 checks -- pure in-process and in a separate emptied-environment process, clock-free, biting, complete, perspective-and-currency bearing, naming every absent field (lists included) rather than printing a zero, refusing a non-artefact
+PASS: handbook render seam: 54 checks -- pure in-process and in a separate emptied-environment process, clock-free, biting, complete, perspective-and-currency bearing, naming every absent field (lists included) rather than printing a zero, refusing a non-artefact
 [1;36m==>[0m 2. the render committed beside its artefact is fresh at the tag that carries both
-  ok   /tmp/tmp.sV9hQFu4lW/adopter@planted-v1: the served handbook is byte-identical to a re-render of the served artefact (7172 bytes)
+  ok   /tmp/tmp.6txzNTQnVV/adopter@planted-v1: the served handbook is byte-identical to a re-render of the served artefact (7172 bytes)
 [1;36m==>[0m 3. a hand-edited page over an untouched artefact is STALE (the lie with a nicer font)
   ok   a sentence added by hand is caught at the tag
 [1;36m==>[0m 4. a moved ARTEFACT under an untouched page is STALE too (the page went stale, not wrong)

@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-09-25T19:01Z run=346 hub=32739f1 enact=development units=[driftwood=155db9e@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=32ea73d@main ludlow=b8e14f7@main nist=f83126f@main platform=557c153@v4.0.0 tuppence=5deffe6@main] pass=87 [observed=30 self=43 simulated=4 meta=10] fail=2 skip=32 [never=10 waits=22] excluded=8 total=129 ceiling=110
+# TRUTH 2026-09-26T02:20Z run=349 hub=9c3b1f2 enact=development units=[driftwood=155db9e@main feeds=ff3ac9a@main ico=abcb3a8@main insurer=32ea73d@main ludlow=b8e14f7@main nist=f83126f@main platform=541d2aa@main tuppence=5deffe6@main] pass=87 [observed=30 self=43 simulated=4 meta=10] fail=2 skip=32 [never=10 waits=22] excluded=8 total=129 ceiling=110
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      acceptance record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
