@@ -196,3 +196,94 @@ removed; `verify/misuse/verify-misuse.sh` PASS and `verify/pound-seam/verify-pou
 (waits) on the line this ticket declares. Platform PR #46 (head ea2f1bb2) and feeds PR #9 (head
 b1d9459b) have no pull-request CI in their repositories; their verify scripts ran locally as
 recorded above, and the release workflows run them again at the tag.
+
+**2026-09-26, review round 1 fixed, owner-instructed.** The owner wrote on 2026-09-25: "i'm afk you
+have all the approvals you need to deliver". Under that authorisation the reviewer's findings on
+the three pull requests are addressed on the same branches (platform #46, hub #143; feeds #9 is
+unchanged), with no merge, tag, release or dispatch. The blocking finding first, then every minor
+one, each accepted; the decisions each fix forced are **delegated** (ADR-0025) and recorded here.
+
+*Blocking, leg 3b measured only the line's own labels.* The PASS claimed the line was priced "at
+threat-register@v4's frequency" and "over 1 day(s)" but read both off the line: a line priced at
+ten times the row's frequency, or over a thirty-day window, with its amount and residuals recomputed
+to match, was green. Leg 3b now measures against served artefacts outside the line: the frequency
+against `institutions.<adopter>.threats.scheduled-agent-misuses-write-credential.lef` in the
+estate's feeds tree at the version the party's own party.yaml pins (`_agent_register`, the way leg
+4 reads ico's weights; a `register_version` on the line that is not the pinned one is a FAIL; a
+pinned tree with no row is a SKIP by name), and the window against the interval of the one
+`schedule: cron` in the hub's own `.github/workflows/truth.yml`, read from the checkout the check
+runs in (`_gate_window`; a fixed hourly, daily or weekly cron derives, any other shape is a SKIP by
+name, never a guess). The PASS now states what was read: the cron, the file, the row and its path.
+Decision: the register is read at the estate clone's version path (feeds main), the precedent leg 4
+set, and the PASS names that path; the portability check reads at the pinned tag and owns that
+comparison. Decision: the two new SKIP shapes stay undeclared in talk/verify-manifest.txt, because
+neither is reachable on the served estate (the hub's cron is daily and feeds main carries v4 once
+PR #9 merges), so either appearing fails the gate by design.
+
+*Minor, the fold skipped any non-Namespace subject.* Only the kind that declares a subject may carry
+one: `wargamer.folds_into_namespace` refuses (ValueError, a missing instrument) a line whose subject
+is not the one its kind declares, in both directions: a `feed` line hand-carrying `subject:
+twin-agent` (which used to drop out of the fold, so a looser declaration graded bound) and an
+`agent-cage` line carrying the Namespace's subject or none (which would have caged every pod for
+the twin agent's rung). `select_party_tier`, `wargame_cage_tier`, `wargame_agent_cage` and
+`tier_binding.bind` share the one rule; planted in both selfchecks; the hub's check_agent_cage
+prints the refusal as "platform's tier fold refused this document". Nothing is less safe: a document
+that used to fold out a line now refuses to fold at all.
+
+*Minor, P1 and P2 typed 1.0.* `_twin_agent_reach` now reads `.github/workflows/twin-sweep.yml`
+(`_served_sweep`): a `schedule:` trigger and a job whose effective permissions grant `contents:
+write` derive the whole gap for both token paths, naming the file, the cron and the job on
+`reach_basis`; a sweep not served, not scheduled or declaring no `contents: write` is a named
+could-not-look, because the token's scope then falls to a repository default the composition cannot
+read and a token minted another way is not in the file. Decision: the sweep is identified by the
+served file name the ticket, ticket 143 and verify/schedules all use, not by any scheduled workflow
+holding a write token (each adopter serves three others: drift-sample, propose-tier, renovate-run,
+which are other actors and not this cage's subject). Decision: a rung that leaves a could-not-look
+path open has no residual and is not a candidate, so the pick falls closed; measured in the
+composition selfcheck: a read-only sweep picks `isolated`, a pull-request gate without the recompose
+job picks `quarantine`. P3 now needs both the tier-binding step AND the recompose job that fails on
+drift against `composed/` (`_served_pull_request_gate`, matched by what the step does, not a job
+name), and names both. On the three served trees every figure is what it was (1.0, 1.0, 0.0, 0.0),
+so no price moved; the basis did.
+
+*Minor, `restricted != baseline` hard-coded.* Leg 3b re-derives every residual from the line's own
+`reach` through the four paths' closures (`_rederive_agent_residuals`, cage.py's rule restated in
+the seam), refuses a `closes` map that is not the decision's and a `reach` that names other paths,
+and states in the PASS whether restricted carries baseline's residual rather than requiring it. A
+None baseline beside a numeric restricted, consistent with a model path that could not be derived,
+is not a FAIL; selecting the rung with no residual still is.
+
+*Minor, the fold-moves FAIL printed the tier only.* It prints the tier without and with the line and
+the lines that differ. Unreachable by a document plant now that the fold refuses a malformed subject;
+it guards a platform fold that regresses.
+
+*Minor, the agent-cage drift row's confidence.* `tolerance` is None on the row (`old_amount` travels
+beside it), so proposer_bounds grades a rung move at STRUCTURAL_CONFIDENCE and reports it whether
+the amount rose, held or fell; planted for all four shapes.
+
+*Minor, the selfcheck typed the feeds triple.* It reads the expected `lef` off the register file it
+composed against (the estate's v4 or the planted fixture).
+
+*Minor, the handbook's frequency absence on an unpriced line.* A line with no amount reads "no loss
+frequency was read for ...: the line could not be priced"; the selfcheck sees the sentence (58
+checks).
+
+**Measured, on the branches in the planted estate (platform 541d2aab plus the branch, feeds
+ff3ac9a plus the branch, adopters at their served heads), hub venv python.** Platform:
+`wargamer.py selfcheck`, `tier_pr.py selfcheck`, `rejection_ledger.py selfcheck`,
+`verify-wargamer.sh`, `tier_binding.py selfcheck`, `verify-tier-binding.sh`, `handbook.py
+--selfcheck` (58) all rc 0; `composition.py --selfcheck` rc 0 with 106 OK lines, three of them
+agent-cage (the real driftwood unpriced by name; the v4 copy at 0.4213 GBP, `baseline`, the fold
+unmoved, the reach basis naming twin-sweep.yml, its cron and job and shift-left.yml's two jobs; the
+read-only sweep and the gateless copy falling to `isolated` and `quarantine`). Hub: `pound_seam.py
+selfcheck` ok with 59 planted cases; `pound_seam.py check` over the estate as served rc 3, 30 PASS,
+0 FAIL, the same three named SKIPs; over an estate where driftwood serves a v4-priced document
+composed by the fixed composer: 32 PASS, 0 FAIL, the leg-3b PASS naming cron '47 5 * * *' in
+.github/workflows/truth.yml, the row at feeds/threat-register/v4/feed.json and every residual
+re-derived. Adversarial re-plants through the real check: c (lef x10, amount and residuals
+recomputed) 1 FAIL naming the served row; d (window 30 days, magnitude, amount and residuals
+recomputed) 1 FAIL naming the served cron; b (subject dropped) 2 FAILs, the fold's refusal among
+them; a `feed` line carrying `subject: twin-agent` 1 FAIL, the fold's refusal. `tests/test_misuse.py`
+43 passed; `verify-misuse.sh` PASS (6 of 12 by path, the four twin-agent rows wait on this ticket by
+name); `verify-tier-binding.sh` PASS over the real adopters through the changed fold. CI results
+for the pushed heads are appended below.

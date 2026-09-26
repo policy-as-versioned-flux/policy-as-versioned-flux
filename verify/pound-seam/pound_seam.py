@@ -10,6 +10,12 @@ What it observes, per adopter, on `.estate-clone/<adopter>/composed/evidence.jso
      or null where that party declares no customer count;
   3. exactly one `source: twin` entry when that adopter publishes a forward-intel feed, carrying
      policy_version, curve_hash and tail — and NO twin entry when it publishes no such feed;
+  3b. at most one `agent-cage` entry (eco-system ticket 145, ADR-0031), priced by the platform for
+     the subject `twin-agent`: its gap re-derives from this document's own twin line, its window
+     equals the interval of the cron in the hub's OWN .github/workflows/truth.yml, its frequency
+     equals the row the estate's feeds tree serves at the register version the party pins, its
+     residuals re-derive from its own reach through the four paths' closures, and its rung is
+     what the adopter's own selection-policy package picks (the estate leg check_agent_cage);
   4. the regime entry's (source: ico, kind: feed) holes[] amounts sum to its total, and the entry's own
      amount equals the sum of the lines the adopter has not implemented (status neither
      `covered` nor `closed`), so implementing a control reduces it (eco-system ticket 121);
@@ -83,6 +89,21 @@ SOURCES = {"ico", "feeds", "twin", "insurer", "platform"}   # plus any party nam
 LADDER = ("baseline", "restricted", "quarantine", "isolated")
 AGENT_CAGE_KIND, AGENT_CAGE_SUBJECT = "agent-cage", "twin-agent"
 AGENT_TABLE_PREFIX = "platform-twin-agent-table@"
+# The four misuse paths of eco-system ticket 30 decision 15 and the loosest rung that closes
+# each (ADR-0031; platform/graded/cage.py TWIN_AGENT_PATHS). Leg 3b re-derives every residual
+# on the line from the line's own `reach` through these closures, so a residual is measured
+# rather than believed, and a `closes` map that disagrees with the decision is a FAIL.
+AGENT_PATHS = {
+    "writer-pushes-a-looser-declaration": "isolated",
+    "writer-merges-or-tags-through-rest": "isolated",
+    "misleading-proposal-merged-by-a-human": "quarantine",
+    "model-step-writes-a-wrong-binding-or-forecast": "restricted",
+}
+AGENT_MISUSE_THREAT = "scheduled-agent-misuses-write-credential"
+# The hub's own truth gate: its schedule is the detection window the scenario runs over
+# (ticket 30 decision 12), and this check runs from the checkout that serves it.
+ROOT = os.path.dirname(os.path.dirname(HERE))
+TRUTH_WORKFLOW = os.path.join(".github", "workflows", "truth.yml")
 AMOUNT_KEYS = ("amount", "total", "new_price", "old_price")
 # The statuses of a regime line the adopter has implemented (eco-system ticket 121).
 IMPLEMENTED = ("covered", "closed")
@@ -280,43 +301,101 @@ def check_doc(doc, ctx):
         if e.get("lef_from") != "threat-register":
             out("FAIL", f"{at}: frequency comes from {e.get('lef_from')!r}, not the threat register "
                         f"(ticket 30 decision 12)")
+        # Everything below is MEASURED against something other than the line's own labels:
+        # the gap against this document's twin line, the window against the cron in the hub's
+        # own truth.yml, the frequency against the row the estate's feeds tree serves at the
+        # version the party pins, the residuals against the line's own reach through the four
+        # paths' closures. The first cut read `window_days` and `lef` off the line and graded
+        # them against themselves: a line priced at ten times the row's frequency, or over a
+        # thirty-day window, with its amount recomputed to match, was green (review of eco-system
+        # ticket 145, finding 1). `bad` collects what is false, `waits` what could not be looked
+        # at; the PASS below is printed only when both are empty.
+        bad, waits = [], []
         sc = e["scenario"]
         twin = twins[0] if len(twins) == 1 else None
         tres = (twin or {}).get("residuals") or {}
         loosest, selected = sc.get("loosest_pod_tier"), sc.get("selected_pod_tier")
+        window_days = sc.get("window_days")
         if twin is None or loosest not in tres or selected not in tres:
-            out("FAIL", f"{at}: its gap reads rungs {loosest!r} and {selected!r} off a twin line this "
-                        f"document does not carry residuals for")
+            bad.append(f"its gap reads rungs {loosest!r} and {selected!r} off a twin line this "
+                       f"document does not carry residuals for")
         elif selected != twin.get("proposed_tier"):
-            out("FAIL", f"{at}: its gap is read at pod rung {selected!r}, but the twin line selected "
-                        f"{twin.get('proposed_tier')!r}")
+            bad.append(f"its gap is read at pod rung {selected!r}, but the twin line selected "
+                       f"{twin.get('proposed_tier')!r}")
         elif not close(float(sc.get("gap", -1)), float(tres[loosest]) - float(tres[selected])):
-            out("FAIL", f"{at}: gap {sc.get('gap')} is not the twin line's {loosest} residual "
-                        f"({tres[loosest]}) minus its {selected} residual ({tres[selected]})")
+            bad.append(f"gap {sc.get('gap')} is not the twin line's {loosest} residual "
+                       f"({tres[loosest]}) minus its {selected} residual ({tres[selected]})")
         elif not (isinstance(sc.get("lm"), list) and len(sc["lm"]) == 3
-                  and all(close(float(x), float(sc["gap"]) * float(sc.get("window_days", 0)) / 365.25)
+                  and isinstance(window_days, (int, float))
+                  and all(close(float(x), float(sc["gap"]) * float(window_days) / 365.25)
                           for x in sc["lm"])):
-            out("FAIL", f"{at}: loss magnitude {sc.get('lm')} is not the gap {sc.get('gap')} times "
-                        f"the window ({sc.get('window_days')} day(s) of 365.25)")
+            bad.append(f"loss magnitude {sc.get('lm')} is not the gap {sc.get('gap')} times the "
+                       f"window ({window_days} day(s) of 365.25)")
         elif not sc.get("window_source"):
-            out("FAIL", f"{at}: the detection window names no source")
+            bad.append("the detection window names no source")
         elif sc.get("annualised_by") == "expectation" and not close(
                 amount_of(e),
                 (float(e["lef"][0]) + 4.0 * float(e["lef"][1]) + float(e["lef"][2])) / 6.0
                 * (float(sc["lm"][0]) + 4.0 * float(sc["lm"][1]) + float(sc["lm"][2])) / 6.0):
-            out("FAIL", f"{at}: amount {amount_of(e)} is not the PERT-mean frequency times the "
-                        f"PERT-mean magnitude the line says it was annualised by")
-        elif residuals["restricted"] != residuals["baseline"]:
-            out("FAIL", f"{at}: restricted's residual ({residuals['restricted']}) differs from "
-                        f"baseline's ({residuals['baseline']}); a model claim never prices, so the "
-                        f"model step closes no priced loss (ADR-0031 consequences)")
+            bad.append(f"amount {amount_of(e)} is not the PERT-mean frequency times the PERT-mean "
+                       f"magnitude the line says it was annualised by")
+        # the window, against the served gate's own schedule (ticket 30 decision 12)
+        gw = ctx.get("gate_window") or {}
+        if gw.get("days") is None:
+            waits.append(f"the window ({window_days} day(s)) could not be compared with the gate's "
+                         f"schedule: {gw.get('why') or 'no gate window was read'}")
+        elif not (isinstance(window_days, (int, float)) and close(float(window_days), float(gw["days"]))):
+            bad.append(f"the window is {window_days} day(s), but the hub's own {gw['source']} cron "
+                       f"{gw['cron']!r} fires every {gw['days']:g} day(s); the loss runs until the "
+                       f"gate detects it, and the gate runs on that schedule")
+        # the frequency, against the row the estate serves at the register version the party pins
+        reg = ctx.get("agent_register") or {}
+        if reg.get("version") is not None and e.get("register_version") != reg["version"]:
+            bad.append(f"priced at threat-register@{e.get('register_version')}, but {who}'s party.yaml "
+                       f"pins threat-register@{reg['version']}")
+        elif reg.get("lef") is None:
+            waits.append(f"the frequency {e.get('lef')} could not be compared with the pinned "
+                         f"register: {reg.get('why') or 'no register row was read'}")
+        elif not (isinstance(e.get("lef"), list) and len(e["lef"]) == 3
+                  and all(close(float(a), float(b)) for a, b in zip(e["lef"], reg["lef"]))):
+            bad.append(f"frequency {e.get('lef')} is not the row {reg['path']} serves for "
+                       f"{who} ({reg['lef']}); the line is priced at a frequency the pinned register "
+                       f"does not publish")
+        # the residuals, re-derived from the line's own reach through the four paths' closures
+        reach, closes = e["reach"], e["closes"]
+        if not isinstance(reach, dict) or set(reach) != set(AGENT_PATHS):
+            bad.append(f"reach names {sorted(reach) if isinstance(reach, dict) else reach!r}, not the four "
+                       f"paths of ticket 30 decision 15 {sorted(AGENT_PATHS)}")
+        elif not isinstance(closes, dict) or any(sorted(closes.get(r) or []) != _agent_closes(r)
+                                                 for r in LADDER):
+            bad.append(f"closes {closes!r} is not the decision's: each path closes at "
+                       f"{AGENT_PATHS} and a tighter rung keeps every closure of the looser ones")
         else:
-            out("PASS", f"{at}: the platform prices the twin agent's cage under {e['residual_basis']} "
-                        f"at rung {tier!r} (policy {e['policy_version']}), a gap of "
-                        f"{float(sc['gap']):,.2f} {e.get('currency')} between pod rungs "
-                        f"{loosest!r} and {selected!r} over {sc.get('window_days')} day(s), at "
-                        f"threat-register@{e.get('register_version')}'s frequency; restricted "
-                        f"carries baseline's residual and isolated {residuals['isolated']}")
+            expected = _rederive_agent_residuals(amount_of(e), reach)
+            for r in LADDER:
+                got, want = residuals.get(r), expected[r]
+                if (got is None) != (want is None) or (got is not None and not close(float(got), float(want))):
+                    bad.append(f"residual at {r!r} is {got!r}, but the line's own reach {reach} through "
+                               f"the paths open at {r!r} gives {want!r} (amount times the largest open "
+                               f"reach; None where an open path could not be derived)")
+        for msg in bad:
+            out("FAIL", f"{at}: {msg}")
+        for msg in waits:
+            out("SKIP", f"{at}: {msg}")
+        if bad or waits:
+            continue
+        same = residuals["restricted"] == residuals["baseline"]
+        out("PASS", f"{at}: the platform prices the twin agent's cage under {e['residual_basis']} "
+                    f"at rung {tier!r} (policy {e['policy_version']}): a gap of "
+                    f"{float(sc['gap']):,.2f} {e.get('currency')} re-derived from this document's "
+                    f"twin line between pod rungs {loosest!r} and {selected!r}, over "
+                    f"{window_days:g} day(s), the interval of the cron {gw['cron']!r} in the hub's own "
+                    f"{gw['source']}, at the frequency {reg['lef']} the estate serves at {reg['path']} "
+                    f"for threat-register@{reg['version']}; every residual re-derives from the line's "
+                    f"own reach {reach}: restricted "
+                    f"{'carries' if same else 'does not carry'} baseline's residual "
+                    f"({residuals['restricted']!r} against {residuals['baseline']!r}) and isolated "
+                    f"{residuals['isolated']!r}")
 
     # 4: the regime entry's holes partition it. The regime entry is ico's `kind: feed`
     # price. ico's switching and supersede prices are not regime entries and carry no
@@ -439,6 +518,107 @@ def _policy_version(estate, adopter):
             with open(p) as fh:
                 return fh.read().strip(), f"{owner}/{POLICY_PACKAGE}/VERSION"
     return None, None
+
+
+def _agent_register(estate, parties, adopter, adopter_doc):
+    """The threat-register version this adopter pins, and the frequency row the twin agent's
+    cage is priced at, read off the estate's feeds tree at that version path (as
+    _regime_weights reads ico's weights). `lef` is None with `why` naming what was not there:
+    no pin, no file at the version, or a payload with no row (the row arrives with the
+    register's major 4)."""
+    for edge in adopter_doc.get("inherits") or []:
+        if edge.get("kind") != "feed" or edge.get("party") != "feeds" \
+                or edge.get("name") != "threat-register":
+            continue
+        pub = parties.get("feeds") or {}
+        path = next((r.get("path") for r in pub.get("publishes") or []
+                     if r.get("name") == "threat-register"), "threat-register")
+        version = str(edge.get("version"))
+        feed = os.path.join(estate, "feeds", str(path), version, "feed.json")
+        rel = os.path.relpath(feed, estate)
+        if not os.path.exists(feed):
+            return {"version": version, "path": rel, "lef": None,
+                    "why": f"the estate's feeds clone serves no {rel}"}
+        try:
+            with open(feed) as fh:
+                doc = json.load(fh)
+        except (OSError, ValueError) as exc:
+            return {"version": version, "path": rel, "lef": None, "why": f"{rel} does not parse: {exc}"}
+        row = (((((doc.get("payload") or {}).get("institutions") or {}).get(adopter) or {})
+                .get("threats") or {}).get(AGENT_MISUSE_THREAT))
+        lef = (row or {}).get("lef") if isinstance(row, dict) else None
+        if not (isinstance(lef, list) and len(lef) == 3
+                and all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in lef)):
+            return {"version": version, "path": rel, "lef": None,
+                    "why": (f"{rel} publishes no institutions.{adopter}.threats.{AGENT_MISUSE_THREAT} "
+                            f"row with a three-point lef (the row arrives with the register's major 4)")}
+        return {"version": version, "path": rel, "lef": [float(x) for x in lef], "why": None}
+    return {"version": None, "path": None, "lef": None,
+            "why": f"{adopter} pins no feeds threat-register feed"}
+
+
+def _cron_interval_days(cron):
+    """The interval, in days, of a five-field cron that fires on a fixed hourly, daily or
+    weekly schedule. None for any other shape: an interval this check cannot derive is a
+    named could-not-look, never a guess."""
+    fields = str(cron).split()
+    if len(fields) != 5:
+        return None
+    minute, hour, dom, month, dow = fields
+    if not minute.isdigit() or dom != "*" or month != "*":
+        return None
+    if hour == "*" and dow == "*":
+        return 1.0 / 24.0
+    if hour.isdigit() and dow == "*":
+        return 1.0
+    if hour.isdigit() and dow.isdigit():
+        return 7.0
+    return None
+
+
+def _gate_window(root=ROOT):
+    """The detection window the hub's own truth gate gives (ticket 30 decision 12): the
+    interval of the one `schedule: cron` in .github/workflows/truth.yml, in days, read off
+    the file in THIS checkout. `days` is None with `why` when the file, the trigger or the
+    cron's shape does not yield one number."""
+    path = os.path.join(root, TRUTH_WORKFLOW)
+    try:
+        doc = load_yaml(path)
+    except (OSError, yaml.YAMLError) as exc:
+        return {"days": None, "cron": None, "source": TRUTH_WORKFLOW,
+                "why": f"{TRUTH_WORKFLOW} could not be read: {exc}"}
+    on = doc.get("on", doc.get(True))          # YAML 1.1 reads a bare `on` as True
+    crons = [s.get("cron") for s in ((on.get("schedule") if isinstance(on, dict) else None) or [])
+             if isinstance(s, dict) and s.get("cron")]
+    if len(crons) != 1:
+        return {"days": None, "cron": None, "source": TRUTH_WORKFLOW,
+                "why": f"{TRUTH_WORKFLOW} declares {len(crons)} schedule cron(s), not one, so the "
+                       f"gate's interval is not one number"}
+    days = _cron_interval_days(crons[0])
+    return {"days": days, "cron": crons[0], "source": TRUTH_WORKFLOW,
+            "why": (None if days is not None else
+                    f"cron {crons[0]!r} in {TRUTH_WORKFLOW} is not a fixed hourly, daily or weekly "
+                    f"schedule this check can derive an interval from")}
+
+
+def _agent_closes(rung):
+    return sorted(p for p, at in AGENT_PATHS.items() if LADDER.index(at) <= LADDER.index(rung))
+
+
+def _rederive_agent_residuals(amount, reach):
+    """The residual at each rung from the line's own reach: `amount` times the largest reach
+    among the paths still open at that rung (doors onto one loss do not add), 0.0 where every
+    path is closed, None where an open path's reach could not be derived -- platform/graded/
+    cage.py twin_agent_residuals, restated here so the seam measures the line's residuals
+    rather than believes them."""
+    out = {}
+    for rung in LADDER:
+        open_paths = [p for p in AGENT_PATHS if p not in _agent_closes(rung)]
+        if any(reach.get(p) is None for p in open_paths):
+            out[rung] = None
+        else:
+            out[rung] = float(amount) * max((float(reach[p]) for p in open_paths), default=0.0)
+    return out
 
 
 def _regime_weights(estate, parties, adopter_doc):
@@ -811,9 +991,13 @@ def check_agent_cage(estate, parties, adopters):
             out("FAIL", f"{name}: platform's tier fold refused this document: {exc}")
             continue
         if (with_line["tier"], with_line["lines"]) != (without["tier"], without["lines"]):
-            out("FAIL", f"{name}: the agent-cage line moves the Namespace fold from "
-                        f"{without['tier']!r} to {with_line['tier']!r}; a rung for the twin agent "
-                        f"never folds into a Namespace (ADR-0031 decision 6)")
+            keys = sorted(set(without["lines"]) | set(with_line["lines"]))
+            moved = {k: (without["lines"].get(k), with_line["lines"].get(k)) for k in keys
+                     if without["lines"].get(k) != with_line["lines"].get(k)}
+            out("FAIL", f"{name}: the agent-cage line moves the Namespace fold: tier "
+                        f"{without['tier']!r} without it, {with_line['tier']!r} with it; lines that "
+                        f"differ (without, with): {moved}; a rung for the twin agent never folds "
+                        f"into a Namespace (ADR-0031 decision 6)")
             continue
         out("PASS", f"{name}: the twin-agent rung {theirs!r} is what {name}'s own {POLICY_PACKAGE} "
                     f"package picks over the line's residuals and its signed band (floor "
@@ -1090,6 +1274,7 @@ def run(estate):
         out("FAIL", f"no adopter party in {estate}")
     check_ordinal_and_aggregate(estate, adopters)
     check_agent_cage(estate, parties, adopters)
+    gate_window = _gate_window()
     for name in adopters:
         ev = os.path.join(estate, name, "composed", "evidence.json")
         if not os.path.exists(ev):
@@ -1105,6 +1290,8 @@ def run(estate):
         publishes = parties[name].get("publishes") or []
         check_doc(doc, {
             "regime_weights": _regime_weights(estate, parties, parties[name]),
+            "agent_register": _agent_register(estate, parties, name, parties[name]),
+            "gate_window": gate_window,
             "adopter": name,
             "parties": set(parties),
             "customers": customers,
@@ -1140,6 +1327,11 @@ def _good():
     ctx = {"adopter": "driftwood", "parties": {"driftwood", "ico", "nist", "platform"},
            "customers": {"driftwood": 100}, "forward_intel": True,
            "regime_weights": {"version": "v3", "available": True},
+           # eco-system ticket 145: what the estate serves for the agent-cage line to be
+           # measured against -- the pinned register's row and the hub gate's own schedule
+           "agent_register": {"version": "v4", "path": "feeds/threat-register/v4/feed.json",
+                              "lef": [8e-5, 8e-5, 3e-4], "why": None},
+           "gate_window": {"days": 1.0, "cron": "47 5 * * *", "source": TRUTH_WORKFLOW, "why": None},
            "policy_version": "1.0.0", "policy_version_source": "driftwood/selection-policy/VERSION"}
     return doc, ctx
 
@@ -1333,9 +1525,11 @@ def selfcheck():
                 "proposed_tier": "baseline", "old_tier": "baseline", "changed": False,
                 "residual_basis": "platform-twin-agent-table@1.0.0",
                 "residuals": {"baseline": amount, "restricted": amount, "quarantine": amount, "isolated": 0.0},
-                "reach": {"p1": 1.0, "p2": 1.0, "p3": 0.0, "p4": 0.0},
-                "closes": {"baseline": [], "restricted": ["p4"], "quarantine": ["p3", "p4"],
-                           "isolated": ["p1", "p2", "p3", "p4"]},
+                "reach": {"writer-pushes-a-looser-declaration": 1.0,
+                          "writer-merges-or-tags-through-rest": 1.0,
+                          "misleading-proposal-merged-by-a-human": 0.0,
+                          "model-step-writes-a-wrong-binding-or-forecast": 0.0},
+                "closes": {r: _agent_closes(r) for r in LADDER},
                 "scenario": {"gap": 90.0, "loosest_pod_tier": "baseline", "selected_pod_tier": "isolated",
                              "window_days": 1.0, "window_source": "fixture truth.yml cron",
                              "lm": [lm, lm, lm], "annualised_by": "expectation"},
@@ -1375,6 +1569,91 @@ def selfcheck():
                         amount=1.0, per_customer={"amount": 0.01, "currency": "GBP"},
                         scenario=dict(_agent()["scenario"], annualised_by="simulation")),
            "a restricted residual below baseline's fails: a model claim never prices", True)
+
+    # --- review finding 1: the line's labels are not the measurement. Each plant below keeps
+    # the line self-consistent (amount, magnitude and residuals recomputed from its own lef and
+    # window) and is red only because the seam reads the register the estate serves and the
+    # cron in the hub's own truth.yml. Before the fix both were green. ---
+    def _consistent(lef=None, window_days=None):
+        """An agent line whose amount, magnitude and residuals all follow from the lef and
+        window it carries, so only a read of something OUTSIDE the line can refuse it."""
+        base = _agent()
+        lef = lef or base["lef"]
+        window_days = window_days if window_days is not None else base["scenario"]["window_days"]
+        lm = 90.0 * window_days / 365.25
+        amount = (lef[0] + 4 * lef[1] + lef[2]) / 6 * lm
+        return _agent(lef=lef, amount=amount, per_customer={"amount": amount / 100, "currency": "GBP"},
+                      residuals={"baseline": amount, "restricted": amount, "quarantine": amount, "isolated": 0.0},
+                      scenario=dict(base["scenario"], window_days=window_days, lm=[lm, lm, lm]),
+                      window={"days": window_days})
+
+    _grade(*_with_agent(**_consistent(lef=[8e-4, 8e-4, 3e-3])),
+           "plant c: a line priced at ten times the pinned register's frequency, with its amount "
+           "and residuals recomputed to match, fails against the row the estate serves", True)
+    _grade(*_with_agent(**_consistent(window_days=30.0)),
+           "plant d: a line priced over a thirty-day window, with its magnitude, amount and "
+           "residuals recomputed to match, fails against the cron in the hub's own truth.yml", True)
+    _grade(*_with_agent(register_version="v3"),
+           "a line priced at a register version the party does not pin fails", True)
+    doc, ctx = _with_agent()
+    ctx["agent_register"] = {"version": "v4", "path": "feeds/threat-register/v4/feed.json", "lef": None,
+                             "why": "feeds/threat-register/v4/feed.json publishes no institutions.driftwood"
+                                    ".threats.scheduled-agent-misuses-write-credential row with a three-point lef"}
+    _grade(doc, ctx, "a pinned register tree that carries no row is a SKIP by name, never a FAIL and "
+                     "never a PASS", False, want_skip=True)
+    doc, ctx = _with_agent()
+    ctx["gate_window"] = {"days": None, "cron": "47 5 * * 1-5", "source": TRUTH_WORKFLOW,
+                          "why": "cron '47 5 * * 1-5' is not a fixed hourly, daily or weekly schedule"}
+    _grade(doc, ctx, "a gate cron this check cannot derive an interval from is a SKIP by name", False,
+           want_skip=True)
+    # review finding 4: a None baseline beside a numeric restricted is the composer's own
+    # legitimate output when the model path's reach could not be derived (a priced line resting
+    # on a grade above 3); it re-derives from the line's reach and is not a FAIL
+    amt = _agent()["amount"]
+    _grade(*_with_agent(reach={"writer-pushes-a-looser-declaration": 1.0,
+                               "writer-merges-or-tags-through-rest": 1.0,
+                               "misleading-proposal-merged-by-a-human": 0.0,
+                               "model-step-writes-a-wrong-binding-or-forecast": None},
+                        residuals={"baseline": None, "restricted": amt, "quarantine": amt, "isolated": 0.0},
+                        proposed_tier="restricted"),
+           "a None baseline beside a numeric restricted, consistent with a model path that could not "
+           "be derived, is not a FAIL: the residuals re-derive from the line's own reach and the "
+           "rung selected is one with a residual", False)
+    _grade(*_with_agent(reach={"writer-pushes-a-looser-declaration": 1.0,
+                               "writer-merges-or-tags-through-rest": 1.0,
+                               "misleading-proposal-merged-by-a-human": 0.0,
+                               "model-step-writes-a-wrong-binding-or-forecast": None},
+                        residuals={"baseline": None, "restricted": amt, "quarantine": amt, "isolated": 0.0}),
+           "...while selecting the rung whose residual could not be derived fails", True)
+    _grade(*_with_agent(reach={"writer-pushes-a-looser-declaration": 1.0,
+                               "writer-merges-or-tags-through-rest": 1.0,
+                               "misleading-proposal-merged-by-a-human": 0.0,
+                               "model-step-writes-a-wrong-binding-or-forecast": None}),
+           "...but a numeric baseline over a model path that could not be derived fails: the residual "
+           "cannot be stated", True)
+    _grade(*_with_agent(reach={"writer-pushes-a-looser-declaration": 0.5,
+                               "writer-merges-or-tags-through-rest": 0.5,
+                               "misleading-proposal-merged-by-a-human": 0.0,
+                               "model-step-writes-a-wrong-binding-or-forecast": 0.0}),
+           "residuals that do not follow from the line's own reach fail", True)
+    _grade(*_with_agent(reach={"writer-pushes-a-looser-declaration": 1.0,
+                               "writer-merges-or-tags-through-rest": 1.0,
+                               "some-fifth-path": 0.0,
+                               "model-step-writes-a-wrong-binding-or-forecast": 0.0}),
+           "a reach naming a path that is not one of the decision's four fails", True)
+    _grade(*_with_agent(closes={"baseline": [], "restricted": ["p4"], "quarantine": ["p3", "p4"],
+                                "isolated": ["p1", "p2", "p3", "p4"]}),
+           "a closes map that is not the decision's closures fails", True)
+    # the two readers, on their own: the cron shapes, and the hub's own served truth.yml
+    assert _cron_interval_days("47 5 * * *") == 1.0 and _cron_interval_days("5 * * * *") == 1.0 / 24 \
+        and _cron_interval_days("0 9 * * 1") == 7.0, "fixed daily, hourly and weekly crons derive"
+    assert all(_cron_interval_days(c) is None for c in ("*/15 * * * *", "47 5 1 * *", "47 5 * * 1-5",
+                                                           "47 5,17 * * *", "bad")), \
+        "any other shape is a could-not-look, never a guess"
+    gw = _gate_window()
+    assert gw["days"] == 1.0 and gw["cron"] and gw["why"] is None, (
+        "the hub's own truth.yml gives one daily cron", gw)
+    print(f"ok  the hub's own {gw['source']} cron {gw['cron']!r} derives a {gw['days']:g}-day window")
     _grade(*_with_agent(proposed_tier="paranoid"), "an off-ladder twin-agent rung fails", True)
     _grade(*_with_agent(residuals={"baseline": 1.0}), "residuals that do not cover every rung fail", True)
     _grade(*_with_agent(lef_from="editorial"), "a frequency not from the threat register fails", True)
