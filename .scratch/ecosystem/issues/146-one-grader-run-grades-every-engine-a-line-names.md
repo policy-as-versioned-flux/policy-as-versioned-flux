@@ -265,8 +265,10 @@ and, offline only, 1.19.1 were used. Both darwin_arm64 archives were checked aga
 `https://github.com/kyverno/kyverno/releases/download/v1.19.1/checksums.txt`. The platform
 branch head sits directly on platform `origin/main` `541d2aa`.
 
-- Grader tests: 23 pass. Four of them fail on the builder's grader (`ea027f9`): an excluded pass
-  row, rows that cannot be read, the tag-bound cage grade and the verdict line.
+- Grader tests: 23 pass. On the builder's grader (`ea027f9`) the final test file gives six failures
+  and one error (corrected by the integrator from the review's measurement: this line first said
+  four). Among them are an excluded pass row, rows that cannot be read, the tag-bound cage grade and
+  the verdict line.
 - `verify-cage-engine.sh` at the platform head with `KYVERNO_ENGINE_DIR` holding 1.18.2 exits 0
   and ends `PASS: engine cells -- passed; 2 cell(s): 2 passed; graded platform commit
   1dba561...: policy 5.0.0 from refs/tags/policy/v5.0.0 at 5b88f1d...`.
@@ -299,3 +301,13 @@ branch head sits directly on platform `origin/main` `541d2aa`.
   `verify-branch-refs`, `verify-schedules`, `verify-forge-review` and `verify-local-clock` read
   the same as on `origin/main`. `tests/test_can_record.py` (28), `test_fall_check.py` (46),
   `test_schedules_clock.py` (32) and `test_lost_recordings.py` (7) pass.
+
+**2026-09-26, the integrator, before the merge.** Review round 2 approved with three minor
+findings. Two are fixed on this branch. First, `truth.yml` now exports `KYVERNO_ENGINE_DIR` before
+it reads the engine table, so an absent table leaves the directory empty and every listed cell
+reads could-not-look. Before this fix the step exited first, and `verify-cage-engine.sh` then used
+the CLI on `PATH`. Second, the test count above is corrected. The third finding is outside this
+ticket and is carried here: platform `distribution/render-governed-namespace-guard.py` and
+`distribution/verify-governed-namespace-guard.sh` still say that the kyverno CLI cannot evaluate
+`namespaceSelector` offline. The review measured on 1.18.2 that `kyverno test` and `kyverno apply`
+evaluate it against a Namespace that a Values file declares.

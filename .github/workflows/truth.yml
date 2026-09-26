@@ -334,13 +334,15 @@ jobs:
         run: |
           set -uo pipefail
           table=.estate-clone/platform/engine/kyverno/engine-table.yaml
-          if [ ! -f "$table" ]; then
-            echo "::warning::$table is absent: no engine is installed for the cage-engine grader"
-            exit 0
-          fi
+          # Exported before the table is read, so an absent table leaves the directory empty and
+          # the grader is never handed the CLI on PATH in its place.
           dest="$RUNNER_TEMP/kyverno-engines"
           mkdir -p "$dest"
           echo "KYVERNO_ENGINE_DIR=$dest" >>"$GITHUB_ENV"
+          if [ ! -f "$table" ]; then
+            echo "::warning::$table is absent: no engine is installed for the cage-engine grader, so every listed cell reads could-not-look"
+            exit 0
+          fi
           rows="$RUNNER_TEMP/engine-rows.txt"
           : >"$rows"
           python3 - "$table" "$rows" <<'PY' || echo "::error::$table could not be read, so no engine is installed for the cage-engine grader"
