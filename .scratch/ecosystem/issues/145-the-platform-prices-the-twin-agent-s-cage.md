@@ -185,3 +185,14 @@ adopter ("carries no `agent-cage` line ... composed under platform v4.0.0"), whi
 selfcheck on the branch, in the planted estate: rc 0 with 105 OK lines, two of them the new
 agent-cage legs (the real driftwood's unpriced line by name; the v4 copy priced at 0.4213 GBP,
 `baseline`, the fold unmoved). CI results are appended below after each push.
+
+**CI, 2026-09-26.** Hub PR #143 (head 0348f96c): the `twin` workflow's `demo`, `typecheck`,
+`reproduce-elsewhere` and three `determinism` jobs pass; `tests` and `invariants` fail with
+exactly main's standing red (invariant 45, `flux_coverage_floor_is_still_reachable`: 1 failed,
+2891 passed on this head and on main 9c3b1f22 run 36210103426; 72 passed, 1 failed on both), so
+no failure is this branch's. The branch push also ran the truth workflow (run 350, gate
+36213266620): 121 result rows and the same two FAIL rows as main's run 349, none added and none
+removed; `verify/misuse/verify-misuse.sh` PASS and `verify/pound-seam/verify-pound-seam.sh` SKIP
+(waits) on the line this ticket declares. Platform PR #46 (head ea2f1bb2) and feeds PR #9 (head
+b1d9459b) have no pull-request CI in their repositories; their verify scripts ran locally as
+recorded above, and the release workflows run them again at the tag.
