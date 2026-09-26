@@ -1,7 +1,7 @@
 # 161 — Fact 7 is registered again with a reference workload
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -43,3 +43,23 @@ The offline proof that an unclaimed pod in a Namespace that declares nothing is 
 **Changed 2026-09-26, after ticket 71's round 5.** Ticket 71 no longer adds an engine fact to the drift lane, so no ticket from it edits `drift/five-facts.py` or `drift/window.yaml`. Ticket 147 creates `gitops/engine/kyverno.yaml` in each adopter, and item 4.2 reads it. The `KYVERNO_CLI` variable is decided here, delegated under ADR-0025, and was agreed with the session that owns ticket 71.
 
 This ticket blocks ticket 151, and the fleet, policy and governance-agent row of ticket 156's register.
+
+## Comments
+
+**2026-09-26, the builder (owner-instructed).** The owner wrote on 2026-09-26: "everything use dynamic workflows to span out and map the dependncies with code reviews gating completion etc. push git commits as you go, merge to main etc build the thing. you've got bypass permissions set so you can merge everything necessary." and then "make sure you don't step on the other agents toes". Under that, this pull request and the three adopter pull requests on branch `ticket-161-reference-workload` build items 1 to 6 in full, in driftwood, tuppence and ludlow and in the hub. The builder pushed feature branches and opened pull requests only; the integrator merges.
+
+What the adopter pull requests build, each in two commits so that the grade change (item 1) is in the same commit as the new section and the sampler (items 2 and 3), never after them: `drift/window.yaml` carries the section from `research/ticket-152-fact-7-reference/cage-behaviour-sample.draft.yaml` byte for byte except `declared_on: '2026-09-26'`, and the addendum comment above it no longer says "refuses to score"; `drift/five-facts.py` renames every control to reference, gives fact 7 its new id, retires the same-rung falsifier and adds `the_cage_selects_the_reference_workload`, `the_fall_closed_rung_is_not_the_ladder_s_bottom` and `the_cage_facts_stay_unmeasured`, reads could-not-look on facts 6 and 7 for a sample older than the newest registration with a line naming the commit, names each null fact and its reason on the SKIP line, and derives the bottom from the cluster's own `cage-` PriorityClasses and the selecting NetworkPolicy; `drift/README.md` describes the reference workload. The second commit adds `verify-cage-probe.sh` with `drift/cage_probe.py`, one step in `shift-left.yml` after the CLI install, and the recomposed `composed/HEADER.yaml`. The hub pull request adds three manifest rows (class `self-proof`, skip `-`), the narration and the regenerated deck, the test docstring, and this record.
+
+Measured, on a throwaway merge of each branch onto that adopter's `origin/main` (ludlow `2eca9d0`, driftwood `5d0f467`, tuppence `0be3665`) with the kyverno 1.18.2 CLI: `drift/five-facts.py selfcheck` exit 0 on all three, and `verify-cage-probe.sh` PASS on all three in about five seconds each, reading the served documents at the pinned tag `v3.0.0` and at HEAD: the fall-closed pod lands on `isolated` at priority -10000 (`cage-isolated`, the lowest served `cage-` class), `cage-reach-isolated` selects it with no rules and both types, and the reference pod is untouched by all six served mutations and selected by no generated NetworkPolicy. A recompose of an unmodified ludlow tree with the same tools and parents produced zero drift, so the recompose recipe reproduces CI; on each branch the recompose changed one line, the comparison-inputs hash in `composed/HEADER.yaml`. The hub records no literal total or ceiling outside `talk/truth.log`: the manifest header carries none, `talk/truth_manifest.py` and its tests use fixture numbers, so the three rows move the next recorded TRUTH line from total 130 and ceiling 111 to 133 and 114, and `talk/fall_check.py` excuses the change because the manifest changed in the same commit.
+
+Decided while building, each **delegated** (ADR-0025):
+
+- A fact 6 that would read TRUE reads could-not-look when the bottom check fires; a fact 6 observed FALSE stays FALSE whatever the rung. Ticket 152 says both facts read null when the fall-closed rung is not the bottom, and its reason is that a TRUE would name a rung the cage did not use. A refusal or a never-run was observed on whatever rung the pod got, and softening it to null would repeat the defect ADR-0028 point 6 removed.
+- `_cage_networkpolicies` matches a policy against the pod's whole label set, not the two cage labels only, so an empty podSelector or a selector on the version label counts. The matchExpressions limit stays.
+- The record's `schema_version` is 3: fact 7's id and the evidence keys changed.
+- The offline proof lives in `drift/cage_probe.py`, called by `verify-cage-probe.sh`; the wrapper holds steps 1 to 3 and the prover holds 4 and 5, so the proof is importable and the gate discovers one script.
+- The proof runs the fall-closed pod once per version in the ResourceSet array and applies every served MutatingPolicy at once, then every served GeneratingPolicy, as the API server would.
+- The deck was regenerated for run 235, the run the committed deck already names, so only the narration prose moves and `talk/verify-demo.sh`'s grade is unchanged; moving the deck to the newest run is a separate decision.
+- The branch is `ticket-161-reference-workload`, not the wave worktree's name: a second agent wrote an uncommitted five-facts.py and window.yaml into the wave worktree for ludlow while this build ran, so this build moved to private worktrees and left that work untouched (a patch of it is with the integrator's report).
+
+Not done here, and not fakeable: the first scheduled sample after the merge scoring facts 6 and 7 as a PASS or an observed FALSE. Until three samples after the registration have been taken, `the_cage_facts_stay_unmeasured` cannot fire.
