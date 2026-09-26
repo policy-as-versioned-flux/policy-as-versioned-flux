@@ -78,7 +78,13 @@ that a rewritten entry cites stay as the record of the decision at the time.
   selects the spec**. The spec is a **tier** on one ladder: **baseline, restricted, quarantine,
   isolated, infra**. The rung names are shared; each **actor class** has its own **dial table**
   that says what a rung means for it, so a pod's dials and the twin agent's dials differ under one
-  rung name (2026-09-25, ticket 30; ADR-0031). The mea-culpa's two ends survive as rungs: continuous, corrective guidance is
+  rung name (2026-09-25, ticket 30; ADR-0031). The platform prices the twin agent's cage on a
+  composed **`agent-cage` line** (`source: platform`, `subject: twin-agent`, a `prices[]` kind of
+  its own): its residual at each rung is derived from the misuse paths the rung closes, its loss
+  magnitude is the adopter's own residual gap on its twin line over the gate's detection window,
+  its frequency is a threat-register row, the adopter's own selection policy picks the rung, and
+  the tier fold keys on the subject so the line never folds into a Namespace (2026-09-26, ticket
+  145). The mea-culpa's two ends survive as rungs: continuous, corrective guidance is
   the loose end; the **bottom rung is `isolated`** (the quarantine cage plus no ingress, no egress,
   first eviction) and it replaces every earlier deny or refusal, so nothing is ever refused, only
   caged. A "locked door" is therefore the bottom rung reached by the £, not a separate mechanism.
