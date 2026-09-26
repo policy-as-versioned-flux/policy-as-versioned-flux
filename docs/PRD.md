@@ -246,6 +246,11 @@ of adoption cadence. Background scans + PolicyReports give measurability for fre
 bumped via the same reviewed Renovate PR path as policy, because an engine upgrade can change
 verdicts across every installed policy version.
 
+> **Amended 2026-09-26 (eco-system ticket 71).** The "≥1.18" floor and the Renovate path are
+> replaced by [ADR-0033](adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md):
+> a line supports exactly the engine versions it passed on, and an engine bump is a reviewed PR
+> that the gate grades. The served lines also carry `MutatingPolicy` and `GeneratingPolicy` bodies.
+
 ### 6.4 Multi-version coexistence (the crux) — `ResourceSet` matrix (ADR-0005)
 
 A single cluster runs N policy versions side by side:

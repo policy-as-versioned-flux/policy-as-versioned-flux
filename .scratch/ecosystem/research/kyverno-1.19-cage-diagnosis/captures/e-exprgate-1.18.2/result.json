@@ -1,0 +1,26 @@
+{
+  "mode": "variant",
+  "variant": "<scratch>/variants/e-exprgate",
+  "binary": "<scratch>/bin/1.18.2/kyverno",
+  "matrices": [
+    {
+      "family": "cage-tier",
+      "outcome": "passed",
+      "passed_assertions": 13,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "8957209f00351a9d83d3e88580a0b2dc822e9183f54c06e44f46ab7d83b28a93",
+      "diagnostic": null
+    },
+    {
+      "family": "cage-netpol",
+      "outcome": "passed",
+      "passed_assertions": 11,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "31bd87cefcc134a4a99296ad4f928746abfcf015a8b274bad5ce542d702f8e27",
+      "diagnostic": null
+    }
+  ],
+  "outcome": "passed"
+}

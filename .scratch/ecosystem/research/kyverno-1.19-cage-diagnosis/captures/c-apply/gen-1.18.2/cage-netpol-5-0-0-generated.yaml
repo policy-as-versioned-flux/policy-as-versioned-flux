@@ -1,0 +1,252 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: restricted
+  name: cage-reach-restricted
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: restricted
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: quarantine
+  name: cage-reach-quarantine
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: quarantine
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: isolated
+  name: cage-reach-isolated
+  namespace: default
+spec:
+  egress: []
+  ingress: []
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: isolated
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: restricted
+  name: cage-reach-restricted
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: restricted
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: quarantine
+  name: cage-reach-quarantine
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: quarantine
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: isolated
+  name: cage-reach-isolated
+  namespace: default
+spec:
+  egress: []
+  ingress: []
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: isolated
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: restricted
+  name: cage-reach-restricted
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: restricted
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: quarantine
+  name: cage-reach-quarantine
+  namespace: default
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: quarantine
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    posture.acme.io/cage: reach
+    posture.acme.io/tier: isolated
+  name: cage-reach-isolated
+  namespace: default
+spec:
+  egress: []
+  ingress: []
+  podSelector:
+    matchLabels:
+      posture.acme.io/caged: "true"
+      posture.acme.io/tier: isolated
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+

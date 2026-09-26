@@ -18,6 +18,10 @@ Two incompatibilities are proven, and they are not the same size:
 2. With that applied, `cage-netpol`'s per-tier reach matrix then fails under 1.19 with a
    behavioural difference in the generated NetworkPolicy, not a compile error. Depth unknown.
 
+> **Corrected 2026-09-26.** Item 2 is refuted. Under the offline CLI the generated NetworkPolicies
+> are the same on both engines. Only the report for an unmatched trigger differs. See
+> `.scratch/ecosystem/research/kyverno-1.19-cage-diagnosis/`.
+
 The decisions the owner owns. What engine versions does a published policy line claim to support,
 and where is that claim declared and graded? Does a supported-version claim belong on the
 `versions.yaml` array element, so an adopter can price a cluster it cannot serve? Is fixing 1.19
@@ -43,16 +47,18 @@ decision below is labelled delegated.
 **The facts that shaped the answers, read on 2026-09-25.**
 
 - Part of this ticket is already built. Platform PR 26 (97dd40d, 2026-09-10) added
-  `tested_engines: { scope: published-cage-fixtures-v1, kyverno: ["1.18.2"] }` to the 5.0.0 element
-  of `distribution/versions.yaml` and a grader, `computed-semver/engine_compatibility.py`, which
+  `tested_engines: { scope: published-cage-fixtures-v1, kyverno: ["1.18.2"] }` to the 4.0.0 and
+  5.0.0 elements of `distribution/versions.yaml` (4.0.0 has since retired) and a grader, `computed-semver/engine_compatibility.py`, which
   `verify-cage-engine.sh` runs. The platform README says that this is "not a runtime support
   range" and that it completes "only ticket 71's bounded offline matrix subtask".
 - The grader requires `tested_engines.kyverno == [running version]`. A list with two engines
   therefore reads could-not-look, and that turns the hub gate red.
 - Policy 4.0.0 is retired. All three adopters compose `[5.0.0]` only. Ticket 63's cut was 5.0.0,
   tagged 2026-09-10, so a 1.19 fix cannot ride with it.
-- The adopter installs its own engine. Adopters sync platform `./distribution` only, not
-  `./engine`. Each adopter's `drift-sample.yml` installs Kyverno 1.18.2 itself. No adopter declares
+- No adopter reconciles a platform path. Each adopter serves its own composed set, and
+  `gitops/platform/platform-distribution.yaml` is opt-in (corrected 2026-09-26; this line first
+  said that adopters sync platform `./distribution`). Each adopter's `drift-sample.yml` installs
+  Kyverno 1.18.2 itself. No adopter declares
   its engine version, and `party/schema.json` has `additionalProperties: false`.
 - Every served body is `policies.kyverno.io/v1alpha1`. The `install.yaml` of Kyverno 1.18.2 and of
   1.19.1 both serve `v1`, mark `v1alpha1` deprecated, and store `v1beta1`, for each policy kind
@@ -88,13 +94,15 @@ agent tried to refute. The second agent confirmed the classification and correct
 
 - The cage-tier failure is a policy defect. `string(variables.tier)` compiles on 1.18.2 and 1.19.1,
   passes 13/0 on both, and gives the same mutated output as the tagged body.
-- The cage-netpol failure is not a policy behaviour change. The generated NetworkPolicies are
-  the same on both engines. Kyverno 1.19 (upstream PR #16505) returns no result when a
+- The cage-netpol failure is not a policy behaviour change under the offline CLI. The generated
+  NetworkPolicies are the same on both engines, and the offline PolicyReport differs. Kyverno 1.19 (upstream PR #16505) returns no result when a
   GeneratingPolicy's `matchConditions` do not match. So the fixture's two `result: skip` rows read
   "Fail / Not found". On 1.18.2 those rows were a real "generates nothing" check. No body change
   measured makes them green on 1.19.1, and a PolicyException masks the gate.
 - The fixture has a gap on both engines: no row tests the `is-caged` gate alone.
-- Moving the five bodies to `policies.kyverno.io/v1` changed no result on either engine.
+- Moving the five bodies to `policies.kyverno.io/v1` changed no result on either engine, under the
+  offline CLI: the two cage matrices, and `kyverno apply` of the other three bodies over the
+  cage-tier fixture pods. Those three bodies compile on 1.19.1. Their own fixtures did not run.
 
 This changes the shape of the Q3 ticket. The body needs a one-token fix. The fixture needs a
 "generates nothing" check that does not depend on how the engine reports a miss.
@@ -184,26 +192,68 @@ engine version from the file that ticket 147 names.
 **On 2026-09-25 the owner also said:** "You have explicit permission to merge your own PRs.
 Remember this".
 
+**2026-09-26, a review of the record, and round 5.** Before the merge, a review workflow checked
+the record: one agent looked for conflicts with standing records, and a second agent checked every
+factual claim against the estate. It returned 34 findings. Thirty were corrections, made on
+2026-09-26 without a decision. Four needed a decision, and one conflict was found before the
+review. The owner answered round 5 with "Agree". Each decision is delegated.
+
+15. **Q15 (a). The ticket 149 line also retires `posture-trust-boundary`.** Ticket 89's register,
+    `NORTH-STAR.md:54` and ticket 84 each commit the retirement to the next declared line. The line
+    carries four changes, and `render-version-tree.py` changes too. The patch prediction of
+    decision 12 is withdrawn. If the computed bump is a major, each institution needs an acceptance
+    record, which the owner writes.
+16. **Q16 (a). "Supported" covers every body that the line serves.** Each body compiles on the
+    engine and its fixtures pass. The machinery carries its own `tested_engines`, and composition
+    prices cm-6 the same way. The reason: the price counts the control claims, and the old scope
+    never graded a body that carries a claim.
+17. **Q17 (a), replacing decision 11. The declared engine installs on every cluster the adopter
+    runs.** `kind-driftwood` got the platform's Kyverno from `talk/up.sh`, and no adopter's Flux
+    reconciles `gitops/engine/`. So `talk/up.sh` installs each named cluster's engine from its
+    adopter's file. Adopters that share a cluster declare the same engine. A static check replaces
+    the drift fact: the file's version, URL and checksum agree with the platform engine table. The
+    reason: the lane installs from the same file, so the drift fact could only read true. Because
+    the static check reads the engine table, ticket 147 now waits on ticket 146, which changes the
+    order of decision 13: 146 runs first, then 147.
+18. **Q18 (a). The adopter's shift-left check runs each line only on engines that the line
+    supports.** A line in the window that does not support the declared engine is reported by name
+    as an unsupported pairing.
+19. **Q19 (a), changing decision 12's cut sentence. An uncut line is graded on its candidate tree.**
+    The cut is signed only after every cell passes. This reverses the platform README's "deliberately
+    not a pre-cut gate".
+
 ## Answer
 
-Resolved 2026-09-25 in four grilling rounds. The owner answered each round with an agreement and no
-reason, so every decision is **delegated** under ADR-0025. Decisions 1 to 14 are recorded above,
-round by round. The architecture is
+Resolved 2026-09-25 in four grilling rounds, and revised on 2026-09-26 in a fifth round after a
+review. The owner answered each round with an agreement and no reason, so every decision is
+**delegated** under ADR-0025. Decisions 1 to 19 are recorded above, round by round. The architecture
+is
 [ADR-0033](../../../docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md).
-ADR-0003 has a dated amendment.
+ADR-0003 and `docs/PRD.md` have dated amendments.
 
-- **What a line supports.** Exactly the engines in its `tested_engines`, each an exact version. No
-  range, and no neighbouring patch.
+- **What a line supports.** Exactly the engine versions on which every body it serves compiles and
+  its fixtures pass. No range, and no neighbouring patch. The machinery has its own supported
+  engines.
 - **Who owns the engine.** The adopter. Its engine install file in its own gitops is its declared
-  engine. The drift sample checks the running engine against it.
+  engine, and every cluster it runs installs from that file. Adopters that share a cluster declare
+  the same engine.
 - **The price.** An unsupported pairing makes every control that the line claims a hole, under an
-  `unsupported-engine` delta. It is never refused. No declaration is priced the same way.
-- **The grading.** One run grades every cell of the matrix. An engine bump is not a policy
-  version. The estate's own pins must name a supported engine of every served line.
-- **1.19.** The cage-tier failure is a one-token policy defect. The cage-netpol failure is a
-  Kyverno reporting change, not a behaviour change. A new line carries the fix, the `v1` move and
-  a fixture that compares generated documents.
+  `unsupported-engine` delta. It is never refused. No declaration is priced the same way. Whether a
+  body that does not compile fails open at admission is not measured yet.
+- **The grading.** One run grades every cell of the matrix, on the candidate tree before the cut
+  and on the tag after it. An engine bump is not a policy version. The estate's own pins must name a
+  supported engine of every served line.
+- **1.19.** Under the offline CLI, the cage-tier failure is a one-token policy defect, and the
+  cage-netpol failure is a Kyverno reporting change. The generated documents are the same. A new
+  line carries the fix, the `posture-trust-boundary` retirement, the `v1` move and a fixture that
+  compares generated documents.
 
-The build is tickets 146 to 150. Two authorisations are held for the owner: the signed tag for
-the new line, with the platform tools tag that ticket 148 needs, and a public upstream report to
-kyverno/kyverno.
+The build is tickets 146 to 150. These steps are held for the owner, 2026-09-26 at the earliest:
+
+- the signed policy tag for the ticket 149 line, and an acceptance record for each institution if
+  its bump is a major;
+- the platform tools tag and the adopter tags that ticket 148 needs;
+- for ticket 150: the authorisation to merge over the adopter gate's retirement refusal, the
+  adopter's signed composed tag with its composed-set move, and a platform tools tag that carries
+  the 149 line;
+- a public upstream report to kyverno/kyverno about the GeneratingPolicy change.

@@ -1,0 +1,26 @@
+{
+  "mode": "variant",
+  "variant": "<scratch>/variants/x-fixture-noskip",
+  "binary": "<scratch>/bin/1.18.2/kyverno",
+  "matrices": [
+    {
+      "family": "cage-tier",
+      "outcome": "passed",
+      "passed_assertions": 13,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "d2ff25953146e45d53207bf16465242e74ade9acff31a0221d187d0f2a3d154a",
+      "diagnostic": null
+    },
+    {
+      "family": "cage-netpol",
+      "outcome": "passed",
+      "passed_assertions": 9,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "6f22e5e20711b1f3bac461c2449dc469ba519f5caf9bbe51eeac53bd8658804f",
+      "diagnostic": null
+    }
+  ],
+  "outcome": "passed"
+}

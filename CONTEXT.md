@@ -190,15 +190,18 @@ that a rewritten entry cites stay as the record of the decision at the time.
   policy version applies to it. The original's signature elegance: **one string** served as both
   the dependency pin *and* the engine's workload selector.
 
-- **Supported engine** (added 2026-09-25, ticket 71) — An exact engine version, such as Kyverno
-  `1.18.2`, on which a published policy line's cage fixtures passed. A line supports exactly the
-  engines it passed on. No range is inferred, and no neighbouring patch is inferred: `1.18.3` is
-  unsupported until the line passes on it. _Avoid_: compatible range, "works on 1.18".
+- **Supported engine** (added 2026-09-25, widened 2026-09-26, ticket 71) — An exact engine
+  version, such as Kyverno `1.18.2`, on which every body that a published policy line serves
+  compiles and its fixtures pass. A line supports exactly the engines it passed on. No range is
+  inferred, and no neighbouring patch is inferred: `1.18.3` is unsupported until the line passes on
+  it. The platform's machinery has supported engines of its own. _Avoid_: compatible range, "works
+  on 1.18".
 
-- **Declared engine** (added 2026-09-25, ticket 71) — The engine version an adopter states that its
-  own cluster runs. The adopter owns it, because the adopter installs its own engine. Composition
-  reads the declared engine. The drift sample observes the running engine, which is a different
-  fact. The declaration is the adopter's own engine install pin, not a separate statement.
+- **Declared engine** (added 2026-09-25, rewritten 2026-09-26, ticket 71) — The engine version an
+  adopter's clusters run. The adopter owns it. The declaration is the adopter's own engine install
+  file, not a separate statement, and every cluster the adopter runs installs its engine from that
+  file. Adopters that use one cluster together declare the same engine. Composition reads the
+  declared engine.
 
 - **Unsupported pairing** (added 2026-09-25, ticket 71) — An adopter whose declared engine is not a
   supported engine of a line it composes. On that engine the line's control claims do not count,
@@ -851,7 +854,9 @@ stray `|` inside its own prose is named and red rather than dropped in silence.
   do not conflate them.
 
 - **Engine = Kyverno; policies authored as CEL `ValidatingPolicy`.** See
-  [ADR-0003](docs/adr/0003-kyverno-validatingpolicy-cel.md).
+  [ADR-0003](docs/adr/0003-kyverno-validatingpolicy-cel.md). Amended 2026-09-26 (ticket 71): the
+  served lines also carry `MutatingPolicy` and `GeneratingPolicy` bodies, and the engine versions a
+  line supports are its **supported engines** (ADR-0033).
 
 - **Two planes:** **workload plane** (native Kubernetes workloads) and **cloud plane** (cloud
   resources). Both governed by the *same* versioned Kyverno engine. The cloud plane is built by

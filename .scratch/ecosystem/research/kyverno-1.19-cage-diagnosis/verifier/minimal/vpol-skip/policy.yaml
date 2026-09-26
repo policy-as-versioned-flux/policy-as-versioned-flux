@@ -1,0 +1,17 @@
+apiVersion: policies.kyverno.io/v1alpha1
+kind: ValidatingPolicy
+metadata:
+  name: mc-val
+spec:
+  validationActions: [Audit]
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ['']
+      apiVersions: [v1]
+      operations: [CREATE, UPDATE]
+      resources: [pods]
+  matchConditions:
+  - name: is-caged
+    expression: object.metadata.?labels['caged'].orValue('') == 'true'
+  validations:
+  - expression: "true"

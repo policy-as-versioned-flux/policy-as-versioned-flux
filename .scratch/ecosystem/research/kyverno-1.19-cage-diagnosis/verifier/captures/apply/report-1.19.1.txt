@@ -1,0 +1,88 @@
+
+
+Generate:
+Generation completed successfully.
+
+Generate:
+Generation completed successfully.
+
+Generate:
+Generation completed successfully.
+
+Generate:
+Generation completed successfully.
+
+Generate:
+Generation completed successfully.
+
+Generate:
+Generation completed successfully.
+
+Generate:
+Generation completed successfully.
+
+Generate:
+Generation completed successfully.
+
+Generate:
+Generation completed successfully.apiVersion: openreports.io/v1alpha1
+kind: ClusterReport
+metadata:
+  name: merged
+results:
+- message: policy evaluated successfully
+  policy: cage-netpol-5-0-0
+  properties:
+    process: admission review
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: caged-restricted
+    namespace: default
+  result: pass
+  rule: cage-netpol-5-0-0
+  scored: true
+  source: KyvernoGeneratingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357951
+- message: policy evaluated successfully
+  policy: cage-netpol-5-0-0
+  properties:
+    process: admission review
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: caged-quarantine
+    namespace: default
+  result: pass
+  rule: cage-netpol-5-0-0
+  scored: true
+  source: KyvernoGeneratingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357951
+- message: policy evaluated successfully
+  policy: cage-netpol-5-0-0
+  properties:
+    process: admission review
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: caged-isolated
+    namespace: default
+  result: pass
+  rule: cage-netpol-5-0-0
+  scored: true
+  source: KyvernoGeneratingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357951
+source: ""
+summary:
+  error: 0
+  fail: 0
+  pass: 3
+  skip: 0
+  warn: 0
+

@@ -1,0 +1,26 @@
+{
+  "mode": "variant",
+  "variant": "<scratch>/variants/f-v1-on-b",
+  "binary": "<scratch>/bin/1.19.1/kyverno",
+  "matrices": [
+    {
+      "family": "cage-tier",
+      "outcome": "passed",
+      "passed_assertions": 13,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "56ee2f0ce991150c97bd57fba1e9fa71677101f76ed67c9030db60d3f46048d7",
+      "diagnostic": null
+    },
+    {
+      "family": "cage-netpol",
+      "outcome": "failed",
+      "passed_assertions": 9,
+      "failed_assertions": 2,
+      "exit_code": 1,
+      "output_sha256": "fc420765ed06611f56939fcdd98e00e5b32e46e799e3c96d4c6a54e00baa79e3",
+      "diagnostic": "Loading test  ( <scratch>/work/f-v1-on-b-1.19.1/graded/tests/cage-netpol/kyverno-test.yaml ) ...\n  Loading values/variables ...\n  Loading policies ...\n  Loading resources ...\n  Loading exceptions ...\n  Applying 1 policy to 5 resources with 0 exceptions ...\n  Checking results ...\n\n\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\n\u2502 \u001b[40;32mID (11) \u001b[0m \u2502 \u001b[40;32mPOLICY           \u001b[0m \u2502 \u001b[40;32mRULE             \u001b[0m \u2502 \u001b[40;32mRESOURCE                     \u001b[0m \u2502 \u001b[40;32mRESULT\u001b[0m \u2502 \u001b[40;32mREASON   \u001b[0m \u2502\n\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\n\u2502 1        \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 /cage-reach-restricted        \u2502 Pass   \u2502 Ok        \u2502\n\u2502 2        \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 /cage-reach-quarantine        \u2502 Pass   \u2502 Ok        \u2502\n\u2502 3        \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 /cage-reach-isolated          \u2502 Pass   \u2502 Ok        \u2502\n\u2502 4        \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 /cage-reach-restricted        \u2502 Pass   \u2502 Ok        \u2502\n\u2502 5        \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 /cage-reach-quarantine        \u2502 Pass   \u2502 Ok        \u2502\n\u2502 6        \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 /cage-reach-isolated          \u2502 Pass   \u2502 Ok        \u2502\n\u2502 7        \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 /cage-reach-restricted        \u2502 Pass   \u2502 Ok        \u2502\n\u2502 8        \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 /cage-reach-quarantine        \u2502 Pass   \u2502 Ok        \u2502\n\u2502 9        \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 /cage-reach-isolated          \u2502 Pass   \u2502 Ok        \u2502\n\u2502 10       \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 v1/Pod/default/caged-baseline \u2502 Fail   \u2502 Not found \u2502\n\u2502 11       \u2502 cage-netpol-5-0-0 \u2502 cage-netpol-5-0-0 \u2502 v1/Pod/default/healthy        \u2502 Fail   \u2502 Not found \u2502\n\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2502\n\n\nTest Summary: 9 tests passed and 2 tests failed\n\nError: 2 tests failed\n"
+    }
+  ],
+  "outcome": "failed"
+}

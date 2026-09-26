@@ -1,0 +1,12 @@
+posture-trust-boundary v1alpha1 1.18.2 per-resource results equal to v1alpha1@1.18.2: True
+posture-trust-boundary v1alpha1 1.19.1 per-resource results equal to v1alpha1@1.18.2: True
+posture-trust-boundary v1 1.18.2 per-resource results equal to v1alpha1@1.18.2: True
+posture-trust-boundary v1 1.19.1 per-resource results equal to v1alpha1@1.18.2: True
+require-nonroot v1alpha1 1.18.2 per-resource results equal to v1alpha1@1.18.2: True
+require-nonroot v1alpha1 1.19.1 per-resource results equal to v1alpha1@1.18.2: True
+require-nonroot v1 1.18.2 per-resource results equal to v1alpha1@1.18.2: True
+require-nonroot v1 1.19.1 per-resource results equal to v1alpha1@1.18.2: True
+stamp-posture v1alpha1 1.18.2 per-resource results equal to v1alpha1@1.18.2: True
+stamp-posture v1alpha1 1.19.1 per-resource results equal to v1alpha1@1.18.2: True
+stamp-posture v1 1.18.2 per-resource results equal to v1alpha1@1.18.2: True
+stamp-posture v1 1.19.1 per-resource results equal to v1alpha1@1.18.2: True

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "scope": "published-cage-fixtures-v1",
+  "outcome": "could-not-look",
+  "engine": {
+    "name": "kyverno",
+    "version": "1.19.1",
+    "sha256": "44477b1176c9aac308794c3638fe5f82dfd1ceab28b7d8faa96651c81a0d0504"
+  },
+  "rows": [
+    {
+      "policy_version": "5.0.0",
+      "outcome": "could-not-look",
+      "reason": "engine/version outside the declared test matrix or additional engines unmeasured; compatibility unknown"
+    }
+  ],
+  "limits": [
+    "Only the released cage-tier mutation and cage-netpol generation fixtures are graded; no complete policy, validation, Kubernetes admission or live network compatibility claim.",
+    "Exact CLI versions only; no patch range, Kubernetes version or adopter runtime is inferred.",
+    "Tag signature verification remains the provenance gate; this check binds tag and array policy trees.",
+    "Executable SHA256 identifies this run; binary authenticity rests on the caller checksum pin.",
+    "This evidence changes no policy body, policy bump, money, or release authorization."
+  ]
+}

@@ -5,8 +5,8 @@ status: accepted
 # Engine API: Kyverno CEL `ValidatingPolicy`, not the 2022 `ClusterPolicy`
 
 > **Amended 2026-09-25 (eco-system ticket 71, delegated under [ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md)).**
-> Three statements in the "Version pin" point below are false about the estate as built. The
-> choice of Kyverno and of CEL policies stands.
+> Four statements in the "Version pin" point below are false about the estate as built, or claim
+> more than was measured. The choice of Kyverno and of CEL policies stands.
 >
 > 1. *"author every policy as `apiVersion: policies.kyverno.io/v1`"*. Every served body is
 >    `policies.kyverno.io/v1alpha1`. Kyverno 1.18.2 and 1.19.1 both serve `v1` and mark `v1alpha1`
@@ -21,6 +21,9 @@ status: accepted
 >    [ADR-0033](0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md):
 >    a line supports exactly the engines it passed on, and the route is a reviewed PR that the gate
 >    grades.
+> 4. *"The reference pins Kyverno **≥1.18** as a hard dependency"*. That is a range, and no run
+>    measured it. ADR-0033 replaces it: a line supports exactly the engine versions on which every
+>    body it serves compiles and its fixtures pass.
 
 The reference policies are authored as Kyverno **`ValidatingPolicy`** (CEL expressions,
 `validationActions: [Audit|Deny|Warn]`), not the original's **`ClusterPolicy`** /

@@ -1,0 +1,8 @@
+b-string-tier vs f-v1-on-b [1.18.2 cage-tier]: IDENTICAL
+b-string-tier vs f-v1-on-b [1.18.2 cage-netpol]: IDENTICAL
+b-string-tier vs f-v1-on-b [1.19.1 cage-tier]: IDENTICAL
+b-string-tier vs f-v1-on-b [1.19.1 cage-netpol]: IDENTICAL
+a1-row vs f-v1-on-tagged [1.18.2 cage-tier]: IDENTICAL
+a1-row vs f-v1-on-tagged [1.18.2 cage-netpol]: IDENTICAL
+a1-row vs f-v1-on-tagged [1.19.1 cage-tier]: DIFFERS
+a1-row vs f-v1-on-tagged [1.19.1 cage-netpol]: IDENTICAL
