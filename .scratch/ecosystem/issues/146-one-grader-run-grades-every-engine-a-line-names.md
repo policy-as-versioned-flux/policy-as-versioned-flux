@@ -156,7 +156,9 @@ What the two pull requests build, item by item:
   fixtures pass, and the remedy is the estate's own: write one.
 - The grader reads one commit (HEAD by default) for the array, the machinery and the line
   fixtures, never the working tree. Line fixtures are read from that commit, not from the tag,
-  because they can be written after the cut. The row records both identities.
+  because they can be written after the cut. The row records both identities. For cage-tier and
+  cage-netpol the tag's own `graded/tests` fixture always runs as well, and a later fixture runs
+  beside it, never instead of it (added by the fixer, below).
 - The machinery declaration is its own file, not a key in `versions.yaml`. That file is a
   ResourceSet clusters apply, and several readers parse its array.
 - The grader gains the generated-documents comparison that ticket 149 item 4 describes, as a
@@ -166,11 +168,13 @@ What the two pull requests build, item by item:
   gate planted to exclude one trigger. The `generates.yaml` fixture fails on that plant. Ticket
   149 can reuse the format for cage-netpol.
 - The two UPDATE-only holds are graded on compiling only. Measured: `kyverno test` never matches
-  an UPDATE-only body, and the rows read skip with the oldObject gate removed too. A planted
-  compile error fails the run.
-- `kyverno test` does not evaluate `namespaceSelector` (measured: a selector that matches nothing
-  still passed every row). The governed-namespace fixtures grade what the body does to a pod it
-  matches, and say so.
+  an UPDATE-only body, and the rows read Pass / Excluded with the oldObject gate removed too. A
+  planted compile error fails the run.
+- Corrected by the fixer. The builder wrote here that `kyverno test` does not evaluate
+  `namespaceSelector`. That was wrong. `kyverno test` evaluates it only against a Namespace that a
+  `cli.kyverno.io/v1alpha1` Values file declares. The builder's two governed-namespace fixtures
+  declared none. So the CLI applied those bodies to no pod, and every row read Pass / Excluded
+  whatever it asserted. The fixer's paragraph below says what changed.
 - `PINNED_KYVERNO` stays a constant, and the pins check reads it with `ast`. Making the test read
   the table would tie the hub pytest suite to the platform clone's table.
 - The pins check binds the pins to the cut lines and to the machinery. An uncut candidate serves
@@ -181,7 +185,7 @@ What the two pull requests build, item by item:
 
 **2026-09-26, what was measured on the branches.** Local runs on the owner's Mac, pinned CLI
 1.18.2 (darwin_arm64, checksum verified), on a scratch estate of every repository's `origin/main`
-with platform at the branch head.
+with platform at the builder's head `ea027f9`. Two sentences below are corrected by the fixer.
 
 - Grader tests: 19 pass (`python3 -m unittest test_engine_compatibility`). They include a second
   listed engine with no binary (could-not-look), a candidate graded on its declaring commit
@@ -189,13 +193,16 @@ with platform at the branch head.
   binary (could-not-look, never the CLI on PATH).
 - The real grade before the scope moved: 5.0.0 reads could-not-look, naming the retired scope.
   Under the new scope, on 1.18.2: cage-tier 13, cage-netpol 11, require-nonroot 6, stamp-posture 5
-  and posture-trust-boundary 5 assertions pass, and all seven machinery bodies pass.
+  and posture-trust-boundary 5 assertions pass, and all seven machinery bodies pass. Two of those
+  seven passed on rows that all read Excluded, so they graded nothing (corrected by the fixer).
   `verify-cage-engine.sh` ends `PASS: engine cells -- passed; 2 cell(s): 2 passed`.
 - With 1.19.1 listed on a throwaway commit and both binaries handed in, the 5.0.0 cell on 1.19.1
   reads FAIL: cage-tier does not compile, and cage-netpol reads 9/2, as the diagnosis found. The
   other three 5.0.0 bodies and all seven machinery bodies pass on 1.19.1 under these fixtures.
   That is an offline measurement, not a support claim. Only tickets 148 and 149 list 1.19.1.
-- Each new fixture fails when its body is planted broken.
+- Each new fixture fails when its body is planted broken, except the two governed-namespace
+  fixtures. The reviewer planted a wrong bottom rung, and `governed-namespace-requires-claim` still
+  passed (corrected by the fixer).
 - `verify-cut-release-tags.sh` case 9 fails on the old script, with the field dropped and a stray
   brace. It passes after the fix. A degraded cut still writes `tier: "quarantine"`.
 - `verify/estate-engines/` passes with platform at the branch, fails on platform `main` (no
@@ -203,3 +210,92 @@ with platform at the branch head.
   planted estates as planted.
 - `graded/verify-graded.sh` on 1.18.2: the offline proofs hold and the live tail skips. On
   1.19.1 it fails, naming the engine.
+
+**2026-09-26, owner-instructed: the review's findings, fixed on the same two branches.** On
+2026-09-26 the owner answered "Authorised" to a list that began "build eco-system tickets 146 to
+150". A reviewer read both pull requests and returned one blocking finding and four minor ones.
+The fixer pushed to the same branches, platform#47 and this pull request. Nothing was merged or
+tagged.
+
+- **Blocking: two machinery fixtures graded nothing.** The reviewer measured it on 1.18.2. Every
+  row of `governed-namespace-requires-claim` and `governed-namespace-unclaimed-report` read
+  Pass / Excluded, and a wrong `patched.yaml` still passed. The bodies match on
+  `namespaceSelector`, and `kyverno test` evaluates that only against a Namespace a Values file
+  declares. Each governed-namespace folder now carries a `values.yaml` that declares `governed-ns`
+  (`policy-as-versioned.dev/governed: "true"`) and `app-ns` (`"false"`). A new skip row puts the
+  unclaimed pod in `app-ns`, so the fixtures now grade the namespace scope too. The instrument
+  catches this class itself now. The grader runs `kyverno test -o json` and reads each row's
+  reason, and a pass or fail row that reads Excluded fails its body. The false sentences above
+  are corrected in place, and both platform READMEs say what is true.
+- **Minor: a later fixture could replace the tag-bound cage grade.** Accepted. For cage-tier and
+  cage-netpol the tag's `graded/tests` fixture now always runs. An `engine-fixtures` folder for
+  the same body runs beside it and never instead of it.
+- **Minor: the green path has run only locally.** Accepted. The fixer cannot dispatch a
+  workflow. The integrator's merge order names the dispatch and what it must show.
+- **Minor: a failed engine download stopped the whole gate.** Accepted. The `truth.yml` step now
+  prints `::error::` naming the row, installs nothing for it, and goes on.
+  `KYVERNO_ENGINE_DIR` is set before any download. The grader then reads that engine's cells as
+  could-not-look, and its verdict line names them.
+- **Minor: the PASS line named no served artefact.** Accepted. The verdict line now names the
+  graded platform commit, each cut line's tag and the commit it points at, and every cell that
+  did not pass, with its reason.
+
+**2026-09-26, delegated decisions made by the fixer (ADR-0025).**
+
+- The grader reads rows from `kyverno test -o json`, not from the printed table. Reason, measured:
+  1.18.2 and 1.19.1 print the same JSON fields (`POLICY`, `RESOURCE`, `RESULT`, `REASON`), with no
+  colour codes and no column widths to parse.
+- A skip row may read Excluded. Reason, measured: Excluded means the engine did not apply the
+  policy, which is what a skip row asserts. If the body does act, the row reads "Want skip, got
+  pass" and fails. The two holds and two cage-netpol rows rely on this.
+- A run whose rows cannot be read, or whose row count differs from its summary, fails its body
+  and names why. It does not read could-not-look, because the engine ran and the grade cannot be
+  shown to hold.
+- `governed-namespace-cage-holds` also carries the `values.yaml`. Reason: its rows now read
+  Excluded because it is UPDATE-only, not because its Namespace is unknown. Measured: with the
+  Namespace declared and the gate removed it still reads Excluded, and with CREATE added it reads
+  "Want skip, got pass".
+- `verify/estate-engines/` is not extended to check the installed engine directory. Reason: the
+  grader's verdict line already names a row that did not install, inside the record (measured
+  below), and `estate-engines` stays a check of files that runs the same locally and on CI.
+
+**2026-09-26, what the fixer measured.** Local runs on the owner's Mac. The pinned CLI 1.18.2
+and, offline only, 1.19.1 were used. Both darwin_arm64 archives were checked against
+`https://github.com/kyverno/kyverno/releases/download/v1.18.2/checksums.txt` and
+`https://github.com/kyverno/kyverno/releases/download/v1.19.1/checksums.txt`. The platform
+branch head sits directly on platform `origin/main` `541d2aa`.
+
+- Grader tests: 23 pass. Four of them fail on the builder's grader (`ea027f9`): an excluded pass
+  row, rows that cannot be read, the tag-bound cage grade and the verdict line.
+- `verify-cage-engine.sh` at the platform head with `KYVERNO_ENGINE_DIR` holding 1.18.2 exits 0
+  and ends `PASS: engine cells -- passed; 2 cell(s): 2 passed; graded platform commit
+  1dba561...: policy 5.0.0 from refs/tags/policy/v5.0.0 at 5b88f1d...`.
+- Row reasons on 1.18.2. Policy 5.0.0: cage-tier 13 Ok; cage-netpol 9 Ok and 2 skip rows
+  Excluded; require-nonroot 6 Ok; stamp-posture 5 Ok; posture-trust-boundary 5 Ok. Machinery: the
+  orphan guard 3 Ok and the orphan cage 3 Ok. Each governed-namespace body reads 2 Ok and 1 skip
+  row Excluded. The holds read skip rows Excluded only. The bottom-rung generator passes on five
+  triggers.
+- The builder's fixtures under the new grader: FAIL, naming each Excluded pass or fail row of
+  both governed-namespace bodies.
+- Six plants, each on a throwaway commit, each FAIL: the selector matching `governed: "yes"`
+  (Excluded refused); a selector matching every Namespace ("Want skip, got pass" and "Want skip,
+  got fail"); a `patched.yaml` on `baseline` ("Resource diff"); the report's fail row flipped to
+  pass ("Want pass, got fail"); `BOTTOM_RUNG = 'baseline'`, the reviewer's plant, which now fails
+  `governed-namespace-requires-claim` as well as the orphan cage and the bottom rung; and the
+  `values.yaml` removed (Excluded refused).
+- The machinery listed on 1.19.1 on a throwaway commit, with both binaries handed in: 3 cells
+  pass, with the same row reasons. That is an offline measurement, not a support claim.
+- The new `truth.yml` engine step, lifted verbatim and run under `bash -e` with the darwin column
+  swapped in, exits 0 in all seven cases. A good row installs. A wrong checksum, a release that
+  does not exist, a checksum YAML reads as a number, a wrong archive name and an unreadable table
+  each print `::error::` naming the row, and the good rows beside them still install. The branch
+  for a binary that reports another version was not exercised.
+- The grader handed the directory from the wrong-checksum case, with 1.19.1 listed on the
+  machinery: exit 3, `SKIP: ... not passed: machinery on 1.19.1 could-not-look (no binary for
+  kyverno 1.19.1 was handed to this run)`.
+- On a throwaway merge of this branch onto hub `origin/main` `8ee6a97c`, with platform at
+  `1dba561`: `verify/estate-engines/` passes 5 of 5, and its selfcheck grades 12 planted estates.
+  `verify-can-record`, `verify-a-fall-blocks` and `verify-cited-truth` pass.
+  `verify-branch-refs`, `verify-schedules`, `verify-forge-review` and `verify-local-clock` read
+  the same as on `origin/main`. `tests/test_can_record.py` (28), `test_fall_check.py` (46),
+  `test_schedules_clock.py` (32) and `test_lost_recordings.py` (7) pass.
