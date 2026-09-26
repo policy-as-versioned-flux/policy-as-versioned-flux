@@ -321,9 +321,18 @@ jobs:
       # every other check calls is still KYVERNO_VERSION above. A table the platform does not
       # carry installs nothing: the grader then reads a listed cell with no binary as
       # could-not-look, and verify/estate-engines names the missing table.
+      #
+      # A row this step cannot install never stops the gate (ADR-0020: a missing instrument
+      # refuses by name inside the record). A failed download, a checksum that is not the row's,
+      # a binary that reports another version, or a row with no exact version, checksum or file
+      # name prints ::error:: naming the row and installs nothing for it, and the step goes on.
+      # The gate then runs and records: the grader reads that engine's cells as could-not-look,
+      # "no binary for kyverno X was handed to this run", which is red under its self-proof
+      # manifest row. KYVERNO_ENGINE_DIR is set before any download, so the grader is never
+      # handed the CLI on PATH in place of a row that did not arrive.
       - name: every engine the platform engine table lists, by the table's checksum
         run: |
-          set -euo pipefail
+          set -uo pipefail
           table=.estate-clone/platform/engine/kyverno/engine-table.yaml
           if [ ! -f "$table" ]; then
             echo "::warning::$table is absent: no engine is installed for the cage-engine grader"
@@ -331,31 +340,47 @@ jobs:
           fi
           dest="$RUNNER_TEMP/kyverno-engines"
           mkdir -p "$dest"
-          python3 - "$table" >"$RUNNER_TEMP/engine-rows.txt" <<'PY'
+          echo "KYVERNO_ENGINE_DIR=$dest" >>"$GITHUB_ENV"
+          rows="$RUNNER_TEMP/engine-rows.txt"
+          : >"$rows"
+          python3 - "$table" "$rows" <<'PY' || echo "::error::$table could not be read, so no engine is installed for the cage-engine grader"
           import re, sys, yaml
+          good = []
           for row in yaml.safe_load(open(sys.argv[1]))["versions"]:
-              art = row["cli"]["linux_x86_64"]
-              version, sha = str(row["version"]), str(art["sha256"])
+              art = (row.get("cli") or {}).get("linux_x86_64") or {}
+              version, sha, name = str(row.get("version")), str(art.get("sha256")), str(art.get("file"))
               # A malformed checksum line is not a mismatch to sha256sum: it can warn and pass.
-              if not re.fullmatch(r"\d+\.\d+\.\d+", version) or not re.fullmatch(r"[0-9a-f]{64}", sha):
-                  sys.exit("the engine table row %r carries no exact version or no sha256" % version)
-              url = "https://github.com/kyverno/kyverno/releases/download/v%s/%s" % (version, art["file"])
-              print(version, url, sha)
+              if (not re.fullmatch(r"\d+\.\d+\.\d+", version) or not re.fullmatch(r"[0-9a-f]{64}", sha)
+                      or name != "kyverno-cli_v%s_linux_x86_64.tar.gz" % version):
+                  print("::error::the engine table row %r carries no exact version, sha256 or linux_x86_64 "
+                        "archive name, so it is not installed" % version)
+                  continue
+              good.append("%s https://github.com/kyverno/kyverno/releases/download/v%s/%s %s\n"
+                          % (version, version, name, sha))
+          open(sys.argv[2], "w").writelines(good)
           PY
-          while read -r version url sha; do
-            curl -fsSL -o "$dest/cli.tgz" "$url"
-            echo "${sha}  $dest/cli.tgz" | sha256sum -c -
+          # One row: prints why on stdout and returns 1 if it cannot be installed.
+          install_row() {
+            local version=$1 url=$2 sha=$3 got reported
+            curl -fsSL -o "$dest/cli.tgz" "$url" || { echo "the download of $url failed"; return 1; }
+            got="$(sha256sum "$dest/cli.tgz" | awk '{print $1}')"
+            [ "$got" = "$sha" ] || { echo "$url hashes to $got, not the table's $sha"; return 1; }
             mkdir -p "$dest/$version"
-            tar -xzf "$dest/cli.tgz" -C "$dest/$version" kyverno
-            rm -f "$dest/cli.tgz"
+            tar -xzf "$dest/cli.tgz" -C "$dest/$version" kyverno || { echo "the archive carries no kyverno binary"; return 1; }
             # Captured first: `grep -q` stops reading at its match, and under pipefail the CLI's
             # SIGPIPE would fail a binary that reported the right version.
-            reported="$("$dest/$version/kyverno" version)"
-            grep -qE "^Version: v?${version}\$" <<<"$reported" \
-              || { echo "::error::the $version archive's binary reports another version"; exit 1; }
-            echo "installed kyverno $version at $dest/$version/kyverno"
-          done <"$RUNNER_TEMP/engine-rows.txt"
-          echo "KYVERNO_ENGINE_DIR=$dest" >>"$GITHUB_ENV"
+            reported="$("$dest/$version/kyverno" version)" || { echo "the binary did not run"; return 1; }
+            grep -qE "^Version: v?${version}\$" <<<"$reported" || { echo "the binary reports another version"; return 1; }
+          }
+          while read -r version url sha; do
+            if why="$(install_row "$version" "$url" "$sha")"; then
+              echo "installed kyverno $version at $dest/$version/kyverno"
+            else
+              rm -rf "${dest:?}/$version"
+              echo "::error::kyverno $version, a row of the engine table, is not installed: $why. The cage-engine grader reads its cells as could-not-look."
+            fi
+            rm -f "$dest/cli.tgz"
+          done <"$rows"
       - name: the gate
         id: gate
         continue-on-error: true
