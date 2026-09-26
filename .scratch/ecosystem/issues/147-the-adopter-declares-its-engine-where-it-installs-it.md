@@ -147,8 +147,8 @@ What the four pull requests build, item by item:
   walks. A manifest cannot carry a checksum of a remote file that `kubectl` checks. Every reader
   (the lane, shift-left, `talk/engine-up.sh`, ticket 161 and, later, ticket 148's composition)
   reads a few named fields.
-- *The CLI checksum is carried in the adopter's own file.* Item 6 says the checksum comes "from the
-  engine table". The adopters pin platform tools `v4.0.0`, which has no engine table, so no
+- *The CLI checksum is carried in the adopter's own file.* Item 6 asks for "the CLI checksum from
+  the engine table". The adopters pin platform tools `v4.0.0`, which has no engine table, so no
   adopter workflow reads the table. The file carries the table's figure, and the hub check holds
   it to the table on platform `origin/main`. Only the linux_x86_64 CLI is declared, because both
   adopter workflows run on `ubuntu-latest`.
@@ -197,10 +197,10 @@ What the four pull requests build, item by item:
   the branch estate. In each mode the only engine install is `talk/engine-up.sh driftwood`: one
   server-side apply on `kind-driftwood` of a file whose sha256 is `3dcd43ea...`, then the
   flux-operator HelmRelease. No engine call names `kind-tuppence` or `kind-ludlow`, and platform
-  `engine/up.sh` is never run. `talk/engine-up.sh` alone refused, and applied nothing, on a
-  stubbed HelmRelease `kyverno/kyverno` and on a declaration whose sha256 does not match the
-  download. It refused after the apply when the stubbed admission controller reported
-  `v1.19.1`.
+  `engine/up.sh` is never run. `talk/engine-up.sh` alone refused before any apply on a stubbed
+  HelmRelease `kyverno/kyverno`. On a declaration whose sha256 does not match the download it
+  refused before the engine apply, after applying only the substrate Namespaces. It refused after
+  the apply when the stubbed admission controller reported `v1.19.1`.
 - Each adopter's `.github/tests` passes (8 tests). The new workflow test fails against
   `origin/main`'s `drift-sample.yml` and `shift-left.yml`, on a `KYVERNO_VERSION` typed back into
   the lane's env, and on a second, client-side apply of the engine.
@@ -211,7 +211,7 @@ What the four pull requests build, item by item:
 
 **What CI measured, on 2026-09-26.**
 
-- Each adopter pull request's `shift-left` and `compose-check` jobs pass (driftwood run
+- Each adopter pull request's `shift-left` and `compose-check` jobs pass (Actions ids: driftwood
   36242241671, tuppence 36242243112, ludlow 36242244410). The logs show the declared CLI's
   `kyverno.tar.gz: OK`, "kyverno CLI 1.18.2: the engine gitops/engine/kyverno.yaml declares", the
   8 `.github/tests` passing and "composed artefact matches the committed copy -- no drift". The
