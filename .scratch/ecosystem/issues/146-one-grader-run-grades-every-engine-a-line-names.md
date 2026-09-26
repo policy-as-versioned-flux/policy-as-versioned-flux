@@ -336,3 +336,15 @@ cb680f2@main) records pass=88 and no fall. It measured each Done clause as follo
 What stays open elsewhere: the table has one row, 1.18.2, until ticket 148 or ticket 149 adds
 1.19.1. The two UPDATE-only holds are graded on compiling only, because the offline CLI evaluates
 every resource as a CREATE.
+
+**2026-09-26, a correction by the integrator, after the Answer.** Ticket 146's `truth.yml` step
+"assemble the estate checkout, with the platform's tags" listed the tags with the `tag`
+subcommand of git. `verify/schedules` reads that subcommand in a clock as making a tag, so from
+run 358 it reported a new false check: `hub/truth.yml job gate ... makes a tag`. The gate recorded
+no fall, because `verify/schedules` was already red for other clocks, so its FAIL count did not
+rise. The Answer above did not look inside that red, and that was a miss. The step now lists the
+tags with `git for-each-ref`, which only reads refs. `schedules.signed_artefact_faults()` reads no
+fault for the gate job on the fixed file and one on the old file (measured on the branch
+`ticket-146-tags-read-only`). Lesson: when a check is already red, compare its list of false
+items, not only its FAIL count.
+

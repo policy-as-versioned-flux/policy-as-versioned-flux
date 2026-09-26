@@ -314,7 +314,9 @@ jobs:
           set -euo pipefail
           bash clone-estate.sh
           git -C .estate-clone/platform fetch --quiet --tags origin
-          git -C .estate-clone/platform tag --list 'policy/v*' | tail -n 3
+          # for-each-ref only reads refs. verify/schedules reads the tag subcommand in a clock as
+          # making a tag, whatever its flags, and this step makes none.
+          git -C .estate-clone/platform for-each-ref --format='%(refname:short)' 'refs/tags/policy/v*' | tail -n 3
       # ADR-0033 point 4: one grader run grades every cell, so the gate hands it one binary per
       # engine. Each is downloaded from the release, checked against the table's linux_x86_64
       # sha256, and must report the row's version. They go to RUNNER_TEMP, not PATH, so the CLI
