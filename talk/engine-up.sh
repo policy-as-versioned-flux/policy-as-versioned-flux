@@ -34,6 +34,7 @@ die() { echo "engine-up: $*" >&2; exit 1; }
 sha256() { if command -v sha256sum >/dev/null; then sha256sum "$1"; else shasum -a 256 "$1"; fi | cut -d' ' -f1; }
 
 for c in kubectl flux curl; do command -v "$c" >/dev/null || die "MISSING cli: $c"; done
+"$PY" -c 'import yaml' 2>/dev/null || die "$PY cannot import yaml, so the declaration cannot be read (make the hub .venv)"
 DECLARATION="$CLONE/$OWNER/gitops/engine/kyverno.yaml"
 declared="$("$PY" "$READER" read "$DECLARATION")" || die "$OWNER's $DECLARATION is not a readable declaration"
 read -r VERSION URL SHA <<<"$declared"
@@ -56,8 +57,9 @@ got="$(sha256 "$tmp/install.yaml")"
 [ "$got" = "$SHA" ] || die "$URL hashes to $got, and $OWNER's gitops/engine/kyverno.yaml states $SHA"
 echo "   $URL: sha256 $got, as declared"
 kubectl --context "$CTX" apply --server-side --force-conflicts -f "$tmp/install.yaml"
-kubectl --context "$CTX" -n kyverno rollout status deploy/kyverno-admission-controller --timeout=300s \
-  || die "the admission controller did not become ready within 300s; re-run to converge"
+# Both waits together stay inside the 600s talk/up.sh gives a step.
+kubectl --context "$CTX" -n kyverno rollout status deploy/kyverno-admission-controller --timeout=240s \
+  || die "the admission controller did not become ready within 240s; re-run to converge"
 image="$(kubectl --context "$CTX" -n kyverno get deploy kyverno-admission-controller \
   -o jsonpath='{.spec.template.spec.containers[?(@.name=="kyverno")].image}')"
 case "$image" in
@@ -67,7 +69,7 @@ esac
 
 say "flux-operator (platform engine/flux-operator/helmrelease.yaml: the ResourceSet CRD)"
 kubectl --context "$CTX" apply -f "$CLONE/platform/engine/flux-operator/helmrelease.yaml"
-flux --context "$CTX" --timeout 5m reconcile helmrelease -n flux-system flux-operator \
-  || echo "  (reconcile of flux-operator not finished within 5m; safe to re-run)"
+flux --context "$CTX" --timeout 4m reconcile helmrelease -n flux-system flux-operator \
+  || echo "  (reconcile of flux-operator not finished within 4m; safe to re-run)"
 
 say "done: $CTX runs kyverno $VERSION, the engine $OWNER declares"
