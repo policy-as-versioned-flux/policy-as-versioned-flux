@@ -408,3 +408,18 @@ the real check: the pristine document 0 FAIL, and c, d, e, f, f2, g, h, i, j, k,
 s each red; `tests/test_misuse.py` 43 passed; `verify-misuse.sh` PASS with the four `_agent_reach`
 anchors resolving; `verify-tier-binding.sh` PASS. CI results for the pushed heads are appended
 below.
+
+**CI, 2026-09-26, review round 2 heads.** Hub PR #143 (code head 01be36df, ticket head f7f78c35):
+twin workflow runs 36220384889 (push) and 36220387173 (pull request) on 01be36df and 36220556389 on
+f7f78c35: `demo`, `typecheck`, `reproduce-elsewhere` and the three `determinism` jobs pass; `tests`
+and `invariants` fail with exactly main's standing red (invariant 45,
+`flux_coverage_floor_is_still_reachable`: `tests/test_invariant_suite.py::test_the_suite_is_green`,
+1 failed, 2891 passed, 16 skipped; 72 passed, 1 failed, 2 skipped), as on main 9c3b1f22 run
+36210103426. The push of 01be36df ran the truth workflow (run 352, gate job 108344667451 of run
+36220384882, TRUTH hub=01be36d): pass=87 fail=2 skip=32, 53 verdict rows, verdict for verdict main's
+run 349 (36210103413, hub 9c3b1f2), the same two FAIL rows (`verify/forge-review`,
+`verify/schedules`), none added and none removed; the only text difference is the pound-seam wait,
+now naming v4.0.0's `PRICE_KINDS`; `verify/misuse/verify-misuse.sh` PASS and
+`verify/tier-binding/verify-tier-binding.sh` PASS. The ticket-only push of f7f78c35 matched no truth
+path and triggered no truth run. Platform PR #46 (head 0f46233) and feeds PR #9 (head b1d9459b,
+unchanged) report no pull-request checks in their repositories.
