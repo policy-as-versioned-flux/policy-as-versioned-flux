@@ -22,7 +22,7 @@ Build what ticket 152 decided, in driftwood, tuppence and ludlow, and in the hub
    - Add a selfcheck branch for each new falsifier, for item 1, and for the case that only one or two samples exist after the registration. The selfcheck assertion that the probe names no rung (ludlow `:1595-1600`) stays true: the reference Namespace declares nothing.
 4. **The check, `verify-cage-probe.sh`, in each adopter.** It does these steps in order:
    1. It runs `five-facts.py selfcheck`. Nothing runs it today.
-   2. It compares `kyverno version` with the engine pin in the adopter's own `drift-sample.yml`. If they differ, it exits 3 and names both versions. If a later ticket from ticket 71 moves the pin into gitops, it reads the pin there.
+   2. It compares `kyverno version` with the engine that the adopter declares. When `gitops/engine/kyverno.yaml` exists (ticket 147), it reads the version there. Until then it reads `KYVERNO_VERSION` in the adopter's `drift-sample.yml`. If they differ, it exits 3 and names both versions. It runs the CLI named by the environment variable `KYVERNO_CLI`, and `kyverno` on the PATH when that variable is not set. So the hub can give each adopter its own CLI: ticket 150 item 4 supplies it from ticket 146's engine table when an adopter declares another engine.
    3. It proves that the CLI reads Namespace labels. A Namespace that declares `restricted`, given through a Values file `namespaces:` list, must land on `restricted`. If not, it exits 3 and names the CLI quirk.
    4. It reads the served versions from the ResourceSet array in `gitops/composed/composed-set.yaml`. It runs the sampler's own objects, imported from `_cage_objects`, against the served bodies at two points: the pinned composed tag and HEAD. It reports both.
    5. It fails when the fall-closed pod is not on the bottom (lowest `cage-` priority, and a selecting NetworkPolicy with no rules and both types), when any mutation or generated NetworkPolicy selects the reference pod, or when a PriorityClass that a mutation names is not served. It judges generation by the objects written, not by the CLI's result table.
@@ -40,6 +40,6 @@ Graduated 2026-09-25 from ticket 152, Q12. Definition of done: the new section i
 
 The offline proof that an unclaimed pod in a Namespace that declares nothing is not caged, on all three adopters, is in [research/ticket-152-fact-7-reference/](../research/ticket-152-fact-7-reference/README.md). It is a document proof, not a cluster proof.
 
-Session 71 plans an engine fact for the drift lane, from ticket 71. It may touch `five-facts.py` too. Whichever lands second rebases. Session 71 was told on 2026-09-25.
+**Changed 2026-09-26, after ticket 71's round 5.** Ticket 71 no longer adds an engine fact to the drift lane, so no ticket from it edits `drift/five-facts.py` or `drift/window.yaml`. Ticket 147 creates `gitops/engine/kyverno.yaml` in each adopter, and item 4.2 reads it. The `KYVERNO_CLI` variable is decided here, delegated under ADR-0025, and was agreed with the session that owns ticket 71.
 
 This ticket blocks ticket 151, and the fleet, policy and governance-agent row of ticket 156's register.
