@@ -1,0 +1,52 @@
+--- tagged/cage-netpol.yaml
++++ g-no-cagedgate/cage-netpol.yaml
+@@ -1,7 +1,3 @@
+-# Self-scopes via matchConditions on the policy-version label -- NOT
+-# matchConstraints.objectSelector, which Kyverno flattens into one shared
+-# ValidatingWebhookConfiguration (last-reconciled-wins) and silently breaks
+-# multi-version coexistence.
+ apiVersion: policies.kyverno.io/v1alpha1
+ kind: GeneratingPolicy
+ metadata:
+@@ -26,12 +22,12 @@
+       resources:
+       - pods
+   matchConditions:
+-  - name: is-caged
+-    expression: object.metadata.?labels['posture.acme.io/caged'].orValue('') == 'true'
+   - name: tier-restricts-reach
+-    expression: object.metadata.?labels['posture.acme.io/tier'].orValue('baseline') != 'baseline'
++    expression: object.metadata.?labels['posture.acme.io/tier'].orValue('baseline')
++      != 'baseline'
+   - name: only-this-policy-version
+-    expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '5.0.0'
++    expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('')
++      == '5.0.0'
+   variables:
+   - name: nsName
+     expression: string(object.metadata.namespace)
+@@ -40,6 +36,22 @@
+   - name: rungs
+     expression: '[''restricted'', ''quarantine'', ''isolated'']'
+   - name: reach
+-    expression: "{'isolated': {'ingress': dyn([]), 'egress': dyn([])},\n 'other':    {'ingress': dyn([dyn({\"from\": dyn([dyn({\"podSelector\": dyn({})})])})]),\n              'egress':  dyn([dyn({\n                \"to\": dyn([dyn({\"namespaceSelector\": dyn({\"matchLabels\": dyn({\"kubernetes.io/metadata.name\": dyn(\"kube-system\")})})})]),\n                \"ports\": dyn([dyn({\"protocol\": dyn(\"UDP\"), \"port\": dyn(53)})])})])}}"
++    expression: "{'isolated': {'ingress': dyn([]), 'egress': dyn([])},\n 'other':\
++      \    {'ingress': dyn([dyn({\"from\": dyn([dyn({\"podSelector\": dyn({})})])})]),\n\
++      \              'egress':  dyn([dyn({\n                \"to\": dyn([dyn({\"namespaceSelector\"\
++      : dyn({\"matchLabels\": dyn({\"kubernetes.io/metadata.name\": dyn(\"kube-system\"\
++      )})})})]),\n                \"ports\": dyn([dyn({\"protocol\": dyn(\"UDP\"),\
++      \ \"port\": dyn(53)})])})])}}"
+   generate:
+-  - expression: "generator.Apply(variables.nsName, variables.rungs.map(t, dyn({\n  \"apiVersion\": dyn(\"networking.k8s.io/v1\"),\n  \"kind\": dyn(\"NetworkPolicy\"),\n  \"metadata\": dyn({\"name\": dyn(\"cage-reach-\" + t), \"namespace\": dyn(variables.nsName),\n               \"labels\": dyn({\"app.kubernetes.io/managed-by\": dyn(\"kyverno\"),\n                              \"posture.acme.io/cage\": dyn(\"reach\"),\n                              \"posture.acme.io/tier\": dyn(t)})}),\n  \"spec\": dyn({\n    \"podSelector\": dyn({\"matchLabels\": dyn({\"posture.acme.io/caged\": dyn(\"true\"),\n                                            \"posture.acme.io/tier\": dyn(t)})}),\n    \"policyTypes\": dyn([\"Ingress\", \"Egress\"]),\n    \"ingress\": dyn(variables.reach[t == 'isolated' ? 'isolated' : 'other'].ingress),\n    \"egress\": dyn(variables.reach[t == 'isolated' ? 'isolated' : 'other'].egress)})})\n))"
++  - expression: "generator.Apply(variables.nsName, variables.rungs.map(t, dyn({\n\
++      \  \"apiVersion\": dyn(\"networking.k8s.io/v1\"),\n  \"kind\": dyn(\"NetworkPolicy\"\
++      ),\n  \"metadata\": dyn({\"name\": dyn(\"cage-reach-\" + t), \"namespace\":\
++      \ dyn(variables.nsName),\n               \"labels\": dyn({\"app.kubernetes.io/managed-by\"\
++      : dyn(\"kyverno\"),\n                              \"posture.acme.io/cage\"\
++      : dyn(\"reach\"),\n                              \"posture.acme.io/tier\": dyn(t)})}),\n\
++      \  \"spec\": dyn({\n    \"podSelector\": dyn({\"matchLabels\": dyn({\"posture.acme.io/caged\"\
++      : dyn(\"true\"),\n                                            \"posture.acme.io/tier\"\
++      : dyn(t)})}),\n    \"policyTypes\": dyn([\"Ingress\", \"Egress\"]),\n    \"\
++      ingress\": dyn(variables.reach[t == 'isolated' ? 'isolated' : 'other'].ingress),\n\
++      \    \"egress\": dyn(variables.reach[t == 'isolated' ? 'isolated' : 'other'].egress)})})\n\
++      ))"

@@ -199,9 +199,9 @@ that a rewritten entry cites stay as the record of the decision at the time.
 
 - **Declared engine** (added 2026-09-25, rewritten 2026-09-26, ticket 71) — The engine version an
   adopter's clusters run. The adopter owns it. The declaration is the adopter's own engine install
-  file, not a separate statement, and every cluster the adopter runs installs its engine from that
-  file. Adopters that use one cluster together declare the same engine. Composition reads the
-  declared engine.
+  file, not a separate statement, and every cluster of the adopter that runs an engine installs it
+  from that file. Adopters that use one cluster together declare the same engine. Composition reads
+  the declared engine.
 
 - **Unsupported pairing** (added 2026-09-25, ticket 71) — An adopter whose declared engine is not a
   supported engine of a line it composes. On that engine the line's control claims do not count,

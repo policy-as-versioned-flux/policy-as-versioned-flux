@@ -18,9 +18,10 @@ Two incompatibilities are proven, and they are not the same size:
 2. With that applied, `cage-netpol`'s per-tier reach matrix then fails under 1.19 with a
    behavioural difference in the generated NetworkPolicy, not a compile error. Depth unknown.
 
-> **Corrected 2026-09-26.** Item 2 is refuted. Under the offline CLI the generated NetworkPolicies
-> are the same on both engines. Only the report for an unmatched trigger differs. See
-> `.scratch/ecosystem/research/kyverno-1.19-cage-diagnosis/`.
+> **Corrected 2026-09-26.** Item 2 was not reproduced on 1.19.1 for the tagged 5.0.0 bodies. Under
+> the offline CLI the generated NetworkPolicies are the same on both engines, and only the report
+> for an unmatched trigger differs. The upstream change that explains it (PR #16505) is also in
+> 1.19.0, which did not run. See `.scratch/ecosystem/research/kyverno-1.19-cage-diagnosis/`.
 
 The decisions the owner owns. What engine versions does a published policy line claim to support,
 and where is that claim declared and graded? Does a supported-version claim belong on the
@@ -55,7 +56,8 @@ decision below is labelled delegated.
   therefore reads could-not-look, and that turns the hub gate red.
 - Policy 4.0.0 is retired. All three adopters compose `[5.0.0]` only. Ticket 63's cut was 5.0.0,
   tagged 2026-09-10, so a 1.19 fix cannot ride with it.
-- No adopter reconciles a platform path. Each adopter serves its own composed set, and
+- No adopter's Flux reconciles a platform path. On the named clusters Flux reconciles
+  `./gitops/apps` only, `gitops/composed/` reaches only the drift lane, and
   `gitops/platform/platform-distribution.yaml` is opt-in (corrected 2026-09-26; this line first
   said that adopters sync platform `./distribution`). Each adopter's `drift-sample.yml` installs
   Kyverno 1.18.2 itself. No adopter declares
@@ -162,13 +164,17 @@ delegated.
     `tested_engines` is `[1.18.2, 1.19.1]`. The engine computes the bump. The diagnosis predicts no
     behaviour change, so a patch is expected, but the engine decides. 5.0.0 stays served, because
     it still supports 1.18.2.
+    *Superseded in part on 2026-09-26:* decision 15 makes the changes four, with four bodies at
+    `v1`, and withdraws the patch prediction. Decision 19 replaces how `tested_engines` is graded
+    before the cut.
 
 **Held for the owner, 2026-09-26 at the earliest.** On 2026-09-25 the three grilling sessions used
 the five owner-only decisions for the day. Two questions here are owner-only:
 
 - **An authorisation to build and cut.** The owner's instruction of 2026-09-23 left the grilling
   tickets, and all work that they block, with the owner. The new line needs a signed
-  `policy/v5.0.x` tag.
+  `policy/v5.0.x` tag. (Superseded 2026-09-26 by decision 15: the bump may be larger than a patch,
+  so the tag is not assumed to be `v5.0.x`.)
 - **An authorisation to report upstream.** A Kyverno GeneratingPolicy returns no result on a
   `matchConditions` miss, but ValidatingPolicy and MutatingPolicy return a skip. A report to
   kyverno/kyverno is public and is made under the owner's identity.
@@ -196,10 +202,12 @@ Remember this".
 the record: one agent looked for conflicts with standing records, and a second agent checked every
 factual claim against the estate. It returned 34 findings. Thirty were corrections, made on
 2026-09-26 without a decision. Four needed a decision, and one conflict was found before the
-review. The owner answered round 5 with "Agree". Each decision is delegated.
+review. A third agent then checked the round 5 text and returned 19 findings, all corrected. The
+review outputs are in `.scratch/ecosystem/research/ticket-71-record-review/`. The owner answered round 5 with "Agree". Each decision is delegated.
 
-15. **Q15 (a). The ticket 149 line also retires `posture-trust-boundary`.** Ticket 89's register,
-    `NORTH-STAR.md:54` and ticket 84 each commit the retirement to the next declared line. The line
+15. **Q15 (a). The ticket 149 line also retires `posture-trust-boundary`.** Ticket 89's register
+    and `NORTH-STAR.md:54` commit the retirement to the next declared line, which the register
+    assigns to ticket 84. The line
     carries four changes, and `render-version-tree.py` changes too. The patch prediction of
     decision 12 is withdrawn. If the computed bump is a major, each institution needs an acceptance
     record, which the owner writes.
@@ -215,6 +223,10 @@ review. The owner answered round 5 with "Agree". Each decision is delegated.
     reason: the lane installs from the same file, so the drift fact could only read true. Because
     the static check reads the engine table, ticket 147 now waits on ticket 146, which changes the
     order of decision 13: 146 runs first, then 147.
+    *Clarified 2026-09-26, delegated:* `kind-tuppence` and `kind-ludlow` run no Kyverno today. The
+    rule covers every cluster of the adopter that runs an engine, and it adds no engine to a cluster
+    that has none.
+
 18. **Q18 (a). The adopter's shift-left check runs each line only on engines that the line
     supports.** A line in the window that does not support the declared engine is reported by name
     as an unsupported pairing.
@@ -235,8 +247,8 @@ ADR-0003 and `docs/PRD.md` have dated amendments.
   its fixtures pass. No range, and no neighbouring patch. The machinery has its own supported
   engines.
 - **Who owns the engine.** The adopter. Its engine install file in its own gitops is its declared
-  engine, and every cluster it runs installs from that file. Adopters that share a cluster declare
-  the same engine.
+  engine, and every cluster of the adopter that runs an engine installs from that file. Adopters
+  that share a cluster declare the same engine.
 - **The price.** An unsupported pairing makes every control that the line claims a hole, under an
   `unsupported-engine` delta. It is never refused. No declaration is priced the same way. Whether a
   body that does not compile fails open at admission is not measured yet.

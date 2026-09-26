@@ -4,7 +4,7 @@ status: accepted
 
 # Engine API: Kyverno CEL `ValidatingPolicy`, not the 2022 `ClusterPolicy`
 
-> **Amended 2026-09-25 (eco-system ticket 71, delegated under [ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md)).**
+> **Amended 2026-09-25 and 2026-09-26 (eco-system ticket 71, delegated under [ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md)).**
 > Four statements in the "Version pin" point below are false about the estate as built, or claim
 > more than was measured. The choice of Kyverno and of CEL policies stands.
 >

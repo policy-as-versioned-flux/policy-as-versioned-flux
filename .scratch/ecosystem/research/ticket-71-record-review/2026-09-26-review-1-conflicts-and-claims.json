@@ -1,0 +1,364 @@
+{
+ "conflicts": {
+  "findings": [
+   {
+    "severity": "blocking",
+    "where": ".scratch/ecosystem/issues/150-one-adopter-runs-kyverno-1-19-1-on-a-live-cluster.md:5",
+    "claim": "Ticket 150 is blocked only by 147, 148 and 149. Item 2 (lines 22-23) moves the adopter's composed set to the ticket 149 line only, and 5.0.0 leaves it (line 16). Ticket 71 (lines 207-209) holds only two things for the owner: the policy tag with 148's tools tag, and the upstream report.",
+    "evidence": "Dropping 5.0.0 from an adopter's composed window is a retirement. Each adopter gate refuses a retirement whether or not an acceptance record exists: ticket 132 decision 2 (132:71-73) and the gate rule 'admitted only when the pull request retires nothing' (132:48). The 4.0.0 retirement passed only because 'the integrator merged over on the owner's authorisation' (113:318-320). Ticket 113:291-293 records that a pin bump past a retirement is 'a forced major that each adopter's own gate refuses... needs an owner decision'. The adopter's own signed composed tag and the composed-set move are owner steps under ticket 130's delivery route (130:194-199). A platform tools tag that carries the 149 line is also needed unless 148's tag is cut after 149.",
+    "kind": "missing-dependency",
+    "needs_owner_decision": true,
+    "suggested_fix": "Add these to ticket 150's Blocked-by line and to ticket 71's held list: the owner's authorisation to merge over the adopter gate's retirement refusal (or a gate change, decided), the adopter's signed composed tag with the composed-set move, and the platform tools tag that carries the 149 line."
+   },
+   {
+    "severity": "blocking",
+    "where": ".scratch/ecosystem/issues/147-the-adopter-declares-its-engine-where-it-installs-it.md:24",
+    "claim": "Item 3 makes the adopter's shift-left CLI equal its declared engine. Ticket 150 then declares 1.19.1 while 5.0.0 stays served (149:36-37). The only condition (150:13-17) covers cage-tier bodies 'that it composes'.",
+    "evidence": "Platform shift-left/ci-check.py runs `kyverno apply` over every *.yaml of every declared version in the target's ±1-major window, read from the platform array at the adopter's pin (.estate-clone/platform/shift-left/ci-check.py:71-94; policy_files at :92-94; driftwood shift-left.yml:139 calls it). For a workload on the 149 line, that window includes 5.0.0 and its cage-tier.yaml. On 1.19.1 that file is a compile error (research/kyverno-1.19-cage-diagnosis/README.md:24). The adopter's composed set does not limit the window, so the adopter's required shift-left check would go red on every PR once it declares 1.19.1.",
+    "kind": "conflicts-with-standing-decision",
+    "needs_owner_decision": true,
+    "suggested_fix": "Decide one of two options. (a) ci-check's window skips a line whose tested_engines does not list the CLI's version and prices it instead. (b) Shift-left keeps the estate's own CLI and does not use the declared engine. Record the choice in 147 and 150, and widen the 150 condition from 'composes' to 'served in its window'."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/149-a-policy-line-that-passes-on-kyverno-1-18-2-and-1-19-1.md:35",
+    "claim": "The new element's tested_engines 'is written only after every cell passes, and ticket 146's fix to the cut script keeps it'. Ticket 146 changes nothing about uncut lines.",
+    "evidence": "engine_compatibility.check() grades every declared element. An element with no `commit` reads could-not-look ('uncut policy line has no published tree to grade', .estate-clone/platform/computed-semver/engine_compatibility.py:165-166). The platform's flow declares an element uncut and lets cut-release.yml fill `commit` (versions.yaml:132-139). verify-cage-engine.sh is a self-proof row that declares no skip (talk/verify-manifest.txt:101), so the hub gate goes red from the declaration until the owner's signed cut. The grader grades only tagged lines, and the README says it is 'deliberately not wired as a new-policy pre-cut gate' (computed-semver/README.md:108-114). So cells cannot pass before the cut, and the cut script only needs to keep a field that is written before the cut.",
+    "kind": "missing-dependency",
+    "needs_owner_decision": true,
+    "suggested_fix": "Decide how an uncut line is graded: a candidate-tree pre-cut grade built in 146, or tested_engines written after the cut plus a declared `waits:` on the manifest row for the uncut window. Then rewrite decision 12, 146 item 5 and 149's cut paragraph to match."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/149-a-policy-line-that-passes-on-kyverno-1-18-2-and-1-19-1.md:14",
+    "claim": "'The line carries three changes only.' Done (lines 41-43) names only versions.yaml and the cage-engine cells.",
+    "evidence": "verify-coexistence.sh step 1b FAILs unless the `policies:` list in distribution/tests/require-nonroot/kyverno-test.yaml equals the DECLARED array, and uncut elements count as declared (.estate-clone/platform/distribution/verify-coexistence.sh:164-167, threshold and array reader at :80-90 and :134-140). Today the fixture loads v5.0.0 only (kyverno-test.yaml header, 2026-09-24 note). It is a self-proof row (talk/verify-manifest.txt:112). Declaring the 149 line without extending the coexistence fixture turns it from could-not-look into FAIL. Ticket 75 Q3 and ticket 84 make this the coexistence subject (84:26, 93-97).",
+    "kind": "missing-dependency",
+    "needs_owner_decision": false,
+    "suggested_fix": "In ticket 149, add the coexistence fixture edit (the new line's require-nonroot and its self-scoping rows) to the same platform change that declares the element, and say that the line is the second of the three declared lines ticket 84 counts."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/149-a-policy-line-that-passes-on-kyverno-1-18-2-and-1-19-1.md:14",
+    "claim": "The new line needs no hub record changes. Only three changes, all in platform.",
+    "evidence": "verify/refusal-by-another-name/register.yaml:38-44 accepts the cage-tier UPDATE refusal for exactly `[cage-tier-5-0-0]`. The `policies` list is graded both ways, and 'A new served copy is a change this row has to admit, in the same edit that says why it is accepted' (register.yaml:21-24; refusal_scan.py:884-899). The scan grades an uncut declared tail 'because it is what the NEXT tag serves' (refusal_scan.py:699-703). Declaring the line's cage-tier-5-0-x turns the check red with 'NOT NAMED'.",
+    "kind": "missing-dependency",
+    "needs_owner_decision": false,
+    "suggested_fix": "In ticket 149, add a hub PR that adds the new cage-tier copy to the register row with its dated reason. It lands with the platform declaration."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/149-a-policy-line-that-passes-on-kyverno-1-18-2-and-1-19-1.md:18",
+    "claim": "'All five bodies at policies.kyverno.io/v1' (posture-trust-boundary included), with a patch predicted (149:34-35; 71:152-156). This follows from the already-known deny-register conflict.",
+    "evidence": "NORTH-STAR.md:54 also commits to it: '`posture-trust-boundary` retires at the next declared line'. render-version-tree.py treats posture-trust-boundary as a mandatory member that 'a human must not be able to omit' and writes it into every tree (.estate-clone/platform/distribution/render-version-tree.py:9-14, 77-81, 187, 194). Retiring it on this line therefore also changes the renderer, not just a policy body. Removing a Deny body is movement the engine classifies, so the 'patch expected' prediction holds only if the rule stays.",
+    "kind": "conflicts-with-standing-decision",
+    "needs_owner_decision": true,
+    "suggested_fix": "When the known posture-trust-boundary conflict is decided, also update NORTH-STAR.md:54, name the render-version-tree.py change as a fourth change, and drop or restate the patch prediction."
+   },
+   {
+    "severity": "should-fix",
+    "where": "docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md:35",
+    "claim": "On a supported engine 'the line's control claims' count. On an unsupported engine every control the line claims is a hole. Support means the line's cage fixtures passed (point 1; CONTEXT.md:193-196).",
+    "evidence": "The platform's claims are ac-6 → require-nonroot and cm-6 → governed-namespace-requires-claim (.estate-clone/platform/oscal/component-definition.json, which composition reads via PARENT_CLAIMS_PATH at composition.py:2263). The tested_engines scope grades only cage-tier and cage-netpol (engine_compatibility.py:25-29), so neither claim-bearing body is graded on any engine. cm-6 is machinery at the composed root, shipped by the tools tag. It has no tested_engines and point 3 never prices it. The machinery bodies governed-namespace-guard and orphan-cage write the same `\"posture.acme.io/tier\": variables.tier` that fails on 1.19.1 in cage-tier (.estate-clone/driftwood composed/governed-namespace-guard.yaml:29-36, orphan-cage.yaml:26-33). The diagnosis never ran them (driver.py FAMILIES; README Limits). Ticket 148 item 5 moves them to v1 without grading them, and ticket 150's condition covers cage-tier only. Ticket 151:12 puts the RDS and S3 policies into the same implementations package.",
+    "kind": "overstated",
+    "needs_owner_decision": true,
+    "suggested_fix": "Decide whether support covers the claim-bearing bodies (add require-nonroot to the graded families) and the machinery and implementations package (their own tested engines, and pricing for cm-6). Until then, narrow point 3 to what the fixtures grade, and add machinery grading on 1.19.1 to ticket 150's blockers."
+   },
+   {
+    "severity": "should-fix",
+    "where": "docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md:30",
+    "claim": "'The adopter installs its own engine. The platform cannot choose another org's engine.' CONTEXT.md:198-201 says the same.",
+    "evidence": "The hub's talk/up.sh:66 runs platform/engine/up.sh, which applies the platform's own Kyverno HelmRelease (chart 3.8.2, helmrelease.yaml:36) onto `kind-driftwood` (.estate-clone/platform/engine/up.sh:12, 26). tuppence's flagship runs on that cluster (talk/up.sh:76-77). This is the 'platform in-cluster engine' that ADR-0033 point 5 and 146 item 4 name. No adopter Flux Kustomization reconciles gitops/engine/: gotk-sync.yaml `path: ./gitops/apps` (driftwood :48, tuppence and ludlow :47). The lane applies only gitops/flux-system/, platform-pin.yaml and gitops/composed/ (drift-sample.yml:187, 193, 202). So the adopter's gitops/engine/kyverno.yaml would install nothing on its named cluster.",
+    "kind": "false-fact",
+    "needs_owner_decision": true,
+    "suggested_fix": "Choose one: (a) move the engine install for each named adopter cluster onto the adopter's file, or (b) scope point 2 to the observation lane and state that the named demo clusters run the platform's engine. Then restate point 5's 'platform in-cluster engine' to match."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/71-which-kyverno-versions-does-the-estate-support.md:148",
+    "claim": "Decision 11: the engine drift fact 'proves that the price describes the real cluster'. ADR-0033 point 2 says the same.",
+    "evidence": "Ticket 147 items 2 and 4 (147:22-30) install Kyverno on the lane from the same file that the fact then compares against. The lane cluster is ephemeral and created per run (drift-sample.yml:11-17, 131-134). The fact is false only if the install fails or the file contradicts itself. It observes no cluster the adopter runs, and on kind-driftwood the platform installs the engine (see the finding above).",
+    "kind": "overstated",
+    "needs_owner_decision": true,
+    "suggested_fix": "Restate what the fact measures (the declared install succeeds and names its own version), or aim it at a cluster the adopter actually runs. Then re-decide Q11 on that basis."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/147-the-adopter-declares-its-engine-where-it-installs-it.md:26",
+    "claim": "Item 4 adds a drift fact numbered 'after the facts that tickets 155 and 161 add'. It says nothing about pre-registration.",
+    "evidence": "ADR-0028 point 4 (0028:104-119) scores a fact only after its section is committed on the served ref, and keys registration on the SECTION. Ticket 155:11 puts fact 8 'in its own pre-registered section of drift/window.yaml... A separate section does not restart facts 6 and 7'. window.yaml requires falsifiers declared before sample one (driftwood drift/window.yaml:159-163, 319-325). Ticket 152 Q10's rule that three nulls in a row is a FAIL (161:20; 160) is not addressed. Ticket 161 adds no new fact: it re-registers fact 7 under a new id (161:12-16).",
+    "kind": "missing-dependency",
+    "needs_owner_decision": false,
+    "suggested_fix": "Add to ticket 147: the fact's own pre-registered section with falsifiers, committed before the first scored sample. State whether the three-null FAIL rule applies. Correct the numbering sentence to 'after ticket 155's fact 8'."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/147-the-adopter-declares-its-engine-where-it-installs-it.md:18",
+    "claim": "Each adopter gains gitops/engine/kyverno.yaml. No recompose is named. Ticket 150 item 3 recomposes after its own edit.",
+    "evidence": "comparison_history identity() hashes every non-hidden file outside composed/ and the declared observation lanes, and a YAML file counts as source (ticket 134:11-23, 53-61). A new source file makes composed/HEADER.yaml's `comparison-inputs.after` stale, so compose-check and cut-release's pre-tag verify refuse until a recompose (134:19-23; 130:307-309). Composition also walks every *.yaml in the adopter tree for Namespaces and workloads (composition.py:1506, 1614). A raw install.yaml would bring Namespace kyverno and its Deployments into that walk. kyverno is substrate (platform engine/namespaces.yaml), so no price moves, but the walk reads it.",
+    "kind": "missing-dependency",
+    "needs_owner_decision": false,
+    "suggested_fix": "Add to ticket 147 a recompose in the same adopter PR. Also state the file's form, and that its objects sit in the substrate namespace."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/150-one-adopter-runs-kyverno-1-19-1-on-a-live-cluster.md:24",
+    "claim": "The adopter declares 1.19.1 and recomposes. Done names the lane facts and captures only.",
+    "evidence": "Ticket 161's verify-cage-probe.sh exits 3 when `kyverno version` differs from the adopter's engine pin, and reads that pin from gitops/engine/kyverno.yaml once 147 lands (161:25). Its manifest row declares no skip, 'so on the hub an exit 3 is a fall' (161:31). The hub runs it with truth.yml's single CLI, 1.18.2 (.github/workflows/truth.yml:58). ADR-0033 point 5 keeps that CLI on an engine every served line supports, so 1.18.2 while 5.0.0 is served. After ticket 150, that adopter's row falls on every truth run.",
+    "kind": "missing-dependency",
+    "needs_owner_decision": false,
+    "suggested_fix": "In ticket 150 (or 146), give verify-cage-probe.sh the adopter's declared CLI from the engine table on the hub, or declare the wait. Land it before the declaration moves."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/149-a-policy-line-that-passes-on-kyverno-1-18-2-and-1-19-1.md:23",
+    "claim": "The `result: skip` rows leave kyverno-test.yaml, and 'the grader' compares generated documents with `kyverno apply -o`.",
+    "evidence": "The authoring fixture graded/tests/cage-netpol is also run by graded/verify-graded.sh:183 (`kyverno test \"$HERE/tests/cage-netpol\"`), which is part of the hub's offline cage proof under ADR-0028 (0028:27-33). Only engine_compatibility is said to gain the apply -o comparison. Once the skip rows go, verify-graded.sh loses its 'generates nothing' check, and the diagnosis measured that check as real on 1.18.2 (README:42-45).",
+    "kind": "missing-dependency",
+    "needs_owner_decision": false,
+    "suggested_fix": "In ticket 149, give graded/verify-graded.sh the same generated-document comparison, or keep a check it can run."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/149-a-policy-line-that-passes-on-kyverno-1-18-2-and-1-19-1.md:34",
+    "claim": "'The engine decides' the bump. No ticket says what happens if it computes major.",
+    "evidence": "A major that an adopter carries needs an accepted-majors/ record per institution, which is the owner's decision (129:48-60 and What remains; 132:48). Otherwise verify/unreviewed-major and each adopter gate refuse. Neither 149 nor 150 mentions acceptance. The known posture-trust-boundary conflict makes a non-patch outcome plausible.",
+    "kind": "missing-dependency",
+    "needs_owner_decision": true,
+    "suggested_fix": "Add a conditional to 149 and 150: if the computed bump is major, the owner writes a per-institution acceptance before the adopter moves."
+   },
+   {
+    "severity": "note",
+    "where": "docs/adr/0003-kyverno-validatingpolicy-cel.md:8",
+    "claim": "The amendment says three statements are false and corrects them.",
+    "evidence": "ADR-0003:49 still says 'The reference pins Kyverno **≥1.18** as a hard dependency'. That is a range, which ADR-0033 point 1 and its considered options reject. CONTEXT.md:839 still says 'policies authored as CEL `ValidatingPolicy`', which amendment point 2 calls false.",
+    "kind": "conflicts-with-standing-decision",
+    "needs_owner_decision": false,
+    "suggested_fix": "Add a fourth amended statement for the ≥1.18 range, and amend CONTEXT.md:839 to match."
+   },
+   {
+    "severity": "note",
+    "where": "docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md:47",
+    "claim": "Adding an engine to a cut line 'changes metadata only'. Removing one gives the delta 'at its next composition'.",
+    "evidence": "Composition reads tested_engines at the adopter's pinned platform tools tag (148:14-16). Every support change reaches an adopter only through a signed tools tag and a pin move, both owner steps (113:291; 130:194-199). computed-semver/README.md:108-114 still says that adding or removing a promised support window needs comparison_window. Ticket 146 item 6 corrects only the 'not a runtime support range' and 'two current rows' sentences.",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "State the tools-tag and pin-move route in point 5, and have 146 item 6 rewrite the README's 'Contract and release boundary' paragraph too."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/71-which-kyverno-versions-does-the-estate-support.md:152",
+    "claim": "'The engine computes the bump. The diagnosis predicts no behaviour change, so a patch is expected.'",
+    "evidence": "ADR-0011's 2026-08-29 note (0011:6-21) makes the bump a DECLARED `bump:` on the array element, graded against the computed one. With no verdict movement, cage_engine returns 'none' (.estate-clone/platform/computed-semver/cage_engine.py:1039). The publisher gate runs on the release CLI 1.18.2 only (release.yml:52, cut-release.yml:92).",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Say that the line declares a patch, the gate is expected to compute 'none', and the gate permits a declaration stronger than the computed bump."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/71-which-kyverno-versions-does-the-estate-support.md:113",
+    "claim": "The price 'prices the worst case, the cage not loading' (148:43-45 says the same).",
+    "evidence": "No admission ran (diagnosis README:18, 68). Ticket 150 item 4 asks whether a non-compiling cage-tier fails open or refuses the pod. If it refuses, the pairing is a refusal by another name under ticket 98's register, not holes. Ticket 150's Done rests on throwaway-KinD captures, and NORTH-STAR.md:83 and ADR-0023:96-97 bar any document from citing those.",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Mark the worst-case sentence unmeasured until ticket 150. Say that a refusing outcome reopens ADR-0033 point 3, and treat the captures as reasoning, not as Done evidence."
+   },
+   {
+    "severity": "note",
+    "where": "docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md:39",
+    "claim": "An adopter with no declared engine is priced under `undeclared-engine`, never refused.",
+    "evidence": "Composition already treats an adopter's missing declaration as a missing instrument under ADR-0020: a party.yaml with no appetite.tolerance gives kind missing-instrument (composition.py:2216-2226). ADR-0033 does not say why an absent engine declaration is a behaviour and not an instrument. It also does not say how a line with no tested_engines is priced.",
+    "kind": "other",
+    "needs_owner_decision": false,
+    "suggested_fix": "Add one sentence classifying undeclared-engine under ADR-0020, and one saying how a line without tested_engines is priced."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/147-the-adopter-declares-its-engine-where-it-installs-it.md:18",
+    "claim": "The file 'installs Kyverno at an exact version'. It may name a Helm chart version as well as the Kyverno version.",
+    "evidence": "The lane installs only source-controller and kustomize-controller (drift-sample.yml:169) and applies Kyverno server-side, because two CRDs exceed 256KB (drift-sample.yml:162-167). A HelmRelease-form file would not install there. ADR-0033 point 4's table pins CLI and install.yaml checksums, but the platform in-cluster engine is Helm chart 3.8.2 (helmrelease.yaml:36), so 146 item 4 needs a chart-to-app mapping.",
+    "kind": "other",
+    "needs_owner_decision": false,
+    "suggested_fix": "Fix the file's form as a raw, checksummed manifest the lane can apply server-side, and say how the table covers the Helm-installed platform engine."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/148-composition-prices-an-unsupported-pairing.md:30",
+    "claim": "Rollout is a platform tools tag, a pin move and a recompose on each adopter.",
+    "evidence": "Under ticket 130's route, machinery reaches a cluster only after the owner cuts each adopter's tag and the composed-set moves to it (130:194-199, 316-318). The lane renders and applies composed/ at the tag that composed-set.yaml pins (drift-sample.yml:283-286). The v1 machinery from item 5 would therefore reach no cluster, including ticket 150's lane.",
+    "kind": "missing-dependency",
+    "needs_owner_decision": false,
+    "suggested_fix": "Add the adopter tag and composed-set move (owner step) to 148's rollout, or state that item 5 reaches clusters only with ticket 150's tag."
+   }
+  ],
+  "checked": [
+   "Branch diff origin/main...HEAD in wt-71 (5 commits): ADR-0033, ADR-0003 amendment, CONTEXT.md terms, ticket 71 decisions 1-14 and Answer, tickets 146-150, map.md lines, research/kyverno-1.19-cage-diagnosis README, assertion counts, engine captures and driver.py",
+   "verify/deny-is-not-a-rung/register.yaml and deny_register.py waiting-state grading; verify/refusal-by-another-name/register.yaml and refusal_scan.py uncut-tail and policies-list grading; verify/lifted-apps register (grep only)",
+   "Every 'next declared line / next cut' commitment in .scratch/ecosystem/issues (grep), NORTH-STAR.md:54, tickets 84 (full), 75 Q3, 113 Phase B, 128, 129, 130, 132, 133, 134; tickets 152 (name only), 155, 160, 161 read from origin/main",
+   "talk/verify-manifest.txt rows for verify-cage-engine.sh, verify-coexistence.sh, verify-shift-left.sh",
+   "ADR-0003, 0011, 0016, 0020, 0023 D4, 0026, 0028 point 4; NORTH-STAR §5; CONTEXT.md engine and support entries",
+   "Platform at origin/main 557c153: distribution/versions.yaml (4.0.0 retired, 5.0.0 only, machinery v1alpha1), engine_compatibility.py check() and scope, computed-semver/README.md, verify-coexistence.sh step 1b, render-version-tree.py mandatory members, shift-left/ci-check.py window, engine/up.sh and kyverno helmrelease, oscal/component-definition.json claims, compose/composition.py (namespace and workload walk, claims file, missing-instrument precedent, posture-trust-boundary selfcheck live_v), release and cut-release Kyverno pins, cut-release-update-array-commit.sh",
+   "Adopters at origin/main (driftwood, tuppence, ludlow): Kyverno pins in drift-sample.yml and shift-left.yml, gotk-sync.yaml Kustomization paths, platform-pin and composed-set, composed machinery bodies (variables.tier), drift/window.yaml pre-registration sections, drift-sample.yml install and apply steps, renovate.json enabledManagers",
+   "Hub talk/up.sh (platform engine installed onto kind-driftwood), .github/workflows/truth.yml Kyverno pin; feeds, ico, nist and insurer grepped for Kyverno pins (none)"
+  ],
+  "not_checked": [
+   "No verify script, kyverno binary or pytest was run. Every red predicted above is read from code and manifest rows, not observed.",
+   "Whether Kyverno 1.19.1 compiles the machinery bodies whose variables.tier is a string literal: not measured, reported as unmeasured.",
+   "Whether `kyverno apply` fails the whole ci-check run when one policy in the window does not compile: inferred from the diagnosis's `kyverno test` compile error, not run.",
+   "How computed-semver classifies a v1alpha1→v1 apiVersion change or a removed policy body. The patch/none/major outcome of the 149 line is unverified.",
+   "The upstream Kyverno source diffs, PR #16287 and #16505 texts, and the minimal/ cases in the diagnosis were not re-verified.",
+   "Tickets 152, 157, 158 and 159 were not read in full. Tickets 155, 160 and 161 exist only on origin/main: the branch is based on 32739f18 and is 3 commits behind origin/main, including ticket 152's merge #139.",
+   "Adopter clones were read at their existing origin/main refs (local main is 2 behind). No fresh fetch was done.",
+   "Whether Kyverno 1.19's default report API affects platform/oscal/result2oscal.py.",
+   "Whether ADR number 0034 was reserved elsewhere. No reference to ADR-0034 was found on origin/main or the branch."
+  ]
+ },
+ "claims": {
+  "findings": [
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/149-a-policy-line-that-passes-on-kyverno-1-18-2-and-1-19-1.md:18",
+    "claim": "'All five bodies at policies.kyverno.io/v1. The diagnosis measured that this changes no result on either engine.' Ticket 71:97 says the same ('Moving the five bodies ... changed no result on either engine'). README:55-57 says it too ('Moving all five bodies to v1 gave the same results in every cell'). 71:154-155: 'The diagnosis predicts no behaviour change'. The line then declares tested_engines [1.18.2, 1.19.1].",
+    "evidence": "Each matrix loads only its own family's body: platform computed-semver/engine_compatibility.py:26 has FAMILIES = ('cage-tier', 'cage-netpol'), and :86 sets test['policies'] to the single file <family>.yaml. assertion-counts.txt:1-27 has only cage-tier and cage-netpol rows. So neither engine ever loaded stamp-posture, posture-trust-boundary or require-nonroot, whether at v1alpha1 or v1. stamp-posture at policy/v5.0.0 (distribution/policies/v5.0.0/stamp-posture.yaml, the mutation expression) builds a label map from an expression, `labels: {\"posture.acme.io/version\": object.metadata.labels['policy-as-versioned.dev/policy-version']}`. That is the same shape that fails to compile in cage-tier on 1.19.1. Whether it compiles on 1.19.1 is unmeasured. Ticket 150 puts all five bodies on a live 1.19.1 cluster, and its condition (150:13-15) covers cage-tier only.",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Limit the three sentences to 'the two cage bodies'. In ticket 149, before the element is declared, compile and apply all five new-line bodies on both engines. At minimum run `kyverno apply` of each body over the fixture pods. Widen ticket 150's condition from cage-tier to every served body the adopter composes."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/research/kyverno-1.19-cage-diagnosis/README.md:30",
+    "claim": "The README states these measured results: '26 equal documents' (:30-31); 'with the tier gate removed, 1.18.2 gives 10/3' (:43); 'With the is-caged gate removed, 1.18.2 still gives 11/0' (:49); the PolicyException result (:46-48); identical v1/v1alpha1 CRD schemas (:55-56); the CLI line `if res.Result == nil { continue }` and commit fd90931fad (:36-39); 'a byte-identical copy' of the grader (:15). Ticket 149:27 and ticket 71:96 repeat the 11/0 result as measured.",
+    "evidence": "No file in the directory shows these. assertion-counts.txt:1-27 has no tier-gate-removed or is-caged-removed variant, and no `kyverno apply` output is committed (diffs-b-string-tier.cage-tier.diff is a source diff only). verifier-minimal-transcript.txt names 15 cases, but minimal/ holds inputs for only 6 (expr-gate, mc-as-fail, mc-as-pass, mc-skip, mpol-skip, objsel-skip). The polex-* cases (:108-132) that point 5 rests on have no inputs. driver.py:24 imports HERE/engine_compatibility.py and writes to captures/ (:44). Neither is committed, so the driver cannot re-run from this directory. No captured diff contains 'Result == nil' or fd90931. I confirmed three of these claims myself in this run: (1) the 1.18.2 install.yaml downloaded with sha256 3dcd43..., the adopters' pin, and both it and the 1.19.1 install.yaml serve v1, deprecate v1alpha1, store v1beta1, and have identical v1 and v1alpha1 schemas; (2) gh api shows fd90931fad is PR #16505's merge commit and carries the `if result == nil { return response }` hunk; (3) upstream v1.19.1 cmd/cli/kubectl-kyverno/processor/policy_processor.go:719-721 holds the `continue`. The 26-document, 10/3, 11/0 and PolicyException results remain unverified.",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Commit the missing captures: the apply outputs, the two gate-removed test tables, the polex and other minimal inputs, the CRD extraction, and the harness copy with the platform commit it came from. Otherwise mark each of these sentences as not captured, and stop citing 11/0 as measured in 149:27 and 71:96."
+   },
+   {
+    "severity": "should-fix",
+    "where": ".scratch/ecosystem/issues/71-which-kyverno-versions-does-the-estate-support.md:54",
+    "claim": "'Adopters sync platform `./distribution` only, not `./engine`.' Ticket 147:12-13 repeats it.",
+    "evidence": "No adopter reconciles any platform path. driftwood gitops/flux-system/gotk-sync.yaml:48 reconciles `path: ./gitops/apps`, and gitops/apps/kustomization.yaml lists no platform file in any of the three adopters. composed-set.yaml:41 says 'OPT-IN, exactly like gitops/platform/'. drift-sample.yml:188-193 applies platform-pin.yaml ONLY, and says 'platform-distribution.yaml is deliberately not installed here'. composed-set.yaml:23-24: 'driftwood does not install platform's tree; it installs the artefact its own composition rendered'. The './engine' half holds: no adopter file names it.",
+    "kind": "false-fact",
+    "needs_owner_decision": false,
+    "suggested_fix": "Rewrite as: 'No adopter reconciles a platform path. Each adopter serves its own composed set (gitops/composed/), and gitops/platform/platform-distribution.yaml is opt-in and not applied by the lane. No adopter file names ./engine.'"
+   },
+   {
+    "severity": "should-fix",
+    "where": "docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md:16",
+    "claim": "'The estate claimed no engine window before this ADR.' Lines 9-10 say ADR-0003 'decided no engine version window'.",
+    "evidence": "ADR-0003:49 (branch) says 'The reference pins Kyverno **≥1.18** as a hard dependency'. Platform engine/kyverno/helmrelease.yaml:11 cites \"ADR-0003's '>=1.18' floor\". docs/PRD.md:244 says 'Kyverno **≥1.18**'. ADR-0009:79 and platform oscal/result2oscal.py:12 also say '≥1.18'. That is a claimed range, which ADR-0033 point 1 rejects. The earlier note asked the ADR-0003 amendment to cover :49. This finding is separate: ADR-0033's own context statement is false, and the other places that cite the floor are left standing.",
+    "kind": "false-fact",
+    "needs_owner_decision": false,
+    "suggested_fix": "State that the estate claimed an unmeasured ≥1.18 floor and that ADR-0033 supersedes it. Add PRD.md:244 and platform helmrelease.yaml:11 to what gets corrected; ticket 146 item 6 can carry the platform file."
+   },
+   {
+    "severity": "note",
+    "where": "docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md:17",
+    "claim": "'It pinned one engine, 1.18.2, in ten places ... Nothing asserted that those pins agree.' Point 5 and ticket 146 item 4 name the estate's own pins as the truth CLI, the release CLIs and the in-cluster engine.",
+    "evidence": "The count of ten matches the install pins (hub truth.yml:58; platform release.yml:52, cut-release.yml:92, helmrelease.yaml:36; the drift-sample.yml and shift-left.yml pins in each adopter). But the hub also carries tests/test_cage_ladder_holes.py:61, `PINNED_KYVERNO = \"1.18.2\"`, and :126-128 compare the kyverno on PATH with it ('the pinned 1.18.2 that release.yml installs'). Laya-loophole ticket 08:153-154 records that it 'asserts the pin'. engine_compatibility.py:167-170 also asserts that the running hub CLI equals every cut line's tested_engines. The ticket 146 pin check omits the test constant, and that test skips rather than fails on another CLI.",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Name the hub test constant as an eleventh pin in 146 item 4, or have the test read the engine table. Say that engine_compatibility already ties the truth CLI to tested_engines."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/map.md:114",
+    "claim": "'Measured: ... the cage-netpol failure is a Kyverno reporting change, not a behaviour change'. Ticket 71:203-204 says the same, and README:62-63 says 'The policy's behaviour is the same'.",
+    "evidence": "Only the offline CLI ran; there was no admission and no background controller (README:18, :68). The same directory captures a report difference: diffs-c-apply-policyreport-1.18.2-vs-1.19.1.diff shows pass 5 on 1.18.2 and 3 on 1.19.1. What was measured is that the offline CLI generates the same NetworkPolicies.",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Say 'under the offline CLI the generated NetworkPolicies are equal, and the PolicyReport differs'. Leave live behaviour to ticket 150."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/150-one-adopter-runs-kyverno-1-19-1-on-a-live-cluster.md:30",
+    "claim": "'On 1.18.2, Kyverno writes a pass entry for each pod that cage-netpol does not match.' Stated without qualification, then item 5 asks whether result2oscal.py's OSCAL output changes.",
+    "evidence": "The claim was measured only with offline `kyverno apply -p`, and only for the two pods that fail matchConditions (README:52-54; diffs-c-apply-policyreport). The OSCAL question can already be answered from code: result2oscal.py:94-96 drops any result whose policy maps to no control, and oscal/component-definition.json maps only require-nonroot (ac-6) and governed-namespace-requires-claim (cm-6). So cage-netpol's missing pass entries cannot change the OSCAL output. The body whose report does reach OSCAL, require-nonroot, never ran on 1.19.1.",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Mark the 1.18.2 sentence as offline. Aim item 5's OSCAL comparison at require-nonroot's report entries."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/150-one-adopter-runs-kyverno-1-19-1-on-a-live-cluster.md:16",
+    "claim": "'On the drift lane, an engine that cannot compile the cage reads as could-not-look, never as a false pass (ticket 152).'",
+    "evidence": "Ticket 152 Q5 (origin/main 152:46) decides only that 'an unstamped fall-closed pod keeps reading null for fact 6'. No record measures how facts 4, 5 or 7 read when the engine holds a policy it cannot compile, and no admission ran (README:68).",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Cite 152 Q5 for fact 6 only. List the other facts as unmeasured until item 4's throwaway-KinD run."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/149-a-policy-line-that-passes-on-kyverno-1-18-2-and-1-19-1.md:22",
+    "claim": "'So a `result: skip` row reads \"Fail / Not found\", and no body change fixes it.'",
+    "evidence": "README:71-72: 'The claim that no body fix exists rests on the source and on the levers measured ... The search was not exhaustive.' Ticket 71:94-95 correctly says 'No body change measured'.",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Write 'no body change measured fixes it'."
+   },
+   {
+    "severity": "note",
+    "where": "docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md:20",
+    "claim": "'platform PR 26 added a `tested_engines` field to the 5.0.0 element'. Ticket 71:45-47 says the same.",
+    "evidence": "`git show 97dd40d -- distribution/versions.yaml` adds tested_engines to both the 4.0.0 and the 5.0.0 elements. 4.0.0 was retired later, in 557c153 (2026-09-24). The platform README:93 still says 'The two current rows (policy 4.0.0 and 5.0.0)'.",
+    "kind": "false-fact",
+    "needs_owner_decision": false,
+    "suggested_fix": "Say 'to the 4.0.0 and 5.0.0 elements; 4.0.0 has since been retired'."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/146-one-grader-run-grades-every-engine-a-line-names.md:37",
+    "claim": "Item 6 corrects two README sentences. The branch leaves the earlier 1.19 description standing elsewhere.",
+    "evidence": "Ticket 54's Answer (origin/main 54:30-31) says 'a behavioural difference in the generated NetworkPolicy'. Ticket 71's own Question (71:18-19) says the same. Platform computed-semver/README.md:67-69 says 'including a generation difference'. The diagnosis refutes all three (README:32-35).",
+    "kind": "other",
+    "needs_owner_decision": false,
+    "suggested_fix": "Add a dated pointer to the diagnosis in ticket 54 and in ticket 71's Question. Add README:67-69 to 146 item 6."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/149-a-policy-line-that-passes-on-kyverno-1-18-2-and-1-19-1.md:14",
+    "claim": "The line's changes are made to 'cage-tier' and 'all five bodies'. The map (map.md:300) closes the v1alpha1 fog line on this basis.",
+    "evidence": "Four of the five bodies are not edited in the version tree. render-version-tree.py:5-9 and :77-82 render cage-tier, cage-netpol, stamp-posture and posture-trust-boundary from graded/policies/ and posture/policies/, taking apiVersion as-is. Only the head version is rendered, and older trees are proven from their committed bytes (render-and-prove.py:96-104). require-nonroot is written by hand for each version. So the `string()` fix and the v1 move land in the authoring copies and in graded/tests/cage-netpol, which graded/verify-graded.sh:180-183 also runs.",
+    "kind": "missing-dependency",
+    "needs_owner_decision": false,
+    "suggested_fix": "Name the authoring files in 149 (graded/policies/cage-tier.yaml, cage-netpol.yaml, posture/policies/*.yaml, the hand-written require-nonroot) and say that the new tree comes from render-version-tree.py."
+   },
+   {
+    "severity": "note",
+    "where": ".scratch/ecosystem/issues/150-one-adopter-runs-kyverno-1-19-1-on-a-live-cluster.md:10",
+    "claim": "'Every earlier ticket measures the engine offline. This ticket measures it on a real cluster.'",
+    "evidence": "Ticket 147 item 4 (147:26-28) reads the version of the Kyverno controller running on the drift lane's KinD cluster, which is a live observation. The lane creates that cluster for each run (drift-sample.yml:129-134).",
+    "kind": "overstated",
+    "needs_owner_decision": false,
+    "suggested_fix": "Write 'Every earlier ticket grades policy behaviour offline'."
+   }
+  ],
+  "checked": [
+   "The ten Kyverno install pins across hub, platform and adopters (origin/main of each), plus other version literals and checksums",
+   "The pin line numbers in 146:54-56 and 147:49-51: all match (truth.yml:58-59, release.yml:52-53, cut-release.yml:92-93, helmrelease.yaml:36, drift-sample and shift-left in each adopter)",
+   "The grader's equality check (engine_compatibility.py:163-170, :169) and test_engine_compatibility.py:136-138",
+   "verify-cage-engine.sh is a self-proof row with skip '-' (talk/verify-manifest.txt:101); the hub clones default branches (clone-estate.sh)",
+   "The cut-release regex defect: replayed the script's regexes and confirmed the field is lost and a stray } appears (cut-release-update-array-commit.sh:62-87)",
+   "The platform README quotes: 'not a runtime support range', 'bounded offline matrix subtask', 'two current rows'",
+   "PR 26 / 97dd40d contents; the policy/v5.0.0 tag date; all three composed sets are [5.0.0]",
+   "platform party/schema.json: top-level additionalProperties false, no engine field",
+   "No renovate.json in any repo names Kyverno; the managers are custom.regex on named files plus npm, maven or pip",
+   "Every v5.0.0 body is v1alpha1; the kinds match ADR-0016; no ClusterPolicy anywhere except a hub research doc and a test fixture",
+   "Both upstream install.yaml files, parsed: v1 served, v1alpha1 deprecated, v1beta1 stored, identical schemas (the 1.18.2 file matches the pinned checksum)",
+   "The Kyverno tag commits 945ac9ce and 40ec788d (git ls-remote); PR #16505's merge commit is fd90931fad and it contains the nil-result hunk; it is an ancestor of v1.19.0 and v1.19.1; policy_processor.go:719-721 at v1.19.1",
+   "The research captures against the README table and points 1-8: assertion counts, netpol table diff, PolicyReport diff, generated-text diff (whitespace only), minimal transcript",
+   "Adopter sync paths, gotk-sync, the composed-set header, the drift-sample apply steps, talk/up.sh and platform engine/up.sh",
+   "Tickets 54, 63, 119, 152, 155 and 161 (161 exists on origin/main only, not at the branch HEAD), laya-loophole 08, ADR-0016, ADR-0020, ADR-0026, the five-per-day cap (GAPS.md:94)",
+   "result2oscal.py and the component-definition control mapping; render-version-tree.py and render-and-prove.py",
+   "All relative markdown links added on the branch (13) resolve; there are no ADR or ticket number collisions with origin/main"
+  ],
+  "not_checked": [
+   "Did not run any Kyverno CLI, because it is outside the permitted commands. The 26-document, 10/3, 11/0 and PolicyException results, and whether stamp-posture, posture-trust-boundary and require-nonroot compile on 1.19.1, are unverified",
+   "The linux CLI checksum cb2feb... (not downloaded) and the darwin_arm64 CLI binaries the diagnosis used (no checksum was recorded)",
+   "The chart 3.8.2 to app 1.18.2 mapping beyond the helmrelease comment",
+   "The owner quotes (71:168, 71:184-185), the second-agent refutation account, and whether the three sessions had used five owner-only decisions on 2026-09-25",
+   "Any live-cluster behaviour; the hub's verify scripts were not run",
+   "Whether the branch's map.md and ticket files merge cleanly with origin/main, which gained 0c1249d0 and 56f22d7b after the merge base 32739f18"
+  ]
+ }
+}

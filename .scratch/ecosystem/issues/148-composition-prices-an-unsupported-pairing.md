@@ -32,9 +32,9 @@ following in the platform tools:
    engine. A line in the window that does not support that engine is reported by name as an
    unsupported pairing. It is not a compile error and not a pass.
 6. **The machinery supports 1.19.1 and moves to `policies.kyverno.io/v1`** in the same tools
-   release. Some machinery bodies build the same `variables.tier` label map that does not compile
-   on 1.19.1, so fix each body that ticket 146 item 4 grades red, as ticket 149 fixes cage-tier.
-   Then the machinery's `tested_engines` is `[1.18.2, 1.19.1]`. The bodies are `v1alpha1` today,
+   release. Fix each machinery body that ticket 146 item 4 grades red on 1.19.1, as ticket 149
+   fixes cage-tier. Then the machinery's `tested_engines` is `[1.18.2, 1.19.1]`. If this ticket
+   lands before ticket 149, it adds the 1.19.1 row to the engine table. The bodies are `v1alpha1` today,
    and both engines mark `v1alpha1` deprecated. Ticket 149 moves the policy line's bodies.
 7. **A hub check grades the price.** A planted declaration of an engine that a composed line does
    not list gives the `unsupported-engine` delta. Its amount equals the sum of the hole prices of

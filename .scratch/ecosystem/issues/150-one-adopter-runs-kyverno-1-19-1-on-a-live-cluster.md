@@ -27,9 +27,10 @@ composed-set move (ticket 130), and a platform tools tag whose array carries the
 
 Build the following:
 
-1. **Choose one adopter** and record the choice with its reason. Prefer an adopter whose named
-   cluster no other adopter uses, because a shared cluster runs one engine (ADR-0033 point 2).
-   Today driftwood and tuppence share `kind-driftwood`.
+1. **Choose one adopter** and record the choice with its reason. Prefer an adopter none of whose
+   workloads run on a cluster that another adopter uses, because a shared cluster runs one engine
+   (ADR-0033 point 2). Today that is ludlow: tuppence's workload flagship runs on
+   `kind-driftwood`.
 2. **The adopter moves to the ticket 149 line.** Its composed set and its workloads' claims move to
    the new line only.
 3. **The adopter declares 1.19.1** in `gitops/engine/kyverno.yaml` (ticket 147), and recomposes.
@@ -43,12 +44,14 @@ Build the following:
    the 5.0.0 cage-tier body, which does not compile. Record what admission does with a pod: does it
    admit the pod without the mutation, or does it refuse the pod? If admission lets the pod in
    without the mutation, the cage fails open. That is the worst case that ADR-0033 point 3 prices.
-   If admission refuses the pod, point 3 reopens. A throwaway-KinD capture is reasoning, not Done
-   evidence (NORTH-STAR.md, ADR-0023). Record it in this ticket as reasoning.
+   If admission refuses the pod, point 3 reopens. A throwaway-KinD capture is a rehearsal, not Done
+   evidence (ADR-0028, lines 35-36, citing ADR-0023). Record it in this ticket as reasoning.
 6. **Measure the PolicyReport effect on the lane.** `platform/oscal/result2oscal.py` drops a result
    whose policy maps to no control, so cage-netpol's report entries cannot change the OSCAL output.
-   Compare `require-nonroot`'s entries, which map to ac-6, between the adopter's last 1.18.2 sample
-   and its first 1.19.1 sample.
+   The entries that matter are `require-nonroot`'s, which map to ac-6. Drift samples record no
+   PolicyReport today. So the lane first captures PolicyReports, and at least one scheduled 1.18.2
+   sample carries that capture before the engine moves. Then compare it with the first 1.19.1
+   sample.
 
 ## Done
 

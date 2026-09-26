@@ -17,9 +17,10 @@ does not compile the 5.0.0 cage-tier body at all.
 
 Before this ADR, the estate claimed a floor, "Kyverno ≥1.18", in ADR-0003, `docs/PRD.md` and a
 comment in platform `engine/kyverno/helmrelease.yaml`. No run measured that range. The estate
-pinned 1.18.2 in ten install pins across the hub, the platform and the three adopters, and in one
-hub test constant. Only one thing tied any of them together: the platform grader requires the hub
-CLI to equal each cut line's tested engines.
+pinned 1.18.2 in ten live install pins across the hub, the platform and the three adopters (hub
+spikes excluded), and in one hub test constant. Two things tied some of them together: the platform
+grader requires the hub CLI to equal each cut line's tested engines, and the hub test skips unless
+the CLI on `PATH` reports its constant.
 
 Platform PR 26 (97dd40d, 2026-09-10) added a `tested_engines` field to the 4.0.0 and 5.0.0
 elements of `distribution/versions.yaml`, and a grader, `computed-semver/engine_compatibility.py`.
@@ -36,9 +37,11 @@ widens what it grades.
    carries its own `tested_engines`, graded the same way. CONTEXT.md: **Supported engine**.
 2. **The adopter owns its engine version.** The platform cannot choose another org's engine. The
    adopter's engine install file, `gitops/engine/kyverno.yaml` in its own repo, is its declared
-   engine. Every cluster that the adopter runs installs Kyverno from that file: its named cluster
-   and its drift lane. A cluster that more than one adopter uses runs one engine, so those adopters
-   must declare the same engine, and a check asserts that. A static check asserts that the file's
+   engine. Every cluster of the adopter that runs an engine installs Kyverno from that file. Today
+   that is each adopter's drift lane, and `kind-driftwood`, which driftwood owns and where
+   tuppence's workload flagship also runs. `kind-tuppence` and `kind-ludlow` run no engine today,
+   and this ADR adds none. A cluster that more than one adopter uses runs one engine, so those
+   adopters must declare the same engine, and a check asserts that. A static check asserts that the file's
    version, install URL and checksum agree with the platform engine table's row for that version.
    No drift fact compares the lane's engine with the file, because the lane installs from that
    file and such a fact can only read true. CONTEXT.md: **Declared engine**.
@@ -64,7 +67,8 @@ widens what it grades.
    checksum for each CLI and each `install.yaml`, and the Helm chart version where one applies. An
    uncut element that carries `tested_engines` is graded on the tree of the commit that declares
    it. The cut is signed only after every cell passes. After the cut, the grade reads the tag. This
-   reverses the platform README's "deliberately not a pre-cut gate".
+   reverses the platform README, which says that the grader is "deliberately **not** wired as a
+   new-policy pre-cut gate".
 5. **An engine bump is not a policy version.** The policy bytes do not change, so the line keeps
    its version.
    - To add an engine to a line changes metadata only. The same change must pass the new cells.

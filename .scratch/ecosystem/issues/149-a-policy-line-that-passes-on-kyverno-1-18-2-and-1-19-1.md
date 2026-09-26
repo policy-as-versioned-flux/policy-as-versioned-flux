@@ -12,16 +12,21 @@ and ADR-0033 points 4 and 6.
 The diagnosis is in `.scratch/ecosystem/research/kyverno-1.19-cage-diagnosis/`. On Kyverno 1.19.1,
 the 5.0.0 cage-tier body does not compile, and two cage-netpol fixture rows fail. The tagged 5.0.0
 bodies cannot change, so the fix is a new line. It is the next declared line, so it also carries a
-retirement that three records already commit to it. It carries four changes:
+retirement that two records already commit to it. It carries four changes:
 
 1. **`string(variables.tier)` in cage-tier.** The diagnosis measured that this compiles on both
    engines and gives the same mutated output as the tagged body.
 2. **`posture-trust-boundary` retires** (decision 15). Ticket 89's register
-   (`verify/deny-is-not-a-rung/register.yaml`), `NORTH-STAR.md:54` and ticket 84 each commit its
-   retirement to the next declared line. The reason is recorded in the register: `stamp-posture`
-   already enforces the boundary as a mutation, so the Deny cannot fire.
-   `distribution/render-version-tree.py` makes the rule a mandatory member of every tree, so the
-   renderer changes too. Update the register's `state:` when the line is cut.
+   (`verify/deny-is-not-a-rung/register.yaml`) and `NORTH-STAR.md:54` commit its retirement to the
+   next declared line, which the register assigns to ticket 84. The reason is recorded in the
+   register: `stamp-posture` already enforces the boundary as a mutation, so the Deny cannot fire.
+   Other platform code reads the rule, so it changes too:
+   - `distribution/render-version-tree.py` makes the rule a mandatory member of every tree;
+   - `compose/composition.py` uses it as its Deny-inheriting selfcheck fixture;
+   - `computed-semver/cage_engine.py` cases 15a and 15b read it from the rendered tree;
+   - `currency-controller/verify-currency.sh` reads it.
+
+   Update the register's `state:` when the line is cut.
 3. **The four remaining bodies move to `policies.kyverno.io/v1`.** The diagnosis measured, under
    the offline CLI, that the move changes no result for the two cage matrices, and no per-resource
    result for `require-nonroot` and `stamp-posture` under `kyverno apply`. The `v1` and `v1alpha1`

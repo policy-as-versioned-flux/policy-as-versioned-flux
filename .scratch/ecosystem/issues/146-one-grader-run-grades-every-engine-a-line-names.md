@@ -36,16 +36,18 @@ Build the following:
    The `scope` value of `tested_engines` changes, so that an old declaration cannot pass under the
    wider meaning.
 4. **The machinery has its own `tested_engines`.** The machinery bodies that the composer renders
-   (the governed-namespace guard, the orphan cage and the others) are graded the same way, against
-   the platform tools release that ships them. Some of them build the same `variables.tier` label
-   map that does not compile on 1.19.1.
+   are graded the same way, against the platform tools release that ships them. Two of them,
+   `orphan-cage` and `governed-namespace-guard`, build the same `posture.acme.io/tier` label map as
+   cage-tier, but their `variables.tier` is the string literal `'isolated'`. A review run on
+   2026-09-26 compiled both on 1.19.1 under the offline CLI. That run is not captured. The other
+   machinery bodies have not run on 1.19.1.
 5. **A candidate grade before the cut** (decision 19). An uncut element that carries
    `tested_engines` is graded on the tree of the commit that declares it. After the cut, the grade
    reads the tag. So the gate is not red for the time between a declaration and its cut, and the
    cut is signed only after every cell passes.
 6. **The gate installs every engine in the table.** `truth.yml` and `verify-cage-engine.sh` pass
-   one binary for each engine to the grader. Until ticket 149 adds a second engine, the table has
-   one row.
+   one binary for each engine to the grader. The table has one row until ticket 148 or ticket 149
+   needs 1.19.1. Whichever of the two lands first adds the 1.19.1 row.
 7. **A gate check on the estate's own pins** (ADR-0033 point 5). Each of these must name a version
    in the table and a supported engine of every served line:
    - the hub `truth.yml` CLI;
@@ -63,9 +65,9 @@ Build the following:
 9. **The platform records state what is true.** In `computed-semver/README.md`:
    - "not a runtime support range" is now false (ADR-0033);
    - "The two current rows (policy 4.0.0 and 5.0.0)" is stale, because 4.0.0 is retired;
-   - "including a generation difference" (`:67-69`) is refuted by the diagnosis;
-   - the "Contract and release boundary" paragraph and "deliberately not a pre-cut gate" are
-     reversed by item 5.
+   - "including a generation difference" (`:67-69`) was not reproduced on 1.19.1 by the diagnosis;
+   - the "Contract and release boundary" paragraph, and the sentence that the gate is "deliberately
+     **not** wired as a new-policy pre-cut gate", are reversed by item 5.
 
    The comment in `engine/kyverno/helmrelease.yaml` cites "ADR-0003's '>=1.18' floor", which
    ADR-0033 supersedes.
