@@ -52,10 +52,13 @@ applied and their basis beside the ladder's pin.
 
 ADR-0032 point 4, twin ticket 12. A record marked synthetic, planted or injected evidences
 detection machinery, never the world. `twin/synthetic.py` says what such a record is and whether
-an edge, a valuation or a claim rests on one; an impact whose primary path or valuation does, and
-a mitigation claim whose own evidence or whose enactment record does, is a register entry
-(`RESTS_ON_SYNTHETIC`) whatever grade the file declares. Refused first, by name, because the
-grade a synthetic record raised may sit inside the threshold and pass every other gate.
+an edge, a valuation or a claim rests on one; an impact whose primary path, admitting path or
+valuation does, and a mitigation claim whose own evidence or whose enactment record does, is a
+register entry (`RESTS_ON_SYNTHETIC`) whatever grade the file declares. The admitting path is
+read because the price rests on it (its worst hop is folded into `rests_on_grade`), so an edge
+strengthened on a synthetic drill on the way to the cash flow refuses the price exactly as one on
+the way from the shock does. Refused first, by name, because the grade a synthetic record raised
+may sit inside the threshold and pass every other gate.
 
 ## Mitigation credit is a causal claim, and is gated like one
 
@@ -169,21 +172,23 @@ def _register(component: str, reason: str, detail: str, **extra: Any) -> dict[st
     return {"component": component, "reason": reason, "detail": detail, **extra}
 
 
-def _synthetic_reason(overlay: "Overlay", path: dict[str, Any], component: str,
-                      valuation: dict[str, Any] | None) -> str | None:
+def _synthetic_reason(overlay: "Overlay", path: dict[str, Any], verdict: dict[str, Any],
+                      component: str, valuation: dict[str, Any] | None) -> str | None:
     """Why this impact's evidence chain includes a synthetic record, or None.
 
-    Every hop on the primary path is a graded edge with a regrade chain and a note; the valuation
-    has a basis. `twin/synthetic.py` reads each of them. Checked before the gates below rather
-    than after, so a synthetic record is refused by name even where the grade it raised would
-    have priced.
+    Three preconditions of the price, and every one is read: each hop on the primary path and
+    each hop on the admitting path (`verdict["path"]`, empty when the perspective named the
+    component as its own cash flow, or when nothing admitted it) is a graded edge with a regrade
+    chain and a note, and the valuation has a basis. `twin/synthetic.py` reads each of them.
+    Checked before the gates below rather than after, so a synthetic record is refused by name
+    even where the grade it raised would have priced.
     """
-    for hop in path["path"]:
-        edge_id = str(hop["edge"])
-        note = (overlay.edges.get(edge_id) or {}).get("note")
-        why = synthetic.rests_on(overlay, edge_id, (note,))
-        if why:
-            return f"hop {edge_id!r}: {why}"
+    why = synthetic.path_rests_on(overlay, path["path"], "hop")
+    if why:
+        return why
+    why = synthetic.path_rests_on(overlay, verdict.get("path") or [], "admitting-path hop")
+    if why:
+        return why
     if valuation is not None:
         why = synthetic.rests_on(overlay, f"valuation of {component}", (valuation.get("basis"),))
         if why:
@@ -232,7 +237,7 @@ def impacts(
         valuation = declared.get(component)
         # A synthetic record never raises a grade (ADR-0032 point 4). Refused first, by name,
         # because the grade it raised may sit inside the threshold and pass every gate below.
-        synthetic_why = _synthetic_reason(overlay, path, component, valuation)
+        synthetic_why = _synthetic_reason(overlay, path, verdict, component, valuation)
         if synthetic_why:
             register.append(_register(
                 component, RESTS_ON_SYNTHETIC,

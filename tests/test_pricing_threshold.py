@@ -9,8 +9,10 @@ Four things, each planted and each read back off the artefact rather than off th
 3. the weakest grade: every price carries `rests_on_grade`, the one order statistic ADR-0024
    point 6 admits, and the `gating` block says which thresholds were applied and why;
 4. a synthetic record never raises a grade: a planted regrade that strengthens an edge on a
-   synthetic drill goes red at the pricing gate whatever the file declares, and so does a
-   mitigation claim that rests on one.
+   synthetic drill goes red at the pricing gate whatever the file declares, whether the edge is
+   on the propagation path or on the path that admits the figure to the £; so does a valuation
+   whose basis rests on one, a mitigation claim that rests on one, and the same valuation or
+   admitting path under `twin exposure`. Each plant has a control with real records that prices.
 """
 
 from __future__ import annotations
@@ -446,6 +448,194 @@ evidence: The incident drill incident-drill-2026, run twice in the rehearsal env
     body = _price(pocket, REFUSED_ORIGIN)
     assert "customer-portal" in {i["component"] for i in body["impacts"]}
     assert not any(r["reason"] == pricing.RESTS_ON_SYNTHETIC for r in body["register"])
+
+
+# -- 4b. the admitting path is a precondition of the figure, so it is read too ------------------
+#
+# The shape review round 2 planted (ADR-0032 point 4 against the PR's own decision that a price
+# rests on its admitting path). A `reporting-service` the operator values at grade 2 with an
+# amount; a clean grade-2 edge order-service -> reporting-service, which is the propagation path
+# a shock at order-service takes; and an edge reporting-service -> customer-portal (the operator's
+# declared cash flow), which is the path that ADMITS the figure, strengthened 3 -> 2 by a regrade.
+# The regrade cites a synthetic drill in the plant and three dated incidents in the control, and
+# nothing else differs, so a refusal is attributable to the record and not to the regrade.
+
+REPORTING_SERVICE = "reporting-service"
+SCENARIO_FILE = "orgs/pocket/scenarios/portal-availability-2026.yaml"
+ADMITTING_EDGE = "reporting-drives-the-portal"
+
+_REPORTING_COMPONENT = """\
+id: reporting-service
+name: Reporting service
+kind: activity
+evolution: product
+evolution_position: 0.5
+visibility: 0.5
+needs:
+  - order-service
+"""
+
+_PROPAGATION_EDGE = """\
+id: orders-feed-reporting
+type: influences
+from: order-service
+to: reporting-service
+sign: negative
+lag_days: 1
+elasticity:
+  min: 0.3
+  mode: 0.3
+  max: 0.3
+evidence_grade: 2
+confidence: 0.5
+note: >-
+  Reporting lags orders, from repeated incident records.
+"""
+
+_ADMITTING_EDGE = """\
+id: reporting-drives-the-portal
+type: influences
+from: reporting-service
+to: customer-portal
+sign: negative
+lag_days: 1
+elasticity:
+  min: 0.2
+  mode: 0.2
+  max: 0.2
+evidence_grade: {grade}
+confidence: 0.5
+note: >-
+  Portal dashboards depend on the reporting service.
+"""
+
+_ADMITTING_REGRADE_ON_A_DRILL = """\
+id: reporting-drives-the-portal-strengthened
+subject: reporting-drives-the-portal
+from_grade: 3
+to_grade: 2
+regraded_on: '2026-03-02'
+by_role: model-steward
+reason: The drill showed the reporting slowdown reaching the portal, so the mechanism is observed.
+evidence: The incident drill incident-drill-2026, run twice in the rehearsal environment.
+"""
+
+_ADMITTING_REGRADE_ON_RECORDS = """\
+id: reporting-drives-the-portal-strengthened
+subject: reporting-drives-the-portal
+from_grade: 3
+to_grade: 2
+regraded_on: '2026-03-02'
+by_role: model-steward
+reason: Three dated incidents showed the reporting slowdown reaching the portal.
+evidence: Incident records of 2025-11-02, 2026-01-14 and 2026-02-20.
+"""
+
+
+def _plant_reporting_service(root: Path, *, on_a_drill: bool) -> None:
+    """The operator values a reporting service; a shock at order-service reaches it over a clean
+    edge; the edge that admits it to the cash flow was strengthened 3 -> 2 on a regrade. The
+    scenario names it too, so `twin exposure` is offered the same figure `twin price` is."""
+    _rewrite(root, OPERATOR_FILE, "  identity-store:\n",
+             "  reporting-service:\n    amount: 30000\n    evidence_grade: 2\n"
+             "    basis: Reporting outage cost per hour, from repeated incident records.\n"
+             "  identity-store:\n")
+    _rewrite(root, SCENARIO_FILE, "  - identity-store\n", "  - identity-store\n  - reporting-service\n")
+    _plant(root, {
+        f"orgs/pocket/components/{REPORTING_SERVICE}.yaml": _REPORTING_COMPONENT,
+        "orgs/pocket/edges/orders-feed-reporting.yaml": _PROPAGATION_EDGE,
+        f"orgs/pocket/edges/{ADMITTING_EDGE}.yaml": _ADMITTING_EDGE.format(grade=3),
+    }, "a reporting service the operator values, admitted at grade 3")
+    files = {
+        f"orgs/pocket/edges/{ADMITTING_EDGE}.yaml": _ADMITTING_EDGE.format(grade=2),
+        f"orgs/pocket/regrades/{ADMITTING_EDGE}-strengthened.yaml":
+            _ADMITTING_REGRADE_ON_A_DRILL if on_a_drill else _ADMITTING_REGRADE_ON_RECORDS,
+    }
+    if on_a_drill:
+        files["orgs/pocket/signals/incident-drill-2026.yaml"] = SYNTHETIC_SIGNAL
+    _plant(root, files, "strengthen the admitting edge")
+
+
+def _exposure_entry(root: Path, caps: Capabilities) -> dict:
+    import json
+
+    artefact = verbs.exposure(ModelRepo.open(root), caps, "pocket", "portal-availability-2026", [OPERATOR],
+                              verbs.command_for("exposure", org="pocket", scenario="portal-availability-2026"))
+    return json.loads(artefact.to_bytes())["body"]["perspectives"][0]
+
+
+def test_a_price_whose_admitting_path_was_strengthened_on_a_synthetic_drill_is_refused(pocket: Path) -> None:
+    """The propagation path is clean and the valuation is clean; only the edge that admits the
+    figure to the cash flow rests on the drill. The price rests on that path (its worst hop is
+    folded into `rests_on_grade`), so it is refused by name, under the default and under 3."""
+    _plant_reporting_service(pocket, on_a_drill=True)
+    for threshold in (None, 3):
+        body = _price(pocket, PRICED_ORIGIN, threshold=threshold)
+        assert REPORTING_SERVICE not in {i["component"] for i in body["impacts"]}
+        entry = next(r for r in body["register"] if r["component"] == REPORTING_SERVICE)
+        assert entry["reason"] == pricing.RESTS_ON_SYNTHETIC
+        assert "admitting-path hop" in entry["detail"] and ADMITTING_EDGE in entry["detail"]
+        assert "incident-drill-2026" in entry["detail"] and "synthetic" in entry["detail"]
+        assert set(entry) <= {"component", "reason", "detail", "depth", "worst_evidence_grade"}
+        # The plant touched nothing else: the portal itself still prices under the same eye.
+        assert "customer-portal" in {i["component"] for i in body["impacts"]}
+
+
+def test_the_control_with_real_records_on_the_admitting_path_prices(pocket: Path) -> None:
+    """The identical regrade citing dated incident records prices: 30000 x 0.3 = 9000 at depth
+    1, resting on grade 2 (the clean hop, the valuation and the admitting hop are all 2)."""
+    _plant_reporting_service(pocket, on_a_drill=False)
+    body = _price(pocket, PRICED_ORIGIN)
+    impact = next(i for i in body["impacts"] if i["component"] == REPORTING_SERVICE)
+    assert impact["price"]["composed"]["mode"] == 9000.0
+    assert impact["admitted_because"] == "a-graded-causal-path-reaches-a-declared-cash-flow"
+    assert impact["rests_on_grade"] == 2
+    assert not any(r["reason"] == pricing.RESTS_ON_SYNTHETIC for r in body["register"])
+
+
+def test_an_exposure_figure_whose_valuation_rests_on_a_synthetic_drill_is_a_register_entry(
+    pocket: Path, caps: Capabilities
+) -> None:
+    """The same valuation `twin price` refuses (the portal's basis rewritten onto the drill) is
+    not admitted by `twin exposure` either: register entry, no figure, the record named."""
+    _rewrite(pocket, OPERATOR_FILE, "Order value lost per hour of portal outage, from repeated incident records.",
+             "Order value lost per hour of portal outage, from the synthetic incident drill.")
+    fixtures.git(pocket, "add", "-A")
+    fixtures.git(pocket, "commit", "-q", "-m", "rest the valuation on a drill")
+    entry = _exposure_entry(pocket, caps)
+    assert "customer-portal" not in {e["component"] for e in entry["admitted"]}
+    held = next(r for r in entry["register"] if r["component"] == "customer-portal")
+    assert pricing.RESTS_ON_SYNTHETIC in held["reason"] and "synthetic" in held["reason"]
+    assert "declared_value" not in held and "amount" not in held and "rests_on_grade" not in held
+    # The other admitted figure is untouched, so the refusal is the valuation's and not the eye's.
+    assert "order-service" in {e["component"] for e in entry["admitted"]}
+    assert entry["declared_exposure"] == 250000.0
+
+
+def test_an_exposure_figure_whose_admitting_path_rests_on_a_synthetic_drill_is_a_register_entry(
+    pocket: Path, caps: Capabilities
+) -> None:
+    """The reporting service is valued cleanly at grade 2 and admitted over an edge strengthened
+    on the drill; the exposure figure rests on that path (`rests_on_grade` folds it), so it is a
+    register entry naming the admitting hop and the record. The control admits it at 30000."""
+    _plant_reporting_service(pocket, on_a_drill=True)
+    entry = _exposure_entry(pocket, caps)
+    verdict = next(v for v in entry["admission"] if v["component"] == REPORTING_SERVICE)
+    assert verdict["admitted"] and [h["edge"] for h in verdict["path"]] == [ADMITTING_EDGE]
+    assert REPORTING_SERVICE not in {e["component"] for e in entry["admitted"]}
+    held = next(r for r in entry["register"] if r["component"] == REPORTING_SERVICE)
+    assert pricing.RESTS_ON_SYNTHETIC in held["reason"]
+    assert "admitting-path hop" in held["reason"] and ADMITTING_EDGE in held["reason"]
+    assert "incident-drill-2026" in held["reason"]
+    assert "declared_value" not in held and "rests_on_grade" not in held
+
+
+def test_the_control_admits_the_exposure_figure_over_real_records(pocket: Path, caps: Capabilities) -> None:
+    _plant_reporting_service(pocket, on_a_drill=False)
+    entry = _exposure_entry(pocket, caps)
+    admitted = next(e for e in entry["admitted"] if e["component"] == REPORTING_SERVICE)
+    assert admitted["declared_value"] == 30000.0 and admitted["rests_on_grade"] == 2
+    assert not any(pricing.RESTS_ON_SYNTHETIC in r["reason"] for r in entry["register"])
 
 
 # -- the citation that authorises a golden re-bless names its namespace --------------------------

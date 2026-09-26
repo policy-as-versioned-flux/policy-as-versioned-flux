@@ -42,6 +42,16 @@ can rest a grade on a synthetic drill without ever writing the word. The net cat
 case, which is the one ticket 30 round 1 would have created ("a marked synthetic incident record
 counts as grade 2"), and a false positive costs an author one rewording, as `schema.py`'s
 Article 9 net already trades. The limit is stated here rather than papered over.
+
+## Which subjects a figure rests on
+
+A figure rests on every graded subject that is a precondition of it, and `path_rests_on` reads a
+whole path of hops the way `rests_on` reads one edge. A priced impact rests on its propagation
+path, its valuation and its admitting path (the third gate is a precondition of the price, so a
+grade raised on that path by a synthetic record is a grade the price rests on); an exposure figure
+rests on its valuation and its admitting path; a credit rests on the claim and the enactment
+record. `twin/pricing.py` and `twin/verbs.py` `exposure` read all of them, so the two verbs that
+carry money refuse the same record in the same place.
 """
 
 from __future__ import annotations
@@ -164,4 +174,24 @@ def rests_on(overlay: Any, subject: str, prose: Iterable[Any] = ()) -> str | Non
         named = _names_a_record(text, records)
         if named:
             return f"{subject!r} cites signal {named!r}, a synthetic record: {records[named]}"
+    return None
+
+
+def path_rests_on(overlay: Any, hops: Iterable[dict[str, Any]], label: str = "hop") -> str | None:
+    """Why any hop of a path rests on a synthetic record, or None if no hop does.
+
+    `hops` are the dicts `twin/blast.py` and `twin/propagate.py` emit, each carrying `edge`; the
+    edge's own note is the third leg's prose and its regrade chain the second. `label` names the
+    path in the reason ("hop" for the propagation path, "admitting-path hop" for the path that
+    admits a figure to the £), so a reader can see which precondition of the figure the record
+    sits under. A structural hop carries no grade and is read all the same: a note that says the
+    dependency was planted is still a marked record.
+    """
+    edges = getattr(overlay, "edges", {})
+    for hop in hops:
+        edge_id = str(hop["edge"])
+        note = (edges.get(edge_id) or {}).get("note")
+        why = rests_on(overlay, edge_id, (note,))
+        if why:
+            return f"{label} {edge_id!r}: {why}"
     return None

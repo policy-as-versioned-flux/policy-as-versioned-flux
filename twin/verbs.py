@@ -37,6 +37,7 @@ from . import (
     propagate as propagate_mod,
     regimes as regimes_mod,
     scoring,
+    synthetic,
 )
 from .pert import PertError, Triple
 from .severity import Severity, SeverityError
@@ -686,6 +687,13 @@ def exposure(
     An impact with no such path is a register entry whose reason is falsifiable — "no evidenced
     causal path yet", never "we decided it does not count".
 
+    **And before either gate, a synthetic record never raises a grade** (ADR-0032 point 4,
+    eco-system ticket 141). An exposure figure rests on its valuation and on its admitting path,
+    and `rests_on_grade` says so, so the same `twin/synthetic.py` net `twin price` applies runs
+    here on both: a valuation whose basis rests on a synthetic drill, or an admitting path with a
+    hop strengthened on one, is a register entry named `synthetic` and carries no figure,
+    whatever grade the file declares. The two verbs that carry money refuse the same record.
+
     What this is **not**: a modelled price. Nothing propagates into these figures — they are the
     perspective's own declared valuations of the components a scenario names, and the artefact says
     so in `basis` rather than implying otherwise. `twin price` is the verb that multiplies one of
@@ -729,6 +737,7 @@ def exposure(
         admissible = {v["component"] for v in verdicts if v["admitted"]}
         basis_of = {v["component"]: v.get("basis") for v in verdicts}
         path_grade_of = {v["component"]: v.get("worst_evidence_grade") for v in verdicts}
+        admitting_path_of = {v["component"]: v.get("path") or [] for v in verdicts}
         admitted: list[dict[str, Any]] = []
         register: list[dict[str, Any]] = []
         for component in components:
@@ -737,7 +746,23 @@ def exposure(
                 continue
             grade = int(valuation["evidence_grade"])
             held = {"component": component, "evidence_grade": grade, "basis": valuation["basis"]}
-            if not evidence.may_price(grade, threshold=threshold) or "amount" not in valuation:
+            # A synthetic record never raises a grade (ADR-0032 point 4). Read first, by name,
+            # on the two subjects this figure rests on: the valuation's own basis and the path
+            # that admits it to the £. `twin price` refuses the same record at the same place.
+            synthetic_why = synthetic.rests_on(
+                overlay, f"valuation of {component}", (valuation.get("basis"),)
+            ) or synthetic.path_rests_on(
+                overlay, admitting_path_of[component], "admitting-path hop"
+            )
+            if synthetic_why:
+                register.append(
+                    {**held, "reason": (
+                        f"{pricing.RESTS_ON_SYNTHETIC}: {synthetic_why}. A synthetic record "
+                        "evidences detection machinery, never the world, so no grade resting on "
+                        "one carries a figure, whatever the grade says (ADR-0032 point 4)"
+                    )}
+                )
+            elif not evidence.may_price(grade, threshold=threshold) or "amount" not in valuation:
                 # No figure, anywhere. The schema refuses one at this grade for this party, so
                 # the register is a list of names and reasons rather than a price with a null
                 # field.

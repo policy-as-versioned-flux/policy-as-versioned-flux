@@ -1429,9 +1429,13 @@ the valuation and the admitting path's worst hop; for a credit, the impact, the 
 corroborated enactment; for an exposure entry, the valuation and the admitting path), the one
 order statistic ADR-0024 point 6 admits; the `gating` block carries `applied`, the thresholds in force
 and their basis, beside the ladder's pin. And a synthetic record never raises a grade (ADR-0032
-point 4): `twin/synthetic.py` refuses a price through any edge, valuation or claim whose evidence
-chain includes a record marked synthetic, planted or injected, by name, whatever grade the file
-declares.
+point 4): `twin/synthetic.py` says whether an edge, a valuation or a claim rests on a record marked
+synthetic, planted or injected, and `twin price` and `twin exposure` refuse a figure by name,
+whatever grade the file declares, when any subject it rests on does: for a price, the propagation
+path, the admitting path and the valuation; for an exposure figure, the valuation and the
+admitting path; for a credit, the claim and the corroborated enactment. The subjects read are
+exactly the ones `rests_on_grade` folds, so the grade a figure shows and the records it is
+refused on are the same set.
 
 **And a second gate, derived rather than declared.** A well-graded valuation still enters the
 figure only when a causal path runs from the component to a cash flow that perspective declared,
@@ -1457,7 +1461,10 @@ summed into one indistinguishable number. Constraining what may be *called* a ca
 modelling question this code does not answer, and `twin/admission.py` says so.
 
 The admitted figures in an **exposure** are declared valuations rather than modelled prices, and
-the artefact says so. `twin price` below is what multiplies one of them by a propagated influence,
+the artefact says so. They are gated on the same synthetic-record rule as a price, on the two
+subjects they rest on (the valuation's basis and the admitting path), so a figure `twin price`
+refuses as resting on a synthetic drill is not admitted by `twin exposure` either; it is a
+register entry naming the record. `twin price` below is what multiplies one of them by a propagated influence,
 and it answers a different question: an exposure says what a scenario's components are worth to
 each eye, and a price says what one shock costs them. `prefilter.applied` is `false` in an
 exposure rather than implied — there is no choice set there to filter, because these are
@@ -1485,8 +1492,9 @@ in force for the party (the ladder's 2, or the 3 its signed `party.yaml` declare
 ticket 141). The **valuation** must be too, which the schema guarantees at the source for the
 threshold the loader was handed and the gate re-checks itself. And **admission** must hold — a
 graded causal path has to reach a cash flow the perspective declared. Before any of them, a
-**synthetic record never raises a grade**: an impact whose path or valuation rests on a record
-marked synthetic, planted or injected is refused by name (`RESTS_ON_SYNTHETIC`). Anything that
+**synthetic record never raises a grade**: an impact whose propagation path, admitting path or
+valuation rests on a record marked synthetic, planted or injected is refused by name
+(`RESTS_ON_SYNTHETIC`), the admitting path included because the price rests on it. Anything that
 fails one of them is a register entry with a falsifiable reason and **no figure at all**. Not a
 zero: zero is a price, and "we cannot price this" is not. Every impact that prices carries
 `rests_on_grade`, the weakest grade it rests on.
