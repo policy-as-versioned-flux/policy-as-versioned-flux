@@ -60,10 +60,15 @@ bash "$ROOT/clone-estate.sh" || { warn "clone-estate.sh failed — no network? n
 step "driftwood: KinD + Flux + signed source + reconcile" "$CLONE/driftwood/scripts/up.sh"
 
 # --- platform layers on the driftwood cluster (dependency order) ---------------
-# identity substrate first (SPIRE/Istio/OpenBao), then the engine (Kyverno +
-# flux-operator) the posture policies need, then everything that rides both.
+# identity substrate first (SPIRE/Istio/OpenBao), then the engine the posture policies need,
+# then everything that rides both. The engine is the one driftwood declares, because driftwood
+# owns this cluster (eco-system ticket 147, ADR-0033 point 2): talk/engine-up.sh installs Kyverno
+# from driftwood's own gitops/engine/kyverno.yaml, and flux-operator from the platform. The
+# platform's engine/up.sh is its reference install and runs on no named cluster. tuppence's
+# workload flagship below shares this cluster and this engine, so tuppence must declare the same
+# one; verify/adopter-engines asserts that. kind-tuppence and kind-ludlow run no engine.
 step "platform: identity substrate (SPIRE+Istio+OpenBao)" "$CLONE/platform/identity/up.sh"
-step "platform: engine (Kyverno + flux-operator)"     "$CLONE/platform/engine/up.sh"
+step "driftwood: engine (Kyverno from driftwood's declaration + flux-operator)" "$ROOT/talk/engine-up.sh" driftwood
 step "platform: posture projection (posture/vN in SVID path)" "$CLONE/platform/posture/up.sh"
 step "platform: graded enforcement envelope (cages)" "$CLONE/platform/graded/up.sh"
 # after graded, not before it (eco-system ticket 91): the controller re-cages a
