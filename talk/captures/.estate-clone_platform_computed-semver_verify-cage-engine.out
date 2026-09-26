@@ -1,28 +1,42 @@
   ok   selfcheck: with kyverno unreachable this script exits 3 and its last line is SKIP:
 selfcheck ok: dial_table parses the real cage-tier.yaml; UNCAGED sits at the top of the permissiveness lattice, every real tier below it, tighter tiers below looser ones; a dial tightening classifies major and names the moved corpus entries and the dial CEL expression (never an enumerated dial list); a widen-only change is patch; no change is none; one field regressing while another improves is still major (spec-level, not dial-level); priorityClass ranks on the ACTUAL assigned PriorityClass's real value, so a tier's pc field repointed at a different PriorityClass registers as major even with every other dial untouched (cs-21 regression guard); cage-tier added/removed fall out of the same per-pod comparison with no special case; the major detail is one sentence with no viability language; Track 1 reuses rederive_bumps.classify_policy unchanged; classify_repo reproduces the three known-good bumps; a whole-body release whose only movement is a policy removal computes patch; cs-16: a self-scoped pair (real render-version-tree.py bodies, real generated corpus, real kyverno apply) differing ONLY in the version literal classifies 'none', never the old spurious 'major' the vacuous self-scope match used to produce, and a real narrowing bundled with the same version bump still classifies 'major' -- the fix removes the artifact without suppressing real movement; ticket 09 item 2: the real v3.0.0 -> v4.0.0 cage release computes major against the real committed corpus and names both real reasons (the tier source moved to namespaceObject, so a governed Namespace with no tier falls closed to isolated and a forged pod label is clobbered; and the cage became tighten-only), and a body that starts writing false over a workload's own true -- invisible to a dial-table comparison, proven identical first -- classifies major as a loosening
-.........
+.......................
 ----------------------------------------------------------------------
-Ran 9 tests in 1.012s
+Ran 23 tests in 10.315s
 
 OK
 {
-  "schema": 1,
-  "scope": "published-cage-fixtures-v1",
+  "schema": 2,
+  "scope": "every-served-body-v1",
   "outcome": "passed",
-  "engine": {
-    "name": "kyverno",
-    "version": "1.18.2",
-    "sha256": "791e5a4a68e50823f0c101761acfa7976f49c4c073a8b3d1e15b4461a4e21124"
-  },
+  "graded_commit": "cb680f22eb46b0fab5e56844758242a2ab200975",
+  "engines": [
+    {
+      "name": "kyverno",
+      "version": "1.18.2",
+      "binary": "/home/runner/work/_temp/kyverno-engines/1.18.2/kyverno",
+      "sha256": "791e5a4a68e50823f0c101761acfa7976f49c4c073a8b3d1e15b4461a4e21124"
+    }
+  ],
+  "extra_engines": [],
+  "unusable_engines": [],
   "rows": [
     {
+      "subject": "policy 5.0.0",
+      "kind": "line",
       "policy_version": "5.0.0",
+      "declared": [
+        "1.18.2"
+      ],
+      "state": "published",
+      "ref": "refs/tags/policy/v5.0.0",
       "tag": "policy/v5.0.0",
       "array_commit": "597f214bcdf10a77c957debc7e8a7842e1156fb8",
       "tag_commit": "5b88f1d0bb33274e3348db93645d972c893b3c2c",
       "policy_tree": "a8468fb3e156f91f826750dd543ba6e1bfa99439",
-      "fixtures_tree": "1a5beae73c2259fd786d3a616ea9ad4de928938b",
       "policy_sha256": "6b61be47ded40234f73366ecaf9855c3dd58bb62b24f355a2fb04d91d3b2b9b5",
+      "fixtures_commit": "cb680f22eb46b0fab5e56844758242a2ab200975",
+      "fixtures_sha256": "a4381c7927f738b750fe6e952270f8943cccc89a6f05b40746d04f90de58f9b1",
       "api_versions": [
         "kustomize.config.k8s.io/v1beta1",
         "policies.kyverno.io/v1alpha1",
@@ -32,35 +46,474 @@ OK
         "kustomize.config.k8s.io/v1beta1",
         "policies.kyverno.io/v1alpha1"
       ],
-      "matrices": [
+      "bodies": [
+        "cage-netpol",
+        "cage-tier",
+        "posture-trust-boundary",
+        "require-nonroot",
+        "stamp-posture"
+      ],
+      "not_bodies": [
+        "kustomization.yaml",
+        "priorityclasses.yaml"
+      ],
+      "cells": [
         {
-          "family": "cage-tier",
+          "engine": "1.18.2",
+          "binary_sha256": "791e5a4a68e50823f0c101761acfa7976f49c4c073a8b3d1e15b4461a4e21124",
           "outcome": "passed",
-          "passed_assertions": 13,
-          "failed_assertions": 0,
-          "exit_code": 0,
-          "output_sha256": "4068eebab795c1baf9321ea0544b894de586b83a244df7bf14ac1625a14d91cb",
-          "diagnostic": null
+          "bodies": [
+            {
+              "family": "cage-netpol",
+              "policies": [
+                "cage-netpol-5-0-0"
+              ],
+              "body_sha256": "2f2b08fe6dace31742ff98a367f5100ea3220ef77bf43034aef30d2496439187",
+              "fixture": "graded/tests (adapted)",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "cage-netpol",
+                  "policies": [
+                    "cage-netpol-5-0-0"
+                  ],
+                  "fixture": "graded/tests (adapted)",
+                  "outcome": "passed",
+                  "passed_assertions": 11,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Ok": 9,
+                    "Excluded": 2
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "f89bdcbd4f87c0d4800918bea02e4ffa82fac10c49094d3e326438dc36513a7c",
+                  "diagnostic": null
+                }
+              ]
+            },
+            {
+              "family": "cage-tier",
+              "policies": [
+                "cage-tier-5-0-0"
+              ],
+              "body_sha256": "8088165d2909fe15880d696629e5d8e8431901156b9585c9954289e3346a28de",
+              "fixture": "graded/tests (adapted)",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "cage-tier",
+                  "policies": [
+                    "cage-tier-5-0-0"
+                  ],
+                  "fixture": "graded/tests (adapted)",
+                  "outcome": "passed",
+                  "passed_assertions": 13,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Ok": 13
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "7044ddbaa83c7e5e3d3343b9dedcf8b584753681e0821edfc3bcd0f39da80eed",
+                  "diagnostic": null
+                }
+              ]
+            },
+            {
+              "family": "posture-trust-boundary",
+              "policies": [
+                "posture-trust-boundary-5-0-0"
+              ],
+              "body_sha256": "877d087ffddb990240277a6723628074024eb058afec05576d7a9df6c5eac81a",
+              "fixture": "engine-fixtures",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "posture-trust-boundary",
+                  "policies": [
+                    "posture-trust-boundary-5-0-0"
+                  ],
+                  "fixture": "engine-fixtures",
+                  "outcome": "passed",
+                  "passed_assertions": 5,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Ok": 5
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "48e5fa6c66d1d5ccb373c779380b6ca3481d9a7730f406bfaad1726e7aac679c",
+                  "diagnostic": null
+                }
+              ]
+            },
+            {
+              "family": "require-nonroot",
+              "policies": [
+                "require-nonroot-5-0-0"
+              ],
+              "body_sha256": "83910bf37ef0d4125aca667370c267a9be4a8246ea2710d91d81b54c5e3501d7",
+              "fixture": "engine-fixtures",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "require-nonroot",
+                  "policies": [
+                    "require-nonroot-5-0-0"
+                  ],
+                  "fixture": "engine-fixtures",
+                  "outcome": "passed",
+                  "passed_assertions": 6,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Ok": 6
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "788e66347398bbfea7b92178b5cd56e9ead4e3dbc0fc530bf42cf1be59edb184",
+                  "diagnostic": null
+                }
+              ]
+            },
+            {
+              "family": "stamp-posture",
+              "policies": [
+                "stamp-posture-5-0-0"
+              ],
+              "body_sha256": "a5cb056c1dd132a002858b88d857eaadef86a4d2686fb0aae8ca782c40993c91",
+              "fixture": "engine-fixtures",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "stamp-posture",
+                  "policies": [
+                    "stamp-posture-5-0-0"
+                  ],
+                  "fixture": "engine-fixtures",
+                  "outcome": "passed",
+                  "passed_assertions": 5,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Ok": 5
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "638523b4489b3dcd5429dccc9ec3a2ede765782cbac380eb8d2b76fec7fd75af",
+                  "diagnostic": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "outcome": "passed"
+    },
+    {
+      "subject": "machinery",
+      "kind": "machinery",
+      "declaration": "distribution/machinery.yaml",
+      "declared": [
+        "1.18.2"
+      ],
+      "state": "graded commit",
+      "ref": "cb680f22eb46b0fab5e56844758242a2ab200975",
+      "members": [
+        {
+          "member": "policy-version-orphan-guard",
+          "kind": "ValidatingPolicy",
+          "out_path": "composed/orphan-guard.yaml"
         },
         {
-          "family": "cage-netpol",
+          "member": "governed-namespace-requires-claim",
+          "kind": "MutatingPolicy",
+          "out_path": "composed/governed-namespace-guard.yaml"
+        },
+        {
+          "member": "policy-version-orphan-cage",
+          "kind": "MutatingPolicy",
+          "out_path": "composed/orphan-cage.yaml"
+        },
+        {
+          "member": "policy-version-orphan-cage-holds",
+          "kind": "MutatingPolicy",
+          "out_path": "composed/orphan-cage-holds.yaml"
+        },
+        {
+          "member": "governed-namespace-cage-holds",
+          "kind": "MutatingPolicy",
+          "out_path": "composed/governed-namespace-holds.yaml"
+        },
+        {
+          "member": "governed-namespace-unclaimed-report",
+          "kind": "ValidatingPolicy",
+          "out_path": "composed/governed-namespace-report.yaml"
+        },
+        {
+          "member": "cage-netpol-bottom-rung",
+          "kind": "GeneratingPolicy",
+          "out_path": "composed/bottom-rung-netpol.yaml"
+        },
+        {
+          "member": "cage-isolated",
+          "kind": "PriorityClass",
+          "out_path": "composed/bottom-rung-priorityclass.yaml"
+        }
+      ],
+      "bodies": [
+        "cage-netpol-bottom-rung",
+        "governed-namespace-cage-holds",
+        "governed-namespace-requires-claim",
+        "governed-namespace-unclaimed-report",
+        "policy-version-orphan-cage-holds",
+        "policy-version-orphan-cage",
+        "policy-version-orphan-guard"
+      ],
+      "not_bodies": [
+        "cage-isolated.yaml"
+      ],
+      "fixtures_sha256": "db6842992fc0073ae9aa566b8f9408e64b4ab7c8bc84fceec6de369e3164ecb5",
+      "cells": [
+        {
+          "engine": "1.18.2",
+          "binary_sha256": "791e5a4a68e50823f0c101761acfa7976f49c4c073a8b3d1e15b4461a4e21124",
           "outcome": "passed",
-          "passed_assertions": 11,
-          "failed_assertions": 0,
-          "exit_code": 0,
-          "output_sha256": "ed644d21238b7796da935a39cdc9b3416464e571373990d0fec4d626249c4f34",
-          "diagnostic": null
+          "bodies": [
+            {
+              "family": "cage-netpol-bottom-rung",
+              "policies": [
+                "cage-netpol-bottom-rung"
+              ],
+              "body_sha256": "513b6e698cee971499b7f4d7be10ca2d5005416a64c740aaaec21f83c0c83294",
+              "fixture": "generates.yaml",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "cage-netpol-bottom-rung",
+                  "fixture": "generates.yaml",
+                  "outcome": "passed",
+                  "triggers": [
+                    {
+                      "trigger": "orphan-isolated",
+                      "documents": 1
+                    },
+                    {
+                      "trigger": "unclaimed-isolated",
+                      "documents": 1
+                    },
+                    {
+                      "trigger": "served-isolated",
+                      "documents": 0
+                    },
+                    {
+                      "trigger": "orphan-uncaged",
+                      "documents": 0
+                    },
+                    {
+                      "trigger": "orphan-baseline",
+                      "documents": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "family": "governed-namespace-cage-holds",
+              "policies": [
+                "governed-namespace-cage-holds"
+              ],
+              "body_sha256": "26c1fbe3775c161f39d3b84b535523c89b66c952d6bd029e55b17aa491a053f3",
+              "fixture": "engine-fixtures",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "governed-namespace-cage-holds",
+                  "policies": [
+                    "governed-namespace-cage-holds"
+                  ],
+                  "fixture": "engine-fixtures",
+                  "outcome": "passed",
+                  "passed_assertions": 2,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Excluded": 2
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "8eab4d3776e9caf2a59b31fd271ecf6dc7b6287aec1ccfee872829f6e55933ac",
+                  "diagnostic": null
+                }
+              ]
+            },
+            {
+              "family": "governed-namespace-requires-claim",
+              "policies": [
+                "governed-namespace-requires-claim"
+              ],
+              "body_sha256": "36d20bb4506a6ebe652e4ff8ea16d54851bba92a5b71c452d9b941e00dc4dec0",
+              "fixture": "engine-fixtures",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "governed-namespace-requires-claim",
+                  "policies": [
+                    "governed-namespace-requires-claim"
+                  ],
+                  "fixture": "engine-fixtures",
+                  "outcome": "passed",
+                  "passed_assertions": 3,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Ok": 2,
+                    "Excluded": 1
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "935406db1ce5ddb87e42b1e331346f97c1deb9f2d69b4704ae3ea03573acbfc3",
+                  "diagnostic": null
+                }
+              ]
+            },
+            {
+              "family": "governed-namespace-unclaimed-report",
+              "policies": [
+                "governed-namespace-unclaimed-report"
+              ],
+              "body_sha256": "71e29f290c8baa0155bfd0e08688a5657dd074b30953701668a95cfef8063eca",
+              "fixture": "engine-fixtures",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "governed-namespace-unclaimed-report",
+                  "policies": [
+                    "governed-namespace-unclaimed-report"
+                  ],
+                  "fixture": "engine-fixtures",
+                  "outcome": "passed",
+                  "passed_assertions": 3,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Ok": 2,
+                    "Excluded": 1
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "d6e701497762fd114caca3ff67d6fa25f80419c1d6fb77347da67d239d4c814c",
+                  "diagnostic": null
+                }
+              ]
+            },
+            {
+              "family": "policy-version-orphan-cage-holds",
+              "policies": [
+                "policy-version-orphan-cage-holds"
+              ],
+              "body_sha256": "1afa12b3a22a75a17ec3349e319b1011277046229ae6e4cc14b08a41bc76ba61",
+              "fixture": "engine-fixtures",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "policy-version-orphan-cage-holds",
+                  "policies": [
+                    "policy-version-orphan-cage-holds"
+                  ],
+                  "fixture": "engine-fixtures",
+                  "outcome": "passed",
+                  "passed_assertions": 3,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Excluded": 3
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "4ea91c2a52f8ee9b04640abf0f0e140863319cf4ba721b1d6437f4157d795a89",
+                  "diagnostic": null
+                }
+              ]
+            },
+            {
+              "family": "policy-version-orphan-cage",
+              "policies": [
+                "policy-version-orphan-cage"
+              ],
+              "body_sha256": "4991793c910a925f575e85b017050141a433d04af66403f0eb60a77bdd0d3f53",
+              "fixture": "engine-fixtures",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "policy-version-orphan-cage",
+                  "policies": [
+                    "policy-version-orphan-cage"
+                  ],
+                  "fixture": "engine-fixtures",
+                  "outcome": "passed",
+                  "passed_assertions": 3,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Ok": 3
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "b0183c1919257e929e7ae488094370f373844ca1aa94725062fd00380567b6f0",
+                  "diagnostic": null
+                }
+              ]
+            },
+            {
+              "family": "policy-version-orphan-guard",
+              "policies": [
+                "policy-version-orphan-guard"
+              ],
+              "body_sha256": "cbee0ad6ba2fbaf849f2f5647c5b0a6a2f519356d70ac59e12ed30608bc36574",
+              "fixture": "engine-fixtures",
+              "outcome": "passed",
+              "parts": [
+                {
+                  "family": "policy-version-orphan-guard",
+                  "policies": [
+                    "policy-version-orphan-guard"
+                  ],
+                  "fixture": "engine-fixtures",
+                  "outcome": "passed",
+                  "passed_assertions": 3,
+                  "failed_assertions": 0,
+                  "row_reasons": {
+                    "Ok": 3
+                  },
+                  "refusals": [],
+                  "exit_code": 0,
+                  "output_sha256": "2153c6b87d540241af1a18885ecee7f059bf0aa0f75b234018c1f1fa9d2ed0d2",
+                  "diagnostic": null
+                }
+              ]
+            }
+          ]
         }
       ],
       "outcome": "passed"
     }
   ],
   "limits": [
-    "Only the released cage-tier mutation and cage-netpol generation fixtures are graded; no complete policy, validation, Kubernetes admission or live network compatibility claim.",
+    "Offline Kyverno CLI only: no Kubernetes admission, no background controller, no live reach.",
     "Exact CLI versions only; no patch range, Kubernetes version or adopter runtime is inferred.",
+    "A cell grades the bodies the subject serves against their fixtures; a fixture proves what its rows assert and nothing else. The CLI evaluates every resource as a CREATE and cannot populate oldObject, so an UPDATE-only body is graded on compiling only.",
+    "Line fixtures under computed-semver/engine-fixtures/ are read from the graded commit, not from the tag, because a fixture can be written after its line was cut; the row records both. For cage-tier and cage-netpol the tag's own graded/tests fixture always runs as well.",
+    "A pass or fail row that kyverno test reads as Excluded (the policy was not applied to the resource) fails its body; a skip row may read Excluded.",
     "Tag signature verification remains the provenance gate; this check binds tag and array policy trees.",
-    "Executable SHA256 identifies this run; binary authenticity rests on the caller checksum pin.",
+    "Executable SHA256 identifies each binary; its authenticity rests on the caller checksum.",
     "This evidence changes no policy body, policy bump, money, or release authorization."
-  ]
+  ],
+  "ambiguous_engines": {},
+  "matrix": {
+    "policy 5.0.0": {
+      "1.18.2": "passed"
+    },
+    "machinery": {
+      "1.18.2": "passed"
+    }
+  }
 }
-PASS: published cage fixture compatibility -- passed
+subject       1.18.2          row
+policy 5.0.0  passed          passed
+machinery     passed          passed
+PASS: engine cells -- passed; 2 cell(s): 2 passed; graded platform commit cb680f22eb46b0fab5e56844758242a2ab200975: policy 5.0.0 from refs/tags/policy/v5.0.0 at 5b88f1d0bb33274e3348db93645d972c893b3c2c, machinery rendered by compose/composition.py at the graded commit; each body read by git archive at that ref and run by the kyverno binaries above

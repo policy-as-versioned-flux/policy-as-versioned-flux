@@ -1,0 +1,7 @@
+PASS: selfcheck: 12 planted estates grade as planted, including a pin on a row of the table that no served line supports
+PASS: hub truth.yml CLI names kyverno 1.18.2, a row of the engine table, with the row's checksum, listed by policy 5.0.0, machinery
+PASS: platform release.yml CLI names kyverno 1.18.2, a row of the engine table, with the row's checksum, listed by policy 5.0.0, machinery
+PASS: platform cut-release.yml CLI names kyverno 1.18.2, a row of the engine table, with the row's checksum, listed by policy 5.0.0, machinery
+PASS: platform reference install (engine/kyverno/helmrelease.yaml chart) names kyverno 1.18.2, a row of the engine table (chart 3.8.2), listed by policy 5.0.0, machinery
+PASS: hub test constant PINNED_KYVERNO (tests/test_cage_ladder_holes.py) names kyverno 1.18.2, a row of the engine table, listed by policy 5.0.0, machinery
+PASS: all 5 of the estate's own engine pins name a row of the platform engine table and a supported engine of every served line and of the machinery

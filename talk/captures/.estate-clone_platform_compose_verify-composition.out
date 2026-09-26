@@ -1,25 +1,25 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 11.412s
+Ran 11 tests in 11.335s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 8.160s
+Ran 9 tests in 8.131s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .............................
 ----------------------------------------------------------------------
-Ran 29 tests in 25.796s
+Ran 29 tests in 25.427s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 1.726s
+Ran 16 tests in 1.693s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)

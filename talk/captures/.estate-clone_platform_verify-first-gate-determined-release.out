@@ -2,7 +2,7 @@
 ok  selfcheck: evidence+no tag is a could-not-look; NO evidence with a RELEASED element (commit on the array, or a tag) is still a refusal, tagless checkout included; the gate-determines-the-number claim is not weakened
 
 == 1. the workflow is wired: the gate runs BEFORE the tag, and the evidence commit lands first ==
-ok  gate -> commit evidence -> correct the array -> tag -> push, in that order
+ok  gate -> engine cells -> commit evidence -> correct the array -> tag -> push, in that order
 
 == 2. every declared bump agrees with the gate's own evidence ==
 ok  policy/v5.0.0: declared 'major' == evidence 'major', computed 'major', outcome passed
