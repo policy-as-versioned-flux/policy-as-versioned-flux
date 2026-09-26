@@ -62,14 +62,21 @@ def compact(verdict: dict[str, Any]) -> dict[str, Any]:
     return {**verdict, "blast_radius": {k: v for k, v in radius.items() if k != "gating"}}
 
 
-def admit(graph: "Graph", perspective: dict[str, Any], component: str) -> dict[str, Any]:
-    """Does an impact at `component` enter this perspective's £, and on what evidence?"""
+def admit(graph: "Graph", perspective: dict[str, Any], component: str, *,
+          threshold: int | None = None) -> dict[str, Any]:
+    """Does an impact at `component` enter this perspective's £, and on what evidence?
+
+    `threshold` is the admission threshold in force for the party whose money this is: the
+    ladder's published one unless the party declared its own (eco-system ticket 141, ADR-0032:
+    one declaration governs both gates), which the caller reads off the loaded overlay.
+    """
     from .model import ModelError
 
     if component not in graph.components:
         raise ModelError(f"no component {component!r} in the graph of {graph.org!r}")
 
-    threshold = evidence.admission_threshold()
+    threshold = evidence.admission_threshold() if threshold is None \
+        else evidence.check_threshold(threshold)
     declared = cash_flows(perspective)
     out: dict[str, Any] = {
         "component": component,
