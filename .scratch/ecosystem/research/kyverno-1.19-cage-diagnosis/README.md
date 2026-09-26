@@ -102,3 +102,28 @@ skip rows cannot express a "generates nothing" check on 1.19.1.
 - `minimal/run.sh` needs `BIN` set to a directory that holds `bin/<version>/kyverno`.
   `verifier/minimal/run.sh` and the two drivers still name the scratch layout, so they document the
   runs and do not re-run from this directory.
+
+## Upstream status, read 2026-09-26
+
+The GitHub search was read-only. Nothing was posted upstream.
+
+- The cage-netpol reporting change is already reported upstream as kyverno/kyverno#17382 ("Kyverno
+  CLI 1.19.0 reports `Not found` instead of `skip` when a GeneratingPolicy match condition does
+  not match"), opened 2026-08-27.
+- PR #17388, "fix(cli): preserve GeneratingPolicy skips in test results", fixes it. It merged into
+  `main` on 2026-09-25 as 12ebba27 and closed #17382.
+- The fix is in the CLI only (`cmd/cli/kubectl-kyverno/processor/policy_processor.go`, +6 lines).
+  The CLI keeps an engine response for a GeneratingPolicy that does not match, and the test then
+  reports `Pass / Excluded`. The engine still returns no rule result on a `matchConditions` miss.
+- No release carries the fix. The newest release is v1.19.1 (2026-09-10). No commit on
+  `release-1.19` since 2026-09-01 touches `policy_processor.go`, and the PR search found no
+  backport.
+- For ValidatingPolicy, upstream PR #16588 (merged 2026-07-16) suppresses the PolicyReport `skip`
+  entries that a `matchConditions` miss produces. So the missing report entries under 1.19.1 for a
+  GeneratingPolicy follow the same direction, and upstream appears to intend them.
+- For the `MutatingPolicy` type check (item 1), the search found no upstream report. The nearest
+  item, #14341, is a GeneratingPolicy question about mixed types in one `dyn` map.
+
+What this changes here: when a Kyverno release carries #17388, a `result: skip` row passes again,
+as `Pass / Excluded`. That is the 1.18.2 path, which does not compare the status word (item 4). So
+ticket 149 keeps the fixture that compares generated documents (ADR-0033 point 6).

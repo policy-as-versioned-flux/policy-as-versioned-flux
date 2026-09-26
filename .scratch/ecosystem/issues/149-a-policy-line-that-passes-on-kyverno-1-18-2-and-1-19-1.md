@@ -80,3 +80,12 @@ and all three pass: 5.0.0 on 1.18.2, the new line on 1.18.2, and the new line on
   Ticket 150 measures that.
 - Under `kyverno apply -p`, 1.19.1 writes no pass PolicyReport entry for the two unmatched pods, and
   1.18.2 writes one for each. This is offline only.
+
+## Comments
+
+**2026-09-26, upstream status.** Upstream already tracks the `result: skip` change as
+kyverno/kyverno#17382. PR #17388 fixed it in the CLI on `main` on 2026-09-25, and no release carries
+the fix yet. The engine still returns no result on a `matchConditions` miss. When a release carries
+the fix, a `result: skip` row passes again as `Pass / Excluded`, which does not compare the status
+word. So item 4 stands: the fixture compares generated documents. Details are in the research
+README, section "Upstream status".
