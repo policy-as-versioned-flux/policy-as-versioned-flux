@@ -209,6 +209,22 @@ What the four pull requests build, item by item:
   `verify/real-signature/` read the `adopter gate` step and the job-level identity env of each
   `shift-left.yml`. Neither changed. They were read, not run.
 
+**What CI measured, on 2026-09-26.**
+
+- Each adopter pull request's `shift-left` and `compose-check` jobs pass (driftwood run
+  36242241671, tuppence 36242243112, ludlow 36242244410). The logs show the declared CLI's
+  `kyverno.tar.gz: OK`, "kyverno CLI 1.18.2: the engine gitops/engine/kyverno.yaml declares", the
+  8 `.github/tests` passing and "composed artefact matches the committed copy -- no drift". The
+  latest `shift-left` runs of ticket 143a's pull requests in the same repositories also pass.
+- The hub branch's `truth` workflow on `4fc814b` (Actions id 36242579517) printed a TRUTH line.
+  A branch run records nothing, so its figures are not citable: pass=88 fail=3 total=131 ceiling=112.
+  The newest recorded line on `main`, run 358 on `ef0edb9`, carries pass=88 fail=2 total=130 ceiling=111.
+  The two fails on both are `verify/forge-review/` and
+  `verify/schedules/`. The one more fail on the branch is the new row: it reads the adopters'
+  `origin/main`, where no declaration exists yet. Its selfcheck passed on the Linux runner. The
+  hub pull request's own truth run cannot pass that row before the three adopter pull requests
+  merge.
+
 **Not run live.** No KinD cluster ran. The Docker daemon on the owner's Mac was not running, and
 this builder did not start it, because other sessions share the machine and a Docker start can
 bring the named clusters back. So `talk/engine-up.sh` has not installed Kyverno on a real cluster.
