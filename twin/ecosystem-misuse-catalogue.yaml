@@ -32,7 +32,7 @@
 #
 # Versioned: bump `version` in the same commit as any change to an entry below.
 schema: twin.misuse-catalogue/v1
-version: 8
+version: 9
 entries:
   - id: publisher-games-own-feed-price
     risk: >-
@@ -278,3 +278,137 @@ entries:
       - "verify/priced-holes/priced_holes.py::def _workloads_at"
     source: eco-system ticket 120 (survivor 2 of 18); round one `loophole-2`, echoed by round
       two `loophole-3`; ADR-0026 point 4 and its rejected "grandfather clause"
+
+  # ---- the twin agent's four misuse paths (ADR-0031; eco-system ticket 30 decision 15,
+  # built by eco-system ticket 145). One ladder, a dial table per actor class: the platform's
+  # twin-agent table (platform/graded/cage.py TWIN_AGENT_TIERS and TWIN_AGENT_PATHS) names the
+  # loosest rung that closes each path, and a rung's reduction is DERIVED from what the paths
+  # still open at it can land on the adopter's own composed prices, never typed. Each row below
+  # says what its path reaches and why, and which served check reads the act. The platform side
+  # waits on ticket 145's platform tools release: when that ticket resolves, replace each row's
+  # `waits_on` with the platform anchors written beside it as comments (the estate clone then
+  # carries them), or verify-misuse.sh goes red by design.
+  - id: adopter-twin-writer-pushes-a-looser-declaration
+    risk: >-
+      The adopter's twin agent, acting with nobody at the keyboard, pushes a looser cage
+      declaration to `main` with the writer job's `contents: write` token: the governed Namespace
+      then serves a rung looser than its priced one, for every pod in it, until the gate reads it.
+    mechanism: >-
+      Path 1 of ticket 30 decision 15, closed at `isolated` only: the writer keeps the same token
+      at every rung it runs, so only the rung where the writer job does not run closes it. What it
+      reaches is the WHOLE declaration gap: platform/compose/composition.py `_twin_agent_reach`
+      derives 1.0, the gap being the adopter's own residual at the loosest pod rung minus its
+      residual at the selected rung, read off the same composition's `source: twin` line (decision
+      12), over the window until the hub's gate detects the act. The window is the gate's cadence,
+      `.github/workflows/truth.yml` once a day, copied with its source and assumptions into
+      platform/graded/cage.py `DETECTION_WINDOW`; the detection is verify/schedules/lane.py, which
+      since eco-system ticket 142a grades a push to `main` by a scheduled identity as a FAIL, and
+      verify/tier-binding, which grades a served declaration looser than its priced tier. The
+      frequency is the threat register's `scheduled-agent-misuses-write-credential` row (feeds
+      threat-register major 4): N x C / M, the one marketplace action the served sweep runs by
+      floating tag times the published 2025 compromise count over the marketplace population,
+      grade 3, with what it could not look at named on the row. The adopter's own selection policy
+      picks the rung over the residuals the table derives; the proposer proposes it and a human
+      merges the recompose that carries it. The composed `agent-cage` line (source: platform,
+      subject: twin-agent) carries the whole derivation, and verify/pound-seam leg 3b re-derives the
+      gap, the magnitude and the rung from it. Residual: the price is small because the window is
+      one day; it says nothing about a merge over a red gate by a person, which is the human's act.
+    anchors:
+      - "verify/schedules/lane.py::def grade_ref"
+      - "verify/pound-seam/pound_seam.py::AGENT_TABLE_PREFIX"
+      - "verify/pound-seam/pound_seam.py::def check_agent_cage"
+      - "docs/adr/0031-the-twin-agent-is-caged-by-a-dial-table-the-platform-prices-it-and-the-adopter-selects.md::The platform prices the cage; the adopter selects the rung"
+      # - "platform/graded/cage.py::TWIN_AGENT_PATHS"
+      # - "platform/graded/cage.py::DETECTION_WINDOW"
+      # - "platform/compose/composition.py::def _twin_agent_reach"
+      # - "feeds/threat-register/v4/feed.json::scheduled-agent-misuses-write-credential"
+    waits_on:
+      - ticket: "145"
+        for: the platform twin-agent table, the composed agent-cage line and the register row on a served platform tools tag and a signed threat-register/v4.0.0
+    source: eco-system ticket 30 decisions 11, 12 and 15; ADR-0031 decisions 3, 5 and 6; ticket 142a
+
+  - id: adopter-twin-writer-merges-or-tags-through-rest
+    risk: >-
+      The adopter's twin agent merges a pull request, or creates a tag or a release, through the
+      REST API with the writer job's token: a looser declaration lands on `main` by another door,
+      or an untagged render is made to look signed.
+    mechanism: >-
+      Path 2 of ticket 30 decision 15, closed at `isolated`. A REST merge lands the same looser
+      declaration path 1 pushes, so it reaches the same whole gap and the two do not add: a served
+      cage is one loss whichever door it came through, and platform/graded/cage.py
+      `twin_agent_reduce` takes the residual at a rung as what the LOOSEST path still open can
+      land. A REST tag signs only this party's own artefacts and moves no price under its own
+      perspective, so the tag half reaches none of the adopter's gap (what it could move sits under
+      another party's perspective, which this line never prices, ADR-0021). The detection is the
+      same gate: since eco-system ticket 142a, verify/schedules/schedules.py names every merge, tag
+      and release shape (`gh api .../pulls/N/merge`, `/releases`, `/git/refs`, `git update-ref`,
+      tag pushes, the GraphQL mutations) and verify/schedules/lane.py grades a merge made by a
+      scheduled identity as a FAIL. The rung that closes it is priced as path 1's is, on the same
+      `agent-cage` line.
+    anchors:
+      - "verify/schedules/lane.py::def grade_ref"
+      - "verify/schedules/schedules.py::_SIGNED_ARTEFACT"
+      - "verify/pound-seam/pound_seam.py::def check_agent_cage"
+      # - "platform/graded/cage.py::def twin_agent_reduce"
+      # - "platform/compose/composition.py::writer-merges-or-tags-through-rest"
+    waits_on:
+      - ticket: "145"
+        for: the platform twin-agent table and the reach derivation on a served platform tools tag
+    source: eco-system ticket 30 decisions 8 and 15; ADR-0031 decision 5; ticket 142a
+
+  - id: adopter-merges-a-misleading-twin-proposal
+    risk: >-
+      The adopter's twin agent opens a proposal pull request that misleads its reviewer (a render
+      or a rung that does not follow from the signed inputs), and a human merges it.
+    mechanism: >-
+      Path 3 of ticket 30 decision 15, closed at `quarantine`, where the twin writes an observation
+      line and no proposal. What it reaches is derived off the served pull-request gate, not
+      assumed: every adopter's `.github/workflows/shift-left.yml` runs platform
+      shift-left/tier_binding.py on every pull request, which refuses a declaration looser than
+      the strictest priced line clamped to the party's floor, so a proposal a human merges THROUGH
+      the gate serves none of the declaration gap, and platform/compose/composition.py
+      `_twin_agent_reach` derives 0.0 when it finds that workflow and a named could-not-look when
+      it does not. A merge over a red gate is the human's act, not the twin agent's (ADR-0031
+      decision 1: a skill a human runs is the human's act); the cage prices what the twin agent
+      does with nobody at the keyboard. Consequence, measured on the derived table: `quarantine`
+      carries the same residual as `restricted` and `baseline`, because the writer's token, still
+      held at every rung below `isolated`, reaches the whole gap on its own; the pound selects
+      `quarantine` for no reason of its own, and a party that wants it declares it as a floor.
+    anchors:
+      - "verify/tier-binding/tier_binding_estate.py::def owed"
+      - "verify/pound-seam/pound_seam.py::def check_agent_cage"
+      - "docs/adr/0031-the-twin-agent-is-caged-by-a-dial-table-the-platform-prices-it-and-the-adopter-selects.md::A skill a human runs is the human's act"
+      # - "platform/shift-left/tier_binding.py::def bind"
+      # - "platform/compose/composition.py::misleading-proposal-merged-by-a-human"
+    waits_on:
+      - ticket: "145"
+        for: the reach derivation on a served platform tools tag
+    source: eco-system ticket 30 decisions 11 and 15; ADR-0031 decisions 1 and 5; ticket 78
+
+  - id: adopter-twin-model-step-writes-a-wrong-binding-or-forecast
+    risk: >-
+      A model step of the adopter's twin (the local clock at grade 5) writes a wrong binding or a
+      wrong forecast into the twin's outputs, and a price moves on it.
+    mechanism: >-
+      Path 4 of ticket 30 decision 15, closed at `restricted`, where no model step runs and the
+      local clock does not run. It reaches about nothing on the price, and the reason is derived:
+      every price shows the weakest grade it rests on (ADR-0032 point 3, eco-system ticket 141),
+      the platform party schema admits `appetite.pricing_threshold` of 2 or 3 only, and a model's
+      claim is grade 5, which never prices (`twin/evidence-ladder.yaml`, invariant
+      `grade_5_only_path_never_prices`); platform/compose/composition.py `_twin_agent_reach`
+      derives 0.0 when no composed price rests on a grade above 3 and a named could-not-look
+      otherwise. Consequence, recorded in ADR-0031 and measured by platform/graded/cage.py's
+      selfcheck and by verify/pound-seam leg 3b on every composed line: `restricted` carries the
+      same residual as `baseline`, so the pound never selects it for its own sake. That is correct,
+      not a gap: the rung still exists for a party that declares it as a floor.
+    anchors:
+      - "twin/invariants/checks.py::grade_5_only_path_never_prices"
+      - "twin/evidence-ladder.yaml"
+      - "verify/pound-seam/pound_seam.py::restricted's residual"
+      - "docs/adr/0031-the-twin-agent-is-caged-by-a-dial-table-the-platform-prices-it-and-the-adopter-selects.md::because model claims never price today"
+      # - "platform/graded/cage.py::model-step-writes-a-wrong-binding-or-forecast"
+      # - "platform/party/schema.json::pricing_threshold"
+    waits_on:
+      - ticket: "145"
+        for: the reach derivation and the table's selfcheck on a served platform tools tag
+    source: eco-system ticket 30 decisions 11 and 15; ADR-0031 consequences; ADR-0032 point 3

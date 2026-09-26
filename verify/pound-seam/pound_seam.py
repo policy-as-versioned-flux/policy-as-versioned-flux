@@ -75,8 +75,14 @@ ISO4217 = re.compile(r"^[A-Z]{3}$")
 # `supersede` (eco-system ticket 84): the surcharge on a feed line whose pin sits behind a newer
 # tagged major, carried beside the line under the same perspective and currency, never summed
 # into the exposure; verify/supersede/ grades its arithmetic.
-KINDS = {"feed", "twin", "premium", "switching", "reliability", "supersede"}
+# `agent-cage` (eco-system ticket 145, ADR-0031): the PLATFORM's price of the twin agent's cage,
+# for a subject that is not a pod (`subject: twin-agent`), carried beside the exposure; its
+# `proposed_tier` is the twin agent's rung and never folds into a Namespace. Leg 3b grades it.
+KINDS = {"feed", "twin", "premium", "switching", "reliability", "supersede", "agent-cage"}
 SOURCES = {"ico", "feeds", "twin", "insurer", "platform"}   # plus any party name in the estate
+LADDER = ("baseline", "restricted", "quarantine", "isolated")
+AGENT_CAGE_KIND, AGENT_CAGE_SUBJECT = "agent-cage", "twin-agent"
+AGENT_TABLE_PREFIX = "platform-twin-agent-table@"
 AMOUNT_KEYS = ("amount", "total", "new_price", "old_price")
 # The statuses of a regime line the adopter has implemented (eco-system ticket 121).
 IMPLEMENTED = ("covered", "closed")
@@ -225,6 +231,92 @@ def check_doc(doc, ctx):
     else:
         out("PASS", f"{who}: publishes no forward-intel feed yet, so no twin entry is expected "
                     f"(named absence, not a silent pass)")
+
+    # 3b: the twin agent's cage line (eco-system ticket 145; ADR-0031). At most one, priced by
+    # the PLATFORM for the subject it names -- the twin never prices its own cage -- and, when
+    # priced, carrying the derivation the rung can be re-derived from: residuals at every rung
+    # under a named twin-agent table, what each misuse path reaches, the rungs that close them,
+    # the scenario (the gap read off THIS document's twin line, over a window with a source) and
+    # the register row's frequency. Check 3 counts `source: twin` lines and stays honest: this
+    # line's source is `platform`. An unpriced line was printed by leg 1 as a named SKIP; here it
+    # may propose no rung.
+    agents = [e for e in prices if e.get("kind") == AGENT_CAGE_KIND]
+    if len(agents) > 1:
+        out("FAIL", f"{who}: {len(agents)} `agent-cage` prices[] entries; the twin agent has one "
+                    f"cage and one line (eco-system ticket 145)")
+    for e in agents:
+        at = f"{who} prices[{prices.index(e)}] agent-cage"
+        if e.get("subject") != AGENT_CAGE_SUBJECT:
+            out("FAIL", f"{at}: names subject {e.get('subject')!r}, not {AGENT_CAGE_SUBJECT!r}; a "
+                        f"kind for a subject that is not a pod names its subject on the line")
+        if e.get("source") != "platform":
+            out("FAIL", f"{at}: priced by {e.get('source')!r}; the platform prices the twin agent's "
+                        f"cage and the twin never prices its own (ADR-0031 decision 5)")
+        if amount_of(e) is None:
+            if e.get("proposed_tier") is not None:
+                out("FAIL", f"{at}: could not be priced yet proposes rung {e.get('proposed_tier')!r}")
+            continue
+        missing = [f for f in ("proposed_tier", "residuals", "residual_basis", "reach", "closes",
+                               "scenario", "lef", "lef_from", "policy_version", "window")
+                   if e.get(f) in (None, {}, [], "")]
+        if missing:
+            out("FAIL", f"{at}: priced, but carries no {', '.join(missing)} -- the rung cannot be "
+                        f"re-derived from the line (ADR-0021)")
+            continue
+        tier, residuals = e["proposed_tier"], e["residuals"]
+        if tier not in LADDER:
+            out("FAIL", f"{at}: proposes rung {tier!r}, which is not on the ladder {list(LADDER)}")
+            continue
+        if not isinstance(residuals, dict) or set(residuals) != set(LADDER):
+            out("FAIL", f"{at}: residuals cover {sorted(residuals) if isinstance(residuals, dict) else residuals!r}, "
+                        f"not every rung {list(LADDER)}")
+            continue
+        if residuals.get(tier) is None:
+            out("FAIL", f"{at}: selected {tier!r}, a rung whose residual could not be derived")
+            continue
+        if not str(e["residual_basis"]).startswith(AGENT_TABLE_PREFIX):
+            out("FAIL", f"{at}: residual_basis {e['residual_basis']!r} names no twin-agent table "
+                        f"({AGENT_TABLE_PREFIX}<version>); pod reductions never price the twin agent")
+        if e.get("lef_from") != "threat-register":
+            out("FAIL", f"{at}: frequency comes from {e.get('lef_from')!r}, not the threat register "
+                        f"(ticket 30 decision 12)")
+        sc = e["scenario"]
+        twin = twins[0] if len(twins) == 1 else None
+        tres = (twin or {}).get("residuals") or {}
+        loosest, selected = sc.get("loosest_pod_tier"), sc.get("selected_pod_tier")
+        if twin is None or loosest not in tres or selected not in tres:
+            out("FAIL", f"{at}: its gap reads rungs {loosest!r} and {selected!r} off a twin line this "
+                        f"document does not carry residuals for")
+        elif selected != twin.get("proposed_tier"):
+            out("FAIL", f"{at}: its gap is read at pod rung {selected!r}, but the twin line selected "
+                        f"{twin.get('proposed_tier')!r}")
+        elif not close(float(sc.get("gap", -1)), float(tres[loosest]) - float(tres[selected])):
+            out("FAIL", f"{at}: gap {sc.get('gap')} is not the twin line's {loosest} residual "
+                        f"({tres[loosest]}) minus its {selected} residual ({tres[selected]})")
+        elif not (isinstance(sc.get("lm"), list) and len(sc["lm"]) == 3
+                  and all(close(float(x), float(sc["gap"]) * float(sc.get("window_days", 0)) / 365.25)
+                          for x in sc["lm"])):
+            out("FAIL", f"{at}: loss magnitude {sc.get('lm')} is not the gap {sc.get('gap')} times "
+                        f"the window ({sc.get('window_days')} day(s) of 365.25)")
+        elif not sc.get("window_source"):
+            out("FAIL", f"{at}: the detection window names no source")
+        elif sc.get("annualised_by") == "expectation" and not close(
+                amount_of(e),
+                (float(e["lef"][0]) + 4.0 * float(e["lef"][1]) + float(e["lef"][2])) / 6.0
+                * (float(sc["lm"][0]) + 4.0 * float(sc["lm"][1]) + float(sc["lm"][2])) / 6.0):
+            out("FAIL", f"{at}: amount {amount_of(e)} is not the PERT-mean frequency times the "
+                        f"PERT-mean magnitude the line says it was annualised by")
+        elif residuals["restricted"] != residuals["baseline"]:
+            out("FAIL", f"{at}: restricted's residual ({residuals['restricted']}) differs from "
+                        f"baseline's ({residuals['baseline']}); a model claim never prices, so the "
+                        f"model step closes no priced loss (ADR-0031 consequences)")
+        else:
+            out("PASS", f"{at}: the platform prices the twin agent's cage under {e['residual_basis']} "
+                        f"at rung {tier!r} (policy {e['policy_version']}), a gap of "
+                        f"{float(sc['gap']):,.2f} {e.get('currency')} between pod rungs "
+                        f"{loosest!r} and {selected!r} over {sc.get('window_days')} day(s), at "
+                        f"threat-register@{e.get('register_version')}'s frequency; restricted "
+                        f"carries baseline's residual and isolated {residuals['isolated']}")
 
     # 4: the regime entry's holes partition it. The regime entry is ico's `kind: feed`
     # price. ico's switching and supersede prices are not regime entries and carry no
@@ -641,6 +733,94 @@ def check_engine_agreement(estate, parties):
                     "nothing here observed that they agree")
 
 
+def check_agent_cage(estate, parties, adopters):
+    """Eco-system ticket 145 (ADR-0031 decisions 5 and 6), on each adopter's committed
+    evidence: the twin agent's rung is what the adopter's OWN selection-policy package picks
+    over the residuals the line carries and the party's own signed band and floor (the
+    two-implementations guard, as leg 9 applies it to the pod line); and platform's own
+    tier fold, run over the document with and without the line, moves the Namespace tier
+    not at all. An adopter whose evidence carries no such line was composed under a platform
+    tag that predates the kind: a NAMED could-not-look naming the pin, never a FAIL against
+    an adopter that has done nothing wrong, and never a PASS."""
+    wargamer_dir = os.path.join(estate, "platform", "wargamer")
+    if wargamer_dir not in sys.path:
+        sys.path.insert(0, wargamer_dir)
+    try:
+        import wargamer                                          # noqa: PLC0415
+    except Exception as exc:                                     # noqa: BLE001
+        wargamer, fold_why = None, f"platform/wargamer/wargamer.py could not be imported ({exc})"
+    else:
+        fold_why = None
+    for name in adopters:
+        ev = os.path.join(estate, name, "composed", "evidence.json")
+        if not os.path.exists(ev):
+            continue                                  # run() names the missing document
+        try:
+            with open(ev) as fh:
+                prices = json.load(fh).get("prices") or []
+        except (OSError, ValueError):
+            continue                                  # run() names the unreadable document
+        agents = [e for e in prices if e.get("kind") == AGENT_CAGE_KIND]
+        if not agents:
+            pin = _platform_pin(estate, name)
+            out("SKIP", f"{name}'s evidence carries no `agent-cage` line: it was composed under "
+                        f"platform {pin or 'an unrecorded pin'}, which predates the kind "
+                        f"(eco-system ticket 145). It waits on the owner's next signed platform "
+                        f"tag and on this adopter's pin moving to it; nothing here may be "
+                        f"re-rendered from an untagged branch")
+            continue
+        e = agents[0]
+        if amount_of(e) is None or e.get("proposed_tier") not in LADDER:
+            continue                                  # leg 1 printed the named SKIP; leg 3b the shape
+        doc = parties.get(name) or {}
+        tol = (doc.get("appetite") or {}).get("tolerance")
+        floor = (doc.get("overlay") or {}).get("floor")
+        pkg = os.path.join(estate, name, POLICY_PACKAGE, "selection_policy.py")
+        if not (isinstance(tol, dict) and "amount" in tol) or not os.path.exists(pkg):
+            out("FAIL", f"{name}: its agent-cage line names selection policy "
+                        f"{e.get('policy_version')!r} but the party signs no appetite.tolerance or "
+                        f"ships no {POLICY_PACKAGE}/selection_policy.py that could have picked "
+                        f"(ADR-0021)")
+            continue
+        try:
+            spec = importlib.util.spec_from_file_location(f"_sp_agent_{name}", pkg)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            candidates = {r: {"amount": v, "currency": e.get("currency")}
+                          for r, v in (e.get("residuals") or {}).items() if v is not None}
+            theirs = mod.select(candidates, {"amount": float(tol["amount"]),
+                                             "currency": str(tol["currency"])}, floor)["tier"]
+        except Exception as exc:                                 # noqa: BLE001
+            out("FAIL", f"{name}: its own {POLICY_PACKAGE} package could not re-pick the twin-agent "
+                        f"rung from the line's residuals: {exc}")
+            continue
+        if theirs != e["proposed_tier"]:
+            out("FAIL", f"{name}: the agent-cage line proposes {e['proposed_tier']!r} but {name}'s own "
+                        f"{POLICY_PACKAGE} package picks {theirs!r} over the same residuals and band "
+                        f"(ADR-0021: the package named is the package that picked)")
+            continue
+        if wargamer is None:
+            out("SKIP", f"{name}: the twin-agent rung re-derives ({theirs!r}), but whether it folds "
+                        f"into the Namespace could not be looked at: {fold_why}")
+            continue
+        try:
+            with_line = wargamer.select_party_tier(prices, current=None, floor=floor)
+            without = wargamer.select_party_tier([p for p in prices if p is not e],
+                                                 current=None, floor=floor)
+        except ValueError as exc:
+            out("FAIL", f"{name}: platform's tier fold refused this document: {exc}")
+            continue
+        if (with_line["tier"], with_line["lines"]) != (without["tier"], without["lines"]):
+            out("FAIL", f"{name}: the agent-cage line moves the Namespace fold from "
+                        f"{without['tier']!r} to {with_line['tier']!r}; a rung for the twin agent "
+                        f"never folds into a Namespace (ADR-0031 decision 6)")
+            continue
+        out("PASS", f"{name}: the twin-agent rung {theirs!r} is what {name}'s own {POLICY_PACKAGE} "
+                    f"package picks over the line's residuals and its signed band (floor "
+                    f"{floor!r}), and platform's tier fold gives the Namespace {without['tier']!r} "
+                    f"with the line and without it")
+
+
 def _policy_versions_named(estate, name):
     """The selection-policy versions this party's composed evidence attributes a tier to."""
     ev = os.path.join(estate, name, "composed", "evidence.json")
@@ -909,6 +1089,7 @@ def run(estate):
     if not adopters:
         out("FAIL", f"no adopter party in {estate}")
     check_ordinal_and_aggregate(estate, adopters)
+    check_agent_cage(estate, parties, adopters)
     for name in adopters:
         ev = os.path.join(estate, name, "composed", "evidence.json")
         if not os.path.exists(ev):
@@ -1138,6 +1319,74 @@ def selfcheck():
     doc, ctx = _good()
     doc["prices"].append(_switching("feeds", 10.0, could_not_look="no lef"))
     _grade(doc, ctx, "a price that carries both an amount and a could_not_look fails", True)
+
+    # --- eco-system ticket 145: the twin agent's cage line (leg 3b) ---
+    def _agent(**over):
+        """An `agent-cage` price shaped as composition.py price_twin_agent writes one, over the
+        _good() document's twin line (residuals 100 at baseline, 10 at isolated; selected isolated)."""
+        lef = [8e-5, 8e-5, 3e-4]
+        lm = 90.0 * 1.0 / 365.25
+        amount = (lef[0] + 4 * lef[1] + lef[2]) / 6 * lm
+        line = {"source": "platform", "kind": "agent-cage", "subject": "twin-agent", "name": "twin-agent",
+                "perspective": "driftwood", "currency": "GBP", "amount": amount,
+                "per_customer": {"amount": amount / 100, "currency": "GBP"},
+                "proposed_tier": "baseline", "old_tier": "baseline", "changed": False,
+                "residual_basis": "platform-twin-agent-table@1.0.0",
+                "residuals": {"baseline": amount, "restricted": amount, "quarantine": amount, "isolated": 0.0},
+                "reach": {"p1": 1.0, "p2": 1.0, "p3": 0.0, "p4": 0.0},
+                "closes": {"baseline": [], "restricted": ["p4"], "quarantine": ["p3", "p4"],
+                           "isolated": ["p1", "p2", "p3", "p4"]},
+                "scenario": {"gap": 90.0, "loosest_pod_tier": "baseline", "selected_pod_tier": "isolated",
+                             "window_days": 1.0, "window_source": "fixture truth.yml cron",
+                             "lm": [lm, lm, lm], "annualised_by": "expectation"},
+                "lef": lef, "lef_from": "threat-register", "register_version": "v4",
+                "policy_version": "1.0.0", "window": {"days": 1.0}}
+        line.update(over)
+        return line
+
+    def _with_agent(**over):
+        doc, ctx = _good()
+        doc["prices"][1].update(residuals={"baseline": 100.0, "restricted": 40.0,
+                                           "quarantine": 20.0, "isolated": 10.0},
+                                proposed_tier="isolated")
+        doc["prices"].append(_agent(**over))
+        return doc, ctx
+
+    _grade(*_with_agent(), "a priced agent-cage line with a re-derivable gap, magnitude, amount and "
+                            "rung passes leg 3b", False)
+    doc, ctx = _with_agent()
+    doc["prices"].append(_agent())
+    _grade(doc, ctx, "two agent-cage lines fail: one cage, one line", True)
+    _grade(*_with_agent(subject="namespace"), "an agent-cage line whose subject is not the twin "
+                                               "agent fails", True)
+    _grade(*_with_agent(source="twin"), "an agent-cage line priced by the twin fails: the twin never "
+                                         "prices its own cage", True)
+    _grade(*_with_agent(residual_basis="platform-cage-tiers@1.0.0"),
+           "an agent-cage line priced under the pod table fails", True)
+    _grade(*_with_agent(scenario=dict(_agent()["scenario"], gap=50.0)),
+           "a gap that is not the twin line's loosest minus selected residual fails", True)
+    _grade(*_with_agent(scenario=dict(_agent()["scenario"], selected_pod_tier="baseline", gap=0.0)),
+           "a gap read at a pod rung the twin line did not select fails", True)
+    _grade(*_with_agent(scenario=dict(_agent()["scenario"], lm=[1.0, 1.0, 1.0])),
+           "a magnitude that is not the gap times the window fails", True)
+    _grade(*_with_agent(amount=1.0, per_customer={"amount": 0.01, "currency": "GBP"}),
+           "an amount that is not the PERT-mean frequency times the magnitude fails", True)
+    _grade(*_with_agent(residuals={"baseline": 1.0, "restricted": 0.5, "quarantine": 0.5, "isolated": 0.0},
+                        amount=1.0, per_customer={"amount": 0.01, "currency": "GBP"},
+                        scenario=dict(_agent()["scenario"], annualised_by="simulation")),
+           "a restricted residual below baseline's fails: a model claim never prices", True)
+    _grade(*_with_agent(proposed_tier="paranoid"), "an off-ladder twin-agent rung fails", True)
+    _grade(*_with_agent(residuals={"baseline": 1.0}), "residuals that do not cover every rung fail", True)
+    _grade(*_with_agent(lef_from="editorial"), "a frequency not from the threat register fails", True)
+    _grade(*_with_agent(amount=None, per_customer=None, proposed_tier="baseline",
+                        could_not_look="missing instrument: fixture"),
+           "an unpriced agent-cage line that still proposes a rung fails", True)
+    _grade(*_with_agent(amount=None, per_customer=None, proposed_tier=None,
+                        could_not_look="missing instrument: threat-register@v2 publishes no row"),
+           "an unpriced agent-cage line naming why is a SKIP, never a FAIL", False, want_skip=True)
+    doc, ctx = _with_agent()
+    del doc["prices"][-1]["residuals"]
+    _grade(doc, ctx, "a priced agent-cage line with no residuals fails: the rung cannot be re-derived", True)
 
     LINES.clear()
     print("ok  selfcheck: labelling, per-customer, twin edge, hole partition, mixed sums, "
