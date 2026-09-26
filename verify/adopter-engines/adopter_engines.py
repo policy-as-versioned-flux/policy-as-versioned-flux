@@ -66,6 +66,13 @@ _CTX = re.compile(r'^\s*CTX="\$\{CTX:-kind-(?P<name>[A-Za-z0-9][A-Za-z0-9-]*)\}"
 _SOURCES_LIB = re.compile(r'^\s*(?:source|\.)\s+"?\$\(dirname "\$\{BASH_SOURCE\[0\]\}"\)/lib\.sh"?\s*$', re.M)
 _CLUSTER = re.compile(r'^CLUSTER=(?P<name>[A-Za-z0-9][A-Za-z0-9-]*)\s*$', re.M)
 _CREATES = re.compile(r'kind create cluster --name "?\$\{?CLUSTER\}?"?')
+# The check places a script by the cluster its own default names, and it reads `step` calls only.
+# So talk/up.sh may not override CTX, and may not run an estate or hub script outside a step:
+# either would move work to a cluster this check never reads, and it fails closed on both.
+_SCRIPT = re.compile(r'\$\{?(?:CLONE|ROOT)\}?/[^"\s;)]+\.sh')
+_CTX_SET = re.compile(r'(?:^|[\s;&|(])(?:export\s+|local\s+|declare\s+(?:-\w+\s+)?)?CTX=')
+# Runs outside a step and targets no cluster: it clones the estate this check reads.
+_BARE_ALLOWED = {"$ROOT/clone-estate.sh"}
 
 
 class CouldNotLook(Exception):
@@ -172,6 +179,22 @@ def steps(up_sh: Path) -> list[tuple[str, list[str]]]:
     return out
 
 
+def unread(up_sh: Path) -> list[str]:
+    """Lines of talk/up.sh that could put work on a cluster this check does not read: a CTX
+    override, or an estate or hub script run outside a `step` call."""
+    out = []
+    for n, line in enumerate(up_sh.read_text().splitlines(), 1):
+        if line.lstrip().startswith("#"):
+            continue
+        if _CTX_SET.search(line):
+            out.append(f"line {n} sets CTX, which moves a script off the cluster its own default names")
+        if not _STEP.search(line):
+            for script in _SCRIPT.findall(line):
+                if script not in _BARE_ALLOWED:
+                    out.append(f"line {n} runs {script} outside a step call")
+    return out
+
+
 # ------------------------------------------------------------------------------ the grade
 
 def grade(hub: Path, estate: Path) -> tuple[int, list[str]]:
@@ -219,8 +242,12 @@ def grade(hub: Path, estate: Path) -> tuple[int, list[str]]:
     engines: dict[str, str] = {}
     try:
         called = steps(up_sh)
+        hidden = unread(up_sh)
     except OSError as exc:
         return 1, lines + [f"FAIL: talk/up.sh is not readable ({exc.strerror}), so no cluster's engine can be traced"]
+    for why in hidden:
+        fail(f"talk/up.sh {why}, and this check reads each script's cluster from its default and "
+             "reads step calls only, so it cannot show where that work runs")
     for script, args in called:
         if script.startswith("$ROOT/"):
             if script == f"$ROOT/{ENGINE_UP}":
@@ -422,6 +449,18 @@ def selfcheck() -> int:
              "extra": {("tuppence", "reset/up.sh"): 'CTX="${CTX:-kind-tuppence}"\n'}}, 0,
             "no named cluster is used by more than one adopter (kind-driftwood: driftwood; kind-ludlow: ludlow; "
             "kind-tuppence: tuppence"),
+        "a CTX override moves the engine to another cluster": (
+            {"up_sh": UP_SH.replace('step "driftwood: Kyverno', 'CTX=kind-tuppence step "driftwood: Kyverno')}, 1,
+            "sets CTX, which moves a script off the cluster its own default names"),
+        "a platform layer put on kind-ludlow by a CTX override": (
+            {"up_sh": UP_SH + 'CTX=kind-ludlow step "platform: posture" "$CLONE/platform/posture/up.sh"\n'}, 1,
+            "sets CTX"),
+        "the reference install run outside a step": (
+            {"up_sh": UP_SH + 'bash "$CLONE/platform/engine/up.sh"\n'}, 1,
+            "runs $CLONE/platform/engine/up.sh outside a step call"),
+        "an exported CTX": ({"up_sh": "export CTX=kind-ludlow\n" + UP_SH}, 1, "line 1 sets CTX"),
+        "clone-estate.sh outside a step is allowed": (
+            {"up_sh": 'bash "$ROOT/clone-estate.sh" || exit 1\n' + UP_SH}, 0, None),
         "the owner of an engine declares none": (
             {"declarations": {"driftwood": None}}, 1,
             "installs kind-driftwood's engine from driftwood's gitops/engine/kyverno.yaml, and driftwood "

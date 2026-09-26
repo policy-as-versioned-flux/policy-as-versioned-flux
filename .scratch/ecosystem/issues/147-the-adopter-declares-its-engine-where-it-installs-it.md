@@ -236,3 +236,16 @@ is current, `talk/up.sh` installs `kind-driftwood`'s engine from driftwood's fil
 the file and the header on each adopter's `origin/main`, and the hub check passing on the hub.
 After the merges and a scheduled run: a scheduled drift sample on each adopter that installed
 Kyverno from the file. A dispatched run does not count. This ticket is not resolved until then.
+
+**2026-09-26, the integrator, before the merge.** Review round 1 approved with two minor findings.
+The first is expected: the hub PR's truth run reads one more FAIL (`verify/adopter-engines`) until
+the three adopter PRs merge. The second was a green line that claimed more than it measured.
+Assertion (c) read only `step` calls and placed each script by its own `CTX` default, so three
+plants on `talk/up.sh` stayed green: a `CTX=` override in front of the engine step, a platform
+layer put on `kind-ludlow` by a `CTX=` override, and a bare `bash "$CLONE/platform/engine/up.sh"`.
+The check now fails closed on any `CTX` assignment in `talk/up.sh`, and on any estate or hub script
+run outside a `step` call. `$ROOT/clone-estate.sh` is the one exception, because it targets no
+cluster. The selfcheck gained five plants, the three above plus an exported `CTX` and the allowed
+`clone-estate.sh` line: "PASS: selfcheck: 22 planted estates grade as planted". Over the
+branch-head estate the check still reads PASS on all its assertions.
+
