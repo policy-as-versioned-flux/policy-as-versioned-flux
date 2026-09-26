@@ -88,19 +88,19 @@ Done when: you can state the two feed versions, the adopter, and how many pool e
 
 ## 1. Derive the moves — never the levels
 
-For market-moves, the series is what is published and a **move** is what a consumer derives:
+For market-moves, the series is what is published and a **move** is what a consumer derives.
+From the hub root:
 
 ```
-python3 - <<'PY'
-import json, sys; sys.path.insert(0, ".")   # the hub root, where the twin package lives
-from twin.market_signals import PriceObservation, price_moves, move_statement
-feed = json.load(open(".estate-clone/feeds/market-moves/v1/feed.json"))
-obs = [PriceObservation(mid, m["venue"], p["date"], p["price_level"])
-       for mid, m in feed["payload"]["markets"].items() for p in m["observations"]]
-for move in price_moves(obs):
-    print(move.to_date, f"{move.delta:+.2f}", move_statement(move))
-PY
+python3 -m twin.market_signals moves --feeds .estate-clone/feeds
 ```
+
+(`--major N` for a pinned major other than 1; on the local clock the feeds are under the estate
+the headless note names.) That is `twin.market_signals.price_moves` over the envelope's
+`payload.markets.<id>.observations[]`, one line per consecutive dated move: the date, the delta
+and `move_statement`'s sentence. It is a named program on purpose (ticket 142): the local clock's
+child may run only named scripts, and the inline `python3 - <<'PY'` heredoc this step used to
+carry is exactly what that rule cannot admit.
 
 A price **level** is never a probability. `twin/market_signals.as_probability` refuses outright,
 and so do you: the favourite-longshot bias makes a level a biased estimator of unknown scale,

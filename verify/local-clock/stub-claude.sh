@@ -46,13 +46,25 @@
 #   signoff  a Signed-off-by trailer naming a person -- refused
 #   signoff2 the same trailer on line 2 of a one-paragraph message (no blank line) -- refused
 #   coauthor a Co-authored-by whose value names a person AND the clock -- refused
-#   globalcfg  `git config --global` (run under a throwaway GIT_CONFIG_GLOBAL) -- refused
+#   globalcfg  `git config --global` -- lands in the child's clock-only global config and is
+#            refused by key; the owner's file and the clock's own global are never reached
 #   bodysig  the word gpgsig in the message BODY -- admitted: it is text, not a header
+#   pushprobe  (ticket 142 item 3) as claim, and BEFORE committing try every push a model could
+#            make from inside the child -- an adopter push from inside `python3`
+#            (subprocess.run), an https push, an ssh push -- plus `git remote-https`, the
+#            osxkeychain helper, `gh auth status` and `gh auth token`, and record each result
+#            in $LOCAL_CLOCK_HOME/push-probe.out for the test to read. Every one must fail
+#            before any credential is consulted, and origin must be unmoved
 # LOCAL_CLOCK_INJECTED (set by the clock on a rehearsal) makes the claim say injected: true.
 # Every invocation touches $LOCAL_CLOCK_HOME/model-was-called first, so a test can prove the
-# clock refused BEFORE the model ran. This is a stand-in and says so in its result line.
+# clock refused BEFORE the model ran, and writes its argv (one per line) to
+# $LOCAL_CLOCK_HOME/claude-argv, so a test can read the flags the clock passed. This is a
+# stand-in and says so in its result line.
 set -euo pipefail
-if [ -n "${LOCAL_CLOCK_HOME:-}" ]; then mkdir -p "$LOCAL_CLOCK_HOME"; touch "$LOCAL_CLOCK_HOME/model-was-called"; fi
+if [ -n "${LOCAL_CLOCK_HOME:-}" ]; then
+  mkdir -p "$LOCAL_CLOCK_HOME"; touch "$LOCAL_CLOCK_HOME/model-was-called"
+  printf '%s\n' "$@" >"$LOCAL_CLOCK_HOME/claude-argv"
+fi
 # This stand-in's own commits and tags run no hook (ticket 92 follow-up R2): the owner's global
 # core.hooksPath runs a network secret scan on every commit, and its quota refusal is not a
 # fact about the clock. The real model's commits DO run the owner's hooks; the clock under
@@ -157,6 +169,27 @@ EOF
 EOF
 } >"$claim"
 if [ "$what" = dirty ]; then echo '{"type":"result","result":"LOCAL-CLOCK: failed ran out of turns"}'; exit 0; fi
+if [ "$what" = pushprobe ]; then
+  # Plain `git` and `python3` from PATH, on purpose: this is what a model would run, not this
+  # file's hook-free wrapper. Each line is `<probe>: <first 200 chars of what happened>`.
+  probe() { local name="$1"; shift; printf '%s: ' "$name"; { "$@" </dev/null 2>&1 || true; } | tr '\n' ' ' | cut -c1-200 | sed 's/ *$//'; echo; }
+  {
+    probe "env GH_TOKEN" sh -c 'echo "${GH_TOKEN:-unset}"'
+    probe "env GITHUB_TOKEN" sh -c 'echo "${GITHUB_TOKEN:-unset}"'
+    probe "env SSH_AUTH_SOCK" sh -c 'echo "${SSH_AUTH_SOCK:-unset}"'
+    probe "env GIT_ALLOW_PROTOCOL" sh -c 'echo "${GIT_ALLOW_PROTOCOL:-unset}"'
+    probe "env GIT_EXEC_PATH entries" sh -c 'ls -A "${GIT_EXEC_PATH:-/nonexistent}" | wc -l | tr -d " "'
+    probe "credential.helper" command git config --show-origin --get-all credential.helper
+    probe "push origin (python3 subprocess)" python3 -c 'import subprocess, sys; r = subprocess.run(["git", "-C", sys.argv[1], "push", "origin", "HEAD:refs/heads/probe-pushed-by-the-child"], capture_output=True, text=True); print("rc", r.returncode, r.stderr.strip())' "$wt"
+    probe "push https (python3 subprocess)" python3 -c 'import subprocess, sys; r = subprocess.run(["git", "-C", sys.argv[1], "push", "https://github.invalid/stub/driftwood.git", "HEAD:refs/heads/probe"], capture_output=True, text=True); print("rc", r.returncode, r.stderr.strip())' "$wt"
+    probe "push ssh" command git -C "$wt" push git@github.invalid:stub/driftwood.git HEAD:refs/heads/probe
+    probe "ls-remote origin" command git -C "$wt" ls-remote origin
+    probe "remote-https" command git remote-https origin https://github.invalid/stub/driftwood.git
+    probe "credential-osxkeychain" command git credential-osxkeychain get
+    probe "gh auth status" gh auth status
+    probe "gh auth token" gh auth token
+  } >"${LOCAL_CLOCK_HOME:?}/push-probe.out"
+fi
 git -C "$wt" add -- "twin/claims"
 if [ "$what" = leak ]; then mkdir -p "$wt/composed"; echo "tier: 3" >"$wt/composed/x.yaml"; git -C "$wt" add -- composed; fi
 # The identity and the no-signature come from the environment the clock set (GIT_AUTHOR_*,
