@@ -54,7 +54,11 @@ env:
   # kyverno-1.18-cage-facts.md). The gate must observe with the estate's own toolchain, or its
   # reds report the instrument, not the estate. An unpinned `latest` download silently became
   # 1.19.0 (db47f88 was a URL fix, not a version decision) and reddened three checks for two
-  # recorded runs. 1.19 compatibility is real work with its own ticket, not an instrument fix.
+  # recorded runs. This is the CLI on PATH that every check calls. Since ticket 146 (ADR-0033)
+  # it must be a row of platform engine/kyverno/engine-table.yaml, carry that row's checksum and
+  # be a supported engine of every served line and of the machinery, which
+  # verify/estate-engines/ asserts. The cage-engine grader also gets one binary per engine in the
+  # table, installed by a step of its own below.
   KYVERNO_VERSION: 1.18.2
   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
   COSIGN_VERSION: 3.1.3
@@ -299,6 +303,59 @@ jobs:
           tar xzf flux.tar.gz flux && chmod +x flux && sudo mv flux /usr/local/bin/flux
           rm -f flux.tar.gz
           flux --version
+      # --- one binary per engine the platform table lists (ticket 146 item 6) -----------------
+      # talk/verify-all.sh assembles the estate itself, and skips a unit already cloned, so doing
+      # it here first changes nothing it grades. It is here because the next step reads the
+      # platform's engine table. The tags are fetched explicitly: the cage-engine grader reads
+      # every cut line from its annotated policy/vX.Y.Z tag, and a checkout that lacks one reads
+      # could-not-look (a clone fetches tags today; this makes that a stated requirement).
+      - name: assemble the estate checkout, with the platform's tags
+        run: |
+          set -euo pipefail
+          bash clone-estate.sh
+          git -C .estate-clone/platform fetch --quiet --tags origin
+          git -C .estate-clone/platform tag --list 'policy/v*' | tail -n 3
+      # ADR-0033 point 4: one grader run grades every cell, so the gate hands it one binary per
+      # engine. Each is downloaded from the release, checked against the table's linux_x86_64
+      # sha256, and must report the row's version. They go to RUNNER_TEMP, not PATH, so the CLI
+      # every other check calls is still KYVERNO_VERSION above. A table the platform does not
+      # carry installs nothing: the grader then reads a listed cell with no binary as
+      # could-not-look, and verify/estate-engines names the missing table.
+      - name: every engine the platform engine table lists, by the table's checksum
+        run: |
+          set -euo pipefail
+          table=.estate-clone/platform/engine/kyverno/engine-table.yaml
+          if [ ! -f "$table" ]; then
+            echo "::warning::$table is absent: no engine is installed for the cage-engine grader"
+            exit 0
+          fi
+          dest="$RUNNER_TEMP/kyverno-engines"
+          mkdir -p "$dest"
+          python3 - "$table" >"$RUNNER_TEMP/engine-rows.txt" <<'PY'
+          import re, sys, yaml
+          for row in yaml.safe_load(open(sys.argv[1]))["versions"]:
+              art = row["cli"]["linux_x86_64"]
+              version, sha = str(row["version"]), str(art["sha256"])
+              # A malformed checksum line is not a mismatch to sha256sum: it can warn and pass.
+              if not re.fullmatch(r"\d+\.\d+\.\d+", version) or not re.fullmatch(r"[0-9a-f]{64}", sha):
+                  sys.exit("the engine table row %r carries no exact version or no sha256" % version)
+              url = "https://github.com/kyverno/kyverno/releases/download/v%s/%s" % (version, art["file"])
+              print(version, url, sha)
+          PY
+          while read -r version url sha; do
+            curl -fsSL -o "$dest/cli.tgz" "$url"
+            echo "${sha}  $dest/cli.tgz" | sha256sum -c -
+            mkdir -p "$dest/$version"
+            tar -xzf "$dest/cli.tgz" -C "$dest/$version" kyverno
+            rm -f "$dest/cli.tgz"
+            # Captured first: `grep -q` stops reading at its match, and under pipefail the CLI's
+            # SIGPIPE would fail a binary that reported the right version.
+            reported="$("$dest/$version/kyverno" version)"
+            grep -qE "^Version: v?${version}\$" <<<"$reported" \
+              || { echo "::error::the $version archive's binary reports another version"; exit 1; }
+            echo "installed kyverno $version at $dest/$version/kyverno"
+          done <"$RUNNER_TEMP/engine-rows.txt"
+          echo "KYVERNO_ENGINE_DIR=$dest" >>"$GITHUB_ENV"
       - name: the gate
         id: gate
         continue-on-error: true
