@@ -22,6 +22,14 @@ version: 2
 # This is a threshold on the ladder, not a switch. A weaker claim is still representable, still
 # traversable and still visible in the output — it produces an unpriced structural blast radius
 # instead of a number.
+#
+# This is the estate default (ADR-0032 point 1, eco-system ticket 141). A party may declare, on
+# its own signed party artefact (`appetite.pricing_threshold`), that it prices on grade 3:
+# published work, not observed here. Only 2 and 3 can be declared (`twin/evidence.py`
+# `DECLARABLE_THRESHOLDS`); 4 and 5 never price for anybody. The declaration governs both
+# thresholds in this file for that party only, and every price shows the weakest grade it rests
+# on. So `may_price` below is what each rung may do under the default; the artefact's `gating`
+# block says which thresholds were actually applied and on what basis.
 pricing_threshold: 2
 
 # What may enter the £ at all (build ticket 29, decision ticket 09 Q4). An impact prices only if a

@@ -1,0 +1,659 @@
+"""An adopter declares the grade it prices on (eco-system ticket 141, ADR-0032).
+
+Four things, each planted and each read back off the artefact rather than off the code:
+
+1. the declaration: `appetite.pricing_threshold` on a party artefact is 2 or 3, absent means the
+   ladder's 2, and every other value is refused by name;
+2. the gate: an amount at grade 3 loads and prices only for a party that declared 3, and every
+   overlay that declares nothing behaves exactly as it did, the pocket org included;
+3. the weakest grade: every price carries `rests_on_grade`, the one order statistic ADR-0024
+   point 6 admits, and the `gating` block says which thresholds were applied and why;
+4. a synthetic record never raises a grade: a planted regrade that strengthens an edge on a
+   synthetic drill goes red at the pricing gate whatever the file declares, whether the edge is
+   on the propagation path or on the path that admits the figure to the £; so does a valuation
+   whose basis rests on one, a mitigation claim that rests on one, and the same valuation or
+   admitting path under `twin exposure`. Each plant has a control with real records that prices.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from twin import evidence, fixtures, pricing, synthetic, verbs
+from twin.evidence import EvidenceError
+from twin.grades import Capabilities
+from twin.model import Overlay
+from twin.repo import ModelRepo
+from twin.schema import SchemaError, validate
+
+OPERATOR = "the-operator"
+PRICED_ORIGIN, REFUSED_ORIGIN = "order-service", "shared-database"
+GRADE_3_EDGE = "orgs/pocket/edges/database-slows-orders.yaml"
+OPERATOR_FILE = "orgs/pocket/perspectives/the-operator.yaml"
+
+PERSPECTIVE = {
+    "id": "planted", "name": "Planted", "party": "employer", "pays": "somebody",
+    "ruin": {"insolvency": "a boundary"}, "cash_flow": ["a-component"],
+}
+
+
+def _plant(root: Path, files: dict[str, str], message: str) -> None:
+    fixtures._write(root, files)
+    fixtures.git(root, "add", "-A")
+    fixtures.git(root, "commit", "-q", "-m", message)
+
+
+def _rewrite(root: Path, rel: str, old: str, new: str) -> None:
+    path = root / rel
+    text = path.read_text(encoding="utf-8")
+    assert old in text, f"{rel} no longer carries {old!r}; this test lost its subject"
+    path.write_text(text.replace(old, new), encoding="utf-8", newline="\n")
+
+
+@pytest.fixture()
+def pocket(tmp_path: Path) -> Path:
+    return fixtures.build_pocket_org(tmp_path / "pocket")
+
+
+def _price(root: Path, origin: str, threshold: int | None = None, perspective: str = OPERATOR) -> dict:
+    overlay = Overlay.load(ModelRepo.open(root), "pocket", pricing_threshold=threshold)
+    return pricing.price(overlay.graph(), overlay.perspectives[perspective], origin,
+                         overlay.responses, overlay)
+
+
+# -- 1. the declaration -----------------------------------------------------------------------
+
+
+def test_only_two_and_three_can_be_declared() -> None:
+    assert evidence.DECLARABLE_THRESHOLDS == (2, 3)
+    assert evidence.check_threshold(2) == 2 and evidence.check_threshold(3) == 3
+
+
+@pytest.mark.parametrize("bad", [1, 4, 5, 0, -3, "3", 3.0, True, False, None, [3], {"grade": 3}])
+def test_every_other_threshold_is_refused_by_name(bad: object) -> None:
+    with pytest.raises(EvidenceError, match="appetite.pricing_threshold"):
+        evidence.check_threshold(bad)
+
+
+def test_the_declaration_is_read_off_the_party_artefact() -> None:
+    assert evidence.declared_threshold(None) == evidence.threshold() == 2
+    assert evidence.declared_threshold({}) == 2
+    assert evidence.declared_threshold({"appetite": {"tolerance": {"amount": 1, "currency": "GBP"}}}) == 2
+    assert evidence.declared_threshold({"appetite": {"pricing_threshold": 2}}) == 2
+    assert evidence.declared_threshold({"appetite": {"pricing_threshold": 3}}) == 3
+
+
+@pytest.mark.parametrize("bad", [1, 4, 5, "3", 3.0, True])
+def test_a_declaration_outside_the_admitted_values_is_refused_not_clamped(bad: object) -> None:
+    with pytest.raises(EvidenceError, match=r"driftwood/party.yaml: pricing threshold"):
+        evidence.declared_threshold({"appetite": {"pricing_threshold": bad}}, where="driftwood/party.yaml")
+
+
+def test_an_appetite_that_is_not_a_mapping_is_refused() -> None:
+    with pytest.raises(EvidenceError, match="appetite is not a mapping"):
+        evidence.declared_threshold({"appetite": 3})
+    with pytest.raises(EvidenceError, match="is a mapping"):
+        evidence.declared_threshold(["appetite"])
+
+
+def test_may_price_takes_the_declaration_and_never_a_grade_nobody_may_declare() -> None:
+    assert evidence.may_price(3) is False
+    assert evidence.may_price(3, threshold=3) is True
+    assert evidence.may_price(3, threshold=2) is False
+    assert evidence.may_price(4, threshold=3) is False
+    assert evidence.may_price(5, threshold=3) is False
+    with pytest.raises(EvidenceError):
+        evidence.may_price(4, threshold=4)
+
+
+# -- 3. the weakest grade, and what was applied --------------------------------------------------
+
+
+def test_weakest_is_an_order_statistic_and_nothing_else() -> None:
+    assert evidence.weakest(2, 3) == 3
+    assert evidence.weakest(3, 2, 1) == 3
+    assert evidence.weakest(1, 1) == 1
+    assert evidence.weakest(None, 2) == 2
+    assert evidence.weakest() is None
+    assert evidence.weakest(None) is None
+    with pytest.raises(EvidenceError, match="not on the ladder"):
+        evidence.weakest(2, 6)
+
+
+def test_applied_names_the_basis_of_the_thresholds_in_force() -> None:
+    default = evidence.applied()
+    assert default == {"pricing_threshold": 2, "path_admission_threshold": 2,
+                       "basis": evidence.LADDER_DEFAULT}
+    declared = evidence.applied(3, 3)
+    assert declared["pricing_threshold"] == declared["path_admission_threshold"] == 3
+    assert declared["basis"] == evidence.PARTY_DECLARATION
+    assert "appetite.pricing_threshold" in declared["basis"]
+    # A traversal that passes nothing publishes the ladder alone, exactly as before.
+    assert "applied" not in evidence.published()
+    assert evidence.published(pricing=3, admission=3)["applied"] == declared
+    assert "1-3" in evidence.published(pricing=3, admission=3)["rule"]
+
+
+# -- 2. the gate, at the source -----------------------------------------------------------------
+
+
+def test_an_amount_at_grade_three_loads_only_for_a_party_that_declared_three() -> None:
+    doc = {**PERSPECTIVE, "values": {"a-component": {"amount": 1.0, "evidence_grade": 3, "basis": "published"}}}
+    with pytest.raises(SchemaError, match=r"outside the pricing threshold \(2\)"):
+        validate("perspective", doc, "planted")
+    with pytest.raises(SchemaError, match="declares appetite.pricing_threshold: 3"):
+        validate("perspective", doc, "planted", pricing_threshold=2)
+    validate("perspective", doc, "planted", pricing_threshold=3)
+
+
+def test_a_grade_three_valuation_with_no_amount_is_a_gap_for_a_party_that_declared_three() -> None:
+    doc = {**PERSPECTIVE, "values": {"a-component": {"evidence_grade": 3, "basis": "published"}}}
+    validate("perspective", doc, "planted")
+    with pytest.raises(SchemaError, match="admits a figure and none is declared"):
+        validate("perspective", doc, "planted", pricing_threshold=3)
+
+
+@pytest.mark.parametrize("grade", [4, 5])
+def test_an_amount_at_grade_four_or_five_never_loads_for_anybody(grade: int) -> None:
+    doc = {**PERSPECTIVE, "values": {"a-component": {"amount": 1.0, "evidence_grade": grade, "basis": "said so"}}}
+    for threshold in (None, 2, 3):
+        with pytest.raises(SchemaError, match="may not carry an amount for anybody"):
+            validate("perspective", doc, "planted", pricing_threshold=threshold)
+
+
+def test_the_loader_is_refused_a_threshold_nobody_may_declare(pocket: Path) -> None:
+    with pytest.raises(EvidenceError, match="appetite.pricing_threshold"):
+        Overlay.load(ModelRepo.open(pocket), "pocket", pricing_threshold=4)
+
+
+def test_the_loader_takes_the_declaration_and_records_it(pocket: Path) -> None:
+    """The operator's portal valuation moved to grade 3 with its amount kept: published work."""
+    _rewrite(pocket, OPERATOR_FILE, "amount: 400000\n    evidence_grade: 2",
+             "amount: 400000\n    evidence_grade: 3")
+    fixtures.git(pocket, "add", "-A")
+    fixtures.git(pocket, "commit", "-q", "-m", "the portal valuation now rests on published work")
+    repo = ModelRepo.open(pocket)
+    with pytest.raises(SchemaError, match="declares appetite.pricing_threshold: 3"):
+        Overlay.load(repo, "pocket")
+    overlay = Overlay.load(repo, "pocket", pricing_threshold=3)
+    assert overlay.pricing_threshold == 3
+    assert Overlay.load(ModelRepo.open(fixtures.build_pocket_org(pocket.parent / "untouched")), "pocket").pricing_threshold == 2
+
+
+# -- 2. the gate, at the price ------------------------------------------------------------------
+
+
+def test_the_pocket_org_prices_exactly_as_before_without_a_declaration(pocket: Path) -> None:
+    body = _price(pocket, REFUSED_ORIGIN)
+    assert body["impacts"] == []
+    reasons = {r["component"]: r["reason"] for r in body["register"]}
+    assert reasons["customer-portal"] == pricing.PATH_TOO_WEAK
+    assert body["gating"]["applied"] == evidence.applied()
+    priced = _price(pocket, PRICED_ORIGIN)
+    assert [i["component"] for i in priced["impacts"]] == ["customer-portal"]
+    assert priced["impacts"][0]["price"]["attenuated"]["mode"] == 160000.0
+
+
+def test_a_party_that_declared_three_prices_the_grade_three_path(pocket: Path) -> None:
+    """Every route out of shared-database crosses `database-slows-orders` at grade 3."""
+    body = _price(pocket, REFUSED_ORIGIN, threshold=3)
+    named = {i["component"]: i for i in body["impacts"]}
+    assert "customer-portal" in named
+    impact = named["customer-portal"]
+    assert impact["worst_evidence_grade"] == 3
+    assert impact["valuation"]["evidence_grade"] == 2
+    # The weaker of the path (3) and the valuation (2): the price rests on grade 3.
+    assert impact["rests_on_grade"] == 3
+    assert body["gating"]["applied"] == {
+        "pricing_threshold": 3, "path_admission_threshold": 3, "basis": evidence.PARTY_DECLARATION,
+    }
+    assert body["gating"]["pin"] == evidence.pin()  # the ladder itself did not move
+    assert "1-3" in body["gating"]["rule"]
+
+
+def test_every_price_shows_the_weakest_grade_it_rests_on(pocket: Path) -> None:
+    body = _price(pocket, PRICED_ORIGIN)
+    for impact in body["impacts"]:
+        assert impact["rests_on_grade"] == max(impact["worst_evidence_grade"], impact["valuation"]["evidence_grade"])
+    credited = [o for o in body["responses"]["priced"] if "credit" in o["mitigation"]]
+    assert credited, "the pocket org credits one option; this leg would assert nothing"
+    for option in credited:
+        mitigation = option["mitigation"]
+        assert mitigation["rests_on_grade"] >= mitigation["evidence_grade"]
+        assert mitigation["rests_on_grade"] in evidence.EVIDENCE_GRADES
+    for option in body["responses"]["priced"]:
+        if "reason" in option["mitigation"]:
+            assert "rests_on_grade" not in option["mitigation"]
+
+
+def test_an_amount_at_grade_three_prices_only_for_a_party_that_declared_three(pocket: Path) -> None:
+    """The gate re-checks the valuation itself: a grade-3 amount in a file loaded at 3 prices
+    under 3 and is a register entry under the default, even when the file could load."""
+    _rewrite(pocket, OPERATOR_FILE, "amount: 400000\n    evidence_grade: 2",
+             "amount: 400000\n    evidence_grade: 3")
+    fixtures.git(pocket, "add", "-A")
+    fixtures.git(pocket, "commit", "-q", "-m", "the portal valuation now rests on published work")
+    overlay = Overlay.load(ModelRepo.open(pocket), "pocket", pricing_threshold=3)
+    body = pricing.price(overlay.graph(), overlay.perspectives[OPERATOR], PRICED_ORIGIN,
+                         overlay.responses, overlay)
+    impact = next(i for i in body["impacts"] if i["component"] == "customer-portal")
+    assert impact["valuation"]["evidence_grade"] == 3 and impact["rests_on_grade"] == 3
+    # The same overlay object with its threshold forced back to the default: the loader is not
+    # trusted, the gate refuses the amount itself.
+    forced = Overlay(**{**overlay.__dict__, "pricing_threshold": 2})
+    body = pricing.price(forced.graph(), forced.perspectives[OPERATOR], PRICED_ORIGIN,
+                         forced.responses, forced)
+    assert "customer-portal" not in {i["component"] for i in body["impacts"]}
+    entry = next(r for r in body["register"] if r["component"] == "customer-portal")
+    assert entry["reason"] == pricing.VALUATION_TOO_WEAK
+    assert "amount" not in entry
+
+
+def test_the_exposure_carries_the_applied_thresholds_and_the_weakest_grade(
+    pocket: Path, caps: Capabilities
+) -> None:
+    import json
+
+    artefact = verbs.exposure(ModelRepo.open(pocket), caps, "pocket", "portal-availability-2026", None,
+                              verbs.command_for("exposure", org="pocket", scenario="portal-availability-2026"))
+    body = json.loads(artefact.to_bytes())["body"]
+    assert body["gating"]["applied"] == evidence.applied()
+    for entry in body["perspectives"]:
+        for admitted in entry["admitted"]:
+            assert admitted["rests_on_grade"] in evidence.EVIDENCE_GRADES
+            assert admitted["rests_on_grade"] >= admitted["evidence_grade"]
+
+
+def test_the_corroboration_gate_does_not_read_the_declaration(repo: ModelRepo) -> None:
+    """A declaration widens what a party may price about the world, never what counts as the
+    party having acted: a self-declared-only enactment stays uncorroborated at 3 as at 2."""
+    intel = Overlay.load(repo, "intel", pricing_threshold=3)
+    claim = {"component": "a-component", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
+             "evidence_grade": 3, "basis": "published work, not observed here"}
+    priced = [{"component": "a-component", "rests_on_grade": 3,
+               "price": {"attenuated": {"min": 100.0, "mode": 200.0, "max": 300.0}}}]
+    self_declared = pricing._credit({"option": "report-node-schedule-variance"}, claim, priced, intel)
+    assert self_declared["reason"] == pricing.NOT_ENACTED
+    corroborated = pricing._credit({"option": "pin-the-tooling-image-set"}, claim, priced, intel)
+    assert "reason" not in corroborated
+    assert corroborated["rests_on_grade"] == 3  # the claim's own grade 3 is the weakest
+    # And the same grade-3 claim earns nothing at all without the declaration.
+    default = Overlay.load(repo, "intel")
+    assert pricing._credit({"option": "pin-the-tooling-image-set"}, claim, priced, default)["reason"] \
+        == pricing.CLAIM_TOO_WEAK
+
+
+# -- 4. a synthetic record never raises a grade -------------------------------------------------
+
+
+SYNTHETIC_SIGNAL = """\
+id: incident-drill-2026
+date: '2026-03-01'
+steep: technological
+source: The platform team's synthetic incident drill
+statement: A forced database slowdown was injected into a rehearsal environment and observed.
+provenance:
+  observed_by: fixture
+  synthetic: true
+"""
+
+
+def test_what_marks_a_record_synthetic() -> None:
+    assert synthetic.is_synthetic_record({"substrate": fixtures.ABSENT_SUBSTRATE}) is None
+    assert synthetic.is_synthetic_record({"substrate": "sha256:" + "a" * 64 + ":1024"})
+    assert synthetic.is_synthetic_record({"provenance": {"observed_by": "fixture"}}) is None
+    for marker in synthetic.MARKERS:
+        why = synthetic.is_synthetic_record({"provenance": {marker: True}})
+        assert why is not None and marker in why
+    # A stamp spelled any way YAML 1.1 reads as true marks the record; an author cannot slip a
+    # marked record past the rule by quoting the stamp. A stamp that reads false marks nothing.
+    truthy: tuple[object, ...] = ("yes", "Yes", "YES", "on", "y", "true", "True", "1", 1)
+    for stamp in truthy:
+        why = synthetic.is_synthetic_record({"provenance": {"synthetic": stamp}})
+        assert why is not None and "synthetic" in why, stamp
+    falsy: tuple[object, ...] = (False, "no", "off", "false", "n", "0", 0, "", None, "maybe")
+    for stamp in falsy:
+        assert synthetic.is_synthetic_record({"provenance": {"synthetic": stamp}}) is None, stamp
+    assert synthetic.marker_in("the planted-signal walk") == "planted"
+    assert synthetic.marker_in("nothing of the kind") is None
+    assert synthetic.marker_in("synthetically") is None  # word boundaries, not substrings
+
+
+def test_a_planted_regrade_on_a_synthetic_drill_goes_red_whatever_the_file_declares(pocket: Path) -> None:
+    """Ticket 30 round 1's shape, reversed by ADR-0032: the grade-3 edge is regraded to 2 on a
+    marked synthetic incident record, so the file now says the path prices. It does not."""
+    _rewrite(pocket, GRADE_3_EDGE, "evidence_grade: 3", "evidence_grade: 2")
+    _plant(pocket, {
+        "orgs/pocket/signals/incident-drill-2026.yaml": SYNTHETIC_SIGNAL,
+        "orgs/pocket/regrades/database-slows-orders-strengthened.yaml": """\
+id: database-slows-orders-strengthened
+subject: database-slows-orders
+from_grade: 3
+to_grade: 2
+regraded_on: '2026-03-02'
+by_role: model-steward
+reason: The drill showed the slowdown reaching the order service, so the mechanism is observed.
+evidence: The incident drill incident-drill-2026, run twice in the rehearsal environment.
+""",
+    }, "strengthen the edge on a synthetic drill")
+    for threshold in (None, 3):
+        body = _price(pocket, REFUSED_ORIGIN, threshold=threshold)
+        assert "customer-portal" not in {i["component"] for i in body["impacts"]}
+        entry = next(r for r in body["register"] if r["component"] == "customer-portal")
+        assert entry["reason"] == pricing.RESTS_ON_SYNTHETIC
+        assert "database-slows-orders-strengthened" in entry["detail"]
+        assert "incident-drill-2026" in entry["detail"]
+        assert "synthetic" in entry["detail"]
+        assert set(entry) <= {"component", "reason", "detail", "depth", "worst_evidence_grade"}
+    # The rule reads the record, not the word: the same regrade citing the drill by its marker
+    # word alone is refused too.
+    _rewrite(pocket, "orgs/pocket/regrades/database-slows-orders-strengthened.yaml",
+             "The incident drill incident-drill-2026, run twice",
+             "A synthetic incident drill, run twice")
+    fixtures.git(pocket, "add", "-A")
+    fixtures.git(pocket, "commit", "-q", "-m", "cite the drill by kind")
+    entry = next(r for r in _price(pocket, REFUSED_ORIGIN)["register"] if r["component"] == "customer-portal")
+    assert entry["reason"] == pricing.RESTS_ON_SYNTHETIC
+
+
+def test_the_control_case_without_the_synthetic_record_prices(pocket: Path) -> None:
+    """The negative control: the identical regrade citing a real record prices, so the refusal
+    above is attributable to the synthetic marker and not to the regrade."""
+    _rewrite(pocket, GRADE_3_EDGE, "evidence_grade: 3", "evidence_grade: 2")
+    _plant(pocket, {
+        "orgs/pocket/regrades/database-slows-orders-strengthened.yaml": """\
+id: database-slows-orders-strengthened
+subject: database-slows-orders
+from_grade: 3
+to_grade: 2
+regraded_on: '2026-03-02'
+by_role: model-steward
+reason: Three dated incidents showed the slowdown reaching the order service.
+evidence: Incident records of 2025-11-02, 2026-01-14 and 2026-02-20.
+""",
+    }, "strengthen the edge on real records")
+    body = _price(pocket, REFUSED_ORIGIN)
+    assert "customer-portal" in {i["component"] for i in body["impacts"]}
+
+
+def test_a_valuation_whose_basis_is_a_synthetic_drill_is_refused(pocket: Path) -> None:
+    _rewrite(pocket, OPERATOR_FILE, "Order value lost per hour of portal outage, from repeated incident records.",
+             "Order value lost per hour of portal outage, from the synthetic incident drill.")
+    fixtures.git(pocket, "add", "-A")
+    fixtures.git(pocket, "commit", "-q", "-m", "rest the valuation on a drill")
+    body = _price(pocket, PRICED_ORIGIN)
+    assert "customer-portal" not in {i["component"] for i in body["impacts"]}
+    entry = next(r for r in body["register"] if r["component"] == "customer-portal")
+    assert entry["reason"] == pricing.RESTS_ON_SYNTHETIC and "valuation" in entry["detail"]
+
+
+def test_a_mitigation_claim_resting_on_a_synthetic_record_earns_nothing(repo: ModelRepo) -> None:
+    intel = Overlay.load(repo, "intel")
+    claim = {"component": "a-component", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
+             "evidence_grade": 2, "basis": "the reduction observed in the injected drill"}
+    priced = [{"component": "a-component", "rests_on_grade": 2,
+               "price": {"attenuated": {"min": 100.0, "mode": 200.0, "max": 300.0}}}]
+    result = pricing._credit({"option": "pin-the-tooling-image-set"}, claim, priced, intel)
+    assert result["reason"] == pricing.RESTS_ON_SYNTHETIC and "credit" not in result
+
+
+def test_an_enactment_observed_only_through_a_synthetic_record_does_not_corroborate(scratch_repo: Path) -> None:
+    """The reconciler's report is replaced by a synthetic one: the option is still declared
+    enacted by its subject, and the second channel now rests on a record marked synthetic."""
+    _rewrite(scratch_repo, "orgs/intel/signals/fab-cluster-reconciled-against-pinned-source.yaml",
+             "provenance:\n  observed_by: fixture", "provenance:\n  observed_by: fixture\n  injected: true")
+    fixtures.git(scratch_repo, "add", "-A")
+    fixtures.git(scratch_repo, "commit", "-q", "-m", "the reconciler report was injected by the world simulator")
+    intel = Overlay.load(ModelRepo.open(scratch_repo), "intel")
+    claim = {"component": "a-component", "reduction": {"min": 0.1, "mode": 0.2, "max": 0.3},
+             "evidence_grade": 2, "basis": "an evidenced reduction"}
+    priced = [{"component": "a-component", "rests_on_grade": 2,
+               "price": {"attenuated": {"min": 100.0, "mode": 200.0, "max": 300.0}}}]
+    result = pricing._credit({"option": "pin-the-tooling-image-set"}, claim, priced, intel)
+    assert result["reason"] == pricing.RESTS_ON_SYNTHETIC
+    assert "enacted-pins-reconciled" in result["detail"]
+    assert "credit" not in result
+
+
+def test_a_quoted_stamp_marks_the_record_as_the_bare_one_does(pocket: Path) -> None:
+    """`synthetic: 'yes'` (a quoted string, which PyYAML leaves as text) marks the record exactly
+    as `synthetic: true` does, so an author cannot slip a marked record past the rule by quoting
+    the stamp. The regrade names the signal by id and carries no marker word, so only the record
+    leg can catch it. The control stamps `synthetic: 'no'` on the same record and prices."""
+    _rewrite(pocket, GRADE_3_EDGE, "evidence_grade: 3", "evidence_grade: 2")
+    regrade = """\
+id: database-slows-orders-strengthened
+subject: database-slows-orders
+from_grade: 3
+to_grade: 2
+regraded_on: '2026-03-02'
+by_role: model-steward
+reason: The drill showed the slowdown reaching the order service, so the mechanism is observed.
+evidence: The incident drill incident-drill-2026, run twice in the rehearsal environment.
+"""
+    _plant(pocket, {
+        "orgs/pocket/signals/incident-drill-2026.yaml":
+            SYNTHETIC_SIGNAL.replace("synthetic: true", "synthetic: 'yes'"),
+        "orgs/pocket/regrades/database-slows-orders-strengthened.yaml": regrade,
+    }, "strengthen the edge on a drill whose stamp is quoted")
+    entry = next(r for r in _price(pocket, REFUSED_ORIGIN)["register"] if r["component"] == "customer-portal")
+    assert entry["reason"] == pricing.RESTS_ON_SYNTHETIC
+    assert "incident-drill-2026" in entry["detail"] and "'yes'" in entry["detail"]
+    # The control: the same record stamped `synthetic: 'no'` is not a synthetic record.
+    _rewrite(pocket, "orgs/pocket/signals/incident-drill-2026.yaml", "synthetic: 'yes'", "synthetic: 'no'")
+    fixtures.git(pocket, "add", "-A")
+    fixtures.git(pocket, "commit", "-q", "-m", "the stamp reads false")
+    body = _price(pocket, REFUSED_ORIGIN)
+    assert "customer-portal" in {i["component"] for i in body["impacts"]}
+    assert not any(r["reason"] == pricing.RESTS_ON_SYNTHETIC for r in body["register"])
+
+
+# -- 4b. the admitting path is a precondition of the figure, so it is read too ------------------
+#
+# The shape review round 2 planted (ADR-0032 point 4 against the PR's own decision that a price
+# rests on its admitting path). A `reporting-service` the operator values at grade 2 with an
+# amount; a clean grade-2 edge order-service -> reporting-service, which is the propagation path
+# a shock at order-service takes; and an edge reporting-service -> customer-portal (the operator's
+# declared cash flow), which is the path that ADMITS the figure, strengthened 3 -> 2 by a regrade.
+# The regrade cites a synthetic drill in the plant and three dated incidents in the control, and
+# nothing else differs, so a refusal is attributable to the record and not to the regrade.
+
+REPORTING_SERVICE = "reporting-service"
+SCENARIO_FILE = "orgs/pocket/scenarios/portal-availability-2026.yaml"
+ADMITTING_EDGE = "reporting-drives-the-portal"
+
+_REPORTING_COMPONENT = """\
+id: reporting-service
+name: Reporting service
+kind: activity
+evolution: product
+evolution_position: 0.5
+visibility: 0.5
+needs:
+  - order-service
+"""
+
+_PROPAGATION_EDGE = """\
+id: orders-feed-reporting
+type: influences
+from: order-service
+to: reporting-service
+sign: negative
+lag_days: 1
+elasticity:
+  min: 0.3
+  mode: 0.3
+  max: 0.3
+evidence_grade: 2
+confidence: 0.5
+note: >-
+  Reporting lags orders, from repeated incident records.
+"""
+
+_ADMITTING_EDGE = """\
+id: reporting-drives-the-portal
+type: influences
+from: reporting-service
+to: customer-portal
+sign: negative
+lag_days: 1
+elasticity:
+  min: 0.2
+  mode: 0.2
+  max: 0.2
+evidence_grade: {grade}
+confidence: 0.5
+note: >-
+  Portal dashboards depend on the reporting service.
+"""
+
+_ADMITTING_REGRADE_ON_A_DRILL = """\
+id: reporting-drives-the-portal-strengthened
+subject: reporting-drives-the-portal
+from_grade: 3
+to_grade: 2
+regraded_on: '2026-03-02'
+by_role: model-steward
+reason: The drill showed the reporting slowdown reaching the portal, so the mechanism is observed.
+evidence: The incident drill incident-drill-2026, run twice in the rehearsal environment.
+"""
+
+_ADMITTING_REGRADE_ON_RECORDS = """\
+id: reporting-drives-the-portal-strengthened
+subject: reporting-drives-the-portal
+from_grade: 3
+to_grade: 2
+regraded_on: '2026-03-02'
+by_role: model-steward
+reason: Three dated incidents showed the reporting slowdown reaching the portal.
+evidence: Incident records of 2025-11-02, 2026-01-14 and 2026-02-20.
+"""
+
+
+def _plant_reporting_service(root: Path, *, on_a_drill: bool) -> None:
+    """The operator values a reporting service; a shock at order-service reaches it over a clean
+    edge; the edge that admits it to the cash flow was strengthened 3 -> 2 on a regrade. The
+    scenario names it too, so `twin exposure` is offered the same figure `twin price` is."""
+    _rewrite(root, OPERATOR_FILE, "  identity-store:\n",
+             "  reporting-service:\n    amount: 30000\n    evidence_grade: 2\n"
+             "    basis: Reporting outage cost per hour, from repeated incident records.\n"
+             "  identity-store:\n")
+    _rewrite(root, SCENARIO_FILE, "  - identity-store\n", "  - identity-store\n  - reporting-service\n")
+    _plant(root, {
+        f"orgs/pocket/components/{REPORTING_SERVICE}.yaml": _REPORTING_COMPONENT,
+        "orgs/pocket/edges/orders-feed-reporting.yaml": _PROPAGATION_EDGE,
+        f"orgs/pocket/edges/{ADMITTING_EDGE}.yaml": _ADMITTING_EDGE.format(grade=3),
+    }, "a reporting service the operator values, admitted at grade 3")
+    files = {
+        f"orgs/pocket/edges/{ADMITTING_EDGE}.yaml": _ADMITTING_EDGE.format(grade=2),
+        f"orgs/pocket/regrades/{ADMITTING_EDGE}-strengthened.yaml":
+            _ADMITTING_REGRADE_ON_A_DRILL if on_a_drill else _ADMITTING_REGRADE_ON_RECORDS,
+    }
+    if on_a_drill:
+        files["orgs/pocket/signals/incident-drill-2026.yaml"] = SYNTHETIC_SIGNAL
+    _plant(root, files, "strengthen the admitting edge")
+
+
+def _exposure_entry(root: Path, caps: Capabilities) -> dict:
+    import json
+
+    artefact = verbs.exposure(ModelRepo.open(root), caps, "pocket", "portal-availability-2026", [OPERATOR],
+                              verbs.command_for("exposure", org="pocket", scenario="portal-availability-2026"))
+    return json.loads(artefact.to_bytes())["body"]["perspectives"][0]
+
+
+def test_a_price_whose_admitting_path_was_strengthened_on_a_synthetic_drill_is_refused(pocket: Path) -> None:
+    """The propagation path is clean and the valuation is clean; only the edge that admits the
+    figure to the cash flow rests on the drill. The price rests on that path (its worst hop is
+    folded into `rests_on_grade`), so it is refused by name, under the default and under 3."""
+    _plant_reporting_service(pocket, on_a_drill=True)
+    for threshold in (None, 3):
+        body = _price(pocket, PRICED_ORIGIN, threshold=threshold)
+        assert REPORTING_SERVICE not in {i["component"] for i in body["impacts"]}
+        entry = next(r for r in body["register"] if r["component"] == REPORTING_SERVICE)
+        assert entry["reason"] == pricing.RESTS_ON_SYNTHETIC
+        assert "admitting-path hop" in entry["detail"] and ADMITTING_EDGE in entry["detail"]
+        assert "incident-drill-2026" in entry["detail"] and "synthetic" in entry["detail"]
+        assert set(entry) <= {"component", "reason", "detail", "depth", "worst_evidence_grade"}
+        # The plant touched nothing else: the portal itself still prices under the same eye.
+        assert "customer-portal" in {i["component"] for i in body["impacts"]}
+
+
+def test_the_control_with_real_records_on_the_admitting_path_prices(pocket: Path) -> None:
+    """The identical regrade citing dated incident records prices: 30000 x 0.3 = 9000 at depth
+    1, resting on grade 2 (the clean hop, the valuation and the admitting hop are all 2)."""
+    _plant_reporting_service(pocket, on_a_drill=False)
+    body = _price(pocket, PRICED_ORIGIN)
+    impact = next(i for i in body["impacts"] if i["component"] == REPORTING_SERVICE)
+    assert impact["price"]["composed"]["mode"] == 9000.0
+    assert impact["admitted_because"] == "a-graded-causal-path-reaches-a-declared-cash-flow"
+    assert impact["rests_on_grade"] == 2
+    assert not any(r["reason"] == pricing.RESTS_ON_SYNTHETIC for r in body["register"])
+
+
+def test_an_exposure_figure_whose_valuation_rests_on_a_synthetic_drill_is_a_register_entry(
+    pocket: Path, caps: Capabilities
+) -> None:
+    """The same valuation `twin price` refuses (the portal's basis rewritten onto the drill) is
+    not admitted by `twin exposure` either: register entry, no figure, the record named."""
+    _rewrite(pocket, OPERATOR_FILE, "Order value lost per hour of portal outage, from repeated incident records.",
+             "Order value lost per hour of portal outage, from the synthetic incident drill.")
+    fixtures.git(pocket, "add", "-A")
+    fixtures.git(pocket, "commit", "-q", "-m", "rest the valuation on a drill")
+    entry = _exposure_entry(pocket, caps)
+    assert "customer-portal" not in {e["component"] for e in entry["admitted"]}
+    held = next(r for r in entry["register"] if r["component"] == "customer-portal")
+    assert pricing.RESTS_ON_SYNTHETIC in held["reason"] and "synthetic" in held["reason"]
+    assert "declared_value" not in held and "amount" not in held and "rests_on_grade" not in held
+    # The other admitted figure is untouched, so the refusal is the valuation's and not the eye's.
+    assert "order-service" in {e["component"] for e in entry["admitted"]}
+    assert entry["declared_exposure"] == 250000.0
+
+
+def test_an_exposure_figure_whose_admitting_path_rests_on_a_synthetic_drill_is_a_register_entry(
+    pocket: Path, caps: Capabilities
+) -> None:
+    """The reporting service is valued cleanly at grade 2 and admitted over an edge strengthened
+    on the drill; the exposure figure rests on that path (`rests_on_grade` folds it), so it is a
+    register entry naming the admitting hop and the record. The control admits it at 30000."""
+    _plant_reporting_service(pocket, on_a_drill=True)
+    entry = _exposure_entry(pocket, caps)
+    verdict = next(v for v in entry["admission"] if v["component"] == REPORTING_SERVICE)
+    assert verdict["admitted"] and [h["edge"] for h in verdict["path"]] == [ADMITTING_EDGE]
+    assert REPORTING_SERVICE not in {e["component"] for e in entry["admitted"]}
+    held = next(r for r in entry["register"] if r["component"] == REPORTING_SERVICE)
+    assert pricing.RESTS_ON_SYNTHETIC in held["reason"]
+    assert "admitting-path hop" in held["reason"] and ADMITTING_EDGE in held["reason"]
+    assert "incident-drill-2026" in held["reason"]
+    assert "declared_value" not in held and "rests_on_grade" not in held
+
+
+def test_the_control_admits_the_exposure_figure_over_real_records(pocket: Path, caps: Capabilities) -> None:
+    _plant_reporting_service(pocket, on_a_drill=False)
+    entry = _exposure_entry(pocket, caps)
+    admitted = next(e for e in entry["admitted"] if e["component"] == REPORTING_SERVICE)
+    assert admitted["declared_value"] == 30000.0 and admitted["rests_on_grade"] == 2
+    assert not any(pricing.RESTS_ON_SYNTHETIC in r["reason"] for r in entry["register"])
+
+
+# -- the citation that authorises a golden re-bless names its namespace --------------------------
+
+
+def test_the_authorising_citation_admits_both_ticket_namespaces_and_only_as_themselves() -> None:
+    """`twin verify --bless-goldens` and `--rehash` refuse without a cited ticket. The twin's own
+    decision tickets are two digits (`.scratch/twin/issues/NN`); eco-system tickets run to three
+    (`.scratch/ecosystem/issues/NNN`). The words carry the namespace, so an eco-system ticket is
+    cited as one and a three-digit number is never read as a twin decision ticket."""
+    from twin.cli import _cites
+
+    assert _cites("eco-system ticket 141 (ADR-0032): every price shows the grade it rests on")
+    assert _cites("eco-system ticket 30 decision 6")
+    assert _cites("decision ticket 22 — demo-slice closes its own checklist")
+    assert _cites("Decision Ticket 9: reason")
+    assert not _cites("decision ticket 141 - three digits are not a twin decision ticket")
+    assert not _cites("ticket 141")
+    assert not _cites("ADR-0032 alone")
+    assert not _cites("")
+    assert not _cites(None)
