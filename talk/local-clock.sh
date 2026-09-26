@@ -361,7 +361,7 @@ make_cage() {  # tag wt unit -- the child's environment on disk: config, ssh ref
     echo "# the child's ENTIRE global git config for run $RUN_ID step $tag (talk/local-clock.sh,"
     echo "# ticket 142): read with GIT_CONFIG_NOSYSTEM=1, so nothing else configures its git"
     printf '[credential]\n\thelper =\n[protocol]\n\tallow = never\n[commit]\n\tgpgsign = false\n[tag]\n\tgpgsign = false\n'
-    [ -n "$hooks" ] && printf '[core]\n\thooksPath = %s\n' "$hooks"
+    if [ -n "$hooks" ]; then printf '[core]\n\thooksPath = %s\n' "$hooks"; fi
   } >"$cage/gitconfig" || return 1
   cp "$cage/gitconfig" "$cage/gitconfig.as-written" || return 1
   printf '#!/bin/sh\necho "local-clock: ssh is refused for the headless child (ticket 142 item 3); the clock pushes after it, under the owner" >&2\nexit 255\n' >"$cage/no-ssh.sh" || return 1
