@@ -1515,7 +1515,8 @@ def _rehash(authorise: str | None) -> int:
         print(
             "refusing to re-pin: "
             + ", ".join(sorted(set(changed)))
-            + " already had a hash. Pass --authorise \"decision ticket NN — reason\".",
+            + " already had a hash. Pass --authorise \"decision ticket NN — reason\" or "
+            + "\"eco-system ticket NNN — reason\".",
             file=sys.stderr,
         )
         return 1
@@ -1619,7 +1620,7 @@ def _bless_goldens(authorise: str | None) -> int:
     if moved and not _cites(authorise):
         print(
             f"refusing to re-bless: {', '.join(moved)} already had a golden digest. "
-            'Pass --authorise "decision ticket NN — reason".',
+            'Pass --authorise "decision ticket NN — reason" or "eco-system ticket NNN — reason".',
             file=sys.stderr,
         )
         return 1
@@ -1646,7 +1647,14 @@ def _bless_goldens(authorise: str | None) -> int:
 
 
 def _cites(text: str | None) -> bool:
-    return bool(text and re.search(r"decision ticket\s+\d{1,2}", text, re.I))
+    """Whether an authorisation names a ticket in a namespace this repository holds: a twin
+    decision ticket (`.scratch/twin/issues/NN`, two digits) or an eco-system ticket
+    (`.scratch/ecosystem/issues/NNN`, up to three digits; eco-system ticket 141 admitted the
+    form). The words carry the namespace, so "eco-system ticket 30" and "decision ticket 30" name
+    different tickets. This checks the form of the citation, not that the ticket exists."""
+    return bool(
+        text and re.search(r"(?:decision ticket\s+\d{1,2}|eco-system ticket\s+\d{1,3})\b", text, re.I)
+    )
 
 
 # -- wiring -----------------------------------------------------------------------------------
@@ -2081,7 +2089,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--only", action="append", default=[], help="check name or number; repeatable")
     verify.add_argument("--list", action="store_true", help="list the checks without running them")
     verify.add_argument("--rehash", action="store_true", help="re-pin check-body hashes in the manifest")
-    verify.add_argument("--authorise", default=None, help="decision ticket authorising a hash change")
+    verify.add_argument("--authorise", default=None, help="the decision ticket or eco-system ticket authorising a hash change")
     verify.add_argument(
         "--bless-goldens", action="store_true", help="re-record the committed artefact digests"
     )
