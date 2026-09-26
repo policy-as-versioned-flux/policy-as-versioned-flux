@@ -1,0 +1,39 @@
+{
+  "policy_version": "5.0.0",
+  "tag": "policy/v5.0.0",
+  "array_commit": "597f214bcdf10a77c957debc7e8a7842e1156fb8",
+  "tag_commit": "5b88f1d0bb33274e3348db93645d972c893b3c2c",
+  "policy_tree": "a8468fb3e156f91f826750dd543ba6e1bfa99439",
+  "fixtures_tree": "1a5beae73c2259fd786d3a616ea9ad4de928938b",
+  "policy_sha256": "6b61be47ded40234f73366ecaf9855c3dd58bb62b24f355a2fb04d91d3b2b9b5",
+  "api_versions": [
+    "kustomize.config.k8s.io/v1beta1",
+    "policies.kyverno.io/v1alpha1",
+    "scheduling.k8s.io/v1"
+  ],
+  "prerelease_api_versions": [
+    "kustomize.config.k8s.io/v1beta1",
+    "policies.kyverno.io/v1alpha1"
+  ],
+  "matrices": [
+    {
+      "family": "cage-tier",
+      "outcome": "passed",
+      "passed_assertions": 13,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "2bbd1969ade2d2e560b6af4018874260679878cd6b722a7f1cd7e475b7b418b2",
+      "diagnostic": null
+    },
+    {
+      "family": "cage-netpol",
+      "outcome": "passed",
+      "passed_assertions": 11,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "b84af4ffd7e4203d8b693af86c9db10b8c4bc46c06f336d6de5d5910df4a47d7",
+      "diagnostic": null
+    }
+  ],
+  "outcome": "passed"
+}

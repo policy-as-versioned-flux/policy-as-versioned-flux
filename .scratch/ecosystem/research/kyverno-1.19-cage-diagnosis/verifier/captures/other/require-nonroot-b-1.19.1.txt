@@ -1,0 +1,244 @@
+apiVersion: openreports.io/v1alpha1
+kind: ClusterReport
+metadata:
+  name: merged
+results:
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-quarantine
+    namespace: cage-quarantine
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-isolated
+    namespace: cage-isolated
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: untiered-ns
+    namespace: cage-untiered
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: hardened-baseline
+    namespace: cage-baseline
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: skip
+  policy: require-nonroot-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: unclaimed-system
+    namespace: kube-system
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: privileged-pod
+    namespace: cage-baseline
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: forged-tier
+    namespace: cage-quarantine
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: host-namespaces
+    namespace: cage-isolated
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: tighter-than-tier
+    namespace: cage-baseline
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: sidecar-resident
+    namespace: cage-quarantine
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: ungoverned-ns
+    namespace: cage-ungoverned
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-baseline
+    namespace: cage-baseline
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+- message: pods on policy-version 5.0.0 must run as non-root with a read-only root
+    filesystem on every container, OR (if they must run as root) carry a policy-as-versioned.dev/root-attestation
+    AND drop ALL capabilities + mount a read-only root filesystem on every container
+  policy: require-nonroot-5-0-0
+  properties:
+    cel.validationIndex: "0"
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-restricted
+    namespace: cage-restricted
+  result: fail
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790358297
+source: ""
+summary:
+  error: 0
+  fail: 12
+  pass: 0
+  skip: 1
+  warn: 0
+

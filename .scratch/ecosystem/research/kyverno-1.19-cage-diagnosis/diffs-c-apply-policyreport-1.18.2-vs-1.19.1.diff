@@ -1,0 +1,50 @@
+--- kyverno 1.18.2 apply -p (cage-netpol)
++++ kyverno 1.19.1 apply -p (cage-netpol)
+@@ -37,20 +37,6 @@
+   resources:
+   - apiVersion: v1
+     kind: Pod
+-    name: caged-baseline
+-    namespace: default
+-  result: pass
+-  rule: cage-netpol-5-0-0
+-  scored: true
+-  source: KyvernoGeneratingPolicy
+-  timestamp:
+-- message: policy evaluated successfully
+-  policy: cage-netpol-5-0-0
+-  properties:
+-    process: admission review
+-  resources:
+-  - apiVersion: v1
+-    kind: Pod
+     name: caged-restricted
+     namespace: default
+   result: pass
+@@ -86,25 +72,11 @@
+   scored: true
+   source: KyvernoGeneratingPolicy
+   timestamp:
+-- message: policy evaluated successfully
+-  policy: cage-netpol-5-0-0
+-  properties:
+-    process: admission review
+-  resources:
+-  - apiVersion: v1
+-    kind: Pod
+-    name: healthy
+-    namespace: default
+-  result: pass
+-  rule: cage-netpol-5-0-0
+-  scored: true
+-  source: KyvernoGeneratingPolicy
+-  timestamp:
+ source: ""
+ summary:
+   error: 0
+   fail: 0
+-  pass: 5
++  pass: 3
+   skip: 0
+   warn: 0
+ 

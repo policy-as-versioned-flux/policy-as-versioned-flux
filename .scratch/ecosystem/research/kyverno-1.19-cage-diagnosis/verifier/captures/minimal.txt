@@ -1,0 +1,132 @@
+## mc-skip on 1.18.2 (exit 0)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok       │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Pass   │ Excluded │
+Test Summary: 2 tests passed and 0 tests failed
+## mc-skip on 1.19.1 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok        │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Fail   │ Not found │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## mc-skip-kindpod on 1.18.2 (exit 0)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok       │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Pass   │ Excluded │
+Test Summary: 2 tests passed and 0 tests failed
+## mc-skip-kindpod on 1.19.1 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok        │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Fail   │ Not found │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## mc-as-fail on 1.18.2 (exit 0)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok       │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Pass   │ Excluded │
+Test Summary: 2 tests passed and 0 tests failed
+## mc-as-fail on 1.19.1 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok        │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Fail   │ Not found │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## mc-as-pass on 1.18.2 (exit 0)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok       │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Pass   │ Excluded │
+Test Summary: 2 tests passed and 0 tests failed
+## mc-as-pass on 1.19.1 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok        │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Fail   │ Not found │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## objsel-skip on 1.18.2 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok        │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Fail   │ Not found │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## objsel-skip on 1.19.1 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok        │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Fail   │ Not found │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## exprgate-skip on 1.18.2 (exit 0)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok       │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Pass   │ Excluded │
+Test Summary: 2 tests passed and 0 tests failed
+## exprgate-skip on 1.19.1 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok                  │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Fail   │ Want skip, got pass │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## mpol-skip on 1.18.2 (exit 0)
+│ 1  │ mc-mut │      │ v1/Pod/default/pod-in  │ Pass   │ Ok     │
+│ 2  │ mc-mut │      │ v1/Pod/default/pod-out │ Pass   │ Ok     │
+Test Summary: 2 tests passed and 0 tests failed
+## mpol-skip on 1.19.1 (exit 0)
+│ 1  │ mc-mut │      │ v1/Pod/default/pod-in  │ Pass   │ Ok     │
+│ 2  │ mc-mut │      │ v1/Pod/default/pod-out │ Pass   │ Ok     │
+Test Summary: 2 tests passed and 0 tests failed
+## mpol-as-fail on 1.18.2 (exit 1)
+│ 1  │ mc-mut │      │ v1/Pod/default/pod-in  │ Pass   │ Ok                  │
+│ 2  │ mc-mut │      │ v1/Pod/default/pod-out │ Fail   │ Want fail, got skip │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## mpol-as-fail on 1.19.1 (exit 1)
+│ 1  │ mc-mut │      │ v1/Pod/default/pod-in  │ Pass   │ Ok                  │
+│ 2  │ mc-mut │      │ v1/Pod/default/pod-out │ Fail   │ Want fail, got skip │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## vpol-skip on 1.18.2 (exit 0)
+│ 1  │ mc-val │      │ v1/Pod/default/pod-in  │ Pass   │ Ok     │
+│ 2  │ mc-val │      │ v1/Pod/default/pod-out │ Pass   │ Ok     │
+Test Summary: 2 tests passed and 0 tests failed
+## vpol-skip on 1.19.1 (exit 0)
+│ 1  │ mc-val │      │ v1/Pod/default/pod-in  │ Pass   │ Ok     │
+│ 2  │ mc-val │      │ v1/Pod/default/pod-out │ Pass   │ Ok     │
+Test Summary: 2 tests passed and 0 tests failed
+## vpol-as-fail on 1.18.2 (exit 1)
+│ 1  │ mc-val │      │ v1/Pod/default/pod-in  │ Pass   │ Ok                  │
+│ 2  │ mc-val │      │ v1/Pod/default/pod-out │ Fail   │ Want fail, got skip │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## vpol-as-fail on 1.19.1 (exit 1)
+│ 1  │ mc-val │      │ v1/Pod/default/pod-in  │ Pass   │ Ok                  │
+│ 2  │ mc-val │      │ v1/Pod/default/pod-out │ Fail   │ Want fail, got skip │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed
+## gen-asserted-skip on 1.18.2 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen  │ Fail   │ Want skip, got pass │
+Test Summary: 0 tests passed and 1 tests failed
+Error: 1 tests failed
+## gen-asserted-skip on 1.19.1 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen  │ Fail   │ Want skip, got pass │
+Test Summary: 0 tests passed and 1 tests failed
+Error: 1 tests failed
+## gen-asserted-fail on 1.18.2 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen  │ Fail   │ Want fail, got pass │
+Test Summary: 0 tests passed and 1 tests failed
+Error: 1 tests failed
+## gen-asserted-fail on 1.19.1 (exit 1)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen  │ Fail   │ Want fail, got pass │
+Test Summary: 0 tests passed and 1 tests failed
+Error: 1 tests failed
+## polex-skip on 1.18.2 (exit 0)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok       │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Pass   │ Excluded │
+Test Summary: 2 tests passed and 0 tests failed
+## polex-skip on 1.19.1 (exit 0)
+│ 1  │ mc-gen │ mc-gen    │ /cm-gen                │ Pass   │ Ok     │
+│ 2  │ mc-gen │ exception │ v1/Pod/default/pod-out │ Pass   │ Ok     │
+Test Summary: 2 tests passed and 0 tests failed
+## polex-nogate on 1.18.2 (exit 0)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok       │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Pass   │ Excluded │
+Test Summary: 2 tests passed and 0 tests failed
+## polex-nogate on 1.19.1 (exit 0)
+│ 1  │ mc-gen │ mc-gen    │ /cm-gen                │ Pass   │ Ok     │
+│ 2  │ mc-gen │ exception │ v1/Pod/default/pod-out │ Pass   │ Ok     │
+Test Summary: 2 tests passed and 0 tests failed
+## polex-as-fail on 1.18.2 (exit 0)
+│ 1  │ mc-gen │ mc-gen │ /cm-gen                │ Pass   │ Ok       │
+│ 2  │ mc-gen │ mc-gen │ v1/Pod/default/pod-out │ Pass   │ Excluded │
+Test Summary: 2 tests passed and 0 tests failed
+## polex-as-fail on 1.19.1 (exit 1)
+│ 1  │ mc-gen │ mc-gen    │ /cm-gen                │ Pass   │ Ok                  │
+│ 2  │ mc-gen │ exception │ v1/Pod/default/pod-out │ Fail   │ Want fail, got skip │
+Test Summary: 1 tests passed and 1 tests failed
+Error: 1 tests failed

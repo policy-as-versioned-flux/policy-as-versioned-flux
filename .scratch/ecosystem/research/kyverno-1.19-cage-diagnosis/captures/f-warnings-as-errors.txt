@@ -1,0 +1,4 @@
+1.18.2 b-string-tier --warnings-as-errors rc=1 deprecation-lines=0
+1.18.2 f-v1-on-b --warnings-as-errors rc=1 deprecation-lines=0
+1.19.1 b-string-tier --warnings-as-errors rc=0 deprecation-lines=0
+1.19.1 f-v1-on-b --warnings-as-errors rc=0 deprecation-lines=0

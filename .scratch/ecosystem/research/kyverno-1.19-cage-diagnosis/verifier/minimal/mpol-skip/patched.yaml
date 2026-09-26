@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-in
+  namespace: default
+  labels:
+    caged: "true"
+    mutated: "yes"
+spec:
+  containers:
+  - name: app
+    image: nginx

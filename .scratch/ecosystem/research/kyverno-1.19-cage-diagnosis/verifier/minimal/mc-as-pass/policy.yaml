@@ -1,0 +1,23 @@
+apiVersion: policies.kyverno.io/v1alpha1
+kind: GeneratingPolicy
+metadata:
+  name: mc-gen
+spec:
+  evaluation:
+    synchronize:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ['']
+      apiVersions: [v1]
+      operations: [CREATE, UPDATE]
+      resources: [pods]
+
+  matchConditions:
+  - name: is-caged
+    expression: object.metadata.?labels['caged'].orValue('') == 'true'
+  variables:
+  - name: ns
+    expression: string(object.metadata.namespace)
+  generate:
+  - expression: 'generator.Apply(variables.ns, [dyn({"apiVersion": dyn("v1"), "kind": dyn("ConfigMap"), "metadata": dyn({"name": dyn("cm-gen"), "namespace": dyn(variables.ns)}), "data": dyn({"k": dyn("v")})})])'

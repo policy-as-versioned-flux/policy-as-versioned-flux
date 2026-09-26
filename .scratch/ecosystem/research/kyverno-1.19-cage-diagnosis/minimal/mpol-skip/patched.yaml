@@ -1,0 +1,4 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: matched, namespace: default, labels: {caged: "true", seen: "yes"}}
+spec: {containers: [{name: app, image: nginx}]}

@@ -1,0 +1,11 @@
+docs 1.18.2: 9  docs 1.19.1: 9  expected (distinct): 3
+1.18.2 == 1.19.1 (parsed, ordered): True
+distinct generated 1.18.2: ['cage-reach-isolated', 'cage-reach-quarantine', 'cage-reach-restricted']
+distinct generated 1.19.1: ['cage-reach-isolated', 'cage-reach-quarantine', 'cage-reach-restricted']
+1.18.2 cage-reach-restricted equals expected fixture exactly: True
+1.18.2 cage-reach-quarantine equals expected fixture exactly: True
+1.18.2 cage-reach-isolated equals expected fixture exactly: True
+1.19.1 cage-reach-restricted equals expected fixture exactly: True
+1.19.1 cage-reach-quarantine equals expected fixture exactly: True
+1.19.1 cage-reach-isolated equals expected fixture exactly: True
+keys of one generated doc: ['apiVersion', 'kind', 'metadata', 'spec'] ['labels', 'name', 'namespace']

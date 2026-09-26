@@ -1,0 +1,27 @@
+$ <scratch>/bin/1.19.1/kyverno test <scratch>/work/x-fixture-noskip-1.19.1/graded/tests/cage-netpol
+# rc=0
+Loading test  ( <scratch>/work/x-fixture-noskip-1.19.1/graded/tests/cage-netpol/kyverno-test.yaml ) ...
+  Loading values/variables ...
+  Loading policies ...
+  Loading resources ...
+  Loading exceptions ...
+  Applying 1 policy to 5 resources with 0 exceptions ...
+  Checking results ...
+
+│────│───────────────────│───────────────────│────────────────────────│────────│────────│
+│ [40;32mID[0m │ [40;32mPOLICY           [0m │ [40;32mRULE             [0m │ [40;32mRESOURCE              [0m │ [40;32mRESULT[0m │ [40;32mREASON[0m │
+│────│───────────────────│───────────────────│────────────────────────│────────│────────│
+│ 1  │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-restricted │ Pass   │ Ok     │
+│ 2  │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-quarantine │ Pass   │ Ok     │
+│ 3  │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-isolated   │ Pass   │ Ok     │
+│ 4  │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-restricted │ Pass   │ Ok     │
+│ 5  │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-quarantine │ Pass   │ Ok     │
+│ 6  │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-isolated   │ Pass   │ Ok     │
+│ 7  │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-restricted │ Pass   │ Ok     │
+│ 8  │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-quarantine │ Pass   │ Ok     │
+│ 9  │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-isolated   │ Pass   │ Ok     │
+│────│───────────────────│───────────────────│────────────────────────│────────│────────│
+
+
+Test Summary: 9 tests passed and 0 tests failed
+

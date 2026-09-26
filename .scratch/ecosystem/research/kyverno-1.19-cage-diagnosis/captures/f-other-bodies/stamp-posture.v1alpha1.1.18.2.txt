@@ -1,0 +1,728 @@
+$ bin/1.18.2/kyverno apply variants/b-string-tier/distribution/policies/v5.0.0/stamp-posture.yaml --resource work/b-string-tier-1.18.2/graded/tests/cage-tier/resources.yaml -f work/b-string-tier-1.18.2/graded/tests/cage-tier/values.yaml --remove-color -p
+
+policy stamp-posture-5-0-0 applied to cage-baseline/Pod/at-baseline:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: at-baseline
+  namespace: cage-baseline
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-baseline/Pod/at-baseline:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: at-baseline
+  namespace: cage-baseline
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-restricted/Pod/at-restricted:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: at-restricted
+  namespace: cage-restricted
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-restricted/Pod/at-restricted:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: at-restricted
+  namespace: cage-restricted
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-quarantine/Pod/at-quarantine:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: at-quarantine
+  namespace: cage-quarantine
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-quarantine/Pod/at-quarantine:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: at-quarantine
+  namespace: cage-quarantine
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-isolated/Pod/at-isolated:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: at-isolated
+  namespace: cage-isolated
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-isolated/Pod/at-isolated:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: at-isolated
+  namespace: cage-isolated
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-untiered/Pod/untiered-ns:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: untiered-ns
+  namespace: cage-untiered
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-untiered/Pod/untiered-ns:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: untiered-ns
+  namespace: cage-untiered
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-quarantine/Pod/forged-tier:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 5.0.0
+  name: forged-tier
+  namespace: cage-quarantine
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-quarantine/Pod/forged-tier:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/tier: baseline
+    posture.acme.io/version: 5.0.0
+  name: forged-tier
+  namespace: cage-quarantine
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-baseline/Pod/hardened-baseline:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: hardened-baseline
+  namespace: cage-baseline
+spec:
+  containers:
+  - image: nginx
+    name: app
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-baseline/Pod/hardened-baseline:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: hardened-baseline
+  namespace: cage-baseline
+spec:
+  containers:
+  - image: nginx
+    name: app
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to kube-system/Pod/unclaimed-system:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unclaimed-system
+  namespace: kube-system
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to kube-system/Pod/unclaimed-system:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unclaimed-system
+  namespace: kube-system
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-baseline/Pod/privileged-pod:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: privileged-pod
+  namespace: cage-baseline
+spec:
+  containers:
+  - image: nginx
+    name: app
+    securityContext:
+      privileged: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-baseline/Pod/privileged-pod:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: privileged-pod
+  namespace: cage-baseline
+spec:
+  containers:
+  - image: nginx
+    name: app
+    securityContext:
+      privileged: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-isolated/Pod/host-namespaces:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: host-namespaces
+  namespace: cage-isolated
+spec:
+  containers:
+  - image: nginx
+    name: app
+  hostIPC: true
+  hostNetwork: true
+  hostPID: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-isolated/Pod/host-namespaces:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: host-namespaces
+  namespace: cage-isolated
+spec:
+  containers:
+  - image: nginx
+    name: app
+  hostIPC: true
+  hostNetwork: true
+  hostPID: true
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-baseline/Pod/tighter-than-tier:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: tighter-than-tier
+  namespace: cage-baseline
+spec:
+  containers:
+  - image: nginx
+    name: app
+    resources:
+      limits:
+        cpu: 50m
+        memory: 32Mi
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-baseline/Pod/tighter-than-tier:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: tighter-than-tier
+  namespace: cage-baseline
+spec:
+  containers:
+  - image: nginx
+    name: app
+    resources:
+      limits:
+        cpu: 50m
+        memory: 32Mi
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-quarantine/Pod/sidecar-resident:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: sidecar-resident
+  namespace: cage-quarantine
+spec:
+  containers:
+  - image: nginx
+    name: app
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-quarantine/Pod/sidecar-resident:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: sidecar-resident
+  namespace: cage-quarantine
+spec:
+  containers:
+  - image: nginx
+    name: app
+  - image: ghcr.io/acme/coraza-waf:cage
+    name: waf-sidecar
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-ungoverned/Pod/ungoverned-ns:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: ungoverned-ns
+  namespace: cage-ungoverned
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.
+policy stamp-posture-5-0-0 applied to cage-ungoverned/Pod/ungoverned-ns:
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 5.0.0
+    posture.acme.io/version: 5.0.0
+  name: ungoverned-ns
+  namespace: cage-ungoverned
+spec:
+  containers:
+  - image: nginx
+    name: app
+
+---
+
+
+Mutation:
+Mutation has been applied successfully.apiVersion: openreports.io/v1alpha1
+kind: ClusterReport
+metadata:
+  name: merged
+results:
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: untiered-ns
+    namespace: cage-untiered
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: forged-tier
+    namespace: cage-quarantine
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: privileged-pod
+    namespace: cage-baseline
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: sidecar-resident
+    namespace: cage-quarantine
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: ungoverned-ns
+    namespace: cage-ungoverned
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-baseline
+    namespace: cage-baseline
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-restricted
+    namespace: cage-restricted
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-quarantine
+    namespace: cage-quarantine
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-isolated
+    namespace: cage-isolated
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: hardened-baseline
+    namespace: cage-baseline
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: skip
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: unclaimed-system
+    namespace: kube-system
+  result: skip
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: host-namespaces
+    namespace: cage-isolated
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+- message: success
+  policy: stamp-posture-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: tighter-than-tier
+    namespace: cage-baseline
+  result: pass
+  scored: true
+  source: KyvernoMutatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357559
+source: ""
+summary:
+  error: 0
+  fail: 0
+  pass: 12
+  skip: 1
+  warn: 0
+
+# rc=0

@@ -1,0 +1,18 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: cage-netpol
+policies:
+- <tmp>
+resources:
+- resources.yaml
+results:
+- policy: cage-netpol-5-0-0
+  rule: cage-netpol-5-0-0
+  kind: NetworkPolicy
+  resources:
+  - caged-restricted
+  - caged-quarantine
+  - caged-isolated
+  generatedResource: generated-all.yaml
+  result: pass

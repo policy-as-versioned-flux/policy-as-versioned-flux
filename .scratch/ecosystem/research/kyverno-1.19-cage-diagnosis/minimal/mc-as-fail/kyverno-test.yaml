@@ -1,0 +1,17 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata: {name: gen-min}
+policies: [policy.yaml]
+resources: [resources.yaml]
+results:
+- policy: gen-min
+  rule: gen-min
+  kind: ConfigMap
+  resources: [matched]
+  generatedResource: generated.yaml
+  result: pass
+- policy: gen-min
+  rule: gen-min
+  kind: ConfigMap
+  resources: [unmatched]
+  result: fail

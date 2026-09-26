@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1alpha1
+kind: PolicyException
+metadata:
+  name: out-of-scope
+  namespace: default
+spec:
+  policyRefs:
+  - name: mc-gen
+    kind: GeneratingPolicy
+  matchConditions:
+  - name: not-caged
+    expression: object.metadata.?labels['caged'].orValue('') != 'true'

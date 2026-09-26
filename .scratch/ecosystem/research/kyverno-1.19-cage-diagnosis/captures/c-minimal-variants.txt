@@ -1,0 +1,93 @@
+======== case objsel-skip
+### kyverno 1.18.2: $ kyverno test <scratch>/minimal/objsel-skip --remove-color
+  Applying 1 policy to 2 resources with 0 exceptions ...
+  Checking results ...
+
+│────│─────────│─────────│──────────────────────────│────────│───────────│
+│ ID │ POLICY  │ RULE    │ RESOURCE                 │ RESULT │ REASON    │
+│────│─────────│─────────│──────────────────────────│────────│───────────│
+│ 1  │ gen-min │ gen-min │ /made                    │ Pass   │ Ok        │
+│ 2  │ gen-min │ gen-min │ v1/Pod/default/unmatched │ Fail   │ Not found │
+│────│─────────│─────────│──────────────────────────│────────│───────────│
+
+
+Test Summary: 1 tests passed and 1 tests failed
+
+Error: 1 tests failed
+# rc=1
+### kyverno 1.19.1: $ kyverno test <scratch>/minimal/objsel-skip --remove-color
+  Applying 1 policy to 2 resources with 0 exceptions ...
+  Checking results ...
+
+│────│─────────│─────────│──────────────────────────│────────│───────────│
+│ ID │ POLICY  │ RULE    │ RESOURCE                 │ RESULT │ REASON    │
+│────│─────────│─────────│──────────────────────────│────────│───────────│
+│ 1  │ gen-min │ gen-min │ /made                    │ Pass   │ Ok        │
+│ 2  │ gen-min │ gen-min │ v1/Pod/default/unmatched │ Fail   │ Not found │
+│────│─────────│─────────│──────────────────────────│────────│───────────│
+
+
+Test Summary: 1 tests passed and 1 tests failed
+
+Error: 1 tests failed
+# rc=1
+======== case expr-gate
+### kyverno 1.18.2: $ kyverno test <scratch>/minimal/expr-gate --remove-color
+  Applying 1 policy to 2 resources with 0 exceptions ...
+  Checking results ...
+
+│────│─────────│─────────│──────────────────────────│────────│──────────│
+│ ID │ POLICY  │ RULE    │ RESOURCE                 │ RESULT │ REASON   │
+│────│─────────│─────────│──────────────────────────│────────│──────────│
+│ 1  │ gen-min │ gen-min │ /made                    │ Pass   │ Ok       │
+│ 2  │ gen-min │ gen-min │ v1/Pod/default/unmatched │ Pass   │ Excluded │
+│────│─────────│─────────│──────────────────────────│────────│──────────│
+
+
+Test Summary: 2 tests passed and 0 tests failed
+# rc=0
+### kyverno 1.19.1: $ kyverno test <scratch>/minimal/expr-gate --remove-color
+  Applying 1 policy to 2 resources with 0 exceptions ...
+  Checking results ...
+
+│────│─────────│─────────│──────────────────────────│────────│─────────────────────│
+│ ID │ POLICY  │ RULE    │ RESOURCE                 │ RESULT │ REASON              │
+│────│─────────│─────────│──────────────────────────│────────│─────────────────────│
+│ 1  │ gen-min │ gen-min │ /made                    │ Pass   │ Ok                  │
+│ 2  │ gen-min │ gen-min │ v1/Pod/default/unmatched │ Fail   │ Want skip, got pass │
+│────│─────────│─────────│──────────────────────────│────────│─────────────────────│
+
+
+Test Summary: 1 tests passed and 1 tests failed
+
+Error: 1 tests failed
+# rc=1
+======== case mpol-skip
+### kyverno 1.18.2: $ kyverno test <scratch>/minimal/mpol-skip --remove-color
+  Applying 1 policy to 2 resources with 0 exceptions ...
+  Checking results ...
+
+│────│─────────│──────│──────────────────────────│────────│────────│
+│ ID │ POLICY  │ RULE │ RESOURCE                 │ RESULT │ REASON │
+│────│─────────│──────│──────────────────────────│────────│────────│
+│ 1  │ mut-min │      │ v1/Pod/default/matched   │ Pass   │ Ok     │
+│ 2  │ mut-min │      │ v1/Pod/default/unmatched │ Pass   │ Ok     │
+│────│─────────│──────│──────────────────────────│────────│────────│
+
+
+Test Summary: 2 tests passed and 0 tests failed
+# rc=0
+### kyverno 1.19.1: $ kyverno test <scratch>/minimal/mpol-skip --remove-color
+  Applying 1 policy to 2 resources with 0 exceptions ...
+  Checking results ...
+
+│────│─────────│──────│──────────────────────────│────────│────────│
+│ ID │ POLICY  │ RULE │ RESOURCE                 │ RESULT │ REASON │
+│────│─────────│──────│──────────────────────────│────────│────────│
+│ 1  │ mut-min │      │ v1/Pod/default/matched   │ Pass   │ Ok     │
+│ 2  │ mut-min │      │ v1/Pod/default/unmatched │ Pass   │ Ok     │
+│────│─────────│──────│──────────────────────────│────────│────────│
+
+
+Test Summary: 2 tests passed and 0 tests failed
+# rc=0

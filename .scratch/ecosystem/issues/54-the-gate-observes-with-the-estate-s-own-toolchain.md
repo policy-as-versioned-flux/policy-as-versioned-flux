@@ -47,3 +47,9 @@ Landed on the hub (`5edb962`, with `80f74af` fixing a SIGPIPE that commit introd
 SIGPIPE class ticket 55 fixes elsewhere: under `set -o pipefail` head closes the pipe, and the
 step exited 141 before the gate ran. Run 14 failed on it. Fixed in `80f74af`. Run 14's log proves
 the pins themselves worked: `Version: 1.18.2` and jsonschema both installed.
+
+**2026-09-26, a pointer from ticket 71.** The cage-netpol "behavioural difference" that this
+ticket's Answer records under 1.19.0 was not reproduced on 1.19.1 for the tagged 5.0.0 bodies.
+Under the offline CLI the generated NetworkPolicies are the same on both engines, and only the
+report for an unmatched trigger differs. The upstream change that explains it (PR #16505) is also
+in 1.19.0, which did not run. The capture is in `.scratch/ecosystem/research/kyverno-1.19-cage-diagnosis/`.

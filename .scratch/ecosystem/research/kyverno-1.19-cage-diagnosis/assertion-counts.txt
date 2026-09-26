@@ -1,0 +1,27 @@
+a0-check-1.18.2              cage-tier    passed  passed=13 failed=0 exit=0  
+a0-check-1.18.2              cage-netpol  passed  passed=11 failed=0 exit=0  
+a0-check-1.19.1              (no matrices) outcome=could-not-look reason=['engine/version outside the declared test matrix or additional engines unmeasured; compatibility unknown']
+a1-row-1.18.2                cage-tier    passed  passed=13 failed=0 exit=0  
+a1-row-1.18.2                cage-netpol  passed  passed=11 failed=0 exit=0  
+a1-row-1.19.1                cage-tier    failed  passed= 0 failed=0 exit=1  compile error
+a1-row-1.19.1                cage-netpol  failed  passed= 9 failed=2 exit=1  #10 v1/Pod/default/caged-baseline: Not found; #11 v1/Pod/default/healthy: Not found
+b-string-tier-1.18.2         cage-tier    passed  passed=13 failed=0 exit=0  
+b-string-tier-1.18.2         cage-netpol  passed  passed=11 failed=0 exit=0  
+b-string-tier-1.19.1         cage-tier    passed  passed=13 failed=0 exit=0  
+b-string-tier-1.19.1         cage-netpol  failed  passed= 9 failed=2 exit=1  #10 v1/Pod/default/caged-baseline: Not found; #11 v1/Pod/default/healthy: Not found
+e-exprgate-1.18.2            cage-tier    passed  passed=13 failed=0 exit=0  
+e-exprgate-1.18.2            cage-netpol  passed  passed=11 failed=0 exit=0  
+e-exprgate-1.19.1            cage-tier    passed  passed=13 failed=0 exit=0  
+e-exprgate-1.19.1            cage-netpol  failed  passed= 9 failed=2 exit=1  #10 v1/Pod/default/caged-baseline: Want skip, got pass; #11 v1/Pod/default/healthy: Want skip, got pass
+f-v1-on-b-1.18.2             cage-tier    passed  passed=13 failed=0 exit=0  
+f-v1-on-b-1.18.2             cage-netpol  passed  passed=11 failed=0 exit=0  
+f-v1-on-b-1.19.1             cage-tier    passed  passed=13 failed=0 exit=0  
+f-v1-on-b-1.19.1             cage-netpol  failed  passed= 9 failed=2 exit=1  #10 v1/Pod/default/caged-baseline: Not found; #11 v1/Pod/default/healthy: Not found
+f-v1-on-tagged-1.18.2        cage-tier    passed  passed=13 failed=0 exit=0  
+f-v1-on-tagged-1.18.2        cage-netpol  passed  passed=11 failed=0 exit=0  
+f-v1-on-tagged-1.19.1        cage-tier    failed  passed= 0 failed=0 exit=1  compile error
+f-v1-on-tagged-1.19.1        cage-netpol  failed  passed= 9 failed=2 exit=1  #10 v1/Pod/default/caged-baseline: Not found; #11 v1/Pod/default/healthy: Not found
+x-fixture-noskip-1.18.2      cage-tier    passed  passed=13 failed=0 exit=0  
+x-fixture-noskip-1.18.2      cage-netpol  passed  passed= 9 failed=0 exit=0  
+x-fixture-noskip-1.19.1      cage-tier    passed  passed=13 failed=0 exit=0  
+x-fixture-noskip-1.19.1      cage-netpol  passed  passed= 9 failed=0 exit=0  

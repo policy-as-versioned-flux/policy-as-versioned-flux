@@ -1,0 +1,31 @@
+$ <scratch>/bin/1.18.2/kyverno test <scratch>/work/f-v1-on-tagged-1.18.2/graded/tests/cage-tier
+# rc=0
+Loading test  ( <scratch>/work/f-v1-on-tagged-1.18.2/graded/tests/cage-tier/kyverno-test.yaml ) ...
+  Loading values/variables ...
+  Loading policies ...
+  Loading resources ...
+  Loading exceptions ...
+  Applying 1 policy to 13 resources with 0 exceptions ...
+  Checking results ...
+
+│──────────│─────────────────│──────│─────────────────────────────────────────│────────│────────│
+│ [40;32mID (13) [0m │ [40;32mPOLICY         [0m │ [40;32mRULE[0m │ [40;32mRESOURCE                               [0m │ [40;32mRESULT[0m │ [40;32mREASON[0m │
+│──────────│─────────────────│──────│─────────────────────────────────────────│────────│────────│
+│ 1        │ cage-tier-5-0-0 │      │ v1/Pod/cage-baseline/at-baseline        │ Pass   │ Ok     │
+│ 2        │ cage-tier-5-0-0 │      │ v1/Pod/cage-restricted/at-restricted    │ Pass   │ Ok     │
+│ 3        │ cage-tier-5-0-0 │      │ v1/Pod/cage-quarantine/at-quarantine    │ Pass   │ Ok     │
+│ 4        │ cage-tier-5-0-0 │      │ v1/Pod/cage-isolated/at-isolated        │ Pass   │ Ok     │
+│ 5        │ cage-tier-5-0-0 │      │ v1/Pod/cage-untiered/untiered-ns        │ Pass   │ Ok     │
+│ 6        │ cage-tier-5-0-0 │      │ v1/Pod/cage-quarantine/forged-tier      │ Pass   │ Ok     │
+│ 7        │ cage-tier-5-0-0 │      │ v1/Pod/cage-baseline/hardened-baseline  │ Pass   │ Ok     │
+│ 8        │ cage-tier-5-0-0 │      │ v1/Pod/cage-baseline/privileged-pod     │ Pass   │ Ok     │
+│ 9        │ cage-tier-5-0-0 │      │ v1/Pod/cage-isolated/host-namespaces    │ Pass   │ Ok     │
+│ 10       │ cage-tier-5-0-0 │      │ v1/Pod/cage-baseline/tighter-than-tier  │ Pass   │ Ok     │
+│ 11       │ cage-tier-5-0-0 │      │ v1/Pod/cage-quarantine/sidecar-resident │ Pass   │ Ok     │
+│ 12       │ cage-tier-5-0-0 │      │ v1/Pod/cage-ungoverned/ungoverned-ns    │ Pass   │ Ok     │
+│ 13       │ cage-tier-5-0-0 │      │ v1/Pod/kube-system/unclaimed-system     │ Pass   │ Ok     │
+│──────────│─────────────────│──────│─────────────────────────────────────────│────────│────────│
+
+
+Test Summary: 13 tests passed and 0 tests failed
+

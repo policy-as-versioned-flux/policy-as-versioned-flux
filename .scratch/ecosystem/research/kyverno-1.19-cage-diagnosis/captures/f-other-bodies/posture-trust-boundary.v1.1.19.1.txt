@@ -1,0 +1,210 @@
+$ bin/1.19.1/kyverno apply variants/f-v1-on-b/distribution/policies/v5.0.0/posture-trust-boundary.yaml --resource work/b-string-tier-1.18.2/graded/tests/cage-tier/resources.yaml -f work/b-string-tier-1.18.2/graded/tests/cage-tier/values.yaml --remove-color -p
+apiVersion: openreports.io/v1alpha1
+kind: ClusterReport
+metadata:
+  name: merged
+results:
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: untiered-ns
+    namespace: cage-untiered
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: forged-tier
+    namespace: cage-quarantine
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: hardened-baseline
+    namespace: cage-baseline
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: unclaimed-system
+    namespace: kube-system
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: host-namespaces
+    namespace: cage-isolated
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: tighter-than-tier
+    namespace: cage-baseline
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: sidecar-resident
+    namespace: cage-quarantine
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-baseline
+    namespace: cage-baseline
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-restricted
+    namespace: cage-restricted
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-quarantine
+    namespace: cage-quarantine
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: at-isolated
+    namespace: cage-isolated
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: privileged-pod
+    namespace: cage-baseline
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+- message: skip
+  policy: posture-trust-boundary-5-0-0
+  properties:
+    process: background scan
+  resources:
+  - apiVersion: v1
+    kind: Pod
+    name: ungoverned-ns
+    namespace: cage-ungoverned
+  result: skip
+  scored: true
+  source: KyvernoValidatingPolicy
+  timestamp:
+    nanos: 0
+    seconds: 1790357572
+source: ""
+summary:
+  error: 0
+  fail: 0
+  pass: 0
+  skip: 13
+  warn: 0
+
+# rc=0

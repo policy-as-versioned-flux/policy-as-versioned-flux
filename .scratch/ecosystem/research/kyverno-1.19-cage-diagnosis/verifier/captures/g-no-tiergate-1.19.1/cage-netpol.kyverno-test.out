@@ -1,0 +1,30 @@
+Loading test  ( <tmp> ) ...
+  Loading values/variables ...
+  Loading policies ...
+  Loading resources ...
+  Loading exceptions ...
+  Applying 1 policy to 5 resources with 0 exceptions ...
+  Checking results ...
+
+│──────────│───────────────────│───────────────────│────────────────────────│────────│─────────────────────│
+│ [40;32mID (13) [0m │ [40;32mPOLICY           [0m │ [40;32mRULE             [0m │ [40;32mRESOURCE              [0m │ [40;32mRESULT[0m │ [40;32mREASON             [0m │
+│──────────│───────────────────│───────────────────│────────────────────────│────────│─────────────────────│
+│ 1        │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-restricted │ Pass   │ Ok                  │
+│ 2        │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-quarantine │ Pass   │ Ok                  │
+│ 3        │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-isolated   │ Pass   │ Ok                  │
+│ 4        │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-restricted │ Pass   │ Ok                  │
+│ 5        │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-quarantine │ Pass   │ Ok                  │
+│ 6        │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-isolated   │ Pass   │ Ok                  │
+│ 7        │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-restricted │ Pass   │ Ok                  │
+│ 8        │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-quarantine │ Pass   │ Ok                  │
+│ 9        │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-isolated   │ Pass   │ Ok                  │
+│ 10       │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-restricted │ Fail   │ Want skip, got pass │
+│ 11       │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-quarantine │ Fail   │ Want skip, got pass │
+│ 12       │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ /cage-reach-isolated   │ Fail   │ Want skip, got pass │
+│ 13       │ cage-netpol-5-0-0 │ cage-netpol-5-0-0 │ v1/Pod/default/healthy │ Fail   │ Not found           │
+│──────────│───────────────────│───────────────────│────────────────────────│────────│─────────────────────│
+
+
+Test Summary: 9 tests passed and 4 tests failed
+
+Error: 4 tests failed

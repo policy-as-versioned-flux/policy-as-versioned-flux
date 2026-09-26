@@ -1,0 +1,14 @@
+Version: 1.18.2
+Time: 2026-07-10T01:17:50Z
+Git commit ID: 945ac9ce8546ea6cd51370f24b615148c577da5e
+rc=0
+Version: 1.19.1
+Time: 2026-09-10T05:20:21Z
+Git commit ID: 40ec788d48bb28d83dbf85538e962a59db9d45c6
+rc=0
+
+# sha256, measured 2026-09-26 from the files the diagnosis ran (darwin_arm64)
+cc69bc6638da1993146c134943fac91cbc9dd0ce60a3e88c6d7c518ae00f1abc  bin/k1182.tgz
+2cf5febbedaafca5d3c7819925a49f9723bf4c3337a1327b6f72970480af385a  bin/k1191.tgz
+e22e36099762401ad1c82ebe00c0b80aac0317c5e11396d613b407a7668107df  bin/1.18.2/kyverno
+44477b1176c9aac308794c3638fe5f82dfd1ceab28b7d8faa96651c81a0d0504  bin/1.19.1/kyverno

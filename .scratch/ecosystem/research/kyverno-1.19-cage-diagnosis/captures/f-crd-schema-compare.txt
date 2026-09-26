@@ -1,0 +1,37 @@
+1.18.2 generatingpolicies: v1(served=True,storage=False,deprecated=False), v1alpha1(served=True,storage=False,deprecated=True), v1beta1(served=True,storage=True,deprecated=False)
+   only in v1alpha1: []
+   only in v1      : []
+   spec.required v1alpha1: ['generate']  v1: ['generate']
+1.18.2 mutatingpolicies: v1(served=True,storage=False,deprecated=False), v1alpha1(served=True,storage=False,deprecated=True), v1beta1(served=True,storage=True,deprecated=False)
+   only in v1alpha1: []
+   only in v1      : []
+   spec.required v1alpha1: None  v1: None
+1.18.2 validatingpolicies: v1(served=True,storage=False,deprecated=False), v1alpha1(served=True,storage=False,deprecated=True), v1beta1(served=True,storage=True,deprecated=False)
+   only in v1alpha1: []
+   only in v1      : []
+   spec.required v1alpha1: None  v1: None
+1.19.1 generatingpolicies: v1(served=True,storage=False,deprecated=False), v1alpha1(served=True,storage=False,deprecated=True), v1beta1(served=True,storage=True,deprecated=False)
+   only in v1alpha1: []
+   only in v1      : []
+   spec.required v1alpha1: ['generate']  v1: ['generate']
+1.19.1 mutatingpolicies: v1(served=True,storage=False,deprecated=False), v1alpha1(served=True,storage=False,deprecated=True), v1beta1(served=True,storage=True,deprecated=False)
+   only in v1alpha1: []
+   only in v1      : []
+   spec.required v1alpha1: None  v1: None
+1.19.1 validatingpolicies: v1(served=True,storage=False,deprecated=False), v1alpha1(served=True,storage=False,deprecated=True), v1beta1(served=True,storage=True,deprecated=False)
+   only in v1alpha1: []
+   only in v1      : []
+   spec.required v1alpha1: None  v1: None
+--- full openAPIV3Schema comparison v1alpha1 vs v1 ---
+1.18.2 generatingpolicies schema differences: 0
+   additionalPrinterColumns equal: True  subresources equal: True
+1.18.2 mutatingpolicies schema differences: 0
+   additionalPrinterColumns equal: True  subresources equal: True
+1.18.2 validatingpolicies schema differences: 0
+   additionalPrinterColumns equal: True  subresources equal: True
+1.19.1 generatingpolicies schema differences: 0
+   additionalPrinterColumns equal: True  subresources equal: True
+1.19.1 mutatingpolicies schema differences: 0
+   additionalPrinterColumns equal: True  subresources equal: True
+1.19.1 validatingpolicies schema differences: 0
+   additionalPrinterColumns equal: True  subresources equal: True

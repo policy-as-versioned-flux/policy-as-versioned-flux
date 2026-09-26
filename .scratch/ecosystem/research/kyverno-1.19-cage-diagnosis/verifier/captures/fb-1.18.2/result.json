@@ -1,0 +1,22 @@
+{
+  "matrices": [
+    {
+      "family": "cage-tier",
+      "outcome": "passed",
+      "passed_assertions": 13,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "69c40644c3f966f77176e229bdc157d797d2add6e8a512f95a31daa3ed21108f",
+      "diagnostic": null
+    },
+    {
+      "family": "cage-netpol",
+      "outcome": "passed",
+      "passed_assertions": 11,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "138690b9105325245dbf6d8e80bd4df87cedaf38f5308e0fea2f679446f2a2b5",
+      "diagnostic": null
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "mode": "variant",
+  "variant": "<scratch>/variants/b-string-tier",
+  "binary": "<scratch>/bin/1.18.2/kyverno",
+  "matrices": [
+    {
+      "family": "cage-tier",
+      "outcome": "passed",
+      "passed_assertions": 13,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "ca3ad116fd467d45f1a8e6c934c9ce3acef124686a98f1d664f1a12b15b662aa",
+      "diagnostic": null
+    },
+    {
+      "family": "cage-netpol",
+      "outcome": "passed",
+      "passed_assertions": 11,
+      "failed_assertions": 0,
+      "exit_code": 0,
+      "output_sha256": "a198a89ff617e53a5ac5fb8f5d079b1d0438af2b578b0a92b2e292f7def7b91b",
+      "diagnostic": null
+    }
+  ],
+  "outcome": "passed"
+}
