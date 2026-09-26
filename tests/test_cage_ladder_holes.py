@@ -36,6 +36,13 @@ reason the ticket refuses to catalogue a candidate unread.
      observation that cannot be looked at now holds the walk at exit 3, outside the manifest's
      declared `waits:`, so leg B is that repair's regression test.
 
+These legs evaluate placement on PLATFORM's bodies: `distribution/policies/v*/cage-tier.yaml` and
+`graded/policies/cage-tier.yaml`. Each adopter's SERVED composed set is a different object, and it
+is graded by that adopter's own `verify-cage-probe.sh` (driftwood, ludlow and tuppence; eco-system
+ticket 161, from ticket 152 Q9): the sampler's own probe objects against `composed/` at the tag the
+adopter pins and at HEAD, through `drift/cage_probe.py`. That script does not replace these legs,
+and these legs do not grade an adopter's served set.
+
 The `infra` legs that need an engine run under the version the release workflows pin, 1.18.2.
 A different CLI is a could-not-look and says so: 1.19.1 refuses to compile the served body at all
 (`expected type 'string' but found 'dyn'`), and grading that as a passing fixture would be this
@@ -404,7 +411,7 @@ def test_the_tripwire_fires_on_a_duplicated_matchconditions_key(tmp_path):
 
 
 def test_the_tripwire_passes_a_platform_that_serves_only_the_fixed_line(tmp_path):
-    """The control. Without it, the FAIL legs below could be the tripwire failing everything."""
+    """The reference. Without it, the FAIL legs below could be the tripwire failing everything."""
     run = _tripwire(_plant_platform(tmp_path))
     assert run.returncode == 0 and "PASS:" in run.stdout, run.stdout + run.stderr
 
