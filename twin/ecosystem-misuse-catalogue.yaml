@@ -320,13 +320,18 @@ entries:
       picks the rung over the residuals the table derives; the proposer proposes it and a human
       merges the recompose that carries it. The composed `agent-cage` line (source: platform,
       subject: twin-agent) carries the whole derivation, and leg 3b re-derives the gap, the
-      magnitude, every residual (from the line's own reach through the four closures) and the rung
-      from it. Residual: the price is small because the window is one day; it says nothing about a
+      magnitude, the amount (always, as the PERT-mean frequency times the PERT-mean magnitude,
+      whatever the line says it was annualised by; any other annualisation is refused by name),
+      the reach (off the adopter's SERVED tree through `_agent_reach`, the hub's restatement of
+      `_twin_agent_reach`: the sweep's token, the pull-request gate's steps, the grades the
+      document's own prices rest on; a reach the line asserts that the tree does not give is a
+      FAIL) and every residual (from that reach through the four closures) and the rung from it. Residual: the price is small because the window is one day; it says nothing about a
       merge over a red gate by a person, which is the human's act.
     anchors:
       - "verify/schedules/lane.py::def grade_ref"
       - "verify/pound-seam/pound_seam.py::AGENT_TABLE_PREFIX"
       - "verify/pound-seam/pound_seam.py::def check_agent_cage"
+      - "verify/pound-seam/pound_seam.py::def _agent_reach"
       - "docs/adr/0031-the-twin-agent-is-caged-by-a-dial-table-the-platform-prices-it-and-the-adopter-selects.md::The platform prices the cage; the adopter selects the rung"
       # - "platform/graded/cage.py::TWIN_AGENT_PATHS"
       # - "platform/graded/cage.py::DETECTION_WINDOW"
@@ -361,6 +366,7 @@ entries:
       - "verify/schedules/lane.py::def grade_ref"
       - "verify/schedules/schedules.py::_SIGNED_ARTEFACT"
       - "verify/pound-seam/pound_seam.py::def check_agent_cage"
+      - "verify/pound-seam/pound_seam.py::def _agent_reach"
       # - "platform/graded/cage.py::def twin_agent_reduce"
       # - "platform/compose/composition.py::writer-merges-or-tags-through-rest"
     waits_on:
@@ -381,9 +387,13 @@ entries:
       job recomposes the party artefact on every pull request and fails on any drift against the
       committed composed/ tree, which refuses a hand-edited rung on the agent-cage line itself; so
       a proposal a human merges THROUGH the gate serves none of the declaration gap, and
-      platform/compose/composition.py `_twin_agent_reach` derives 0.0 when it finds both in a
-      pull-request workflow, naming both on `reach_basis`, and a named could-not-look when either
-      is missing. A merge over a red gate is the human's act, not the twin agent's (ADR-0031
+      platform/compose/composition.py `_twin_agent_reach` derives 0.0 when it finds both as steps'
+      own `run` blocks in a pull-request workflow (comment lines stripped, the drift test a
+      `status --porcelain`, `diff --exit-code` or `diff --quiet` on `composed/` followed by a non-
+      zero exit; a drift test that survives only as a comment, or whose exit is zero, is no gate),
+      naming both on `reach_basis`, and a named could-not-look when either is missing;
+      verify/pound-seam `_agent_reach` reads the same served steps and grades the composed line's
+      reach against them. A merge over a red gate is the human's act, not the twin agent's (ADR-0031
       decision 1: a skill a human runs is the human's act); the cage prices what the twin agent
       does with nobody at the keyboard. Consequence, measured on the derived table: `quarantine`
       carries the same residual as `restricted` and `baseline`, because the writer's token, still
@@ -392,6 +402,7 @@ entries:
     anchors:
       - "verify/tier-binding/tier_binding_estate.py::def owed"
       - "verify/pound-seam/pound_seam.py::def check_agent_cage"
+      - "verify/pound-seam/pound_seam.py::def _agent_reach"
       - "docs/adr/0031-the-twin-agent-is-caged-by-a-dial-table-the-platform-prices-it-and-the-adopter-selects.md::A skill a human runs is the human's act"
       # - "platform/shift-left/tier_binding.py::def bind"
       # - "platform/compose/composition.py::misleading-proposal-merged-by-a-human"
@@ -413,9 +424,10 @@ entries:
       `grade_5_only_path_never_prices`); platform/compose/composition.py `_twin_agent_reach`
       derives 0.0 when no composed price rests on a grade above 3 and a named could-not-look
       otherwise. Consequence, recorded in ADR-0031 and measured by platform/graded/cage.py's
-      selfcheck and by verify/pound-seam leg 3b on every composed line, which re-derives every
-      residual from the line's own reach through the four closures rather than hard-coding
-      today's consequence as a rule: on the served trees `restricted` carries the same residual as
+      selfcheck and by verify/pound-seam leg 3b on every composed line, which derives the reach
+      off the served tree and the document's own grades (`_agent_reach`) and re-derives every
+      residual from it through the four closures rather than believing the line's own reach or
+      hard-coding today's consequence as a rule: on the served trees `restricted` carries the same residual as
       `baseline`, so the pound never selects it for its own sake, and where the model path's reach
       could not be derived (a priced line resting on a grade above 3) `baseline` has no residual
       and is not a candidate. That is correct, not a gap: the rung still exists for a party that
@@ -424,6 +436,7 @@ entries:
       - "twin/invariants/checks.py::grade_5_only_path_never_prices"
       - "twin/evidence-ladder.yaml"
       - "verify/pound-seam/pound_seam.py::def _rederive_agent_residuals"
+      - "verify/pound-seam/pound_seam.py::def _agent_reach"
       - "docs/adr/0031-the-twin-agent-is-caged-by-a-dial-table-the-platform-prices-it-and-the-adopter-selects.md::because model claims never price today"
       # - "platform/graded/cage.py::model-step-writes-a-wrong-binding-or-forecast"
       # - "platform/party/schema.json::pricing_threshold"
