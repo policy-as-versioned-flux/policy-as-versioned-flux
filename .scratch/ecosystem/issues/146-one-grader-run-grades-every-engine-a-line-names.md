@@ -1,7 +1,7 @@
 # 146 — One grader run grades every engine a line names
 
 Type: task
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -93,3 +93,112 @@ line supports. The cut script keeps a `tested_engines` that it finds before a cu
 - No platform tools tag is needed for items 1 to 3 and 5 to 10. The hub gate grades platform
   `main`. Item 4 grades the machinery on platform `main` too. The machinery reaches adopters only
   with ticket 148's tools tag.
+
+## Comments
+
+**2026-09-26, owner-instructed: built as two pull requests.** On 2026-09-26 the owner answered
+"Authorised" to a list that began "build eco-system tickets 146 to 150". This ticket is built as a
+platform pull request (branch `ticket-146-engine-cells` in `policy-as-versioned-platform/platform`)
+and this hub pull request. Nothing here reaches an adopter, and no tag is cut. The platform pull
+request must merge first. Until it does, the hub gate's `verify/estate-engines/` check reads no
+engine table on platform `main` and fails by name.
+
+What the two pull requests build, item by item:
+
+1. **The engine table** is platform `engine/kyverno/engine-table.yaml`, read by
+   `engine/engine_table.py`, which refuses a malformed row. It has one row, 1.18.2. The CLI
+   checksums (darwin_arm64 `cc69bc66...`, linux_x86_64 `cb2feb83...`) are from
+   `https://github.com/kyverno/kyverno/releases/download/v1.18.2/checksums.txt`. The linux_x86_64
+   value equals the pin in hub `truth.yml` and platform `release.yml` and `cut-release.yml`.
+   `install.yaml` is not listed in that checksums file. Its sha256 (`3dcd43ea...`) is the GitHub
+   release API's asset digest, the sha256 of the file downloaded on 2026-09-26, and the pin in all
+   three adopters' `drift-sample.yml`. All three agree. The chart row (3.8.2, appVersion v1.18.2,
+   digest `f4fc787c...`) is from `https://kyverno.github.io/kyverno/index.yaml`.
+   `engine/install-kyverno-engines.sh` installs every row by checksum.
+2. **One run grades every cell.** `computed-semver/engine_compatibility.py` `check()` takes one
+   binary per engine and identifies each by running it. A listed cell with no binary reads
+   could-not-look. A binary no subject lists is reported as extra and never read as support. The
+   report prints the whole matrix.
+3. **Every body the line serves.** The new scope is `every-served-body-v1`. The grader refuses
+   `published-cage-fixtures-v1` by name. Fixtures for `require-nonroot`, `stamp-posture` and
+   `posture-trust-boundary` at 5.0.0 are new, in `computed-semver/engine-fixtures/v5.0.0/`,
+   written against the tagged bytes. 5.0.0 was graded under the new scope on a throwaway commit
+   before the scope was written on its element.
+4. **The machinery** declares `tested_engines` in platform `distribution/machinery.yaml`. The
+   grader renders it through a new public `machinery_members()` in `compose/composition.py`, the
+   same call composition makes, and grades each member against
+   `computed-semver/engine-fixtures/machinery/<member>/`.
+5. **The candidate grade.** An uncut element with `tested_engines` is graded on the commit being
+   graded, which is the commit that declares it. `cut-release.yml` now installs every engine in
+   the table and runs the grader after the publisher gate and before the evidence commit, so no
+   tag is signed until every cell passes. `verify-first-gate-determined-release.sh` asserts that
+   step's place.
+6. **The gate installs every engine.** Hub `truth.yml` assembles the estate, fetches the platform
+   tags, installs every row's linux_x86_64 CLI by the table's checksum into `RUNNER_TEMP`, and
+   names the directory in `KYVERNO_ENGINE_DIR`. `verify-cage-engine.sh` hands that directory to
+   the grader.
+7. **The pins check** is `verify/estate-engines/`. It is not called `engine-pins`, because a file
+   hook refuses that word in a file name. It reads the five pins and fails on a planted pin that no
+   served line supports.
+8. **The cut script** keeps a nested `tested_engines`. The red test is case 9 of platform
+   `verify-cut-release-tags.sh`, committed before the fix.
+9. **The records.** The computed-semver README section is rewritten, and the four statements are
+   gone. The `helmrelease.yaml` comment cites ADR-0033 and the table.
+10. **`graded/verify-graded.sh`** prints the engine it measured with, and fails by name if the
+    engine is not a row of the table.
+
+**2026-09-26, delegated decisions made during the build (ADR-0025).**
+
+- The table lives beside the reference install whose chart column it constrains, and is named
+  for what ADR-0033 calls it. Checksums are quoted strings, because YAML reads an all-digit value
+  as an integer, and the macOS `sha256sum` passed a malformed line when one was tried.
+- A body with no fixture FAILS its cell rather than reading could-not-look. Support means its
+  fixtures pass, and the remedy is the estate's own: write one.
+- The grader reads one commit (HEAD by default) for the array, the machinery and the line
+  fixtures, never the working tree. Line fixtures are read from that commit, not from the tag,
+  because they can be written after the cut. The row records both identities.
+- The machinery declaration is its own file, not a key in `versions.yaml`. That file is a
+  ResourceSet clusters apply, and several readers parse its array.
+- The grader gains the generated-documents comparison that ticket 149 item 4 describes, as a
+  `generates.yaml` in a fixture folder. Reason, measured: on 1.18.2 `kyverno test` reads a
+  generator trigger that the body excludes as Pass / Excluded, even on a row that expects a
+  generated resource. So a `kyverno test` fixture for the bottom-rung generator passed with a
+  gate planted to exclude one trigger. The `generates.yaml` fixture fails on that plant. Ticket
+  149 can reuse the format for cage-netpol.
+- The two UPDATE-only holds are graded on compiling only. Measured: `kyverno test` never matches
+  an UPDATE-only body, and the rows read skip with the oldObject gate removed too. A planted
+  compile error fails the run.
+- `kyverno test` does not evaluate `namespaceSelector` (measured: a selector that matches nothing
+  still passed every row). The governed-namespace fixtures grade what the body does to a pod it
+  matches, and say so.
+- `PINNED_KYVERNO` stays a constant, and the pins check reads it with `ast`. Making the test read
+  the table would tie the hub pytest suite to the platform clone's table.
+- The pins check binds the pins to the cut lines and to the machinery. An uncut candidate serves
+  nothing, and the grader grades its cut. The check reads each subject's `kyverno` list, and
+  leaves the scope to the grader.
+- Hub `truth.yml` installs the engines inline from the table, rather than by running the
+  platform's installer script, so a platform script change cannot change how the hub installs.
+
+**2026-09-26, what was measured on the branches.** Local runs on the owner's Mac, pinned CLI
+1.18.2 (darwin_arm64, checksum verified), on a scratch estate of every repository's `origin/main`
+with platform at the branch head.
+
+- Grader tests: 18 pass (`python3 -m unittest test_engine_compatibility`). They include a second
+  listed engine with no binary (could-not-look), a candidate graded on its declaring commit
+  (pass), and a candidate that fails a cell (FAIL, exit 1).
+- The real grade before the scope moved: 5.0.0 reads could-not-look, naming the retired scope.
+  Under the new scope, on 1.18.2: cage-tier 13, cage-netpol 11, require-nonroot 6, stamp-posture 5
+  and posture-trust-boundary 5 assertions pass, and all seven machinery bodies pass.
+  `verify-cage-engine.sh` ends `PASS: engine cells -- passed; 2 cell(s): 2 passed`.
+- With 1.19.1 listed on a throwaway commit and both binaries handed in, the 5.0.0 cell on 1.19.1
+  reads FAIL: cage-tier does not compile, and cage-netpol reads 9/2, as the diagnosis found. The
+  other three 5.0.0 bodies and all seven machinery bodies pass on 1.19.1 under these fixtures.
+  That is an offline measurement, not a support claim. Only tickets 148 and 149 list 1.19.1.
+- Each new fixture fails when its body is planted broken.
+- `verify-cut-release-tags.sh` case 9 fails on the old script, with the field dropped and a stray
+  brace. It passes after the fix. A degraded cut still writes `tier: "quarantine"`.
+- `verify/estate-engines/` passes with platform at the branch, fails on platform `main` (no
+  table), and fails with 1.19.1 planted in a copy of `truth.yml`. Its selfcheck grades twelve
+  planted estates as planted.
+- `graded/verify-graded.sh` on 1.18.2: the offline proofs hold and the live tail skips. On
+  1.19.1 it fails, naming the engine.
