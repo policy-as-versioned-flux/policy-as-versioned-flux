@@ -1,6 +1,6 @@
 INFO: driftwood: scheduled identities ['drift-sample@policy-as-versioned-driftwood.invalid', 'twin-agent@policy-as-versioned-driftwood.invalid', 'twin-sweep@policy-as-versioned-driftwood.invalid', 'wargamer-proposer@policy-as-versioned-driftwood.invalid'], lane ['drift/samples.jsonl', 'observations'], refs main fetched now; observations absent on origin
 PASS: driftwood@main: 49 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['drift/samples.jsonl', 'observations'] and none a merge
-NOTE: driftwood@main: 23 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
+NOTE: driftwood@main: 24 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
 INFO: feeds: scheduled identities ['feeds-bot@policy-as-versioned-feeds.invalid'], lane ['observations'], refs main fetched now; observations fetched now
 PASS: feeds@main: no scheduled identity has landed a commit here -- the lane holds vacuously; whether the clock runs at all is verify-schedules' question, not this one's
 NOTE: feeds@main: 7 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
@@ -14,8 +14,8 @@ PASS: insurer@main: no scheduled identity has landed a commit here -- the lane h
 NOTE: insurer@main: 6 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
 PASS: insurer@observations: 26 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['observations'] and none a merge
 INFO: ludlow: scheduled identities ['drift-sample@policy-as-versioned-ludlow.invalid', 'twin-sweep@policy-as-versioned-ludlow.invalid', 'wargamer-proposer@policy-as-versioned-ludlow.invalid'], lane ['drift/samples.jsonl', 'observations/twin-sweep.jsonl'], refs main fetched now; observations absent on origin
-PASS: ludlow@main: 42 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['drift/samples.jsonl', 'observations/twin-sweep.jsonl'] and none a merge
-NOTE: ludlow@main: 23 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
+PASS: ludlow@main: 43 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['drift/samples.jsonl', 'observations/twin-sweep.jsonl'] and none a merge
+NOTE: ludlow@main: 24 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
 INFO: nist: scheduled identities ['fetch-bot@policy-as-versioned-nist.invalid'], lane ['observations'], refs main fetched now; observations fetched now
 PASS: nist@main: no scheduled identity has landed a commit here -- the lane holds vacuously; whether the clock runs at all is verify-schedules' question, not this one's
 NOTE: nist@main: 4 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
@@ -26,10 +26,10 @@ NOTE: platform@main: 18 merge(s) made through GitHub by pavc-other-hand, the rev
 NOTE: platform@main: 6 commit(s) committed by automation identity releases@policy-as-versioned-platform.invalid, which no scheduled workflow configures -- outside this lane (a dispatched workflow is a human act, ADR-0023) and not graded
 PASS: platform@observations: 26 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['observations'] and none a merge
 INFO: tuppence: scheduled identities ['drift-sample@policy-as-versioned-tuppence.invalid', 'twin-sweep@policy-as-versioned-tuppence.invalid', 'wargamer-proposer@policy-as-versioned-tuppence.invalid'], lane ['drift/samples.jsonl', 'observations/twin-sweep.jsonl'], refs main fetched now; observations absent on origin
-PASS: tuppence@main: 42 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['drift/samples.jsonl', 'observations/twin-sweep.jsonl'] and none a merge
-NOTE: tuppence@main: 25 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
+PASS: tuppence@main: 43 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['drift/samples.jsonl', 'observations/twin-sweep.jsonl'] and none a merge
+NOTE: tuppence@main: 26 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
 INFO: hub: scheduled identities ['truth@users.noreply.github.com'], lane ['talk/truth.log', 'drift/samples.jsonl', 'talk/captures', 'observations'], refs main fetched now; observations absent on origin
-PASS: hub@main: 91 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['talk/truth.log', 'drift/samples.jsonl', 'talk/captures', 'observations'] and none a merge
+PASS: hub@main: 92 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['talk/truth.log', 'drift/samples.jsonl', 'talk/captures', 'observations'] and none a merge
 NOTE: hub@main: 79 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
 PASS: platform@main: compose/comparison_history.py OBSERVATION_PATHS equals ADR-0024's list here
 PASS: every commit a scheduled identity has landed on an observation ref touched only
