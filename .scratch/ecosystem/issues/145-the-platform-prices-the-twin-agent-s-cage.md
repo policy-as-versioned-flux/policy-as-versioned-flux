@@ -277,7 +277,8 @@ agent-cage (the real driftwood unpriced by name; the v4 copy at 0.4213 GBP, `bas
 unmoved, the reach basis naming twin-sweep.yml, its cron and job and shift-left.yml's two jobs; the
 read-only sweep and the gateless copy falling to `isolated` and `quarantine`). Hub: `pound_seam.py
 selfcheck` ok with 59 planted cases; `pound_seam.py check` over the estate as served rc 3, 30 PASS,
-0 FAIL, the same three named SKIPs; over an estate where driftwood serves a v4-priced document
+0 FAIL, four named SKIPs (one agent-cage wait per adopter and the standing switching one;
+corrected in review round 2, which had read three); over an estate where driftwood serves a v4-priced document
 composed by the fixed composer: 32 PASS, 0 FAIL, the leg-3b PASS naming cron '47 5 * * *' in
 .github/workflows/truth.yml, the row at feeds/threat-register/v4/feed.json and every residual
 re-derived. Adversarial re-plants through the real check: c (lef x10, amount and residuals
@@ -300,3 +301,110 @@ as main's run 349 (36210103413, hub 9c3b1f2), the same two FAIL rows (`verify/fo
 `verify/pound-seam/verify-pound-seam.sh` SKIP (waits) on the declared agent-cage line. Platform PR
 #46 (head ed4f735) and feeds PR #9 (head b1d9459b, unchanged this round) have no pull-request CI in
 their repositories; the platform checks ran locally as recorded above.
+
+**2026-09-26, review round 2 fixed, owner-instructed.** The owner wrote on 2026-09-25: "i'm afk you
+have all the approvals you need to deliver". Under that authorisation the reviewer's second-round
+findings on the three pull requests are addressed on the same branches (platform #46, hub #143;
+feeds #9 is unchanged), with no merge, tag, release or dispatch. The blocking finding first, then
+every minor one, each accepted; the decisions each fix forced are **delegated** (ADR-0025) and
+recorded here with their reason.
+
+*Blocking, the amount measurement ran only under the line's own label.* Leg 3b re-derived the amount
+as the PERT-mean frequency times the PERT-mean magnitude only when the line's own
+`scenario.annualised_by` said `expectation`; a line labelled `simulation` with its amount a thousand
+times the product and its residuals recomputed to match was green, and the record claimed the amount
+was re-derived. Now the amount is re-derived on every priced line whatever the label says, and any
+`annualised_by` other than `expectation` is refused by name. Decision: refuse the label rather than
+believe it, because a simulated mean is not re-derivable in the seam (`fair.simulate` rounds each
+year's event count to an integer and resolves no event at this frequency) and the composer writes
+`expectation` and nothing else (platform compose/composition.py `price_twin_agent`). Measured: the
+reviewer's plant e through the real check over a v4-priced estate is now three FAILs (the label, the
+product, and the reviewer's own per-customer restatement); the same amount under `expectation` fails
+on the product; an amount that IS the product but labelled `simulation` fails on the label.
+
+*Minor, the reach was believed.* The line's own `reach` was the only input to the residuals the seam
+did not read off a served artefact. `_agent_reach` now restates the composer's `_twin_agent_reach`
+in the seam (as `_rederive_agent_residuals` restates cage.py): the two token paths off the adopter's
+served `.github/workflows/twin-sweep.yml` (a `schedule:` trigger and a job whose effective
+permissions grant `contents: write`), the proposal path off the pull-request workflows' own `run`
+steps (one running `tier_binding.py`, one recomposing with a drift test on `composed/` followed by a
+non-zero exit), the model path off the grades the document's own prices rest on. The line's `reach`
+must equal that derivation on every path. Decision: the served document must agree with the served
+tree in BOTH directions, so a path the line leaves underived where the tree derives it is also a
+FAIL, because the compose-check re-derives the document on every pull request and on a served main
+the two can disagree only where that gate was bypassed. A tree the seam cannot read at all (no
+adopter directory in the estate clone) is a SKIP by name, undeclared because unreachable. The
+residuals are re-derived from the served reach, and the PASS names what was read: the sweep's file,
+cron and job, the gate's binding and recompose steps, and that no priced line rests above grade 3.
+Consequence: the reviewer's plant q (a None model-path reach on a line whose document carries no
+grade-5 price) is now a FAIL, since the composer would not have written it; the round-1 selfcheck
+plant for that shape now sits in a context whose served document does rest on a grade above 3.
+Measured: plants f (every path 0.0) and f2 (the token paths 0.0) FAIL naming the served sweep's
+cron and job; `_agent_reach` on planted trees derives (1.0, 1.0, 0.0, 0.0) for a scheduled sweep
+with `contents: write` and a gate with both steps, and None by name for a read-only, unscheduled or
+absent sweep, a commented-out or zero-exit drift test, a missing binding step, a push-only gate and
+a grade-5 line; on the three served adopter trees it derives what the composer derives (1.0, 1.0,
+0.0, 0.0).
+
+*Minor, the tolerance.* `close_rel` (relative 1e-6, absolute 0) now compares the frequency, the
+magnitude, the amount and the residuals; the gap keeps `close()` at its residual scale. Measured:
+the reviewer's plant l (each frequency point nudged by 5e-7, 0.6 % at the mode, amount and residuals
+recomputed) FAILs against the served row.
+
+*Minor, the composer's gate reader read the raw file text.* `_served_pull_request_gate` now reads
+each pull-request workflow's steps' `run` blocks with whole comment lines stripped, and a recompose
+step is a compose invocation, then a drift TEST on `-- composed/` (`status --porcelain`, `diff
+--exit-code` or `diff --quiet`), then a literal non-zero exit after it, in one step; each hit is
+named `<file> job <job>` on `reach_basis`. Decision: a plain `git diff -- composed/` piped to a
+pager is a print, not a test, and is not matched; reason: every served recompose step prints one
+inside its drift block after the porcelain test, so a pattern that matched any `diff` still derived
+0.0 with the porcelain line commented out (the first cut of this fix did, and the selfcheck caught
+it). Measured: the reviewer's plant2 (driftwood's shift-left.yml with the porcelain line and its
+`::error` commented out) now derives None for the proposal path and the pick falls to `quarantine`;
+the composition selfcheck plants both that and a drift test whose exit is turned to zero; on the
+three served trees every reach figure is what it was, and the basis now names `shift-left.yml job
+compose-check` for both steps.
+
+*Minor, "predates the kind" was asserted.* `_kinds_at_pin` reads `PRICE_KINDS` off
+`<pin>:compose/composition.py` with `git show` in the estate's platform clone (clone-estate.sh makes
+a full clone, tags included), never off its working tree. A pinned tag whose `PRICE_KINDS` lacks the
+kind is the declared wait, now stating the tuple it read; one that carries the kind with no line
+served is a FAIL (the document was not composed by the composer at the pin); a tag, file or line
+that cannot be read is a SKIP worded so the manifest does not match it, undeclared because
+unreachable. Decision: no fetch, because the wrapper promises to read committed files only and the
+clone is full. Measured: over the estate as served, each adopter's wait names v4.0.0's tuple ending
+at `supersede`; the selfcheck builds a tagged repository with git plumbing (no commit hook, no
+signature) and reads v4.0.0 without the kind, v5.0.0 with it, and v9.9.9 as a could-not-look;
+`talk/truth_manifest.py judge` says `declared waits` for the derived wait and `undeclared` for the
+unreadable one.
+
+*Minor, tier_pr's recompose branch was untested.* Selfcheck 4h feeds `run()` an agent-cage line
+whose rung moved from `baseline` to `quarantine` beside an unchanged twin line: one landed row of
+kind `recompose`, landed "by the next recompose pull request", naming `composed/evidence.json
+prices[]` and the move; no `pr create` or `pr edit`; no branch created locally or on the remote; no
+file edited; the Namespace declaration on main byte-identical; and with the rung unchanged, no row.
+
+*Minor, the wording.* The round-1 paragraph read "the same three named SKIPs"; the served check
+prints four (one agent-cage wait per adopter and the standing switching one). Corrected above.
+
+**Measured, on the branches in the planted estate (platform 541d2aab plus the branch at 0f46233,
+feeds ff3ac9a plus the branch at b1d9459, adopters at their served heads driftwood 155db9e, tuppence
+5deffe6, ludlow b8e14f7), hub venv python.** Platform: `compose/composition.py --selfcheck` rc 0
+with 106 OK lines (the three agent-cage legs: the real driftwood unpriced by name; the v4 copy at
+0.4213 GBP a year, `baseline`, the fold unmoved, the basis naming `shift-left.yml job compose-check`
+twice; the read-only sweep to `isolated`, and the gateless copy, the commented-out drift test and
+the zero-exit drift test each to `quarantine`); `wargamer/tier_pr.py selfcheck` rc 0 with 4h;
+`wargamer/wargamer.py`, `wargamer/rejection_ledger.py`, `shift-left/tier_binding.py`,
+`graded/cage.py` selfchecks rc 0; `compose/handbook.py --selfcheck` PASS 58; `verify-wargamer.sh`
+and `verify-tier-binding.sh` rc 0. Hub, on a throwaway merge of 01be36df onto origin/main c196a3c1:
+`pound_seam.py selfcheck` ok with 70 planted cases (59 before); `verify-pound-seam.sh` rc 3 over the
+estate as served, 30 PASS, 0 FAIL, 4 SKIP from the check (three derived agent-cage waits naming
+v4.0.0's `PRICE_KINDS`, one switching) plus the wrapper's own summary line; over a plant estate where
+driftwood, pinned to threat-register v4, was recomposed through the fixed composer: 32 PASS, 0 FAIL,
+the leg-3b PASS naming the cron `'47 5 * * *'`, the row at `feeds/threat-register/v4/feed.json`, the
+served sweep's cron `'5 7 * * *'` and job `sweep`, both gate steps in `shift-left.yml job
+compose-check`, and every residual re-derived from that reach; the reviewer's nineteen plants through
+the real check: the pristine document 0 FAIL, and c, d, e, f, f2, g, h, i, j, k, l, m, n, o, p, q, r,
+s each red; `tests/test_misuse.py` 43 passed; `verify-misuse.sh` PASS with the four `_agent_reach`
+anchors resolving; `verify-tier-binding.sh` PASS. CI results for the pushed heads are appended
+below.
