@@ -287,3 +287,16 @@ them; a `feed` line carrying `subject: twin-agent` 1 FAIL, the fold's refusal. `
 43 passed; `verify-misuse.sh` PASS (6 of 12 by path, the four twin-agent rows wait on this ticket by
 name); `verify-tier-binding.sh` PASS over the real adopters through the changed fold. CI results
 for the pushed heads are appended below.
+
+**CI, 2026-09-26, review round 1 heads.** Hub PR #143 (head 569f78ea), twin workflow run
+36216690922: `demo`, `typecheck`, `reproduce-elsewhere` and the three `determinism` jobs pass;
+`tests` and `invariants` fail with exactly main's standing red (invariant 45,
+`flux_coverage_floor_is_still_reachable`: `tests/test_invariant_suite.py::test_the_suite_is_green`,
+1 failed, 2891 passed, 16 skipped on this head and on main 9c3b1f22 run 36210103426; 72 passed, 1
+failed, 2 skipped on both). The branch push also ran the truth workflow (run 351, gate
+36216689399, TRUTH hub=569f78e): 121 result rows, 87 PASS, 2 FAIL, 32 SKIP, row for row the same
+as main's run 349 (36210103413, hub 9c3b1f2), the same two FAIL rows (`verify/forge-review`,
+`verify/schedules`), none added and none removed; `verify/misuse/verify-misuse.sh` PASS and
+`verify/pound-seam/verify-pound-seam.sh` SKIP (waits) on the declared agent-cage line. Platform PR
+#46 (head ed4f735) and feeds PR #9 (head b1d9459b, unchanged this round) have no pull-request CI in
+their repositories; the platform checks ran locally as recorded above.
