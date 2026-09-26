@@ -175,13 +175,15 @@ What the four pull requests build, item by item:
 
 **What was measured, on 2026-09-26, on the owner's Mac.**
 
-- The hub check's selfcheck plants 16 estates and each grades as planted. Among them: tuppence on
+- The hub check's selfcheck plants 17 estates and each grades as planted. Among them: tuppence on
   another row of the table while it shares `kind-driftwood` (FAIL), ludlow on another row while it
   shares nothing (PASS), a ludlow script moved onto `kind-tuppence` with the two disagreeing
   (FAIL), `talk/up.sh` still running platform `engine/up.sh` (FAIL) and an engine added to
-  `kind-ludlow` (FAIL). Five mutations of the check (no shared-cluster comparison, no field
-  comparison, the reference install allowed, an engine allowed anywhere, and the sharing
-  hard-coded) each make the selfcheck fail.
+  `kind-ludlow` (FAIL), and tuppence on another row when `talk/up.sh` does not run driftwood's
+  own bring-up (FAIL, because the engine's owner counts as a user of its cluster). Six mutations
+  of the check (no shared-cluster comparison, no field comparison, the reference install allowed,
+  an engine allowed anywhere, the sharing hard-coded, and the owner not counted as a user) each
+  make the selfcheck fail.
 - The check over an estate of platform `origin/main` (`cb680f2`) and the three adopters'
   `origin/main` (driftwood `5d0f467`, tuppence `0be3665`, ludlow `2eca9d0`): exit 1, five FAIL
   lines, each naming a missing declaration. Over the same platform and the three adopter branch

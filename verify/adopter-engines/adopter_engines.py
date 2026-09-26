@@ -217,7 +217,11 @@ def grade(hub: Path, estate: Path) -> tuple[int, list[str]]:
     users: dict[str, set[str]] = {}
     platform_clusters: set[str] = set()
     engines: dict[str, str] = {}
-    for script, args in steps(up_sh):
+    try:
+        called = steps(up_sh)
+    except OSError as exc:
+        return 1, lines + [f"FAIL: talk/up.sh is not readable ({exc.strerror}), so no cluster's engine can be traced"]
+    for script, args in called:
         if script.startswith("$ROOT/"):
             if script == f"$ROOT/{ENGINE_UP}":
                 owner = args[0] if args else ""
@@ -232,6 +236,9 @@ def grade(hub: Path, estate: Path) -> tuple[int, list[str]]:
                 if cluster in engines:
                     fail(f"talk/up.sh installs an engine on kind-{cluster} twice ({engines[cluster]} and {owner})")
                 engines[cluster] = owner
+                # The owner runs its engine on the cluster, so it is one of the cluster's users even
+                # when talk/up.sh does not run the owner's own bring-up script.
+                users.setdefault(cluster, set()).add(owner)
             continue
         m = re.fullmatch(r"\$CLONE/(?P<unit>[^/]+)/(?P<rel>.+)", script)
         if not m:
@@ -406,6 +413,10 @@ def selfcheck() -> int:
             {"extra": {("tuppence", "reset/up.sh"): "kubectl apply -f workloads.yaml\n"}}, 1,
             "cannot read which cluster it targets"),
         "no engine table": ({"table": False}, 1, "the platform engine table is not readable"),
+        "the owner's own bring-up not in talk/up.sh, and tuppence on another engine": (
+            {"declarations": {"tuppence": _declaration("1.19.1")},
+             "up_sh": UP_SH.replace('step "driftwood: KinD + Flux" "$CLONE/driftwood/scripts/up.sh"\n', "")}, 1,
+            "kind-driftwood is used by driftwood, tuppence, and they declare different engines"),
         "tuppence's workload moved to its own cluster, so nothing is shared": (
             {"declarations": {"tuppence": _declaration("1.19.1")},
              "extra": {("tuppence", "reset/up.sh"): 'CTX="${CTX:-kind-tuppence}"\n'}}, 0,
