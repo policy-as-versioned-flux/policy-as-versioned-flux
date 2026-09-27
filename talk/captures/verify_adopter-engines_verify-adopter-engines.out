@@ -1,0 +1,7 @@
+PASS: selfcheck: 22 planted estates grade as planted, among them tuppence on another engine while it shares kind-driftwood, and ludlow on another engine while it shares nothing
+PASS: driftwood declares kyverno 1.18.2, and its install.yaml URL and sha256 and its linux_x86_64 CLI archive and sha256 are the platform engine table's row for that version
+PASS: ludlow declares kyverno 1.18.2, and its install.yaml URL and sha256 and its linux_x86_64 CLI archive and sha256 are the platform engine table's row for that version
+PASS: tuppence declares kyverno 1.18.2, and its install.yaml URL and sha256 and its linux_x86_64 CLI archive and sha256 are the platform engine table's row for that version
+PASS: kind-driftwood is used by driftwood, tuppence, and all of them declare kyverno 1.18.2 with the same figures (derived from the scripts talk/up.sh runs: kind-driftwood: driftwood, tuppence; kind-ludlow: ludlow; kind-tuppence: tuppence)
+PASS: talk/up.sh installs kind-driftwood's engine from driftwood's own gitops/engine/kyverno.yaml, and no engine on kind-ludlow, kind-tuppence, and runs no platform reference install
+PASS: all 5 assertions hold: each adopter's gitops/engine/kyverno.yaml is the platform engine table's row for its version, the adopters that share a named cluster declare one engine, and talk/up.sh installs each named cluster's engine from its owner's file
