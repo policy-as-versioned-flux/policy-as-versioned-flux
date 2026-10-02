@@ -1,5 +1,5 @@
 E2E step 4 flux reconciles the new cage spec onto the cluster
-   five-fact sample 2026-09-30T12:40:02Z on cluster dsample-36715924302 (run 36715924302), 3 sources
+   five-fact sample 2026-10-01T13:20:29Z on cluster dsample-36867745153 (run 36867745153), 3 sources
      the cage facts (6, 7) ARE scored on this sample: registered by 77c1cde5f57f at 2026-09-10T18:30:20+01:00 on refs/remotes/origin/main, and the sample is later
      driftwood-composed   true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      driftwood-composed   true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v3.0.0 was verified at the source boundary against driftwood's own pinned identity ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
