@@ -1,0 +1,10 @@
+{
+  "verified_on": "2026-10-03",
+  "method": "Anonymous GET of GHCR v1.0.1 manifests; HTTP 200 and Docker-Content-Digest",
+  "images": {
+    "ghcr.io/policy-as-versioned-tuppence/ledger": "sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5",
+    "ghcr.io/policy-as-versioned-driftwood/storefront": "sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+    "ghcr.io/policy-as-versioned-driftwood/api": "sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+    "ghcr.io/policy-as-versioned-ludlow/reports": "sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+  }
+}

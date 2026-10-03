@@ -1,7 +1,7 @@
 # 155 — The lane runs the served workloads, and collects their evidence
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -18,3 +18,7 @@ Graduated 2026-09-25 from ticket 35, round 1 Q3 with amendment A3, and round 2 Q
 Facts on 2026-09-25: the component-definition maps two Check_Ids, `require-nonroot` and `governed-namespace-requires-claim`. Each composed set serves 4 ValidatingPolicy, 6 MutatingPolicy, 2 GeneratingPolicy and 5 PriorityClass documents. The lane waits only for the Kyverno admission controller. Nothing has measured whether a PolicyReport for a probe pod exists before teardown.
 
 When the OSCAL check passes, the incumbent `c2p-collector` repo meets its row in ticket 156's register. Ticket 154 first is preferred, so the lane runs the image each adopter builds.
+
+## Answer
+
+**Local implementation, 2026-10-03.** Built a separate pre-registered fact 8 instrument, sampling the actual signed apps tag and commit rather than HEAD. It observes each live Pod inside its cage and an unclaimed reference copy on the same node, records Node capacity/allocatable and container states, and grades does-not-fit only when the reference runs and the caged copy does not. Its public selfcheck failed before the implementation and now passes. Its registration is bounded separately from facts 6/7. The lane collects real PolicyReports through its pinned platform converter, counts served control mappings, and appends assessment-results as observations. No report before teardown remains could-not-look. The named `verify/oscal-lane/verify-oscal-lane.sh` grades each failed observation's actual risk join; it refuses to invent a Cage decision or risk amount. Missing joins and unmapped failed results are falls. The exact two new log paths are added to the declared observation lane. New signed adopter delivery and scheduled app/report evidence remain pending.

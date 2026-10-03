@@ -1,0 +1,20 @@
+# Ticket 156 / ADR-0036. A check grants eligibility; this file never performs an archive.
+schema: 1
+organization: policy-as-versioned-flux
+repositories:
+  - {name: policy-as-versioned-flux, disposition: retained, reason: The ecosystem hub stays live, checks: []}
+  - {name: apps, disposition: dropped, reason: Historical archive predating this migration, checks: []}
+  - {name: readiness-collector, disposition: dropped, reason: Readiness is answered by price, checks: []}
+  - {name: pr-gate-action, disposition: dropped, reason: Each adopter verifies its own pin trust chain, checks: []}
+  - {name: renovate-config, disposition: dropped, reason: Incumbent-only Renovate configuration, checks: []}
+  - {name: handbook-generator, disposition: lifted, reason: Compose-time handbook replaces the generator, checks: [verify/handbook/verify-handbook-is-a-compose-time-render.sh]}
+  - {name: ledger, disposition: transferred, owner: policy-as-versioned-tuppence, reason: One application repository per adopter, checks: []}
+  - {name: storefront, disposition: transferred, owner: policy-as-versioned-driftwood, reason: One application repository per adopter, checks: []}
+  - {name: api, disposition: transferred, owner: policy-as-versioned-driftwood, reason: One application repository per adopter, checks: []}
+  - {name: reports, disposition: transferred, owner: policy-as-versioned-ludlow, reason: One application repository per adopter, checks: []}
+  - {name: c2p-collector, disposition: dropped, reason: Platform converts lane PolicyReports into OSCAL, checks: [verify/oscal-lane/verify-oscal-lane.sh]}
+  - {name: datastore, disposition: lifted, reason: Crossplane claims move to tuppence, checks: [verify/cloud-plane/verify-cloud-plane.sh]}
+  - {name: cloud, disposition: lifted, reason: Platform publishes cloud implementations, checks: [verify/cloud-plane/verify-cloud-plane.sh]}
+  - {name: governance-agent, disposition: dropped, reason: Platform wargamer replaces the incumbent agent, checks: [cage-lane]}
+  - {name: policy, disposition: dropped, reason: Platform published lines replace incumbent policy, checks: [cage-lane]}
+  - {name: fleet, disposition: dropped, reason: Adopter lanes replace the incumbent fleet, checks: [cage-lane]}

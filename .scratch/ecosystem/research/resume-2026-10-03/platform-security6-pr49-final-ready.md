@@ -1,0 +1,9 @@
+# Final security6 source ready for publication approval
+
+[PR49](https://github.com/policy-as-versioned-platform/platform/pull/49) is open and ready at **e18d0e2faca3b8ae5c1c4c8a03a9560008a42b5e**, SSH-signed and verified by GitHub. [Independent exact-head App review](https://github.com/policy-as-versioned-platform/platform/pull/49#pullrequestreview-5402513556) is APPROVED. Its committed tree exactly reconstructs from the canonical 307-path final platform export plus the measured five-path security6 preparation patch.
+
+Three narrowly tested corrections follow the original reviewed source: unpriced exposure regimes render without inventing money; a CVE version comparison preserves unknown old/new prices and known historical prices; declared lexical/resolved filesystem aliases produce portable absence reasons. Committed-source validation passes **20 tests + 27 subtests**, the actual publisher major gate and all **four engine cells**. All three real adopter candidate compositions and relocated byte replays pass. Compiler type diagnostics retain 131 baseline findings, with no new diagnostics; no clean broad typecheck is claimed.
+
+The first isolated test run lacked the three sibling adopter test checkouts and failed only those file reads. Supplying read-only links to the existing siblings made the complete focused run pass; both logs are retained. The unsigned dry-run receipt is archived with an explicit local-rehearsal label and removed from the clean delivery checkout.
+
+The earlier automatic main-merge rejection remains in effect. This source-branch update and review did not merge main, create a tag or dispatch a workflow. Explicit approval is required for the exact default-branch publication and subsequent normal signed-release sequence described in `publication-approval-scope.md`.

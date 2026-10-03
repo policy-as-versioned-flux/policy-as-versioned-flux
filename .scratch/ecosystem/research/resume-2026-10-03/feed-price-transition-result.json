@@ -1,0 +1,41 @@
+{
+  "scope": "local source correction only; no publication or adopter declaration change",
+  "cause": "price_parent passed a legitimate old CVE intersection absence to cage.select, and discarded known old money when the new intersection was absent",
+  "changed_paths": [
+    "compose/composition.py",
+    "compose/test_feed_price_transitions.py"
+  ],
+  "before": {
+    "red_tests": 2,
+    "passed_tests": 3,
+    "exact_original_error": "scenario has no 'warn' block and no top-level lef/lm"
+  },
+  "after": {
+    "passed_tests": 17,
+    "passed_subtests": 27,
+    "original_replays": "all three composed; see feed-price-transition-replay.json"
+  },
+  "test_command": ".venv/bin/python -m pytest -q -n 0 .estate-clone/platform/compose/test_feed_price_transitions.py .estate-clone/platform/feeds/test_cve_inventory.py .estate-clone/platform/compose/test_workload_risk.py .estate-clone/platform/compose/test_handbook_unpriced.py",
+  "patch": ".scratch/ecosystem/patches/resume-2026-10-03/feed-price-transition-fix.patch",
+  "patch_sha256": "d004fbda3cf4ba0059a8c16543a109a8fa3b414d8027414742ed64b46dbb7496",
+  "file_sha256": {
+    "compose/composition.py": "434083fa2a962abbe911e0c1ddd4a2d060a510dd50a5628f5aa6045543d4325e",
+    "compose/test_feed_price_transitions.py": "15965c199d9acdf56d8e7f4a94f16491b4b9fa63d9db422c0a4899c9a4814dd4"
+  },
+  "sessions": [],
+  "typecheck": {
+    "scope": "exact pre/post narrow fix; all imports skipped, missing stubs ignored; legacy file type debt retained",
+    "command": "python -m mypy --follow-imports=skip --ignore-missing-imports --no-incremental <composition.py>",
+    "before": {
+      "exit": 1,
+      "error_count": 131
+    },
+    "after": {
+      "exit": 1,
+      "error_count": 131
+    },
+    "introduced_diagnostics": [],
+    "removed_diagnostics": []
+  },
+  "patch_reverse_check": "passed"
+}

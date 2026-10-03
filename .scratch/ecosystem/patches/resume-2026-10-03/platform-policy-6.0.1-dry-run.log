@@ -1,0 +1,28 @@
+Unsigned offline rehearsal after local synthetic policy/v6.0.0 tag; no original worktree changes.
+DEGRADED policy/v6.0.1: declared bump 'patch' is weaker than the computed bump 'major' (window: 5.0.0, 6.0.0) -- cage-tier.yaml: ns-declares-078d977f4fbf4807, ns-declares-12974bf7ed29b34f, ns-declares-6e30210d6b79f1f6, ns-declares-f944f13747b62d01, pin-ns-8193685ebe9e7df6, pin-ns-f944f13747b62d01, tier-ns-2f46a2c16736bf08, tier-ns-a993f817e721f6b9, tier-ns-af0822801a2a79f7, tier-ns-ce5f5fb79b076e9e, tier-ns-f944f13747b62d01 via `{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-6-0-1',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},
+ 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-6-0-1','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},
+ 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-6-0-1','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},
+ 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-6-0-1',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]; namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'
+  ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('')
+  : ''; variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']
+  ? variables.nsTier
+  : 'isolated'`. Published DEGRADED at tier 'quarantine' with a prerelease suffix on the declared number; the adopter prices the tier, nothing is refused
+         publishing as policy/v6.0.1-quarantine.1 (tier quarantine), array element carries tier: quarantine
+dry run: wrote computed-semver/evidence/6.0.1-quarantine.1.json, signed nothing
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v6.0.1-quarantine.1` | patch | major | degraded | declared bump 'patch' is weaker than the computed bump 'major' (window: 5.0.0, 6.0.0) -- cage-tier.yaml: ns-declares-078d977f4fbf4807, ns-declares-12974bf7ed29b34f, ns-declares-6e30210d6b79f1f6, ns-declares-f944f13747b62d01, pin-ns-8193685ebe9e7df6, pin-ns-f944f13747b62d01, tier-ns-2f46a2c16736bf08, tier-ns-a993f817e721f6b9, tier-ns-af0822801a2a79f7, tier-ns-ce5f5fb79b076e9e, tier-ns-f944f13747b62d01 via `{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-6-0-1',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},
+ 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-6-0-1','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},
+ 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-6-0-1','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},
+ 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-6-0-1',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]; namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'
+  ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('')
+  : ''; variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']
+  ? variables.nsTier
+  : 'isolated'`. Published DEGRADED at tier 'quarantine' with a prerelease suffix on the declared number; the adopter prices the tier, nothing is refused |
+
+GATE: cut-release.yml must cut policy/v6.0.1-quarantine.1 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
+GATE: passed for policy/v6.0.1-quarantine.1 (some DEGRADED -- see above)
+
+Exit: 0

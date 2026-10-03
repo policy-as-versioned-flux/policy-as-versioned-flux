@@ -1,0 +1,20 @@
+{
+  "driftwood": {
+    "exit": 0,
+    "stdout": "OK: platform tools v4.0.0 at 557c1538fe022c784ea4ffb345c92d2e4b11fe71, release identity verified\n",
+    "stderr": "",
+    "tools_directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/driftwood-estate/platform-tools"
+  },
+  "tuppence": {
+    "exit": 0,
+    "stdout": "OK: platform tools v4.0.0 at 557c1538fe022c784ea4ffb345c92d2e4b11fe71, release identity verified\n",
+    "stderr": "",
+    "tools_directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/tuppence-estate/platform-tools"
+  },
+  "ludlow": {
+    "exit": 0,
+    "stdout": "OK: platform tools v4.0.0 at 557c1538fe022c784ea4ffb345c92d2e4b11fe71, release identity verified\n",
+    "stderr": "",
+    "tools_directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/ludlow-estate/platform-tools"
+  }
+}

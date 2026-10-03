@@ -1,0 +1,30 @@
+diff --git a/accepted-majors/platform-6.0.0.yaml b/accepted-majors/platform-6.0.0.yaml
+new file mode 100644
+index 0000000..b3bc842
+--- /dev/null
++++ b/accepted-majors/platform-6.0.0.yaml
+@@ -0,0 +1,9 @@
++# Exact version accepted under the owner's delegated instruction of 2026-10-03.
++kind: major-acceptance
++party: ludlow
++publisher: platform
++version: 6.0.0
++accepted_by: 'chrisns (owner); decision delegated to the implementing assistant on
++  2026-10-03: "you tell me, you control them all, you don''t need me to answer"; recorded
++  by the integrator'
++accepted_on: '2026-10-03'
+diff --git a/accepted-majors/platform-6.0.1.yaml b/accepted-majors/platform-6.0.1.yaml
+new file mode 100644
+index 0000000..dd8bdd2
+--- /dev/null
++++ b/accepted-majors/platform-6.0.1.yaml
+@@ -0,0 +1,9 @@
++# Exact version accepted under the owner's delegated instruction of 2026-10-03.
++kind: major-acceptance
++party: ludlow
++publisher: platform
++version: 6.0.1
++accepted_by: 'chrisns (owner); decision delegated to the implementing assistant on
++  2026-10-03: "you tell me, you control them all, you don''t need me to answer"; recorded
++  by the integrator'
++accepted_on: '2026-10-03'

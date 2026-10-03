@@ -1,0 +1,13 @@
+{
+  "scope": "exact pre/post alias delta; file legacy diagnostics retained",
+  "before": {
+    "exit": 1,
+    "error_count": 131
+  },
+  "after": {
+    "exit": 1,
+    "error_count": 131
+  },
+  "introduced_diagnostics": [],
+  "removed_diagnostics": []
+}

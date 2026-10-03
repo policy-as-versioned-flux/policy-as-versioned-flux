@@ -33,7 +33,8 @@ on:
     # the number MEANS and did not re-run the gate until the next day's schedule.
     paths: ['talk/verify-all.sh', 'talk/verify-exclusions.txt', 'talk/verify-manifest.txt',
             'talk/truth_manifest.py', 'talk/fall_check.py', 'talk/verify-falls.txt',
-            'clone-estate.sh', 'verify/**', '.github/workflows/truth.yml']
+            'clone-estate.sh', 'verify/**', '.github/workflows/truth.yml',
+            'twin/ENACT_MODE', 'twin/ENACT_MODE.why']
 
 permissions:
   contents: write
@@ -141,6 +142,22 @@ jobs:
         with:
           name: forge-facts
           path: ${{ runner.temp }}/forge.json
+          retention-days: 7
+          if-no-files-found: error
+
+      # Ticket 156: API and anonymous OCI reads stay in the credentialled read-only job.
+      # The gate receives facts; it never receives github.token or executes an archive.
+      - name: read incumbent repository ownership and anonymous image manifests
+        id: incumbent
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 verify/incumbent-org/incumbent_org.py collect --out "$RUNNER_TEMP/incumbent.json"
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.incumbent.outcome == 'success' }}
+        with:
+          name: incumbent-facts
+          path: ${{ runner.temp }}/incumbent.json
           retention-days: 7
           if-no-files-found: error
 
@@ -273,6 +290,11 @@ jobs:
         with:
           name: forge-facts
           path: ${{ runner.temp }}/forge-facts
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: incumbent-facts
+          path: ${{ runner.temp }}/incumbent-facts
       - name: install pinned gitsign (binary + checksum, no marketplace action)
         run: |
           set -euo pipefail
@@ -398,6 +420,7 @@ jobs:
           VERIFY_TIMEOUT: '900'
           CLOCK_VERDICT: ${{ runner.temp }}/clock-verdict/clocks.json
           FORGE_FACTS: ${{ runner.temp }}/forge-facts/forge.json
+          INCUMBENT_FACTS: ${{ runner.temp }}/incumbent-facts/incumbent.json
         run: set -o pipefail; bash talk/verify-all.sh | tee "$RUNNER_TEMP/gate.out"
       # The line is PRINTED whatever the guard said, into the log and the step summary, because a
       # measurement a run cannot record is still a measurement a reader can quote (ticket 100).

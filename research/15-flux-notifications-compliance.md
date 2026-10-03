@@ -329,3 +329,7 @@ This is the full "measurable / visible compliance" story: **Git commit status = 
 - [Introducing Capacitor](https://fluxcd.io/blog/2024/02/introducing-capacitor/) · [Weave GitOps as Flux UI](https://fluxcd.io/blog/2023/04/how-to-use-weave-gitops-as-your-flux-ui/) · [Weave GitOps 2026 status](https://computingforgeeks.com/weave-gitops-install-migration-flux/)
 - [Policy Reporter](https://kyverno.github.io/policy-reporter/) · [Kyverno monitoring](https://kyverno.io/docs/guides/monitoring/)
 - [Monitoring & Hardening the GitOps pipeline with Flux (MediaMarktSaturn)](https://medium.com/mediamarktsaturn-tech-blog/monitoring-and-hardening-the-gitops-delivery-pipeline-with-flux-a226bdef0351)
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

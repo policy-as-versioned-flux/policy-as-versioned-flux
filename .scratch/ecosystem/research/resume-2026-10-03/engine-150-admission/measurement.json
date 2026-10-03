@@ -1,0 +1,36 @@
+{
+  "scope": "isolated-kind-admission-rehearsal; no scheduled lane or release evidence",
+  "measured_at": "2026-10-03T14:39:46.715142+00:00",
+  "engine": "kyverno",
+  "engine_version": "1.19.1",
+  "cluster": "pavf-engine-150-20261003",
+  "install_sha256": "d3322cb346d3d42dd0f41e230b0d1d7bc5619960e1c36fdac4d9151d724b88e6",
+  "node_image": "kindest/node@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5",
+  "admission_operation": "Pod CREATE, server dry-run, governed baseline namespace",
+  "results": [
+    {
+      "policy_version": "5.0.0",
+      "policy_apply_exit": 1,
+      "policy_conditions": [],
+      "pod_admission_exit": 0,
+      "pod_admitted": true,
+      "pod_caged": false,
+      "pod_tier": null,
+      "priority_class": null,
+      "container_run_as_non_root": null,
+      "pod_stderr": ""
+    },
+    {
+      "policy_version": "6.0.1",
+      "policy_apply_exit": 0,
+      "policy_conditions": [],
+      "pod_admission_exit": 0,
+      "pod_admitted": true,
+      "pod_caged": true,
+      "pod_tier": "baseline",
+      "priority_class": "cage-baseline-6-0-1",
+      "container_run_as_non_root": true,
+      "pod_stderr": ""
+    }
+  ]
+}

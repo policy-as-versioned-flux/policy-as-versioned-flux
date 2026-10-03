@@ -289,9 +289,9 @@ def _grade(tmp_path: Path, **kw):
 
 # --------------------------------------------------------------------------- 1. the register
 
-def test_the_register_names_the_three_apps_of_the_ticket_each_in_one_adopter():
+def test_the_register_names_the_four_transferred_apps_each_in_one_adopter():
     lifts = lifted_apps.load_register(REGISTER)
-    assert {lift.app for lift in lifts} == {"ledger", "storefront", "reports"}
+    assert {lift.app for lift in lifts} == {"ledger", "storefront", "reports", "api"}
     assert len({lift.adopter for lift in lifts}) == 3
     for lift in lifts:
         assert lift.origin.startswith("policy-as-versioned-flux/")
@@ -307,6 +307,65 @@ def test_a_landed_lift_passes(tmp_path):
     assert report.exit_code == 0, report.text()
     assert report.rows[0].grade == "PASS"
     assert "on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps)" in report.text()
+
+
+def test_transferred_source_is_read_from_its_app_repository(tmp_path):
+    estate = _estate(tmp_path, pinned_has_lift=True)
+    adopter = estate / "tuppence"
+    source = tmp_path / ".estate-apps" / "ledger"
+    source.mkdir(parents=True)
+    (source / "pom.xml").write_text(POM)
+    (source / "renovate.json").write_text(json.dumps({"extends": ["config:recommended"]}))
+    _git(source, "init", "-q")
+    _git(source, "remote", "add", "origin", "https://github.com/policy-as-versioned-tuppence/ledger")
+    _git(source, "add", ".")
+    _git(source, "commit", "-qm", "the transferred application")
+    _git(source, "tag", "v1.0.1")
+    (adopter / "apps/ledger/pom.xml").unlink()
+    (adopter / "apps/ledger").rmdir()
+    image = "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:0000"
+    (adopter / "gitops/apps/ledger.yaml").write_text(SERVED.replace(
+        "ghcr.io/policy-as-versioned-flux/ledger@sha256:0000", image))
+    (adopter / "renovate.json").write_text(json.dumps({
+        "enabledManagers": ["kubernetes"], "dependencyDashboard": True,
+        "kubernetes": {"managerFilePatterns": ["/^gitops/apps/.*\\.yaml$/"]},
+        "packageRules": [{"matchDatasources": ["docker"], "pinDigests": True}],
+    }))
+    text = REGISTER_ONE.replace("image_publisher: policy-as-versioned-flux",
+                               "image_publisher: policy-as-versioned-tuppence").replace(
+        "ghcr.io/policy-as-versioned-flux/ledger@sha256:0000", image)
+    text += "  source_repository: policy-as-versioned-tuppence/ledger\n  source_ref: v1.0.1\n  source_manifest: pom.xml\n"
+    reg = _register(tmp_path, text)
+    report = lifted_apps.grade(_hub(tmp_path), estate, reg)
+    assert report.exit_code == 0, report.text()
+    assert "LIMIT  1 of 1 lifted apps are still served an image" in report.text()
+    assert "0 pinned workload image(s) could not be read" in report.text()
+    config = json.loads((adopter / "renovate.json").read_text())
+    (adopter / "renovate.json").write_text(json.dumps({**config, "enabled": False}))
+    report = lifted_apps.grade(tmp_path / "hub", estate, reg)
+    assert report.exit_code == 1 and "disables Renovate" in report.text(), report.text()
+    config["kubernetes"]["enabled"] = False
+    (adopter / "renovate.json").write_text(json.dumps(config))
+    report = lifted_apps.grade(tmp_path / "hub", estate, reg)
+    assert report.exit_code == 1 and "no enabled image manager" in report.text(), report.text()
+    config["kubernetes"]["enabled"] = True
+    (adopter / "renovate.json").write_text(json.dumps(config))
+    custom = {"enabledManagers": ["custom.regex"], "customManagers": [{
+        "customType": "regex", "datasourceTemplate": "docker",
+        "managerFilePatterns": ["/^gitops/apps/.*\\.yaml$/"],
+        "matchStrings": [r"(?<depName>ghcr.io/[^:\s]+):(?<currentValue>v[\d.]+)@(?<currentDigest>sha256:[a-f0-9]+)"],
+    }]}
+    (adopter / "renovate.json").write_text(json.dumps(custom))
+    report = lifted_apps.grade(tmp_path / "hub", estate, reg)
+    assert report.exit_code == 0, report.text()
+    custom["customManagers"][0]["customType"] = "jsonata"
+    (adopter / "renovate.json").write_text(json.dumps(custom))
+    report = lifted_apps.grade(tmp_path / "hub", estate, reg)
+    assert report.exit_code == 1 and "no enabled image manager" in report.text(), report.text()
+    (adopter / "renovate.json").write_text(json.dumps(config))
+    (source / "pom.xml").unlink()
+    report = lifted_apps.grade(tmp_path / "hub", estate, reg)
+    assert report.exit_code == 1 and "pom.xml" in report.text(), report.text()
 
 
 def test_a_served_file_the_kustomization_does_not_list_fails(tmp_path):

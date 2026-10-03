@@ -1,0 +1,56 @@
+{
+  "scope": "all explicitly staged owned code and artifacts; high-confidence private-key/token patterns; content omitted",
+  "files": 607,
+  "total_bytes": 14470988,
+  "secret_pattern_paths": [],
+  "invalid_json_paths": [],
+  "unrelated_owner_paths_staged": [],
+  "complete_export_hash_checks": [
+    {
+      "repository": "platform",
+      "sha256_matches": true,
+      "byte_count_matches": true
+    },
+    {
+      "repository": "feeds",
+      "sha256_matches": true,
+      "byte_count_matches": true
+    },
+    {
+      "repository": "driftwood",
+      "sha256_matches": true,
+      "byte_count_matches": true
+    },
+    {
+      "repository": "tuppence",
+      "sha256_matches": true,
+      "byte_count_matches": true
+    },
+    {
+      "repository": "ludlow",
+      "sha256_matches": true,
+      "byte_count_matches": true
+    },
+    {
+      "repository": "app-ledger",
+      "sha256_matches": true,
+      "byte_count_matches": true
+    },
+    {
+      "repository": "app-storefront",
+      "sha256_matches": true,
+      "byte_count_matches": true
+    },
+    {
+      "repository": "app-api",
+      "sha256_matches": true,
+      "byte_count_matches": true
+    },
+    {
+      "repository": "app-reports",
+      "sha256_matches": true,
+      "byte_count_matches": true
+    }
+  ],
+  "ok": true
+}

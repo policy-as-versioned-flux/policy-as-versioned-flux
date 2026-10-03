@@ -1,0 +1,13 @@
+{
+  "release": "v3.0.1",
+  "workflow": "cut-release.yml",
+  "ref": "main",
+  "release_workflow": "release.yml",
+  "method": "only existing Actions cut-release creates gitsign tag; then explicit release verification/publication dispatch",
+  "messages": {
+    "driftwood": "driftwood v3.0.1: record digest-pinned nginx, storefront and API manifests before exact-tag CVE inventory adoption; unchanged platform tools and parent pins, policy window5.0.0, ordinary composed bump none.",
+    "tuppence": "tuppence v3.0.1: record digest-pinned ledger manifest before exact-tag CVE inventory adoption; unchanged platform tools and parent pins, policy window5.0.0, ordinary composed bump none.",
+    "ludlow": "ludlow v3.0.1: record digest-pinned reports manifest before exact-tag CVE inventory adoption; unchanged platform tools and parent pins, policy window5.0.0, ordinary composed bump none."
+  },
+  "state": "PR CI PASS; waiting independent matching-head App approval/normal merge"
+}

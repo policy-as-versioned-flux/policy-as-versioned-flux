@@ -1,0 +1,75 @@
+{
+  "description": "Complete working diffs on owned paths; includes tracked, staged and explicit new files. No commits or adopter price declarations.",
+  "repositories": {
+    "driftwood": {
+      "base": "529e159397d3e64f94b0270cc7de69c235580961",
+      "bytes": 17136,
+      "file_sha256": {
+        "drift/oscal_lane.py": "9b1e21bd1d9c69396d7be9038fc7dd41f540d9a42b33ba3390d61ef2cc891b70"
+      },
+      "patch_sha256": "e54c4d83c8be67f109ae7b0e2de1e9c0d539d04606ab1d615636dc918c862daa",
+      "paths": [
+        "drift/oscal_lane.py"
+      ]
+    },
+    "hub": {
+      "base": "4c3ed061f5837281ac9b07c3bb0a6de3c5620063",
+      "bytes": 6232,
+      "file_sha256": {
+        "verify/cve-inventory/cve_inventory.py": "b5d2b80a52cfd60cc31d9a427778a73d12e50c7a4f48c40f029caf2bfe36a278"
+      },
+      "patch_sha256": "912e62d9d1e09c3e11a108dfde577264e23e98cc8c1dadb8fe6b2a8b67236cfb",
+      "paths": [
+        "verify/cve-inventory/cve_inventory.py"
+      ]
+    },
+    "ludlow": {
+      "base": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+      "bytes": 17136,
+      "file_sha256": {
+        "drift/oscal_lane.py": "9b1e21bd1d9c69396d7be9038fc7dd41f540d9a42b33ba3390d61ef2cc891b70"
+      },
+      "patch_sha256": "e54c4d83c8be67f109ae7b0e2de1e9c0d539d04606ab1d615636dc918c862daa",
+      "paths": [
+        "drift/oscal_lane.py"
+      ]
+    },
+    "platform": {
+      "base": "cb680f22eb46b0fab5e56844758242a2ab200975",
+      "bytes": 137464,
+      "file_sha256": {
+        "compose/README.md": "f54062cba2be005cfa4fbcd78b36865ff2db749933745804b60a05ed17aba73d",
+        "compose/composition.py": "f6ff2ab353a1597ffed6a7220ec420c0254c098a64e6465fd77ccae16c5f1c45",
+        "compose/test_workload_risk.py": "1ef6a7474cbd4728f14993df0c08e99c67b45d366721f463afd94bb7c517072d",
+        "party/README.md": "8ced2f3de6a1228d05ec97d9caba19ce934fc3a06973952e9b9974d53ef9c4ee",
+        "party/party_artefact.py": "0738b7d8943e627106ed2b562f70abcc60b1af1ebd1e2f5e06d2d3192a904018",
+        "party/schema.json": "0bcdf0021d81333649e49dc7554a35233f77bda1fd35484827609a398f4c2628",
+        "wargamer/inventory.py": "2cb807ab1edb765773b0288cb24bb88fa63a0db75965525a9af6c60568271cfb",
+        "wargamer/test_inventory.py": "6d296f66fe4e4eb7d04c0c3650ccdc27632657e3f09b6526af65f08b75b73a11"
+      },
+      "patch_sha256": "324dabfbdfc3b05ac6ecc3bf0cbcf06ad2cedf87ef6229ef32ca89b535778cca",
+      "paths": [
+        "wargamer/inventory.py",
+        "wargamer/test_inventory.py",
+        "compose/composition.py",
+        "compose/test_workload_risk.py",
+        "compose/README.md",
+        "party/schema.json",
+        "party/party_artefact.py",
+        "party/README.md"
+      ]
+    },
+    "tuppence": {
+      "base": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+      "bytes": 17136,
+      "file_sha256": {
+        "drift/oscal_lane.py": "9b1e21bd1d9c69396d7be9038fc7dd41f540d9a42b33ba3390d61ef2cc891b70"
+      },
+      "patch_sha256": "e54c4d83c8be67f109ae7b0e2de1e9c0d539d04606ab1d615636dc918c862daa",
+      "paths": [
+        "drift/oscal_lane.py"
+      ]
+    }
+  },
+  "validation": "32 passed, 46 subtests passed; all three OSCAL lane selfchecks passed"
+}

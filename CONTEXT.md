@@ -945,3 +945,8 @@ stray `|` inside its own prose is named and red rather than dropped in silence.
 ## Decision log
 
 See `docs/adr/` for the hard-to-reverse decisions and their rationale.
+
+## Mode record and development window (2026-10-03, ticket 97)
+
+- **Mode record** — Ordered, dated acknowledgements of the durable enactment mode, carrying the owner's exact words and their source. It records authorization and cannot independently authenticate those words.
+- **Development window** — An owner-acknowledged interval of permissive enactment lasting at most 28 days. Expiry is a failure of the authorization record and does not silently change the enactment mode.

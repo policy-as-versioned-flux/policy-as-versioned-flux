@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "<stdin>", line 8, in <module>
+  File "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 5921, in compose
+    rendered[handbook.HANDBOOK_PATH] = handbook.render(dict(rendered), document)
+                                       ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/handbook.py", line 521, in render
+    f"{r.get('version')}: {_money(r.get('amount'), exposure['currency'])}, "
+                           ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/handbook.py", line 89, in _money
+    raise CannotRender(f"an amount that is not a number: {amount!r}")
+handbook.CannotRender: an amount that is not a number: None

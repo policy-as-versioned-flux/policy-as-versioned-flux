@@ -34,10 +34,10 @@ What it observes, on the estate's committed files only:
         the recount agrees (eco-system ticket 122);
      e. the regime entry's `holes[]` lines each carry the adopter's status for that control, and
         the open ones agree with `holes[]`;
-     f. every `deltas[]` entry is one of the ten kinds `DELTA_KINDS` names (the eight hole,
-        removal, withdrawal, baseline and namespace kinds, plus ticket 69's two untagged-pin
-        kinds), under the adopter's perspective and currency, and the new/closed hole and
-        namespace deltas match the entries they report.
+     f. every `deltas[]` entry is one of the twelve kinds `DELTA_KINDS` names (the eight hole,
+        removal, withdrawal, baseline and namespace kinds, ticket 69's two untagged-pin kinds and
+        ticket 148's two engine kinds), under the adopter's perspective and currency, and the
+        new/closed hole and namespace deltas match the entries they report.
 
 Grading, per the gate contract: any FAIL -> 1; else any SKIP -> 3; else 0.
 
@@ -73,10 +73,14 @@ GONE = {"new-hole", "baseline-widening", "new-ungoverned-namespace", "removed-co
 # ticket 69's: an untagged feed pin is a priced hole on the premium entry, and its moves are
 # reported as deltas like every other hole's. This set is a whitelist, so a kind missing from
 # it fails the adopter that reports it -- adding a kind here is how a new delta is admitted.
+# `unsupported-engine` and `undeclared-engine` are eco-system ticket 148's (hub ADR-0033 point
+# 3): a composed line, or the machinery, whose claims do not count on the adopter's declared
+# engine. verify/engine-pairing grades their amounts; this whitelist only admits them.
 DELTA_KINDS = {"new-hole", "closed-hole", "baseline-widening",
                "removed-control", "baseline-narrowing", "withdrawn-control",
                "new-ungoverned-namespace", "closed-ungoverned-namespace",
-               "new-untagged-pin", "closed-untagged-pin"}
+               "new-untagged-pin", "closed-untagged-pin",
+               "unsupported-engine", "undeclared-engine"}
 HOLE_STATUS = {"new", "recorded", "closed"}
 # `withdrawn` is eco-system ticket 123's: the weight names a control its pinned catalogue
 # no longer defines, the feed's own fact to fix in its next version.

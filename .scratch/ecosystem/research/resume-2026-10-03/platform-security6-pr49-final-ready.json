@@ -1,0 +1,34 @@
+{
+  "scope": "final proposed security6 source, not merged or released",
+  "head": "e18d0e2faca3b8ae5c1c4c8a03a9560008a42b5e",
+  "pr": {
+    "baseRefName": "main",
+    "headRefOid": "e18d0e2faca3b8ae5c1c4c8a03a9560008a42b5e",
+    "isDraft": false,
+    "mergeStateStatus": "CLEAN",
+    "reviewDecision": "APPROVED",
+    "state": "OPEN",
+    "url": "https://github.com/policy-as-versioned-platform/platform/pull/49"
+  },
+  "source_signature": {
+    "reason": "valid",
+    "verified": true,
+    "verified_at": "2026-10-03T20:02:47Z"
+  },
+  "review": {
+    "id": 5402513556,
+    "actor": "pavc-other-hand[bot]",
+    "commit": "e18d0e2faca3b8ae5c1c4c8a03a9560008a42b5e",
+    "state": "APPROVED",
+    "url": "https://github.com/policy-as-versioned-platform/platform/pull/49#pullrequestreview-5402513556"
+  },
+  "checks": {
+    "focused": "20 passed, 27 subtests passed",
+    "committed_engine_matrix": "4 cells passed",
+    "publisher": "declared major, computed major, passed",
+    "source_tree": "matches complete export plus security6 preparation patch",
+    "all_three_candidate_compositions": "composed, relocated byte replay passed",
+    "compiler_type_delta": "131 pre-existing findings before and after, zero introduced"
+  },
+  "publication": "HELD: explicit approval required after recorded automatic main-merge rejection; no merge/cut/workflow dispatch attempted afterward"
+}

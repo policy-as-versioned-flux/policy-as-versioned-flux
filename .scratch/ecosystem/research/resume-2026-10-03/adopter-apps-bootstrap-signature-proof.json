@@ -1,0 +1,14 @@
+{
+  "driftwood": {
+    "exit": 0,
+    "output": "tlog index: 3075511413\ngitsign: Signature made using certificate ID 0x9446b34c6882a48e6c4629ee15cfa7128808f277 | CN=sigstore-intermediate,O=sigstore.dev\ngitsign: Good signature from [https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)\nValidated Git signature: true\nValidated Rekor entry: true\nValidated Certificate claims: true\n"
+  },
+  "tuppence": {
+    "exit": 0,
+    "output": "tlog index: 3075511590\ngitsign: Signature made using certificate ID 0x2af1812fc6a850298d8f8e6032f0e99e0bc6621b | CN=sigstore-intermediate,O=sigstore.dev\ngitsign: Good signature from [https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)\nValidated Git signature: true\nValidated Rekor entry: true\nValidated Certificate claims: true\n"
+  },
+  "ludlow": {
+    "exit": 0,
+    "output": "tlog index: 3075511349\ngitsign: Signature made using certificate ID 0xd17bf91b02853fe7d72fd75f76ecb0e711abb161 | CN=sigstore-intermediate,O=sigstore.dev\ngitsign: Good signature from [https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)\nValidated Git signature: true\nValidated Rekor entry: true\nValidated Certificate claims: true\n"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "full_name": "policy-as-versioned-platform/platform",
+  "private": false,
+  "visibility": "public",
+  "default_branch": "main",
+  "archived": false,
+  "disabled": false,
+  "html_url": "https://github.com/policy-as-versioned-platform/platform",
+  "permissions": {
+    "admin": true,
+    "maintain": true,
+    "push": true,
+    "triage": true,
+    "pull": true
+  }
+}

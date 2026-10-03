@@ -1,0 +1,9 @@
+dry run: wrote computed-semver/evidence/6.0.0.json, signed nothing
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v6.0.0` | major | major | passed |  |
+
+GATE: cut-release.yml must cut policy/v6.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
+GATE: passed for policy/v6.0.0

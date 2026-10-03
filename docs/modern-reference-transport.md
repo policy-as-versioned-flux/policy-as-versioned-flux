@@ -70,8 +70,7 @@ against either.
 The floor proves coexistence and cloud-admission on KiND+LocalStack (no spend). The modern reference runs
 a **multi-cluster, multi-account fleet**: clusters subscribing to different policy semver sets via
 `ResourceSet`, real RDS/S3 provisioned by [Crossplane](https://crossplane.io), C2P attesting control satisfaction from
-PolicyReports over live resources, notification-controller posting commit-status compliance back to PRs across the
-fleet. This is the "show the CIO the whole estate" proof at production shape.
+PolicyReports over live resources, and scheduled adopter lane observations graded by the truth surface. This is the "show the CIO the whole estate" proof at production shape.
 
 ## 7. The production governance agent
 
@@ -130,3 +129,7 @@ upgrades** (PR as the unit of debate); **lane-keeping + gate** proportionality; 
 enforce) the why**; **deterministic policy** (no time conditions); the **human-governance** loop;
 and the honestly-named **last-mile** residual. The modern reference deepens the plumbing; it does not
 touch the argument.
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

@@ -1,0 +1,6 @@
+[
+  {
+    "tag": "policy/v6.0.0",
+    "message": "Security major: use pod runAsNonRoot fallback and trust tier only from governed Namespaces; preserve frozen5.0.0."
+  }
+]

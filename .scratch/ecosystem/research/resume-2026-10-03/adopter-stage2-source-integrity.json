@@ -1,0 +1,23 @@
+{
+  "driftwood": {
+    "apps_commit": "17302ecd20041df61a52428e67246c330294d2a6",
+    "apps_tag": "v3.0.1",
+    "inventory_bytes_unchanged": true,
+    "new_primary_provenance": "inventory/PROVENANCE.json",
+    "protected_source_hashes_unchanged": true
+  },
+  "ludlow": {
+    "apps_commit": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+    "apps_tag": "v3.0.1",
+    "inventory_bytes_unchanged": true,
+    "new_primary_provenance": "inventory/PROVENANCE.json",
+    "protected_source_hashes_unchanged": true
+  },
+  "tuppence": {
+    "apps_commit": "d8dead25e0e5e275172640b1a637562e45edb15d",
+    "apps_tag": "v3.0.1",
+    "inventory_bytes_unchanged": true,
+    "new_primary_provenance": "inventory/PROVENANCE.json",
+    "protected_source_hashes_unchanged": true
+  }
+}

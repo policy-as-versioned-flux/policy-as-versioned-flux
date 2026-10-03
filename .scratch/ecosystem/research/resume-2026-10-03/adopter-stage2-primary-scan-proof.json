@@ -1,0 +1,140 @@
+{
+  "adopters": {
+    "driftwood": {
+      "images": [
+        {
+          "database_date": "2026-10-03T07:01:46.027466673Z",
+          "existing_row_sha256": "c2c81147c77903a6e9ca520d2ea82578d88a1a6d0e0f2c9b388d220ed56c0a36",
+          "existing_vulnerability_rows": 0,
+          "normalized_matches_existing": true,
+          "observed_repo_digests": [
+            "ghcr.io/policy-as-versioned-driftwood/api@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3"
+          ],
+          "primary_trimmed_row_sha256": "c2c81147c77903a6e9ca520d2ea82578d88a1a6d0e0f2c9b388d220ed56c0a36",
+          "primary_vulnerability_rows": 0,
+          "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/api.json",
+          "raw_report_sha256": "6c754e86c5c836aecb298ca1552da48117264fd2b7f2d375631204c8d411da2e",
+          "reported_artifact": "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+          "requested_image": "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+          "scanner_version": "0.69.3"
+        },
+        {
+          "database_date": "2026-10-03T07:01:46.027466673Z",
+          "existing_row_sha256": "eabb22338328b029efd152378b0e79337b3d0c808eec56edfee8d28669606576",
+          "existing_vulnerability_rows": 212,
+          "normalized_matches_existing": true,
+          "observed_repo_digests": [
+            "ghcr.io/policy-as-versioned-driftwood/storefront@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6"
+          ],
+          "primary_trimmed_row_sha256": "eabb22338328b029efd152378b0e79337b3d0c808eec56edfee8d28669606576",
+          "primary_vulnerability_rows": 212,
+          "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/storefront.json",
+          "raw_report_sha256": "040ee55b4b031ba4939c1c9ce14bc65b7aa9c7fcebf08db0c0dce3283cf6f788",
+          "reported_artifact": "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+          "requested_image": "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+          "scanner_version": "0.69.3"
+        },
+        {
+          "database_date": "2026-10-03T07:01:46.027466673Z",
+          "existing_row_sha256": "8129272c7d3c8b857ad4dfacd1196dc996041ca976bb9d8f3fa24cf9608dbde2",
+          "existing_vulnerability_rows": 395,
+          "normalized_matches_existing": true,
+          "observed_repo_digests": [
+            "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+          ],
+          "primary_trimmed_row_sha256": "8129272c7d3c8b857ad4dfacd1196dc996041ca976bb9d8f3fa24cf9608dbde2",
+          "primary_vulnerability_rows": 395,
+          "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/nginx.json",
+          "raw_report_sha256": "649bd0f4bde00c38aa1b48e6168aa2cd6fab8a73f250f1c095b3fd3823f428f0",
+          "reported_artifact": "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2",
+          "requested_image": "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2",
+          "scanner_version": "0.69.3"
+        }
+      ],
+      "inventory_rows_unchanged": true,
+      "whole_tagged_graph_matches_inventory": true
+    },
+    "ludlow": {
+      "images": [
+        {
+          "database_date": "2026-10-03T07:01:46.027466673Z",
+          "existing_row_sha256": "f6b1f52d143584a6df8aeb1f046d3114648a604129f09a0b1f76ef72a73f333d",
+          "existing_vulnerability_rows": 228,
+          "normalized_matches_existing": true,
+          "observed_repo_digests": [
+            "ghcr.io/policy-as-versioned-ludlow/reports@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+          ],
+          "primary_trimmed_row_sha256": "f6b1f52d143584a6df8aeb1f046d3114648a604129f09a0b1f76ef72a73f333d",
+          "primary_vulnerability_rows": 228,
+          "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/reports.json",
+          "raw_report_sha256": "817d7fbb2673d4bb38721d4e8be7d556e50927ed00d17b2e9bfa986920cdede2",
+          "reported_artifact": "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2",
+          "requested_image": "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2",
+          "scanner_version": "0.69.3"
+        }
+      ],
+      "inventory_rows_unchanged": true,
+      "whole_tagged_graph_matches_inventory": true
+    },
+    "tuppence": {
+      "images": [
+        {
+          "database_date": "2026-10-03T07:01:46.027466673Z",
+          "existing_row_sha256": "54a860ef5fae28ba89eb71e2e23558a79af82f9e5a5e39b57374fc8b35a5f0b0",
+          "existing_vulnerability_rows": 9,
+          "normalized_matches_existing": true,
+          "observed_repo_digests": [
+            "ghcr.io/policy-as-versioned-tuppence/ledger@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5"
+          ],
+          "primary_trimmed_row_sha256": "54a860ef5fae28ba89eb71e2e23558a79af82f9e5a5e39b57374fc8b35a5f0b0",
+          "primary_vulnerability_rows": 9,
+          "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/ledger.json",
+          "raw_report_sha256": "e34bb1e33c0676a9599d69921e7b4bbb890660d9e5f1e9f864e0ef1e0f790190",
+          "reported_artifact": "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5",
+          "requested_image": "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5",
+          "scanner_version": "0.69.3"
+        }
+      ],
+      "inventory_rows_unchanged": true,
+      "whole_tagged_graph_matches_inventory": true
+    }
+  },
+  "cached_database_unchanged": true,
+  "captured_at": "2026-10-03T19:23:16.006536+00:00",
+  "scan_options": [
+    "image",
+    "--timeout",
+    "10m",
+    "--scanners",
+    "vuln",
+    "--format",
+    "json",
+    "--quiet",
+    "--skip-db-update",
+    "--skip-java-db-update"
+  ],
+  "scanner": {
+    "archive_checksum_matches": true,
+    "archive_sha256": "a2f2179afd4f8bb265ca3c7aefb56a666bc4a9a411663bc0f22c3549fbc643a5",
+    "executable": "/private/tmp/pavc-trivy-0.69.3/trivy",
+    "executable_sha256": "bef08bfe2644873257d75585dd62e1409eb5c53403075c4bc83d54279dffd812",
+    "matching_checksum_line": [
+      "a2f2179afd4f8bb265ca3c7aefb56a666bc4a9a411663bc0f22c3549fbc643a5  trivy_0.69.3_macOS-ARM64.tar.gz"
+    ],
+    "version": {
+      "JavaDB": {
+        "DownloadedAt": "2026-10-03T14:34:28.219965Z",
+        "NextUpdate": "2026-10-06T01:07:11.83014273Z",
+        "UpdatedAt": "2026-10-03T01:07:11.830142851Z",
+        "Version": 1
+      },
+      "Version": "0.69.3",
+      "VulnerabilityDB": {
+        "DownloadedAt": "2026-10-03T14:32:53.331883Z",
+        "NextUpdate": "2026-10-04T07:01:46.027466402Z",
+        "UpdatedAt": "2026-10-03T07:01:46.027466673Z",
+        "Version": 2
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+Offline isolated working-tree snapshot; no signing or network.
+Command: cut-release-gate.py --dry-run tags-6.0.0.json
+Exit: 0
+policy/v6.0.0: declared major, computed major, passed

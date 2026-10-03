@@ -1,0 +1,163 @@
+bringing up nodes...
+bringing up nodes...
+
+.uu...uuuuu............u.uu.u.u.                                         [100%]
+=================================== FAILURES ===================================
+_ WorkloadRisk.test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine (party='driftwood') _
+[gw8] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+self = <test_workload_risk.WorkloadRisk testMethod=test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine>
+
+    def test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine(self):
+        document, _ = self.compose()
+        for relative in ('oscal/result2oscal.py', 'graded/cage.py'):
+            destination = self.platform/relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(ct.PLATFORM_DIR/relative, destination)
+        entry, = document['cages']
+        report = {'scope': {'kind': 'Pod', 'name': 'legacy-till', 'namespace': 'shop'},
+                  'results': [{'policy': 'member-a-1-0-0', 'result': 'fail'}]}
+        pod = {'metadata': {'name': 'legacy-till', 'namespace': 'shop', 'labels': {
+            'policy-as-versioned.dev/policy-version': '1.0.0',
+            'posture.acme.io/caged': 'true', 'posture.acme.io/tier': entry['tier']}}}
+        class API:
+            reason = ''
+            def get(self, *arguments):
+                if arguments[0] == '-n':
+                    return pod
+                return {'items': [json.loads(json.dumps(report))] if arguments[1].startswith('policyreports.') else []}
+        sampler = SimpleNamespace(Cluster=lambda _: API(), now=lambda: '2026-10-03T00:00:00Z',
+            rc=SimpleNamespace(pinned_tag=lambda: 'v1.0.0', render=lambda _: {
+                'member': {'kind': 'ValidatingPolicy', 'metadata': {'name': 'member-a-1-0-0'}}}),
+            _git_output=lambda *_: json.dumps(document))
+        ambient = SimpleNamespace(NS=ct._cage_engine().NS, observation_uuid=lambda *_: 'wrong-ambient-engine',
+                                  oscal_risk=lambda *_args, **_kwargs: {})
+        for party in ('driftwood', 'tuppence', 'ludlow'):
+            with self.subTest(party=party):
+                spec = importlib.util.spec_from_file_location('workload_lane_'+party,
+                    ct.PLATFORM_DIR.parent/party/'drift/oscal_lane.py')
+                lane = importlib.util.module_from_spec(spec)
+>               spec.loader.exec_module(lane)
+
+compose/test_workload_risk.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<frozen importlib._bootstrap_external>:755: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:892: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x107714cb0>
+path = '/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/driftwood/drift/oscal_lane.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/driftwood/drift/oscal_lane.py'
+
+<frozen importlib._bootstrap_external>:950: FileNotFoundError
+_ WorkloadRisk.test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine (party='tuppence') _
+[gw8] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+self = <test_workload_risk.WorkloadRisk testMethod=test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine>
+
+    def test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine(self):
+        document, _ = self.compose()
+        for relative in ('oscal/result2oscal.py', 'graded/cage.py'):
+            destination = self.platform/relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(ct.PLATFORM_DIR/relative, destination)
+        entry, = document['cages']
+        report = {'scope': {'kind': 'Pod', 'name': 'legacy-till', 'namespace': 'shop'},
+                  'results': [{'policy': 'member-a-1-0-0', 'result': 'fail'}]}
+        pod = {'metadata': {'name': 'legacy-till', 'namespace': 'shop', 'labels': {
+            'policy-as-versioned.dev/policy-version': '1.0.0',
+            'posture.acme.io/caged': 'true', 'posture.acme.io/tier': entry['tier']}}}
+        class API:
+            reason = ''
+            def get(self, *arguments):
+                if arguments[0] == '-n':
+                    return pod
+                return {'items': [json.loads(json.dumps(report))] if arguments[1].startswith('policyreports.') else []}
+        sampler = SimpleNamespace(Cluster=lambda _: API(), now=lambda: '2026-10-03T00:00:00Z',
+            rc=SimpleNamespace(pinned_tag=lambda: 'v1.0.0', render=lambda _: {
+                'member': {'kind': 'ValidatingPolicy', 'metadata': {'name': 'member-a-1-0-0'}}}),
+            _git_output=lambda *_: json.dumps(document))
+        ambient = SimpleNamespace(NS=ct._cage_engine().NS, observation_uuid=lambda *_: 'wrong-ambient-engine',
+                                  oscal_risk=lambda *_args, **_kwargs: {})
+        for party in ('driftwood', 'tuppence', 'ludlow'):
+            with self.subTest(party=party):
+                spec = importlib.util.spec_from_file_location('workload_lane_'+party,
+                    ct.PLATFORM_DIR.parent/party/'drift/oscal_lane.py')
+                lane = importlib.util.module_from_spec(spec)
+>               spec.loader.exec_module(lane)
+
+compose/test_workload_risk.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<frozen importlib._bootstrap_external>:755: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:892: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x106f64d70>
+path = '/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/tuppence/drift/oscal_lane.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/tuppence/drift/oscal_lane.py'
+
+<frozen importlib._bootstrap_external>:950: FileNotFoundError
+_ WorkloadRisk.test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine (party='ludlow') _
+[gw8] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+self = <test_workload_risk.WorkloadRisk testMethod=test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine>
+
+    def test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine(self):
+        document, _ = self.compose()
+        for relative in ('oscal/result2oscal.py', 'graded/cage.py'):
+            destination = self.platform/relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(ct.PLATFORM_DIR/relative, destination)
+        entry, = document['cages']
+        report = {'scope': {'kind': 'Pod', 'name': 'legacy-till', 'namespace': 'shop'},
+                  'results': [{'policy': 'member-a-1-0-0', 'result': 'fail'}]}
+        pod = {'metadata': {'name': 'legacy-till', 'namespace': 'shop', 'labels': {
+            'policy-as-versioned.dev/policy-version': '1.0.0',
+            'posture.acme.io/caged': 'true', 'posture.acme.io/tier': entry['tier']}}}
+        class API:
+            reason = ''
+            def get(self, *arguments):
+                if arguments[0] == '-n':
+                    return pod
+                return {'items': [json.loads(json.dumps(report))] if arguments[1].startswith('policyreports.') else []}
+        sampler = SimpleNamespace(Cluster=lambda _: API(), now=lambda: '2026-10-03T00:00:00Z',
+            rc=SimpleNamespace(pinned_tag=lambda: 'v1.0.0', render=lambda _: {
+                'member': {'kind': 'ValidatingPolicy', 'metadata': {'name': 'member-a-1-0-0'}}}),
+            _git_output=lambda *_: json.dumps(document))
+        ambient = SimpleNamespace(NS=ct._cage_engine().NS, observation_uuid=lambda *_: 'wrong-ambient-engine',
+                                  oscal_risk=lambda *_args, **_kwargs: {})
+        for party in ('driftwood', 'tuppence', 'ludlow'):
+            with self.subTest(party=party):
+                spec = importlib.util.spec_from_file_location('workload_lane_'+party,
+                    ct.PLATFORM_DIR.parent/party/'drift/oscal_lane.py')
+                lane = importlib.util.module_from_spec(spec)
+>               spec.loader.exec_module(lane)
+
+compose/test_workload_risk.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<frozen importlib._bootstrap_external>:755: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:892: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x107793350>
+path = '/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/ludlow/drift/oscal_lane.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/ludlow/drift/oscal_lane.py'
+
+<frozen importlib._bootstrap_external>:950: FileNotFoundError
+=========================== short test summary info ============================
+SUBFAILED(party='driftwood') compose/test_workload_risk.py::WorkloadRisk::test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine
+SUBFAILED(party='tuppence') compose/test_workload_risk.py::WorkloadRisk::test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine
+SUBFAILED(party='ludlow') compose/test_workload_risk.py::WorkloadRisk::test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine
+3 failed, 20 passed, 9 subtests passed in 2.16s

@@ -1,0 +1,99 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index 47b7b84..d8f44bf 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -616,7 +616,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: f6a3d270196359b58ea4cc21e5afaabce0554b56b6a728c35217c392f1d9415e
++  after: d47eabfdc8c30348230dfea687bf86516e326da317ef4ced617e265385b25dd8
+   before:
+     header:
+       parents:
+diff --git a/deploy/pod.yaml b/deploy/pod.yaml
+index a6f1de6..8a3c25e 100644
+--- a/deploy/pod.yaml
++++ b/deploy/pod.yaml
+@@ -42,7 +42,7 @@ spec:
+   securityContext: { runAsNonRoot: true, runAsUser: 101 }
+   containers:
+     - name: c
+-      image: nginx
++      image: nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2
+       securityContext: { readOnlyRootFilesystem: true }
+       volumeMounts:
+         - { name: cache, mountPath: /var/cache/nginx }
+diff --git a/gitops/apps/api.yaml b/gitops/apps/api.yaml
+new file mode 100644
+index 0000000..47f6eaa
+--- /dev/null
++++ b/gitops/apps/api.yaml
+@@ -0,0 +1,23 @@
++# Ticket 154: API lifted from its transferred app repo. The adopter's served policy array
++# declares 5.0.0; its governed Namespace owns the rung. A Pod reaches the pod-only cage.
++# The image digest was read anonymously from the existing v1.0.1 GHCR manifest on 2026-10-03.
++apiVersion: v1
++kind: Pod
++metadata:
++  name: api
++  namespace: driftwood
++  labels:
++    app: api
++    app.kubernetes.io/part-of: driftwood
++    policy-as-versioned.dev/policy-version: "5.0.0"
++spec:
++  securityContext:
++    runAsNonRoot: true
++    runAsUser: 1000
++  containers:
++    - name: api
++      image: ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3
++      ports:
++        - containerPort: 8080
++      securityContext:
++        readOnlyRootFilesystem: true
+diff --git a/gitops/apps/kustomization.yaml b/gitops/apps/kustomization.yaml
+index f3c4165..a04046d 100644
+--- a/gitops/apps/kustomization.yaml
++++ b/gitops/apps/kustomization.yaml
+@@ -6,3 +6,4 @@ resources:
+   - nist-pin-configmap.yaml
+   - pod.yaml
+   - storefront.yaml
++  - api.yaml
+diff --git a/gitops/apps/pod.yaml b/gitops/apps/pod.yaml
+index 3a6b661..ce2004c 100644
+--- a/gitops/apps/pod.yaml
++++ b/gitops/apps/pod.yaml
+@@ -48,7 +48,7 @@ spec:
+   securityContext: { runAsNonRoot: true, runAsUser: 101 }
+   containers:
+     - name: c
+-      image: nginx
++      image: nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2
+       securityContext: { readOnlyRootFilesystem: true }
+       volumeMounts:
+         - { name: cache, mountPath: /var/cache/nginx }
+diff --git a/gitops/apps/storefront.yaml b/gitops/apps/storefront.yaml
+index 13b556f..2d4bbff 100644
+--- a/gitops/apps/storefront.yaml
++++ b/gitops/apps/storefront.yaml
+@@ -6,7 +6,7 @@
+ # only because that list names it. A workload file sitting in this directory unlisted is served
+ # to nobody; the hub's verify/lifted-apps/ check reads the path and the list, not the directory.
+ #
+-# NOT YET SERVED FROM THE PIN. The same file's GitRepository pins `ref: {tag: v1.0.0, commit:
++# HISTORICAL CEILING, before ticket 155 moves the self-pin. The same file's GitRepository pins `ref: {tag: v1.0.0, commit:
+ # ...}`, and that tree's kustomization does not list this file, so a cluster reconciling the pin
+ # today is served nothing from here until driftwood cuts a tag and moves its own pin -- which no
+ # renovate customManager bumps (they cover the parents only). The hub check counts that on every
+@@ -66,7 +66,7 @@ spec:
+     runAsUser: 101
+   containers:
+     - name: storefront
+-      image: ghcr.io/policy-as-versioned-flux/storefront@sha256:ef53f41d380af4f56aa3e1f1e4ad922fa64e8f47361a41e83822fa8ace0f96bc
++      image: ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6
+       ports:
+         - containerPort: 80
+       securityContext:

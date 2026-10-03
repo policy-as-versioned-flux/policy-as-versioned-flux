@@ -1,0 +1,191 @@
+[
+  {
+    "repository": "policy-as-versioned-tuppence/ledger",
+    "head": "a54f73dcb5bce9a5c9e33c272d3b21209a88649d",
+    "branch": "resume-2026-10-03-app-maintenance",
+    "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-ledger",
+    "body_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/ledger-pr-body.md",
+    "paths": [
+      "renovate.json"
+    ],
+    "public_admin_metadata": {
+      "full_name": "policy-as-versioned-tuppence/ledger",
+      "owner": "policy-as-versioned-tuppence",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    },
+    "url": "https://github.com/policy-as-versioned-tuppence/ledger/pull/12",
+    "merge": {
+      "mergeCommit": {
+        "oid": "d3255fa6fc0ccd25c84043f61b128b4d2e929ac0"
+      },
+      "mergedAt": "2026-10-03T17:20:44Z",
+      "reviews": [
+        {
+          "id": "PRR_kwDOTadN388AAAABQfmNtw",
+          "author": {
+            "login": "pavc-other-hand"
+          },
+          "authorAssociation": "NONE",
+          "body": "Reviewed the exact maintenance diff: Renovate uses its recommended preset, enables the dependency dashboard, and keeps automerge disabled. The API README correction describes the recorded historic scan. The payload is limited to Renovate configuration and README text; application code and image digests do not change. Configuration parsing and whitespace validation passed. This is assistant review as the registered second machine identity during the recorded development window; no human review is claimed.\n",
+          "submittedAt": "2026-10-03T17:20:40Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "a54f73dcb5bce9a5c9e33c272d3b21209a88649d"
+          }
+        }
+      ],
+      "state": "MERGED"
+    }
+  },
+  {
+    "repository": "policy-as-versioned-driftwood/storefront",
+    "head": "3be69e2f1c686cac77bfd05cefe7cc2e61eb208d",
+    "branch": "resume-2026-10-03-app-maintenance",
+    "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-storefront",
+    "body_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/storefront-pr-body.md",
+    "paths": [
+      "renovate.json"
+    ],
+    "public_admin_metadata": {
+      "full_name": "policy-as-versioned-driftwood/storefront",
+      "owner": "policy-as-versioned-driftwood",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    },
+    "url": "https://github.com/policy-as-versioned-driftwood/storefront/pull/16",
+    "merge": {
+      "mergeCommit": {
+        "oid": "deb25d3467c9b7c59a83b39bbb8023c790fbad31"
+      },
+      "mergedAt": "2026-10-03T17:20:52Z",
+      "reviews": [
+        {
+          "id": "PRR_kwDOTadDNM8AAAABQfmQGA",
+          "author": {
+            "login": "pavc-other-hand"
+          },
+          "authorAssociation": "NONE",
+          "body": "Reviewed the exact maintenance diff: Renovate uses its recommended preset, enables the dependency dashboard, and keeps automerge disabled. The API README correction describes the recorded historic scan. The payload is limited to Renovate configuration and README text; application code and image digests do not change. Configuration parsing and whitespace validation passed. This is assistant review as the registered second machine identity during the recorded development window; no human review is claimed.\n",
+          "submittedAt": "2026-10-03T17:20:48Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "3be69e2f1c686cac77bfd05cefe7cc2e61eb208d"
+          }
+        }
+      ],
+      "state": "MERGED"
+    }
+  },
+  {
+    "repository": "policy-as-versioned-driftwood/api",
+    "head": "1f7f49b7b1ce98f973f355d696920c038b8e020a",
+    "branch": "resume-2026-10-03-app-maintenance",
+    "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-api",
+    "body_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/api-pr-body.md",
+    "paths": [
+      "renovate.json",
+      "README.md"
+    ],
+    "public_admin_metadata": {
+      "full_name": "policy-as-versioned-driftwood/api",
+      "owner": "policy-as-versioned-driftwood",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    },
+    "url": "https://github.com/policy-as-versioned-driftwood/api/pull/6",
+    "merge": {
+      "mergeCommit": {
+        "oid": "d9b5f4f922cb4ff4b30d75733d48975c86c6df61"
+      },
+      "mergedAt": "2026-10-03T17:21:00Z",
+      "reviews": [
+        {
+          "id": "PRR_kwDOTadi3M8AAAABQfmSUw",
+          "author": {
+            "login": "pavc-other-hand"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Reviewed the exact maintenance diff: Renovate uses its recommended preset, enables the dependency dashboard, and keeps automerge disabled. The API README correction describes the recorded historic scan. The payload is limited to Renovate configuration and README text; application code and image digests do not change. Configuration parsing and whitespace validation passed. This is assistant review as the registered second machine identity during the recorded development window; no human review is claimed.\n",
+          "submittedAt": "2026-10-03T17:20:57Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "1f7f49b7b1ce98f973f355d696920c038b8e020a"
+          }
+        }
+      ],
+      "state": "MERGED"
+    }
+  },
+  {
+    "repository": "policy-as-versioned-ludlow/reports",
+    "head": "286d81987a84b23b0b4f4537c4a5b2d050638773",
+    "branch": "resume-2026-10-03-app-maintenance",
+    "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-reports",
+    "body_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/reports-pr-body.md",
+    "paths": [
+      "renovate.json"
+    ],
+    "public_admin_metadata": {
+      "full_name": "policy-as-versioned-ludlow/reports",
+      "owner": "policy-as-versioned-ludlow",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    },
+    "url": "https://github.com/policy-as-versioned-ludlow/reports/pull/11",
+    "merge": {
+      "mergeCommit": {
+        "oid": "f21bff06fac89401bf180ffc40dd46a37c36db51"
+      },
+      "mergedAt": "2026-10-03T17:21:10Z",
+      "reviews": [
+        {
+          "id": "PRR_kwDOTadaB88AAAABQfmVYw",
+          "author": {
+            "login": "pavc-other-hand"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Reviewed the exact maintenance diff: Renovate uses its recommended preset, enables the dependency dashboard, and keeps automerge disabled. The API README correction describes the recorded historic scan. The payload is limited to Renovate configuration and README text; application code and image digests do not change. Configuration parsing and whitespace validation passed. This is assistant review as the registered second machine identity during the recorded development window; no human review is claimed.\n",
+          "submittedAt": "2026-10-03T17:21:05Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "286d81987a84b23b0b4f4537c4a5b2d050638773"
+          }
+        }
+      ],
+      "state": "MERGED"
+    }
+  }
+]

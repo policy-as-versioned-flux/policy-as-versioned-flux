@@ -1,0 +1,673 @@
+{
+  "driftwood": {
+    "candidate_only": true,
+    "error": "candidate byte replay differs: ['composed/HANDBOOK.md: committed content differs from the re-render']",
+    "outcome": "instrument_error",
+    "shared_composed_files_written": false,
+    "traceback": "Traceback (most recent call last):\n  File \"/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-compose-replay.py\", line 66, in main\n    raise ValueError(\"candidate byte replay differs: \" + str(mismatches))\nValueError: candidate byte replay differs: ['composed/HANDBOOK.md: committed content differs from the re-render']\n"
+  },
+  "ludlow": {
+    "authenticated_foundation_adoption": false,
+    "candidate_only": true,
+    "cve_prices": [
+      {
+        "absence_count": 109,
+        "absence_only": true,
+        "absences": [
+          {
+            "amount": null,
+            "id": "CVE-2005-2541",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2007-5686",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2010-4756",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2011-3374",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2011-4116",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2013-4392",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2017-18018",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2018-20796",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2019-1010022",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2019-1010023",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2019-1010024",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2019-1010025",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2019-9192",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2021-45346",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2022-0563",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2023-23934",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2023-25577",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2023-30861",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2023-31437",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2023-31438",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2023-31439",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2024-22195",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2024-34064",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2024-34069",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2024-49766",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2024-56326",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2024-56433",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2025-27516",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2025-5278",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2025-6141",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2025-66221",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2025-69720",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2025-70873",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2025-8869",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-102010",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-102473",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-102474",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-103111",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-13346",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-15059",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-15534",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-16742",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-1703",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-18374",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-18477",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-18508",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-19487",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-19499",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-19542",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-21860",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-23949",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-24049",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-27171",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-27199",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-27205",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-3184",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-3219",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-35189",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-35191",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-40228",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-42250",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-42772",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-50812",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-50813",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-53910",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-5435",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-54369",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-54370",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-54371",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-54411",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-54872",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-54873",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-54875",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-56391",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-56392",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-5704",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-59890",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-6238",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-6357",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-6368",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-6791",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-72897",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-75804",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-75805",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-75806",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-76642",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-77117",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-77696",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-78408",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-78409",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-78410",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-80489",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-82560",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-84782",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-84784",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-85091",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-8643",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-8674",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-86805",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-89092",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-9538",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-95619",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-95818",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "CVE-2026-97399",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "TEMP-0290435-0B57B5",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "TEMP-0517018-A83CE6",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "TEMP-0628843-DBAD28",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "TEMP-0841856-B18BAF",
+            "reason": "outside pinned KEV feed"
+          },
+          {
+            "amount": null,
+            "id": "TEMP-1147318-639065",
+            "reason": "outside pinned KEV feed"
+          }
+        ],
+        "amount": null,
+        "changed": false,
+        "could_not_look": "No scanned CVE is in the pinned KEV feed; 109 scanned CVE(s) outside it are named absences carrying no amount.",
+        "currency": "GBP",
+        "hole": null,
+        "holes": [],
+        "intersection_count": 0,
+        "inventory_cve_count": 109,
+        "kind": "feed",
+        "lef": null,
+        "lef_basis": "No scanned CVE is in the pinned KEV feed; 109 scanned CVE(s) outside it are named absences carrying no amount.",
+        "name": "cve",
+        "new_price": null,
+        "new_version": "v3",
+        "old_absence_only": true,
+        "old_could_not_look": "No scanned CVE is in the pinned KEV feed; 109 scanned CVE(s) outside it are named absences carrying no amount.",
+        "old_price": null,
+        "old_tier": null,
+        "old_version": "v3",
+        "per_customer": null,
+        "perspective": "ludlow",
+        "pin_signature": {
+          "detail": "no signed tag cve/v3.x.y (or v3.x.y) exists on the feeds parent's checkout, which carries 3 tag(s) of its own",
+          "state": "untagged",
+          "tag": null
+        },
+        "priced_cve": null,
+        "proposed_tier": null,
+        "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+        "source": "feeds",
+        "superseded": {
+          "detail": "the pinned v3 of cve carries no signed tag of its own (see pin_signature), and nothing signed is ahead of it either; it is a hole, not a current pin",
+          "state": "unpublished"
+        },
+        "total": null
+      },
+      {
+        "alternates": [],
+        "amount": 1105457.6060590744,
+        "as_of": "2026-10-03",
+        "basis": "re-composed with this publisher's feed edges dropped",
+        "could_not_look": null,
+        "currency": "GBP",
+        "dropped_edges": [
+          "feeds/feed:threat-register@v1",
+          "feeds/feed:cve@v3",
+          "feeds/feed:eol@v2"
+        ],
+        "kind": "switching",
+        "name": "cve",
+        "over_pin_life": 0.0,
+        "per_customer": {
+          "amount": 0.024439724223095913,
+          "currency": "GBP"
+        },
+        "perspective": "ludlow",
+        "pin_life_months": 0,
+        "since": "2026-10-03",
+        "sized": true,
+        "source": "feeds",
+        "unpriceable": [
+          {
+            "amount": 318229.7785850087,
+            "currency": "GBP",
+            "kind": "feed",
+            "name": "threat-register",
+            "perspective": "ludlow",
+            "source": "feeds"
+          },
+          {
+            "amount": 27899.597026630927,
+            "currency": "GBP",
+            "kind": "supersede",
+            "name": "threat-register",
+            "perspective": "ludlow",
+            "source": "feeds"
+          },
+          {
+            "amount": null,
+            "currency": "GBP",
+            "kind": "feed",
+            "name": "cve",
+            "perspective": "ludlow",
+            "source": "feeds"
+          },
+          {
+            "amount": 787227.8274739302,
+            "currency": "GBP",
+            "kind": "feed",
+            "name": "eol",
+            "perspective": "ludlow",
+            "source": "feeds"
+          }
+        ],
+        "version": "v3"
+      }
+    ],
+    "outcome": "composed",
+    "refusals": [],
+    "rendered_files": 54,
+    "shared_composed_files_written": false,
+    "temporary_copy_byte_replay": true
+  },
+  "tuppence": {
+    "candidate_only": true,
+    "error": "candidate byte replay differs: ['composed/HANDBOOK.md: committed content differs from the re-render']",
+    "outcome": "instrument_error",
+    "shared_composed_files_written": false,
+    "traceback": "Traceback (most recent call last):\n  File \"/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-compose-replay.py\", line 66, in main\n    raise ValueError(\"candidate byte replay differs: \" + str(mismatches))\nValueError: candidate byte replay differs: ['composed/HANDBOOK.md: committed content differs from the re-render']\n"
+  }
+}

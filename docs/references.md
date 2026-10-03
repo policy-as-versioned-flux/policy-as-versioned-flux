@@ -78,3 +78,7 @@ confirm)" link anyway but could not be independently confirmed.
 - [kind — Kubernetes IN Docker](https://kind.sigs.k8s.io) — free, reproducible local clusters.
 - [LocalStack — local AWS cloud emulator](https://localstack.cloud) — local cloud for provisioning proofs.
 - [ControlPlane — Kubernetes, Cloud Native & OSS Security](https://control-plane.io) — company homepage.
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

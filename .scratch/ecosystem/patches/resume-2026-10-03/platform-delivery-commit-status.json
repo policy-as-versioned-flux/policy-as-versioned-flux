@@ -1,0 +1,10 @@
+{
+  "status": "failed",
+  "started_at": "2026-10-03T18:07:50.000Z",
+  "ordinary_hooks_and_signing": true,
+  "command": "bash platform-delivery-local-commit.sh",
+  "pid": 30968,
+  "exit_code": 128,
+  "signal": null,
+  "completed_at": "2026-10-03T18:07:50.176Z"
+}

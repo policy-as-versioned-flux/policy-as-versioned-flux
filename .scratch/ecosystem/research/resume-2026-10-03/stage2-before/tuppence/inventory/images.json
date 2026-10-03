@@ -1,0 +1,76 @@
+{
+  "images": [
+    {
+      "database_date": "2026-10-03T07:01:46.027466673Z",
+      "digest": "sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5",
+      "image": "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5",
+      "scanner_version": "0.69.3",
+      "vulnerabilities": [
+        {
+          "fixed_version": "2.15.0, 2.3.1, 2.12.2",
+          "id": "CVE-2021-44228",
+          "installed_version": "2.14.1",
+          "package": "org.apache.logging.log4j:log4j-core",
+          "severity": "CRITICAL"
+        },
+        {
+          "fixed_version": "2.3.2, 2.12.4, 2.17.1",
+          "id": "CVE-2021-44832",
+          "installed_version": "2.14.1",
+          "package": "org.apache.logging.log4j:log4j-core",
+          "severity": "MEDIUM"
+        },
+        {
+          "fixed_version": "2.16.0, 2.12.2, 2.3.1",
+          "id": "CVE-2021-45046",
+          "installed_version": "2.14.1",
+          "package": "org.apache.logging.log4j:log4j-core",
+          "severity": "CRITICAL"
+        },
+        {
+          "fixed_version": "2.12.3, 2.17.0, 2.3.1",
+          "id": "CVE-2021-45105",
+          "installed_version": "2.14.1",
+          "package": "org.apache.logging.log4j:log4j-core",
+          "severity": "HIGH"
+        },
+        {
+          "fixed_version": "2.25.3",
+          "id": "CVE-2025-68161",
+          "installed_version": "2.14.1",
+          "package": "org.apache.logging.log4j:log4j-core",
+          "severity": "MEDIUM"
+        },
+        {
+          "fixed_version": "2.25.4",
+          "id": "CVE-2026-34477",
+          "installed_version": "2.14.1",
+          "package": "org.apache.logging.log4j:log4j-core",
+          "severity": "MEDIUM"
+        },
+        {
+          "fixed_version": "2.25.4",
+          "id": "CVE-2026-34480",
+          "installed_version": "2.14.1",
+          "package": "org.apache.logging.log4j:log4j-core",
+          "severity": "MEDIUM"
+        },
+        {
+          "fixed_version": "1.6.59-r0",
+          "id": "CVE-2026-46675",
+          "installed_version": "1.6.58-r1",
+          "package": "libpng",
+          "severity": "UNKNOWN"
+        },
+        {
+          "fixed_version": "2.25.5, 2.26.1",
+          "id": "CVE-2026-49844",
+          "installed_version": "2.14.1",
+          "package": "org.apache.logging.log4j:log4j-api",
+          "severity": "MEDIUM"
+        }
+      ]
+    }
+  ],
+  "schema_version": "1.0.0"
+}

@@ -1,7 +1,7 @@
 # 157 — Fact 2 is null on two composed sources
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -24,3 +24,7 @@ Diagnose on a lane run, not by reading the code only. A sample taken by hand is 
 Graduated 2026-09-25 from ticket 152, Q3 and Q11. Definition of done: a scheduled sample on each adopter reads fact 2 true on each source, or observed false with its cause named, and looks at falsifier 2 wherever fact 2 is true. Or a dated paragraph in each adopter's `drift/window.yaml` records the cause as a ceiling. Wire any new check into `talk/verify-all.sh`.
 
 Step 4 grades driftwood (`verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh:46`). So ticket 152 alone cannot give step 4 a PASS. This ticket blocks ticket 151.
+
+## Answer
+
+**Local implementation, 2026-10-03.** Diagnosed from actual scheduled run logs and recorded the evidence in [drift-signature-diagnosis.md](../research/resume-2026-10-03/drift-signature-diagnosis.md). Current tuppence and ludlow fact 2 are true on every source. Driftwood sampled its composed source without an annotation soon after verifier rollout; the timeline supports a controller-cycle race, without proving every older null shares that cause. Old FALSEs explicitly named certificate notBefore versus tagger-time rejection. Added a bounded wait for any terminal signature verdict, controller reason logging, read-only publisher checkouts and source-specific CI identities/tags. Fixed unknown being collapsed into a cleared falsifier on tuppence/ludlow. Local selfchecks pass; post-change scheduled proof remains pending.

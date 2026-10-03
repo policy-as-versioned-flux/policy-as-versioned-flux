@@ -83,6 +83,11 @@ cannot carry the app's credential), and a bare merge is still refused with a rea
 this mode. `development` was not chosen: it would have admitted the pushes too, and the owner's
 instruction split the two hands on purpose. As with everything in this file, the screen is a net
 over the shapes a merge takes here, not a proof; ticket 87's ruleset is the server-side half.
+
+**Amended 2026-10-03 (ticket 97).** The ambient declaration can only tighten the durable one.
+An ambient development value cannot loosen other-hand or operations; the refusal names the
+ignored value. The checked-in mode's owner decision and development window are graded from
+ENACT_MODE.why. Expiry grades red and does not silently change the guard's mode.
 """
 
 from __future__ import annotations
@@ -105,22 +110,26 @@ _MODES = ("development", "operations", "other-hand")
 DEFAULT_MODE = "operations"
 
 
+def declared_mode() -> str:
+    """Read the checked-in declaration; an unreadable or malformed declaration refuses."""
+    try:
+        value = ENACT_MODE_FILE.read_text(encoding="utf-8").strip().lower()
+    except OSError:
+        value = ""
+    return value if value in _MODES else DEFAULT_MODE
+
+
 def enact_mode() -> str:
-    """The active mode: `TWIN_ENACT_MODE` in the environment first (a one-run override), then
-    `ENACT_MODE_FILE` (the durable default), then `DEFAULT_MODE` when neither says otherwise.
+    """The stricter of the durable declaration and an ambient one-run tightening.
 
     The fallback is the refusing mode (amended 2026-08-29, see the docstring): an unreadable file,
     a typo in it, and a checkout that lost it are all cases where nobody has said the twin may
     dispose, and a guard that cannot tell must not admit.
     """
-    env = os.environ.get("TWIN_ENACT_MODE", "").strip().lower()
-    if env in _MODES:
-        return env
-    try:
-        from_file = ENACT_MODE_FILE.read_text(encoding="utf-8").strip().lower()
-    except OSError:
-        from_file = ""
-    return from_file if from_file in _MODES else DEFAULT_MODE
+    ranks = {"development": 0, "other-hand": 1, "operations": 2}
+    durable = declared_mode()
+    ambient = os.environ.get("TWIN_ENACT_MODE", "").strip().lower()
+    return ambient if ambient in ranks and ranks[ambient] > ranks[durable] else durable
 
 # Every repository this estate enacts into carries the org prefix — it is the impersonation
 # guardrail `estate/README.md` describes, and it doubles as the thing a guard can recognise.
@@ -543,9 +552,14 @@ def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -
     mode = enact_mode()
     if mode == "development":
         return None
+    ambient = os.environ.get("TWIN_ENACT_MODE", "").strip().lower()
+    override_note = (f"TWIN_ENACT_MODE={ambient!r} ignored because it would loosen the "
+                     f"checked-in {declared_mode()!r} declaration. "
+                     if ambient in _MODES and ambient != mode else "")
 
     if DISPOSITION_TOOL_NAME.search(tool_name or ""):
         return (
+            override_note +
             f"{tool_name} disposes rather than proposes. The twin opens pull requests and never "
             "merges them (decision ticket 18 Q1): Article 22 admits no solely-automated "
             "significant decision, a trade-off curve has nothing to auto-execute, and an agent "
@@ -563,6 +577,7 @@ def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -
                 if _merge_is_made_as_the_other_hand(command):
                     break
                 return (
+                    override_note +
                     f"`{shape}` under the owner's own token is author-equals-merger. In "
                     "`other-hand` mode a merge is admitted only as the other hand: mint the "
                     "app's token in the same command (`GH_TOKEN=\"$(python -m twin.other_hand "
@@ -570,6 +585,7 @@ def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -
                     "(ticket 88; ticket 75 Q6, Q14)."
                 )
             return (
+                override_note +
                 f"`{shape}` disposes rather than proposes, and the twin only proposes (decision "
                 "ticket 18 Q1). Open the pull request and leave it open: a human merges it, and "
                 "that hand-off is the accountability, not a formality."
@@ -578,6 +594,7 @@ def decide(tool_name: str, tool_input: dict[str, Any], cwd: str | None = None) -
     target = _push_target(command, cwd)
     if target:
         return (
+            override_note +
             f"a push to {target} writes to an enactment repository directly, which is disposal "
             "without even the pull request. The twin changes its own model constantly and the "
             "world never without a human (decision ticket 18 Q1)."

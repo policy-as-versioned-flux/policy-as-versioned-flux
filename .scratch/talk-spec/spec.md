@@ -416,3 +416,7 @@ pattern (old estate = research-only prior art, patterns reused, code not).
   the hard backstop on the AI proposer.
 - Next step after review: `/to-tickets` to split Phases 0–7 into build tickets under
   `.scratch/talk-spec/build/`. Enforcement gradient + three-actor identity fold-in: 2026-07-31.
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

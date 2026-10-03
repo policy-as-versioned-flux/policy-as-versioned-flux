@@ -1,0 +1,36 @@
+{
+  "base": "ff3ac9ab00bdc73e1bbf83cabf91c767d35b8e88",
+  "branch": "resume/2026-10-03-primary-cve-fx-threat-feeds",
+  "commit": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+  "cuts": [
+    "cve/v3.0.0",
+    "fx/v1.1.0",
+    "threat-register/v4.0.0"
+  ],
+  "external_writes": "AUTO-REVIEW REJECTED branch push before execution; no push, PR, merge or tag occurred",
+  "publication_blocker": "Trusted user content did not specifically authorize exporting the 19-path payload to public policy-as-versioned-feeds/feeds; the reviewer could not independently verify its sensitivity. No workaround or indirect execution is permitted.",
+  "local_signature": "ordinary repository signing configuration; workflow release tag remains the feed signature",
+  "patch_sha256": "2702903e8aa1b0e4efbd59f49a5420c04b241fc3ca9a205fb03bc83d1630a1ef",
+  "paths": [
+    "README.md",
+    "bump.py",
+    "cve/bump.yaml",
+    "cve/rule.yaml",
+    "cve/v3/feed.json",
+    "fetch/cve.py",
+    "fetch/fx.py",
+    "fetch/lib.py",
+    "fetch/source/cve.json",
+    "fetch/source/fx.json",
+    "fetch/source/threat-register.json",
+    "fx/bump.yaml",
+    "fx/v1/feed.json",
+    "threat-register/bump.yaml",
+    "threat-register/payload.schema.v4.json",
+    "threat-register/to_fair_scenario.py",
+    "threat-register/v4/feed.json",
+    "verify-feeds.sh",
+    "verify-market-and-news.sh"
+  ],
+  "repository": "policy-as-versioned-feeds/feeds"
+}

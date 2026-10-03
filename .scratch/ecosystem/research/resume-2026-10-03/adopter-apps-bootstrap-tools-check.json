@@ -1,0 +1,22 @@
+{
+  "trust_target_sha256": "6494e21ea73fa7ee769f85f57d5a3e6a08725eae1e38c755fc3517c9e6bc0b66",
+  "cached_tuf_timestamp_expired": "2026-09-29T13:28:12Z",
+  "proof_scope": "historical tag signature identity issuer SCT with exact cached official public trust keys; current TUF freshness not claimed",
+  "checks": {
+    "driftwood": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": "REFUSED: platform tools: Error: no signer could be verified online: signer 0: looking up rekor entry: Post \"https://rekor.sigstore.dev/api/v1/index/retrieve\": giving up after 4 attempt(s): Post \"https://rekor.sigstore.dev/api/v1/index/retrieve\": dial tcp: lookup rekor.sigstore.dev: no such host\n\n"
+    },
+    "tuppence": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": "REFUSED: platform tools: Error: no signer could be verified online: signer 0: looking up rekor entry: Post \"https://rekor.sigstore.dev/api/v1/index/retrieve\": giving up after 4 attempt(s): Post \"https://rekor.sigstore.dev/api/v1/index/retrieve\": dial tcp: lookup rekor.sigstore.dev: no such host\n\n"
+    },
+    "ludlow": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": "REFUSED: platform tools: Error: no signer could be verified online: signer 0: looking up rekor entry: Post \"https://rekor.sigstore.dev/api/v1/index/retrieve\": giving up after 4 attempt(s): Post \"https://rekor.sigstore.dev/api/v1/index/retrieve\": dial tcp: lookup rekor.sigstore.dev: no such host\n\n"
+    }
+  }
+}

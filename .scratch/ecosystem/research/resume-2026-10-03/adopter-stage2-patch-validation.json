@@ -1,0 +1,53 @@
+{
+  "driftwood": {
+    "applies_to_local_base": "529e159397d3e64f94b0270cc7de69c235580961",
+    "apply_check": true,
+    "full_payload_paths": [
+      "gitops/flux-system/gotk-sync.yaml",
+      "inventory/images.json",
+      "inventory/PROVENANCE.json"
+    ],
+    "incremental_pin_delta": ".scratch/ecosystem/research/resume-2026-10-03/driftwood-stage2-apps-pin-delta.patch",
+    "inventory_images_unchanged": true,
+    "own_changes": [
+      "gitops/flux-system/gotk-sync.yaml",
+      "inventory/PROVENANCE.json"
+    ],
+    "patch": ".scratch/ecosystem/research/resume-2026-10-03/driftwood-stage2-apps-inventory.patch",
+    "patch_sha256": "599659a626ef1bfd755141db32094954ab4302b99b789900e82b1e2b02759098"
+  },
+  "ludlow": {
+    "applies_to_local_base": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+    "apply_check": true,
+    "full_payload_paths": [
+      "gitops/flux-system/gotk-sync.yaml",
+      "inventory/images.json",
+      "inventory/PROVENANCE.json"
+    ],
+    "incremental_pin_delta": ".scratch/ecosystem/research/resume-2026-10-03/ludlow-stage2-apps-pin-delta.patch",
+    "inventory_images_unchanged": true,
+    "own_changes": [
+      "gitops/flux-system/gotk-sync.yaml",
+      "inventory/PROVENANCE.json"
+    ],
+    "patch": ".scratch/ecosystem/research/resume-2026-10-03/ludlow-stage2-apps-inventory.patch",
+    "patch_sha256": "d1d23499e26e54b07b73b5d8f1db82eda2468695a9f06e44e1b976de12120f1c"
+  },
+  "tuppence": {
+    "applies_to_local_base": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+    "apply_check": true,
+    "full_payload_paths": [
+      "gitops/flux-system/gotk-sync.yaml",
+      "inventory/images.json",
+      "inventory/PROVENANCE.json"
+    ],
+    "incremental_pin_delta": ".scratch/ecosystem/research/resume-2026-10-03/tuppence-stage2-apps-pin-delta.patch",
+    "inventory_images_unchanged": true,
+    "own_changes": [
+      "gitops/flux-system/gotk-sync.yaml",
+      "inventory/PROVENANCE.json"
+    ],
+    "patch": ".scratch/ecosystem/research/resume-2026-10-03/tuppence-stage2-apps-inventory.patch",
+    "patch_sha256": "e4cfe86a8d50d91a92668896b7d80fb0734592713b3e20a6c9f909cdee46f487"
+  }
+}

@@ -1,0 +1,956 @@
+diff --git a/party.yaml b/party.yaml
+index 78a9d8d..373413d 100644
+--- a/party.yaml
++++ b/party.yaml
+@@ -38,6 +38,12 @@ roles: [publisher, platform]
+ # is a new version plus the old one listed here, never a deleted tag; a pin
+ # to a revoked version is a priced hole, never a refusal (ADR-0019 point 6).
+ publishes:
++  # Ticket 151: a separately published implementations member package. Its
++  # source path and cloud/v* tags do not alter any frozen Pod policy line.
++  - kind: implementations
++    name: cloud
++    path: implementations/cloud
++    revoked: []
+   - kind: implementations
+     name: policy
+     path: distribution/policies
+diff --git a/.github/workflows/cloud-release.yml b/.github/workflows/cloud-release.yml
+new file mode 100644
+index 0000000..433d44c
+--- /dev/null
++++ b/.github/workflows/cloud-release.yml
+@@ -0,0 +1,64 @@
++name: cloud-release
++# Prepared dispatch-only publication path, separate from frozen Pod lines.
++on:
++  workflow_dispatch:
++    inputs:
++      version: {description: 'Cloud package semver matching implementations/cloud/VERSION', required: true}
++      hub_record: {description: 'Full signed hub clock commit carrying a modern e2e4 PASS', required: true}
++      message: {description: 'What changed and why', required: true}
++permissions: {contents: write, id-token: write}
++env:
++  GITSIGN_VERSION: 0.17.1
++  GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
++  EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cloud-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
++  EXPECTED_ISSUER: https://token.actions.githubusercontent.com
++jobs:
++  release:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++        with: {fetch-depth: 0, persist-credentials: false}
++      - uses: actions/checkout@v4
++        with:
++          repository: policy-as-versioned-flux/policy-as-versioned-flux
++          ref: ${{ inputs.hub_record }}
++          path: _hub
++          fetch-depth: 0
++          persist-credentials: false
++      - name: Install pinned verifier and declared engines
++        run: |
++          set -euo pipefail
++          curl -sSL -o "$RUNNER_TEMP/gitsign" "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"
++          echo "${GITSIGN_SHA256}  $RUNNER_TEMP/gitsign" | sha256sum -c -
++          chmod +x "$RUNNER_TEMP/gitsign"
++          sudo mv "$RUNNER_TEMP/gitsign" /usr/local/bin/gitsign
++          pip install --quiet pyyaml
++          bash engine/install-kyverno-engines.sh linux_x86_64 "$RUNNER_TEMP/cloud-engines"
++      - name: Cloud preflight before signing
++        env:
++          HUB_RECORD: ${{ inputs.hub_record }}
++          VERSION: ${{ inputs.version }}
++          KYVERNO_ENGINE_DIR: ${{ runner.temp }}/cloud-engines
++        run: python3 implementations/cloud/release_check.py --hub _hub --record "$HUB_RECORD" --version "$VERSION"
++      - name: Sign and verify the one immutable cloud tag
++        env:
++          VERSION: ${{ inputs.version }}
++          RELEASE_MESSAGE: ${{ inputs.message }}
++        run: |
++          set -euo pipefail
++          git config user.name cloud-release
++          git config user.email cloud-release@users.noreply.github.com
++          git config gpg.format x509
++          git config gpg.x509.program gitsign
++          git tag -s "cloud/v${VERSION}" -m "$RELEASE_MESSAGE"
++          GITSIGN_REKOR_MODE=offline gitsign verify-tag "cloud/v${VERSION}" --certificate-identity-regexp="$EXPECTED_IDENTITY_REGEXP" --certificate-oidc-issuer="$EXPECTED_ISSUER"
++      - name: Publish verified tag and release
++        env:
++          GH_TOKEN: ${{ github.token }}
++          VERSION: ${{ inputs.version }}
++          RELEASE_MESSAGE: ${{ inputs.message }}
++        run: |
++          set -euo pipefail
++          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push origin "refs/tags/cloud/v${VERSION}"
++          printf '%s\n' "$RELEASE_MESSAGE" > "$RUNNER_TEMP/cloud-release-notes.md"
++          gh release create "cloud/v${VERSION}" --title "cloud/v${VERSION}" --notes-file "$RUNNER_TEMP/cloud-release-notes.md"
+diff --git a/implementations/cloud/README.md b/implementations/cloud/README.md
+new file mode 100644
+index 0000000..90f6af0
+--- /dev/null
++++ b/implementations/cloud/README.md
+@@ -0,0 +1,40 @@
++# Cloud implementations package (ticket 151)
++
++The platform owns the RDS/S3 members and their `component-definition.json` control claims.
++The separate source path is `implementations/cloud`, published on `cloud/v<semver>` by the
++dispatch-only `cloud-release.yml`. It has its own VERSION and engine cells; it changes no
++frozen `distribution/policies` tree or declared Pod line. This is a prepared package: no
++cloud tag, release, provider or AWS resource was created by this implementation.
++
++`crossplane-dials.yaml` is the single table rendered into CEL. A governed Namespace selects
++the rung; forged CR labels cannot select it. A missing/unknown Namespace tier, `infra`, a
++missing claim or an orphan claim selects isolated. The served-claims array makes versioned
++copies disjoint, while every unserved population takes the bottom rung. Mutations are
++tighten-only and idempotent: public RDS access closes, storage encryption stays on, Multi-AZ
++and backup retention only rise; supported KMS encryption and unrelated fields are retained.
++Audit policies report the original intent. There is no Deny gate or pause/Observe switch.
++
++The isolated service dials equal quarantine. Pod CPU, eviction, WAF and NetworkPolicy dials
++have no projection onto these CRs, and this package does not claim AWS network isolation.
++An encryption configuration CR is its subject: an absent configuration on a Bucket is
++not observed here. Storage encryption on an already provisioned RDS instance may be an
++immutable cloud setting; no provider reconciliation is part of this admission proof.
++
++Run `KYVERNO_ENGINE_DIR=<local binaries> ./verify-cloud-package.sh`. The real CLI replays
++every fixture on exact 1.18.2 and 1.19.1, checks mutated fields and idempotency, and grades
++the Audit outcomes separately. The preserve-unknown fixture CRDs supply offline GVK
++mapping only. They are not vendor schema evidence. CLI oldObject/status exclusion compiles;
++the CLI supplies no oldObject, so the status-only runtime behavior is not claimed as tested.
++
++`render.py --claim <served claim> --served-claims <all composed claims> --source-commit
++<full SHA> --output <tree>` renders the package without publication. Tuppence's `gitops/cloud/
++prepare.py` extracts an exact identity-verified cloud tag, verifies supplied vendor CRD
++field shapes and refuses the fixture CRDs, then emits the cloud-only composed paths.
++The current S3 field shape comes from locally available incumbent policy fixtures; if the
++actual vendor schema differs, preparation refuses it and the CEL must be updated and replayed.
++
++The hub's `verify/cloud-plane/verify-cloud-plane.sh` grades actual delivery and server
++admission separately. It first requires a modern step-4 PASS from an immutable signed clock
++commit on the hub's origin/main, with its own recorded TRUTH line and capture. A local replay,
++current capture or fixture line cannot activate the cloud plane. Missing trigger or a signed
++tuppence tag that lacks a cloud path is an explicit declared wait, never a pass.
+diff --git a/implementations/cloud/VERSION b/implementations/cloud/VERSION
+new file mode 100644
+index 0000000..3eefcb9
+--- /dev/null
++++ b/implementations/cloud/VERSION
+@@ -0,0 +1 @@
++1.0.0
+diff --git a/implementations/cloud/cloud-rbac.yaml b/implementations/cloud/cloud-rbac.yaml
+new file mode 100644
+index 0000000..892900f
+--- /dev/null
++++ b/implementations/cloud/cloud-rbac.yaml
+@@ -0,0 +1,16 @@
++# Provider-family CRD install does not run any provider or grant AWS access.
++# Kyverno's reports/background controllers still need to read these CRs.
++apiVersion: rbac.authorization.k8s.io/v1
++kind: ClusterRole
++metadata:
++  name: kyverno:cloud-cr-view
++  labels:
++    rbac.kyverno.io/aggregate-to-background-controller: 'true'
++    rbac.kyverno.io/aggregate-to-reports-controller: 'true'
++rules:
++  - apiGroups: [rds.aws.m.upbound.io]
++    resources: [instances]
++    verbs: [get, list, watch]
++  - apiGroups: [s3.aws.m.upbound.io]
++    resources: [bucketserversideencryptionconfigurations]
++    verbs: [get, list, watch]
+diff --git a/implementations/cloud/component-definition.json b/implementations/cloud/component-definition.json
+new file mode 100644
+index 0000000..101b4d3
+--- /dev/null
++++ b/implementations/cloud/component-definition.json
+@@ -0,0 +1,22 @@
++{
++  "component-definition": {
++    "uuid": "cf151000-0000-4000-8000-000000000001",
++    "metadata": {
++      "title": "Platform cloud implementations — RDS and S3 admission intent",
++      "last-modified": "2026-10-03T00:00:00Z", "version": "1.0.0", "oscal-version": "1.1.2",
++      "remarks": "The platform ships and claims these members (ADR-0017). A mapping is not an assessment of AWS reconciliation, an absent Bucket encryption configuration, or cloud networking. Only actual PolicyReport results enter the up-flow. Prepared publication, not a signed release claim."
++    },
++    "components": [{
++      "uuid": "cf151000-0000-4000-8000-000000000002", "type": "policy", "title": "Crossplane cloud admission",
++      "description": "Hand-authored CEL members harvest collie's control intent; mutations tighten service dials without Deny.",
++      "control-implementations": [{
++        "uuid": "cf151000-0000-4000-8000-000000000003", "source": "nist/catalog/NIST_SP-800-53_rev5.2.0_catalog.json",
++        "description": "NIST SP 800-53 Rev 5.2.0; exact bare control ids",
++        "implemented-requirements": [
++          {"uuid": "cf151000-0000-4000-8000-000000000004", "control-id": "cp-10", "description": "Observe RDS Multi-AZ and tighten availability by declared rung.", "props": [{"name": "Check_Id", "ns": "https://oscal-compass.github.io/compliance-trestle/plugins/kyverno", "value": "require-rds-multi-az"}], "remarks": "policies/require-rds-multi-az.yaml and cloud-cage-rds.yaml; primary mapping harvested through the incumbent collie rationale."},
++          {"uuid": "cf151000-0000-4000-8000-000000000005", "control-id": "sc-28", "description": "Observe supported server-side encryption algorithms on every rule and supply AES256 when absent or invalid, preserving aws:kms.", "props": [{"name": "Check_Id", "ns": "https://oscal-compass.github.io/compliance-trestle/plugins/kyverno", "value": "require-s3-bucket-encryption"}], "remarks": "policies/require-s3-bucket-encryption.yaml and cloud-cage-s3.yaml. A configuration CR is the subject, not every Bucket."}
++        ]
++      }]
++    }]
++  }
++}
+diff --git a/implementations/cloud/crossplane-dials.yaml b/implementations/cloud/crossplane-dials.yaml
+new file mode 100644
+index 0000000..28db20e
+--- /dev/null
++++ b/implementations/cloud/crossplane-dials.yaml
+@@ -0,0 +1,23 @@
++schema: 1
++authority: governed-namespace
++default: isolated
++orphan_or_missing_claim: isolated
++infra: role-declaration-not-a-rung
++# This table is read by render.py, not copied into a second Python table.
++tiers:
++  baseline:   {publiclyAccessible: false, storageEncrypted: true, multiAz: false, backupRetentionPeriod: 1, sseAlgorithm: AES256}
++  restricted: {publiclyAccessible: false, storageEncrypted: true, multiAz: true, backupRetentionPeriod: 7, sseAlgorithm: AES256}
++  quarantine: {publiclyAccessible: false, storageEncrypted: true, multiAz: true, backupRetentionPeriod: 35, sseAlgorithm: AES256}
++  isolated:   {publiclyAccessible: false, storageEncrypted: true, multiAz: true, backupRetentionPeriod: 35, sseAlgorithm: AES256}
++preserve:
++  - RDS multiAz true remains true at baseline
++  - RDS backup retention above the rung minimum remains unchanged
++  - S3 aws:kms and its key identifier remain unchanged
++  - S3 bucketKeyEnabled and every unrelated provider field remain unchanged
++not_projected:
++  - Pod CPU and memory ceilings, PriorityClasses and eviction order
++  - Pod WAF sidecars and NetworkPolicy ingress or egress
++limits:
++  - The isolated service settings equal quarantine; no AWS network isolation is claimed.
++  - This package governs encryption configuration CRs; absence of such a CR is not evidence that a Bucket is encrypted.
++  - No pause flag, ProviderConfig, credential or reconciliation prohibition implements a rung.
+diff --git a/implementations/cloud/package.yaml b/implementations/cloud/package.yaml
+new file mode 100644
+index 0000000..2441b10
+--- /dev/null
++++ b/implementations/cloud/package.yaml
+@@ -0,0 +1,19 @@
++schema: 1
++party: platform
++kind: implementations
++name: cloud
++version: 1.0.0
++path: implementations/cloud
++tag: cloud/v1.0.0
++publication: prepared
++engine_scope: every-cloud-body-and-fixture-v1
++tested_engines: ["1.18.2", "1.19.1"]
++provider_crds:
++  package_version: v2.6.0
++  groups: [rds.aws.m.upbound.io, s3.aws.m.upbound.io]
++proof_boundary: admission-only-no-provider-controller-or-credentials
++members:
++  - policies/require-rds-multi-az.yaml
++  - policies/require-s3-bucket-encryption.yaml
++  - policies/cloud-cage-rds.yaml
++  - policies/cloud-cage-s3.yaml
+diff --git a/implementations/cloud/policies/cloud-cage-rds.yaml b/implementations/cloud/policies/cloud-cage-rds.yaml
+new file mode 100644
+index 0000000..160a8f9
+--- /dev/null
++++ b/implementations/cloud/policies/cloud-cage-rds.yaml
+@@ -0,0 +1,56 @@
++apiVersion: policies.kyverno.io/v1
++kind: MutatingPolicy
++metadata:
++  name: cloud-cage-rds
++  labels: {policy-as-versioned.dev/policy: cloud}
++spec:
++  matchConstraints:
++    resourceRules:
++      - apiGroups: [rds.aws.m.upbound.io]
++        apiVersions: [v1beta1]
++        operations: [CREATE, UPDATE]
++        resources: [instances]
++  matchConditions:
++    - name: only-this-copy-or-bottom-rung
++      expression: >-
++        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '__POLICY_VERSION__' ||
++        !(object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') in __SERVED_CLAIMS__)
++    - name: cloud-population
++      expression: >-
++        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != '' ||
++        (namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true')
++    - name: spec-change
++      expression: >-
++        oldObject == null || !has(oldObject.spec) || object.spec != oldObject.spec ||
++        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != oldObject.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') ||
++        object.metadata.?labels['posture.acme.io/tier'].orValue('') != oldObject.metadata.?labels['posture.acme.io/tier'].orValue('')
++  variables:
++    - name: claim
++      expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('')
++    - name: nsTier
++      expression: >-
++        namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'
++          ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('') : ''
++    - name: tier
++      expression: >-
++        variables.claim == '__POLICY_VERSION__' && variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']
++          ? variables.nsTier : 'isolated'
++    - name: dial
++      expression: __DIAL_TABLE__
++  mutations:
++    - patchType: JSONPatch
++      jsonPatch:
++        expression: >-
++          (!has(object.metadata.labels)
++            ? [JSONPatch{op: 'add', path: '/metadata/labels', value: {}}] : []) +
++          [JSONPatch{op: 'add', path: '/metadata/labels/posture.acme.io~1caged', value: 'true'},
++           JSONPatch{op: 'add', path: '/metadata/labels/posture.acme.io~1tier', value: string(variables.tier)}] +
++          (!has(object.spec.forProvider)
++            ? [JSONPatch{op: 'add', path: '/spec/forProvider', value: {}}] : []) +
++          [JSONPatch{op: 'add', path: '/spec/forProvider/publiclyAccessible', value: false},
++           JSONPatch{op: 'add', path: '/spec/forProvider/storageEncrypted', value: true},
++           JSONPatch{op: 'add', path: '/spec/forProvider/multiAz',
++             value: variables.dial.multiAz == 'true' || object.spec.?forProvider.?multiAz.orValue(false)},
++           JSONPatch{op: 'add', path: '/spec/forProvider/backupRetentionPeriod',
++             value: object.spec.?forProvider.?backupRetentionPeriod.orValue(0) > int(variables.dial.backupRetentionPeriod)
++               ? object.spec.forProvider.backupRetentionPeriod : int(variables.dial.backupRetentionPeriod)}]
+diff --git a/implementations/cloud/policies/cloud-cage-s3.yaml b/implementations/cloud/policies/cloud-cage-s3.yaml
+new file mode 100644
+index 0000000..1c3a8ce
+--- /dev/null
++++ b/implementations/cloud/policies/cloud-cage-s3.yaml
+@@ -0,0 +1,61 @@
++apiVersion: policies.kyverno.io/v1
++kind: MutatingPolicy
++metadata:
++  name: cloud-cage-s3
++  labels: {policy-as-versioned.dev/policy: cloud}
++spec:
++  matchConstraints:
++    resourceRules:
++      - apiGroups: [s3.aws.m.upbound.io]
++        apiVersions: [v1beta1]
++        operations: [CREATE, UPDATE]
++        resources: [bucketserversideencryptionconfigurations]
++  matchConditions:
++    - name: only-this-copy-or-bottom-rung
++      expression: >-
++        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '__POLICY_VERSION__' ||
++        !(object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') in __SERVED_CLAIMS__)
++    - name: cloud-population
++      expression: >-
++        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != '' ||
++        (namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true')
++    - name: spec-change
++      expression: >-
++        oldObject == null || !has(oldObject.spec) || object.spec != oldObject.spec ||
++        object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != oldObject.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') ||
++        object.metadata.?labels['posture.acme.io/tier'].orValue('') != oldObject.metadata.?labels['posture.acme.io/tier'].orValue('')
++  variables:
++    - name: claim
++      expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('')
++    - name: nsTier
++      expression: >-
++        namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'
++          ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('') : ''
++    - name: tier
++      expression: >-
++        variables.claim == '__POLICY_VERSION__' && variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']
++          ? variables.nsTier : 'isolated'
++    - name: dial
++      expression: __DIAL_TABLE__
++  mutations:
++    - patchType: JSONPatch
++      jsonPatch:
++        expression: >-
++          (!has(object.metadata.labels)
++            ? [JSONPatch{op: 'add', path: '/metadata/labels', value: {}}] : []) +
++          [JSONPatch{op: 'add', path: '/metadata/labels/posture.acme.io~1caged', value: 'true'},
++           JSONPatch{op: 'add', path: '/metadata/labels/posture.acme.io~1tier', value: string(variables.tier)}]
++    - patchType: JSONPatch
++      jsonPatch:
++        expression: >-
++          !has(object.spec.forProvider) ?
++            [JSONPatch{op: 'add', path: '/spec/forProvider', value: {'rule': [{'applyServerSideEncryptionByDefault': {'sseAlgorithm': variables.dial.sseAlgorithm}}]}}] :
++          !has(object.spec.forProvider.rule) || size(object.spec.forProvider.rule) == 0 ?
++            [JSONPatch{op: 'add', path: '/spec/forProvider/rule', value: [{'applyServerSideEncryptionByDefault': {'sseAlgorithm': variables.dial.sseAlgorithm}}]}] :
++          object.spec.forProvider.rule.filter(r,
++            !(r.?applyServerSideEncryptionByDefault.?sseAlgorithm.orValue('') in ['AES256', 'aws:kms']))
++            .map(r, JSONPatch{
++              op: 'add',
++              path: '/spec/forProvider/rule/' + string(object.spec.forProvider.rule.indexOf(r)) + '/applyServerSideEncryptionByDefault',
++              value: {'sseAlgorithm': variables.dial.sseAlgorithm}
++            })
+diff --git a/implementations/cloud/policies/require-rds-multi-az.yaml b/implementations/cloud/policies/require-rds-multi-az.yaml
+new file mode 100644
+index 0000000..7ffca17
+--- /dev/null
++++ b/implementations/cloud/policies/require-rds-multi-az.yaml
+@@ -0,0 +1,26 @@
++apiVersion: policies.kyverno.io/v1
++kind: ValidatingPolicy
++metadata:
++  name: require-rds-multi-az
++  labels: {policy-as-versioned.dev/policy: cloud}
++  annotations:
++    policies.kyverno.io/title: RDS Multi-AZ observation
++    policies.kyverno.io/description: >-
++      Harvested collie intent (cp-10). Audit observes the field; the cloud
++      cage tightens it at restricted and below. Nothing is denied.
++spec:
++  validationActions: [Audit]
++  matchConstraints:
++    resourceRules:
++      - apiGroups: [rds.aws.m.upbound.io]
++        apiVersions: [v1beta1]
++        operations: [CREATE, UPDATE]
++        resources: [instances]
++  matchConditions:
++    - name: only-this-policy-version
++      expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '__POLICY_VERSION__'
++    - name: spec-change
++      expression: oldObject == null || !has(oldObject.spec) || object.spec != oldObject.spec
++  validations:
++    - expression: object.spec.?forProvider.?multiAz.orValue(false) == true
++      message: spec.forProvider.multiAz should be true (cp-10).
+diff --git a/implementations/cloud/policies/require-s3-bucket-encryption.yaml b/implementations/cloud/policies/require-s3-bucket-encryption.yaml
+new file mode 100644
+index 0000000..eb02391
+--- /dev/null
++++ b/implementations/cloud/policies/require-s3-bucket-encryption.yaml
+@@ -0,0 +1,31 @@
++apiVersion: policies.kyverno.io/v1
++kind: ValidatingPolicy
++metadata:
++  name: require-s3-bucket-encryption
++  labels: {policy-as-versioned.dev/policy: cloud}
++  annotations:
++    policies.kyverno.io/title: S3 encryption configuration observation
++    policies.kyverno.io/description: >-
++      Harvested collie intent (sc-28), under ADR-0022's later no-Deny doctrine.
++      Every rule must name AES256 or aws:kms; a nonempty garbage string is
++      not encryption evidence. The mutation supplies AES256 when absent.
++spec:
++  validationActions: [Audit]
++  matchConstraints:
++    resourceRules:
++      - apiGroups: [s3.aws.m.upbound.io]
++        apiVersions: [v1beta1]
++        operations: [CREATE, UPDATE]
++        resources: [bucketserversideencryptionconfigurations]
++  matchConditions:
++    - name: only-this-policy-version
++      expression: object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '__POLICY_VERSION__'
++    - name: spec-change
++      expression: oldObject == null || !has(oldObject.spec) || object.spec != oldObject.spec
++  validations:
++    - expression: >-
++        has(object.spec.forProvider) && has(object.spec.forProvider.rule) &&
++        size(object.spec.forProvider.rule) > 0 &&
++        object.spec.forProvider.rule.all(r,
++          r.?applyServerSideEncryptionByDefault.?sseAlgorithm.orValue('') in ['AES256', 'aws:kms'])
++      message: Every encryption rule must use AES256 or aws:kms (sc-28).
+diff --git a/implementations/cloud/release_check.py b/implementations/cloud/release_check.py
+new file mode 100644
+index 0000000..7c1aa7b
+--- /dev/null
++++ b/implementations/cloud/release_check.py
+@@ -0,0 +1,42 @@
++#!/usr/bin/env python3
++"""Cloud-only release preflight; no tag, commit or network operation occurs."""
++import argparse
++import json
++import os
++from pathlib import Path
++import re
++import subprocess
++import yaml
++from trigger import find
++from replay import replay
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--hub', type=Path, required=True)
++    parser.add_argument('--record', required=True)
++    parser.add_argument('--version', required=True)
++    args = parser.parse_args()
++    package = Path(__file__).resolve().parent
++    descriptor = yaml.safe_load((package / 'package.yaml').read_text())
++    if not re.fullmatch(r'\d+\.\d+\.\d+', args.version) or descriptor['version'] != args.version or (package / 'VERSION').read_text().strip() != args.version:
++        raise ValueError('tag, package descriptor and VERSION disagree')
++    trigger = find(args.hub, args.record)
++    if trigger is None:
++        raise ValueError('no citable modern step-4 PASS: cloud release remains prepared')
++    tag = 'cloud/v' + args.version
++    repository = package.parents[1]
++    if subprocess.run(['git', '-C', str(repository), 'rev-parse', '--verify', 'refs/tags/' + tag], capture_output=True).returncode == 0:
++        raise ValueError('cloud tag already exists; a published tag is frozen')
++    engines = Path(os.environ['KYVERNO_ENGINE_DIR'])
++    cells = []
++    for engine in descriptor['tested_engines']:
++        result = replay(str(engines / engine / 'kyverno'), package)
++        if result['engine'] != engine:
++            raise ValueError('local engine slot does not hold ' + engine)
++        cells.append(result)
++    print(json.dumps({'tag': tag, 'trigger': trigger, 'cells': cells, 'proof_boundary': descriptor['proof_boundary']}, indent=2))
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/implementations/cloud/render.py b/implementations/cloud/render.py
+new file mode 100644
+index 0000000..3ae4fc2
+--- /dev/null
++++ b/implementations/cloud/render.py
+@@ -0,0 +1,95 @@
++#!/usr/bin/env python3
++"""Render the cloud package for a workload claim; no network or release act.
++
++This is deliberately separate from distribution/versions.yaml and the Pod
++computed-semver subject. Published Pod lines are never edited by adding a
++cloud member. The platform owns the source policies and OSCAL claims;
++tuppence owns the derived signed composed artefact.
++"""
++from __future__ import annotations
++
++import argparse
++import copy
++import json
++from pathlib import Path
++import re
++
++import yaml
++
++HERE = Path(__file__).resolve().parent
++LABEL = 'policy-as-versioned.dev/policy-version'
++
++
++def render(package: Path, claim: str, party: str, source_commit: str,
++           served_claims: list[str] | None = None) -> list[dict]:
++    if not re.fullmatch(r'\d+\.\d+\.\d+', claim):
++        raise ValueError('workload claim must be an exact semver')
++    if not re.fullmatch(r'[0-9a-f]{40}', source_commit):
++        raise ValueError('source commit must be a full immutable SHA, never a placeholder')
++    served_claims = served_claims or [claim]
++    if claim not in served_claims or any(not re.fullmatch(r'\d+\.\d+\.\d+', value) for value in served_claims):
++        raise ValueError('served claims must include this copy and contain only exact semvers')
++    descriptor = yaml.safe_load((package / 'package.yaml').read_text())
++    version = (package / 'VERSION').read_text().strip()
++    if descriptor['version'] != version or descriptor['tag'] != f'cloud/v{version}':
++        raise ValueError('package descriptor, VERSION and tag disagree')
++    dials = yaml.safe_load((package / 'crossplane-dials.yaml').read_text())['tiers']
++    if list(dials) != ['baseline', 'restricted', 'quarantine', 'isolated']:
++        raise ValueError('cloud dials must carry exactly the cage ladder, with no infra exemption')
++    # CEL maps are homogeneous; encode the mixed dial values as strings and
++    # convert them only at the field assignment, as the Pod cage does.
++    cel_dials = {tier: {key: str(value).lower() if isinstance(value, bool) else str(value)
++                        for key, value in row.items()} for tier, row in dials.items()}
++    dial_cel = json.dumps(cel_dials, separators=(',', ':')) + '[variables.tier]'
++    out = []
++    for member in descriptor['members']:
++        doc = yaml.safe_load((package / member).read_text())
++        for condition in doc['spec'].get('matchConditions', []):
++            condition['expression'] = condition['expression'].replace('__POLICY_VERSION__', claim).replace('__SERVED_CLAIMS__', json.dumps(served_claims))
++        for variable in doc['spec'].get('variables', []):
++            variable['expression'] = variable['expression'].replace('__POLICY_VERSION__', claim).replace('__DIAL_TABLE__', dial_cel)
++        md = doc['metadata']
++        # Keep result2oscal's existing one-suffix identity normalization exact.
++        md['name'] += '-' + claim.replace('.', '-')
++        md.setdefault('labels', {}).update({
++            LABEL: claim, 'policy-as-versioned.dev/composed-for': party,
++            'policy-as-versioned.dev/cloud-package-version': version,
++        })
++        md.setdefault('annotations', {}).update({
++            'policy-as-versioned.dev/inherited-from': f'platform@{source_commit}',
++            'policy-as-versioned.dev/source-path': f'implementations/cloud/{member}',
++        })
++        out.append(copy.deepcopy(doc))
++    return out
++
++
++def write_tree(destination: Path, docs: list[dict]) -> None:
++    destination.mkdir(parents=True, exist_ok=True)
++    members = []
++    for doc in docs:
++        name = doc['metadata']['name'] + '.yaml'
++        (destination / name).write_text(yaml.safe_dump(doc, sort_keys=False))
++        members.append(name)
++    (destination / 'kustomization.yaml').write_text(yaml.safe_dump({
++        'apiVersion': 'kustomize.config.k8s.io/v1beta1', 'kind': 'Kustomization',
++        'resources': members,
++    }, sort_keys=False))
++
++
++def main() -> None:
++    ap = argparse.ArgumentParser(description=__doc__)
++    ap.add_argument('--claim', required=True)
++    ap.add_argument('--party', default='tuppence')
++    ap.add_argument('--source-commit', required=True)
++    ap.add_argument('--served-claims', nargs='+')
++    ap.add_argument('--output', type=Path)
++    args = ap.parse_args()
++    docs = render(HERE, args.claim, args.party, args.source_commit, args.served_claims)
++    if args.output:
++        write_tree(args.output, docs)
++    else:
++        print(yaml.safe_dump_all(docs, sort_keys=False), end='')
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/implementations/cloud/replay.py b/implementations/cloud/replay.py
+new file mode 100644
+index 0000000..9ea355f
+--- /dev/null
++++ b/implementations/cloud/replay.py
+@@ -0,0 +1,152 @@
++#!/usr/bin/env python3
++"""Exercise the real Kyverno CLI on cloud mutations and Audit outcomes.
++
++No Kubernetes client, provider installation, network or AWS API is used.
++This proves CEL and the declared fields, not CRD schema validity, webhook
++registration, cloud networking or provider reconciliation. oldObject/status
++exclusion compiles but is a live admission question: CLI supplies no oldObject.
++"""
++from __future__ import annotations
++
++import argparse
++import copy
++import json
++from pathlib import Path
++import re
++import shutil
++import subprocess
++import tempfile
++
++import yaml
++
++from render import HERE, LABEL, render, write_tree
++
++
++def resource(case: dict) -> dict:
++    kind = case['kind']
++    group = 'rds' if kind == 'Instance' else 's3'
++    md = {'name': case['name'], 'namespace': 'cloud-proof', 'labels': {'app.kubernetes.io/name': 'ledger'}}
++    if case.get('claim', '5.0.0') is not None:
++        md['labels'][LABEL] = case.get('claim', '5.0.0')
++    if 'workload_tier' in case:
++        md['labels']['posture.acme.io/tier'] = case['workload_tier']
++    provider = {'region': 'eu-west-1'}
++    if kind == 'Instance':
++        provider.update({'engine': 'postgres', 'instanceClass': 'db.t3.micro',
++                         'allocatedStorage': 20, 'username': 'ledger',
++                         'publiclyAccessible': True, 'storageEncrypted': False, 'multiAz': False})
++    else:
++        provider['bucketRef'] = {'name': 'ledger-data'}
++    provider.update(copy.deepcopy(case.get('provider', {})))
++    return {'apiVersion': f'{group}.aws.m.upbound.io/v1beta1', 'kind': kind,
++            'metadata': md, 'spec': {'forProvider': provider}}
++
++
++def namespace(case: dict) -> dict:
++    labels = {}
++    if case.get('governed', True):
++        labels['policy-as-versioned.dev/governed'] = 'true'
++    if case.get('tier') is not None:
++        labels['posture.acme.io/tier'] = case['tier']
++    return {'apiVersion': 'v1', 'kind': 'Namespace',
++            'metadata': {'name': 'cloud-proof', 'labels': labels}}
++
++
++def run(binary: str, *args: str) -> subprocess.CompletedProcess:
++    result = subprocess.run([binary, *args], capture_output=True, text=True, timeout=30)
++    text = result.stdout + result.stderr
++    # The CLI has printed compile errors while returning zero. Inspect them.
++    if re.search(r'Error:|failed to compile|error: [1-9]', text):
++        raise AssertionError(text)
++    return result
++
++
++def check_fields(before: dict, after: dict, case: dict) -> None:
++    expected = case['expected']
++    labels = after['metadata']['labels']
++    assert labels['posture.acme.io/tier'] == expected['tier'], case['name']
++    assert labels['posture.acme.io/caged'] == 'true', case['name']
++    assert labels['app.kubernetes.io/name'] == 'ledger'
++    fp = after['spec']['forProvider']
++    assert fp['region'] == before['spec']['forProvider']['region']
++    if case['kind'] == 'Instance':
++        assert fp['publiclyAccessible'] is False and fp['storageEncrypted'] is True
++        for key in ('multiAz', 'backupRetentionPeriod'):
++            assert fp[key] == expected[key], (case['name'], key, fp[key])
++        for key in ('engine', 'instanceClass', 'allocatedStorage', 'username'):
++            assert fp[key] == before['spec']['forProvider'][key]
++    else:
++        assert fp['bucketRef'] == before['spec']['forProvider']['bucketRef']
++        for rule in fp['rule']:
++            assert rule['applyServerSideEncryptionByDefault']['sseAlgorithm'] == expected['sseAlgorithm']
++            if 'kmsMasterKeyId' in expected:
++                assert rule['applyServerSideEncryptionByDefault']['kmsMasterKeyId'] == expected['kmsMasterKeyId']
++            if 'bucketKeyEnabled' in expected:
++                assert rule['bucketKeyEnabled'] == expected['bucketKeyEnabled']
++
++
++def replay(binary: str, package: Path = HERE) -> dict:
++    version_output = run(binary, 'version').stdout
++    version = re.search(r'Version:\s*(\d+\.\d+\.\d+)', version_output).group(1)
++    descriptor = yaml.safe_load((package / 'package.yaml').read_text())
++    assert version in descriptor['tested_engines'], f'engine {version} is not declared by this package'
++    crd_flag = '--crd-paths' if '--crd-paths' in run(binary, 'apply', '--help').stdout else '--crd-path'
++    docs = render(package, '5.0.0', 'tuppence', '0' * 40)
++    assert all(d['spec'].get('validationActions', ['Audit']) == ['Audit'] for d in docs)
++    cases = yaml.safe_load((package / 'tests/cases.yaml').read_text())['cases']
++    with tempfile.TemporaryDirectory(prefix='cloud-replay-') as tmp:
++        work = Path(tmp)
++        write_tree(work / 'policies', docs)
++        for case in cases:
++            before = resource(case)
++            (work / 'input.yaml').write_text(yaml.safe_dump(before))
++            (work / 'values.yaml').write_text(yaml.safe_dump({
++                'apiVersion': 'cli.kyverno.io/v1alpha1', 'kind': 'Values',
++                'namespaces': [namespace(case)],
++                'globalValues': {'request.operation': 'CREATE'},
++            }))
++            service = 'rds' if case['kind'] == 'Instance' else 's3'
++            mutate = work / 'policies' / f'cloud-cage-{service}-5-0-0.yaml'
++            audit = work / 'policies' / (('require-rds-multi-az' if service == 'rds' else 'require-s3-bucket-encryption') + '-5-0-0.yaml')
++            args = ['--values-file', str(work / 'values.yaml'), crd_flag,
++                    str(package / 'tests/resource-mapping-crds.yaml')]
++            result = run(binary, 'apply', str(mutate), '--resource', str(work / 'input.yaml'), *args,
++                         '--output', str(work / 'mutated.yaml'))
++            assert result.returncode == 0, result.stdout + result.stderr
++            after = next(d for d in yaml.safe_load_all((work / 'mutated.yaml').read_text()) if d)
++            check_fields(before, after, case)
++            # Idempotency is verified by evaluating the shipped CEL again.
++            run(binary, 'apply', str(mutate), '--resource', str(work / 'mutated.yaml'), *args,
++                '--output', str(work / 'twice.yaml'))
++            twice = next(d for d in yaml.safe_load_all((work / 'twice.yaml').read_text()) if d)
++            assert after == twice, f'{case["name"]}: mutation changed an already caged object'
++            result = run(binary, 'apply', str(audit), '--resource', str(work / 'input.yaml'), *args, '--audit-warn')
++            stats = re.search(r'pass: (\d+), fail: (\d+), warn: (\d+), error: (\d+), skip: (\d+)', result.stdout)
++            assert stats, result.stdout + result.stderr
++            passed, failed, warned, errors, skipped = map(int, stats.groups())
++            assert errors == 0, result.stdout
++            if case['audit'] == 'skip':
++                assert skipped > 0 and passed == warned == failed == 0, case['name']
++            elif case['audit']:
++                assert passed == 1 and warned == failed == 0, case['name']
++            else:
++                # CEL Audit failures may still appear in the CLI's `fail`
++                # column. That is an observation, never an admission Deny.
++                assert warned + failed == 1 and passed == 0, (case['name'], result.stdout)
++    return {'engine': version, 'cases': len(cases), 'mutation': 'fields-and-idempotency-pass',
++            'audit': 'original-input-outcomes-pass', 'scope': descriptor['engine_scope'],
++            'limits': ['offline-not-admission', 'provider-schema-unmeasured', 'status-update-unmeasured', 'no-AWS-reconciliation']}
++
++
++def main() -> None:
++    ap = argparse.ArgumentParser(description=__doc__)
++    ap.add_argument('--kyverno', default=shutil.which('kyverno'))
++    args = ap.parse_args()
++    assert args.kyverno, 'kyverno CLI is required; no green without the instrument'
++    result = replay(args.kyverno)
++    print(json.dumps(result, sort_keys=True))
++    print(f'PASS: offline cloud replay on Kyverno {result["engine"]}; {result["cases"]} cases; no admission or AWS observation claimed')
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/implementations/cloud/tests/cases.yaml b/implementations/cloud/tests/cases.yaml
+new file mode 100644
+index 0000000..5b165ad
+--- /dev/null
++++ b/implementations/cloud/tests/cases.yaml
+@@ -0,0 +1,24 @@
++# Expected outcomes are service fields, not the CEL source text.
++cases:
++  - {name: rds-baseline, kind: Instance, tier: baseline, expected: {tier: baseline, multiAz: false, backupRetentionPeriod: 1}, audit: false}
++  - {name: rds-restricted, kind: Instance, tier: restricted, expected: {tier: restricted, multiAz: true, backupRetentionPeriod: 7}, audit: false}
++  - {name: rds-quarantine, kind: Instance, tier: quarantine, expected: {tier: quarantine, multiAz: true, backupRetentionPeriod: 35}, audit: false}
++  - {name: rds-isolated, kind: Instance, tier: isolated, expected: {tier: isolated, multiAz: true, backupRetentionPeriod: 35}, audit: false}
++  - {name: rds-preserve-hardening, kind: Instance, tier: baseline, provider: {multiAz: true, backupRetentionPeriod: 35}, expected: {tier: baseline, multiAz: true, backupRetentionPeriod: 35}, audit: true}
++  - {name: rds-forged-workload-tier, kind: Instance, tier: isolated, workload_tier: baseline, expected: {tier: isolated, multiAz: true, backupRetentionPeriod: 35}, audit: false}
++  - {name: rds-missing-claim, kind: Instance, tier: baseline, claim: null, expected: {tier: isolated, multiAz: true, backupRetentionPeriod: 35}, audit: skip}
++  - {name: rds-orphan-claim, kind: Instance, tier: baseline, claim: 99.0.0, expected: {tier: isolated, multiAz: true, backupRetentionPeriod: 35}, audit: skip}
++  - {name: rds-missing-tier, kind: Instance, tier: null, expected: {tier: isolated, multiAz: true, backupRetentionPeriod: 35}, audit: false}
++  - {name: rds-unknown-tier, kind: Instance, tier: unknown, expected: {tier: isolated, multiAz: true, backupRetentionPeriod: 35}, audit: false}
++  - {name: rds-infra-role-not-rung, kind: Instance, tier: infra, expected: {tier: isolated, multiAz: true, backupRetentionPeriod: 35}, audit: false}
++  - {name: rds-ungoverned-forged-tier, kind: Instance, tier: baseline, governed: false, expected: {tier: isolated, multiAz: true, backupRetentionPeriod: 35}, audit: false}
++  - {name: s3-missing-rule, kind: BucketServerSideEncryptionConfiguration, tier: baseline, expected: {tier: baseline, sseAlgorithm: AES256}, audit: false}
++  - {name: s3-empty-rule, kind: BucketServerSideEncryptionConfiguration, tier: restricted, provider: {rule: []}, expected: {tier: restricted, sseAlgorithm: AES256}, audit: false}
++  - {name: s3-invalid-algorithm, kind: BucketServerSideEncryptionConfiguration, tier: quarantine, provider: {rule: [{applyServerSideEncryptionByDefault: {sseAlgorithm: garbage}}]}, expected: {tier: quarantine, sseAlgorithm: AES256}, audit: false}
++  - {name: s3-preserve-kms, kind: BucketServerSideEncryptionConfiguration, tier: baseline, provider: {rule: [{bucketKeyEnabled: true, applyServerSideEncryptionByDefault: {sseAlgorithm: 'aws:kms', kmsMasterKeyId: alias/ledger}}]}, expected: {tier: baseline, sseAlgorithm: 'aws:kms', kmsMasterKeyId: alias/ledger, bucketKeyEnabled: true}, audit: true}
++  - {name: s3-preserve-aes, kind: BucketServerSideEncryptionConfiguration, tier: isolated, provider: {rule: [{applyServerSideEncryptionByDefault: {sseAlgorithm: AES256}}]}, expected: {tier: isolated, sseAlgorithm: AES256}, audit: true}
++  - {name: s3-all-rules-not-one, kind: BucketServerSideEncryptionConfiguration, tier: baseline, provider: {rule: [{applyServerSideEncryptionByDefault: {sseAlgorithm: AES256}}, {applyServerSideEncryptionByDefault: {sseAlgorithm: garbage}}]}, expected: {tier: baseline, sseAlgorithm: AES256}, audit: false}
++  - {name: s3-forged-workload-tier, kind: BucketServerSideEncryptionConfiguration, tier: isolated, workload_tier: baseline, expected: {tier: isolated, sseAlgorithm: AES256}, audit: false}
++  - {name: s3-missing-claim, kind: BucketServerSideEncryptionConfiguration, tier: baseline, claim: null, expected: {tier: isolated, sseAlgorithm: AES256}, audit: skip}
++  - {name: s3-orphan-claim, kind: BucketServerSideEncryptionConfiguration, tier: baseline, claim: 99.0.0, expected: {tier: isolated, sseAlgorithm: AES256}, audit: skip}
++  - {name: s3-ungoverned-forged-tier, kind: BucketServerSideEncryptionConfiguration, tier: baseline, governed: false, expected: {tier: isolated, sseAlgorithm: AES256}, audit: false}
+diff --git a/implementations/cloud/tests/resource-mapping-crds.yaml b/implementations/cloud/tests/resource-mapping-crds.yaml
+new file mode 100644
+index 0000000..b631a0a
+--- /dev/null
++++ b/implementations/cloud/tests/resource-mapping-crds.yaml
+@@ -0,0 +1,43 @@
++# Offline fixture mappings, NOT the vendor CRD schemas. Kyverno 1.18.2
++# requires a GVK->resource mapping even for JSONPatch. preserve-unknown
++# deliberately prevents this fixture from pretending to validate provider
++# fields. Live admission must use Established Upbound v2.6.0 CRDs.
++apiVersion: apiextensions.k8s.io/v1
++kind: CustomResourceDefinition
++metadata:
++  name: instances.rds.aws.m.upbound.io
++spec:
++  group: rds.aws.m.upbound.io
++  scope: Namespaced
++  names: {plural: instances, singular: instance, kind: Instance}
++  versions:
++    - name: v1beta1
++      served: true
++      storage: true
++      schema:
++        openAPIV3Schema:
++          type: object
++          properties:
++            spec:
++              type: object
++              x-kubernetes-preserve-unknown-fields: true
++---
++apiVersion: apiextensions.k8s.io/v1
++kind: CustomResourceDefinition
++metadata:
++  name: bucketserversideencryptionconfigurations.s3.aws.m.upbound.io
++spec:
++  group: s3.aws.m.upbound.io
++  scope: Namespaced
++  names: {plural: bucketserversideencryptionconfigurations, singular: bucketserversideencryptionconfiguration, kind: BucketServerSideEncryptionConfiguration}
++  versions:
++    - name: v1beta1
++      served: true
++      storage: true
++      schema:
++        openAPIV3Schema:
++          type: object
++          properties:
++            spec:
++              type: object
++              x-kubernetes-preserve-unknown-fields: true
+diff --git a/implementations/cloud/trigger.py b/implementations/cloud/trigger.py
+new file mode 100644
+index 0000000..dc22538
+--- /dev/null
++++ b/implementations/cloud/trigger.py
+@@ -0,0 +1,90 @@
++#!/usr/bin/env python3
++"""Grade an immutable step-4 artifact handed in by the clocks job, offline.
++
++Input: run_metadata.json from the forge, truth.txt (that run's full truth
++output), and captures/ containing that run's uncut check output. The collector
++must download that numeric run, never copy the moving current captures tree.
++"""
++from __future__ import annotations
++import json
++from pathlib import Path
++import re
++import os
++import subprocess
++
++CHECK = 'verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh'
++CAPTURE = 'verify_e2e_verify-e2e-step4-flux-reconciles-cage.out'
++IDENTITY = r'^https://github\.com/policy-as-versioned-flux/policy-as-versioned-flux/\.github/workflows/truth\.yml@refs/heads/main$'
++
++
++def find(repository: Path, exact_record: str | None = None) -> dict | None:
++    """Read immutable clock captures, not a builder's current capture files.
++
++The dated trigger amendment is 2026-09-25. An older step-4 grade cannot
++discharge its re-registered question. A candidate must be a signed record on
++origin/main and contain that run's TRUTH line; signature verification uses
++gitsign's offline Rekor mode. Missing evidence returns no trigger.
++"""
++    def git(*args: str) -> str:
++        return subprocess.check_output(['git', '-C', str(repository), *args], text=True, stderr=subprocess.DEVNULL).strip()
++    path = 'talk/captures/' + CAPTURE
++    refs = [exact_record] if exact_record else git('log', '--since=2026-09-25', '--format=%H', 'origin/main', '--', path).splitlines()
++    for record in refs:
++        if not re.fullmatch(r'[0-9a-f]{40}', record):
++            raise ValueError('trigger record must be a full immutable commit')
++        try:
++            capture = git('show', f'{record}:{path}')
++            final = next((line for line in reversed(capture.splitlines()) if line.strip()), '')
++            if not final.startswith('PASS:') or 'fixture' in final.lower():
++                continue
++            subject = git('show', '-s', '--format=%s', record)
++            match = re.fullmatch(r'truth: record run (\d+).*', subject)
++            if not match or git('show', '-s', '--format=%ae', record) != 'truth@users.noreply.github.com':
++                continue
++            run = match.group(1)
++            log = git('show', f'{record}:talk/truth.log')
++            rows = [line for line in log.splitlines() if line.startswith('TRUTH ') and f' run={run} ' in line]
++            if len(rows) != 1 or rows[0].split()[1][:10] < '2026-09-25' or 'fixture=1' in rows[0]:
++                continue
++            if rows[0] not in git('show', 'origin/main:talk/truth.log').splitlines():
++                continue
++            subprocess.run(['git', '-C', str(repository), 'merge-base', '--is-ancestor', record, 'origin/main'], check=True, capture_output=True)
++            env = dict(os.environ, GITSIGN_REKOR_MODE='offline')
++            verified = subprocess.run(['gitsign', 'verify-commit', record,
++                                       '--certificate-identity-regexp=' + IDENTITY,
++                                       '--certificate-oidc-issuer=https://token.actions.githubusercontent.com'],
++                                      cwd=repository, env=env, capture_output=True, text=True, timeout=30)
++            if verified.returncode:
++                raise ValueError('citable step-4 record failed offline identity-pinned signature verification')
++            return {'run': int(run), 'record_commit': record, 'truth': rows[0], 'check': CHECK}
++        except subprocess.CalledProcessError:
++            continue
++    return None
++
++
++def check(directory: Path, recorded_truth: Path | None = None) -> dict:
++    metadata = json.loads((directory / 'run_metadata.json').read_text())
++    if metadata.get('path') != '.github/workflows/truth.yml' or metadata.get('status') != 'completed':
++        raise ValueError('trigger is not a completed truth workflow run')
++    run, sha = str(metadata['id']), metadata['head_sha']
++    if not run.isdigit() or not re.fullmatch(r'[0-9a-f]{40}', sha):
++        raise ValueError('trigger needs a numeric forge run and full head SHA')
++    output = (directory / 'truth.txt').read_text()
++    rows = [line for line in output.splitlines() if line.startswith('TRUTH ') and f' run={run} ' in line]
++    if len(rows) != 1:
++        raise ValueError('no unique TRUTH line for the trigger run')
++    truth = rows[0]
++    if 'fixture=1' in truth or 'units=[fixture]' in truth:
++        raise ValueError('a fixture TRUTH line is never a citable trigger')
++    hub = re.search(r'\bhub=([0-9a-f]+)\b', truth)
++    if not hub or not sha.startswith(hub.group(1)):
++        raise ValueError('TRUTH hub disagrees with the Actions head SHA')
++    if recorded_truth is not None and truth not in recorded_truth.read_text().splitlines():
++        raise ValueError('trigger is absent from recorded talk/truth.log')
++    if not re.search(r'^\s*' + re.escape(CHECK) + r'\s+PASS\s*$', output, re.M):
++        raise ValueError('e2e step 4 did not grade PASS on this run')
++    capture = (directory / 'captures' / CAPTURE).read_text()
++    final = next((line for line in reversed(capture.splitlines()) if line.strip()), '')
++    if not final.startswith('PASS:') or 'fixture' in final.lower():
++        raise ValueError('uncut step-4 capture does not end in an observed PASS')
++    return {'run': int(run), 'hub': sha, 'truth': truth, 'check': CHECK}
+diff --git a/implementations/cloud/verify-cloud-package.sh b/implementations/cloud/verify-cloud-package.sh
+new file mode 100755
+index 0000000..d2b3f9d
+--- /dev/null
++++ b/implementations/cloud/verify-cloud-package.sh
+@@ -0,0 +1,26 @@
++#!/usr/bin/env bash
++# A self-proof over real CEL. Live admission is the separate hub check.
++set -euo pipefail
++HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
++PY="${CLOUD_PYTHON:-python3}"
++"$PY" - "$HERE" <<'PY'
++import os
++from pathlib import Path
++import shutil
++import sys
++sys.path.insert(0, sys.argv[1])
++import yaml
++from replay import replay
++package = Path(sys.argv[1])
++declared = yaml.safe_load((package / 'package.yaml').read_text())['tested_engines']
++engine_dir = os.environ.get('KYVERNO_ENGINE_DIR')
++for engine in declared:
++    binary = str(Path(engine_dir) / engine / 'kyverno') if engine_dir else shutil.which('kyverno')
++    if not binary or not Path(binary).is_file():
++        raise SystemExit('FAIL: no local binary for declared cloud engine ' + engine)
++    result = replay(binary, package)
++    if result['engine'] != engine:
++        raise SystemExit('FAIL: cloud engine slot ' + engine + ' holds ' + result['engine'])
++    print(result)
++print('PASS: cloud CEL replay and idempotency on every declared engine; offline mapping is not vendor-schema or admission evidence')
++PY

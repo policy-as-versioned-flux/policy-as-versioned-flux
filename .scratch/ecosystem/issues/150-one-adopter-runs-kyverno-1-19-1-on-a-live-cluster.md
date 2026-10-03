@@ -1,7 +1,7 @@
 # 150 — One adopter runs Kyverno 1.19.1 on a live cluster
 
 Type: task
-Status: open
+Status: claimed
 Blocked by: 147, 148, 149, and owner steps: the adopter-gate retirement, the adopter's signed composed tag and composed-set move, and a platform tools tag that carries the 149 line
 
 ## Question
@@ -64,3 +64,9 @@ the reason for each difference. A dispatched run does not count. The admission q
 
 - The other adopters stay on 1.18.2. Each adopter moves through its own declaration.
 - If the chosen adopter's price changes, the evidence must name the reason.
+
+## Resume implementation, 2026-10-03
+
+Ludlow is selected because it does not share the cluster that serves tuppence. The isolated upgrade rehearsal retained the frozen 5.0.0 policy UID and spec: admission caged the pod on 1.18.2, then admitted it uncaged after upgrading to 1.19.1. Candidate 6.0.1 admitted and caged it while preserving pod runAsNonRoot. The raw measurement and cleanup records are in research/resume-2026-10-03/engine-150-admission/upgrade/. Both isolated clusters were deleted. This is rehearsal evidence. A scheduled 1.18.2 PolicyReport capture must precede Ludlow’s actual engine move, followed by the scheduled 1.19.1 comparison; neither is fabricated.
+
+The owner delegated the implementing decisions on 2026-10-03: "you tell me, you control them all, you don't need me to answer". This is recorded as delegated, not as an invented institution signature.

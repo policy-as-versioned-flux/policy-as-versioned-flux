@@ -1,0 +1,13 @@
+--- composed/HANDBOOK.md (fresh)
++++ composed/HANDBOOK.md (replay)
+@@ -181,8 +181,8 @@
+ - `spec of cage-restricted-7-0-0` (in `composed/policies/v7.0.0/cage-restricted.yaml`) — this object declares no mutation, validation or generation this page can read
+ - `prices[6].amount` (in `composed/evidence.json`) — platform/twin-agent could not be priced: missing instrument: threat-register@v1 (feed_version 'v1', pinned by tuppence) publishes no institutions.tuppence.threats.scheduled-agent-misuses-write-credential row; the row arrives with the register's major 4 (eco-system ticket 145) and this line prices nothing until the pin moves to it
+ - `prices[6].proposed_tier` (in `composed/evidence.json`) — platform/twin-agent is a `agent-cage` entry that proposes no tier
+-- `prices[8].amount` (in `composed/evidence.json`) — feeds/threat-register could not be priced: missing instrument: twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at
+-- `prices[9].amount` (in `composed/evidence.json`) — feeds/cve could not be priced: missing instrument: twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at
++- `prices[8].amount` (in `composed/evidence.json`) — feeds/threat-register could not be priced: missing instrument: /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/stage2-byte-replay-5lvpesay/tuppence/twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at
++- `prices[9].amount` (in `composed/evidence.json`) — feeds/cve could not be priced: missing instrument: /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/stage2-byte-replay-5lvpesay/tuppence/twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at
+ - `prices[6].lef_basis` (in `composed/evidence.json`) — no loss frequency was read for platform/twin-agent: the line could not be priced, and its `could_not_look` above says why
+ 
+ Two things this page can never tell you, by construction, and neither is a field of the artefact: whether the rules above are the **right** rules, and whether a human read and accepted the change that produced them. The first is the editorial review ([ADR-0007](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/docs/adr/0007-agent-assisted-editorial-governance.md)); the second is the pull request this artefact arrived in.

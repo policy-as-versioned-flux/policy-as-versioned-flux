@@ -1,0 +1,11 @@
+mode: development
+until: '2026-10-22'
+said:
+  - on: '2026-09-04'
+    by: owner
+    words: "can we just always assume we're in development mode until further notice?"
+    where: .scratch/ecosystem/issues/97-a-flip-nobody-recorded-goes-red.md
+  - on: '2026-09-24'
+    by: owner
+    words: agree
+    where: .scratch/ecosystem/issues/97-a-flip-nobody-recorded-goes-red.md

@@ -1,0 +1,26 @@
+{
+  "driftwood": {
+    "exit": 0,
+    "outcome": "composed",
+    "refusals": [],
+    "party_artefact_errors": [],
+    "members": 17,
+    "prices": 9
+  },
+  "tuppence": {
+    "exit": 0,
+    "outcome": "composed",
+    "refusals": [],
+    "party_artefact_errors": [],
+    "members": 17,
+    "prices": 8
+  },
+  "ludlow": {
+    "exit": 0,
+    "outcome": "composed",
+    "refusals": [],
+    "party_artefact_errors": [],
+    "members": 17,
+    "prices": 8
+  }
+}

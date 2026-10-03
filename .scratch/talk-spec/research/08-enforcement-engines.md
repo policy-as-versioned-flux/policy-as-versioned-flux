@@ -290,3 +290,7 @@ The estate already runs Crossplane v2 as a *cloud plane* (targets of policy). Th
 - Local: `pavf-fleet/clusters/cluster1/policy-versions.yaml`, `pavf-fleet/clusters/cluster1/bootstrap.yaml`,
   `pavf-policy/workloads/kyverno/*/policy.yaml`, `policy-as-versioned-flux/docs/adr/0003`, `0006`,
   `docs/shift-left-dev-workflow.md`
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

@@ -1,0 +1,5 @@
+# These are exact captured diffs and command outputs, rather than authored source.
+*.patch -whitespace
+*.diff -whitespace
+*.log -whitespace
+*.out -whitespace

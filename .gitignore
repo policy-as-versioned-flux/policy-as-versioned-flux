@@ -11,6 +11,8 @@ research/repos/
 # commit. That happened twice in one day, once to a builder and once to the integrator amending
 # this very branch. Without the slash the rule matches both.
 .estate-clone
+.estate-apps
+.estate-publish
 
 # The pre-mo-12 working tree, left behind when estate/ was deleted from the hub.
 # `.estate-clone/` supersedes it and is the only copy anything should read. This

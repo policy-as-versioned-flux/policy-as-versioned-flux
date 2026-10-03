@@ -101,7 +101,7 @@ from truth_manifest import parse_truth  # noqa: E402
 # compose/comparison_history.py (eco-system ticket 134), because it runs in each
 # adopter's CI with no hub checkout. lane.py fails when that copy on platform
 # main differs from this one, so change both together.
-ALLOW_LIST = ("talk/truth.log", "drift/samples.jsonl", "talk/captures", "observations")
+ALLOW_LIST = ("talk/truth.log", "drift/samples.jsonl", "drift/workload-samples.jsonl", "drift/oscal-samples.jsonl", "talk/captures", "observations")
 
 # A clock that ran longer ago than this has stopped. One day is the declared
 # period; GitHub delays scheduled runs under load and drops them entirely on a

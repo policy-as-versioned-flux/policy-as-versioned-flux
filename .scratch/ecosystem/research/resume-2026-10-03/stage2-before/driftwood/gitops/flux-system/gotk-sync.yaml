@@ -1,0 +1,50 @@
+# Canonical Flux sync for driftwood — the provenance base everything stacks on.
+#
+# Pinned to a TAG + COMMIT, not a moving branch: git is the only way cluster
+# state changes, and the exact revision is immutable + attestable. The tag is
+# gitsign-signed (keyless → Rekor); that signature is verified out-of-band by
+# `git verify-tag` / Rekor lookup in the provenance beat (ticket 24) — Flux's
+# GitRepository.spec.verify only speaks OpenPGP, so we do NOT fake a PGP block
+# here; the pin + the signed tag are the provenance, not a mis-typed verify.
+#
+# For the offline touring demo, scripts/up.sh rewrites .spec.url to the
+# in-cluster git server and sets the freshly-seeded tag+commit (see up.sh).
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: driftwood
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/policy-as-versioned-driftwood/driftwood
+  ref:
+    tag: v3.0.0
+    commit: bf9889aa6a6d979c87a5633240a1447765d73503
+    # commit pinned at release (belt-and-braces immutability, ADR-0001) --
+    # the resolved SHA driftwood's own v1.0.0 tag points to. Not covered by the
+    # Renovate customManagers in renovate.json (those track nist and platform
+    # only); a self-pin bump is a reviewed PR that moves both fields together.
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: driftwood
+  namespace: flux-system
+spec:
+  interval: 5m
+  retryInterval: 1m
+  timeout: 3m
+  sourceRef:
+    kind: GitRepository
+    name: driftwood
+  # ./gitops/apps, NOT ./apps (eco-system ticket 33 review, 2026-09-08 -- the fix tuppence and
+  # ludlow took under ticket 42 and driftwood never did). This object's source is the github.com
+  # remote above, whose tree root holds gitops/, so ./apps resolves to nothing there and the
+  # Kustomization never becomes Ready: driftwood's own drift-sample lane, run 34122734820,
+  # reported exactly that (`kustomization path not found: stat .../apps`). ./apps was right only
+  # in the OFFLINE SEED world: scripts/up.sh seeds a throwaway repo from the gitops/ directory
+  # itself, so gitops/ IS that repo's root -- and up.sh applies its own inline Kustomization with
+  # ./apps for exactly that reason, so this line does not touch the touring demo.
+  path: ./gitops/apps
+  prune: true   # prune-on-retire: remove what git no longer declares
+  wait: true    # health-gate the reconcile

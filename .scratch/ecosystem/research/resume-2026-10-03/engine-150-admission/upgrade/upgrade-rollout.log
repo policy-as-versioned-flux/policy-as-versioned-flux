@@ -1,0 +1,6 @@
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 1 old replicas are pending termination...
+deployment "kyverno-admission-controller" successfully rolled out
+deployment "kyverno-background-controller" successfully rolled out
+deployment "kyverno-cleanup-controller" successfully rolled out
+deployment "kyverno-reports-controller" successfully rolled out

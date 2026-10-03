@@ -1,0 +1,17 @@
+{
+  "driftwood": {
+    "base": "529e159397d3e64f94b0270cc7de69c235580961",
+    "patch": "driftwood-drift-lane.patch",
+    "bytes": 200485
+  },
+  "tuppence": {
+    "base": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+    "patch": "tuppence-drift-lane.patch",
+    "bytes": 195171
+  },
+  "ludlow": {
+    "base": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+    "patch": "ludlow-drift-lane.patch",
+    "bytes": 192077
+  }
+}

@@ -255,3 +255,7 @@ P0 first, in this sequence: **D5.1 (MVP/Full floor) → D1.1 (OCI) → D1.2 (pin
 D5.2 (Terraform) → D7.1 (ControlPlane dependency)**. These six fix the PRD's shape; everything else (P1/P2)
 is detail within that frame. The single biggest live disagreement between the two syntheses is **D1.2**
 (20 = pinned-everywhere faithful default; 21 = per-env split) — resolve it explicitly.
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

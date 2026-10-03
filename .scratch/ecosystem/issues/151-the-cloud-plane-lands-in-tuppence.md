@@ -1,7 +1,7 @@
 # 151 — The cloud plane lands in tuppence
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: 157, 161
 
 ## Question
@@ -25,3 +25,36 @@ Facts on 2026-09-25: `datastore` holds `README.md`, `claims.yaml` and `kustomiza
 **Second blocker, reported 2026-09-25 by the session that grills ticket 152.** Ticket 152 alone cannot give step 4 a PASS. On the 2026-09-25 samples, fact 2 is `null` on driftwood's and tuppence's composed source, and on driftwood falsifier 2 is not looked at on platform and nist either. Step 4 grades driftwood by default (`verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh:46`). No open ticket owns fact 2 yet. This ticket stays blocked until step 4 passes, whatever unblocks it.
 
 **Blockers renamed, 2026-09-25.** Ticket 152 resolved as a grilling ticket and graduated the build to ticket 161. Fact 2 and driftwood's falsifier 2 went to ticket 157. Step 4 needs both, so this ticket is blocked by 157 and 161, and then by step 4's first PASS.
+
+## Implementation, 2026-10-03
+
+The local implementation is prepared, with activation held on the stated trigger. Platform owns
+`implementations/cloud`: a separate cloud/v1.0.0 publication path, two Audit policies, RDS/S3
+mutating cages, a single Crossplane dial table and its OSCAL cp-10/sc-28 claims. No frozen Pod
+line or declared 6.x line was changed by this ticket. The dispatch-only cloud release preflight
+requires the signed modern e2e4 clock record and every declared CLI cell before signing a tag.
+
+Tuppence holds opt-in cloud delivery and a preparation helper that extracts an exact signed
+platform cloud tag, refuses fixture CRDs as vendor schema evidence, checks real CRD field
+shapes and renders only cloud/crds/workload paths. Claims carry the current 5.0.0 composed
+claim label and routes consume tuppence-composed. Current tuppence v3.0.0 contains none of
+these new paths, so it was not repinned to a fictional commit. Exact incumbent datastore
+resource fidelity remains unmeasured because that clone was unavailable in the offline session;
+the prepared claims use the locally available incumbent fleet/policy seeds.
+
+The real Kyverno CLI replay passes 22 field/outcome/idempotency cases on exact 1.18.2 and
+1.19.1. Offline preserve-unknown CRDs supply resource mapping only. `verify-cloud-plane.sh
+--selfcheck` passes the trigger falsifiers and declaration checks. The default check reports
+the named declared wait for a qualifying citable step-4 PASS; it contacts no cluster before
+the trigger and signed delivery paths exist. It is discovered by talk/verify-all.sh and has
+an estate-observation manifest row; the separate package replay is self-proof.
+
+Limits are explicit: CLI status-only oldObject behavior and real vendor schema are not observed
+by replay; isolated's available service dials equal quarantine, with no AWS network-isolation
+claim; an absent S3 configuration CR is not evidence that a Bucket is encrypted. Nothing is
+denied, paused or put on an Observe-only reconciliation mode. No provider, ProviderConfig,
+credentials, AWS resource, tag, commit or remote branch was created. The datastore/cloud
+register rows already name the admission check and remain ineligible while it skips.
+
+This local validation is not citable estate truth. The ticket remains claimed pending the
+modern citable e2e4 PASS, actual signed package/composed publication and KinD admission grade.

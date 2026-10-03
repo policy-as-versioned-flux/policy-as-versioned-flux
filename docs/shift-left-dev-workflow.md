@@ -6,17 +6,10 @@ runs — no cluster access required for most of this, no bespoke tooling (the
 2022 bash/Docker `policy-checker` stays deleted; every step below is a native
 CLI you'd install anyway: `git`, `kyverno`, `kustomize`, `flux`, `gitsign`).
 
-CI runs the *same* commands (not a reimplementation of them), so laptop and
-CI cannot drift.
-[`pr-gate-action/pr-gate-check.sh`](https://github.com/policy-as-versioned-flux/pr-gate-action/blob/main/pr-gate-check.sh)
-(extracted from `fleet` into its own component repo, real-estate epic ticket 03) runs all three of
-`kyverno test`, `gitsign verify-tag`, and `flux build --dry-run` exactly as shown here;
-[`policy/.github/workflows/release.yml`](https://github.com/policy-as-versioned-flux/policy/blob/main/.github/workflows/release.yml)
-runs the first two at release time. This doc's steps are a subset+narration of what those already
-do, not a parallel invention. **Correction (2026-07-20, wave-5 skeptic pass)**: an earlier version
-of this sentence claimed *each* of the two files calls all three commands — `release.yml` has no
-`flux build` (verified live: `grep -c 'flux build' release.yml` = 0). `pr-gate-check.sh` alone
-covers all three; that's what the no-drift guarantee actually rests on.
+CI runs the same pinned tools through each adopter's `.github/workflows/shift-left.yml`.
+The shared platform tools verify the signed pin and render the composed set before the workload
+is graded. The incumbent `pr-gate-action` is dropped under ADR-0036 (ticket 156, 2026-10-03);
+its old three-command account describes the previous implementation.
 
 ## 0. Find what's actually pinned
 
@@ -151,3 +144,7 @@ simultaneously on one cluster, which `kyverno apply`'s offline, single-policy
 evaluation has no way to reproduce. It's the right tool for "does this one
 policy admit this one workload", not for "is the whole multi-version fleet
 internally consistent" (that's what `fleet/verify-coexistence.sh` is for).
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

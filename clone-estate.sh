@@ -95,3 +95,15 @@ for u in "${UNITS[@]}"; do
   git -C "$DEST/$u" config gpg.x509.program gitsign
 done
 echo "OK: ${#UNITS[@]} units in $DEST"
+
+# Ticket 154: application sources have independent repositories, outside the party estate.
+# Keep existing checkouts (including uncommitted development); never refresh them implicitly.
+APPS_DEST="$ROOT/.estate-apps"
+mkdir -p "$APPS_DEST"
+for mapping in 'tuppence ledger' 'driftwood storefront' 'driftwood api' 'ludlow reports'; do
+  read -r adopter app <<<"$mapping"
+  if [ ! -d "$APPS_DEST/$app/.git" ]; then
+    git clone --quiet "https://github.com/policy-as-versioned-$adopter/$app" "$APPS_DEST/$app"
+  fi
+done
+echo "OK: four independent application repositories in $APPS_DEST"

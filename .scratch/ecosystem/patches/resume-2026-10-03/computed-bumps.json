@@ -1,0 +1,118 @@
+[
+  {
+    "before": "5.0.0",
+    "after": "6.0.0",
+    "computed_bump": "major",
+    "movement": [
+      {
+        "policy": "cage-tier.yaml",
+        "verdict": "major",
+        "entries": [
+          "pod-nonroot-baseline",
+          "ungoverned-baseline"
+        ],
+        "expressions": [
+          "{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-6-0-0',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},\n 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-6-0-0','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},\n 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-6-0-0','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},\n 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-6-0-0',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]",
+          "namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'\n  ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('')\n  : ''",
+          "variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']\n  ? variables.nsTier\n  : 'isolated'"
+        ],
+        "detail": "pod-nonroot-baseline (tier=baseline): runAsNonRoot no longer written over the workload's own value; ungoverned-baseline (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed"
+      },
+      {
+        "policy": "posture-trust-boundary.yaml",
+        "verdict": "none",
+        "entries": [],
+        "expressions": [
+          "variables.posture == variables.claimed"
+        ],
+        "detail": "no fixture in the corpus moved"
+      },
+      {
+        "policy": "require-nonroot.yaml",
+        "verdict": "none",
+        "entries": [],
+        "expressions": [
+          "variables.nonroot || (variables.attested && variables.hardened)"
+        ],
+        "detail": "no fixture in the corpus moved"
+      }
+    ],
+    "corpus": "18 public cage-tier CLI fixture triggers and namespace Values, including explicit pod-nonroot and ungoverned-baseline regressions",
+    "scope": "local candidate comparison; not signed release evidence or a full release-gate run",
+    "body_sha256": {
+      "before": {
+        "cage-netpol.yaml": "2f2b08fe6dace31742ff98a367f5100ea3220ef77bf43034aef30d2496439187",
+        "require-nonroot.yaml": "83910bf37ef0d4125aca667370c267a9be4a8246ea2710d91d81b54c5e3501d7",
+        "priorityclasses.yaml": "79cc16a3e06d0a9120e3ee4d101aa91226dfa1fff7c174d72ec28828a746e251",
+        "kustomization.yaml": "da5215f7ecc9bd864d75574eda831622eda18688caaf6436682180d9c9206ec4",
+        "stamp-posture.yaml": "a5cb056c1dd132a002858b88d857eaadef86a4d2686fb0aae8ca782c40993c91",
+        "cage-tier.yaml": "8088165d2909fe15880d696629e5d8e8431901156b9585c9954289e3346a28de",
+        "posture-trust-boundary.yaml": "877d087ffddb990240277a6723628074024eb058afec05576d7a9df6c5eac81a"
+      },
+      "after": {
+        "cage-netpol.yaml": "3a376d55be88757aa57102eb84c744890c40bf43a5241eb790004d852d03d24d",
+        "require-nonroot.yaml": "46e394ea0f5551290c30dd7a884307330ef9f702923e7120ac9abb4ef6024a90",
+        "priorityclasses.yaml": "2f110954934d887999ae4fed0a7c52b3613d25473c670b54ac92bc66a4a73d45",
+        "kustomization.yaml": "da5215f7ecc9bd864d75574eda831622eda18688caaf6436682180d9c9206ec4",
+        "stamp-posture.yaml": "a0b54890cb5dcb73261d839e96e1083a6796ae2bf39c87f5b01c3a2ba175f7e2",
+        "cage-tier.yaml": "5bb6c6a3cbdb211000cda7e401742d89ac7eed0c91b04f47192e9a745c5c69bf",
+        "posture-trust-boundary.yaml": "1e8125c437767d42fbd0f0fc04a1fdccb97ffddde21e3a5015b0516b175903ed"
+      }
+    }
+  },
+  {
+    "before": "6.0.0",
+    "after": "6.0.1",
+    "computed_bump": "patch",
+    "movement": [
+      {
+        "policy": "cage-tier.yaml",
+        "verdict": "none",
+        "entries": [],
+        "expressions": [
+          "{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-6-0-1',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},\n 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-6-0-1','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},\n 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-6-0-1','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},\n 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-6-0-1',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]"
+        ],
+        "detail": "no corpus entry's cage spec moved"
+      },
+      {
+        "policy": "posture-trust-boundary.yaml",
+        "verdict": "removed",
+        "entries": [],
+        "expressions": [
+          "variables.posture == variables.claimed"
+        ],
+        "detail": "policy dropped"
+      },
+      {
+        "policy": "require-nonroot.yaml",
+        "verdict": "none",
+        "entries": [],
+        "expressions": [
+          "variables.nonroot || (variables.attested && variables.hardened)"
+        ],
+        "detail": "no fixture in the corpus moved"
+      }
+    ],
+    "corpus": "18 public cage-tier CLI fixture triggers and namespace Values, including explicit pod-nonroot and ungoverned-baseline regressions",
+    "scope": "local candidate comparison; not signed release evidence or a full release-gate run",
+    "body_sha256": {
+      "before": {
+        "cage-netpol.yaml": "3a376d55be88757aa57102eb84c744890c40bf43a5241eb790004d852d03d24d",
+        "require-nonroot.yaml": "46e394ea0f5551290c30dd7a884307330ef9f702923e7120ac9abb4ef6024a90",
+        "priorityclasses.yaml": "2f110954934d887999ae4fed0a7c52b3613d25473c670b54ac92bc66a4a73d45",
+        "kustomization.yaml": "da5215f7ecc9bd864d75574eda831622eda18688caaf6436682180d9c9206ec4",
+        "stamp-posture.yaml": "a0b54890cb5dcb73261d839e96e1083a6796ae2bf39c87f5b01c3a2ba175f7e2",
+        "cage-tier.yaml": "5bb6c6a3cbdb211000cda7e401742d89ac7eed0c91b04f47192e9a745c5c69bf",
+        "posture-trust-boundary.yaml": "1e8125c437767d42fbd0f0fc04a1fdccb97ffddde21e3a5015b0516b175903ed"
+      },
+      "after": {
+        "cage-netpol.yaml": "1cd1b4e034f83d3eaf84cec45654356958656837e29e2d337770c63cfb9dd162",
+        "require-nonroot.yaml": "2dc7fc36ea154e0da44254fb3056fbe25ac11712e9381913c138a8f28005050a",
+        "priorityclasses.yaml": "eb7e810e195d2f947b1dccb9f45551c0858dd19f5e873f9e291a766c21783c80",
+        "kustomization.yaml": "d5396c809f3980e8c3aec7d624770789781706bbc7411896a629646236c972c2",
+        "stamp-posture.yaml": "b5f5254a605c60e5d623833be3d9cb82ccba68fb211ffb2753d415cd49c38f6f",
+        "cage-tier.yaml": "d8602744fbf5c20c26c76aa2e0dede78f63f25e1e0162ecd60e8f0f047c07972"
+      }
+    }
+  }
+]

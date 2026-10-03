@@ -1,0 +1,127 @@
+diff --git a/graded/policies/cage-tier.yaml b/graded/policies/cage-tier.yaml
+--- a/graded/policies/cage-tier.yaml
++++ b/graded/policies/cage-tier.yaml
+@@ -142,7 +142,7 @@
+ # stamps, plus the tier label it clobbers, are what the per-tier NetworkPolicy
+ # generate (cage-netpol.yaml) and the eviction PriorityClasses
+ # (priorityclasses.yaml) key on.
+-apiVersion: policies.kyverno.io/v1
++apiVersion: policies.kyverno.io/v1alpha1
+ kind: MutatingPolicy
+ metadata:
+   name: cage-tier
+@@ -243,7 +243,7 @@
+           Object{
+             metadata: Object.metadata{ labels: {
+               "posture.acme.io/caged": "true",
+-              "posture.acme.io/tier": string(variables.tier)
++              "posture.acme.io/tier": variables.tier
+             } },
+             spec: Object.spec{
+               hostNetwork: false,
+diff --git a/graded/policies/cage-netpol.yaml b/graded/policies/cage-netpol.yaml
+--- a/graded/policies/cage-netpol.yaml
++++ b/graded/policies/cage-netpol.yaml
+@@ -59,7 +59,7 @@
+ # and CEL infers a map's value type from its entries, so a heterogeneous k8s object
+ # literal must cast each value or it will not compile. ponytail: verbose but
+ # mechanical — the alternative (a data-source template) is more moving parts.
+-apiVersion: policies.kyverno.io/v1
++apiVersion: policies.kyverno.io/v1alpha1
+ kind: GeneratingPolicy
+ metadata:
+   name: cage-netpol
+diff --git a/posture/policies/stamp-posture.yaml b/posture/policies/stamp-posture.yaml
+--- a/posture/policies/stamp-posture.yaml
++++ b/posture/policies/stamp-posture.yaml
+@@ -15,7 +15,7 @@
+ # A forger who supplies `posture.acme.io/version=9.9.9` gets it clobbered back to
+ # their real validated version — you cannot smuggle a posture the pipeline didn't
+ # grant. Operations include UPDATE, so a post-admission relabel is re-clobbered too.
+-apiVersion: policies.kyverno.io/v1
++apiVersion: policies.kyverno.io/v1alpha1
+ kind: MutatingPolicy
+ metadata:
+   name: stamp-posture
+diff --git a/distribution/render-version-tree.py b/distribution/render-version-tree.py
+--- a/distribution/render-version-tree.py
++++ b/distribution/render-version-tree.py
+@@ -6,9 +6,9 @@
+ and `posture/policies/`. This renderer emits the PER-VERSION copies that
+ `distribution/policies/v<version>/` actually ships -- the same pattern
+ `require-nonroot-1-0-0` already establishes by hand. A human must not be able
+-to omit one, so a renderer writes all seven every time:
+-
+-    cage-tier, cage-netpol, stamp-posture,
++to omit one, so a renderer writes all eight every time:
++
++    cage-tier, cage-netpol, stamp-posture, posture-trust-boundary,
+     cage-baseline, cage-restricted, cage-quarantine, cage-isolated
+     (the four PriorityClasses -- `cage-isolated` is the bottom rung ticket 26
+     added, ADR-0022)
+@@ -71,13 +71,14 @@
+     "# multi-version coexistence.\n"
+ )
+ 
+-# The three claim-wide admission policies rendered as-is (kind + self-scope),
+-# and the four PriorityClasses (renamed only -- they have no matchConditions,
++# The four claim-wide admission policies rendered as-is (kind + self-scope),
++# and the three PriorityClasses (renamed only -- they have no matchConditions,
+ # they are not admission policies).
+ ADMISSION_SOURCES = [
+     (GRADED / "cage-tier.yaml", "cage-tier.yaml"),
+     (GRADED / "cage-netpol.yaml", "cage-netpol.yaml"),
+     (POSTURE / "stamp-posture.yaml", "stamp-posture.yaml"),
++    (POSTURE / "posture-trust-boundary.yaml", "posture-trust-boundary.yaml"),
+ ]
+ PRIORITYCLASSES_SOURCE = GRADED / "priorityclasses.yaml"
+ 
+@@ -183,15 +184,14 @@
+     assert tree_a == tree_b, "render_tree is not deterministic"
+     assert set(tree_a) == {
+         "priorityclasses.yaml", "cage-tier.yaml", "cage-netpol.yaml",
+-        "stamp-posture.yaml",
++        "stamp-posture.yaml", "posture-trust-boundary.yaml",
+     }, sorted(tree_a)
+ 
+-    # Seven mandatory members (3 single-doc files + 4 PriorityClasses).
+-    # Historical trees retain posture-trust-boundary; ticket 149 retires it here.
++    # all eight mandatory members present (4 single-doc files + 4 PriorityClasses)
+     doc_count = sum(len(_load_all_text(t)) for t in tree_a.values())
+-    assert doc_count == 7, f"expected 7 mandatory members, rendered {doc_count}"
+-
+-    admission_files = ["cage-tier.yaml", "cage-netpol.yaml", "stamp-posture.yaml"]
++    assert doc_count == 8, f"expected 8 mandatory members, rendered {doc_count}"
++
++    admission_files = ["cage-tier.yaml", "cage-netpol.yaml", "stamp-posture.yaml", "posture-trust-boundary.yaml"]
+     for fname in admission_files:
+         obj = yaml.safe_load(tree_a[fname])
+         assert obj["metadata"]["name"].endswith(f"-{sv}"), obj["metadata"]["name"]
+@@ -252,7 +252,7 @@
+         "authoring copy of cage-tier.yaml must stay unversioned (verify-graded.sh reads it)"
+ 
+     print(
+-        "selfcheck ok: 7 mandatory members rendered for a named version; "
++        "selfcheck ok: 8 mandatory members rendered for a named version; "
+         "versioned names/labels/self-scope; cage-tier names its own "
+         "PriorityClasses; live path == offline twin; re-rendering an identical "
+         "tree is a no-op; re-rendering over a DIFFERING released file refused; "
+@@ -278,7 +278,7 @@
+         out = Path(args[2])
+     target = out or (HERE / "policies" / f"v{version}")
+     write_tree(version, target)
+-    print(f"rendered 7 mandatory members for {version} into {target}")
++    print(f"rendered 8 mandatory members for {version} into {target}")
+     return 0
+ 
+ 
+diff --git a/distribution/versions.yaml b/distribution/versions.yaml
+--- a/distribution/versions.yaml
++++ b/distribution/versions.yaml
+@@ -150,6 +150,3 @@
+-        # Ticket 149: v1 bodies, typed tier label, document-based generator fixture;
+-        # posture-trust-boundary retires here. Cut 6.0.0 before this patch release.
+-        - { version: "6.0.1", tag: "policy/v6.0.1", commit: "", bump: "patch", tested_engines: { scope: every-served-body-v1, kyverno: ["1.18.2", "1.19.1"] } }
+   resourcesTemplate: |
+     << range $v := (index (inputs) "versions") >>
+     ---

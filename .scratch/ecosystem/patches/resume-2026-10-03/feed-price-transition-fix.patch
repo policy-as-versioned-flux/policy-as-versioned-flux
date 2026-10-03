@@ -1,0 +1,187 @@
+diff --git a/compose/composition.py b/compose/composition.py
+--- a/compose/composition.py
++++ b/compose/composition.py
+@@ -3596,27 +3596,39 @@
+         old_sc = _feed_scenario(name, old_version, adopter_party, tree, composition_as_of, inventory)
+         new_sc = _feed_scenario(name, new_version, adopter_party, tree, composition_as_of, inventory)
+ 
+-    # No scanned KEV intersection is a named absence, never a zero-risk price.
+-    if name == "cve" and new_sc.get("priced_cve") is None:
++    # Either side of a CVE version comparison can have no scanned intersection.
++    # That converter result is a named absence, not a scenario for fair.state().
++    old_absent = name == "cve" and old_sc.get("priced_cve") is None
++    new_absent = name == "cve" and new_sc.get("priced_cve") is None
++    old_absence = ({"old_absence_only": True, "old_could_not_look": old_sc["note"]}
++                   if old_absent else {})
++    cage = _cage_engine()
++    band_native = None
++    if not (old_absent and new_absent):
++        # Select only actual scenarios, in the publisher's currency. No missing
++        # amount or tier is substituted into this comparison.
++        band_native, _ = _converted(tolerance, band_currency or reporting_currency, native,
++                                     as_of, parent_trees)
++    old = None if old_absent else cage.select(
++        old_sc, adopter_party, band_native, mode="warn", floor=floor)
++    old_price = None if old is None else _converted(
++        old["uncaged_residual"], native, reporting_currency, as_of, parent_trees)[0]
++    old_tier = None if old is None else old["tier"]
++
++    # The current line is unpriced; a known previous price remains comparable
++    # evidence, while no new price or tier movement can be measured.
++    if new_absent:
+         signature = observation["pin_signature"] if observation else pin_signature_state(tree, party, name, new_version)
+         return _price_entry(party, "feed", adopter_party, reporting_currency, None, perspective_doc,
+                             name=name, old_version=old_version, new_version=new_version,
+-                            old_price=None, new_price=None, old_tier=None, proposed_tier=None,
++                            old_price=old_price, new_price=None, old_tier=old_tier, proposed_tier=None,
+                             changed=False, holes=[], total=None, hole=None, pin_signature=signature,
+                             absence_only=True, could_not_look=new_sc["note"], lef=None, lef_basis=new_sc["note"],
+                             priced_cve=None, absences=new_sc["absences"], absence_count=new_sc["absence_count"],
+-                            inventory_cve_count=new_sc["inventory_cve_count"], intersection_count=0)
+-
+-    # The band and the residual must be one currency before either is compared:
+-    # the selection happens in the publisher's currency, so the band converts
+-    # into it (or refuses for want of a rate -- never refuses for want of a
+-    # conversion nobody asked the fx feed for).
+-    band_native, _ = _converted(tolerance, band_currency or reporting_currency, native,
+-                                 as_of, parent_trees)
+-    cage = _cage_engine()
+-    old = cage.select(old_sc, adopter_party, band_native, mode="warn", floor=floor)
++                            inventory_cve_count=new_sc["inventory_cve_count"], intersection_count=0,
++                            **old_absence)
++
+     new = cage.select(new_sc, adopter_party, band_native, mode="warn", floor=floor)
+-    old_price, _ = _converted(old["uncaged_residual"], native, reporting_currency, as_of, parent_trees)
+     new_price, fx = _converted(new["uncaged_residual"], native, reporting_currency, as_of, parent_trees)
+ 
+     # The holes are computed BEFORE the entry, because the entry's amount IS
+@@ -3626,8 +3638,9 @@
+     holes = _regime_holes(payload, new_price, adopter_party, reporting_currency)
+     total = _sum_prices(holes, adopter_party, reporting_currency) if holes else None
+     amount = new_price
+-    old_tier, new_tier = old["tier"], new["tier"]
++    new_tier = new["tier"]
+     if holes:
++        assert old is not None and old_price is not None
+         # Eco-system ticket 121: the partition stays whole on `holes` and
+         # `total`; the entry prices the lines still open. The same open share
+         # of each residual picks each tier, through the engine's own pure
+@@ -3653,10 +3666,11 @@
+         old_version=old_version, new_version=new_version,
+         old_price=old_price, new_price=amount,
+         old_tier=old_tier, proposed_tier=new_tier,
+-        changed=old_tier != new_tier,
++        changed=old_tier is not None and old_tier != new_tier,
+         lef=(new_sc.get("warn") or {}).get("lef"),
+         lef_basis=str(new_sc.get("note") or "") or None,
+         proposed_as=PROPOSED_AS_LABEL,
++        **old_absence,
+         **fx,
+     )
+     if name == "cve":
+diff --git a/compose/test_feed_price_transitions.py b/compose/test_feed_price_transitions.py
+new file mode 100644
+--- /dev/null
++++ b/compose/test_feed_price_transitions.py
+@@ -0,0 +1,101 @@
++"""CVE version comparisons preserve named absences on either side of the move."""
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++import composition
++
++
++class FeedPriceTransitions(unittest.TestCase):
++    def setUp(self):
++        temporary = tempfile.TemporaryDirectory()
++        self.addCleanup(temporary.cleanup)
++        self.tree = Path(temporary.name)
++        self.cve = 'CVE-2021-44228'
++        self.inventory = {
++            'schema_version': '1.0.0',
++            'images': [{'image': 'example@sha256:' + 'a' * 64,
++                        'digest': 'sha256:' + 'a' * 64,
++                        'scanner_version': '0.69.3',
++                        'database_date': '2026-10-03T00:00:00Z',
++                        'vulnerabilities': [{'id': self.cve, 'package': 'log4j',
++                                             'installed_version': '2.14.1',
++                                             'fixed_version': '2.17.1',
++                                             'severity': 'critical'}]}],
++        }
++        for version, entries in [('v1', {}), ('v2', {self.cve: {
++            'component': 'Apache Log4j', 'cvss': 10, 'severity': 'critical',
++            'epss': 0.9, 'source': 'declared regression fixture',
++        }})]:
++            directory = self.tree / 'cve' / version
++            directory.mkdir(parents=True)
++            (directory / 'feed.json').write_text(json.dumps({
++                'feed_version': version, 'severity_lm_gbp': {'critical': [100, 200, 300]},
++                'cves': entries,
++            }))
++
++    def price(self, previous, current, *, inventory=True, currency='GBP'):
++        return composition.price_parent(
++            {'party': 'fixture-feeds', 'kind': 'feed', 'name': 'cve', 'version': current},
++            'tuppence', 10000, self.tree, previous,
++            perspective_doc={'size': {'customers': 10}}, reporting_currency=currency,
++            band_currency=currency, floor=None, inventory=self.inventory if inventory else None,
++        )
++
++    def test_previously_absent_intersection_can_be_priced_without_a_fabricated_old_price(self):
++        row = self.price('v1', 'v2')
++        self.assertGreater(row['amount'], 0)
++        self.assertEqual(row['new_price'], row['amount'])
++        self.assertEqual(row['priced_cve'], self.cve)
++        self.assertIsNone(row['old_price'])
++        self.assertIsNone(row['old_tier'])
++        self.assertIn(row['proposed_tier'], composition._cage_engine().ORDER)
++        self.assertFalse(row['changed'], 'an absent old tier provides no measured tier comparison')
++        self.assertTrue(row['old_absence_only'])
++        self.assertIn('No scanned CVE', row['old_could_not_look'])
++
++    def test_newly_absent_intersection_retains_the_known_old_price_and_no_new_zero(self):
++        row = self.price('v2', 'v1')
++        previous = self.price('v2', 'v2')
++        self.assertEqual(row['old_price'], previous['new_price'])
++        self.assertEqual(row['old_tier'], previous['proposed_tier'])
++        self.assertIsNone(row['new_price'])
++        self.assertIsNone(row['amount'])
++        self.assertIsNone(row['proposed_tier'])
++        self.assertIsNone(row['per_customer'])
++        self.assertTrue(row['absence_only'])
++        self.assertFalse(row['changed'])
++        self.assertEqual(row['absences'], [
++            {'id': self.cve, 'amount': None, 'reason': 'outside pinned KEV feed'}])
++
++    def test_both_absent_intersections_remain_unpriced(self):
++        row = self.price('v1', 'v1')
++        for field in ('amount', 'old_price', 'new_price', 'old_tier', 'proposed_tier'):
++            self.assertIsNone(row[field], field)
++        self.assertTrue(row['absence_only'])
++        self.assertFalse(row['changed'])
++
++    def test_two_priced_intersections_retain_their_measured_comparison(self):
++        row = self.price('v2', 'v2')
++        self.assertGreater(row['amount'], 0)
++        self.assertEqual(row['old_price'], row['new_price'])
++        self.assertEqual(row['old_tier'], row['proposed_tier'])
++        self.assertFalse(row['changed'])
++        self.assertNotIn('old_absence_only', row)
++
++    def test_a_known_old_price_still_requires_an_actual_currency_conversion(self):
++        with self.assertRaises(composition.Refused):
++            self.price('v2', 'v1', currency='USD')
++
++    def test_missing_inventory_remains_a_refused_instrument(self):
++        with self.assertRaisesRegex(composition.Refused, 'missing instrument.*inventory'):
++            self.price('v1', 'v2', inventory=False)
++
++    def test_a_malformed_scenario_still_refuses_in_the_price_engine(self):
++        with self.assertRaisesRegex(SystemExit, 'no.*warn.*block'):
++            composition._cage_engine().select({'name': 'malformed'}, 'tuppence', 10000, mode='warn')
++
++
++if __name__ == '__main__':
++    unittest.main()

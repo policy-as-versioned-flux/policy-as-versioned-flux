@@ -1,0 +1,85 @@
+diff --git a/compose/handbook.py b/compose/handbook.py
+old mode 100644
+new mode 100755
+index 34027a6d..3e9a06c8
+--- a/compose/handbook.py
++++ b/compose/handbook.py
+@@ -516,9 +516,16 @@ def render(files: Mapping[str, str], evidence: Mapping[str, Any]) -> str:
+                     "no attachment point is stated")
+         regimes = exposure.get("regimes") or []
+         a(f"- Regimes ({len(regimes)}):")
+-        for r in regimes:
++        for i, r in enumerate(regimes):
++            if r.get("amount") is None:
++                _absent(absences, f"exposure.regimes[{i}].amount", HEADER_PATH,
++                        f"{r.get('name')} from {r.get('source')} feed {r.get('feed')} is "
++                        "unpriced; no monetary amount is stated")
++                amount_cell = "unpriced (section 6)"
++            else:
++                amount_cell = _money(r.get("amount"), exposure["currency"])
+             a(f"  - `{r.get('name')}` from {r.get('source')} feed `{r.get('feed')}` "
+-              f"{r.get('version')}: {_money(r.get('amount'), exposure['currency'])}, "
++              f"{r.get('version')}: {amount_cell}, "
+               f"{len(r.get('controls') or [])} control(s) named")
+         a("")
+ 
+diff --git a/compose/test_handbook_unpriced.py b/compose/test_handbook_unpriced.py
+new file mode 100644
+index 00000000..8f903288
+--- /dev/null
++++ b/compose/test_handbook_unpriced.py
+@@ -0,0 +1,54 @@
++"""An unpriced exposure regime remains visible without an invented monetary amount.
++
++These tests exercise the public handbook render over the composed artefact shape. A
++missing regime amount is a named absence; a measured zero remains a monetary zero.
++"""
++import unittest
++
++import yaml
++
++import handbook
++
++
++class UnpricedExposureRegime(unittest.TestCase):
++    def artefact(self, amount):
++        files, evidence = handbook._fixture()
++        header = yaml.safe_load(files[handbook.HEADER_PATH])
++        regime = header["exposure"]["regimes"][0]
++        regime["amount"] = amount
++        regime["controls"] = ["ac-1"]
++        header["exposure"]["total"] = None
++        files[handbook.HEADER_PATH] = yaml.safe_dump(header, sort_keys=False)
++        return files, evidence
++
++    def test_unpriced_regime_names_its_absent_amount_and_still_renders(self):
++        for amount_present in (True, False):
++            with self.subTest(amount_present=amount_present):
++                files, evidence = self.artefact(None)
++                if not amount_present:
++                    header = yaml.safe_load(files[handbook.HEADER_PATH])
++                    del header["exposure"]["regimes"][0]["amount"]
++                    files[handbook.HEADER_PATH] = yaml.safe_dump(header, sort_keys=False)
++                page = handbook.render(files, evidence)
++                regimes = page.split("- Regimes (1):", 1)[1].split("## 5.", 1)[0]
++                self.assertIn("`uk-gdpr` from ico feed `penalty-schema` v3:", regimes)
++                self.assertIn("unpriced", regimes)
++                self.assertIn("1 control(s) named", regimes)
++                self.assertNotIn("GBP 0.00", regimes)
++                self.assertIn("`exposure.regimes[0].amount` (in `composed/HEADER.yaml`)", page)
++                self.assertNotIn("- Total:", page)
++
++    def test_a_measured_zero_remains_a_monetary_amount(self):
++        page = handbook.render(*self.artefact(0.0))
++        regimes = page.split("- Regimes (1):", 1)[1].split("## 5.", 1)[0]
++        self.assertIn("v3: GBP 0.00, 1 control(s) named", regimes)
++        self.assertNotIn("unpriced", regimes)
++        self.assertNotIn("`exposure.regimes[0].amount`", page)
++
++    def test_a_nonnumeric_present_amount_is_still_refused(self):
++        with self.assertRaisesRegex(handbook.CannotRender, "an amount that is not a number"):
++            handbook.render(*self.artefact("unknown"))
++
++
++if __name__ == "__main__":
++    unittest.main()

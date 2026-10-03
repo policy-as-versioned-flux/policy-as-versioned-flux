@@ -1,0 +1,91 @@
+[
+  {
+    "repository": "policy-as-versioned-tuppence/ledger",
+    "head": "a54f73dcb5bce9a5c9e33c272d3b21209a88649d",
+    "branch": "resume-2026-10-03-app-maintenance",
+    "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-ledger",
+    "body_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/ledger-pr-body.md",
+    "paths": [
+      "renovate.json"
+    ],
+    "public_admin_metadata": {
+      "full_name": "policy-as-versioned-tuppence/ledger",
+      "owner": "policy-as-versioned-tuppence",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    }
+  },
+  {
+    "repository": "policy-as-versioned-driftwood/storefront",
+    "head": "3be69e2f1c686cac77bfd05cefe7cc2e61eb208d",
+    "branch": "resume-2026-10-03-app-maintenance",
+    "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-storefront",
+    "body_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/storefront-pr-body.md",
+    "paths": [
+      "renovate.json"
+    ],
+    "public_admin_metadata": {
+      "full_name": "policy-as-versioned-driftwood/storefront",
+      "owner": "policy-as-versioned-driftwood",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    }
+  },
+  {
+    "repository": "policy-as-versioned-driftwood/api",
+    "head": "1f7f49b7b1ce98f973f355d696920c038b8e020a",
+    "branch": "resume-2026-10-03-app-maintenance",
+    "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-api",
+    "body_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/api-pr-body.md",
+    "paths": [
+      "renovate.json",
+      "README.md"
+    ],
+    "public_admin_metadata": {
+      "full_name": "policy-as-versioned-driftwood/api",
+      "owner": "policy-as-versioned-driftwood",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    }
+  },
+  {
+    "repository": "policy-as-versioned-ludlow/reports",
+    "head": "286d81987a84b23b0b4f4537c4a5b2d050638773",
+    "branch": "resume-2026-10-03-app-maintenance",
+    "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-reports",
+    "body_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/reports-pr-body.md",
+    "paths": [
+      "renovate.json"
+    ],
+    "public_admin_metadata": {
+      "full_name": "policy-as-versioned-ludlow/reports",
+      "owner": "policy-as-versioned-ludlow",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    }
+  }
+]

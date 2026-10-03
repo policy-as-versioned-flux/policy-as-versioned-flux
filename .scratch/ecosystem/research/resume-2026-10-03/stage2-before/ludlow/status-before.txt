@@ -1,0 +1,34 @@
+ M .github/scripts/twin-sweep.py
+ M .github/workflows/drift-sample.yml
+ M .github/workflows/propose-tier.yml
+ M .github/workflows/shift-left.yml
+ M .github/workflows/twin-sweep.yml
+ M .gitignore
+ D apps/reports/Dockerfile
+ D apps/reports/README.md
+ D apps/reports/app.py
+ D apps/reports/requirements.txt
+ M drift/README.md
+ A drift/cage_probe.py
+ M drift/five-facts.py
+ A drift/oscal_lane.py
+ A drift/served_apps.py
+ M drift/window.yaml
+ M gitops/apps/reports.yaml
+ M gitops/flux-system/gotk-sync.yaml
+ M party.yaml
+ M renovate.json
+ M tests/test_twin_clock.py
+ M twin/PIN.yaml
+ M twin/emit-forward-intel.py
+ M twin/forward-intel/payload.schema.json
+ M twin/orgs/ludlow/perspectives/ludlow.yaml
+ A verify-cage-probe.sh
+?? .github/requirements/
+?? accepted-majors/platform-6.0.0.yaml
+?? accepted-majors/platform-6.0.1-superseded.md
+?? accepted-majors/platform-7.0.0.yaml
+?? inventory/
+?? selection-policy/
+?? twin/forward-intel/bump.yaml
+?? twin/forward-intel/rule.yaml

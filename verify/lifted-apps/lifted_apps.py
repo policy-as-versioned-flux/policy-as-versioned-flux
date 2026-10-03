@@ -75,7 +75,7 @@ FLUX_SYNC = "gitops/flux-system/gotk-sync.yaml"
 HUB_RECORD_DIRS = (".scratch", ".git", "docs", "research", "explorations")
 # Directories that are not the hub's tree at all: the estate clone (other parties' trees, which
 # is where the lifted apps are SUPPOSED to be), interpreters, dependency caches.
-HUB_SKIP_DIRS = (".estate-clone", ".venv", "node_modules", "__pycache__", ".mypy_cache",
+HUB_SKIP_DIRS = (".estate-clone", ".estate-apps", ".venv", "node_modules", "__pycache__", ".mypy_cache",
                  ".pytest_cache")
 
 BLIND_SPOTS = (
@@ -83,11 +83,10 @@ BLIND_SPOTS = (
     "three images set no USER, so each served pod names a numeric runAsUser and mounts the paths "
     "its process writes; that reasoning is checked by nobody here. The live half is the "
     "adopters' own drift-sample lane, which has never had a persistent cluster on a citable run",
-    "whether the image digest each served manifest pins still resolves in ghcr.io. Reading a "
-    "package needs `read:packages`, which the gate holds by design not at all (2026-09-06: the "
-    "hub's own credential was refused it), so the digest is graded only against the register",
-    "whether the incumbent org's own repositories have been archived. That is the owner's, it "
-    "needs a credential the gate does not hold, and the ticket records it as waiting",
+    "anonymous OCI manifest reads are collected by the clocks job and graded by "
+    "verify/incumbent-org; this offline check compares each served digest with the register",
+    "public repository archived flags need no private credential; verify/incumbent-org reads "
+    "them in the clocks job to avoid the shared runner's anonymous API rate limit",
     "whether any adopter's composed set admits the workload at UPDATE. Every composed policy and "
     "the orphan guard declare CREATE+UPDATE; `kyverno apply` evaluates CREATE only, and no "
     "UPDATE-scoped evaluation exists anywhere in this estate",
@@ -114,6 +113,11 @@ class Lift:
     # hub-copy rule matches on this anywhere under the hub's non-record directories, so a copy
     # parked at `spikes/ledger/pom.xml` is a copy (review 2026-09-08, F4).
     identity: str
+    # Ticket 154: an application now has its own repository and release cadence. Empty values
+    # retain the historical fixture format, so its planted failures still grade the old lift.
+    source_repository: str = ""
+    source_ref: str = ""
+    source_manifest: str = ""
 
 
 def load_register(path: Path) -> list[Lift]:
@@ -465,6 +469,37 @@ def grade_renovate(lift: Lift, adopter_dir: Path) -> list[str]:
     if not path.is_file():
         return [f"{lift.adopter} has no renovate.json, so nothing bumps {lift.app}'s stack"]
     cfg = json.loads(path.read_text())
+    if lift.source_repository:
+        if cfg.get("enabled") is False:
+            return [f"{lift.adopter}/renovate.json disables Renovate, so no image digest is bumped"]
+        managers = cfg.get("enabledManagers")
+        native = (managers is None or "kubernetes" in managers) and \
+            (cfg.get("kubernetes") or {}).get("enabled") is not False and any(
+            pattern_matches(str(p), lift.served)
+            for p in (cfg.get("kubernetes") or {}).get("managerFilePatterns", [])) and any(
+                rule.get("enabled") is not False and rule.get("pinDigests") is True and "docker" in rule.get("matchDatasources", [])
+                for rule in cfg.get("packageRules", []) if isinstance(rule, dict))
+        custom = False
+        if managers is None or "custom.regex" in managers:
+            for manager in cfg.get("customManagers", []):
+                if not isinstance(manager, dict) or manager.get("customType") != "regex" \
+                        or manager.get("enabled") is False or manager.get("datasourceTemplate") != "docker" or not any(
+                    pattern_matches(str(p), lift.served) for p in manager.get("managerFilePatterns", [])):
+                    continue
+                for pattern in manager.get("matchStrings", []):
+                    try:
+                        match = re.search(re.sub(r"\(\?<([a-zA-Z][a-zA-Z0-9_]*)>", r"(?P<\1>", pattern),
+                                          (adopter_dir / lift.served).read_text())
+                    except (re.error, OSError):
+                        continue
+                    if match and match.groupdict().get("currentDigest") == lift.image.rsplit("@", 1)[-1] \
+                            and match.groupdict().get("depName") == lift.image.split("@", 1)[0].rsplit(":", 1)[0] \
+                            and match.groupdict().get("currentValue"):
+                        custom = True
+        if not native and not custom:
+            bad.append(f"{lift.adopter}/renovate.json has no enabled image manager that reads "
+                       f"{lift.served} and bumps its pinned digest")
+        return bad
     managers = cfg.get("enabledManagers")
     if managers is not None and lift.renovate_manager not in managers:
         bad.append(f"{lift.adopter}/renovate.json enabledManagers {managers} does not enable "
@@ -498,6 +533,38 @@ def grade_renovate(lift: Lift, adopter_dir: Path) -> list[str]:
     return bad
 
 
+def grade_application_source(lift: Lift, estate_root: Path) -> list[str]:
+    """Check the transferred app repository, not a bundled copy in its adopter."""
+    source = estate_root.parent / ".estate-apps" / lift.app
+    if not source.is_dir():
+        return [f"no app checkout for {lift.source_repository}; run clone-estate.sh"]
+    bad: list[str] = []
+    rc, remote = _git(source, "remote", "get-url", "origin")
+    expected = f"https://github.com/{lift.source_repository}"
+    if rc or remote.rstrip("\n").removesuffix(".git").rstrip("/") != expected:
+        bad.append(f"{lift.app} source origin does not name {lift.source_repository}")
+    if lift.source_repository.split("/", 1)[0] != f"policy-as-versioned-{lift.adopter}":
+        bad.append(f"{lift.app} source repository is not in its adopter's organization")
+    if not lift.source_ref or _git(source, "rev-parse", "--verify", f"{lift.source_ref}^{{commit}}")[0]:
+        bad.append(f"{lift.app} source has no published ref {lift.source_ref!r}")
+    manifest = source / lift.source_manifest
+    if not manifest.is_file() or not re.search(lift.identity, _safe_read(manifest), re.M | re.S):
+        bad.append(f"{lift.source_repository} has no {lift.source_manifest} carrying the app's identity")
+    try:
+        config = json.loads((source / "renovate.json").read_text())
+        if not config.get("extends"):
+            bad.append(f"{lift.source_repository}/renovate.json has no own extends preset")
+        if config.get("enabled") is False or (config.get("enabledManagers") is not None and
+                                              lift.renovate_manager not in config["enabledManagers"]):
+            bad.append(f"{lift.source_repository} disables its {lift.renovate_manager} dependency manager")
+    except (OSError, ValueError):
+        bad.append(f"{lift.source_repository} has no readable own renovate.json")
+    for party in ("driftwood", "tuppence", "ludlow"):
+        if (estate_root / party / lift.source_dir).exists():
+            bad.append(f"{party}/{lift.source_dir} remains after the source transferred to its own repository")
+    return bad
+
+
 def grade_lift(lift: Lift, estate_root: Path) -> Row:
     adopter_dir = estate_root / lift.adopter
     row = Row(app=lift.app, adopter=lift.adopter, grade="PASS")
@@ -527,7 +594,9 @@ def grade_lift(lift: Lift, estate_root: Path) -> Row:
                    f"but the tag resolves to {row.pinned.resolved[:7]}: Flux verifies the pair "
                    f"and reconciles neither")
 
-    if not stack.is_file():
+    if lift.source_repository:
+        bad.extend(grade_application_source(lift, estate_root))
+    elif not stack.is_file():
         bad.append(f"{lift.adopter} serves {lift.app} but does not carry {lift.stack_manifest}: "
                    "the workload moved and the thing Renovate reads did not, so the adopter "
                    "does not version this app")
@@ -559,8 +628,10 @@ def grade_lift(lift: Lift, estate_root: Path) -> Row:
         row.reasons.append(
             f"listed by {SERVED_KUSTOMIZATION} at the checked-out tree "
             f"({checkout_head(adopter_dir)}), on the path {FLUX_SYNC} reconciles "
-            f"({sync.path}); versioned by {lift.adopter} at {lift.source_dir}; bumped by "
-            f"renovate's {lift.renovate_manager} manager behind dependencyDashboardApproval; "
+            f"({sync.path}); versioned by "
+            + (f"{lift.source_repository}@{lift.source_ref}; image digest bumped by the adopter; "
+               if lift.source_repository else f"{lift.adopter} at {lift.source_dir}; bumped by "
+                  f"renovate's {lift.renovate_manager} manager behind dependencyDashboardApproval; ") +
             f"lifted from {lift.origin}@{lift.origin_commit}")
     return row
 
@@ -627,14 +698,33 @@ def grade(hub_root: Path, estate_root: Path, register_path: Path) -> Report:
     else:
         report.rows = [grade_lift(lift, Path(estate_root)) for lift in lifts]
 
-    incumbent = [lift for lift in lifts
-                 if lift.image_publisher == lift.origin.split("/", 1)[0]]
+    incumbent = []
+    image_unreadable = []
+    for lift, row in zip(lifts, report.rows):
+        if not lift.source_repository:
+            if lift.image_publisher == lift.origin.split("/", 1)[0]:
+                incumbent.append(lift)
+            continue
+        if not row.pinned or row.pinned.state != "listed":
+            image_unreadable.append(lift.app)
+            continue
+        rc, text = _git(Path(estate_root) / lift.adopter, "show", f"{row.pinned.tag}:{lift.served}")
+        if rc:
+            image_unreadable.append(lift.app)
+            continue
+        pinned_docs = list(yaml.safe_load_all(text))
+        images = [container.get("image", "") for doc in pinned_docs if isinstance(doc, dict)
+                  for container in (doc.get("spec") or {}).get("containers", [])]
+        if not images:
+            image_unreadable.append(lift.app)
+        elif any(image.startswith("ghcr.io/policy-as-versioned-flux/") for image in images):
+            incumbent.append(lift)
     report.notes.append(
         f"LIMIT  {len(incumbent)} of {len(lifts)} lifted apps are still served an image built "
         f"and published by the incumbent org {lifts[0].origin.split('/', 1)[0] if lifts else '-'}"
-        f": the source and the served manifest moved, the image build did not (it needs a "
-        f"workflow job and a registry under the adopter's own organisation -- ticket 33, waits "
-        f"on the owner)")
+        f"; {len(image_unreadable)} pinned workload image(s) could not be read"
+        f": the count reads manifests at each adopter's apps-source tag; a proposed digest "
+        f"at HEAD does not change what that pin serves")
     absent = report.pinned_absent
     unreadable = report.pinned_unreadable
     tags = sorted({r.pinned.tag for r in absent if r.pinned and r.pinned.tag}) or \

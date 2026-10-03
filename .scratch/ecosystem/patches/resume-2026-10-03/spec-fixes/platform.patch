@@ -1,0 +1,2145 @@
+diff --git a/compose/README.md b/compose/README.md
+index e29ab69..383634f 100644
+--- a/compose/README.md
++++ b/compose/README.md
+@@ -57,6 +57,18 @@ adopter already pins `platform` and calls through that pin.
+   `party.yaml` `appetite.tolerance` band. The rendered member keeps the INHERITED action — the composed artefact
+   carries no tier and no tier floor; only the proposer (ADR-0015) ever turns one, later.
+ 
++Ticket 155 retains that exact `select()` decision in each `cages[]` entry, including its
++party, reason and TCoR. A weaker restatement may explicitly bind it to a declared Pod with
++`subject: namespace/name` in the signed `overlay.restate` entry. The binding must name an
++existing Pod and exactly one `Check_Id` → control mapping published by the implementation's
++owner. Composition then emits `binding` and `oscal_risk` beside the existing cage price,
++using `graded/cage.py`'s risk/observation UUID contract; it adds no second monetary line.
++An absent binding emits no workload risk. A malformed subject, missing or ambiguous mapping,
++duplicate binding, or binding on a stricter restatement refuses. The OSCAL lane re-derives
++the risk with its pinned Cage engine and checks the live Pod's identity, policy version and
++tier. A failed observation without a valid bound decision stays red. Institutional and
++twin-agent prices never supply a Pod's decision.
++
+ ## What ticket 14 adds
+ 
+ - **Baseline resolution** — the party artefact's `baseline` name resolves against the `controls`
+@@ -338,6 +350,105 @@ itself needs.
+   exactly the versions it composed, or a claim on a composed but uninstalled version reaches no
+   cage. Each adopter's `scripts/render_composed.py reach` grades that offline.
+ 
++## What eco-system ticket 148 changes: an unsupported engine pairing is priced
++
++Hub ADR-0033 points 2 and 3. A composed line supports exactly the engines its own element of the
++implementations parent's `distribution/versions.yaml` lists in `tested_engines`. The machinery
++supports the engines in the same tree's `distribution/machinery.yaml`. The adopter declares the
++engine it runs in its own `gitops/engine/kyverno.yaml` (ticket 147).
++
++- **Composition reads three facts.** The declared engine, through `engine/declaration.py`, the
++  reader `shift-left/ci-check.py` uses too. Each composed line's `tested_engines` and the
++  machinery's, from the implementations parent tree, which is the platform tag the adopter's
++  `gitops/platform/platform-pin.yaml` names. Each value is read by the engine grader's own rule,
++  `computed-semver/engine_compatibility.py`'s `declared_engines`. A value that rule does not read
++  as support (absent, a retired scope such as `published-cage-fixtures-v1`, an unknown scope, a
++  malformed list) supports no engine, and the reason is kept.
++- **An unsupported pairing makes every claimed control a hole.** A claim belongs to a line when
++  the policy it names is one of the line's bodies, and to the machinery when it names a machinery
++  member. On an engine the line or the machinery does not support, those claims do not count.
++  Each control they name is then a hole, with the regulator's weight times the triple, a
++  bespoke scenario's residual, or a named absence, exactly as ADR-0026 prices any hole. The
++  regime entry's open share grows by the same lines. A control a second, supported line also
++  claims is still a hole: a workload chooses which composed line it claims, so a control whose
++  body does not load for one line's workloads is not implemented for them.
++- **The delta.** Each such line, and the machinery, prints an `unsupported-engine` delta naming
++  the subject, the engine and the tested engines. Its `amount` is the sum of the hole prices of
++  the controls it names, read off the `holes[]` entries they became. A claimed control outside the
++  selected set is listed with `selected: false` and moves no pound. No control priced is `amount:
++  null`, a named absence. The delta prints on every composition while the pairing stands.
++- **No declaration** is priced the same way, under `undeclared-engine`. A declaration that is
++  present and does not read is a missing instrument, and the composition refuses with
++  `missing-instrument`, subject `gitops/engine/kyverno.yaml`.
++- **The header** records `declared-engine` (`engine`, `version`, `file`, or `null`). The
++  evidence document's `engine` section lists every pairing: subject, tree, file read, tested
++  engines, status (`supported`, `unsupported`, `undeclared`), reason, bodies and claimed controls.
++  A hole a pairing opened carries `uncounted_claims`, and its `new-hole` delta names the subject.
++
++Measured 2026-09-26 on the real estate. The regulator's weights (ico penalty-schema v3) name
++pl-2, ra-3, ca-2 and ir-8. The two controls the estate claims, ac-6 (5.0.0's `require-nonroot`)
++and cm-6 (the machinery's `governed-namespace-requires-claim`), carry no weight. So an unsupported
++pairing today opens those two holes with `amount: null`, and moves no pound. Recomposing the three
++adopters against this tree, each declaring 1.18.2, adds the header field and the evidence section
++and nothing else. Composed against a platform tree from before ticket 146 (v4.0.0), the same
++adopters get both deltas: 5.0.0 there carries the retired scope and the tree has no
++`machinery.yaml`. So an adopter moves its tools pin and its implementations pin together.
++
++Adopter-owned members (`overlay.add`) belong to no line and carry no support claim, so their
++claims are not paired.
++
++## What eco-system ticket 145 changes: the platform prices the twin agent's cage
++
++- **A new `prices[]` kind, `agent-cage`** (a `PRICE_KINDS` major the £ seam grades; ADR-0031).
++  One line per composition, `source: platform`, for a subject that is not a pod, named on the line
++  (`subject: twin-agent`). Its `proposed_tier` is the twin agent's rung on the one ladder, picked
++  by the adopter's own selection-policy package over residuals platform's twin-agent dial table
++  (`graded/cage.py` `TWIN_AGENT_TIERS`, its own `TWIN_AGENT_TABLE_VERSION`) derives. The tier fold
++  (`wargamer/wargamer.py` `select_party_tier`, `shift-left/tier_binding.py` `bind`) keys on the
++  subject, so the line never folds into a Namespace tier, and only the kind that declares a
++  subject may carry one (`wargamer.folds_into_namespace`: a `feed` line hand-carrying
++  `subject: twin-agent`, or an agent-cage line carrying the Namespace's, is refused as a missing
++  instrument rather than folded out); `wargamer.wargame_agent_cage` is its
++  own drift row and `tier_pr.py` lands no file for it: the composed line is the declaration the
++  adopter's twin-sweep writer job reads (ticket 143 item 4), and the pull request that recomposes
++  it is the proposal a human merges. Carried beside the exposure and never summed into it
++  (`EXPOSURE_KINDS` is unchanged): its magnitude is a slice of a residual the twin line already
++  carries.
++- **The scenario is the adopter's numbers, the platform's table and feeds' frequency** (ticket 30
++  decisions 12 and 15). Loss magnitude: the gap between the adopter's residual at the loosest pod
++  rung and at its selected pod rung, read off the same composition's `source: twin` line, times
++  the hub gate's detection window (`graded/cage.py` `DETECTION_WINDOW`: one day, the truth run's
++  own schedule, with its source and what it assumes on the line). Frequency: the threat register's
++  `scheduled-agent-misuses-write-credential` row, payload major 4, read off the payload at the
++  major the adopter pins. The amount is `fair.expected_ale`, the closed-form expectation of the
++  same compound process `fair.simulate` samples, because the simulation rounds each year's event
++  count to an integer and resolves no event at a frequency this small; the line says so
++  (`scenario.annualised_by`) and carries the simulated ALE and `p_gt_0` beside it.
++- **The reductions are derived, never typed.** `graded/cage.py` `TWIN_AGENT_PATHS` names the four
++  misuse paths and the loosest rung that closes each; `_twin_agent_reach` derives what each path
++  can still land off the served tree and the composed prices, naming what it read on
++  `reach_basis`: the two token paths off `.github/workflows/twin-sweep.yml` (scheduled, and a
++  job running with `contents: write`: the whole gap; a sweep not served, not scheduled or
++  declaring no `contents: write` is a named could-not-look, because the token's scope then falls
++  to a repository default this composition cannot read), the proposal path off the pull-request
++  workflows' own `run` steps, comment lines stripped (one step must run `tier_binding.py` AND one
++  must recompose the party artefact, test for drift against `composed/` and exit non-zero after
++  the test; either absent is a could-not-look, and a drift test that survives only as a comment,
++  or whose exit is zero, is no gate), the model path off the composed prices (no price rests on a
++  grade above 3). `cage.twin_agent_residuals` takes the residual at a
++  rung as what the loosest open path can land, and a rung with an open could-not-look path has
++  no residual and is not a candidate, so the pick falls closed (the selfcheck measures each: a
++  sweep without `contents: write` picks `isolated`; a gate without the recompose step, with its
++  drift test commented out, or with the exit after it turned to zero, picks `quarantine`). Measured consequence on the served trees: `restricted` and `quarantine` carry
++  `baseline`'s residual, `isolated` collapses it. Cost is 0 at every rung and never enters the
++  selection.
++- **An adopter that cannot price the line gets it as a named could-not-look** (`amount: null`,
++  the reason on `could_not_look`): no `source: twin` line yet (tuppence and ludlow until ticket
++  144), or a pinned register without the row (every adopter until its feeds pin moves to major 4).
++  With no rung on the line, the sweep's writer job reads none and falls closed to `isolated`
++  (ADR-0022). `verify/pound-seam/` in the hub grades the line (leg 3b) and re-derives the rung
++  through the adopter's own package.
++
+ ## Run
+ 
+ ```sh
+diff --git a/compose/composition.py b/compose/composition.py
+index 69aa6f4..28f4392 100644
+--- a/compose/composition.py
++++ b/compose/composition.py
+@@ -316,6 +316,20 @@ COMPUTED IN COMPOSITION -- AND THE TREE THAT MAKES IT PAYABLE.
+     does not match its signed digest REFUSES rather than pricing from
+     bytes nobody signed.
+ 
++ECO-SYSTEM TICKET 148 (hub ADR-0033 points 2 and 3): AN UNSUPPORTED ENGINE
++PAIRING IS PRICED, NEVER REFUSED. The adopter declares its engine in its own
++`gitops/engine/kyverno.yaml` (read by `engine/declaration.py`). Each composed
++line supports the engines its element of the implementations parent's
++`distribution/versions.yaml` lists in `tested_engines`, and the machinery the
++engines in that tree's `distribution/machinery.yaml`, both read by the engine
++grader's own rule. On an engine a line or the machinery does not support, its
++claims do not count: every control it claims is a hole, priced as ADR-0026
++prices one, and an `unsupported-engine` delta names the pairing with the sum of
++those hole prices. No declaration prices the same way under `undeclared-engine`;
++a declaration that does not read refuses as a missing instrument. The header
++records `declared-engine`, and the evidence document's `engine` section lists
++every pairing (`pair_engines`, `engine_deltas`).
++
+ Usage:
+     composition.py compose <adopter-dir> [--estate-clone DIR] [--out DIR]
+     composition.py verify <adopter-dir> [--estate-clone DIR]
+@@ -398,11 +412,15 @@ CONTROL_KEY_SEP = ":"
+ # The OSCAL prop on a bespoke control that names the adopter-signed scenario
+ # pricing its hole, repo-relative to the adopter's own tree.
+ BESPOKE_SCENARIO_PROP = "scenario"
+-# The deltas[] kinds: what replaced the three refusals, plus their closings.
++# The deltas[] kinds: what replaced the three refusals, plus their closings. The last two are
++# eco-system ticket 148's (hub ADR-0033 point 3): a composed line, or the machinery, that does not
++# support the adopter's declared engine, or an adopter that declares none. Each prints on every
++# composition while the pairing stands, because it is a fact of the inputs, not a transition.
+ DELTA_KINDS = ("new-hole", "closed-hole", "baseline-widening",
+                "removed-control", "baseline-narrowing", "withdrawn-control",
+                "new-ungoverned-namespace", "closed-ungoverned-namespace",
+-               "new-untagged-pin", "closed-untagged-pin", "floor-change")
++               "new-untagged-pin", "closed-untagged-pin", "floor-change",
++               "unsupported-engine", "undeclared-engine")
+ # Ticket 69: what a premium entry's `pin_signature.state` may read, and the
+ # kind of the hole an untagged pin opens on that entry.
+ PIN_SIGNATURE_STATES = ("signed", "untagged", "unobserved")
+@@ -461,8 +479,28 @@ FEED_VERSION_KEY = {"threat-register": "feed_version", "penalty-schema": "schema
+ #               feeds module's own EOL ramp from the day that tag was cut
+ #               (ticket 13 D5). Carried beside the line, never summed into the
+ #               exposure the line is already in. Producer: price_supersede().
+-PRICE_KINDS = ("feed", "twin", "premium", "switching", "reliability", "supersede")
++#   agent-cage  eco-system ticket 145 (ADR-0031): the PLATFORM's price of the
++#               twin agent's cage (source: platform), for a SUBJECT that is not a
++#               pod -- the line names it (`subject: twin-agent`). Its amount is
++#               the annualised loss of the scenario ticket 30 decision 12 fixed:
++#               the gap between the adopter's own residual at the loosest pod
++#               rung and at its selected pod rung, read off the same
++#               composition's `source: twin` line, over the hub gate's detection
++#               window, at the frequency the threat register publishes for
++#               `scheduled-agent-misuses-write-credential`. Its `proposed_tier`
++#               is the twin agent's rung, picked by the adopter's own selection
++#               policy over residuals platform's twin-agent table derives; the
++#               tier fold keys on the subject and never folds it into a
++#               Namespace. Carried BESIDE the exposure, never summed into it: the
++#               gap is a slice of a residual the twin line already carries.
++#               Producer: price_twin_agent(). A twin-agent line that cannot be
++#               priced is a named could-not-look on the line, never a silence.
++PRICE_KINDS = ("feed", "twin", "premium", "switching", "reliability", "supersede", "agent-cage")
+ SUPERSEDE_KIND = "supersede"
++AGENT_CAGE_KIND = "agent-cage"
++AGENT_CAGE_SUBJECT = "twin-agent"
++AGENT_MISUSE_THREAT = "scheduled-agent-misuses-write-credential"
++AGENT_CAGE_PROPOSED_AS = "evidence"   # the composed line is the declaration the sweep reads (ticket 143)
+ SUPERSEDE_BASIS = ("the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge "
+                    "the feeds module's EOL ramp puts on a version its publisher has superseded, "
+                    "+1x per year behind and capped at +4x, where `since` is the day the newer "
+@@ -2012,7 +2050,10 @@ def _sum_prices(entries: list[dict], perspective: str, currency: str) -> float:
+     # (a hole) that carries none. An entry that disagrees is what must refuse.
+     # The entry's OWN labels win; the arguments only fill in a breakdown line
+     # (a hole) that carries none. An entry that disagrees is what must refuse.
+-    labelled = [{"perspective": perspective, "currency": currency, **e} for e in entries]
++    labelled = [{"perspective": perspective, "currency": currency, **e} for e in entries if not e.get("absence_only")]
++    for e in entries:
++        if e.get("absence_only") and (e.get("perspective") != perspective or e.get("currency") != currency):
++            raise Refused("refusing to omit a named absence across perspectives/currencies")
+     try:
+         return _cage_engine().fair.sum_prices(labelled)
+     except ValueError as e:
+@@ -2165,6 +2206,47 @@ def _previous_prices(adopter_dir: Path) -> list[dict]:
+         return []
+ 
+ 
++def _workload_risk_binding(entry: dict, meta: dict, party_doc: dict,
++                           adopter_dir: Path, parent_trees: dict[str, Path] | None) -> dict:
++    """A signed Pod identity joins only this declared inability and its publisher's control.
++
++    The existing select() call supplies all money. This binding neither assigns an
++    institutional price to a workload nor fills an absent price or control mapping.
++    """
++    subject = entry['subject']
++    namespace, pod = subject.split('/')
++    declared = False
++    for path in sorted(adopter_dir.rglob('*.yaml')):
++        if any(part in ('.git', 'composed', '.work') for part in path.relative_to(adopter_dir).parts):
++            continue
++        try:
++            documents = yaml.safe_load_all(path.read_text())
++            for document in documents:
++                if not isinstance(document, dict) or document.get('kind') != 'Pod':
++                    continue
++                metadata = document.get('metadata') or {}
++                if metadata.get('name') == pod and str(metadata.get('namespace') or 'default') == namespace:
++                    declared = True
++        except (OSError, yaml.YAMLError) as exc:
++            raise Refused(f"workload subject {subject!r} has an unreadable Pod declaration: {exc}") from exc
++    if not declared:
++        raise Refused(f"workload subject {subject!r} names no declared Pod")
++    owner = meta['source_party']
++    if owner == party_doc['party']:
++        path = adopter_dir / ADOPTER_CLAIMS_FILE
++    elif parent_trees is not None and owner in parent_trees:
++        path = Path(parent_trees[owner]).joinpath(*PARENT_CLAIMS_PATH)
++    else:
++        raise Refused(f"workload subject {subject!r} has no implementation publisher mapping to read")
++    try:
++        controls = {control for _, control, policy in _load_claims(path) if policy == entry['name']}
++    except (OSError, ValueError, KeyError, TypeError) as exc:
++        raise Refused(f"workload subject {subject!r} has an unreadable published control mapping: {exc}") from exc
++    if len(controls) != 1:
++        raise Refused(f"workload subject {subject!r} needs one published Check_Id mapping for {entry['name']!r}; found {len(controls)}")
++    return {'subject': subject, 'policy': entry['name'], 'control': controls.pop()}
++
++
+ def apply_restatements(party_doc: dict, merged: dict, parents: list[dict],
+                         adopter_dir: Path, parent_trees: dict[str, Path] | None = None, *,
+                         previous_cages: list[dict] | None = None
+@@ -2178,6 +2260,7 @@ def apply_restatements(party_doc: dict, merged: dict, parents: list[dict],
+     restatements: list[dict] = []
+     refusals: list[dict] = []
+     cages: list[dict] = []
++    bound: set[tuple[str, str]] = set()
+     adopter_party = party_doc["party"]
+     threat_edge = next((p for p in parents if _feed_name(p) == "threat-register"), None)
+     threat_pin = threat_edge["version"] if threat_edge else None
+@@ -2214,9 +2297,27 @@ def apply_restatements(party_doc: dict, merged: dict, parents: list[dict],
+             "restated_action": action, "outcome": "accepted" if accepted else "caged",
+         })
+         if accepted:
++            if 'subject' in r:
++                refusals.append({'kind': 'missing-instrument', 'subject': rule,
++                    'detail': f"workload binding for {r['subject']!r} has no priced inability: a stricter restatement retains no Cage decision",
++                    'needs_composition': True})
++                continue
+             merged[key] = dict(meta, action=action)
+             continue
+ 
++        binding = None
++        if 'subject' in r:
++            try:
++                binding = _workload_risk_binding(r, meta, party_doc, adopter_dir, parent_trees)
++                bound_key = (binding['subject'], binding['policy'])
++                if bound_key in bound:
++                    raise Refused(f"duplicate workload binding for {bound_key[0]!r}/{bound_key[1]!r} would duplicate one risk")
++                bound.add(bound_key)
++            except Refused as exc:
++                refusals.append({'kind': 'missing-instrument', 'subject': rule,
++                                 'detail': str(exc), 'needs_composition': True})
++                continue
++
+         # Weaker. Never an override, never an exemption (CONTEXT.md
+         # "Exemption"): a declared inability, priced against THIS party's
+         # own appetite band by the estate's own cage engine. merged[key] is
+@@ -2254,12 +2355,17 @@ def apply_restatements(party_doc: dict, merged: dict, parents: list[dict],
+         tier = decision["tier"]
+         prior = next((c for c in previous_cages
+                       if c.get("party") == adopter_party and c.get("rule") == rule), None)
+-        cages.append({
++        cage_entry = {
+             "party": adopter_party, "rule": rule, "band": band,
+             "residual": decision.get("tcor", {}).get("residual", decision.get("uncaged_residual")),
+             "tier": tier, "action": decision["action"], "priced_from": priced_from,
+             "changed": prior is None or prior.get("tier") != tier,
+-        })
++            "decision": decision,
++        }
++        if binding is not None:
++            cage_entry['binding'] = binding
++            cage_entry['oscal_risk'] = _cage_engine().oscal_risk(decision, **binding)
++        cages.append(cage_entry)
+     return restatements, refusals, cages
+ 
+ 
+@@ -2891,6 +2997,220 @@ def _decorate_regime_holes(prices: list[dict], hole_entries: list[dict], selecte
+                 h["status"] = "unselected"
+ 
+ 
++# --------------------------------------------------------------------------
++# eco-system ticket 148 (hub ADR-0033 points 1 to 3): the engine the adopter declares, and the
++# engines each composed line and the machinery support. An unsupported pairing is priced, never
++# refused.
++# --------------------------------------------------------------------------
++
++#: Where the adopter declares its engine, in its own repository (ADR-0033 point 2, ticket 147).
++ENGINE_DECLARATION = ("gitops", "engine", "kyverno.yaml")
++ENGINE_DECLARATION_FILE = "/".join(ENGINE_DECLARATION)
++KYVERNO_RELEASES = "https://github.com/kyverno/kyverno/releases/download"
++#: Where the machinery declares its supported engines, in the implementations parent's tree
++#: (eco-system ticket 146 item 4). A line's is its element in `distribution/versions.yaml`.
++MACHINERY_DECLARATION = ("distribution", "machinery.yaml")
++MACHINERY_LINE = "machinery"
++#: The one reader of an adopter's declaration, shared with shift-left/ci-check.py.
++ENGINE_DECLARATION_READER = PLATFORM_DIR / "engine" / "declaration.py"
++#: The grader whose reading of `tested_engines` this composer uses, so the gate that grades a
++#: support claim and the composer that prices it read one rule: an exact version list under the
++#: scope `every-served-body-v1`, and nothing under a retired or unknown scope.
++ENGINE_GRADER = PLATFORM_DIR / "computed-semver" / "engine_compatibility.py"
++_ENGINE_MODULES: dict[str, object] = {}
++#: The engine every selfcheck fixture adopter declares and every fixture line and fixture
++#: machinery supports, so a fixture that is not about the engine prices exactly as it did before
++#: composition paired engines. `_write_engine_declaration` takes its figures from the real row of
++#: the engine table.
++FIXTURE_ENGINE = "1.18.2"
++FIXTURE_SUPPORT = {"scope": "every-served-body-v1", "kyverno": [FIXTURE_ENGINE]}
++
++
++def _engine_module(name: str, path: Path):
++    """A module of the tools tree this composer ships in, loaded once by path. A tools tree
++    without it is a missing instrument, named: the composer will not guess what a declaration or
++    a `tested_engines` value means."""
++    if name not in _ENGINE_MODULES:
++        if not path.is_file():
++            raise Refused(f"missing instrument: {path.relative_to(PLATFORM_DIR)} is absent from the "
++                          f"tools tree, so no engine pairing can be read (ADR-0033)")
++        spec = importlib.util.spec_from_file_location(name, path)
++        module = importlib.util.module_from_spec(spec)
++        spec.loader.exec_module(module)
++        _ENGINE_MODULES[name] = module
++    return _ENGINE_MODULES[name]
++
++
++def declared_engine(adopter_dir: Path) -> dict | None:
++    """The engine the adopter declares, or None where it declares none.
++
++    An ABSENT `gitops/engine/kyverno.yaml` is an undeclared engine. That is a missing behaviour,
++    and it is priced (ADR-0033 point 3, ADR-0020). A file that is present but does not read, or
++    whose shape the adopter's own reader would refuse, is a missing instrument, and it refuses
++    by name: the adopter wrote a declaration, and the composer cannot say what it declares. The
++    shape is `engine/declaration.py`'s, the reader shift-left/ci-check.py uses too."""
++    reader = _engine_module("engine_declaration_reader", ENGINE_DECLARATION_READER)
++    try:
++        return reader.read(Path(adopter_dir).joinpath(*ENGINE_DECLARATION))
++    except reader.Malformed as exc:
++        raise Refused(f"missing instrument: {exc}, so the engine this adopter runs cannot be read "
++                      f"and no composed line can be paired with it (ADR-0020, ADR-0033 point 2)") from exc
++
++
++def _supported_engines_rule():
++    """`computed-semver/engine_compatibility.py`'s `declared_engines`, the grader's own reading
++    of a `tested_engines` value."""
++    return _engine_module("engine_compatibility_rule", ENGINE_GRADER).declared_engines
++
++
++def engine_subjects(impl_party: str, impl_version: str, impl_root: Path,
++                    members_by_version: dict[str, dict[tuple[str, str], dict]]) -> list[dict]:
++    """One subject per composed line of one implementations parent: its supported engines, read
++    from its own element in that parent's `distribution/versions.yaml` (the adopter's pinned
++    platform tag, ADR-0033 point 5), and the bodies whose control claims it carries. A line with
++    no `tested_engines`, or one the grader's rule does not read as a support claim (a retired
++    scope, an unknown scope, a malformed list), supports no engine, and the reason is kept."""
++    rule = _supported_engines_rule()
++    elements = {str(e.get("version")): e for e in _version_array(impl_root) if isinstance(e, dict)}
++    subjects = []
++    for version, members in sorted(members_by_version.items()):
++        listed, why = rule((elements.get(version) or {}).get("tested_engines"))
++        subjects.append({
++            "subject": f"{impl_party} policy {version}", "party": impl_party, "line": version,
++            "tree": f"{impl_party}@{impl_version}", "read_from": "distribution/versions.yaml",
++            "tested_engines": listed, "reason": why,
++            "bodies": sorted({base for (_family, base), meta in members.items()
++                              if meta["kind"] in ADMISSION_KINDS}),
++        })
++    return subjects
++
++
++def machinery_subject(impl_party: str, impl_version: str, impl_root: Path,
++                      guards: list[dict]) -> dict:
++    """The machinery's subject: its supported engines, read from `distribution/machinery.yaml` in
++    the same parent tree that rendered it, and the bodies whose claims it carries (cm-6's
++    `governed-namespace-requires-claim` today). No file, or one that does not read, supports no
++    engine (ADR-0033 point 3)."""
++    rule = _supported_engines_rule()
++    rel = "/".join(MACHINERY_DECLARATION)
++    path = Path(impl_root).joinpath(*MACHINERY_DECLARATION)
++    if not path.is_file():
++        listed, why = None, (f"{rel} is absent from {impl_party}@{impl_version}, so the machinery "
++                             f"declares no tested_engines and supports no engine (ADR-0033 point 3)")
++    else:
++        try:
++            doc = yaml.safe_load(path.read_text())
++        except (OSError, UnicodeDecodeError, yaml.YAMLError) as exc:
++            listed, why = None, f"{rel} does not read ({type(exc).__name__}), so it supports no engine"
++        else:
++            listed, why = rule(doc.get("tested_engines") if isinstance(doc, dict) else None)
++    return {
++        "subject": f"{impl_party} machinery", "party": impl_party, "line": MACHINERY_LINE,
++        "tree": f"{impl_party}@{impl_version}", "read_from": rel,
++        "tested_engines": listed, "reason": why,
++        "bodies": sorted({g["member_name"] for g in guards if g["kind"] in ADMISSION_KINDS}),
++    }
++
++
++def pair_engines(subjects: list[dict], engine: dict | None,
++                 claims: list[tuple[str | None, str, str, str]],
++                 catalog_props: dict[str, dict[str, dict[str, str]]],
++                 baseline_source: str | None) -> set[ControlKey]:
++    """Pair every subject with the declared engine, give each the controls its bodies claim, and
++    return the controls whose claims do not count.
++
++    `status` is `supported` when the declared version is in the subject's list, `unsupported`
++    when it is not (or the subject lists none), and `undeclared` when the adopter declares no
++    engine. A claim belongs to a subject when the policy it names is one of the subject's bodies,
++    whoever wrote the claim. On an engine a subject does not support, its bodies are priced as not
++    loading, so every control one of them claims is a hole, even where a second claim also names
++    it: a workload chooses which composed line it claims, and a control whose body does not load
++    for one line's workloads is not implemented for them (delegated, ticket 148)."""
++    uncounted: set[ControlKey] = set()
++    sources = set(catalog_props)
++    for s in subjects:
++        if engine is None:
++            s["status"] = "undeclared"
++        elif s["tested_engines"] is not None and engine["version"] in s["tested_engines"]:
++            s["status"] = "supported"
++        else:
++            s["status"] = "unsupported"
++        bodies = set(s["bodies"])
++        s["controls"] = sorted({(str(_claim_source(href, party, sources, baseline_source)), cid)
++                                for href, cid, policy_name, party in claims
++                                if policy_name in bodies})
++        if s["status"] != "supported":
++            uncounted.update(s["controls"])
++    return uncounted
++
++
++def engine_evidence(engine: dict | None, subjects: list[dict],
++                    baseline_source: str | None) -> dict:
++    """The evidence document's `engine` section: what the adopter declares and how each composed
++    subject pairs with it. It is what a reader checks an absent engine delta against."""
++    return {
++        "declared": engine,
++        "file": ENGINE_DECLARATION_FILE,
++        "pairings": [{
++            "subject": s["subject"], "party": s["party"], "line": s["line"], "tree": s["tree"],
++            "read_from": s["read_from"], "tested_engines": s["tested_engines"],
++            "status": s["status"], "reason": s["reason"], "bodies": s["bodies"],
++            "controls": [_encode_control(k, baseline_source) for k in s["controls"]],
++        } for s in subjects],
++    }
++
++
++def engine_deltas(subjects: list[dict], engine: dict | None, hole_entries: list[dict],
++                  selected: set[ControlKey], perspective: str, currency: str) -> list[dict]:
++    """One `unsupported-engine` or `undeclared-engine` delta per subject whose claims do not
++    count (ADR-0033 point 3). Its amount is the sum of the hole prices of the controls the
++    subject claims, read off the very holes[] entries those controls became, so it is priced
++    exactly as ADR-0026 prices a hole: the regulator's weight times the triple, a bespoke
++    control's own scenario residual, or a named absence. A claimed control outside the selected
++    set is no hole and moves no pound; it is listed with `selected: false`. No control priced is
++    `amount: null`, never a zero."""
++    open_holes = {(h["source"], h["control_id"]): h for h in hole_entries if h["status"] != "closed"}
++    deltas: list[dict] = []
++    for s in subjects:
++        if s["status"] == "supported":
++            continue
++        controls = []
++        for key in s["controls"]:
++            hole = open_holes.get(key)
++            controls.append({"source": key[0], "control_id": key[1], "selected": key in selected,
++                             "amount": hole.get("amount") if hole else None,
++                             "priced_by": hole.get("priced_by") if hole else None})
++        priced = [c["amount"] for c in controls if c["amount"] is not None]
++        amount = sum(priced) if priced else None
++        ids = ", ".join(f"{c['source']}{CONTROL_KEY_SEP}{c['control_id']}" for c in controls) or "none"
++        listed = s["tested_engines"]
++        support = (f"lists tested_engines {listed}" if listed is not None
++                   else f"supports no engine ({s['reason']})")
++        if s["status"] == "undeclared":
++            kind, engine_field = "undeclared-engine", None
++            why = (f"{perspective} declares no engine ({ENGINE_DECLARATION_FILE} is absent), so "
++                   f"{s['subject']} ({s['tree']}, {s['read_from']}) is priced as on an engine it "
++                   f"does not support")
++        else:
++            kind = "unsupported-engine"
++            engine_field = {"engine": engine["engine"], "version": engine["version"]}
++            why = (f"{perspective} declares kyverno {engine['version']} in {engine['file']}, and "
++                   f"{s['subject']} ({s['tree']}, {s['read_from']}) {support}: an unsupported "
++                   f"pairing")
++        deltas.append({
++            "kind": kind, "subject": s["subject"], "party": s["party"], "line": s["line"],
++            "engine": engine_field, "tested_engines": listed,
++            "perspective": perspective, "currency": currency,
++            "controls": controls, "priced": len(priced), "amount": amount,
++            "detail": (f"{why}. Its claims do not count on that engine, so each control it claims "
++                       f"is a hole ({ids})"
++                       + (f"; {len(priced)} carry a price, summing to {amount:.2f} {currency}"
++                          if priced else "; none carries a pinned price, a named absence")
++                       + " (ADR-0033 point 3, ADR-0026)"),
++        })
++    return deltas
++
++
+ def _closed_ungoverned_detail(entry: dict) -> str:
+     """Why a recorded ungoverned namespace closed, as its entry's `closed_by`
+     says (eco-system ticket 122). An entry with no `closed_by` names neither
+@@ -2921,9 +3241,13 @@ def compute_deltas(hole_entries: list[dict], ungoverned_entries: list[dict],
+                 "kind": f"{h['status']}-hole", "source": h["source"], "control_id": h["control_id"],
+                 "perspective": perspective, "currency": currency,
+                 "amount": h.get("amount"), "priced_by": h.get("priced_by"),
+-                "detail": (f"{h['source']}{CONTROL_KEY_SEP}{h['control_id']} is selected and no "
+-                           f"claim covers it, and it was not in the last signed composed "
+-                           f"artefact's recorded holes" if h["status"] == "new" else
++                "detail": (f"{h['source']}{CONTROL_KEY_SEP}{h['control_id']} is selected and "
++                           + (f"the claims on it are carried by "
++                              f"{', '.join(h['uncounted_claims'])}, which do not support the "
++                              f"declared engine, so they do not count (ADR-0033 point 3)"
++                              if h.get("uncounted_claims") else "no claim covers it")
++                           + ", and it was not in the last signed composed artefact's recorded "
++                             "holes" if h["status"] == "new" else
+                            f"{h['source']}{CONTROL_KEY_SEP}{h['control_id']} was a recorded hole "
+                            f"and a claim now covers it")
+                           + (f"; priced at {h['amount']:.2f} {currency} by {h['priced_by']}"
+@@ -3223,7 +3547,8 @@ def price_parent(edge: dict, adopter_party: str, tolerance: float, tree: Path |
+                   composition_as_of: str | None = None,
+                   prev_prices: list[dict] | None = None,
+                   observation: dict | None = None,
+-                  implemented: set[ControlKey] | None = None) -> dict:
++                  implemented: set[ControlKey] | None = None,
++                  inventory: dict | None = None) -> dict:
+     """One prices[] entry for one feed edge, in the one schema every price in
+     this estate shares: perspective, currency, source, kind, amount and a
+     per-customer restatement (ticket 25). Priced at the OLD version (the last
+@@ -3268,8 +3593,19 @@ def price_parent(edge: dict, adopter_party: str, tolerance: float, tree: Path |
+     else:
+         # `as_of` above is the FEED's own date, the one an FX rate is looked up
+         # for; the eol converter ramps to the COMPOSITION's date (ticket 84).
+-        old_sc = _feed_scenario(name, old_version, adopter_party, tree, composition_as_of)
+-        new_sc = _feed_scenario(name, new_version, adopter_party, tree, composition_as_of)
++        old_sc = _feed_scenario(name, old_version, adopter_party, tree, composition_as_of, inventory)
++        new_sc = _feed_scenario(name, new_version, adopter_party, tree, composition_as_of, inventory)
++
++    # No scanned KEV intersection is a named absence, never a zero-risk price.
++    if name == "cve" and new_sc.get("priced_cve") is None:
++        signature = observation["pin_signature"] if observation else pin_signature_state(tree, party, name, new_version)
++        return _price_entry(party, "feed", adopter_party, reporting_currency, None, perspective_doc,
++                            name=name, old_version=old_version, new_version=new_version,
++                            old_price=None, new_price=None, old_tier=None, proposed_tier=None,
++                            changed=False, holes=[], total=None, hole=None, pin_signature=signature,
++                            absence_only=True, could_not_look=new_sc["note"], lef=None, lef_basis=new_sc["note"],
++                            priced_cve=None, absences=new_sc["absences"], absence_count=new_sc["absence_count"],
++                            inventory_cve_count=new_sc["inventory_cve_count"], intersection_count=0)
+ 
+     # The band and the residual must be one currency before either is compared:
+     # the selection happens in the publisher's currency, so the band converts
+@@ -3323,6 +3659,8 @@ def price_parent(edge: dict, adopter_party: str, tolerance: float, tree: Path |
+         proposed_as=PROPOSED_AS_LABEL,
+         **fx,
+     )
++    if name == "cve":
++        entry.update({key: new_sc[key] for key in ("priced_cve", "absences", "absence_count", "inventory_cve_count", "intersection_count")})
+     entry["holes"] = holes
+     entry["total"] = total
+     # Ticket 84: ticket 69's rule reaches every feed line, not the premium alone.
+@@ -3339,15 +3677,33 @@ def price_parent(edge: dict, adopter_party: str, tolerance: float, tree: Path |
+     return entry
+ 
+ 
++def _cve_inventory(adopter_dir: Path) -> dict:
++    path = adopter_dir / "inventory/images.json"
++    if not path.is_file():
++        raise Refused("missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)")
++    try:
++        doc = json.loads(path.read_text())
++        spec = importlib.util.spec_from_file_location("_cve_inventory_validator", PLATFORM_DIR / "wargamer/inventory.py")
++        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
++        module.validate(adopter_dir, doc)
++    except (ValueError, OSError, SystemExit) as exc:
++        raise Refused("missing instrument: CVE inventory: " + str(exc)) from None
++    return doc
++
++
+ def _feed_scenario(name: str, version: str, party: str, tree_path: Path,
+-                   as_of: str | None) -> dict:
++                   as_of: str | None, inventory: dict | None = None) -> dict:
+     """Ticket 84: the converter call for a feed name. The register prices one
+     institution; `cve` and `eol` price the feed's HEADLINE entry (the converter
+     names which, and what it did not price); `eol` is time-varying and takes the
+     composition's own as-of -- the newest published_at among the pinned feeds,
+     or the caller's `--as-of` -- so no clock is read here either."""
+     if name == "cve":
+-        return _run_converter("cve", version, tree_path, ["cve"])
++        if inventory is None:
++            raise Refused("missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)")
++        # Canonical argument bytes travel in converter provenance. No temporary
++        # path can make offline replay depend on this runner's filesystem.
++        return _run_converter("cve", version, tree_path, ["cve", "--inventory-json", json.dumps(inventory, sort_keys=True, separators=(",", ":"))])
+     if name == "eol":
+         if not as_of:
+             raise Refused("missing instrument: the eol feed prices as of a date, and this "
+@@ -3484,7 +3840,7 @@ def price_supersede(edge: dict, entry: dict, tree: Path | None, as_of: str | Non
+                               f"(see pin_signature), and nothing signed is ahead of it either; "
+                               f"it is a hole, not a current pin"}
+     entry["superseded"] = observed
+-    if newer is None:
++    if newer is None or entry.get("absence_only"):
+         return None
+     since = newer["since"]
+     limits: list[str] = []
+@@ -3706,6 +4062,452 @@ def price_twin(adopter_dir: Path, adopter_party: str, tolerance: float, floor: s
+     )
+ 
+ 
++# --------------------------------------------------------------------------
++# 8b'. the twin agent's cage (eco-system ticket 145; ADR-0031)
++# --------------------------------------------------------------------------
++
++
++def _agent_misuse_row(edges: list[dict], adopter_party: str,
++                      parent_trees: dict[str, Path]) -> tuple[dict | None, str | None, str | None]:
++    """The threat-register row the twin agent's cage is priced at: the adopter's
++    pinned register, at the major it pins, `institutions.<adopter>.threats.
++    scheduled-agent-misuses-write-credential` (payload major 4). Read off the
++    payload here, the way `_regime_holes` reads ico's, rather than through the
++    converter subprocess: the converter's argv is recorded per (feed, version)
++    for the portability replay, and a second call for the same version would
++    overwrite the headline's record. The publisher's converter still ships the
++    same reader (`to_fair_scenario.py threat <payload> <party> --threat <row>`).
++
++    Returns (row, pinned version, None) or (None, pinned version, why)."""
++    edge = next((e for e in edges if e.get("kind") in FEED_KINDS
++                 and _feed_name(e) == "threat-register"), None)
++    if edge is None:
++        return None, None, (f"{adopter_party} pins no threat-register feed, so no publisher supplies "
++                            f"the frequency the twin agent's cage is priced at (ticket 30 decision 12)")
++    version = str(edge["version"])
++    tree = edge_tree(edge, parent_trees) or PLATFORM_DIR
++    try:
++        path = feed_file("", "threat-register", version, tree)
++        if not path.exists():
++            raise Refused(f"feed threat-register@{version}: no file at {path}")
++        payload = load_feed_payload(path, "threat-register", version)
++    except Refused as e:
++        return None, version, str(e)
++    entry = (payload.get("institutions") or {}).get(adopter_party) or {}
++    row = (entry.get("threats") or {}).get(AGENT_MISUSE_THREAT)
++    if not isinstance(row, dict):
++        return None, version, (
++            f"threat-register@{version} (feed_version {payload.get('feed_version')!r}, pinned by "
++            f"{adopter_party}) publishes no institutions.{adopter_party}.threats."
++            f"{AGENT_MISUSE_THREAT} row; the row arrives with the register's major 4 (eco-system "
++            f"ticket 145) and this line prices nothing until the pin moves to it")
++    return row, version, None
++
++
++SWEEP_WORKFLOW = ".github/workflows/twin-sweep.yml"
++
++
++def _workflow_triggers(doc: dict) -> dict:
++    """The `on:` block as a mapping, whatever shape it was written in. YAML 1.1 reads
++    a bare `on` as the boolean True, so both keys; `on: [pull_request]` and
++    `on: pull_request` are the list and string forms of the same thing."""
++    on = doc.get("on", doc.get(True))
++    if isinstance(on, dict):
++        return on
++    if isinstance(on, list):
++        return {str(t): {} for t in on}
++    if isinstance(on, str):
++        return {on: {}}
++    return {}
++
++
++def _grants_contents_write(perms: object) -> bool | None:
++    """True/False when a `permissions` block decides `contents`, None when it says
++    nothing about it (the enclosing scope or the repository default then applies)."""
++    if perms == "write-all":
++        return True
++    if perms == "read-all":
++        return False
++    if isinstance(perms, dict):
++        if "contents" in perms:
++            return perms["contents"] == "write"
++        return False       # a permissions map that names other scopes sets contents to none
++    return None
++
++
++def _served_sweep(adopter_dir: Path) -> dict:
++    """The served twin sweep and what its token can do, read off the file: which of
++    its jobs run with `contents: write` (a job-level block overrides the workflow's;
++    a job that declares none inherits it), and its schedule. `write_jobs` empty
++    means could-not-look, with `why` naming what the file did or did not say."""
++    path = Path(adopter_dir) / SWEEP_WORKFLOW
++    out = {"file": SWEEP_WORKFLOW, "crons": [], "write_jobs": [], "why": ""}
++    if not path.exists():
++        out["why"] = f"no {SWEEP_WORKFLOW} is served, so there is no scheduled twin sweep to read"
++        return out
++    try:
++        doc = yaml.safe_load(path.read_text(errors="replace")) or {}
++    except yaml.YAMLError as e:
++        out["why"] = f"{SWEEP_WORKFLOW} does not parse ({str(e).splitlines()[-1].strip()})"
++        return out
++    if not isinstance(doc, dict):
++        out["why"] = f"{SWEEP_WORKFLOW} is not a workflow mapping"
++        return out
++    out["crons"] = [s.get("cron") for s in (_workflow_triggers(doc).get("schedule") or [])
++                    if isinstance(s, dict) and s.get("cron")]
++    if not out["crons"]:
++        out["why"] = f"{SWEEP_WORKFLOW} declares no `schedule:` trigger, so it is not the scheduled agent"
++        return out
++    top = _grants_contents_write(doc.get("permissions"))
++    jobs = doc.get("jobs") if isinstance(doc.get("jobs"), dict) else {}
++    for name, job in jobs.items():
++        if not isinstance(job, dict):
++            continue
++        own = _grants_contents_write(job.get("permissions"))
++        if own is True or (own is None and top is True):
++            out["write_jobs"].append(str(name))
++    if not out["write_jobs"]:
++        out["why"] = (f"{SWEEP_WORKFLOW} is scheduled but no job of its {len(jobs)} runs with a declared "
++                      f"`contents: write`: the token's scope falls to the repository's default workflow "
++                      f"permission, which this composition cannot read, and a token minted another "
++                      f"way is not in the file")
++    return out
++
++
++DRIFT_TEST = re.compile(r"(status --porcelain|diff --exit-code|diff --quiet)[^\n]*-- composed/")
++NONZERO_EXIT = re.compile(r"\bexit\s+[1-9]")
++
++
++def _run_blocks(doc: dict):
++    """Every step's `run` block across a workflow's jobs, with whole comment lines
++    stripped, as (job, step, text). A step is what a job DOES; the raw file text
++    also holds comments, and a comment that names the drift test is not a drift
++    test (review of eco-system ticket 145, round 2)."""
++    jobs = doc.get("jobs") if isinstance(doc.get("jobs"), dict) else {}
++    for jname, job in jobs.items():
++        if not isinstance(job, dict) or job.get("if") not in (None, True, "true", "success()", "always()") \
++                or job.get("continue-on-error") not in (None, False):
++            continue
++        for step in job.get("steps") or []:
++            if not isinstance(step, dict) or not isinstance(step.get("run"), str) \
++                    or step.get("if") not in (None, True, "true", "success()", "always()") \
++                    or step.get("continue-on-error") not in (None, False):
++                continue
++            lines = [ln for ln in step["run"].splitlines() if not ln.lstrip().startswith("#")]
++            yield str(jname), str(step.get("name") or "?"), "\n".join(lines)
++
++
++def _served_pull_request_gate(adopter_dir: Path) -> tuple[list[str], list[str], str]:
++    """The pull-request workflow steps that (a) run shift-left/tier_binding.py and
++    (b) recompose the party artefact and exit non-zero on drift against composed/,
++    read off the steps' own `run` blocks (comment lines stripped) by what each
++    step does rather than by a job's name: a compose invocation, then a drift
++    TEST on `-- composed/` (`status --porcelain`, `diff --exit-code` or `diff
++    --quiet`; a plain `diff` piped to a pager prints, it does not test), then a
++    literal non-zero exit after it, all in one step. Each hit is named `<file> job <job>`. The third value names what was
++    looked at."""
++    workflows = sorted(Path(adopter_dir).glob(".github/workflows/*.yml")) + \
++        sorted(Path(adopter_dir).glob(".github/workflows/*.yaml"))
++    binding: list[str] = []
++    recompose: list[str] = []
++    looked = 0
++    for w in workflows:
++        try:
++            doc = yaml.safe_load(w.read_text(errors="replace")) or {}
++        except yaml.YAMLError:
++            continue
++        if not isinstance(doc, dict) or "pull_request" not in _workflow_triggers(doc):
++            continue
++        triggers = doc.get("on", doc.get(True))
++        trigger = triggers.get("pull_request") if isinstance(triggers, dict) else None
++        if isinstance(trigger, dict) and (
++                any(key in trigger for key in ("paths", "paths-ignore", "branches", "branches-ignore"))
++                or ("types" in trigger and not {"opened", "synchronize", "reopened"}.issubset(trigger["types"] or []))):
++            continue
++        looked += 1
++        for job, _step, text in _run_blocks(doc):
++            where = f"{w.name} job {job}"
++            if "tier_binding.py" in text and where not in binding:
++                binding.append(where)
++            m = DRIFT_TEST.search(text)
++            if (m and re.search(r"\bcompose\b", text[:m.start()]) and NONZERO_EXIT.search(text[m.end():])
++                    and where not in recompose):
++                recompose.append(where)
++    return binding, recompose, f"{looked} pull-request workflow(s) read under .github/workflows"
++
++
++def _twin_agent_reach(prices: list[dict], adopter_dir: Path) -> tuple[dict, dict]:
++    """What each misuse path can still land, as a fraction of the scenario's loss
++    (the declaration gap), DERIVED from the served tree and the composed prices
++    (ticket 30 decision 15; graded/cage.py TWIN_AGENT_PATHS). None where it could
++    not be derived, with the reason beside it. Nothing here is typed."""
++    reach: dict[str, float | None] = {}
++    basis: dict[str, str] = {}
++    # P1 and P2: what the writer job's token can land. READ off the served sweep,
++    # `.github/workflows/twin-sweep.yml` (the file ticket 30, ticket 143 and the hub's
++    # verify/schedules all name): a scheduled workflow whose effective permissions grant
++    # `contents: write` holds a token that can push to main, merge a pull request through
++    # REST and cut a tag or a release, so a looser declaration it lands is served whole
++    # until the gate reads it. That is the whole gap for both doors, which do not add
++    # (one loss, two doors). A sweep that is not served, is not scheduled, or declares no
++    # `contents: write` is a named could-not-look, never a 0: the token's scope then falls
++    # to the repository's default workflow permission, which this composition cannot read,
++    # and a token minted another way (an app installation token, a secret) is not in the
++    # file. The first cut typed 1.0 with a prose basis; decision 15 says derived.
++    sweep = _served_sweep(adopter_dir)
++    if sweep["write_jobs"]:
++        reach["writer-pushes-a-looser-declaration"] = 1.0
++        basis["writer-pushes-a-looser-declaration"] = (
++            f"{sweep['file']} is scheduled ({', '.join(sweep['crons'])}) and its job(s) "
++            f"{', '.join(sweep['write_jobs'])} run with contents: write on the repository that serves "
++            f"the governed Namespace, so a looser declaration the token pushes to main is served whole: "
++            f"the whole gap, until the hub gate reads the push (verify/schedules/lane.py grades a push "
++            f"to main by a scheduled identity as a FAIL, eco-system ticket 142a)")
++        reach["writer-merges-or-tags-through-rest"] = 1.0
++        basis["writer-merges-or-tags-through-rest"] = (
++            f"the same contents: write token on {sweep['file']} ({', '.join(sweep['write_jobs'])}) "
++            f"can merge a pull request through REST, landing the same looser declaration by another "
++            f"door, the whole gap; a REST tag signs only this party's own artefacts and moves no price "
++            f"under this perspective; the union of the two is the whole gap, until the hub gate reads "
++            f"the merge (lane.py grades a merge made by a scheduled identity as a FAIL, ticket 142a)")
++    else:
++        reach["writer-pushes-a-looser-declaration"] = None
++        basis["writer-pushes-a-looser-declaration"] = (
++            f"{sweep['why']}; what the writer job's token can push could not be derived")
++        reach["writer-merges-or-tags-through-rest"] = None
++        basis["writer-merges-or-tags-through-rest"] = (
++            f"{sweep['why']}; what the writer job's token can merge or tag through REST could not be "
++            f"derived")
++    # P3: what a merged proposal can serve past the PULL-REQUEST gate. Two served things
++    # close it, both read off the pull-request workflows' own `run` steps and both named:
++    # a step that runs platform's tier_binding.py, which refuses a declaration looser than
++    # the strictest priced line; and a step that recomposes the party artefact, tests for
++    # drift against the committed composed/ tree and exits non-zero on it, which refuses a
++    # hand-edited rung on the agent-cage line itself. A merge over a red gate is the
++    # human's act (ADR-0031 decision 1), not the twin agent's. Either step absent is a
++    # named could-not-look; a comment that names the drift test is not a step.
++    binding, recompose, no_gate = _served_pull_request_gate(adopter_dir)
++    if binding and recompose:
++        reach["misleading-proposal-merged-by-a-human"] = 0.0
++        basis["misleading-proposal-merged-by-a-human"] = (
++            f"{', '.join(binding)} runs shift-left/tier_binding.py on every pull request, which refuses "
++            f"a declaration looser than the strictest priced line clamped to the floor, and "
++            f"{', '.join(recompose)} recomposes the party artefact on every pull request and exits "
++            f"non-zero on drift against the committed composed/ tree (a compose invocation, a drift "
++            f"test on composed/ and a non-zero exit after it, read off the step's own run block), "
++            f"which refuses a hand-edited rung on this line; so a proposal a human merges through the "
++            f"gate serves none of the gap. A merge over a red gate is the human's act, not the twin "
++            f"agent's (ADR-0031 decision 1)")
++    else:
++        reach["misleading-proposal-merged-by-a-human"] = None
++        missing = [what for what, found in (("runs shift-left/tier_binding.py", binding),
++                                            ("recomposes the party artefact and exits non-zero on "
++                                             "drift against composed/", recompose)) if not found]
++        basis["misleading-proposal-merged-by-a-human"] = (
++            f"{no_gate}; no pull-request step under .github/workflows "
++            f"{' or '.join(missing)}, so what a merged proposal can serve past the pull-request gate "
++            f"could not be derived")
++    # P4: what a model step's wrong binding or forecast can reach. A price rests on the weakest
++    # grade behind it (ADR-0032 point 3); the party schema admits a pricing threshold of 2 or 3
++    # only, and a model's claim is grade 5, so no priced figure rests on one.
++    above = [f"{e.get('source')}/{e.get('name') or e.get('kind')}" for e in prices
++             if isinstance(e.get("rests_on_grade"), int) and not isinstance(e.get("rests_on_grade"), bool)
++             and e["rests_on_grade"] >= 4]
++    if above:
++        reach["model-step-writes-a-wrong-binding-or-forecast"] = None
++        basis["model-step-writes-a-wrong-binding-or-forecast"] = (
++            f"{', '.join(above)} rests on a grade above 3, which the party schema admits no pricing "
++            f"threshold for; what a model's claim reaches in it could not be derived")
++    else:
++        reach["model-step-writes-a-wrong-binding-or-forecast"] = 0.0
++        basis["model-step-writes-a-wrong-binding-or-forecast"] = (
++            "no priced line rests on a grade above 3 (party/schema.json admits appetite."
++            "pricing_threshold 2 or 3 only, and a model's claim is grade 5, which never prices), so "
++            "a wrong binding or forecast a model step writes reaches no figure this composition prices")
++    return reach, basis
++
++
++def price_twin_agent(prices: list[dict], edges: list[dict], adopter_dir: Path, adopter_party: str,
++                     tolerance: float, floor: str | None, parent_trees: dict[str, Path],
++                     perspective_doc: dict, prev_prices: list[dict],
++                     band_currency: str | None = None) -> dict:
++    """The platform's price of the twin agent's cage, ONE `agent-cage` line
++    (ADR-0031 decision 5; eco-system ticket 145).
++
++    The scenario (ticket 30 decision 12): the loss magnitude is the gap between
++    this party's residual at the loosest pod rung and at its selected pod rung,
++    both read off the `source: twin` line this same composition priced, over the
++    window until the hub's gate detects the act (graded/cage.py
++    DETECTION_WINDOW, the gate's own schedule); the frequency is the register
++    row feeds publishes for `scheduled-agent-misuses-write-credential`, at the
++    major this party pins. fair.py annualises it. The reductions are DERIVED
++    (decision 15): what each misuse path can still land, off the served tree
++    and the composed prices, through graded/cage.py's twin-agent table. The
++    adopter's OWN selection policy picks the rung over those residuals and its
++    own band (ADR-0021); the proposer proposes it; a human merges. The twin
++    never prices or selects its own cage: the table and the window are the
++    platform's, the frequency feeds', the numbers this party's.
++
++    Cost is 0 GBP at every rung and never enters the selection. The line is
++    carried beside the exposure and never summed into it (EXPOSURE_KINDS): its
++    magnitude is a slice of a residual the twin line already carries.
++
++    A party that cannot price the line today gets it as a NAMED could-not-look
++    (amount null, the reason on `could_not_look`, ADR-0020): no twin line yet
++    (tuppence and ludlow, until ticket 144), or a pinned register without the
++    row (every adopter, until its pin moves to major 4). The rung the sweep's
++    writer job then reads (ticket 143 item 4) is none, which falls closed to
++    `isolated` (ADR-0022)."""
++    cage = _cage_engine()
++    reporting = _reporting_currency(perspective_doc)
++    prior = next((e for e in prev_prices if e.get("kind") == AGENT_CAGE_KIND
++                  and e.get("subject") == AGENT_CAGE_SUBJECT), None)
++    prior_tier = (prior or {}).get("proposed_tier")
++    prior_amount = (prior or {}).get("amount")
++    base = dict(
++        subject=AGENT_CAGE_SUBJECT, name=AGENT_CAGE_SUBJECT,
++        residual_basis=f"platform-twin-agent-table@{cage.TWIN_AGENT_TABLE_VERSION}",
++        proposed_as=AGENT_CAGE_PROPOSED_AS,
++        cost={"amount": 0.0, "currency": reporting,
++              "basis": "0 in cash at every rung: Actions minutes are free on a public repository "
++                       "and the local clock runs on the owner's own subscription (ticket 30 "
++                       "decision 15); booked in tcor, never read by the selection"},
++        window=dict(cage.DETECTION_WINDOW),
++    )
++
++    def refused(reason: str, **more: object) -> dict:
++        return _price_entry("platform", AGENT_CAGE_KIND, adopter_party, reporting, None,
++                            perspective_doc, could_not_look=reason, proposed_tier=None,
++                            old_tier=prior_tier, changed=False, old_amount=prior_amount,
++                            **base, **more)
++
++    twin = next((e for e in prices if e.get("source") == "twin" and e.get("kind") == "twin"), None)
++    if twin is None:
++        return refused(f"missing instrument: {adopter_party} composes no `source: twin` line, so "
++                       f"there is no residual at the loosest and at the selected pod rung to take "
++                       f"the loss magnitude from (ticket 30 decision 12; the line arrives with "
++                       f"eco-system ticket 144)")
++    residuals = twin.get("residuals") or {}
++    selected, loosest = twin.get("proposed_tier"), cage.ORDER[0]
++    if selected not in residuals or loosest not in residuals or twin.get("amount") is None:
++        return refused(f"missing instrument: {adopter_party}'s `source: twin` line carries no "
++                       f"residual at {loosest!r} and at its selected rung {selected!r} "
++                       f"(residuals: {sorted(residuals)}), so the gap cannot be read off it")
++    if twin.get("currency") != reporting:
++        return refused(f"missing instrument: the twin line is in {twin.get('currency')} and this "
++                       f"party reports in {reporting}; a gap is read in one currency")
++    gap = float(residuals[loosest]) - float(residuals[selected])
++    if gap < 0:
++        return refused(f"missing instrument: the twin line's residual at {loosest!r} "
++                       f"({residuals[loosest]}) is below its residual at {selected!r} "
++                       f"({residuals[selected]}); the residuals are not the table's, so the gap "
++                       f"cannot be read off them")
++    scenario = {
++        "gap": gap, "gap_currency": reporting,
++        "loosest_pod_tier": loosest, "selected_pod_tier": selected,
++        "gap_from": (f"the `source: twin` line's residuals ({twin.get('residual_basis')}): "
++                     f"{loosest} {residuals[loosest]} minus {selected} {residuals[selected]}"),
++        "window_days": cage.DETECTION_WINDOW["days"],
++        "window_source": cage.DETECTION_WINDOW["source"],
++        "window_detects": cage.DETECTION_WINDOW["detects"],
++        "window_assumes": list(cage.DETECTION_WINDOW["assumes"]),
++    }
++    row, version, why = _agent_misuse_row(edges, adopter_party, parent_trees)
++    if row is None:
++        return refused(f"missing instrument: {why}", scenario=scenario, register_version=version)
++    lef = row.get("lef")
++    if not (isinstance(lef, list) and len(lef) == 3 and all(isinstance(x, (int, float)) for x in lef)
++            and lef[0] <= lef[1] <= lef[2]):
++        return refused(f"missing instrument: threat-register@{version}'s {AGENT_MISUSE_THREAT} row "
++                       f"for {adopter_party} carries lef {lef!r}, not a lo<=mode<=hi triple",
++                       scenario=scenario, register_version=version)
++    lef_basis = row.get("lef_basis") or {}
++    if not lef_basis.get("statement") or not lef_basis.get("as_of"):
++        return refused(f"missing instrument: threat-register@{version}'s {AGENT_MISUSE_THREAT} row "
++                       f"for {adopter_party} publishes a frequency with no basis carrying a "
++                       f"`statement` and an `as_of` date", scenario=scenario, register_version=version)
++    lef_note = (f"Frequency basis ({lef_basis.get('kind', 'unlabelled')}, read {lef_basis['as_of']}): "
++                f"{lef_basis['statement']}"
++                + (f" COULD NOT LOOK: {lef_basis['could_not_look']}" if lef_basis.get("could_not_look") else ""))
++    window_years = cage.detection_window_years()
++    lm_point = gap * window_years
++    scenario.update(lm=[lm_point, lm_point, lm_point],
++                    lm_basis=f"the gap ({gap} {reporting} a year) times the window "
++                             f"({cage.DETECTION_WINDOW['days']} day(s) of 365.25), a point magnitude: "
++                             f"the loss of serving the loosest rung instead of the selected one for "
++                             f"the window, per event")
++    fair = cage.fair
++    summary = fair.summarize(fair.simulate([float(x) for x in lef], scenario["lm"]))
++    # The amount is the closed-form expectation, not the simulated mean: fair.simulate
++    # rounds each year's event count to an integer, so a frequency this far below half
++    # an event a year resolves no event in any simulated year and its ALE to 0.0 by
++    # construction. The expectation is the same compound process's mean; the simulated
++    # tail and p_gt_0 travel beside it so the resolution limit is readable.
++    amount = float(fair.expected_ale([float(x) for x in lef], scenario["lm"]))
++    scenario.update(
++        annualised_by="expectation",
++        annualised_basis=(f"E[events a year] x E[loss per event] over the PERT means "
++                          f"(fair.expected_ale); fair.simulate at {fair.ITERATIONS} iterations "
++                          f"rounds each year's event count to an integer and resolved "
++                          f"{summary['p_gt_0']:.4f} of its years with an event (simulated ALE "
++                          f"{summary['ale']:.4f}), so the simulated mean is the engine's "
++                          f"resolution, not the scenario's"),
++        simulated_ale=float(summary["ale"]), simulated_p_gt_0=float(summary["p_gt_0"]))
++    reach, reach_basis = _twin_agent_reach(prices, adopter_dir)
++    agent_residuals = cage.twin_agent_residuals(amount, reach)
++    band, _ = _converted(tolerance, band_currency or reporting, reporting, None, parent_trees) \
++        if (band_currency or reporting) != reporting else (float(tolerance), {})
++    try:
++        policy = _selection_policy(adopter_dir, adopter_party)
++    except Refused as e:
++        return refused(str(e), scenario=scenario, register_version=version, lef=list(lef),
++                       lef_basis=lef_note, lef_from="threat-register", residuals=agent_residuals,
++                       reach=reach, reach_basis=reach_basis)
++    candidates = {r: {"amount": v, "currency": reporting} for r, v in agent_residuals.items()
++                  if v is not None}
++    try:
++        picked = policy.select(candidates, {"amount": band, "currency": reporting}, floor)
++    except Exception as e:                       # noqa: BLE001 -- the package's own refusal
++        return refused(f"missing instrument: {adopter_party}'s {SELECTION_POLICY_DIR} package could "
++                       f"not pick a twin-agent rung from the derived residuals ({e})",
++                       scenario=scenario, register_version=version, lef=list(lef),
++                       lef_basis=lef_note, lef_from="threat-register", residuals=agent_residuals,
++                       reach=reach, reach_basis=reach_basis)
++    rung = picked["tier"]
++    twin_grade = twin.get("rests_on_grade")
++    twin_graded = isinstance(twin_grade, int) and not isinstance(twin_grade, bool)
++    return _price_entry(
++        "platform", AGENT_CAGE_KIND, adopter_party, reporting, amount, perspective_doc,
++        **base,
++        proposed_tier=rung,
++        old_tier=prior_tier if prior_tier is not None else rung,
++        changed=prior is not None and prior_tier != rung,
++        old_amount=prior_amount if prior_amount is not None else amount,
++        residuals=agent_residuals,
++        # Which rung closes which path, and what each open path can still land:
++        # the derivation behind `residuals`, on the line, so the rung can be
++        # re-derived rather than believed.
++        closes={r: cage.twin_agent_closed(r) for r in cage.ORDER},
++        reach=reach, reach_basis=reach_basis,
++        scenario=scenario,
++        lef=[float(x) for x in lef], lef_basis=lef_note, lef_from="threat-register",
++        register_version=version,
++        tail=summary["tail"],
++        policy_version=picked["policy_version"], policy_basis=picked["basis"],
++        tcor=cage.twin_agent_tcor(amount, rung, reach),
++        # The weakest grade the price rests on (ADR-0032 point 3): the register
++        # row's own kind (published: grade 3) and the twin line's grade, the one
++        # order statistic ADR-0024 point 6 admits. A twin line that states no
++        # grade leaves this null, a named absence, never a grade this seam invents.
++        rests_on_grade=(max(3, int(twin_grade)) if twin_graded else None),
++        rests_on_grade_basis=(
++            f"the register row is {lef_basis.get('kind', 'unlabelled')} (grade 3 at best: published "
++            f"work, not observed here) and the twin line rests on grade "
++            f"{twin_grade if twin_graded else 'none stated'}; the weaker of the two"
++            + ("" if twin_graded else ", which cannot be stated while the twin line states none")),
++    )
++
++
+ # --------------------------------------------------------------------------
+ # 8c. the insurance premium edge (ticket 36; ticket 14 answer 3)
+ # --------------------------------------------------------------------------
+@@ -4220,8 +5022,9 @@ def exposure_section(prices: list[dict], adopter_party: str, band: dict | None,
+         "attachment": ({"amount": band["amount"],
+                          "currency": band.get("currency") or reporting_currency}
+                         if band else None),
+-        "total": _sum_prices([e for e in prices if e.get("kind") in EXPOSURE_KINDS],
+-                              adopter_party, reporting_currency),
++        "total": None if any(e.get("absence_only") for e in prices) else _sum_prices([e for e in prices if e.get("kind") in EXPOSURE_KINDS], adopter_party, reporting_currency),
++        "priced_subtotal": _sum_prices([e for e in prices if e.get("kind") in EXPOSURE_KINDS], adopter_party, reporting_currency),
++        "unpriced_lines": [e.get("name") for e in prices if e.get("absence_only")],
+         # WHAT THE NUMBER IS. On the section that carries the totals, so no
+         # reader of `total` or of `aggregate` can reach one without the other
+         # (eco-system ticket 79 item 10).
+@@ -4434,7 +5237,7 @@ def compute_prices(edges: list[dict], adopter_party: str, tolerance: float | Non
+             perspective_doc=perspective_doc, reporting_currency=reporting,
+             band_currency=band_currency, floor=floor, parent_trees=parent_trees,
+             composition_as_of=comp_as_of, prev_prices=prev_prices, observation=observation,
+-            implemented=implemented)
++            implemented=implemented, inventory=_cve_inventory(adopter_dir) if _feed_name(edge) == "cve" else None)
+         prices.append(entry)
+         # Ticket 84: is this pin behind a newer major its publisher has signed?
+         # A quote (above) is a cost, not an exposure, and is not surcharged.
+@@ -4457,6 +5260,11 @@ def compute_prices(edges: list[dict], adopter_party: str, tolerance: float | Non
+                        prev_prices or [], lef_by_feed, band_currency)
+     if twin is not None:
+         prices.append(twin)
++    # Eco-system ticket 145: the twin agent's cage, priced by the platform off the
++    # twin line above and the register row this party pins. Always one line: a
++    # party that cannot price it gets the reason on the line, never a silence.
++    prices.append(price_twin_agent(prices, edges, adopter_dir, adopter_party, tolerance, floor,
++                                   parent_trees, perspective_doc, prev_prices or [], band_currency))
+     if include_switching:
+         # Last, and over the finished list: a switching cost is a statement
+         # ABOUT the prices above it, and re-pricing an edge set that already
+@@ -4625,6 +5433,20 @@ def compose(adopter_dir: Path, parent_trees: dict[str, Path], *,
+ 
+     refusals: list[dict] = check_diamonds(edges)
+ 
++    # Eco-system ticket 148 (hub ADR-0033 point 2): the engine the adopter declares in its own
++    # repository. Absent is an undeclared engine, priced below. Present and unreadable is a
++    # missing instrument: it refuses by name, and the rest of this run prices as undeclared.
++    try:
++        engine = declared_engine(adopter_dir)
++    except Refused as e:
++        engine = None
++        refusals.append({"kind": "missing-instrument", "subject": ENGINE_DECLARATION_FILE,
++                         "detail": str(e), "needs_composition": False})
++    # Every composed line of every implementations parent, and the machinery, each with the
++    # engines it supports, read from the same parent tree that supplies its bodies.
++    engine_lines: list[dict] = []
++    machinery: dict | None = None
++
+     # Merge every implementations parent's members into one set, keyed on
+     # (version, family, name). Two sources supplying the same key with
+     # different content is refused -- never merged, never last-wins
+@@ -4651,6 +5473,13 @@ def compose(adopter_dir: Path, parent_trees: dict[str, Path], *,
+         impl_root = Path(parent_trees[impl_party])
+         members_by_version, this_guards = load_implementations(impl_root)
+         source_ref = f"{impl_party}@{impl_version}"
++        try:
++            engine_lines += engine_subjects(impl_party, str(impl_version), impl_root, members_by_version)
++            if machinery is None and not guards and this_guards:
++                machinery = machinery_subject(impl_party, str(impl_version), impl_root, this_guards)
++        except Refused as e:
++            refusals.append({"kind": "missing-instrument", "subject": source_ref,
++                             "detail": str(e), "needs_composition": True})
+ 
+         for href, control_id, policy_name in _load_claims(impl_root.joinpath(*PARENT_CLAIMS_PATH)):
+             claims.append((href, control_id, policy_name, impl_party))
+@@ -4778,6 +5607,13 @@ def compose(adopter_dir: Path, parent_trees: dict[str, Path], *,
+ 
+     covered, claim_refusals = resolve_claims(claims, policy_owner, catalog_props, baseline_source)
+     refusals += claim_refusals
++    # Eco-system ticket 148 (hub ADR-0033 point 3): on an engine a composed line or the machinery
++    # does not support, its claims do not count, so every control it claims is a hole below and
++    # is priced as ADR-0026 prices one. `covered` stays what resolve_claims found; `counted` is
++    # what the price reads.
++    engine_pairings = engine_lines + ([machinery] if machinery is not None else [])
++    uncounted = pair_engines(engine_pairings, engine, claims, catalog_props, baseline_source)
++    counted = covered - uncounted
+ 
+     prev_source = _header_controls_source(prev_header, adopter_party) or baseline_source
+     prev_holes = ({_decode_control(h, prev_source) for h in prev_header.get("holes", [])}
+@@ -4797,7 +5633,12 @@ def compose(adopter_dir: Path, parent_trees: dict[str, Path], *,
+         set(prev_header.get("ungoverned-namespaces", [])) if prev_header is not None else None
+     )
+ 
+-    hole_entries = compute_holes(selected_set, covered, prev_holes)
++    hole_entries = compute_holes(selected_set, counted, prev_holes)
++    for h in hole_entries:
++        key = (h["source"], h["control_id"])
++        if h["status"] != "closed" and key in uncounted:
++            h["uncounted_claims"] = [s["subject"] for s in engine_pairings
++                                     if s["status"] != "supported" and key in s["controls"]]
+     removed, withdrawn = split_withdrawn(
+         removed_controls(selected_set, prev_selected), adopter_party=adopter_party,
+         catalog_props=catalog_props, baseline_source=baseline_source,
+@@ -4819,8 +5660,9 @@ def compose(adopter_dir: Path, parent_trees: dict[str, Path], *,
+     # The adopter's own signed facts: its appetite band, its reporting currency
+     # and its tighten-only cage floor. No fixture prices a party (ticket 25).
+     # What it implements -- a selected control a claim covers -- comes off the
+-    # regime entry it prices (eco-system ticket 121).
+-    implemented = selected_set & covered
++    # regime entry it prices (eco-system ticket 121). A claim that does not count on the declared
++    # engine implements nothing (eco-system ticket 148), so the regime entry's open share grows.
++    implemented = selected_set & counted
+     band = None
+     try:
+         band = _appetite(adopter_party, adopter_dir, parent_trees)
+@@ -4856,7 +5698,7 @@ def compose(adopter_dir: Path, parent_trees: dict[str, Path], *,
+     refusals += _price_bespoke_holes(hole_entries, adopter_party, adopter_dir,
+                                      catalog_props.get(adopter_party, {}), band, reporting,
+                                      (party_doc.get("overlay", {}) or {}).get("floor"))
+-    _decorate_regime_holes(prices, hole_entries, selected_set, covered, catalog_props)
++    _decorate_regime_holes(prices, hole_entries, selected_set, counted, catalog_props)
+     removed_entries = _price_removed(removed, hole_prices, adopter_party, adopter_dir,
+                                      catalog_props.get(adopter_party, {}), band, reporting,
+                                      (party_doc.get("overlay", {}) or {}).get("floor"))
+@@ -4880,6 +5722,10 @@ def compose(adopter_dir: Path, parent_trees: dict[str, Path], *,
+     # Ticket 69 (and 84, for every feed line): a pin that opened or closed as
+     # an untagged-pin hole.
+     deltas += untagged_pin_deltas(prices, adopter_party, reporting)
++    # Eco-system ticket 148: each composed line, and the machinery, whose claims do not count on
++    # the declared engine, priced at the holes its claimed controls became.
++    deltas += engine_deltas(engine_pairings, engine, hole_entries, selected_set,
++                            adopter_party, reporting)
+ 
+     # Ticket 27: publisher-version comparisons above retain their meaning.
+     # A separate counterfactual isolates a floor edit at current feed inputs.
+@@ -4999,6 +5845,11 @@ def compose(adopter_dir: Path, parent_trees: dict[str, Path], *,
+         "policy-as-versioned.dev/composed": True,
+         "parents": parents,
+         "baseline": baseline_name,
++        # Eco-system ticket 148 (hub ADR-0033 point 2): the engine this adopter declares in
++        # gitops/engine/kyverno.yaml, or null where it declares none. Every composed line and
++        # the machinery were paired with it; evidence.json's `engine` section says how.
++        "declared-engine": ({"engine": engine["engine"], "version": engine["version"],
++                             "file": engine["file"]} if engine is not None else None),
+         "floor-comparison": floor_inputs,
+         "governed-namespaces": governed_namespaces(adopter_dir),
+         "holes": recorded_hole_ids,
+@@ -5055,6 +5906,7 @@ def compose(adopter_dir: Path, parent_trees: dict[str, Path], *,
+         "floor_change": floor_change,
+         "limits": limits,
+         "vendored": vendored_records,
++        "engine": engine_evidence(engine, engine_pairings, baseline_source),
+     }
+     # The handbook (ticket 34; ADR-0007's last-mile section). A pure function of `rendered` and
+     # `document` -- the two things this call has just derived from the pinned parents -- so it is
+@@ -5229,6 +6081,8 @@ def _adopter_copy(name: str, dest: Path) -> Path:
+     # selfcheck proves a missing twin feed is silence, not a refusal.
+     if (src / ".github").is_dir():
+         shutil.copytree(src / ".github", work / ".github")
++    if (src / "inventory").is_dir():
++        shutil.copytree(src / "inventory", work / "inventory")
+     return work
+ 
+ 
+@@ -5567,7 +6421,8 @@ def _write_fixture_ico(root: Path, real_ico: Path) -> None:
+ def _write_fixture_adopter(work: Path, baseline: str, controls_add: list[str] | None = None,
+                             add: list[dict] | None = None, own_claims: list[tuple[str, str]] | None = None,
+                             nist_party: str = "fixture-nist", impl_party: str = "fixture-platform",
+-                            extra_inherits: list[dict] | None = None) -> None:
++                            extra_inherits: list[dict] | None = None,
++                            engine: str | None = FIXTURE_ENGINE) -> None:
+     party_doc = {
+         "party": "fixture-adopter14", "roles": ["adopter"], "baseline": baseline,
+         # A synthetic party is still a party: it signs its own appetite band
+@@ -5587,6 +6442,8 @@ def _write_fixture_adopter(work: Path, baseline: str, controls_add: list[str] |
+     _write_baseline_configmap(work, baseline)
+     if own_claims:
+         _write_component_definition(work / ADOPTER_CLAIMS_FILE, own_claims)
++    if engine is not None:
++        _write_engine_declaration(work, engine)
+ 
+ 
+ def _write_namespace(work: Path, name: str, *, institution: bool = True, governed: bool = False) -> None:
+@@ -5680,6 +6537,190 @@ def selfcheck() -> None:
+           "restates its own amount per customer against driftwood's OWN signed size "
+           "(%s customers)" % (customers if customers else "unsigned -> null"))
+ 
++    # ======================================================================
++    # eco-system ticket 145 (ADR-0031): the twin agent's cage
++    # ======================================================================
++
++    # --- on the real driftwood, ONE agent-cage line, unpriced and saying why: the
++    # register it pins (v2) publishes no `scheduled-agent-misuses-write-credential`
++    # row. The line names the version, the row and the ticket the row arrives
++    # with; it proposes no rung; and it moves nothing else in the document. ---
++    agents = [p for p in document["prices"] if p["kind"] == AGENT_CAGE_KIND]
++    assert len(agents) == 1, agents
++    agent = agents[0]
++    assert agent["source"] == "platform" and agent["subject"] == AGENT_CAGE_SUBJECT, agent
++    assert agent["amount"] is None and agent["per_customer"] is None, agent
++    assert agent["proposed_tier"] is None and agent["proposed_as"] == AGENT_CAGE_PROPOSED_AS, agent
++    assert AGENT_MISUSE_THREAT in agent["could_not_look"] and "@v2" in agent["could_not_look"] \
++        and "ticket 145" in agent["could_not_look"], agent["could_not_look"]
++    assert agent["residual_basis"] == f"platform-twin-agent-table@{_cage_engine().TWIN_AGENT_TABLE_VERSION}"
++    assert agent["cost"]["amount"] == 0.0 and agent["window"]["days"] == 1.0, agent
++    assert agent["kind"] not in EXPOSURE_KINDS, "the line is carried beside the exposure, never summed"
++    print("OK agent-cage: the real driftwood carries ONE twin-agent cage line, unpriced by name -- "
++          "its pinned threat-register@v2 publishes no `%s` row -- proposing no rung" % AGENT_MISUSE_THREAT)
++
++    # --- the same driftwood with its register pin moved to a major 4 that
++    # carries the row (planted here, so this check needs no published v4): the
++    # line prices, and every figure on it is derived from the document itself.
++    # The Namespace fold, run with and without the line, does not move. ---
++    with tempfile.TemporaryDirectory() as tmp:
++        root = Path(tmp)
++        work = _adopter_copy("driftwood", root)
++        for extra in ("twin", "selection-policy"):
++            shutil.copytree(driftwood / extra, work / extra)
++        party = yaml.safe_load((work / "party.yaml").read_text())
++        for e in party["inherits"]:
++            if e.get("name") == "threat-register":
++                e["version"] = "v4"
++        (work / "party.yaml").write_text(yaml.safe_dump(party, **YAML_KWARGS))
++        feeds_src = DEFAULT_ESTATE_CLONE / "feeds"
++        feeds_work = root / "feeds"
++        shutil.copytree(feeds_src, feeds_work, ignore=shutil.ignore_patterns(".git"))
++        v4 = feeds_work / "threat-register" / "v4" / "feed.json"
++        if not v4.exists():
++            # A FIXTURE row, labelled as one: the published row's numbers and
++            # sources live in the feeds repository (threat-register/v4), not here.
++            v3 = json.loads((feeds_work / "threat-register" / "v3" / "feed.json").read_text())
++            v3["version"], v3["payload_schema"] = "4.0.0", "threat-register/payload.schema.v4.json"
++            v3["payload"]["feed_version"] = "v4"
++            for inst in v3["payload"]["institutions"].values():
++                inst["threats"] = {AGENT_MISUSE_THREAT: {
++                    "threat": "a scheduled agent misuses its write credential",
++                    "lef": [8e-5, 8e-5, 3e-4],
++                    "lef_basis": {"kind": "published", "as_of": "2026-09-26",
++                                  "statement": "FIXTURE for this selfcheck; the published row is the feeds repository's",
++                                  "could_not_look": "fixture"},
++                    "magnitude_basis": {"kind": "subscriber", "as_of": "2026-09-26",
++                                        "statement": "the subscriber's own gap over the gate's window"}}}
++            v4.parent.mkdir(parents=True)
++            v4.write_text(json.dumps(v3, indent=2) + "\n")
++        doc4, rendered4 = compose(work, {**parent_trees, "feeds": feeds_work})
++        assert doc4["outcome"] == "composed", doc4["refusals"]
++        twin4 = next(p for p in doc4["prices"] if p["kind"] == "twin")
++        agent4 = [p for p in doc4["prices"] if p["kind"] == AGENT_CAGE_KIND]
++        assert len(agent4) == 1, agent4
++        agent4 = agent4[0]
++        cage = _cage_engine()
++        assert agent4["amount"] is not None and agent4["could_not_look" if "could_not_look" in agent4 else "amount"] is not None, agent4
++        assert "could_not_look" not in agent4, agent4.get("could_not_look")
++        sc = agent4["scenario"]
++        gap = twin4["residuals"][cage.ORDER[0]] - twin4["residuals"][twin4["proposed_tier"]]
++        assert abs(sc["gap"] - gap) < 1e-6 and sc["selected_pod_tier"] == twin4["proposed_tier"], (sc, twin4["proposed_tier"])
++        assert all(abs(x - gap * cage.detection_window_years()) < 1e-9 for x in sc["lm"]), sc["lm"]
++        # The frequency is whatever the register file in the estate (or the fixture
++        # planted above) publishes for driftwood's row: read off that file here, never
++        # typed, so a recount in the feeds repository moves nothing in this selfcheck.
++        published = json.loads(v4.read_text())["payload"]["institutions"]["driftwood"]["threats"][AGENT_MISUSE_THREAT]
++        assert agent4["lef"] == [float(x) for x in published["lef"]], (agent4["lef"], published["lef"])
++        expected = cage.fair.expected_ale(agent4["lef"], sc["lm"])
++        assert abs(agent4["amount"] - expected) < 1e-9 and agent4["amount"] >= 0, (agent4["amount"], expected)
++        assert sc["annualised_by"] == "expectation" and sc["simulated_ale"] == 0.0, sc
++        assert agent4["reach"] == {"writer-pushes-a-looser-declaration": 1.0,
++                                   "writer-merges-or-tags-through-rest": 1.0,
++                                   "misleading-proposal-merged-by-a-human": 0.0,
++                                   "model-step-writes-a-wrong-binding-or-forecast": 0.0}, agent4["reach"]
++        # Every reach names what it was read off (decision 15: derived, not typed): the
++        # served sweep's file, cron and job for the two token paths; the tier-binding
++        # workflow AND the recompose job for the proposal path.
++        rb = agent4["reach_basis"]
++        assert SWEEP_WORKFLOW in rb["writer-pushes-a-looser-declaration"] and "5 7 * * *" in rb["writer-pushes-a-looser-declaration"] \
++            and "contents: write" in rb["writer-pushes-a-looser-declaration"], rb
++        assert SWEEP_WORKFLOW in rb["writer-merges-or-tags-through-rest"], rb
++        assert "shift-left.yml job compose-check runs shift-left/tier_binding.py" in rb["misleading-proposal-merged-by-a-human"] \
++            and "shift-left.yml job compose-check recomposes the party artefact" in rb["misleading-proposal-merged-by-a-human"] \
++            and "read off the step's own run block" in rb["misleading-proposal-merged-by-a-human"], rb
++        res4 = agent4["residuals"]
++        assert res4["baseline"] == res4["restricted"] == res4["quarantine"] == agent4["amount"], res4
++        assert res4["isolated"] == 0.0, res4
++        assert agent4["proposed_tier"] == "baseline" and agent4["policy_version"] == twin4["policy_version"], agent4
++        assert agent4["lef_from"] == "threat-register" and agent4["register_version"] == "v4", agent4
++        assert agent4["tcor"]["cost_of_controls"] == 0.0 and agent4["cost"]["amount"] == 0.0, agent4["tcor"]
++        assert agent4["rests_on_grade"] == (max(3, twin4["rests_on_grade"]) if isinstance(twin4.get("rests_on_grade"), int) else None), agent4
++        assert agent4["per_customer"] == {"amount": agent4["amount"] / customers, "currency": "GBP"}, agent4["per_customer"]
++        # the twin line and every other line are what they were: the agent line is
++        # priced beside them and summed into nothing
++        for key in ("amount", "proposed_tier", "residuals"):
++            assert twin4[key] == next(p for p in document["prices"] if p["kind"] == "twin")[key], key
++        assert doc4["prices"].index(agent4) == doc4["prices"].index(twin4) + 1, "the agent line follows the twin line"
++        sys.path.insert(0, str(PLATFORM_DIR / "wargamer"))
++        import wargamer  # noqa: E402
++        with_line = wargamer.select_party_tier(doc4["prices"], current="isolated")
++        without = wargamer.select_party_tier([p for p in doc4["prices"] if p is not agent4], current="isolated")
++        assert (with_line["tier"], with_line["lines"]) == (without["tier"], without["lines"]) == ("isolated", without["lines"]), with_line
++        assert "platform/agent-cage" not in " ".join(with_line["lines"]), with_line["lines"]
++        assert not wargamer.wargame_cage_tier([agent4], "driftwood"), "no Namespace row for the agent line"
++        hb4 = rendered4["composed/HANDBOOK.md"]
++        assert "| platform | agent-cage | twin-agent | driftwood | GBP |" in hb4 and "a rung for the twin agent, not the Namespace: `baseline`" in hb4, "the handbook renders the line"
++        print("OK agent-cage: with the register pin moved to a major 4 carrying the row, driftwood's "
++              "twin-agent cage prices at %.4f GBP a year (gap %.2f over %s day(s), frequency %s), "
++              "restricted and quarantine carry baseline's residual, isolated 0; driftwood's own "
++              "selection policy %s picks %r; the Namespace fold gives %r with the line and without it"
++              % (agent4["amount"], gap, sc["window_days"], agent4["lef"], agent4["policy_version"],
++                 agent4["proposed_tier"], without["tier"]))
++
++        # --- the reach is READ, so a served tree that says less derives less. The same
++        # v4-pinned copy with its sweep's `contents: write` removed: the two token paths
++        # are could-not-look, every rung they stay open at has no residual, and the
++        # adopter's own policy picks the one candidate left, `isolated` (fail closed,
++        # ADR-0022). Then with the recompose gate removed from its pull-request
++        # workflow: the proposal path is could-not-look, so baseline and restricted
++        # have no residual and the pick falls to `quarantine`, the loosest rung whose
++        # open paths are all derived. ---
++        sweep_path = work / SWEEP_WORKFLOW
++        sweep_text = sweep_path.read_text()
++        assert "contents: write" in sweep_text, sweep_path
++        sweep_path.write_text(sweep_text.replace("contents: write", "contents: read"))
++        doc_ro, _ = compose(work, {**parent_trees, "feeds": feeds_work})
++        agent_ro = next(p for p in doc_ro["prices"] if p["kind"] == AGENT_CAGE_KIND)
++        assert agent_ro["amount"] is not None, agent_ro.get("could_not_look")
++        assert agent_ro["reach"]["writer-pushes-a-looser-declaration"] is None \
++            and agent_ro["reach"]["writer-merges-or-tags-through-rest"] is None, agent_ro["reach"]
++        assert "no job of its" in agent_ro["reach_basis"]["writer-pushes-a-looser-declaration"] \
++            and "cannot read" in agent_ro["reach_basis"]["writer-pushes-a-looser-declaration"], agent_ro["reach_basis"]
++        assert agent_ro["residuals"] == {"baseline": None, "restricted": None, "quarantine": None, "isolated": 0.0}, agent_ro["residuals"]
++        assert agent_ro["proposed_tier"] == "isolated", agent_ro["proposed_tier"]
++        sweep_path.write_text(sweep_text)
++        sl_path = work / ".github" / "workflows" / "shift-left.yml"
++        sl_text = sl_path.read_text()
++        assert "-- composed/" in sl_text, sl_path
++        sl_path.write_text(sl_text.replace("-- composed/", "-- elsewhere/"))
++        doc_ng, _ = compose(work, {**parent_trees, "feeds": feeds_work})
++        agent_ng = next(p for p in doc_ng["prices"] if p["kind"] == AGENT_CAGE_KIND)
++        assert agent_ng["reach"]["misleading-proposal-merged-by-a-human"] is None, agent_ng["reach"]
++        assert "recomposes the party artefact" in agent_ng["reach_basis"]["misleading-proposal-merged-by-a-human"] \
++            and "could not be derived" in agent_ng["reach_basis"]["misleading-proposal-merged-by-a-human"], agent_ng["reach_basis"]
++        assert agent_ng["residuals"]["baseline"] is None and agent_ng["residuals"]["restricted"] is None \
++            and agent_ng["residuals"]["quarantine"] == agent4["amount"] and agent_ng["residuals"]["isolated"] == 0.0, agent_ng["residuals"]
++        assert agent_ng["proposed_tier"] == "quarantine", agent_ng["proposed_tier"]
++        # ...and a drift test that survives only as a COMMENT is no gate (review round 2,
++        # finding 4): the served line and its ::error are commented out, the raw file still
++        # holds the substrings, and the step no longer tests for drift, so the proposal path
++        # is could-not-look again. Then the same test with its exit turned to zero.
++        drift_line = next(ln for ln in sl_text.splitlines() if "status --porcelain -- composed/" in ln)
++        error_line = next(ln for ln in sl_text.splitlines() if "::error::the regenerated composed artefact" in ln)
++        commented = sl_text.replace(drift_line, drift_line.replace('drift="$(', '# drift="$(')) \
++                           .replace(error_line, error_line.replace("echo", "# echo"))
++        assert "status --porcelain -- composed/" in commented and commented != sl_text
++        sl_path.write_text(commented)
++        doc_cm, _ = compose(work, {**parent_trees, "feeds": feeds_work})
++        agent_cm = next(p for p in doc_cm["prices"] if p["kind"] == AGENT_CAGE_KIND)
++        assert agent_cm["reach"]["misleading-proposal-merged-by-a-human"] is None, agent_cm["reach"]
++        assert agent_cm["proposed_tier"] == "quarantine", agent_cm["proposed_tier"]
++        sl_path.write_text(sl_text)
++        exit_zero = re.sub(r'(status --porcelain -- composed/[\s\S]*?)\bexit 1\b', r'\1exit 0',
++                           sl_text, count=1)
++        assert exit_zero != sl_text
++        sl_path.write_text(exit_zero)
++        doc_ez, _ = compose(work, {**parent_trees, "feeds": feeds_work})
++        agent_ez = next(p for p in doc_ez["prices"] if p["kind"] == AGENT_CAGE_KIND)
++        assert agent_ez["reach"]["misleading-proposal-merged-by-a-human"] is None, agent_ez["reach"]
++        sl_path.write_text(sl_text)
++        print("OK agent-cage: the reach is read off the served tree -- a sweep without contents: write "
++              "leaves the token paths could-not-look and the pick falls closed to %r; a pull-request "
++              "gate without the recompose step, with its drift test commented out, or with the exit "
++              "after it turned to zero, leaves the proposal path could-not-look and the pick "
++              "falls to %r" % (agent_ro["proposed_tier"], agent_ng["proposed_tier"]))
++
+     # ======================================================================
+     # ticket 36: the exposure section and the premium it buys
+     # ======================================================================
+@@ -6464,24 +7505,29 @@ def selfcheck() -> None:
+                                 ("ludlow", "quarantine")):
+         with tempfile.TemporaryDirectory() as td:
+             work = _adopter_copy(org, Path(td))
++            historical = Path(td) / "platform-historical-deny"
++            shutil.copytree(parent_trees["platform"], historical, ignore=shutil.ignore_patterns(".git", ".work", "__pycache__"))
++            _write_versions_yaml(historical, [{"version": "5.0.0"}])
++            old_pin = work / "gitops/platform/platform-pin.yaml"
++            old_pin.write_text(old_pin.read_text().replace(live_v, "5.0.0"))
+             _with_restate(work, [{
+-                "name": "posture-trust-boundary", "version": live_v, "action": "Audit",
++                "name": "posture-trust-boundary", "version": "5.0.0", "action": "Audit",
+                 "scenario": scenario_rel, "why": "needs CAP_NET_RAW; cannot meet condition C",
+             }])
+-            document, files = compose(work, parent_trees)
++            document, files = compose(work, {**parent_trees, "platform": historical})
+             # a caged inability adds no refusal of its own
+             assert document["outcome"] == "composed", document
+             _assert_only_known_dangling(document["refusals"], f"weaker restatement ({org})")
+             r = next(r for r in document["restatements"]
+-                     if r["rule"] == f"posture/posture-trust-boundary@{live_v}")
++                     if r["rule"] == f"posture/posture-trust-boundary@5.0.0")
+             assert r["inherited_action"] == "Deny" and r["restated_action"] == "Audit"
+             assert r["outcome"] == "caged", r
+             cage_entry = next(c for c in document["cages"]
+-                               if c["rule"] == f"posture/posture-trust-boundary@{live_v}")
++                               if c["rule"] == f"posture/posture-trust-boundary@5.0.0")
+             assert cage_entry["party"] == org
+             tiers[org] = cage_entry["tier"]
+             assert cage_entry["tier"] == expected_tier, (org, cage_entry)
+-            rendered_doc = yaml.safe_load(files[f"composed/policies/v{live_v}/posture-trust-boundary.yaml"])
++            rendered_doc = yaml.safe_load(files["composed/policies/v5.0.0/posture-trust-boundary.yaml"])
+             assert rendered_doc["spec"]["validationActions"] == ["Deny"], rendered_doc  # stays inherited
+             last_files = files
+     print(f"OK cages[]: a weaker restatement is caged against each party's own appetite band, "
+@@ -8339,8 +9385,30 @@ def _assert_only_the_moved_feed_changed(before: dict[str, str], after: dict[str,
+         {p for p in before if not p.startswith(vendored)}, (sorted(after), sorted(before))
+ 
+ 
+-def _write_versions_yaml(root: Path, versions: list[dict]) -> None:
++def _write_engine_declaration(work: Path, version: str = FIXTURE_ENGINE) -> None:
++    """A `gitops/engine/kyverno.yaml` declaring `version`, with the figures of that version's row
++    in this platform's engine table (never invented). A version the table does not list fails
++    here, loudly: a fixture must name an engine the estate can install."""
++    reader = _engine_module("engine_declaration_reader", ENGINE_DECLARATION_READER)
++    doc = reader.from_table(version)
++    path = Path(work).joinpath(*ENGINE_DECLARATION)
++    path.parent.mkdir(parents=True, exist_ok=True)
++    path.write_text(yaml.safe_dump(doc, sort_keys=False))
++
++
++def _write_versions_yaml(root: Path, versions: list[dict],
++                         supported: dict | None = FIXTURE_SUPPORT) -> None:
++    """A fixture array. Each element that names no `tested_engines` supports the fixture engine,
++    and the fixture machinery declares the same unless a `machinery.yaml` is already there
++    (eco-system ticket 148). `supported=None` writes the elements as given and no declaration."""
+     (root / "distribution").mkdir(parents=True, exist_ok=True)
++    if supported is not None:
++        versions = [v if "tested_engines" in v else {**v, "tested_engines": copy.deepcopy(supported)}
++                    for v in versions]
++        machinery = Path(root).joinpath(*MACHINERY_DECLARATION)
++        if not machinery.exists():
++            machinery.write_text(yaml.safe_dump({"tested_engines": copy.deepcopy(supported)},
++                                                sort_keys=False))
+     doc = {
+         "apiVersion": "fluxcd.controlplane.io/v1", "kind": "ResourceSet",
+         "metadata": {"name": "policy-versions", "namespace": "flux-system"},
+diff --git a/party/README.md b/party/README.md
+index 105599a..e34f2ce 100644
+--- a/party/README.md
++++ b/party/README.md
+@@ -50,6 +50,12 @@ overlay:
+ the four floor tiers and the two declarable pricing thresholds — `party_artefact.py` reads its
+ enums from that file rather than re-declaring them.
+ 
++An `overlay.restate` entry may carry `subject: namespace/pod-name` to bind its own priced
++inability to a declared Pod (ticket 155). Both names must be Kubernetes DNS names. The existing
++`name`, `version`, `action`, scenario and inability declaration still determine that decision;
++the subject adds no price. Composition requires one published control mapping for that check
++and emits the Cage decision's OSCAL risk. Without a subject, no workload risk is invented.
++
+ `appetite.pricing_threshold` (eco-system ticket 141, ADR-0032) is the weakest evidence grade on
+ the twin's ladder this party prices on. Absent means the estate default, grade 2 (repeated
+ historical co-movement); `3` declares that the party prices on published work not observed here,
+diff --git a/party/party_artefact.py b/party/party_artefact.py
+index 5de98e5..78f3c36 100644
+--- a/party/party_artefact.py
++++ b/party/party_artefact.py
+@@ -59,6 +59,7 @@ from __future__ import annotations
+ 
+ import argparse
+ import json
++import re
+ import sys
+ import tempfile
+ from datetime import date
+@@ -260,6 +261,16 @@ def validate_schema(doc: object, schema: dict | None = None) -> list[str]:
+                 errors.append(f"overlay missing {field!r}")
+             elif not isinstance(overlay[field], list):
+                 errors.append(f"overlay.{field} must be a list")
++        subject_rule = schema['properties']['overlay']['properties']['restate']['items']['properties']['subject']
++        for i, entry in enumerate(overlay.get('restate') if isinstance(overlay.get('restate'), list) else []):
++            if not isinstance(entry, dict):
++                errors.append(f"overlay.restate[{i}] must be a mapping")
++            elif 'subject' in entry:
++                subject = entry['subject']
++                if (not isinstance(subject, str) or len(subject) > subject_rule['maxLength']
++                        or re.fullmatch(subject_rule['pattern'], subject) is None
++                        or len(subject.split('/')[-1]) > 253):
++                    errors.append(f"overlay.restate[{i}].subject must name one namespace/Pod with valid DNS names")
+         if "controls" in overlay and not isinstance(overlay["controls"], list):
+             errors.append("overlay.controls must be a list")
+         floors = _floor_enum(schema)
+diff --git a/party/schema.json b/party/schema.json
+index ba4f57c..2d48594 100644
+--- a/party/schema.json
++++ b/party/schema.json
+@@ -143,7 +143,18 @@
+         },
+         "restate": {
+           "type": "array",
+-          "description": "An inherited ValidatingPolicy and the action this party wants for it. Stricter is accepted; weaker is a declared inability, caged and priced, never an override."
++          "description": "An inherited ValidatingPolicy and the action this party wants for it. Stricter is accepted; weaker is a declared inability, caged and priced, never an override. An optional subject explicitly binds that priced inability to one declared Pod for the OSCAL risk join; it creates no exemption and no additional price.",
++          "items": {
++            "type": "object",
++            "properties": {
++              "subject": {
++                "type": "string",
++                "maxLength": 317,
++                "pattern": "^[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?/[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?(?:\\.[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?)*$",
++                "description": "Exact namespace/Pod-name identity, with a namespace of at most 63 characters and Pod DNS name of at most 253. Composition verifies the declared Pod and derives its control from the implementation publisher's Check_Id mapping."
++              }
++            }
++          }
+         },
+         "controls": {
+           "type": "array",
+diff --git a/wargamer/inventory.py b/wargamer/inventory.py
+new file mode 100644
+index 0000000..5a27189
+--- /dev/null
++++ b/wargamer/inventory.py
+@@ -0,0 +1,243 @@
++#!/usr/bin/env python3
++"""Native digest-pinned image inventory and bounded PR proposer (ADR-0035).
++
++scan is read-only and writes its requested output. propose writes a single
++signed dedupe branch and opens/updates its PR; it never merges. All dependencies
++run through the independently authenticated platform tools checkout.
++"""
++from __future__ import annotations
++import argparse
++import hashlib
++import json
++import os
++import posixpath
++import re
++import subprocess
++import sys
++import tempfile
++from pathlib import Path
++from typing import Any
++import yaml
++
++HERE = Path(__file__).resolve().parent
++PINNED_VERSION = '0.69.3'
++INVENTORY_PATH = 'inventory/images.json'
++DIGEST = re.compile(r'^.+@sha256:[0-9a-f]{64}$')
++
++class InstrumentFault(ValueError):
++    pass
++
++def served_images(adopter: Path, *, repository: Path | None = None) -> list[str]:
++    """Read the apps source's exact tag+commit and Kustomization path, never HEAD.
++
++    A checker may archive the declaration tree and explicitly supply its original
++    repository for immutable tag objects. A snapshot without that context refuses.
++    """
++    repository = (repository or adopter).resolve()
++    def git(*args: str) -> str:
++        try:
++            return subprocess.run(['git', '-C', str(repository), *args], check=True,
++                                  capture_output=True, text=True, timeout=30).stdout.strip()
++        except (OSError, subprocess.SubprocessError) as exc:
++            raise InstrumentFault('apps source or pinned tree is unreadable: ' + str(exc)) from exc
++    if git('rev-parse', '--show-toplevel') != str(repository):
++        raise InstrumentFault('apps source needs its own repository, not an ancestor checkout')
++    try:
++        declarations = list(yaml.safe_load_all((adopter/'gitops/flux-system/gotk-sync.yaml').read_text()))
++        sources = [d for d in declarations if isinstance(d, dict) and d.get('kind') == 'GitRepository']
++        if len(sources) != 1:
++            raise InstrumentFault('apps source must declare exactly one GitRepository')
++        source = sources[0]
++        pin = source['spec']['ref']
++        tag, commit = pin['tag'], pin['commit']
++        if not isinstance(tag, str) or not isinstance(commit, str) or not re.fullmatch(r'[0-9a-f]{40}', commit):
++            raise InstrumentFault('apps source must pin a tag and full commit')
++        git('check-ref-format', 'refs/tags/'+tag)
++        if git('rev-parse', '--verify', 'refs/tags/'+tag+'^{commit}') != commit:
++            raise InstrumentFault('apps source tag and commit disagree')
++        syncs = [d for d in declarations if isinstance(d, dict) and d.get('kind') == 'Kustomization'
++                 and d.get('spec', {}).get('sourceRef', {}).get('name') == source['metadata']['name']
++                 and d.get('spec', {}).get('sourceRef', {}).get('kind', 'GitRepository') == 'GitRepository']
++        if len(syncs) != 1:
++            raise InstrumentFault('apps source must have exactly one matching Kustomization')
++        root = syncs[0]['spec']['path']
++        if not isinstance(root, str) or root.startswith('/') or '..' in root.split('/'):
++            raise InstrumentFault('apps source Kustomization path leaves its pinned tree')
++    except (OSError, KeyError, TypeError, yaml.YAMLError) as exc:
++        raise InstrumentFault('apps source pin or Kustomization is unreadable: ' + str(exc)) from exc
++    images: set[str] = set()
++    seen: set[str] = set()
++    def containers(node: Any) -> None:
++        if isinstance(node, dict):
++            for key, value in node.items():
++                if key in ('containers', 'initContainers', 'ephemeralContainers'):
++                    if not isinstance(value, list):
++                        raise InstrumentFault('served container list is malformed')
++                    for container in value:
++                        image = container.get('image') if isinstance(container, dict) else None
++                        if not isinstance(image, str) or not DIGEST.fullmatch(image):
++                            raise InstrumentFault('every served image must be pinned by sha256 digest: ' + str(image))
++                        images.add(image)
++                else:
++                    containers(value)
++        elif isinstance(node, list):
++            for item in node:
++                containers(item)
++    def visit(target: str) -> None:
++        target = posixpath.normpath(target)
++        if target.startswith('/') or target == '..' or target.startswith('../'):
++            raise InstrumentFault('apps resource leaves its pinned tree')
++        if target in seen:
++            return
++        seen.add(target)
++        if git('cat-file', '-t', commit+':'+target) == 'tree':
++            target = posixpath.join(target, 'kustomization.yaml')
++        entry = git('ls-tree', commit, '--', target)
++        if not entry.startswith(('100644 blob ', '100755 blob ')):
++            raise InstrumentFault('apps resource is not a pinned manifest file: ' + target)
++        for doc in yaml.safe_load_all(git('show', commit+':'+target)):
++            if not isinstance(doc, dict):
++                continue
++            if doc.get('kind') == 'Kustomization' and 'resources' in doc:
++                if any(key in doc for key in ('images', 'patches', 'patchesStrategicMerge', 'replacements')):
++                    raise InstrumentFault('served image transforms require rendered inventory input; refusing an unrendered guess')
++                for entry in doc['resources']:
++                    if not isinstance(entry, str):
++                        raise InstrumentFault('apps resource path is malformed')
++                    visit(posixpath.join(posixpath.dirname(target), entry))
++            else:
++                containers(doc)
++    visit(root)
++    if not images:
++        raise InstrumentFault('served manifests name no image to scan')
++    return sorted(images)
++
++def trim(image: str, report: dict, version: dict) -> dict:
++    if str(version.get('Version')) != PINNED_VERSION:
++        raise InstrumentFault('scanner version differs from pinned Trivy ' + PINNED_VERSION)
++    database = (version.get('VulnerabilityDB') or {}).get('UpdatedAt')
++    if not database:
++        raise InstrumentFault('Trivy reports no vulnerability database date')
++    observed = (report.get('Metadata') or {}).get('RepoDigests') or []
++    expected = image.split('@')[-1]
++    if observed and not any(str(item).endswith('@' + expected) for item in observed):
++        raise InstrumentFault('Trivy scanned a digest different from the requested image')
++    rows: dict[tuple[str, ...], dict] = {}
++    for result in report.get('Results') or []:
++        for vulnerability in result.get('Vulnerabilities') or []:
++            row = {'id': vulnerability['VulnerabilityID'], 'package': vulnerability['PkgName'],
++                   'installed_version': vulnerability['InstalledVersion'],
++                   'fixed_version': vulnerability.get('FixedVersion') or '',
++                   'severity': vulnerability['Severity']}
++            rows[tuple(str(row[key]) for key in row)] = row
++    return {'image': image, 'digest': expected, 'scanner_version': PINNED_VERSION,
++            'database_date': database, 'vulnerabilities': [rows[key] for key in sorted(rows)]}
++
++def scan(adopter: Path, scanner: str = 'trivy') -> dict:
++    rows = []
++    for image in served_images(adopter):
++        report = subprocess.run([scanner, 'image', '--timeout', '10m', '--scanners', 'vuln',
++                                 '--format', 'json', '--quiet', image], capture_output=True, text=True, check=True)
++        version = subprocess.run([scanner, 'version', '--format', 'json'], capture_output=True, text=True, check=True)
++        rows.append(trim(image, json.loads(report.stdout), json.loads(version.stdout)))
++    return {'schema_version': '1.0.0', 'images': rows}
++
++def id_sets(inventory: dict) -> dict[str, list[str]]:
++    return {row['image']: sorted({v['id'] for v in row['vulnerabilities']}) for row in inventory.get('images', [])}
++
++def validate(adopter: Path, inventory: dict, *, repository: Path | None = None) -> None:
++    sys.path.insert(0, str(HERE.parent / 'feeds'))
++    from to_fair_scenario import inventory_ids
++    inventory_ids(inventory)
++    if sorted(row['image'] for row in inventory['images']) != served_images(adopter, repository=repository):
++        raise InstrumentFault('committed inventory does not match every served image digest')
++
++def propose(adopter: Path, candidate: dict, org: str, *, base: str = 'main', repo: str | None = None,
++            dry_run: bool = False, prior_proposals: list[dict] | None = None) -> list[dict]:
++    sys.path.insert(0, str(HERE)); sys.path.insert(0, str(HERE.parent / 'honesty'))
++    import proposer_bounds, rejection_ledger
++    committed = adopter / INVENTORY_PATH
++    old = json.loads(committed.read_text()) if committed.is_file() else {'images': []}
++    if id_sets(old) == id_sets(candidate):
++        return []
++    shape = {'curve_hash': 'sha256:' + hashlib.sha256(json.dumps(id_sets(candidate), sort_keys=True).encode()).hexdigest(),
++             'policy_version': 'inventory-1.0.0'}
++    row = {'org': org, 'kind': 'inventory', 'control': 'served-images', 'drift': True,
++           'deployed': id_sets(old), 'implied': id_sets(candidate),
++           'policy_file': INVENTORY_PATH, 'evidence': 'digest-pinned Trivy ' + PINNED_VERSION + ' scan'}
++    key = rejection_ledger.key(org, 'inventory', 'served-images')
++    ledger, note = rejection_ledger.derive(repo, {key: shape})
++    print(note, file=sys.stderr)
++    # This clock shares the existing per-run allowance with tier proposals.
++    already = sum(isinstance(p.get('landed'), dict) and p['landed'].get('action') in ('created', 'updated') for p in (prior_proposals or []))
++    if already >= proposer_bounds.RATE_LIMIT:
++        return [{'proposal_kind': 'inventory', 'held': 'defer-rate-limit', 'key': key}]
++    disposition = proposer_bounds.bound([row], ledger)[0]
++    p = disposition['proposal']
++    if not p:
++        return [{'proposal_kind': 'inventory', **disposition}]
++    p['proposal_kind'] = 'inventory'
++    p['ledger_marker'] = rejection_ledger.marker(key, shape['curve_hash'], shape['policy_version'])
++    if dry_run:
++        return [{**p, 'landed': 'dry-run'}]
++    def git(*args: str) -> subprocess.CompletedProcess:
++        return subprocess.run(['git', '-C', str(adopter), *args], text=True, capture_output=True, check=True)
++    git('checkout', '-B', p['branch'], 'origin/' + base)
++    try:
++        path = adopter / INVENTORY_PATH; path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_text(json.dumps(candidate, indent=2, sort_keys=True) + '\n')
++        # Native composer invocation carries provenance for portable offline replay.
++        sys.path.insert(0, str(HERE.parent / 'compose'))
++        import composition
++        party = yaml.safe_load((adopter / 'party.yaml').read_text())
++        document, files = composition.compose(adopter, composition._default_parent_trees(party, adopter.parent))
++        if document['outcome'] != 'composed':
++            raise InstrumentFault('inventory proposal composition refused: ' + json.dumps(document.get('refusals')))
++        for rel, body in files.items():
++            out = adopter / rel; out.parent.mkdir(parents=True, exist_ok=True); out.write_text(body)
++        git('add', '--', INVENTORY_PATH, 'composed')
++        git('commit', '-m', p['title'])
++        git('push', '--force-with-lease', 'origin', p['branch'])
++        gh = ['gh', 'pr']; repo_args = ['--repo', repo] if repo else []
++        listed = subprocess.run(gh + ['list', '--head', p['branch'], '--state', 'open', '--json', 'number', '-q', '.[0].number'] + repo_args, text=True, capture_output=True, check=True)
++        number = listed.stdout.strip()
++        body = 'Updates only the digest-pinned served image inventory when an image CVE id set changes. Scanner/database metadata changes alone open no PR. Carries the composed re-render through the independently pinned, verified platform tools tag. Human review and the ordinary compose gate remain required.\n\n' + p['ledger_marker']
++        with tempfile.NamedTemporaryFile('w', suffix='.md') as fh:
++            fh.write(body); fh.flush()
++            args = ['edit', number] if number else ['create', '--head', p['branch'], '--base', base]
++            result = subprocess.run(gh + args + ['--title', p['title'], '--body-file', fh.name] + repo_args, text=True, capture_output=True, check=True)
++        return [{**p, 'landed': {'action': 'updated' if number else 'created', 'number': number, 'url': result.stdout.strip()}}]
++    finally:
++        git('checkout', base)
++
++def main() -> int:
++    ap = argparse.ArgumentParser(description=__doc__)
++    ap.add_argument('command', choices=('scan', 'propose', 'check'))
++    ap.add_argument('--adopter-dir', type=Path, required=True)
++    ap.add_argument('--scanner', default='trivy'); ap.add_argument('--out', type=Path)
++    ap.add_argument('--candidate', type=Path); ap.add_argument('--prior-proposals', type=Path)
++    ap.add_argument('--org'); ap.add_argument('--repo', default=os.environ.get('GITHUB_REPOSITORY'))
++    ap.add_argument('--base', default='main'); ap.add_argument('--dry-run', action='store_true')
++    args = ap.parse_args()
++    try:
++        if args.command == 'check':
++            validate(args.adopter_dir, json.loads((args.adopter_dir / INVENTORY_PATH).read_text())); print('PASS: inventory matches all served image digests'); return 0
++        if args.command == 'scan':
++            output = scan(args.adopter_dir, args.scanner)
++        else:
++            if not args.candidate or not args.org:
++                ap.error('propose requires --candidate and --org')
++            output = propose(args.adopter_dir, json.loads(args.candidate.read_text()), args.org,
++                             base=args.base, repo=args.repo, dry_run=args.dry_run,
++                             prior_proposals=json.loads(args.prior_proposals.read_text()) if args.prior_proposals else [])
++        text = json.dumps(output, indent=2, sort_keys=True) + '\n'
++        if args.out:
++            args.out.parent.mkdir(parents=True, exist_ok=True); args.out.write_text(text)
++        else:
++            print(text, end='')
++        return 0
++    except (InstrumentFault, OSError, ValueError, subprocess.SubprocessError) as exc:
++        print('missing instrument: inventory: ' + str(exc), file=sys.stderr); return 2
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+diff --git a/wargamer/test_inventory.py b/wargamer/test_inventory.py
+new file mode 100644
+index 0000000..b70d7eb
+--- /dev/null
++++ b/wargamer/test_inventory.py
+@@ -0,0 +1,117 @@
++"""Public scan/proposal seams refuse unknown images and ignore metadata-only moves."""
++import importlib.util
++import json
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import pytest
++import yaml
++SPEC = importlib.util.spec_from_file_location('inventory', Path(__file__).with_name('inventory.py'))
++m = importlib.util.module_from_spec(SPEC); SPEC.loader.exec_module(m)
++
++def git(repo, *args):
++    return subprocess.run(['git', '-C', str(repo), '-c', 'commit.gpgsign=false', '-c', 'tag.gpgsign=false',
++                           '-c', 'core.hooksPath=/dev/null',
++                           '-c', 'user.name=Inventory fixture', '-c', 'user.email=inventory@example.invalid',
++                           *args], check=True, capture_output=True, text=True).stdout.strip()
++
++def pin(repo, tag, commit, path='gitops/apps'):
++    source = repo/'gitops/flux-system/gotk-sync.yaml'
++    source.parent.mkdir(parents=True, exist_ok=True)
++    source.write_text(yaml.safe_dump_all([
++        {'kind': 'GitRepository', 'metadata': {'name': 'fixture'},
++         'spec': {'ref': {'tag': tag, 'commit': commit}}},
++        {'kind': 'Kustomization', 'spec': {'sourceRef': {'kind': 'GitRepository', 'name': 'fixture'},
++                                        'path': './'+path}}]))
++
++def adopter(tmp_path, image, path='gitops/apps'):
++    path=tmp_path/path;path.mkdir(parents=True)
++    (path/'kustomization.yaml').write_text('kind: Kustomization\nresources: [pods.yaml]\n')
++    (path/'pods.yaml').write_text('kind: Pod\nspec:\n  initContainers:\n    - name: init\n      image: '+image+'\n  containers:\n    - name: app\n      image: '+image+'\n')
++    git(tmp_path, 'init', '-q')
++    git(tmp_path, 'add', '.')
++    git(tmp_path, 'commit', '-qm', 'Declared apps source fixture')
++    commit=git(tmp_path, 'rev-parse', 'HEAD')
++    git(tmp_path, 'tag', 'v1.0.0')
++    pin(tmp_path, 'v1.0.0', commit, str(path.relative_to(tmp_path)))
++    return tmp_path
++
++def test_every_container_is_scanned_without_a_policy_label(tmp_path):
++    image='example@sha256:'+'a'*64
++    assert m.served_images(adopter(tmp_path,image)) == [image]
++
++def test_the_served_tag_rejects_an_unpinned_image(tmp_path):
++    adopter(tmp_path, 'nginx')
++    with pytest.raises(m.InstrumentFault,match='digest'):
++        m.served_images(tmp_path)
++
++def test_head_cannot_replace_the_digest_at_the_apps_pin(tmp_path):
++    served='example@sha256:'+'a'*64
++    repo=adopter(tmp_path, served)
++    (repo/'gitops/apps/pods.yaml').write_text('kind: Pod\nspec:\n  containers:\n    - name: future\n      image: example@sha256:'+'b'*64+'\n')
++    git(repo, 'add', '.')
++    git(repo, 'commit', '-qm', 'Candidate images are not served')
++    assert m.served_images(repo) == [served]
++
++def test_the_apps_kustomization_declares_the_served_path(tmp_path):
++    image='example@sha256:'+'a'*64
++    repo=adopter(tmp_path, image, path='deployments/actual-apps')
++    shadow=repo/'gitops/apps';shadow.mkdir()
++    (shadow/'kustomization.yaml').write_text('kind: Kustomization\nresources: [unserved.yaml]\n')
++    (shadow/'unserved.yaml').write_text('kind: Pod\nspec:\n  containers: [{name: ignored, image: nginx}]\n')
++    assert m.served_images(repo) == [image]
++
++@pytest.mark.parametrize('fault', ['missing-tag', 'mismatched-commit', 'missing-commit', 'unsafe-path'])
++def test_unreadable_or_inconsistent_apps_pins_refuse(tmp_path, fault):
++    repo=adopter(tmp_path, 'example@sha256:'+'a'*64)
++    commit=git(repo, 'rev-parse', 'HEAD')
++    if fault=='missing-tag':
++        git(repo, 'tag', '-d', 'v1.0.0')
++    elif fault=='mismatched-commit':
++        pin(repo, 'v1.0.0', 'b'*40)
++    elif fault=='missing-commit':
++        pin(repo, 'v1.0.0', '')
++    else:
++        pin(repo, 'v1.0.0', commit, '../outside')
++    with pytest.raises(m.InstrumentFault, match='apps'):
++        m.served_images(repo)
++
++def test_checker_snapshot_needs_explicit_pinned_repository_objects(tmp_path):
++    image='example@sha256:'+'a'*64
++    repo=adopter(tmp_path/'repo', image)
++    snapshot=tmp_path/'snapshot'
++    shutil.copytree(repo, snapshot, ignore=shutil.ignore_patterns('.git'))
++    assert m.served_images(snapshot, repository=repo) == [image]
++    with pytest.raises(m.InstrumentFault, match='apps'):
++        m.served_images(snapshot)
++
++def test_trim_records_database_and_sorted_findings_and_refuses_wrong_scanner():
++    image='example@sha256:'+'a'*64
++    report={'Metadata':{'RepoDigests':[image]},'Results':[{'Vulnerabilities':[{'VulnerabilityID':'CVE-B','PkgName':'b','InstalledVersion':'1','Severity':'HIGH'}, {'VulnerabilityID':'CVE-A','PkgName':'a','InstalledVersion':'1','FixedVersion':'2','Severity':'LOW'}]}]}
++    version={'Version':'0.69.3','VulnerabilityDB':{'UpdatedAt':'2026-10-03T00:00:00Z'}}
++    got=m.trim(image,report,version)
++    assert [v['id'] for v in got['vulnerabilities']] == ['CVE-A','CVE-B']
++    assert got['digest']==image.split('@')[1] and got['database_date']==version['VulnerabilityDB']['UpdatedAt']
++    with pytest.raises(m.InstrumentFault,match='version'):
++        m.trim(image,report,{**version,'Version':'latest'})
++    with pytest.raises(m.InstrumentFault,match='digest'):
++        m.trim(image,{**report,'Metadata':{'RepoDigests':['example@sha256:'+'b'*64]}},version)
++
++def test_metadata_only_scan_opens_no_proposal(tmp_path):
++    old={'schema_version':'1.0.0','images':[{'image':'example@sha256:'+'a'*64,'database_date':'yesterday','vulnerabilities':[{'id':'CVE-A'}]}]}
++    path=tmp_path/'inventory';path.mkdir();(path/'images.json').write_text(json.dumps(old))
++    newer={**old,'images':[{**old['images'][0],'database_date':'today','scanner_version':'updated'}]}
++    assert m.propose(tmp_path,newer,'fixture',dry_run=True)==[]
++
++def test_inventory_uses_proposer_key_and_rejection_bounds(tmp_path, monkeypatch):
++    sys.path.insert(0,str(Path(__file__).parents[1]/'honesty'));sys.path.insert(0,str(Path(__file__).parent))
++    import rejection_ledger
++    candidate={'images':[{'image':'example@sha256:'+'a'*64,'vulnerabilities':[{'id':'CVE-A'}]}]}
++    monkeypatch.setattr(rejection_ledger,'derive',lambda repo,today: ({'reject_suppress':1,'rejections':{'fixture/inventory/served-images':{'count':1}}},'derived fixture'))
++    got=m.propose(tmp_path,candidate,'fixture',dry_run=True)
++    assert got[0]['disposition']=='suppress-learned-rejection'
++    monkeypatch.setattr(rejection_ledger,'derive',lambda repo,today: ({'rejections':{}},'derived fixture'))
++    got=m.propose(tmp_path,candidate,'fixture',dry_run=True)
++    assert got[0]['branch']=='wargamer/retune-fixture-served-images' and got[0]['merged'] is False
++    assert 'key="fixture/inventory/served-images"' in got[0]['ledger_marker']
+diff --git a/compose/test_workload_risk.py b/compose/test_workload_risk.py
+new file mode 100644
+index 0000000..e2e64be
+--- /dev/null
++++ b/compose/test_workload_risk.py
+@@ -0,0 +1,168 @@
++"""An explicitly bound restatement carries its real Cage decision into OSCAL."""
++import importlib.util
++import json
++from pathlib import Path
++import shutil
++import sys
++import tempfile
++from types import SimpleNamespace
++import unittest
++from unittest.mock import patch
++
++import yaml
++
++import composition as ct
++
++
++class WorkloadRisk(unittest.TestCase):
++    def setUp(self):
++        temporary = tempfile.TemporaryDirectory()
++        self.addCleanup(temporary.cleanup)
++        root = Path(temporary.name)
++        self.adopter = root/'adopter'
++        self.platform = root/'platform'
++        self.trees = {'fixture-platform': self.platform, 'fixture-nist': root/'nist'}
++        ct._write_fixture_catalog(self.trees['fixture-nist'])
++        ct._write_fixture_platform(self.platform, ct.PLATFORM_DIR, [('aa-2', 'member-a')])
++        ct._write_fixture_adopter(self.adopter, 'SMALL')
++        member = self.platform/'distribution/policies/v1.0.0/member-a.yaml'
++        member.write_text(member.read_text().replace('Audit', 'Deny'))
++        apps = self.adopter/'gitops/apps'
++        (apps/'pod.yaml').write_text(yaml.safe_dump({'apiVersion': 'v1', 'kind': 'Pod',
++            'metadata': {'name': 'legacy-till', 'namespace': 'shop',
++                         'labels': {'policy-as-versioned.dev/policy-version': '1.0.0'}},
++            'spec': {'containers': [{'name': 'app', 'image': 'fixture'}]}}))
++        self.restatement = {'name': 'member-a', 'version': '1.0.0', 'action': 'Audit',
++            'scenario': 'policy/scenarios/driftwood-root-residual.json',
++            'why': 'Fixture root inability, priced by the published scenario',
++            'subject': 'shop/legacy-till'}
++
++    def compose(self, **changes):
++        party = self.adopter/'party.yaml'
++        declaration = yaml.safe_load(party.read_text())
++        declaration['overlay']['restate'] = [{**self.restatement, **changes}]
++        party.write_text(yaml.safe_dump(declaration))
++        return ct.compose(self.adopter, self.trees)
++
++    def test_bound_restated_workload_emits_a_joinable_risk_from_its_actual_decision(self):
++        document, rendered = self.compose()
++        self.assertEqual(document['outcome'], 'composed', document)
++        entry, = document['cages']
++        risk = entry['oscal_risk']
++        decision = entry['decision']
++        self.assertEqual(decision['org'], 'fixture-adopter14')
++        self.assertEqual(decision['tcor']['residual'], entry['residual'])
++        self.assertEqual(risk, ct._cage_engine().oscal_risk(decision,
++            subject='shop/legacy-till', policy='member-a', control='aa-2'))
++        self.assertEqual(entry['binding'], {'subject': 'shop/legacy-till', 'policy': 'member-a', 'control': 'aa-2'})
++        self.assertNotIn('risks', document, 'the same money stays on the existing cage line')
++        spec = importlib.util.spec_from_file_location('priced_workload_converter', ct.PLATFORM_DIR/'oscal/result2oscal.py')
++        converter = importlib.util.module_from_spec(spec)
++        spec.loader.exec_module(converter)
++        component = json.loads((self.platform/'oscal/component-definition.json').read_text())
++        assessment = converter.convert([{'scope': {'kind': 'Pod', 'name': 'legacy-till', 'namespace': 'shop'},
++            'results': [{'policy': 'member-a-1-0-0', 'result': 'fail'}]}], component)
++        emitted = {observation['uuid'] for result in assessment['assessment-results']['results']
++                   for observation in result['observations']}
++        self.assertIn(risk['related-observations'][0]['observation-uuid'], emitted)
++        for relative, content in rendered.items():
++            destination = self.adopter/relative
++            destination.parent.mkdir(parents=True, exist_ok=True)
++            destination.write_text(content)
++        self.assertEqual(ct.verify(self.adopter, self.trees), (True, []))
++
++    def test_unbound_inability_keeps_its_decision_without_inventing_a_pod_risk(self):
++        del self.restatement['subject']
++        document, _ = self.compose()
++        self.assertEqual(document['outcome'], 'composed', document)
++        entry, = document['cages']
++        self.assertEqual(entry['decision']['action'], 'Cage')
++        self.assertNotIn('oscal_risk', entry)
++
++    def test_invalid_or_undeclared_subject_refuses(self):
++        for subject in ('shop/not-declared', 'Upper/pod', '../legacy-till', 'shop/', 'shop/pod/extra'):
++            with self.subTest(subject=subject):
++                document, _ = self.compose(subject=subject)
++                self.assertEqual(document['outcome'], 'refused', document)
++                self.assertIn('subject', str(document))
++
++    def test_a_binding_needs_one_published_policy_to_control_mapping(self):
++        for claims in ([], [('aa-1', 'member-a'), ('aa-2', 'member-a')]):
++            with self.subTest(claims=claims):
++                ct._write_component_definition(self.platform/'oscal/component-definition.json', claims)
++                document, _ = self.compose()
++                self.assertEqual(document['outcome'], 'refused', document)
++                self.assertIn('mapping', str(document))
++
++    def test_a_stricter_statement_cannot_claim_a_retained_workload_risk(self):
++        document, _ = self.compose(action='Deny')
++        self.assertEqual(document['outcome'], 'refused', document)
++        self.assertIn('binding', str(document))
++
++    def test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine(self):
++        document, _ = self.compose()
++        for relative in ('oscal/result2oscal.py', 'graded/cage.py'):
++            destination = self.platform/relative
++            destination.parent.mkdir(parents=True, exist_ok=True)
++            shutil.copy(ct.PLATFORM_DIR/relative, destination)
++        entry, = document['cages']
++        report = {'scope': {'kind': 'Pod', 'name': 'legacy-till', 'namespace': 'shop'},
++                  'results': [{'policy': 'member-a-1-0-0', 'result': 'fail'}]}
++        pod = {'metadata': {'name': 'legacy-till', 'namespace': 'shop', 'labels': {
++            'policy-as-versioned.dev/policy-version': '1.0.0',
++            'posture.acme.io/caged': 'true', 'posture.acme.io/tier': entry['tier']}}}
++        class API:
++            reason = ''
++            def get(self, *arguments):
++                if arguments[0] == '-n':
++                    return pod
++                return {'items': [json.loads(json.dumps(report))] if arguments[1].startswith('policyreports.') else []}
++        sampler = SimpleNamespace(Cluster=lambda _: API(), now=lambda: '2026-10-03T00:00:00Z',
++            rc=SimpleNamespace(pinned_tag=lambda: 'v1.0.0', render=lambda _: {
++                'member': {'kind': 'ValidatingPolicy', 'metadata': {'name': 'member-a-1-0-0'}}}),
++            _git_output=lambda *_: json.dumps(document))
++        ambient = SimpleNamespace(NS=ct._cage_engine().NS, observation_uuid=lambda *_: 'wrong-ambient-engine',
++                                  oscal_risk=lambda *_args, **_kwargs: {})
++        for party in ('driftwood', 'tuppence', 'ludlow'):
++            with self.subTest(party=party):
++                spec = importlib.util.spec_from_file_location('workload_lane_'+party,
++                    ct.PLATFORM_DIR.parent/party/'drift/oscal_lane.py')
++                lane = importlib.util.module_from_spec(spec)
++                spec.loader.exec_module(lane)
++                original_load = lane.load
++                def collect():
++                    with patch.object(lane, 'load', side_effect=lambda path, name:
++                            sampler if name == 'five_facts_instrument' else original_load(path, name)), \
++                            patch.dict(sys.modules, {'cage': ambient}):
++                        return lane.collect('fixture', self.platform)
++                row = collect()
++                self.assertEqual(row['status'], 'observed', row)
++                self.assertEqual(row['risk_validation_errors'], [], row)
++                self.assertEqual(row['missing_risk_observations'], [], row)
++                self.assertEqual(row['risks'], [entry['oscal_risk']])
++                original = json.loads(json.dumps(entry))
++                for fault in ('unbound', 'wrong-tier', 'wrong-version', 'wrong-price', 'wrong-rule'):
++                    with self.subTest(fault=fault):
++                        if fault == 'unbound':
++                            entry.pop('binding')
++                            entry.pop('oscal_risk')
++                        elif fault == 'wrong-tier':
++                            pod['metadata']['labels']['posture.acme.io/tier'] = 'wrong-tier'
++                        elif fault == 'wrong-version':
++                            pod['metadata']['labels']['policy-as-versioned.dev/policy-version'] = '2.0.0'
++                        elif fault == 'wrong-price':
++                            entry['oscal_risk']['characterizations'][0]['facets'][-1]['value'] = '0'
++                        else:
++                            entry['rule'] = 'fam-a/unrelated-check@1.0.0'
++                        row = collect()
++                        self.assertEqual(row['status'], 'observed', row)
++                        self.assertTrue(row['missing_risk_observations'], row)
++                        self.assertEqual(row['risks'], [], row)
++                        entry.clear()
++                        entry.update(json.loads(json.dumps(original)))
++                        pod['metadata']['labels']['posture.acme.io/tier'] = original['tier']
++                        pod['metadata']['labels']['policy-as-versioned.dev/policy-version'] = '1.0.0'
++
++
++if __name__ == '__main__':
++    unittest.main()

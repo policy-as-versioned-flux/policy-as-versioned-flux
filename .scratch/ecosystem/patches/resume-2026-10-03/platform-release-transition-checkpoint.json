@@ -1,0 +1,46 @@
+{
+  "scope": [
+    "graded/policies/cage-tier.yaml",
+    "graded/policies/cage-netpol.yaml",
+    "posture/policies/stamp-posture.yaml",
+    "distribution/render-version-tree.py",
+    "distribution/versions.yaml"
+  ],
+  "platform_head": "cb680f22eb46b0fab5e56844758242a2ab200975",
+  "snapshot": "/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavc-release-transition-4w8v9aeo/platform",
+  "working_inputs_sha256": {
+    "graded/policies/cage-tier.yaml": "28bfbc3fb9ae36406e685ca3f7f0d3efa40209a9cf2949845a7e28fc965127b7",
+    "graded/policies/cage-netpol.yaml": "25da9caa4469a9182f42a8eb7255a64fb873d88b8cb1d59e44c3481ebc496ab4",
+    "posture/policies/stamp-posture.yaml": "28163dd82b06d856a85872ae8b2c0e0907fa8628e86fe8d7a9c0fdc476965d1a",
+    "distribution/render-version-tree.py": "78b5642a90a65a4faaa73f4826f3180baf7621682d0736a027d536c969760df3",
+    "distribution/versions.yaml": "5c5cd36dfd9af887b2b15a42f16fe55691228036290bb93d01bbb44f5ea9c7e6"
+  },
+  "patch_sha256": "3ec4ab0f6e4357b8cd77f4d0b1ada9215c5557056e34a0eaf7bd032d18332e46",
+  "unsigned_simulation_only": true,
+  "offline_rehearsal": {
+    "policy_6_0_0_publisher_gate": "passed",
+    "evidence_commit": "27f8a6d5ae345c9575f84ef667a9918b5de86733",
+    "tag_commit": "4922fe7bd6e9ccd4b259b98d543a681173b4ac2a",
+    "tag_name": "policy/v6.0.0",
+    "reverse_after_commit_field_population": "passed",
+    "unsigned_simulation_only": true,
+    "policy_6_0_1_publisher_gate": {
+      "exit": 0,
+      "declared": "patch",
+      "computed": "major",
+      "outcome": "degraded",
+      "published_as": "6.0.1-quarantine.1"
+    },
+    "policy_7_0_0_publisher_gate": {
+      "exit": 0,
+      "declared": "major",
+      "computed": "major",
+      "outcome": "passed"
+    }
+  },
+  "final_candidate": "7.0.0",
+  "current_security_intermediate_commit": "2b877a18b7933353755f5d9ce893492e2146fc35",
+  "historical_6_0_1_evidence_preserved": true,
+  "current_final7_commit": "a41db69b51ae32137009226a78f2a1a528bd2dd2",
+  "reverse_from7_after_commit_field_population": "passed"
+}

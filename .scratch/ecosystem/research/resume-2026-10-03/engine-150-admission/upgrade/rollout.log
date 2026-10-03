@@ -1,0 +1,5 @@
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 0 of 1 updated replicas are available...
+deployment "kyverno-admission-controller" successfully rolled out
+deployment "kyverno-background-controller" successfully rolled out
+deployment "kyverno-cleanup-controller" successfully rolled out
+deployment "kyverno-reports-controller" successfully rolled out

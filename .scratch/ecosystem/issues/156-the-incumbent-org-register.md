@@ -1,7 +1,7 @@
 # 156 — The incumbent org register
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -33,3 +33,11 @@ Graduated 2026-09-25 from ticket 35, round 1 Q2, Q5 and Q6 with amendments A2 an
 Facts on 2026-09-25: the incumbent org held 16 repos, only `apps` archived. Eight repos held 42 open Renovate pull requests. fleet's `sunset escalator` ran daily and runs governance-agent's script. An unauthenticated `GET /repos/policy-as-versioned-flux/apps` returned `archived: true`. The GitHub documentation does not say whether a package stays pullable after its repo is archived. That is why the first archive is a probe.
 
 **Condition sharpened, 2026-09-25.** The fleet, policy and governance-agent row needs a `verify-reconcile.sh` PASS on a sample taken under the re-registered fact 7 question. The grader skips facts 6 and 7 on a sample older than the current registration, so a pre-registration sample can print PASS on five facts with the cage not scored (reported by the session that grills ticket 152). Such a PASS does not meet the row.
+
+## Implementation, 2026-10-03
+
+Claimed by Codex while resuming Claude's handoff. The sixteen-row register and named check are implemented. The credentialled clocks job collects forge ownership and archive flags, and anonymous OCI manifest observations for the images at each adopter's apps-source tag plus the permanent readiness-collector probe. The grading job receives that file without a credential. Missing or duplicate image observations cannot establish a pass; an unacted eligible row is a LIMIT. The final three archives require a reconcile PASS under the reference-workload registration, not a pre-registration five-fact PASS.
+
+The collected pre-action facts are recorded in `research/resume-2026-10-03/incumbent-facts.json`: all four app repositories have the adopter owners; the three unconditional drops are eligible and still live; all served incumbent image manifests and the readiness-collector probe were readable anonymously. The selfcheck plants premature archives, wrong owners, an archived hub, failed and missing anonymous pulls. It passes; the typecheck passes. No archive is claimed here until its action and post-action observation are recorded below.
+
+The notification spine and pr-gate corrections are in the named current documents, with dated notes in the accepted ADR and historical research and talk records. Resolution still requires the archive log and a citable truth run.

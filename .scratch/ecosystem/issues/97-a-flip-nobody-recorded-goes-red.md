@@ -1,7 +1,7 @@
 # 97 — A flip nobody recorded goes red
 
 Type: decision (HITL)
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -196,3 +196,9 @@ said:   # Oldest first. Append a new entry. Do not edit an old one.
 **What Done still needs.** The owner has decided the shape of the acknowledgement. Two parts of
 Done wait for the build: the check that asserts it, and the proof that a flip without the record
 is red.
+
+## Implementation, 2026-10-03
+
+The current instruction to implement everything resumes the build that the 2026-09-24 record-only instruction held. The agreed shape is unchanged. The words recorded for 2026-09-04 are "can we just always assume we're in development mode until further notice?". On 2026-09-24 the owner answered "agree" to the window and acknowledgement shape. These are the historical authorizations; no new authorization or expiry is inferred from this implementation.
+
+`verify/enact-record/verify-enact-record.sh` grades the durable mode against exact dated quotes outside example code fences, and the original development window ending 2026-10-22. A lapse changes the grade, never the guard. Ambient variables can only tighten the checked-in mode. The checker proves the six decided mutations plus a self-citing YAML example. Rollout and the first citable gate reading the check are still pending.

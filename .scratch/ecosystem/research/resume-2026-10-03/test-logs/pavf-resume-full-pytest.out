@@ -1,0 +1,707 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 12%]
+....sssss.sss.................ss........................................ [ 14%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 22%]
+........................................................................ [ 24%]
+........................................................................ [ 27%]
+............................................................ss.......s.s [ 29%]
+ss...................................................................... [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 49%]
+............................................................F..F........ [ 51%]
+F.FF...F...F..FF..F.F.F.F..F............................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+...................................................F.................... [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+.....................................                                    [100%]
+=================================== FAILURES ===================================
+___ test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier ___
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_implementing_a_weighted_c0')
+
+    def test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier(tmp_path):
+        """Survivor 1, round 1 `overreach-6`, repaired by eco-system ticket 121. tuppence is composed
+        against its real pinned parents three times: as it is, with its own claim on `pl-2` alone,
+        and with its own claim on every control the pinned regulator weights name. The partition on
+        the entry does not change: every line keeps its share and the lines still sum to `total`.
+        The entry's amount is the sum of the lines still open. Claiming `pl-2` takes exactly its
+        line off the entry and off the exposure total. Claiming every weighted control takes the
+        whole entry to zero, and the regime's tier drops to the rung a zero residual selects under
+        tuppence's own floor. Every other entry keeps its tier."""
+        comp = _composition()
+        before, before_rendered = comp.compose(_tuppence(tmp_path / "before"), _trees())
+>       assert before["outcome"] == "composed", before["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:320: AssertionError
+_____ test_removing_an_implemented_control_puts_its_line_back_on_the_price _____
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_removing_an_implemented_c0')
+
+    def test_removing_an_implemented_control_puts_its_line_back_on_the_price(tmp_path):
+        """Ticket 121's consequence for ADR-0026 point 5. The regulator prices a control whether or
+        not the adopter selects it, so only a selected, claimed control comes off the entry. tuppence
+        claims `ra-3` under MODERATE, and its line comes off. Against a nist copy whose LOW drops
+        `ra-3`, tuppence on LOW keeps the claim, the line reads `unselected`, and the entry is the
+        whole partition again."""
+        comp = _composition()
+        nist = tmp_path / "nist"
+        shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+        low = nist / "catalog" / "NIST_SP-800-53_rev5.2.0_LOW-baseline_profile.json"
+        profile = json.loads(low.read_text())
+        for imp in profile["profile"]["imports"]:
+            for inc in imp.get("include-controls", []):
+                if "ra-3" in inc.get("with-ids", []):
+                    inc["with-ids"].remove("ra-3")
+        low.write_text(json.dumps(profile))
+        trees = _trees(nist=nist)
+    
+        claimed, _ = _claiming(comp, tmp_path / "moderate", ["ra-3"], trees)
+>       assert claimed["outcome"] == "composed", claimed["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:374: AssertionError
+_ test_an_overlay_or_a_claim_naming_a_withdrawn_status_control_refuses_as_unknown _
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_an_overlay_or_a_claim_nam0')
+
+    def test_an_overlay_or_a_claim_naming_a_withdrawn_status_control_refuses_as_unknown(tmp_path):
+        """Eco-system ticket 126. NIST's pinned catalogue keeps ac-2.10 under `status: withdrawn`.
+        tuppence naming it in `overlay.controls` refuses `unknown-control-id`, the instrument fault
+        ADR-0026's Consequences name for an adopter still naming a withdrawn control. A claim on it
+        in tuppence's own component-definition refuses the same way. Neither is selected nor priced
+        as held."""
+        assert _status(ESTATE / "nist", OWN_WITHDRAWN_STATUS) == "withdrawn"
+        comp = _composition()
+        work = _tuppence(tmp_path / "overlay")
+        _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[OWN_WITHDRAWN_STATUS]))
+        doc, _ = comp.compose(work, _trees())
+        assert doc["outcome"] == "refused", doc["deltas"]
+>       assert [(r["kind"], r["subject"]) for r in doc["refusals"]] == [
+            ("unknown-control-id", f"tuppence overlay.controls: {OWN_WITHDRAWN_STATUS}")], doc["refusals"]
+E       AssertionError: [{'detail': "'ac-2.10' is in nist's catalogue under status: withdrawn -- the regulator no longer defines it, so nothin...ted inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert [('unknown-co..., 'tuppence')] == [('unknown-co...ls: ac-2.10')]
+E         
+E         Left contains one more item: ('missing-instrument', 'tuppence')
+E         Use -v to get more diff
+
+tests/test_loophole_adr_0026.py:711: AssertionError
+_ test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[overlay-recorded] _
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_an_adopters_own_removal_o0')
+legacy_header = False
+
+    @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+    def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal(tmp_path, legacy_header):
+        """Ticket 123, review round, kept by ticket 126. A composer from before ticket 126 signed a
+        header in which tuppence's overlay selected ac-2.10, which NIST's pinned catalogue already
+        keeps under `status: withdrawn`. The adopter drops it; the nist pin does not move. That is
+        the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
+        happen. A last header with no `overlay-controls` must not change the answer. The new header
+        records `withdrawn-selectable: false`."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:738: AssertionError
+_ test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[legacy-header] _
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_an_adopters_own_removal_o1')
+legacy_header = True
+
+    @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+    def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal(tmp_path, legacy_header):
+        """Ticket 123, review round, kept by ticket 126. A composer from before ticket 126 signed a
+        header in which tuppence's overlay selected ac-2.10, which NIST's pinned catalogue already
+        keeps under `status: withdrawn`. The adopter drops it; the nist pin does not move. That is
+        the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
+        happen. A last header with no `overlay-controls` must not change the answer. The new header
+        records `withdrawn-selectable: false`."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:738: AssertionError
+_ test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[overlay-recorded] _
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_an_adopters_own_removal_o2')
+legacy_header = False
+
+    @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+    def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path, legacy_header):
+        """Ticket 123, review round, and ticket 126's legacy-header case. A composer from before
+        ticket 126 signed a header in which tuppence's overlay selected ac-2.10, already under
+        `status: withdrawn`. In one run NIST's next tag withdraws another selected control and
+        tuppence drops ac-2.10. That header cannot prove ac-2.10 was defined when it was selected,
+        so its removal is the adopter's, with or without `overlay-controls`.
+    
+        The other control differs by header. With `overlay-controls` recorded, it came from the
+        baseline, so it left with NIST's bump: a `withdrawn-control`. With a legacy header nothing
+        says whether it came from the baseline or from an overlay that selected it while already
+        withdrawn, so it stays the adopter's `removed-control` for this one run (ticket 123
+        decision 4's default, applied to the withdrawn status by ticket 126)."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:766: AssertionError
+_ test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[legacy-header] _
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_an_adopters_own_removal_o3')
+legacy_header = True
+
+    @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+    def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path, legacy_header):
+        """Ticket 123, review round, and ticket 126's legacy-header case. A composer from before
+        ticket 126 signed a header in which tuppence's overlay selected ac-2.10, already under
+        `status: withdrawn`. In one run NIST's next tag withdraws another selected control and
+        tuppence drops ac-2.10. That header cannot prove ac-2.10 was defined when it was selected,
+        so its removal is the adopter's, with or without `overlay-controls`.
+    
+        The other control differs by header. With `overlay-controls` recorded, it came from the
+        baseline, so it left with NIST's bump: a `withdrawn-control`. With a legacy header nothing
+        says whether it came from the baseline or from an overlay that selected it while already
+        withdrawn, so it stays the adopter's `removed-control` for this one run (ticket 123
+        decision 4's default, applied to the withdrawn status by ticket 126)."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:766: AssertionError
+_ test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators _
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_a_control_the_regulator_w0')
+
+    def test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators(tmp_path):
+        """Eco-system ticket 126. tuppence's overlay selects a control NIST defines outside
+        MODERATE, and composes under the new rule, so its header records `withdrawn-selectable:
+        false`. NIST's next tag marks that control `status: withdrawn`. tuppence keeping it in its
+        overlay refuses `unknown-control-id`. tuppence dropping it composes, and the control prints
+        as NIST's `withdrawn-control`: the last overlay would no longer select it against the new
+        catalogue, and the header proves it was defined when it was selected."""
+        comp = _composition()
+        moderate = comp._baseline_ids(ESTATE / "nist", "MODERATE")
+        extra = sorted(comp._baseline_ids(ESTATE / "nist", "HIGH") - moderate)[0]
+        assert _status(ESTATE / "nist", extra) is None
+        work = _tuppence(tmp_path / "tuppence")
+        _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[extra]))
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:797: AssertionError
+_ test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal _
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_a_weights_feed_that_names0')
+
+    def test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal(tmp_path):
+        """Ticket 123 item 2, against tuppence's real pinned parents. NIST withdraws a control the
+        way its catalogue already marks 182 of them: the control stays in the catalogue with
+        `status: withdrawn` and leaves every baseline. The pinned ico weights still name it. That is
+        the feed's own fact to fix in its next version (ADR-0026). The composition does not refuse
+        and does not re-partition: the regime entry keeps its amount, its line for the control reads
+        `withdrawn`, and the `withdrawn-control` delta carries the price the hole carried."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:834: AssertionError
+___ test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one ___
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_a_narrowing_prices_a_weig0')
+
+    def test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one(tmp_path):
+        """Round 2 `loophole-1`: a mass removal of unweighted controls prints only absences. True,
+        and it is what ADR-0026 says: no pinned weight prices those controls, so the pound they
+        carry is nothing any regulator named. The weighted pound is the regime entry, and a removal
+        does not move it. tuppence narrows from MODERATE to LOW against a nist copy whose LOW also
+        drops the weighted `ra-3`. The one weighted removal prints the price its hole carried; every
+        other removal is a named absence; the summary delta counts both; the regime entry and its
+        `ra-3` line keep their amounts, and the line reads `unselected`."""
+        comp = _composition()
+        nist = tmp_path / "nist"
+        shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+        low = nist / "catalog" / "NIST_SP-800-53_rev5.2.0_LOW-baseline_profile.json"
+        profile = json.loads(low.read_text())
+        for imp in profile["profile"]["imports"]:
+            for inc in imp.get("include-controls", []):
+                if "ra-3" in inc.get("with-ids", []):
+                    inc["with-ids"].remove("ra-3")
+        low.write_text(json.dumps(profile))
+        trees = _trees(nist=nist)
+    
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, trees)
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:925: AssertionError
+_______ test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier ________
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_a_bespoke_hole_is_priced_0')
+
+    def test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier(tmp_path):
+        """Round 1 `loophole-1`, round 3 `loophole-1`. Both need a bespoke control's price to move
+        something that a later removal or a cheaper replacement could move back. A bespoke hole is
+        priced, on its own line, by the adopter's own scenario, and nothing reads that line: the
+        regime entry, the exposure total and every tier match the composition without it. Ticket
+        38 D5 named this limit ("priced but not yet tiered"), so the place is already held. The
+        withdrawal both candidates need composes since ticket 124 and prints a `removed-control`
+        delta at the scenario's own residual, so the withdrawn pound is on the record."""
+        comp = _composition()
+        plain, plain_rendered = comp.compose(_tuppence(tmp_path / "plain"), _trees())
+    
+        work = _tuppence(tmp_path / "bespoke")
+        _edit_party(work, lambda d: (d["inherits"].append({"party": "tuppence", "kind": "controls", "version": "1.0.0"}),
+                                     d.setdefault("overlay", {}).update(controls=["tuppence:vendor-review"])))
+        comp._write_small_catalog(work, {"vendor-review": {"scenario": "scenarios/vendor-review.json"}})
+        (work / "scenarios").mkdir()
+        shutil.copy(PLATFORM / "policy" / "scenarios" / "driftwood-root-residual.json",
+                    work / "scenarios" / "vendor-review.json")
+        bespoke, bespoke_rendered = comp.compose(work, _trees())
+>       assert bespoke["outcome"] == "composed", bespoke["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:971: AssertionError
+_____ test_a_bespoke_id_never_covers_the_regulators_control_of_the_same_id _____
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_a_bespoke_id_never_covers0')
+
+    def test_a_bespoke_id_never_covers_the_regulators_control_of_the_same_id(tmp_path):
+        """Round 1 `loophole-3`, round 2 `loophole-2`, round 3 `overreach-5`. tuppence publishes a
+        bespoke `pl-2`, one of the regulator's weighted ids, and claims it. The claim covers
+        `tuppence:pl-2` only. The regulator's `pl-2` stays a hole and its weighted line is not
+        `covered`. The header lists both keys, one bare and one with its source, so one id from two
+        sources is two selected controls: nothing collapses them."""
+        comp = _composition()
+        work = _tuppence(tmp_path)
+    
+        def edit(doc: dict[str, Any]) -> None:
+            doc["inherits"].append({"party": "tuppence", "kind": "controls", "version": "1.0.0"})
+            overlay = doc.setdefault("overlay", {})
+            overlay["controls"] = ["tuppence:pl-2"]
+            overlay.setdefault("add", []).append(_own_member(comp, "own-plan"))
+    
+        _edit_party(work, edit)
+        comp._write_small_catalog(work, {"pl-2": {"scenario": "scenarios/pl-2.json"}})
+        comp._write_component_definition(work / comp.ADOPTER_CLAIMS_FILE, [("pl-2", "own-plan")],
+                                         source="catalog/catalog.json")
+        doc, rendered = comp.compose(work, _trees())
+>       assert doc["outcome"] == "composed", doc["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:1011: AssertionError
+_ test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier _
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_an_ungoverned_namespace_i0')
+
+    def test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier(tmp_path):
+        """Round 1 `overreach-5`, round 3 `overreach-6`. A directory of manifests is not a
+        Namespace: the walk reads `kind: Namespace` documents and the Namespace a workload names.
+        Since ticket 119 a scratch Job that names a Namespace makes it an ungoverned Namespace, as
+        the candidates say, because silence buys no exemption and neither does intent. An ungoverned
+        Namespace with no workload prices at zero. One that is deleted closes and carries no price.
+        One with workloads is priced, and that price moves no tier and no exposure total."""
+        comp = _composition()
+        scratch = tmp_path / "scratch-dir"
+        (scratch / "gitops" / "scratch").mkdir(parents=True)
+        (scratch / "gitops" / "scratch" / "notes.yaml").write_text(yaml.safe_dump(
+            {"apiVersion": "v1", "kind": "ConfigMap", "metadata": {"name": "grant"}}))
+        assert comp.ungoverned_namespaces(scratch) == [], "a directory was read as a Namespace"
+        (scratch / "gitops" / "scratch" / "job.yaml").write_text(yaml.safe_dump(
+            {"apiVersion": "batch/v1", "kind": "Job", "metadata": {"name": "grant", "namespace": "scratch"}}))
+        assert comp.ungoverned_namespaces(scratch) == ["scratch"], "a Namespace a workload names went unpriced"
+    
+        empty = [{"namespace": "side", "status": "new"}]
+        repo = tmp_path / "empty"
+        (repo / "gitops").mkdir(parents=True)
+        (repo / "gitops" / "ns.yaml").write_text(yaml.safe_dump(
+            {"apiVersion": "v1", "kind": "Namespace", "metadata": {"name": "side", "labels": {INSTITUTION: "x"}}}))
+        comp.price_ungoverned(empty, repo, "adopter", "GBP", 10_000.0, "2026-09-01")
+        assert empty[0]["price"]["amount"] == 0.0, empty
+    
+        deleted = comp.compute_ungoverned(set(), {"side"})
+        comp.price_ungoverned(deleted, repo, "adopter", "GBP", 10_000.0, "2026-09-01")
+        assert deleted == [{"namespace": "side", "status": "closed"}], deleted
+    
+        plain, plain_rendered = comp.compose(_tuppence(tmp_path / "plain"), _trees())
+        work = _tuppence(tmp_path / "sprawl")
+        _namespaces(work, "sprawl")
+        sprawl, sprawl_rendered = comp.compose(work, _trees())
+        priced = next(e for e in sprawl["ungoverned"] if e["namespace"] == "sprawl")
+>       assert priced["price"]["amount"] and priced["price"]["amount"] > 0, priced
+E       AssertionError: {'namespace': 'sprawl', 'price': {'amount': None, 'as_of': '2026-10-03', 'base': None, 'bounded': False, ...}, 'status': 'recorded'}
+E       assert (None)
+
+tests/test_loophole_adr_0026.py:1055: AssertionError
+_____ test_a_mistranscribed_weight_moves_the_price_of_what_is_implemented ______
+[gw2] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw2/test_a_mistranscribed_weight_m0')
+
+    def test_a_mistranscribed_weight_moves_the_price_of_what_is_implemented(tmp_path):
+        """Round 2 `overreach-6`. A clone of the regulator's repo carries a wrong partition: 0.7 on
+        one lower-tier control and 0.1 on the others. With nothing implemented, tuppence composed
+        against it prices the regime entry, the exposure and every tier exactly as against the
+        published weights: a weight splits the entry, and every line is open. Since ticket 121 the
+        entry is the sum of its open lines, so a wrong weight moves the price once the adopter
+        implements a control it names. Claiming that control takes 0.7 of the entry off instead of
+        its published share. The recourse the candidate asks for exists: the adopter's own pin holds
+        the version it priced against, and a correction is a pull request to the publisher's repo."""
+        comp = _composition()
+        right, right_rendered = comp.compose(_tuppence(tmp_path / "right"), _trees())
+        ico = tmp_path / "ico"
+        subprocess.run(["git", "clone", "-q", str(ESTATE / "ico"), str(ico)], check=True, capture_output=True)
+        feed = ico / "penalty-schema" / "v3" / "feed.json"
+        doc = json.loads(feed.read_text())
+        lower = (doc.get("payload") or doc)["control_weights"]["uk-gdpr"]["lower-tier"]
+        published = {w["id"]: float(w["weight"]) for w in lower}
+        for i, w in enumerate(lower):
+            w["weight"] = 0.7 if i == 0 else round(0.3 / (len(lower) - 1), 10)
+        feed.write_text(json.dumps(doc, indent=2))
+        wrong, wrong_rendered = comp.compose(_tuppence(tmp_path / "wrong"), _trees(ico=ico))
+>       assert wrong["outcome"] == "composed", wrong["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:1101: AssertionError
+___________________________ test_the_suite_is_green ____________________________
+[gw0] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+suite_results = ({'a_challenge_to_a_constituent_survives_an_unrelated_resolution': Result(number=12, name='a_challenge_to_a_constituen...88888.89 vs 366666.67); xi>=1 refuses at the shape boundary and xi=0.99 still computes', invariant=False), ...}, False)
+
+    def test_the_suite_is_green(suite_results: tuple[dict[str, Result], bool]) -> None:
+        by_name, ok = suite_results
+        failed = [r for r in by_name.values() if r.status == FAIL]
+>       assert not failed, [f"{r.name}: {r.detail}" for r in failed]
+E       AssertionError: ['drift_window_is_actually_being_sampled: the window is open and the newest sample is 7 day(s) old (2026-09-26T11:28:1... finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached"]
+E       assert not [Result(number=44, name='drift_window_is_actually_being_sampled', status='FAIL', detail='the window is open and the ne...fect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached", invariant=False)]
+
+tests/test_invariant_suite.py:43: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+==> netflix: would-the-twin-have-flagged-it rewound to 2011-08-01 — scoring-eligible under as-consumed
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/netflix-engine-guard/threat.json
+  attestation  threat.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       de508f4550148b82262bbf9f89886d53796e70137281a34f0f86d4e8b3b57776
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix as at 2011-08-01: commit 3d1fb95e715d, committed 2011-07-26T21:00:00Z
+  3 components, 2 edges, 0 causal
+  a model state, not a filtered view: everything downstream reads it unchanged
+rewound-model -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/netflix-engine-guard/rewind.json
+  attestation  rewind.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       b204e47519ce3b432a45dee96ccae520affc274e4f23a78a59de6535ae3a4b38
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> gameplay sweep across 1 repo(s), 1 org(s): 1 opportunity candidate(s) pulled, 3 signal(s) pushed
+opportunity-sweep -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/netflix-engine-guard/sweep.json
+  attestation  sweep.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       1104a8e18f44087395c05ac7989131633b5cd14495a9cdae13fd1b78c439fcfc
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix: 3 option(s) considered for 'the-operator', 2 priced, 1 removed before pricing
+  removed  rank-domestic-members-by-cancellation-risk forbidden — no-individual-level-output (universal tier), no figure
+  priced   hold-the-bundled-price-for-one-quarter 30000000.0/45000000.0/70000000.0 mean 46666666.6667, sampled p50 46287011.5481
+  priced   ship-one-bill-and-one-sign-in-across-the-two-plans 10000000.0/15000000.0/22000000.0 mean 15333333.3333, sampled p50 15142499.58
+  a constraint is not a very large price: a removed option carries no number at all
+priced-option-set -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/netflix-engine-guard/options-head.json
+  attestation  options-head.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       7b359d9cfe0573089d0863a582b7c384f220be3a96527bb58a0f7fb98a3e85d6
+  depth        full
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+==> netflix: a shock at 'dvd-by-mail', priced under 1 perspective(s)
+  the-operator
+    price    streaming-service        23,800,000 / 47,600,000 / 95,200,000  grade 1
+    option   hold-the-bundled-price-for-one-quarter cost 46,666,667, credit 19,040,000
+    option   ship-one-bill-and-one-sign-in-across-the-two-plans cost 15,333,333, the-mitigation-claim-is-graded-outside-the-pricing-threshold
+  prices, costs and credits in one unit, in the order they were authored. Nothing marks one option best and nothing recommends one
+priced-impact -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/netflix-engine-guard/price.json
+  attestation  price.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       f45c9cb3ecc9aa4211799fa0e30745bdfa8a2ef973b4e21ab2ae3cb6f004a564
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+==> netflix/the-operator: a shock at 'dvd-by-mail', 2 response(s) across 3 account(s)
+  hold-the-bundled-price-for-one-quarter range=57,120,000  (the-damage-was-mostly-the-rebrand=35,480,000, the-shock-crossed-to-the-streaming-side=-21,640,000, the-shock-stayed-on-the-dvd-side=25,960,000)
+  ship-one-bill-and-one-sign-in-across-the-two-plans range=0  (the-damage-was-mostly-the-rebrand=15,000,000, the-shock-crossed-to-the-streaming-side=15,000,000, the-shock-stayed-on-the-dvd-side=15,000,000)
+  agreement  unanimous=False  the named accounts disagree about which response is cheapest — reported here rather than smoothed into the default below, because a credible disagreement about the mechanism is the most decision-relevant fact on the page
+  default    hold-the-bundled-price-for-one-quarter — the option whose mean net cost of risk across the named accounts is lowest — a default point for a reader who wants one, computed rather than declared, and not a recommendation. No account is privileged, so the mean rather than any one account's own figure is what breaks the tie; naming or dropping a rival account can move it
+trade-off-curve -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/netflix-engine-guard/curve.json
+  attestation  curve.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       05a68f85989616026b4ac38a96b0b15858499b45227ea4cd3001bdb9436e943a
+  depth        full
+    causal-layer       full     5/5 of decision ticket 08  unchecked: -
+    currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+==> netflix: proposes hold-the-bundled-price-for-one-quarter via the 'record' channel
+  means      the verification substrate — a lever that is not code, carrying a versioned signed record that it was enacted without being enforced by policy. Most levers are this one, and the £ engine's cross-domain comparison depends on it
+  disposed   a human, out of band — this tool has no path to it
+  layer      structural absence   twin/enact.py
+    holds      no merge code path exists; the module's public surface is an allow-list
+    fails when the twin is composed with a shell tool, an MCP GitHub server or a subagent with `gh` — the absence still holds and the guarantee is gone, with no diff to twin/ at all
+  layer      tool-call boundary   twin/enact_guard.py, registered as a PreToolUse hook
+    holds      a disposing tool call is refused before it runs, including a subagent's own
+    fails when the registration is deleted, or the twin is driven by a runner that does not honour hooks — a policy check is a call site, and a forgotten call site fails open in silence
+  dependency 17 cross-repository pin(s) (3 self-sync, counted separately): driftwood-composed, feeds, ico, insurer, ludlow-composed, nist, platform, tuppence-composed consumed by driftwood, insurer, ludlow, tuppence
+    limit      0 of 20 pins name a tag and no commit, so the pin is only as immutable as the tag. Every commit line in this estate is a commented-out placeholder; until one is filled in, 'pinned' means 'pinned to a movable name'.
+    limit      3 of 20 pins are a repository syncing itself rather than consuming anybody's policy, and are counted separately: only the 17 cross-repository pins evidence a dependency at all.
+    limit      the signature is the sources' own declaration, checked by nothing here: no tag is verified, no Rekor entry is looked up, and estate/verify/provenance/verify-provenance.sh records that this repository's own commits are not keyless-signed either. 'Signed' is therefore a property of the design, not an observation, and the word does no work until something verifies it.
+    limit      the consumer repositories are separate by URL and not yet by existence: estate/README.md describes a monorepo-style working tree whose top-level directories become their own GitHub repositories *at split*, and each up.sh rewrites the pinned URL to an in-cluster git server for the offline demo. The pins name real separate repositories; whether those repositories are live is a question this code does not ask.
+    limit      read from committed sources, not from a running cluster: this evidences what the repositories declare they consume, never that a control is in force right now. Whether continuous proof of force is required at all is build ticket 65's question and is still open.
+    limit      these pins are read from this tool's own repository (.estate-clone), not from any repository 'netflix' owns. The dependency block above evidences what THIS estate consumes; it names no pin, tag or repository belonging to the subject the proposal is about, and 'netflix' is not assumed to have an estate under Flux at all.
+  narrowed   Policy-as-code is AN enactment arm, not THE definition of governance. Responses are priced by the FAIR factor they modify and most levers are not code, so if versioned policy were the shape of governance the cross-domain comparison the £ engine exists for could not exist.
+enactment-proposal -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/netflix-engine-guard/proposal.json
+  attestation  proposal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       3535c814536475bcd5c87ca6c9f7aa94807b474a06c41a02243946974e9062ed
+  depth        full
+    enactment          full     5/5 of decision ticket 18  unchecked: -
+==> netflix: substrate fidelity at 2011-10-24, detection scored at 2011-10-24
+  signal_to_noise      0.121  within [0.05, 0.25]
+  plant_difficulty     0.275  within [0.05, 0.5]
+  plant_difficulty_spread 0.600  within [0.05, 1.0]
+  spine_consistency    1.000  within [1.0, 1.0]
+  reporting_asymmetry  0.667  within [0.6, 0.95]
+  mundanity            0.879  within [0.7, 1.0]
+  contamination        0.000  within [0.0, 0.0]
+  free-running         28 line(s) against 5 anchored — the diff-against-the-spine attack has somewhere to hide a plant
+  hit rate             25%, mean score 0.250
+    events           missed  horizon 2011-09-30  not detected: no detection at events[3] ('an unusual incident review opens after hours, examining access to the member billing export')
+    communications   missed  horizon 2011-10-24  not detected: no detection at communications[3] ('a press query is withdrawn abruptly, days after an earlier complaint thread was escalated')
+    hr               timely  horizon 2011-11-15  detected at 2011-10-24, on or before the actionability horizon 2011-11-15 — still actionable
+    telemetry        missed  horizon 2011-09-20  not detected: no detection at telemetry[3] ('an overnight export of the member table runs outside the scheduled batch, with no ticket raised')
+  limitation:  planter and detector are the same model family and share model priors (decision ticket 12 Q2): a synthetic result is never evidence the twin anticipates the world, only evidence that the detection machinery works. The detector may find a plant because it thinks like the planter, not because the signal was findable by an independently-minded reader.
+substrate-report -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/netflix-engine-guard/substrate.json
+  attestation  substrate.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       186420ffbed97daf866204328e573c3f9a601155f3a1ec474627fac73d1b1729
+  depth        full
+    synthetic-substrate full     7/7 of decision ticket 12  unchecked: -
+==> sweep across 1 repo(s): 2 execution(s), 4 forecast(s), 0 failure(s)
+sweep -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/intel-forecast-guard/sweep.json
+  attestation  sweep.json.att.json (agent-signed (origin only))
+  sha256       9dfe5ec7212febd0999f0534de08030f5cb5f86f46215135978f241e63cd9573
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> intel: does-the-14a-bet-land-a-named-customer under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/intel-forecast-guard/run.json
+  attestation  run.json.att.json (agent-signed (origin only))
+  sha256       3c891bc1da4eef0c1ccc0a6031a1a699297752a8e67b71fc420a342224df6740
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix: dvd-decline-2011 rewound to 2026-01-01 — scoring-eligible under as-consumed
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/guard-backtest.json
+  attestation  guard-backtest.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       5d7231a5720c7c1a8b3ade68f94a1e564cd470b4c9246da46d8ec0bf2ed20de8
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/guard-run.json
+  attestation  guard-run.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       bd21812ad2bafa8bad618651731ab65f3c7b13df22b3340f45347ec7fd58001d
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> royal-mail: would-the-twin-have-flagged-it rewound to 2018-06-01 — scoring-eligible under as-consumed
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/beat/forecast-bundle.json
+  attestation  forecast-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       a03e55a0e10a54e13e3f6b716863d811cc42d09876d5d765bd429ecab8e73af8
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> carillion: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/beat/carillion-bundle.json
+  attestation  carillion-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       74725f047f6294fb56d800313ed2db8548597e6dbeedf2baaa54f9513afedd62
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> carillion-collapse-resolved: observed=True, resolved 2018-01-15, contamination low
+  contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+  rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+    market-consensus-2016        p=0.05   brier=0.9025   log-loss=2.9957   [as-consumed]
+score-card -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/beat/carillion-card.json
+  attestation  carillion-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       d8f40a7156283f60cb87d15da97533d82433bd3b4d9753921475801fbc2a0938
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+==> enron: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/beat/enron-bundle.json
+  attestation  enron-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       4e375f00c56348baa430db99564f0af08f244c64e896a9f3ab7898ac0c69600d
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> enron-bankruptcy-resolved: observed=True, resolved 2001-12-02, contamination control
+  contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+  rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+    market-consensus-2001        p=0.03   brier=0.9409   log-loss=3.5066   [as-consumed]
+score-card -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/beat/enron-card.json
+  attestation  enron-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       ac0d90d27d6f1d64e9cb2e39893bfb416562c40178c59d42b25a677f1c28d808
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+==> netflix: dvd-decline-2011 under with-hindsight — not scoring-eligible, 0 fact(s) withheld by date
+  ingestion history unavailable: every fact in the repository today was visible to this execution
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/beat/with-hindsight-bundle.json
+  attestation  with-hindsight-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       082a734b44847c068b1fc4900ed56f6b78e53f41d706471faac16afb6804c4f9
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 1 fact(s) withheld by date
+  withheld dvd-decline-2011-resolved          outcomes, dated 2012-12-31
+  ingestion history unavailable: the ingestion-history filter did not run: this repository has no commit at or before the execution time, so `as-consumed` here rests on fact dates alone. A fact ingested late but dated early is not detectable from this repository.
+forecast-bundle -> /private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pytest-of-cns/pytest-24/popen-gw0/verify0/beat/as-consumed-bundle.json
+  attestation  as-consumed-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       c90b827b7e1705fceb8ac1b6822fb54d36c9b2d86f97fa301de96b9aab80447b
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+bound-signal -> /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/twin-substrate-guard-3u8jt3fd/bound-signal.json
+  attestation  bound-signal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+  sha256       deecec484590202429548d21ee4596781bf6ee01002dec48b700f892cb211083
+  depth        full
+    domain-model       full     7/7 of decision ticket 07  unchecked: -
+    provenance         full     4/4 of decision ticket 14  unchecked: -
+    sense-move         full     8/8 of decision ticket 11  unchecked: -
+=========================== short test summary info ============================
+FAILED tests/test_loophole_adr_0026.py::test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier
+FAILED tests/test_loophole_adr_0026.py::test_removing_an_implemented_control_puts_its_line_back_on_the_price
+FAILED tests/test_loophole_adr_0026.py::test_an_overlay_or_a_claim_naming_a_withdrawn_status_control_refuses_as_unknown
+FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[overlay-recorded]
+FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[legacy-header]
+FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[overlay-recorded]
+FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[legacy-header]
+FAILED tests/test_loophole_adr_0026.py::test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators
+FAILED tests/test_loophole_adr_0026.py::test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal
+FAILED tests/test_loophole_adr_0026.py::test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one
+FAILED tests/test_loophole_adr_0026.py::test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier
+FAILED tests/test_loophole_adr_0026.py::test_a_bespoke_id_never_covers_the_regulators_control_of_the_same_id
+FAILED tests/test_loophole_adr_0026.py::test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier
+FAILED tests/test_loophole_adr_0026.py::test_a_mistranscribed_weight_moves_the_price_of_what_is_implemented
+FAILED tests/test_invariant_suite.py::test_the_suite_is_green - AssertionErro...
+15 failed, 2886 passed, 16 skipped in 1022.49s (0:17:02)
