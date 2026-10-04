@@ -704,6 +704,11 @@ def classify(path: str, declared: dict[str, set[str]], cut: dict[str, set[str]])
       * `vselfcheck/` -- a fixture directory for the renderers' own asserts.
     """
     unit = path.split("/", 1)[0]
+    if path.startswith("platform/implementations/cloud/policies/"):
+        return Surface("authoring", False,
+                       "the cloud package's authoring inputs: package.yaml names these members "
+                       "and render.py emits claim-bound copies into the adopter's composed/cloud; "
+                       "the source path itself is not a reconciled tree")
     if "/graded/policies/" in "/" + path:
         return Surface("authoring", False,
                        "the authoring tree: no Kustomization anywhere applies graded/policies/, "

@@ -236,6 +236,22 @@ def test_the_complete_trio_is_clean() -> None:
     assert rs.priority_trio(rs.mutation(cage())) == ()
 
 
+def test_prepared_cloud_inputs_are_authoring_but_a_delivered_unknown_cr_is_not_exempt() -> None:
+    source = rs.classify("platform/implementations/cloud/policies/cloud-cage-rds.yaml", {}, {})
+    assert source.surface == "authoring" and not source.graded
+    assert rs.classify("driftwood/implementations/cloud/policies/unknown.yaml", {}, {}).surface == "other"
+    delivered = rs.classify("tuppence/composed/cloud/cloud-cage-rds.yaml", {}, {})
+    assert delivered.surface == "served-machinery" and delivered.graded
+    doc = hold()
+    doc["spec"]["matchConstraints"]["resourceRules"][0].update(
+        apiGroups=["rds.aws.m.upbound.io"], resources=["instances"])
+    mutation = rs.mutation(doc, path="tuppence/composed/cloud/cloud-cage-rds.yaml",
+                           surface=delivered.surface)
+    verdict = rs.grade([mutation], {}, {})
+    assert verdict.code == 3
+    assert any("only the pod's mutability is tabulated" in line for line in verdict.lines)
+
+
 def test_a_mutation_that_names_no_priority_class_owes_no_trio() -> None:
     assert rs.priority_trio(rs.mutation(hold())) == ()
 

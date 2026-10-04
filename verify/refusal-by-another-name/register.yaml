@@ -42,6 +42,12 @@ accepted:
     # refusal_scan.py graded it "named but not found", which is this row's own staleness guard.
     policies:
       - cage-tier-5-0-0
+      # 2026-10-04: the genuine source-A 4.0.0 releases also serve policy 6 and 7.
+      # The scan re-derived the same exact thirteen UPDATE field hazards for
+      # every named body. The existing recreate decision and per-policy field
+      # join remain binding; this admits no additional field or wildcard name.
+      - cage-tier-6-0-0
+      - cage-tier-7-0-0
     operation: UPDATE
     fields:
       - spec.containers[*].name

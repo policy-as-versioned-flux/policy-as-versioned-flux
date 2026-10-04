@@ -78,6 +78,7 @@ no skip pattern because there is none to declare.
 """
 from __future__ import annotations
 
+import ast
 import importlib.util
 import re
 import subprocess
@@ -539,7 +540,8 @@ LANE_ENV = re.compile(r"^\s*OBSERVATION_LANE:\s*\"([^\"]*)\"\s*$", re.M)
 UNITS = ("driftwood", "feeds", "ico", "insurer", "ludlow", "nist", "platform", "tuppence")
 
 # What each repository owns in the lane, read from the repository rather than asserted.
-LANE_PATHS = ("talk/truth.log", "drift/samples.jsonl", "talk/captures", "observations")
+LANE_PATHS = ("talk/truth.log", "drift/samples.jsonl", "drift/workload-samples.jsonl",
+              "drift/oscal-samples.jsonl", "talk/captures", "observations")
 
 # THE REF THIS GRADES (review F3, 2026-09-06). What GitHub serves is `origin/main`, not whatever
 # happens to be checked out in `.estate-clone/<unit>`. Reading the working copy made the verdict
@@ -601,7 +603,7 @@ def _workflow_texts(unit_root: Path) -> dict[str, str]:
 
 def checkout_behind(unit_root: Path) -> list[str]:
     """Workflow files whose checkout copy declares a different lane from the served copy."""
-    differs = []
+    differs: list[str] = []
     local = unit_root / ".github" / "workflows"
     if not local.is_dir():
         return differs
@@ -635,6 +637,40 @@ def refresh_served_ref(unit_root: Path) -> str | None:
     return None
 
 
+def _default_instrument_lane(unit_root: Path, texts: list[str], path: str) -> bool:
+    """Read an owned writer's directory-bound default, without executing its code.
+
+    A lane declaration does not own a path. The served workflow must actually
+    invoke the instrument's writing command without redirecting its default.
+    """
+    writers = {"drift/workload-samples.jsonl": ("served_apps.py", "sample"),
+               "drift/oscal-samples.jsonl": ("oscal_lane.py", "collect")}
+    if path not in writers:
+        return False
+    module, command = writers[path]
+    caller = re.compile(r"\s*python3?\s+drift/" + re.escape(module) + r"\s+" + command + r"(?:\s|$)")
+    if not any(caller.match(line) and "--out" not in line
+               for text in texts for line in text.splitlines()):
+        return False
+    source = _git(unit_root, "show", f"{SERVED_REF}:drift/{module}")
+    if source is None:
+        return False
+    try:
+        assignments = {node.targets[0].id: ast.dump(node.value)
+                       for node in ast.parse(source).body
+                       if isinstance(node, ast.Assign) and len(node.targets) == 1
+                       and isinstance(node.targets[0], ast.Name)}
+    except SyntaxError:
+        return False
+    here = ast.dump(ast.parse("Path(__file__).resolve().parent", mode="eval").body)
+    root = ast.dump(ast.parse("Path(__file__).resolve().parents[1]", mode="eval").body)
+    root_drift = ast.dump(ast.parse("ROOT / 'drift'", mode="eval").body)
+    log = ast.dump(ast.parse("HERE / " + repr(Path(path).name), mode="eval").body)
+    own_directory = (assignments.get("HERE") == here or
+                     (assignments.get("ROOT") == root and assignments.get("HERE") == root_drift))
+    return own_directory and assignments.get("LOG") == log
+
+
 def owned_lane_paths(unit_root: Path) -> set[str]:
     """The lane paths this repository owns. Read from git, never from the working copy alone:
 
@@ -643,6 +679,8 @@ def owned_lane_paths(unit_root: Path) -> set[str]:
       * the repository's own workflow shell writes it, outside the OBSERVATION_LANE declaration
         and outside the cage's loop over it. driftwood owns `observations` this way and by no
         other: its twin-sweep appends `observations/twin-sweep.jsonl` on main.
+      * the served workflow calls its own observation instrument's writing command,
+        whose literal default ledger is relative to that instrument's own directory.
     """
     owned: set[str] = set()
     texts = list(_workflow_texts(unit_root).values())
@@ -654,6 +692,9 @@ def owned_lane_paths(unit_root: Path) -> set[str]:
             owned.add(path)
             continue
         if path in ref_roots:
+            owned.add(path)
+            continue
+        if _default_instrument_lane(unit_root, texts, path):
             owned.add(path)
             continue
         for text in texts:
