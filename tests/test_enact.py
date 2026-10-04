@@ -7,6 +7,7 @@ import io
 import json
 import re
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -876,9 +877,12 @@ def test_the_dependency_pins_are_real_and_report_what_they_do_not_establish(prop
     estate = {p.name for p in enact.ESTATE_DIR.iterdir() if p.is_dir()}
     for name in dependency["consumer_repositories"]:
         assert name in estate, f"{name} is reported as a consumer and is not a repository"
-    for name in dependency["dependencies"]:
-        # `<adopter>-composed` is that adopter's own rendered set consumed as a source (ticket 40).
-        assert name in estate or name.rsplit("-", 1)[0] in estate, name
+    for pin in consumed:
+        # A Flux source's name is a local alias: `fx` consumes the feeds repository,
+        # and `<adopter>-composed` consumes that adopter's own rendered set (ticket 40).
+        # Its actual URL must still resolve to a repository this estate contains.
+        repository = Path(urlsplit(pin["url"]).path.rstrip("/")).name.removesuffix(".git")
+        assert repository in estate, (pin["dependency"], pin["url"])
     # A repository syncing itself consumes nobody's policy, so it never reaches this list.
     assert not [p for p in consumed if p["consumer"] == p["dependency"]]
     assert all(pin["tag"] for pin in dependency["pins"])
