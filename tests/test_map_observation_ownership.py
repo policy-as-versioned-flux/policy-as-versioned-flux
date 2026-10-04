@@ -9,6 +9,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("map_observation_ownership", ROOT / "verify/map-surface/map_surface.py")
+assert spec is not None and spec.loader is not None
 surface = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = surface
 spec.loader.exec_module(surface)
