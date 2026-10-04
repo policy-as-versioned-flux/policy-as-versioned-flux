@@ -1,0 +1,8 @@
+{
+  "merge": "b55f643d3bb012658ddb00a26bcfb219c7f3ea12",
+  "candidate": "e0b6f9f3cb33e90e9208c59affdff5afb89fc637",
+  "merge_tree": "62f0a786ab6a1583837b11bcb2230942d623ad48",
+  "candidate_tree": "62f0a786ab6a1583837b11bcb2230942d623ad48",
+  "match": true,
+  "scope": "independent merge-source match only, not a release receipt"
+}

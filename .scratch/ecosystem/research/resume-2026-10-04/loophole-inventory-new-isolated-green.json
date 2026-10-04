@@ -1,0 +1,16 @@
+{
+  "layout": "new",
+  "estate": "/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-tez9uklw/estate",
+  "source_refs": {
+    "driftwood": "aa923631de95276615e4985e67ee41971efacf25",
+    "tuppence": "c70edb11086527c439b9adbc094eca6140136ae0",
+    "ludlow": "4f81da7eca50ae9adadcb905813cf06f17a5d9a1"
+  },
+  "platform_tools": {
+    "tag": "v5.0.0",
+    "commit": "703eff6aee959843c4160aa54fd03413f62858cc"
+  },
+  "pytest_exit": 0,
+  "source_mutations": false,
+  "isolated_cases": 26
+}

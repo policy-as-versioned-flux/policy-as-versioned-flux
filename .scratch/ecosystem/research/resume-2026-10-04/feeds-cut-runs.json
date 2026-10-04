@@ -1,0 +1,413 @@
+{
+  "cve/v3.0.0": {
+    "feed": "cve",
+    "version": "3.0.0",
+    "id": 37161227853,
+    "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161227853",
+    "workflow": "cut-release.yml",
+    "ref": "main",
+    "expected_head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "dispatched_at": "2026-10-03T23:16:32.425359+00:00",
+    "status": "completed",
+    "observed": {
+      "conclusion": "success",
+      "databaseId": 37161227853,
+      "event": "workflow_dispatch",
+      "headSha": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "jobs": [
+        {
+          "completedAt": "2026-10-03T23:16:27Z",
+          "conclusion": "success",
+          "databaseId": 111314901401,
+          "name": "cut",
+          "startedAt": "2026-10-03T23:16:19Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-03T23:16:21Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-03T23:16:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:21Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-03T23:16:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:22Z",
+              "conclusion": "success",
+              "name": "checkout platform (envelope schema for the release gate)",
+              "number": 3,
+              "startedAt": "2026-10-03T23:16:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:23Z",
+              "conclusion": "success",
+              "name": "install pinned gitsign (binary + checksum, no marketplace action)",
+              "number": 4,
+              "startedAt": "2026-10-03T23:16:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:23Z",
+              "conclusion": "success",
+              "name": "the tag must name a real, released feed version",
+              "number": 5,
+              "startedAt": "2026-10-03T23:16:23Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:23Z",
+              "conclusion": "success",
+              "name": "offline verify is the release gate",
+              "number": 6,
+              "startedAt": "2026-10-03T23:16:23Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:24Z",
+              "conclusion": "success",
+              "name": "offline verify -- market-moves and news",
+              "number": 7,
+              "startedAt": "2026-10-03T23:16:23Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:24Z",
+              "conclusion": "success",
+              "name": "reject a tag that already exists (no force-move, ever)",
+              "number": 8,
+              "startedAt": "2026-10-03T23:16:24Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:25Z",
+              "conclusion": "success",
+              "name": "create the signed annotated tag (ambient Actions identity, no interactive login)",
+              "number": 9,
+              "startedAt": "2026-10-03T23:16:24Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:26Z",
+              "conclusion": "success",
+              "name": "push the tag (git push only -- never the git-data REST API)",
+              "number": 10,
+              "startedAt": "2026-10-03T23:16:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:26Z",
+              "conclusion": "success",
+              "name": "Post checkout platform (envelope schema for the release gate)",
+              "number": 19,
+              "startedAt": "2026-10-03T23:16:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:26Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 20,
+              "startedAt": "2026-10-03T23:16:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:26Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-03T23:16:26Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161227853/job/111314901401"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161227853"
+    },
+    "conclusion": "success"
+  },
+  "fx/v1.1.0": {
+    "feed": "fx",
+    "version": "1.1.0",
+    "id": 37161252190,
+    "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161252190",
+    "workflow": "cut-release.yml",
+    "ref": "main",
+    "expected_head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "dispatched_at": "2026-10-03T23:16:58.319128+00:00",
+    "status": "completed",
+    "observed": {
+      "conclusion": "success",
+      "databaseId": 37161252190,
+      "event": "workflow_dispatch",
+      "headSha": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "jobs": [
+        {
+          "completedAt": "2026-10-03T23:16:57Z",
+          "conclusion": "success",
+          "databaseId": 111314975974,
+          "name": "cut",
+          "startedAt": "2026-10-03T23:16:48Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-03T23:16:49Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-03T23:16:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:50Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-03T23:16:49Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:51Z",
+              "conclusion": "success",
+              "name": "checkout platform (envelope schema for the release gate)",
+              "number": 3,
+              "startedAt": "2026-10-03T23:16:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:52Z",
+              "conclusion": "success",
+              "name": "install pinned gitsign (binary + checksum, no marketplace action)",
+              "number": 4,
+              "startedAt": "2026-10-03T23:16:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:52Z",
+              "conclusion": "success",
+              "name": "the tag must name a real, released feed version",
+              "number": 5,
+              "startedAt": "2026-10-03T23:16:52Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:52Z",
+              "conclusion": "success",
+              "name": "offline verify is the release gate",
+              "number": 6,
+              "startedAt": "2026-10-03T23:16:52Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:52Z",
+              "conclusion": "success",
+              "name": "offline verify -- market-moves and news",
+              "number": 7,
+              "startedAt": "2026-10-03T23:16:52Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:53Z",
+              "conclusion": "success",
+              "name": "reject a tag that already exists (no force-move, ever)",
+              "number": 8,
+              "startedAt": "2026-10-03T23:16:52Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:54Z",
+              "conclusion": "success",
+              "name": "create the signed annotated tag (ambient Actions identity, no interactive login)",
+              "number": 9,
+              "startedAt": "2026-10-03T23:16:53Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:55Z",
+              "conclusion": "success",
+              "name": "push the tag (git push only -- never the git-data REST API)",
+              "number": 10,
+              "startedAt": "2026-10-03T23:16:54Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:55Z",
+              "conclusion": "success",
+              "name": "Post checkout platform (envelope schema for the release gate)",
+              "number": 19,
+              "startedAt": "2026-10-03T23:16:55Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:55Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 20,
+              "startedAt": "2026-10-03T23:16:55Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:16:55Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-03T23:16:55Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161252190/job/111314975974"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161252190"
+    },
+    "conclusion": "success"
+  },
+  "threat-register/v4.0.0": {
+    "feed": "threat-register",
+    "version": "4.0.0",
+    "id": 37161274961,
+    "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161274961",
+    "workflow": "cut-release.yml",
+    "ref": "main",
+    "expected_head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "dispatched_at": "2026-10-03T23:17:23.222630+00:00",
+    "status": "completed",
+    "observed": {
+      "conclusion": "success",
+      "databaseId": 37161274961,
+      "event": "workflow_dispatch",
+      "headSha": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "jobs": [
+        {
+          "completedAt": "2026-10-03T23:17:24Z",
+          "conclusion": "success",
+          "databaseId": 111315045746,
+          "name": "cut",
+          "startedAt": "2026-10-03T23:17:13Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-03T23:17:15Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-03T23:17:14Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:16Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-03T23:17:15Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:17Z",
+              "conclusion": "success",
+              "name": "checkout platform (envelope schema for the release gate)",
+              "number": 3,
+              "startedAt": "2026-10-03T23:17:16Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:18Z",
+              "conclusion": "success",
+              "name": "install pinned gitsign (binary + checksum, no marketplace action)",
+              "number": 4,
+              "startedAt": "2026-10-03T23:17:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:18Z",
+              "conclusion": "success",
+              "name": "the tag must name a real, released feed version",
+              "number": 5,
+              "startedAt": "2026-10-03T23:17:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:19Z",
+              "conclusion": "success",
+              "name": "offline verify is the release gate",
+              "number": 6,
+              "startedAt": "2026-10-03T23:17:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:19Z",
+              "conclusion": "success",
+              "name": "offline verify -- market-moves and news",
+              "number": 7,
+              "startedAt": "2026-10-03T23:17:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:19Z",
+              "conclusion": "success",
+              "name": "reject a tag that already exists (no force-move, ever)",
+              "number": 8,
+              "startedAt": "2026-10-03T23:17:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:20Z",
+              "conclusion": "success",
+              "name": "create the signed annotated tag (ambient Actions identity, no interactive login)",
+              "number": 9,
+              "startedAt": "2026-10-03T23:17:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:21Z",
+              "conclusion": "success",
+              "name": "push the tag (git push only -- never the git-data REST API)",
+              "number": 10,
+              "startedAt": "2026-10-03T23:17:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:21Z",
+              "conclusion": "success",
+              "name": "Post checkout platform (envelope schema for the release gate)",
+              "number": 19,
+              "startedAt": "2026-10-03T23:17:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:22Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 20,
+              "startedAt": "2026-10-03T23:17:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-03T23:17:22Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-03T23:17:22Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161274961/job/111315045746"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161274961"
+    },
+    "conclusion": "success"
+  }
+}

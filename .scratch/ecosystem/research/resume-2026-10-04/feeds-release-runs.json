@@ -1,0 +1,415 @@
+{
+  "cve/v3.0.0": {
+    "id": 37170113406,
+    "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37170113406",
+    "workflow": "release.yml",
+    "tag": "cve/v3.0.0",
+    "ref": "main",
+    "expected_head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "status": "completed",
+    "dispatched_at": "2026-10-04T03:36:57.919740+00:00",
+    "conclusion": "success",
+    "observed": {
+      "conclusion": "success",
+      "databaseId": 37170113406,
+      "event": "workflow_dispatch",
+      "headSha": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "jobs": [
+        {
+          "completedAt": "2026-10-04T02:08:14Z",
+          "conclusion": "success",
+          "databaseId": 111341180338,
+          "name": "release",
+          "startedAt": "2026-10-04T02:08:04Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-04T02:08:06Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-04T02:08:05Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:07Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-04T02:08:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:08Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 3,
+              "startedAt": "2026-10-04T02:08:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:08Z",
+              "conclusion": "success",
+              "name": "platform is at the {tag, commit} pair this workflow pins",
+              "number": 4,
+              "startedAt": "2026-10-04T02:08:08Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:09Z",
+              "conclusion": "success",
+              "name": "install pinned gitsign (binary + checksum, no marketplace action)",
+              "number": 5,
+              "startedAt": "2026-10-04T02:08:08Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:09Z",
+              "conclusion": "success",
+              "name": "offline verify (release gate -- must be a real pass, not a skip)",
+              "number": 6,
+              "startedAt": "2026-10-04T02:08:09Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:09Z",
+              "conclusion": "success",
+              "name": "offline verify -- market-moves and news",
+              "number": 7,
+              "startedAt": "2026-10-04T02:08:09Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:11Z",
+              "conclusion": "success",
+              "name": "gitsign verify-tag, identity-pinned, offline Rekor bundle",
+              "number": 8,
+              "startedAt": "2026-10-04T02:08:09Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:11Z",
+              "conclusion": "skipped",
+              "name": "tag still resolves to the commit this run was triggered from",
+              "number": 9,
+              "startedAt": "2026-10-04T02:08:11Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:12Z",
+              "conclusion": "success",
+              "name": "publish GitHub Release recording the resolved SHA",
+              "number": 10,
+              "startedAt": "2026-10-04T02:08:11Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:12Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 19,
+              "startedAt": "2026-10-04T02:08:12Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:12Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 20,
+              "startedAt": "2026-10-04T02:08:12Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T02:08:12Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-04T02:08:12Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37170113406/job/111341180338"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37170113406"
+    }
+  },
+  "fx/v1.1.0": {
+    "workflow": "release.yml",
+    "tag": "fx/v1.1.0",
+    "attempted_ref": "main",
+    "status": "completed",
+    "checked_at": "2026-10-04T06:58:47.273999+00:00",
+    "error": "TCP connection reset; subsequent read timed out; check actual runs before retry",
+    "next_ref": "fx/v1.1.0",
+    "id": 37177589644,
+    "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37177589644",
+    "ref": "main",
+    "conclusion": "success",
+    "observed": {
+      "conclusion": "success",
+      "databaseId": 37177589644,
+      "event": "workflow_dispatch",
+      "headSha": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "jobs": [
+        {
+          "completedAt": "2026-10-04T04:38:41Z",
+          "conclusion": "success",
+          "databaseId": 111363358881,
+          "name": "release",
+          "startedAt": "2026-10-04T04:38:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-04T04:38:33Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-04T04:38:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:34Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-04T04:38:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:35Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 3,
+              "startedAt": "2026-10-04T04:38:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:35Z",
+              "conclusion": "success",
+              "name": "platform is at the {tag, commit} pair this workflow pins",
+              "number": 4,
+              "startedAt": "2026-10-04T04:38:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:35Z",
+              "conclusion": "success",
+              "name": "install pinned gitsign (binary + checksum, no marketplace action)",
+              "number": 5,
+              "startedAt": "2026-10-04T04:38:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:36Z",
+              "conclusion": "success",
+              "name": "offline verify (release gate -- must be a real pass, not a skip)",
+              "number": 6,
+              "startedAt": "2026-10-04T04:38:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:36Z",
+              "conclusion": "success",
+              "name": "offline verify -- market-moves and news",
+              "number": 7,
+              "startedAt": "2026-10-04T04:38:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:37Z",
+              "conclusion": "success",
+              "name": "gitsign verify-tag, identity-pinned, offline Rekor bundle",
+              "number": 8,
+              "startedAt": "2026-10-04T04:38:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:37Z",
+              "conclusion": "skipped",
+              "name": "tag still resolves to the commit this run was triggered from",
+              "number": 9,
+              "startedAt": "2026-10-04T04:38:37Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:38Z",
+              "conclusion": "success",
+              "name": "publish GitHub Release recording the resolved SHA",
+              "number": 10,
+              "startedAt": "2026-10-04T04:38:37Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:38Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 19,
+              "startedAt": "2026-10-04T04:38:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:39Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 20,
+              "startedAt": "2026-10-04T04:38:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T04:38:39Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-04T04:38:39Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37177589644/job/111363358881"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37177589644"
+    },
+    "recovered_actual_run_after_transport_reset": true,
+    "retry_performed": false,
+    "source_checkout_equals_tag_commit": true
+  },
+  "threat-register/v4.0.0": {
+    "id": 37184479972,
+    "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37184479972",
+    "workflow": "release.yml",
+    "tag": "threat-register/v4.0.0",
+    "ref": "threat-register/v4.0.0",
+    "expected_head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "status": "completed",
+    "dispatched_at": "2026-10-04T07:00:42.994717+00:00",
+    "conclusion": "success",
+    "observed": {
+      "conclusion": "success",
+      "databaseId": 37184479972,
+      "event": "workflow_dispatch",
+      "headSha": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "jobs": [
+        {
+          "completedAt": "2026-10-04T07:00:36Z",
+          "conclusion": "success",
+          "databaseId": 111383458639,
+          "name": "release",
+          "startedAt": "2026-10-04T07:00:28Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-04T07:00:29Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-04T07:00:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:30Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-04T07:00:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:30Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 3,
+              "startedAt": "2026-10-04T07:00:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:30Z",
+              "conclusion": "success",
+              "name": "platform is at the {tag, commit} pair this workflow pins",
+              "number": 4,
+              "startedAt": "2026-10-04T07:00:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:31Z",
+              "conclusion": "success",
+              "name": "install pinned gitsign (binary + checksum, no marketplace action)",
+              "number": 5,
+              "startedAt": "2026-10-04T07:00:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:31Z",
+              "conclusion": "success",
+              "name": "offline verify (release gate -- must be a real pass, not a skip)",
+              "number": 6,
+              "startedAt": "2026-10-04T07:00:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:32Z",
+              "conclusion": "success",
+              "name": "offline verify -- market-moves and news",
+              "number": 7,
+              "startedAt": "2026-10-04T07:00:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:33Z",
+              "conclusion": "success",
+              "name": "gitsign verify-tag, identity-pinned, offline Rekor bundle",
+              "number": 8,
+              "startedAt": "2026-10-04T07:00:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:33Z",
+              "conclusion": "skipped",
+              "name": "tag still resolves to the commit this run was triggered from",
+              "number": 9,
+              "startedAt": "2026-10-04T07:00:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:34Z",
+              "conclusion": "success",
+              "name": "publish GitHub Release recording the resolved SHA",
+              "number": 10,
+              "startedAt": "2026-10-04T07:00:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:34Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 19,
+              "startedAt": "2026-10-04T07:00:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:34Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 20,
+              "startedAt": "2026-10-04T07:00:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-04T07:00:34Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-04T07:00:34Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37184479972/job/111383458639"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37184479972"
+    }
+  }
+}

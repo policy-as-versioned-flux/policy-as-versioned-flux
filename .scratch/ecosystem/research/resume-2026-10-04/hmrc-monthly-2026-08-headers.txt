@@ -1,0 +1,27 @@
+HTTP/2 200 
+content-type: text/csv; charset=utf-8
+content-length: 8583
+date: Sun, 04 Oct 2026 08:56:10 GMT
+x-runtime: 0.079329
+x-frame-options: DENY
+x-xss-protection: 0
+x-content-type-options: nosniff
+x-download-options: noopen
+x-permitted-cross-domain-policies: none
+referrer-policy: strict-origin-when-cross-origin
+content-security-policy: default-src 'none'; frame-ancestors 'none'
+last-modified: Sun, 04 Oct 2026 05:00:13 GMT
+content-disposition: attachment; filename=exrates-monthly-0826.csv
+content-transfer-encoding: binary
+link: <https://api-docs.trade-tariff.service.gov.uk/llms.txt>; rel="describedby"
+x-old-path: /api/v2/exchange_rates/files/monthly_csv_2026-8.csv
+x-path-transformed: true
+x-request-id: 21ef3031-4714-46dc-b2ea-319d7141065b
+etag: W/"068458fb0bbdc007a9412642eb73c3fa"
+x-cache: Miss from cloudfront
+via: 1.1 947a4e13e31680bfbeb17e8a1cad3da4.cloudfront.net (CloudFront)
+x-amz-cf-pop: MAN50-P1
+x-amz-cf-id: m9kzyxzk_ebSKjvQuZp10BU3epxnikIjvN6Syj_uMveXQeetPtvy0Q==
+strict-transport-security: max-age=31536000; includeSubDomains
+vary: Origin
+

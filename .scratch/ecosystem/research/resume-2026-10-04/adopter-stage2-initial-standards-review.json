@@ -1,0 +1,28 @@
+{
+  "scope": "initial read-only neutral Stage2 source review against authentic apps3.0.1 baseline; foundation7/tools5 pins and final compose still pending",
+  "findings": [],
+  "adopters": {
+    "driftwood": {
+      "baseline": "17302ecd20041df61a52428e67246c330294d2a6",
+      "baseline_tag_object": "4cdf9152d2af61d9e476f5e0f487d85a2808f42f",
+      "inventory_sha256": "3673e27a8447f33a48430ec6b586ffd7732a352363b7cc533c5df23af428ecca",
+      "provenance_bindings_checked": true,
+      "source_deletions_observed_initially": []
+    },
+    "tuppence": {
+      "baseline": "d8dead25e0e5e275172640b1a637562e45edb15d",
+      "baseline_tag_object": "bc6ee99a1cda20e9fe0365feb25c3086aad7f5a5",
+      "inventory_sha256": "b100844ba2f1b5e776eec6415e677704045fa01d3d0f860f74adacf4b472df18",
+      "provenance_bindings_checked": true,
+      "source_deletions_observed_initially": []
+    },
+    "ludlow": {
+      "baseline": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+      "baseline_tag_object": "2cc62f42b297f1f7ed65babc381a6dad561f3240",
+      "inventory_sha256": "7095e7debc03b48adf87a668b267f9898c9586432bb0259d97251a475aee7d35",
+      "provenance_bindings_checked": true,
+      "source_deletions_observed_initially": []
+    }
+  },
+  "finding_status": "Initial Stage1 source deletion defect acknowledged by cloud; corrected delta recheck pending"
+}

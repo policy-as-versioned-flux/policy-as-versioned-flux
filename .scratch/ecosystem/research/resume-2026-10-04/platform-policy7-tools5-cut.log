@@ -1,0 +1,510 @@
+cut	Set up job	﻿2026-10-04T07:17:58.1855860Z Current runner version: '2.337.0'
+cut	Set up job	2026-10-04T07:17:58.1892508Z ##[group]Runner Image Provisioner
+cut	Set up job	2026-10-04T07:17:58.1893907Z Hosted Compute Agent
+cut	Set up job	2026-10-04T07:17:58.1895210Z Version: 20260901.588
+cut	Set up job	2026-10-04T07:17:58.1896434Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+cut	Set up job	2026-10-04T07:17:58.1897700Z Build Date: 2026-09-01T19:56:44Z
+cut	Set up job	2026-10-04T07:17:58.1898799Z Worker ID: {bcf97e0a-e5a0-4482-b57d-b1797d308b42}
+cut	Set up job	2026-10-04T07:17:58.1900629Z Azure Region: eastus2
+cut	Set up job	2026-10-04T07:17:58.1901587Z ##[endgroup]
+cut	Set up job	2026-10-04T07:17:58.1903955Z ##[group]Operating System
+cut	Set up job	2026-10-04T07:17:58.1905273Z Ubuntu
+cut	Set up job	2026-10-04T07:17:58.1906145Z 24.04.5
+cut	Set up job	2026-10-04T07:17:58.1907144Z LTS
+cut	Set up job	2026-10-04T07:17:58.1907940Z ##[endgroup]
+cut	Set up job	2026-10-04T07:17:58.1909048Z ##[group]Runner Image
+cut	Set up job	2026-10-04T07:17:58.1910082Z Image: ubuntu-24.04
+cut	Set up job	2026-10-04T07:17:58.1910964Z Version: 20260927.320.1
+cut	Set up job	2026-10-04T07:17:58.1912853Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+cut	Set up job	2026-10-04T07:17:58.1916191Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+cut	Set up job	2026-10-04T07:17:58.1917857Z ##[endgroup]
+cut	Set up job	2026-10-04T07:17:58.1919699Z ##[group]GITHUB_TOKEN Permissions
+cut	Set up job	2026-10-04T07:17:58.1922746Z Contents: write
+cut	Set up job	2026-10-04T07:17:58.1923889Z Metadata: read
+cut	Set up job	2026-10-04T07:17:58.1925072Z ##[endgroup]
+cut	Set up job	2026-10-04T07:17:58.1928007Z Secret source: Actions
+cut	Set up job	2026-10-04T07:17:58.1929607Z Cache mode: write
+cut	Set up job	2026-10-04T07:17:58.1931153Z Prepare workflow directory
+cut	Set up job	2026-10-04T07:17:58.2500276Z Prepare all required actions
+cut	Set up job	2026-10-04T07:17:58.2571640Z Getting action download info
+cut	Set up job	2026-10-04T07:17:58.4920706Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+cut	Set up job	2026-10-04T07:17:58.6250709Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+cut	Set up job	2026-10-04T07:17:58.8357470Z Complete job name: cut
+cut	Run actions/checkout@v4	﻿2026-10-04T07:17:58.9148448Z ##[group]Run actions/checkout@v4
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9149348Z with:
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9149813Z   fetch-depth: 0
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9150356Z   repository: policy-as-versioned-platform/platform
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9154164Z   token: ***
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9154819Z   ssh-strict: true
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9155263Z   ssh-user: git
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9155715Z   persist-credentials: true
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9156212Z   clean: true
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9156660Z   sparse-checkout-cone-mode: true
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9157199Z   fetch-tags: false
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9157648Z   show-progress: true
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9158107Z   lfs: false
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9158538Z   submodules: false
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9158994Z   set-safe-directory: true
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9159511Z   allow-unsafe-pr-checkout: false
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9160281Z env:
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9160720Z   GITSIGN_VERSION: 0.17.1
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9161450Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9162282Z   COSIGN_VERSION: 2.4.1
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9162982Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9163791Z   KYVERNO_VERSION: 1.18.2
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9164712Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	Run actions/checkout@v4	2026-10-04T07:17:58.9165500Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0165386Z Syncing repository: policy-as-versioned-platform/platform
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0168324Z ##[group]Getting Git version info
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0169370Z Working directory is '/home/runner/work/platform/platform'
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0170417Z [command]/usr/bin/git version
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0262071Z git version 2.55.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0296629Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0305519Z Temporarily overriding HOME='/home/runner/work/_temp/af06d4a2-4a7f-4d05-bcad-4ce65a8a3cb2' before making global git config changes
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0308287Z Adding repository directory to the temporary git global config as a safe directory
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0310433Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/platform/platform
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0367228Z Deleting the contents of '/home/runner/work/platform/platform'
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0375031Z ##[group]Initializing the repository
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0378151Z [command]/usr/bin/git init /home/runner/work/platform/platform
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0529711Z hint: Using 'master' as the name for the initial branch. This default branch name
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0531621Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0533245Z hint: to use in all of your new repositories, which will suppress this warning,
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0535140Z hint: call:
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0536227Z hint:
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0537448Z hint: 	git config --global init.defaultBranch <name>
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0540077Z hint:
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0541401Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0543144Z hint: 'development'. The just-created branch can be renamed via this command:
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0545927Z hint:
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0546932Z hint: 	git branch -m <name>
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0548096Z hint:
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0549305Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0550996Z Initialized empty Git repository in /home/runner/work/platform/platform/.git/
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0554212Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-platform/platform
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0634670Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0636061Z ##[group]Disabling automatic garbage collection
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0639674Z [command]/usr/bin/git config --local gc.auto 0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0677681Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0679354Z ##[group]Setting up auth
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0686424Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.0740092Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.1148775Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.1185669Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.1417740Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.1462193Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.1702678Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.1749873Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.1751346Z ##[group]Fetching the repository
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.1761767Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6857191Z From https://github.com/policy-as-versioned-platform/platform
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6859535Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6861570Z  * [new branch]      ecosystem/thin-slice    -> origin/ecosystem/thin-slice
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6863798Z  * [new branch]      fix-2026-09-09-absence-count-is-derived -> origin/fix-2026-09-09-absence-count-is-derived
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6866797Z  * [new branch]      fix-transition-replay-20260910 -> origin/fix-transition-replay-20260910
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6869640Z  * [new branch]      implement-engine-fixtures-20260910 -> origin/implement-engine-fixtures-20260910
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6872681Z  * [new branch]      implement-floor-change-evidence-20260910 -> origin/implement-floor-change-evidence-20260910
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6875385Z  * [new branch]      main                    -> origin/main
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6877217Z  * [new branch]      observations            -> origin/observations
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6879126Z  * [new branch]      policy-composition/tickets-09-16-wip -> origin/policy-composition/tickets-09-16-wip
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6881550Z  * [new branch]      release/2.0.x           -> origin/release/2.0.x
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6883180Z  * [new branch]      renovate/configure      -> origin/renovate/configure
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6885379Z  * [new branch]      repair-2026-09-04-gate-regressions -> origin/repair-2026-09-04-gate-regressions
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6887807Z  * [new branch]      repair/array-commit-for-4-0-0 -> origin/repair/array-commit-for-4-0-0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6889850Z  * [new branch]      repair/evidence-reaches-main -> origin/repair/evidence-reaches-main
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6892150Z  * [new branch]      resume/2026-10-03-security6 -> origin/resume/2026-10-03-security6
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6894997Z  * [new branch]      resume/2026-10-04-compatibility7 -> origin/resume/2026-10-04-compatibility7
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6897721Z  * [new branch]      retire-policy-4-0-0     -> origin/retire-policy-4-0-0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6900983Z  * [new branch]      ticket-106-composition-selfcheck-fixture-namespace -> origin/ticket-106-composition-selfcheck-fixture-namespace
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6905030Z  * [new branch]      ticket-110-offline-supersede -> origin/ticket-110-offline-supersede
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6907732Z  * [new branch]      ticket-110-selfcheck-derives-supersede -> origin/ticket-110-selfcheck-derives-supersede
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6910728Z  * [new branch]      ticket-111-the-cage-delivers-its-classes -> origin/ticket-111-the-cage-delivers-its-classes
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6913634Z  * [new branch]      ticket-113-infra-is-a-role-not-a-rung -> origin/ticket-113-infra-is-a-role-not-a-rung
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6916998Z  * [new branch]      ticket-119-unlabelled-namespace-is-priced -> origin/ticket-119-unlabelled-namespace-is-priced
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6920870Z  * [new branch]      ticket-121-implementing-a-control-moves-the-price -> origin/ticket-121-implementing-a-control-moves-the-price
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6924061Z  * [new branch]      ticket-122-ramp-survives-rename -> origin/ticket-122-ramp-survives-rename
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6927161Z  * [new branch]      ticket-123-a-withdrawal-is-the-regulators -> origin/ticket-123-a-withdrawal-is-the-regulators
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6929894Z  * [new branch]      ticket-124-price-the-removal -> origin/ticket-124-price-the-removal
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6932822Z  * [new branch]      ticket-126-a-withdrawn-control-is-not-selectable -> origin/ticket-126-a-withdrawn-control-is-not-selectable
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6936605Z  * [new branch]      ticket-128-behind-a-major-unreadable -> origin/ticket-128-behind-a-major-unreadable
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6939784Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6942735Z  * [new branch]      ticket-134-observation-is-not-source -> origin/ticket-134-observation-is-not-source
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6945705Z  * [new branch]      ticket-136-vendor-by-feed-name -> origin/ticket-136-vendor-by-feed-name
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6948214Z  * [new branch]      ticket-137-parent-tree-per-feed-edge -> origin/ticket-137-parent-tree-per-feed-edge
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6950553Z  * [new branch]      ticket-138-as-of-docstring -> origin/ticket-138-as-of-docstring
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6952620Z  * [new branch]      ticket-139-since-after-as-of -> origin/ticket-139-since-after-as-of
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6955551Z  * [new branch]      ticket-141-party-declares-pricing-threshold -> origin/ticket-141-party-declares-pricing-threshold
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6958169Z  * [new branch]      ticket-145-agent-cage-price -> origin/ticket-145-agent-cage-price
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6960124Z  * [new branch]      ticket-146-engine-cells -> origin/ticket-146-engine-cells
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6962194Z  * [new branch]      ticket-148-unsupported-pairing -> origin/ticket-148-unsupported-pairing
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6964965Z  * [new branch]      ticket-34-followup-2026-09-08 -> origin/ticket-34-followup-2026-09-08
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6967591Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6970866Z  * [new branch]      ticket-45-switching-cost-computed-in-composition -> origin/ticket-45-switching-cost-computed-in-composition
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6973623Z  * [new branch]      ticket-55-instrument-faults -> origin/ticket-55-instrument-faults
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6975927Z  * [new branch]      ticket-62-and-77        -> origin/ticket-62-and-77
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6978134Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6980531Z  * [new branch]      ticket-79-the-pound-inputs -> origin/ticket-79-the-pound-inputs
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6982826Z  * [new branch]      ticket-80-three-forks-not-a-config-base -> origin/ticket-80-three-forks-not-a-config-base
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6985841Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6988246Z  * [new branch]      ticket-89-deny-is-not-a-rung -> origin/ticket-89-deny-is-not-a-rung
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6991263Z  * [new branch]      ticket-91-the-currency-controller-is-owned -> origin/ticket-91-the-currency-controller-is-owned
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6993972Z  * [new branch]      ticket-98-refusal-by-another-name -> origin/ticket-98-refusal-by-another-name
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6996522Z  * [new branch]      truth-surface-computed-semver -> origin/truth-surface-computed-semver
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.6998620Z  * [new branch]      truth-surface-live-tails -> origin/truth-surface-live-tails
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7000318Z  * [new tag]         policy/v2.0.0           -> policy/v2.0.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7001689Z  * [new tag]         policy/v2.0.1           -> policy/v2.0.1
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7003317Z  * [new tag]         policy/v3.0.0           -> policy/v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7005063Z  * [new tag]         policy/v4.0.0           -> policy/v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7006624Z  * [new tag]         policy/v5.0.0           -> policy/v5.0.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7008174Z  * [new tag]         policy/v6.0.0           -> policy/v6.0.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7014013Z  * [new tag]         v0.1.0                  -> v0.1.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7015647Z  * [new tag]         v0.1.1                  -> v0.1.1
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7016957Z  * [new tag]         v1.0.0                  -> v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7018243Z  * [new tag]         v1.1.0                  -> v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7019538Z  * [new tag]         v1.1.1                  -> v1.1.1
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7020818Z  * [new tag]         v2.0.0                  -> v2.0.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7022051Z  * [new tag]         v2.0.1                  -> v2.0.1
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7023355Z  * [new tag]         v3.0.0                  -> v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7024970Z  * [new tag]         v3.1.0                  -> v3.1.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7026322Z  * [new tag]         v3.2.0                  -> v3.2.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7027606Z  * [new tag]         v3.3.0                  -> v3.3.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7028895Z  * [new tag]         v3.4.0                  -> v3.4.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7030205Z  * [new tag]         v3.4.1                  -> v3.4.1
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7031808Z  * [new tag]         v4.0.0                  -> v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7034907Z [command]/usr/bin/git branch --list --remote origin/main
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7036350Z   origin/main
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7038476Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7039811Z b55f643d3bb012658ddb00a26bcfb219c7f3ea12
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7042409Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7043746Z ##[group]Determining the checkout info
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7045595Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7046476Z [command]/usr/bin/git sparse-checkout disable
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7049012Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7059053Z ##[group]Checking out the ref
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7064566Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7556297Z Switched to a new branch 'main'
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7560477Z branch 'main' set up to track 'origin/main'.
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7569979Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7617700Z [command]/usr/bin/git log -1 --format=%H
+cut	Run actions/checkout@v4	2026-10-04T07:17:59.7647735Z b55f643d3bb012658ddb00a26bcfb219c7f3ea12
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	﻿2026-10-04T07:17:59.7967724Z ##[group]Run set -euo pipefail
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7969242Z ^[[36;1mset -euo pipefail^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7972352Z ^[[36;1mcurl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7976099Z ^[[36;1mecho "${GITSIGN_SHA256}  gitsign" | sha256sum -c -^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7978130Z ^[[36;1mchmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7979901Z ^[[36;1m^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7982223Z ^[[36;1mcurl -sSL -o cosign "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64"^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7985347Z ^[[36;1mecho "${COSIGN_SHA256}  cosign" | sha256sum -c -^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7987235Z ^[[36;1mchmod +x cosign && sudo mv cosign /usr/local/bin/cosign^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7988867Z ^[[36;1m^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7991819Z ^[[36;1mcurl -sSL -o kyverno.tar.gz "https://github.com/kyverno/kyverno/releases/download/v${KYVERNO_VERSION}/kyverno-cli_v${KYVERNO_VERSION}_linux_x86_64.tar.gz"^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7995717Z ^[[36;1mecho "${KYVERNO_SHA256}  kyverno.tar.gz" | sha256sum -c -^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.7998153Z ^[[36;1mtar xzf kyverno.tar.gz kyverno && chmod +x kyverno && sudo mv kyverno /usr/local/bin/kyverno^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8000263Z ^[[36;1m^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8001285Z ^[[36;1mpip install --quiet pyyaml^[[0m
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8294074Z shell: /usr/bin/bash -e {0}
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8295614Z env:
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8296610Z   GITSIGN_VERSION: 0.17.1
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8298432Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8300435Z   COSIGN_VERSION: 2.4.1
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8302185Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8304220Z   KYVERNO_VERSION: 1.18.2
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8306170Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:17:59.8308204Z ##[endgroup]
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:18:00.3626480Z gitsign: OK
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:18:00.9274757Z cosign: OK
+cut	install pinned gitsign + cosign + kyverno (binary + checksum, no marketplace action)	2026-10-04T07:18:01.2494572Z kyverno.tar.gz: OK
+cut	normalize the single-tag or multi-tag dispatch into tags.json	﻿2026-10-04T07:18:05.4458696Z ##[group]Run set -euo pipefail
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4459051Z ^[[36;1mset -euo pipefail^[[0m
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4459415Z ^[[36;1mpython3 .github/scripts/cut-release-normalize.py > tags.json^[[0m
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4459800Z ^[[36;1mcat tags.json^[[0m
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4524993Z shell: /usr/bin/bash -e {0}
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4525269Z env:
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4525469Z   GITSIGN_VERSION: 0.17.1
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4525852Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4526260Z   COSIGN_VERSION: 2.4.1
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4526614Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4527030Z   KYVERNO_VERSION: 1.18.2
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4527398Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4527801Z   VERSION_INPUT: 
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4527995Z   MESSAGE_INPUT: 
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4529313Z   TAGS_INPUT: [
+cut	normalize the single-tag or multi-tag dispatch into tags.json	  {
+cut	normalize the single-tag or multi-tag dispatch into tags.json	    "tag": "policy/v7.0.0",
+cut	normalize the single-tag or multi-tag dispatch into tags.json	    "message": "Compatibility major over supported5.0.0/6.0.0: v1 bodies, typed tier, document generation proof and posture-trust-boundary retirement from this new line."
+cut	normalize the single-tag or multi-tag dispatch into tags.json	  },
+cut	normalize the single-tag or multi-tag dispatch into tags.json	  {
+cut	normalize the single-tag or multi-tag dispatch into tags.json	    "tag": "v5.0.0",
+cut	normalize the single-tag or multi-tag dispatch into tags.json	    "message": "Reviewed platform tooling and machinery for exact engines, compatibility grading, restored composition and policy7 coexistence."
+cut	normalize the single-tag or multi-tag dispatch into tags.json	  }
+cut	normalize the single-tag or multi-tag dispatch into tags.json	]
+cut	normalize the single-tag or multi-tag dispatch into tags.json	
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4530969Z ##[endgroup]
+cut	normalize the single-tag or multi-tag dispatch into tags.json	2026-10-04T07:18:05.4849766Z [{"tag": "policy/v7.0.0", "message": "Compatibility major over supported5.0.0/6.0.0: v1 bodies, typed tier, document generation proof and posture-trust-boundary retirement from this new line."}, {"tag": "v5.0.0", "message": "Reviewed platform tooling and machinery for exact engines, compatibility grading, restored composition and policy7 coexistence."}]
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	﻿2026-10-04T07:18:05.4903498Z ##[group]Run ./.github/scripts/cut-release-refuse-existing.sh tags.json
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4904061Z ^[[36;1m./.github/scripts/cut-release-refuse-existing.sh tags.json^[[0m
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4967821Z shell: /usr/bin/bash -e {0}
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4968095Z env:
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4968297Z   GITSIGN_VERSION: 0.17.1
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4968677Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4969094Z   COSIGN_VERSION: 2.4.1
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4969465Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4969908Z   KYVERNO_VERSION: 1.18.2
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4970273Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.4970680Z ##[endgroup]
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.5123752Z ok: policy/v7.0.0 does not exist yet
+cut	refuse any tag that already exists -- checked for EVERY tag before ANY tag is created	2026-10-04T07:18:05.5139027Z ok: v5.0.0 does not exist yet
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	﻿2026-10-04T07:18:05.5176814Z ##[group]Run python3 .github/scripts/cut-release-gate.py tags.json
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5177319Z ^[[36;1mpython3 .github/scripts/cut-release-gate.py tags.json^[[0m
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5241403Z shell: /usr/bin/bash -e {0}
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5241678Z env:
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5241880Z   GITSIGN_VERSION: 0.17.1
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5242255Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5242669Z   COSIGN_VERSION: 2.4.1
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5243031Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5243438Z   KYVERNO_VERSION: 1.18.2
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5243823Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:18:05.5244260Z ##[endgroup]
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:36.5869590Z Using payload from: /home/runner/work/platform/platform/computed-semver/evidence/7.0.0.json
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:36.5870499Z Generating ephemeral keys...
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:36.6491150Z Retrieving signed certificate...
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2319785Z Successfully verified SCT...
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2320215Z 
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2321681Z 	The sigstore service, hosted by sigstore a Series of LF Projects, LLC, is provided pursuant to the Hosted Project Tools Terms of Use, available at https://lfprojects.org/policies/hosted-project-tools-terms-of-use/.
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2324735Z 	Note that if your submission includes personal data associated with this signed artifact, it will be part of an immutable record.
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2326513Z 	This may include the email address associated with the account with which you authenticate your contractual Agreement.
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2329242Z 	This information will be used for signing this artifact and will be stored in public transparency logs and cannot be removed later, and is subject to the Immutable Record notice at https://lfprojects.org/policies/hosted-project-tools-immutable-records/.
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2330977Z 
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2332127Z By typing 'y', you attest that (1) you are not submitting the personal data of any other person; and (2) you understand and agree to the statement and the Agreement terms at the URLs listed above.
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2333596Z using ephemeral certificate:
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2334067Z -----BEGIN CERTIFICATE-----
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2335026Z MIIHwDCCB0agAwIBAgIUS0YUp6bOMcEN820OUbHKm1lq4vIwCgYIKoZIzj0EAwMw
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2335969Z NzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQDExVzaWdzdG9yZS1pbnRl
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2336955Z cm1lZGlhdGUwHhcNMjYxMDA0MDcyMDM2WhcNMjYxMDA0MDczMDM2WjAAMFkwEwYH
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2337877Z KoZIzj0CAQYIKoZIzj0DAQcDQgAEtFpuVccUPmWVlAV3j7u6mTIZ2aDJKP1lCwqw
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2339119Z Fh5Wq+Z9DNU3Xpg3O8Tm6J42k7NRd/dZJw+tpFfT7FjGGm7Mb6OCBmUwggZhMA4G
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2339966Z A1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDAzAdBgNVHQ4EFgQUsIrV
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2340831Z k/Rn9RZQx3oXwgL3R3XHfCcwHwYDVR0jBBgwFoAU39Ppz1YkEZb5qNjpKFWixi4Y
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2341680Z ZD8weAYDVR0RAQH/BG4wbIZqaHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2342514Z ZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0vLmdpdGh1Yi93b3JrZmxvd3MvY3V0
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2343340Z LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA5BgorBgEEAYO/MAEBBCtodHRw
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2344542Z czovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tMB8GCisGAQQB
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2345474Z g78wAQIEEXdvcmtmbG93X2Rpc3BhdGNoMDYGCisGAQQBg78wAQMEKGI1NWY2NDNk
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2346379Z M2JiMDEyNjU4ZGRiMDBhMjZiY2ZiMjE5YzdmM2VhMTIwGQYKKwYBBAGDvzABBAQL
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2347323Z Y3V0LXJlbGVhc2UwMwYKKwYBBAGDvzABBQQlcG9saWN5LWFzLXZlcnNpb25lZC1w
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2348227Z bGF0Zm9ybS9wbGF0Zm9ybTAdBgorBgEEAYO/MAEGBA9yZWZzL2hlYWRzL21haW4w
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2349149Z OwYKKwYBBAGDvzABCAQtDCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNl
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2350071Z cmNvbnRlbnQuY29tMHoGCisGAQQBg78wAQkEbAxqaHR0cHM6Ly9naXRodWIuY29t
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2350990Z L3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0vLmdpdGh1Yi93
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2351929Z b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA4BgorBgEE
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2353231Z AYO/MAEKBCoMKGI1NWY2NDNkM2JiMDEyNjU4ZGRiMDBhMjZiY2ZiMjE5YzdmM2Vh
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2354216Z MTIwHQYKKwYBBAGDvzABCwQPDA1naXRodWItaG9zdGVkMEgGCisGAQQBg78wAQwE
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2355412Z Ogw4aHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZv
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2356335Z cm0vcGxhdGZvcm0wOAYKKwYBBAGDvzABDQQqDChiNTVmNjQzZDNiYjAxMjY1OGRk
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2357304Z YjAwYTI2YmNmYjIxOWM3ZjNlYTEyMB8GCisGAQQBg78wAQ4EEQwPcmVmcy9oZWFk
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2358336Z cy9tYWluMBoGCisGAQQBg78wAQ8EDAwKMTM0MDk4NDY0ODA/BgorBgEEAYO/MAEQ
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2359270Z BDEML2h0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRm
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2360201Z b3JtMBkGCisGAQQBg78wAREECwwJMzA4NDc5NzI1MHoGCisGAQQBg78wARIEbAxq
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2361112Z aHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZvcm0v
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2362027Z cGxhdGZvcm0vLmdpdGh1Yi93b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMv
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2362971Z aGVhZHMvbWFpbjA4BgorBgEEAYO/MAETBCoMKGI1NWY2NDNkM2JiMDEyNjU4ZGRi
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2363907Z MDBhMjZiY2ZiMjE5YzdmM2VhMTIwIQYKKwYBBAGDvzABFAQTDBF3b3JrZmxvd19k
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2365085Z aXNwYXRjaDBsBgorBgEEAYO/MAEVBF4MXGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xp
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2365984Z Y3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3JtL2FjdGlvbnMvcnVucy8z
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2366895Z NzE4NTM1NDQ3MC9hdHRlbXB0cy8xMBYGCisGAQQBg78wARYECAwGcHVibGljMGMG
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2367808Z CisGAQQBg78wARgEVQxTcmVwbzpwb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3Jt
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2368763Z QDMwODQ3OTcyNS9wbGF0Zm9ybUAxMzQwOTg0NjQ4OnJlZjpyZWZzL2hlYWRzL21h
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2369696Z aW4wgYkGCisGAQQB1nkCBAIEewR5AHcAdQDdPTBqxscRMmMZHhyZZzcCokpeuN48
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2370561Z rf+HinKALynujgAAAaEFyTzOAAAEAwBGMEQCIFudHNSO/mAyjnDScUJadWpiqI8v
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2371425Z ub1rkS4WNtiZeJMpAiBAL2gNHH1Z0gdObC2u7hRKgkwTWOZJxMESaMoIxTwhmzAK
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2372338Z BggqhkjOPQQDAwNoADBlAjEApAbYrfBB3FpO85HZCTLjNUNaXGhr46xeneOMBqTH
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2373236Z OUrj5vghmX2pJ8Ih4QXFNSV3AjBhsFP0V3d/s8atPs/9xYsWrNVUrblBN9TygtWI
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2373920Z nT8OBFcFLrPWeVMuGsY2BcxXhYY=
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2374605Z -----END CERTIFICATE-----
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.2374881Z 
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7005121Z tlog entry created with index: 3076599219
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7005941Z using ephemeral certificate:
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7006383Z -----BEGIN CERTIFICATE-----
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7007181Z MIIHwDCCB0agAwIBAgIUS0YUp6bOMcEN820OUbHKm1lq4vIwCgYIKoZIzj0EAwMw
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7008070Z NzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQDExVzaWdzdG9yZS1pbnRl
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7008908Z cm1lZGlhdGUwHhcNMjYxMDA0MDcyMDM2WhcNMjYxMDA0MDczMDM2WjAAMFkwEwYH
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7009713Z KoZIzj0CAQYIKoZIzj0DAQcDQgAEtFpuVccUPmWVlAV3j7u6mTIZ2aDJKP1lCwqw
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7010230Z Fh5Wq+Z9DNU3Xpg3O8Tm6J42k7NRd/dZJw+tpFfT7FjGGm7Mb6OCBmUwggZhMA4G
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7010735Z A1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDAzAdBgNVHQ4EFgQUsIrV
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7011266Z k/Rn9RZQx3oXwgL3R3XHfCcwHwYDVR0jBBgwFoAU39Ppz1YkEZb5qNjpKFWixi4Y
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7011785Z ZD8weAYDVR0RAQH/BG4wbIZqaHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7012293Z ZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0vLmdpdGh1Yi93b3JrZmxvd3MvY3V0
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7012801Z LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA5BgorBgEEAYO/MAEBBCtodHRw
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7013311Z czovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tMB8GCisGAQQB
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7013828Z g78wAQIEEXdvcmtmbG93X2Rpc3BhdGNoMDYGCisGAQQBg78wAQMEKGI1NWY2NDNk
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7014588Z M2JiMDEyNjU4ZGRiMDBhMjZiY2ZiMjE5YzdmM2VhMTIwGQYKKwYBBAGDvzABBAQL
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7015147Z Y3V0LXJlbGVhc2UwMwYKKwYBBAGDvzABBQQlcG9saWN5LWFzLXZlcnNpb25lZC1w
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7015679Z bGF0Zm9ybS9wbGF0Zm9ybTAdBgorBgEEAYO/MAEGBA9yZWZzL2hlYWRzL21haW4w
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7016188Z OwYKKwYBBAGDvzABCAQtDCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNl
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7016712Z cmNvbnRlbnQuY29tMHoGCisGAQQBg78wAQkEbAxqaHR0cHM6Ly9naXRodWIuY29t
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7017230Z L3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0vLmdpdGh1Yi93
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7017921Z b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA4BgorBgEE
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7018458Z AYO/MAEKBCoMKGI1NWY2NDNkM2JiMDEyNjU4ZGRiMDBhMjZiY2ZiMjE5YzdmM2Vh
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7018931Z MTIwHQYKKwYBBAGDvzABCwQPDA1naXRodWItaG9zdGVkMEgGCisGAQQBg78wAQwE
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7019402Z Ogw4aHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZv
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7019867Z cm0vcGxhdGZvcm0wOAYKKwYBBAGDvzABDQQqDChiNTVmNjQzZDNiYjAxMjY1OGRk
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7020346Z YjAwYTI2YmNmYjIxOWM3ZjNlYTEyMB8GCisGAQQBg78wAQ4EEQwPcmVmcy9oZWFk
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7020803Z cy9tYWluMBoGCisGAQQBg78wAQ8EDAwKMTM0MDk4NDY0ODA/BgorBgEEAYO/MAEQ
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7021264Z BDEML2h0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRm
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7021723Z b3JtMBkGCisGAQQBg78wAREECwwJMzA4NDc5NzI1MHoGCisGAQQBg78wARIEbAxq
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7022188Z aHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZvcm0v
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7022651Z cGxhdGZvcm0vLmdpdGh1Yi93b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMv
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7023113Z aGVhZHMvbWFpbjA4BgorBgEEAYO/MAETBCoMKGI1NWY2NDNkM2JiMDEyNjU4ZGRi
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7023601Z MDBhMjZiY2ZiMjE5YzdmM2VhMTIwIQYKKwYBBAGDvzABFAQTDBF3b3JrZmxvd19k
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7024056Z aXNwYXRjaDBsBgorBgEEAYO/MAEVBF4MXGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xp
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7024886Z Y3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3JtL2FjdGlvbnMvcnVucy8z
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7025372Z NzE4NTM1NDQ3MC9hdHRlbXB0cy8xMBYGCisGAQQBg78wARYECAwGcHVibGljMGMG
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7025852Z CisGAQQBg78wARgEVQxTcmVwbzpwb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3Jt
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7026323Z QDMwODQ3OTcyNS9wbGF0Zm9ybUAxMzQwOTg0NjQ4OnJlZjpyZWZzL2hlYWRzL21h
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7026806Z aW4wgYkGCisGAQQB1nkCBAIEewR5AHcAdQDdPTBqxscRMmMZHhyZZzcCokpeuN48
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7027286Z rf+HinKALynujgAAAaEFyTzOAAAEAwBGMEQCIFudHNSO/mAyjnDScUJadWpiqI8v
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7027744Z ub1rkS4WNtiZeJMpAiBAL2gNHH1Z0gdObC2u7hRKgkwTWOZJxMESaMoIxTwhmzAK
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7028216Z BggqhkjOPQQDAwNoADBlAjEApAbYrfBB3FpO85HZCTLjNUNaXGhr46xeneOMBqTH
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7028684Z OUrj5vghmX2pJ8Ih4QXFNSV3AjBhsFP0V3d/s8atPs/9xYsWrNVUrblBN9TygtWI
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7029056Z nT8OBFcFLrPWeVMuGsY2BcxXhYY=
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7029304Z -----END CERTIFICATE-----
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7029456Z 
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7030115Z Wrote bundle to file /home/runner/work/platform/platform/computed-semver/evidence/7.0.0.json.bundle
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7031303Z MEYCIQCqdmFjk0zu9mFga9A/YBj1ORdToCsdP03wsTLI1ZYsNQIhAMZ2KJoCeaNGwuvz6XPnKaZM7RdFBcRbPTWU+rJ70Mdy
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7032386Z ok  'v5.0.0' is not a policy tag -- not this gate's subject, skipped
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7033466Z signed: /home/runner/work/platform/platform/computed-semver/evidence/7.0.0.json.bundle
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7034186Z ## Publisher gate
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7034639Z 
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7034832Z | tag | declared | computed | outcome | reason |
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7035335Z | --- | --- | --- | --- | --- |
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7035825Z | `policy/v7.0.0` | major | major | passed |  |
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7036204Z 
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7037055Z GATE: cut-release.yml must cut policy/v7.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
+cut	publisher gate -- run_gate() on every policy tag, evidence signed cosign keyless (pass or refuse)	2026-10-04T07:20:37.7038218Z GATE: passed for policy/v7.0.0
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	﻿2026-10-04T07:20:37.7182887Z ##[group]Run set -euo pipefail
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7183251Z ^[[36;1mset -euo pipefail^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7183695Z ^[[36;1mbash engine/install-kyverno-engines.sh linux_x86_64 "$RUNNER_TEMP/kyverno-engines"^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7184738Z ^[[36;1mif python3 computed-semver/engine_compatibility.py --engine-dir "$RUNNER_TEMP/kyverno-engines" \^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7185334Z ^[[36;1m     >"$RUNNER_TEMP/engine-cells.txt"; then^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7185686Z ^[[36;1m  tail -n 8 "$RUNNER_TEMP/engine-cells.txt"^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7185988Z ^[[36;1melse^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7186243Z ^[[36;1m  tail -n 60 "$RUNNER_TEMP/engine-cells.txt"^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7186641Z ^[[36;1m  echo "::error::an engine cell did not pass; no tag is signed"^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7186999Z ^[[36;1m  exit 1^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7187204Z ^[[36;1mfi^[[0m
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7249472Z shell: /usr/bin/bash -e {0}
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7249743Z env:
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7249955Z   GITSIGN_VERSION: 0.17.1
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7250351Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7250817Z   COSIGN_VERSION: 2.4.1
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7251189Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7251611Z   KYVERNO_VERSION: 1.18.2
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7251996Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:37.7252419Z ##[endgroup]
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:39.4581092Z installed kyverno 1.18.2 (linux_x86_64, archive sha256 cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b) at /home/runner/work/_temp/kyverno-engines/1.18.2/kyverno
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:20:41.1792194Z installed kyverno 1.19.1 (linux_x86_64, archive sha256 b38228f367fc0fdc2b08f4c83ea50ac5f16c60ff8d62d76a66157c33c47b70ae) at /home/runner/work/_temp/kyverno-engines/1.19.1/kyverno
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:21:11.9320821Z   }
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:21:11.9324614Z }
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:21:11.9325064Z subject       1.18.2          1.19.1          row
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:21:11.9325658Z policy 5.0.0  passed          -               passed
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:21:11.9326225Z policy 6.0.0  passed          -               passed
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:21:11.9326798Z policy 7.0.0  passed          passed          passed
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:21:11.9327377Z machinery     passed          passed          passed
+cut	engine cells -- every line and the machinery pass on every engine they list, before any tag is signed	2026-10-04T07:21:11.9330533Z PASS: engine cells -- passed; 6 cell(s): 6 passed; graded platform commit b55f643d3bb012658ddb00a26bcfb219c7f3ea12: policy 5.0.0 from refs/tags/policy/v5.0.0 at 5b88f1d0bb33274e3348db93645d972c893b3c2c, policy 6.0.0 from refs/tags/policy/v6.0.0 at 59ec7ce39bcd658c2454b23ce1cc26082e737fdd, policy 7.0.0 (uncut candidate) from the graded commit, machinery rendered by compose/composition.py at the graded commit; each body read by git archive at that ref and run by the kyverno binaries above
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	﻿2026-10-04T07:21:11.9419709Z ##[group]Run actions/upload-artifact@v4
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9420021Z with:
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9420233Z   name: publisher-gate-evidence
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9420504Z   path: computed-semver/evidence/
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9420764Z   if-no-files-found: ignore
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9420999Z   compression-level: 6
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9421215Z   overwrite: false
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9421425Z   include-hidden-files: false
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9421649Z env:
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9422013Z   GITSIGN_VERSION: 0.17.1
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9422376Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9422778Z   COSIGN_VERSION: 2.4.1
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9423127Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9423523Z   KYVERNO_VERSION: 1.18.2
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9423884Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:11.9424280Z ##[endgroup]
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.1057382Z (node:8129) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.1058253Z (Use `node --trace-deprecation ...` to show where the warning was created)
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.1140311Z With the provided path, there will be 14 files uploaded
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.1148038Z Artifact name is valid!
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.1148764Z Root directory input is valid!
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.3331827Z Beginning upload of artifact content to blob storage
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.3729347Z (node:8129) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.4238967Z Uploaded bytes 56925
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.4431354Z Finished uploading artifact content to blob storage!
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.4432305Z SHA256 digest of uploaded artifact zip is 2c65a29bf7968a33ba16e3f3b02fcf733a231f0f5aa07c4059795255c5938453
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.4435230Z Finalizing artifact upload
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.6551701Z Artifact publisher-gate-evidence.zip successfully finalized. Artifact ID 11296912282
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.6553037Z Artifact publisher-gate-evidence has been successfully uploaded! Final size is 56925 bytes. Artifact ID is 11296912282
+cut	upload the signed gate evidence as a run artifact (always -- a refusal's own evidence matters most)	2026-10-04T07:21:12.6559088Z Artifact download URL: https://github.com/policy-as-versioned-platform/platform/actions/runs/37185354470/artifacts/11296912282
+cut	commit the signed evidence into the release commit, BEFORE the tag	﻿2026-10-04T07:21:12.6678541Z ##[group]Run ./.github/scripts/cut-release-commit-evidence.sh tags.json
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6679084Z ^[[36;1m./.github/scripts/cut-release-commit-evidence.sh tags.json^[[0m
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6741858Z shell: /usr/bin/bash -e {0}
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6742109Z env:
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6742307Z   GITSIGN_VERSION: 0.17.1
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6742682Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6743095Z   COSIGN_VERSION: 2.4.1
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6743458Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6743885Z   KYVERNO_VERSION: 1.18.2
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6744250Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.6744934Z ##[endgroup]
+cut	commit the signed evidence into the release commit, BEFORE the tag	2026-10-04T07:21:12.7156426Z committed: signed release-gate evidence for policy/v7.0.0, v5.0.0
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	﻿2026-10-04T07:21:12.7201185Z ##[group]Run ./.github/scripts/cut-release-update-array-commit.sh tags.json
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7201781Z ^[[36;1m./.github/scripts/cut-release-update-array-commit.sh tags.json^[[0m
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7264704Z shell: /usr/bin/bash -e {0}
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7264967Z env:
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7265170Z   GITSIGN_VERSION: 0.17.1
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7265551Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7265971Z   COSIGN_VERSION: 2.4.1
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7266330Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7266733Z   KYVERNO_VERSION: 1.18.2
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7267095Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.7267493Z ##[endgroup]
+cut	point versions.yaml's commit field(s) at the evidence commit, in a second commit	2026-10-04T07:21:12.8099518Z committed: versions.yaml array element(s) for policy/v7.0.0 now point at evidence commit 393a40f707f2b23a3a174696a0c84a8473297ca9
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	﻿2026-10-04T07:21:12.8152793Z ##[group]Run ./.github/scripts/cut-release-create-tags.sh tags.json
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8153470Z ^[[36;1m./.github/scripts/cut-release-create-tags.sh tags.json^[[0m
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8216432Z shell: /usr/bin/bash -e {0}
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8216703Z env:
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8216901Z   GITSIGN_VERSION: 0.17.1
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8217287Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8217712Z   COSIGN_VERSION: 2.4.1
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8218075Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8218491Z   KYVERNO_VERSION: 1.18.2
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8218860Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:12.8219257Z ##[endgroup]
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:13.6212944Z tagged policy/v7.0.0
+cut	create the signed annotated tags (ambient Actions identity, no interactive login)	2026-10-04T07:21:14.2844909Z tagged v5.0.0
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	﻿2026-10-04T07:21:14.2883063Z ##[group]Run ./.github/scripts/cut-release-push.sh tags.json origin
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2883583Z ^[[36;1m./.github/scripts/cut-release-push.sh tags.json origin^[[0m
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2945264Z shell: /usr/bin/bash -e {0}
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2945528Z env:
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2945724Z   GITSIGN_VERSION: 0.17.1
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2946096Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2946512Z   COSIGN_VERSION: 2.4.1
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2946869Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2947277Z   KYVERNO_VERSION: 1.18.2
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2947636Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:14.2948029Z ##[endgroup]
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:15.4969191Z To https://github.com/policy-as-versioned-platform/platform
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:15.4969767Z    b55f643..703eff6  HEAD -> main
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:15.4970118Z  * [new tag]         policy/v7.0.0 -> policy/v7.0.0
+cut	push every tag in one atomic push (git push only -- never the git-data REST API)	2026-10-04T07:21:15.4970593Z  * [new tag]         v5.0.0 -> v5.0.0
+cut	Post Run actions/checkout@v4	﻿2026-10-04T07:21:15.5129563Z Post job cleanup.
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.5980171Z [command]/usr/bin/git version
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6021915Z git version 2.55.0
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6060560Z Temporarily overriding HOME='/home/runner/work/_temp/7ee13af7-2534-49ed-8614-59afc122855d' before making global git config changes
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6062159Z Adding repository directory to the temporary git global config as a safe directory
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6066166Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/platform/platform
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6108466Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6148517Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6481471Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6513082Z http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6526068Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6570868Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6893374Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Post Run actions/checkout@v4	2026-10-04T07:21:15.6954022Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Complete job	﻿2026-10-04T07:21:15.7436883Z Cleaning up orphan processes
+cut	Complete job	2026-10-04T07:21:15.7745004Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

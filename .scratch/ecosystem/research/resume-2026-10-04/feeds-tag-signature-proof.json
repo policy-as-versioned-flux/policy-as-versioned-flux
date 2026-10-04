@@ -1,0 +1,50 @@
+{
+  "cve/v3.0.0": {
+    "tag_object": "647f4961eb02d0858092ee6f91a43cb1657bdd97",
+    "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "tag_is_annotated": true,
+    "signature": {
+      "git": true,
+      "rekor": true,
+      "certificate_claims": true,
+      "identity": "https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "verification_exit": 0,
+      "rekor_mode": "offline"
+    },
+    "raw_tag_file": "feeds-cve-v3.0.0.tag-object.txt",
+    "signature_log": "feeds-cve-v3.0.0-signature.log"
+  },
+  "fx/v1.1.0": {
+    "tag_object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+    "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "tag_is_annotated": true,
+    "signature": {
+      "git": true,
+      "rekor": true,
+      "certificate_claims": true,
+      "identity": "https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "verification_exit": 0,
+      "rekor_mode": "offline"
+    },
+    "raw_tag_file": "feeds-fx-v1.1.0.tag-object.txt",
+    "signature_log": "feeds-fx-v1.1.0-signature.log"
+  },
+  "threat-register/v4.0.0": {
+    "tag_object": "57cfe4af7aa85301e27dc720f0227834bfd0574f",
+    "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "tag_is_annotated": true,
+    "signature": {
+      "git": true,
+      "rekor": true,
+      "certificate_claims": true,
+      "identity": "https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "verification_exit": 0,
+      "rekor_mode": "offline"
+    },
+    "raw_tag_file": "feeds-threat-register-v4.0.0.tag-object.txt",
+    "signature_log": "feeds-threat-register-v4.0.0-signature.log"
+  }
+}

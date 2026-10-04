@@ -1,0 +1,38 @@
+{
+  "driftwood": {
+    "platform": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/platform",
+      "head": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "clean": true
+    },
+    "platform-tools": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/platform-tools",
+      "head": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "clean": true
+    }
+  },
+  "tuppence": {
+    "platform": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/platform",
+      "head": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "clean": true
+    },
+    "platform-tools": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/platform-tools",
+      "head": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "clean": true
+    }
+  },
+  "ludlow": {
+    "platform": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/platform",
+      "head": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "clean": true
+    },
+    "platform-tools": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/platform-tools",
+      "head": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "clean": true
+    }
+  }
+}

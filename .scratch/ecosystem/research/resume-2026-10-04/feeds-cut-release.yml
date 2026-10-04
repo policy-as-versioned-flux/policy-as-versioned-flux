@@ -1,0 +1,116 @@
+name: cut-release
+
+# Creates a gitsign-signed git tag and pushes it -- the ONLY way a feed
+# release starts (git push, never the git-data REST API: see the hub repo's
+# enact_guard.py governance rule). Copied from ico's cut-release.yml, with one
+# difference: this repo publishes MORE THAN ONE feed, so the tag is
+# `<feed-name>/vX.Y.Z` (ADR-0019: the tag IS the signature, and a tag has to
+# say which feed it signs). Single-feed repos like ico stay on plain `vX.Y.Z`.
+#
+# Signs keyless via this run's own GitHub Actions identity, not a human
+# Google/Microsoft identity: gitsign auto-detects the Actions ambient
+# credential (present because of the id-token permission below) and needs no
+# browser/device-code interaction. Same keyless -> Fulcio -> Rekor provenance
+# chain as ADR-0001 describes for a human signer; a different, equally real
+# identity. See release.yml for the matching identity-pinned verification.
+#
+# workflow_dispatch only, on purpose: this is a release-cutting ACT, not a
+# standing recurring automation. The clock in fetch.yml opens PRs; a human
+# merges one and then dispatches this.
+
+on:
+  workflow_dispatch:
+    inputs:
+      feed:
+        description: "feed being released: threat-register, cve, eol, fx, market-moves or news"
+        required: true
+        type: choice
+        options: [threat-register, cve, eol, fx, market-moves, news]
+      version:
+        description: "semver, no leading v, e.g. 2.1.0"
+        required: true
+      message:
+        description: "annotated tag message -- what changed and why"
+        required: true
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  GITSIGN_VERSION: 0.17.1
+  GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+
+jobs:
+  cut:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # verify-feeds.sh needs the envelope schema, which lives in the platform
+      # repo (ADR-0019). It looks for an adjacent checkout at .platform when
+      # PLATFORM_DIR is unset. Pinned to the newest signed platform tag; found
+      # missing on this workflow's first-ever run (ecosystem ticket 57).
+      - name: checkout platform (envelope schema for the release gate)
+        uses: actions/checkout@v4
+        with:
+          repository: policy-as-versioned-platform/platform
+          ref: v2.0.1
+          path: .platform
+
+      - name: install pinned gitsign (binary + checksum, no marketplace action)
+        run: |
+          set -euo pipefail
+          curl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"
+          echo "${GITSIGN_SHA256}  gitsign" | sha256sum -c -
+          chmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign
+
+      - name: the tag must name a real, released feed version
+        run: |
+          set -euo pipefail
+          case "${{ inputs.version }}" in
+            v*) echo "FAIL: version carries a leading v -- the tag adds it, the envelope must not" >&2; exit 1 ;;
+          esac
+          major="${{ inputs.version }}"; major="${major%%.*}"
+          file="${{ inputs.feed }}/v${major}/feed.json"
+          [ -f "${file}" ] || { echo "FAIL: ${file} does not exist" >&2; exit 1; }
+          declared=$(python3 -c "import json;print(json.load(open('${file}'))['version'])")
+          if [ "${declared}" != "${{ inputs.version }}" ]; then
+            echo "FAIL: ${file} declares ${declared}, tag says ${{ inputs.version }}" >&2
+            exit 1
+          fi
+          echo "OK: ${file} declares ${declared}"
+
+      - name: offline verify is the release gate
+        run: ./verify-feeds.sh
+
+      # tickets 49 and 50: the series, the thresholds, the observation lane, the
+      # absence of niobium and the absence of a model on the clock. Offline, so a
+      # skip here would be a fault too. verify-news-headline-skill.sh is NOT run:
+      # it reads the skill in the hub checkout and would exit 3 on a runner.
+      - name: offline verify -- market-moves and news
+        run: ./verify-market-and-news.sh
+
+      - name: reject a tag that already exists (no force-move, ever)
+        run: |
+          set -euo pipefail
+          tag="${{ inputs.feed }}/v${{ inputs.version }}"
+          if git rev-parse "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "FAIL: ${tag} already exists -- tags are immutable here, cut a new version" >&2
+            exit 1
+          fi
+
+      - name: create the signed annotated tag (ambient Actions identity, no interactive login)
+        run: |
+          set -euo pipefail
+          git -c gpg.format=x509 -c gpg.x509.program=gitsign \
+            -c user.name="policy-as-versioned release bot" \
+            -c user.email="releases@${GITHUB_REPOSITORY_OWNER}.invalid" \
+            tag -s "${{ inputs.feed }}/v${{ inputs.version }}" -m "${{ inputs.message }}"
+
+      - name: push the tag (git push only -- never the git-data REST API)
+        run: git push origin "${{ inputs.feed }}/v${{ inputs.version }}"
+
+# registered 2026-09-01: this line exists so a push touches the workflow file (ecosystem ticket 57)

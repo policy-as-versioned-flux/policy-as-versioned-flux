@@ -1,0 +1,54 @@
+{
+  "scope": "independent read-only publication effect audit of exact hub6ed vs4c baseline; full source Standards/Spec review passed separately",
+  "head": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+  "base": "4c3ed061f5837281ac9b07c3bb0a6de3c5620063",
+  "verdict": "No new concrete publication-side mutation or credential/data exposure defect found in inspected changed execution seams. Draft publication runs measurements; main publication enables existing observation writes.",
+  "source_scan": {
+    "paths": 611,
+    "bytes": 14473799,
+    "high_confidence_secret_matches": [],
+    "sensitive_filename_matches": [],
+    "source": "hub6ed-publication-data-scan.json"
+  },
+  "draft_branch_effects": {
+    "public_git_objects": "All611 changed paths become readable to repository readers when branch is pushed, including560 .scratch paths. Draft status does not conceal source.",
+    "truth": "Push filter has no branch restriction; changes in this commit match. Runs credentialled read collectors and uncredentialled-script measurement. Branch guard CAN_RECORD=no prevents truth append/commit/push.",
+    "twin": "Same-repository push and PR events run existing read-only test/invariant/typecheck/demo/determinism jobs.",
+    "main_mutation": "No main source mutation from normal draft PR creation; measurement step may publish Actions logs/artifacts."
+  },
+  "main_merge_effects": {
+    "truth": "Matching push triggers measure and signed observation-lane commit/push to actual default branch; existing daily cron05:47UTC and manual dispatch remain.",
+    "observation_paths": [
+      "talk/truth.log",
+      "drift/samples.jsonl",
+      "talk/captures",
+      "observations"
+    ],
+    "signed_observation_not_release": "No tag/release/archive/deployment operation in changed root workflow.",
+    "twin": "Existing daily05:17UTC suite sees merged hub source; no repository writer/enactment entrypoint.",
+    "incumbent": "New collector performs read-only GitHub repository GETs and anonymous OCI pulls; grade only reports archive eligibility.",
+    "cloud": "Verifier may perform KinD-only Kubernetes GET and create--dry-run=server if strict existing receipt/delivery prerequisites hold. No AWS resource creation or Crossplane apply route is executed."
+  },
+  "mode_effects": {
+    "durable_mode": "development, unchanged in this diff",
+    "until": "2026-10-22",
+    "ambient": "Can tighten durable mode only; cannot loosen operations/other-hand.",
+    "expiry": "Grade becomes red; guard mode does not silently change.",
+    "automatic_disposition": "No clock added to merge/tag/release/archive. Guard mode remains a tool-invocation constraint, not a task scheduler."
+  },
+  "consumer_pin_constraint": "Publishing/merging hub code does not move adopter twin/PIN.yaml or any foundation/selfpin automatically; ticket143 exact hub pin adoption remains separately reviewed. Hub truth grades fetched served estate state rather than proposed unmerged source.",
+  "data_exposure_categories": [
+    "public policy/source patches and synthetic fixture corpora",
+    "public image digests and CVE/package observations",
+    "public forge names, archived flags, run IDs, signed tag/evidence/certificate proofs",
+    "local temporary paths, development cluster names and timestamps",
+    "owner-delegated decision quotes and public comparable filing facts"
+  ],
+  "baseline_boundaries": [
+    "truth gate and credentialled observation writer remain in one existing job; this audit does not upgrade the post-hoc observation cage into an adversarial isolation guarantee.",
+    "Uploaded fact artifacts retain7days; public logs/source persist per repository settings.",
+    "Existing runtime boundary/fetch ceilings are preserved; no new live acceptance or activation inferred."
+  ],
+  "source_mutations_by_reviewer": false,
+  "external_actions_by_reviewer": false
+}

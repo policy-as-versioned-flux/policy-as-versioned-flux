@@ -1,0 +1,154 @@
+{
+  "driftwood": {
+    "source_base": "529e159397d3e64f94b0270cc7de69c235580961",
+    "upstream_main": "17302ecd20041df61a52428e67246c330294d2a6",
+    "restored_upstream_app_sources": [
+      "apps/storefront/Dockerfile",
+      "apps/storefront/README.md",
+      "apps/storefront/package.json",
+      "apps/storefront/public/index.html"
+    ],
+    "upstream_change_audit": [
+      {
+        "path": "composed/HEADER.yaml",
+        "upstream_sha256": "7fa118dae299ea5fdfc3bd4f195c751411f38c3ed8e2c9b31dd28aab9f6e281b",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "deploy/pod.yaml",
+        "upstream_sha256": "3411f432dbc00ce3776376e2bade31483a0dbdad7f443837c78f1437a2bc9c03",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "drift/samples.jsonl",
+        "upstream_sha256": "600a5e2f86ae3e689bc23c10128d895a897d36b1885729324dd306d5313c3260",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "gitops/apps/api.yaml",
+        "upstream_sha256": "d61c18f2892100fd0f38f32be331dfea4127b247dde2217fb65987b4b833dbfa",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "gitops/apps/kustomization.yaml",
+        "upstream_sha256": "16e17d4f83f8bcb35a967b28851c5f3ce5a366f96cc7d5e6a68d1e87b4a08cb8",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "gitops/apps/pod.yaml",
+        "upstream_sha256": "e86f5dbd3977d979bb1cab82a45a9e7c915b6b65da454ba1849396180b90f968",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "gitops/apps/storefront.yaml",
+        "upstream_sha256": "a46b8ffdc044ac57c3e7acdecc82828faf627e7969c0d5a27e03525d0f6c93a0",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "observations/twin-sweep.jsonl",
+        "upstream_sha256": "fb86fb8d4d67e6f40de94240b54330359ff14fb7a174028998ee2b6f532b8604",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      }
+    ],
+    "remaining_deletions": []
+  },
+  "tuppence": {
+    "source_base": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+    "upstream_main": "d8dead25e0e5e275172640b1a637562e45edb15d",
+    "restored_upstream_app_sources": [
+      "apps/ledger/Dockerfile",
+      "apps/ledger/README.md",
+      "apps/ledger/pom.xml",
+      "apps/ledger/src/main/java/com/mycompany/ledger/Ledger.java",
+      "apps/ledger/src/main/resources/log4j2.xml"
+    ],
+    "upstream_change_audit": [
+      {
+        "path": "composed/HEADER.yaml",
+        "upstream_sha256": "cb6b6b65f154648ae0d0e79acb262ed05fd4891ed7377f58ab1f21cae566bd11",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "drift/samples.jsonl",
+        "upstream_sha256": "47af8a8b51a54ead4d388a4e744592f82544dfca1b92f243b1279fc781e8ed86",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "gitops/apps/ledger.yaml",
+        "upstream_sha256": "f1aae8ef83c171fbd17d5647dd0ff4f335d23c8d37da21480e20b5bf8bf04a8a",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "observations/twin-sweep.jsonl",
+        "upstream_sha256": "14b437bb6dfaa4ad0aad69b4e46879e92ac488ea44f66b00b897618c5cb0c3fd",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      }
+    ],
+    "remaining_deletions": []
+  },
+  "ludlow": {
+    "source_base": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+    "upstream_main": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+    "restored_upstream_app_sources": [
+      "apps/reports/Dockerfile",
+      "apps/reports/README.md",
+      "apps/reports/app.py",
+      "apps/reports/requirements.txt"
+    ],
+    "upstream_change_audit": [
+      {
+        "path": "composed/HEADER.yaml",
+        "upstream_sha256": "67eac5622a4061b0ed960c3610363f631a5228d927b849a2c4eb3883247de70c",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "drift/samples.jsonl",
+        "upstream_sha256": "9c29fcec36b64d19d17486767a258741e11f73a87164484ddb7f6396225bf82d",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "gitops/apps/reports.yaml",
+        "upstream_sha256": "6a9b9d65bb208ebaef834773fb7578b7ae651e350d3fdb247fb34bff0b6cbf8c",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      },
+      {
+        "path": "observations/twin-sweep.jsonl",
+        "upstream_sha256": "7221eb367710d1f147ca2ba6e296a09d25911185b077cf57ed35cbc00b337cb9",
+        "candidate_exists": true,
+        "equals_upstream": true,
+        "candidate_change_intended": false
+      }
+    ],
+    "remaining_deletions": []
+  }
+}

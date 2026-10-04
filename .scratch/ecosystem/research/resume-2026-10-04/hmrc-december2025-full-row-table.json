@@ -1,0 +1,1314 @@
+[
+  {
+    "Country/Territories": "Abu Dhabi",
+    "Currency": "Dirham",
+    "Currency Code": "AED",
+    "Currency Units per £1": "4.8204",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Albania",
+    "Currency": "Lek",
+    "Currency Code": "ALL",
+    "Currency Units per £1": "109.5037",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Algeria",
+    "Currency": "Dinar",
+    "Currency Code": "DZD",
+    "Currency Units per £1": "171.1817",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Angola",
+    "Currency": "Readj Kwanza",
+    "Currency Code": "AOA",
+    "Currency Units per £1": "1201.0841",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Antigua",
+    "Currency": "E Caribbean Dollar",
+    "Currency Code": "XCD",
+    "Currency Units per £1": "3.5518",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Argentina",
+    "Currency": "Peso",
+    "Currency Code": "ARS",
+    "Currency Units per £1": "1838.1443",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Armenia",
+    "Currency": "Dram",
+    "Currency Code": "AMD",
+    "Currency Units per £1": "499.7654",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Aruba",
+    "Currency": "Florin",
+    "Currency Code": "AWG",
+    "Currency Units per £1": "2.3495",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Australia",
+    "Currency": "Dollar",
+    "Currency Code": "AUD",
+    "Currency Units per £1": "2.0226",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Azerbaijan",
+    "Currency": "New Manat",
+    "Currency Code": "AZN",
+    "Currency Units per £1": "2.2313",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Bahamas",
+    "Currency": "Dollar",
+    "Currency Code": "BSD",
+    "Currency Units per £1": "1.3126",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Bahrain",
+    "Currency": "Dinar",
+    "Currency Code": "BHD",
+    "Currency Units per £1": "0.4935",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Bangladesh",
+    "Currency": "Taka",
+    "Currency Code": "BDT",
+    "Currency Units per £1": "160.5873",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Barbados",
+    "Currency": "Dollar",
+    "Currency Code": "BBD",
+    "Currency Units per £1": "2.6251",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Belarus",
+    "Currency": "Rouble",
+    "Currency Code": "BYN",
+    "Currency Units per £1": "4.4824",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Belize",
+    "Currency": "Dollar",
+    "Currency Code": "BZD",
+    "Currency Units per £1": "2.6435",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Benin",
+    "Currency": "CFA Franc",
+    "Currency Code": "XOF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Bermuda",
+    "Currency": "Dollar (US)",
+    "Currency Code": "BMD",
+    "Currency Units per £1": "1.3126",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Bhutan",
+    "Currency": "Ngultrum",
+    "Currency Code": "BTN",
+    "Currency Units per £1": "116.2366",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Bolivia",
+    "Currency": "Boliviano",
+    "Currency Code": "BOB",
+    "Currency Units per £1": "9.0809",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Bosnia- Herzegovinia",
+    "Currency": "Marka",
+    "Currency Code": "BAM",
+    "Currency Units per £1": "2.2157",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Botswana",
+    "Currency": "Pula",
+    "Currency Code": "BWP",
+    "Currency Units per £1": "17.6973",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Brazil",
+    "Currency": "Real",
+    "Currency Code": "BRL",
+    "Currency Units per £1": "6.9885",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Brunei",
+    "Currency": "Dollar",
+    "Currency Code": "BND",
+    "Currency Units per £1": "1.7114",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Bulgaria",
+    "Currency": "Lev",
+    "Currency Code": "BGN",
+    "Currency Units per £1": "2.2157",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Burkina Faso",
+    "Currency": "CFA Franc",
+    "Currency Code": "XOF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Burundi",
+    "Currency": "Franc",
+    "Currency Code": "BIF",
+    "Currency Units per £1": "3876.0939",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Cambodia",
+    "Currency": "Riel",
+    "Currency Code": "KHR",
+    "Currency Units per £1": "5257.4325",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Cameroon Republic",
+    "Currency": "CFA Franc",
+    "Currency Code": "XAF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Canada",
+    "Currency": "Dollar",
+    "Currency Code": "CAD",
+    "Currency Units per £1": "1.8382",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Cape Verde Islands",
+    "Currency": "Escudo",
+    "Currency Code": "CVE",
+    "Currency Units per £1": "124.9187",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Cayman Islands",
+    "Currency": "Dollar",
+    "Currency Code": "KYD",
+    "Currency Units per £1": "1.0886",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Central African Republic",
+    "Currency": "CFA Franc",
+    "Currency Code": "XAF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Chad",
+    "Currency": "CFA Franc",
+    "Currency Code": "XAF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Chile",
+    "Currency": "Peso",
+    "Currency Code": "CLP",
+    "Currency Units per £1": "1221.3103",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "China",
+    "Currency": "Yuan",
+    "Currency Code": "CNY",
+    "Currency Units per £1": "9.3331",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Colombia",
+    "Currency": "Peso",
+    "Currency Code": "COP",
+    "Currency Units per £1": "4883.0857",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Comoros",
+    "Currency": "Franc",
+    "Currency Code": "KMF",
+    "Currency Units per £1": "557.3228",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Congo (Brazaville)",
+    "Currency": "CFA Franc",
+    "Currency Code": "XAF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Congo (DemRep)",
+    "Currency": "Congo Fr",
+    "Currency Code": "CDF",
+    "Currency Units per £1": "2986.0494",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Costa Rica",
+    "Currency": "Colon",
+    "Currency Code": "CRC",
+    "Currency Units per £1": "656.6043",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Cote d'Ivoire",
+    "Currency": "CFA Franc",
+    "Currency Code": "XOF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Cuba",
+    "Currency": "Peso",
+    "Currency Code": "CUP",
+    "Currency Units per £1": "31.4776",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Czech Republic",
+    "Currency": "Koruna",
+    "Currency Code": "CZK",
+    "Currency Units per £1": "27.3744",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Denmark",
+    "Currency": "Krone",
+    "Currency Code": "DKK",
+    "Currency Units per £1": "8.4616",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Djibouti",
+    "Currency": "Franc",
+    "Currency Code": "DJF",
+    "Currency Units per £1": "234.1972",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Dominica",
+    "Currency": "E Caribbean Dollar",
+    "Currency Code": "XCD",
+    "Currency Units per £1": "3.5518",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Dominican Republic",
+    "Currency": "Peso",
+    "Currency Code": "DOP",
+    "Currency Units per £1": "83.9620",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Dubai",
+    "Currency": "Dirham",
+    "Currency Code": "AED",
+    "Currency Units per £1": "4.8204",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Egypt",
+    "Currency": "Pound",
+    "Currency Code": "EGP",
+    "Currency Units per £1": "62.2092",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "El Salvador",
+    "Currency": "Colon",
+    "Currency Code": "SVC",
+    "Currency Units per £1": "11.4848",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Equatorial Guinea",
+    "Currency": "CFA Franc",
+    "Currency Code": "XAF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Eritrea",
+    "Currency": "Nakfa",
+    "Currency Code": "ERN",
+    "Currency Units per £1": "19.6883",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Ethiopia",
+    "Currency": "Birr",
+    "Currency Code": "ETB",
+    "Currency Units per £1": "203.7889",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Eurozone",
+    "Currency": "Euro",
+    "Currency Code": "EUR",
+    "Currency Units per £1": "1.1328",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Fiji Islands",
+    "Currency": "Dollar",
+    "Currency Code": "FJD",
+    "Currency Units per £1": "2.9983",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Fr. Polynesia",
+    "Currency": "CFP Franc",
+    "Currency Code": "XPF",
+    "Currency Units per £1": "135.1843",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Gabon",
+    "Currency": "CFA Franc",
+    "Currency Code": "XAF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Gambia",
+    "Currency": "Dalasi",
+    "Currency Code": "GMD",
+    "Currency Units per £1": "96.6410",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Georgia",
+    "Currency": "Lari",
+    "Currency Code": "GEL",
+    "Currency Units per £1": "3.5496",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Ghana",
+    "Currency": "Cedi",
+    "Currency Code": "GHS",
+    "Currency Units per £1": "14.4535",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Grenada",
+    "Currency": "E Caribbean Dollar",
+    "Currency Code": "XCD",
+    "Currency Units per £1": "3.5518",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Guatemala",
+    "Currency": "Quetzal",
+    "Currency Code": "GTQ",
+    "Currency Units per £1": "10.0542",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Guinea Bissau",
+    "Currency": "CFA Franc",
+    "Currency Code": "XOF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Guinea Republic",
+    "Currency": "Franc",
+    "Currency Code": "GNF",
+    "Currency Units per £1": "11410.1642",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Guyana",
+    "Currency": "Dollar",
+    "Currency Code": "GYD",
+    "Currency Units per £1": "274.6965",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Haiti",
+    "Currency": "Gourde",
+    "Currency Code": "HTG",
+    "Currency Units per £1": "172.2254",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Honduras",
+    "Currency": "Lempira",
+    "Currency Code": "HNL",
+    "Currency Units per £1": "34.5488",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Hong Kong",
+    "Currency": "Dollar",
+    "Currency Code": "HKD",
+    "Currency Units per £1": "10.2200",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Hungary",
+    "Currency": "Forint",
+    "Currency Code": "HUF",
+    "Currency Units per £1": "433.3110",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Iceland",
+    "Currency": "Krona",
+    "Currency Code": "ISK",
+    "Currency Units per £1": "166.3575",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "India",
+    "Currency": "Rupee",
+    "Currency Code": "INR",
+    "Currency Units per £1": "116.2366",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Indonesia",
+    "Currency": "Rupiah",
+    "Currency Code": "IDR",
+    "Currency Units per £1": "21950.6920",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Iraq",
+    "Currency": "Dinar",
+    "Currency Code": "IQD",
+    "Currency Units per £1": "1720.8643",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Israel",
+    "Currency": "Shekel",
+    "Currency Code": "ILS",
+    "Currency Units per £1": "4.2894",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Jamaica",
+    "Currency": "Dollar",
+    "Currency Code": "JMD",
+    "Currency Units per £1": "210.8915",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Japan",
+    "Currency": "Yen",
+    "Currency Code": "JPY",
+    "Currency Units per £1": "204.8929",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Jordan",
+    "Currency": "Dinar",
+    "Currency Code": "JOD",
+    "Currency Units per £1": "0.9306",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Kazakhstan",
+    "Currency": "Tenge",
+    "Currency Code": "KZT",
+    "Currency Units per £1": "680.7221",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Kenya",
+    "Currency": "Schilling",
+    "Currency Code": "KES",
+    "Currency Units per £1": "170.5808",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Kuwait",
+    "Currency": "Dinar",
+    "Currency Code": "KWD",
+    "Currency Units per £1": "0.4031",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Kyrgyz Republic",
+    "Currency": "Som",
+    "Currency Code": "KGS",
+    "Currency Units per £1": "114.8368",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Lao People's Dem Rep",
+    "Currency": "Kip",
+    "Currency Code": "LAK",
+    "Currency Units per £1": "28435.2205",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Lebanon",
+    "Currency": "Pound",
+    "Currency Code": "LBP",
+    "Currency Units per £1": "117965.0934",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Lesotho",
+    "Currency": "Loti",
+    "Currency Code": "LSL",
+    "Currency Units per £1": "22.5147",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Liberia",
+    "Currency": "Dollar",
+    "Currency Code": "LRD",
+    "Currency Units per £1": "237.0998",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Libya",
+    "Currency": "Dinar",
+    "Currency Code": "LYD",
+    "Currency Units per £1": "7.1618",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Macao",
+    "Currency": "Pataca",
+    "Currency Code": "MOP",
+    "Currency Units per £1": "10.5266",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Macedonia",
+    "Currency": "Denar",
+    "Currency Code": "MKD",
+    "Currency Units per £1": "69.7211",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Madagascar",
+    "Currency": "Malagasy Ariary",
+    "Currency Code": "MGA",
+    "Currency Units per £1": "5890.8664",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Malawi",
+    "Currency": "Kwacha",
+    "Currency Code": "MWK",
+    "Currency Units per £1": "2277.1723",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Malaysia",
+    "Currency": "Ringgit",
+    "Currency Code": "MYR",
+    "Currency Units per £1": "5.4469",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Maldive Islands",
+    "Currency": "Rufiyaa",
+    "Currency Code": "MVR",
+    "Currency Units per £1": "20.2597",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Mali Republic",
+    "Currency": "CFA Franc",
+    "Currency Code": "XOF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Mauritania",
+    "Currency": "Ouguiya",
+    "Currency Code": "MRU",
+    "Currency Units per £1": "52.1296",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Mauritius",
+    "Currency": "Rupee",
+    "Currency Code": "MUR",
+    "Currency Units per £1": "60.2630",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Mexico",
+    "Currency": "Mexican Peso",
+    "Currency Code": "MXN",
+    "Currency Units per £1": "24.0402",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Moldova",
+    "Currency": "Leu",
+    "Currency Code": "MDL",
+    "Currency Units per £1": "22.2585",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Mongolia",
+    "Currency": "Tugrik",
+    "Currency Code": "MNT",
+    "Currency Units per £1": "4685.5492",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Montserrat",
+    "Currency": "E Caribbean Dollar",
+    "Currency Code": "XCD",
+    "Currency Units per £1": "3.5518",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Morocco",
+    "Currency": "Dirham",
+    "Currency Code": "MAD",
+    "Currency Units per £1": "12.1440",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Mozambique",
+    "Currency": "Metical",
+    "Currency Code": "MZN",
+    "Currency Units per £1": "83.8617",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Myanmar",
+    "Currency": "Kyat",
+    "Currency Code": "MMK",
+    "Currency Units per £1": "2756.2148",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Nepal",
+    "Currency": "Rupee",
+    "Currency Code": "NPR",
+    "Currency Units per £1": "186.0657",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "New Caledonia",
+    "Currency": "CFP Franc",
+    "Currency Code": "XPF",
+    "Currency Units per £1": "135.1843",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "New Zealand",
+    "Currency": "Dollar",
+    "Currency Code": "NZD",
+    "Currency Units per £1": "2.3307",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Nicaragua",
+    "Currency": "Gold Cordoba",
+    "Currency Code": "NIO",
+    "Currency Units per £1": "48.3110",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Niger Republic",
+    "Currency": "CFA Franc",
+    "Currency Code": "XOF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Nigeria",
+    "Currency": "Naira",
+    "Currency Code": "NGN",
+    "Currency Units per £1": "1903.3812",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Norway",
+    "Currency": "Norwegian Krone",
+    "Currency Code": "NOK",
+    "Currency Units per £1": "13.3032",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Oman",
+    "Currency": "Rial",
+    "Currency Code": "OMR",
+    "Currency Units per £1": "0.5050",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Pakistan",
+    "Currency": "Rupee",
+    "Currency Code": "PKR",
+    "Currency Units per £1": "370.9532",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Panama",
+    "Currency": "Balboa",
+    "Currency Code": "PAB",
+    "Currency Units per £1": "1.3126",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Papua New Guinea",
+    "Currency": "Kina",
+    "Currency Code": "PGK",
+    "Currency Units per £1": "5.5517",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Paraguay",
+    "Currency": "Guarani",
+    "Currency Code": "PYG",
+    "Currency Units per £1": "9236.4794",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Peru",
+    "Currency": "New Sol",
+    "Currency Code": "PEN",
+    "Currency Units per £1": "4.4238",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Philippines",
+    "Currency": "Peso",
+    "Currency Code": "PHP",
+    "Currency Units per £1": "77.3109",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Poland",
+    "Currency": "Zloty",
+    "Currency Code": "PLN",
+    "Currency Units per £1": "4.7923",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Qatar",
+    "Currency": "Riyal",
+    "Currency Code": "QAR",
+    "Currency Units per £1": "4.7777",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Romania",
+    "Currency": "New Leu",
+    "Currency Code": "RON",
+    "Currency Units per £1": "5.7651",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Russia",
+    "Currency": "Rouble",
+    "Currency Code": "RUB",
+    "Currency Units per £1": "105.9667",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Rwanda",
+    "Currency": "Franc",
+    "Currency Code": "RWF",
+    "Currency Units per £1": "1909.1178",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Saudi Arabia",
+    "Currency": "Riyal",
+    "Currency Code": "SAR",
+    "Currency Units per £1": "4.9221",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Senegal",
+    "Currency": "CFA Franc",
+    "Currency Code": "XOF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Serbia",
+    "Currency": "Dinar",
+    "Currency Code": "RSD",
+    "Currency Units per £1": "132.8126",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Seychelles",
+    "Currency": "Rupee",
+    "Currency Code": "SCR",
+    "Currency Units per £1": "18.3013",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Sierra Leone",
+    "Currency": "Leone",
+    "Currency Code": "SLE",
+    "Currency Units per £1": "30.0508",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Singapore",
+    "Currency": "Dollar",
+    "Currency Code": "SGD",
+    "Currency Units per £1": "1.7114",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Soloman Islands",
+    "Currency": "Dollar",
+    "Currency Code": "SBD",
+    "Currency Units per £1": "10.8139",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Somali Republic",
+    "Currency": "Schilling",
+    "Currency Code": "SOS",
+    "Currency Units per £1": "747.8634",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "South Africa",
+    "Currency": "Rand",
+    "Currency Code": "ZAR",
+    "Currency Units per £1": "22.5147",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "South Korea",
+    "Currency": "Won",
+    "Currency Code": "KRW",
+    "Currency Units per £1": "1924.4352",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Sri Lanka",
+    "Currency": "Rupee",
+    "Currency Code": "LKR",
+    "Currency Units per £1": "404.3503",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "St Christopher & Anguilla",
+    "Currency": "E Caribbean Dollar",
+    "Currency Code": "XCD",
+    "Currency Units per £1": "3.5518",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "St Lucia",
+    "Currency": "E Caribbean Dollar",
+    "Currency Code": "XCD",
+    "Currency Units per £1": "3.5518",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "St Vincent",
+    "Currency": "E Caribbean Dollar",
+    "Currency Code": "XCD",
+    "Currency Units per £1": "3.5518",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Sudan Republic",
+    "Currency": "Pound",
+    "Currency Code": "SDG",
+    "Currency Units per £1": "787.3727",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Surinam",
+    "Currency": "Dollar",
+    "Currency Code": "SRD",
+    "Currency Units per £1": "50.6428",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Swaziland",
+    "Currency": "Lilangeni",
+    "Currency Code": "SZL",
+    "Currency Units per £1": "22.5147",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Sweden",
+    "Currency": "Krona",
+    "Currency Code": "SEK",
+    "Currency Units per £1": "12.4529",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Switzerland",
+    "Currency": "Franc",
+    "Currency Code": "CHF",
+    "Currency Units per £1": "1.0523",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Taiwan",
+    "Currency": "Dollar",
+    "Currency Code": "TWD",
+    "Currency Units per £1": "40.9663",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Tanzania",
+    "Currency": "Schilling",
+    "Currency Code": "TZS",
+    "Currency Units per £1": "3190.7091",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Thailand",
+    "Currency": "Baht",
+    "Currency Code": "THB",
+    "Currency Units per £1": "42.5477",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Togo Republic",
+    "Currency": "CFA Franc",
+    "Currency Code": "XOF",
+    "Currency Units per £1": "743.0970",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Tonga Islands",
+    "Currency": "Pa'anga (AUS)",
+    "Currency Code": "TOP",
+    "Currency Units per £1": "3.1469",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Trinidad/Tobago",
+    "Currency": "Dollar",
+    "Currency Code": "TTD",
+    "Currency Units per £1": "8.8961",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Tunisia",
+    "Currency": "Dinar",
+    "Currency Code": "TND",
+    "Currency Units per £1": "3.8716",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Turkey",
+    "Currency": "Turkish  Lira",
+    "Currency Code": "TRY",
+    "Currency Units per £1": "55.5844",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Turkmenistan",
+    "Currency": "New Manat",
+    "Currency Code": "TMT",
+    "Currency Units per £1": "4.5917",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "UAE",
+    "Currency": "Dirham",
+    "Currency Code": "AED",
+    "Currency Units per £1": "4.8204",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "USA",
+    "Currency": "Dollar",
+    "Currency Code": "USD",
+    "Currency Units per £1": "1.3126",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Uganda",
+    "Currency": "Schilling",
+    "Currency Code": "UGX",
+    "Currency Units per £1": "4788.0958",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Ukraine",
+    "Currency": "Hryvnia",
+    "Currency Code": "UAH",
+    "Currency Units per £1": "55.2617",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Uruguay",
+    "Currency": "Peso",
+    "Currency Code": "UYU",
+    "Currency Units per £1": "52.2715",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Uzbekistan",
+    "Currency": "Sum",
+    "Currency Code": "UZS",
+    "Currency Units per £1": "15700.9387",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Vanuatu",
+    "Currency": "Vatu",
+    "Currency Code": "VUV",
+    "Currency Units per £1": "160.1906",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Venezuela",
+    "Currency": "Venezuelan Bolivar",
+    "Currency Code": "VED",
+    "Currency Units per £1": "311.0557",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Vietnam",
+    "Currency": "Dong",
+    "Currency Code": "VND",
+    "Currency Units per £1": "34628.6075",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Wallis & Futuna Islands",
+    "Currency": "CFP Franc",
+    "Currency Code": "XPF",
+    "Currency Units per £1": "135.1843",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Western Samoa",
+    "Currency": "Tala",
+    "Currency Code": "WST",
+    "Currency Units per £1": "3.6973",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Yemen (Rep of)",
+    "Currency": "Rial",
+    "Currency Code": "YER",
+    "Currency Units per £1": "313.0956",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Zambia",
+    "Currency": "Kwacha",
+    "Currency Code": "ZMW",
+    "Currency Units per £1": "29.8901",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  {
+    "Country/Territories": "Zimbabwe",
+    "Currency": "Zimbabwe Gold",
+    "Currency Code": "ZWG",
+    "Currency Units per £1": "34.5908",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  }
+]

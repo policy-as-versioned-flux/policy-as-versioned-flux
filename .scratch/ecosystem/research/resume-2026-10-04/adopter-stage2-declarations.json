@@ -1,0 +1,304 @@
+{
+  "driftwood": {
+    "declared_engine": "1.18.2",
+    "inventory_sha256": "3673e27a8447f33a48430ec6b586ffd7732a352363b7cc533c5df23af428ecca",
+    "parents": [
+      {
+        "kind": "implementations",
+        "party": "platform",
+        "since": "2026-08-28",
+        "version": "4.0.0"
+      },
+      {
+        "kind": "controls",
+        "party": "nist",
+        "since": "2026-08-28",
+        "version": "1.1.0"
+      },
+      {
+        "kind": "feed",
+        "name": "penalty-schema",
+        "party": "ico",
+        "since": "2026-08-28",
+        "version": "v3"
+      },
+      {
+        "kind": "feed",
+        "name": "threat-register",
+        "party": "feeds",
+        "since": "2026-08-28",
+        "version": "v2"
+      },
+      {
+        "kind": "feed",
+        "name": "cve",
+        "party": "feeds",
+        "since": "2026-10-03",
+        "version": "v3"
+      },
+      {
+        "kind": "feed",
+        "name": "quote-driftwood",
+        "party": "insurer",
+        "since": "2026-08-28",
+        "version": "v1"
+      }
+    ],
+    "pins": {
+      ".github/platform-tools-pin.yaml": [
+        {
+          "gates": null,
+          "identity": null,
+          "name": "platform-tools",
+          "ref": {
+            "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+            "tag": "v4.0.0"
+          }
+        }
+      ],
+      "gitops/composed/composed-set.yaml": [
+        {
+          "gates": "flux-system/composed-v5-0-0,flux-system/composed-machinery",
+          "identity": "^https://github\\.com/policy-as-versioned-driftwood/driftwood/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "name": "driftwood-composed",
+          "ref": {
+            "commit": "bf9889aa6a6d979c87a5633240a1447765d73503",
+            "tag": "v3.0.0"
+          }
+        }
+      ],
+      "gitops/flux-system/gotk-sync-feeds.yaml": [
+        {
+          "gates": null,
+          "identity": "^https://github\\.com/policy-as-versioned-feeds/feeds/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "name": "feeds",
+          "ref": {
+            "commit": "69c89b0732a0c9e4e6013d2656d755c5d916a815",
+            "tag": "threat-register/v2.0.0"
+          }
+        }
+      ],
+      "gitops/flux-system/gotk-sync.yaml": [
+        {
+          "gates": null,
+          "identity": null,
+          "name": "driftwood",
+          "ref": {
+            "commit": "17302ecd20041df61a52428e67246c330294d2a6",
+            "tag": "v3.0.1"
+          }
+        }
+      ],
+      "gitops/platform/platform-pin.yaml": [
+        {
+          "gates": null,
+          "identity": "^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "name": "platform",
+          "ref": {
+            "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+            "tag": "v4.0.0"
+          }
+        }
+      ]
+    }
+  },
+  "ludlow": {
+    "declared_engine": "1.18.2",
+    "inventory_sha256": "7095e7debc03b48adf87a668b267f9898c9586432bb0259d97251a475aee7d35",
+    "parents": [
+      {
+        "kind": "implementations",
+        "party": "platform",
+        "since": "2026-08-28",
+        "version": "4.0.0"
+      },
+      {
+        "kind": "controls",
+        "party": "nist",
+        "since": "2026-08-28",
+        "version": "1.1.0"
+      },
+      {
+        "kind": "feed",
+        "name": "penalty-schema",
+        "party": "ico",
+        "since": "2026-08-28",
+        "version": "v3"
+      },
+      {
+        "kind": "feed",
+        "name": "threat-register",
+        "party": "feeds",
+        "since": "2026-08-28",
+        "version": "v1"
+      },
+      {
+        "kind": "feed",
+        "name": "cve",
+        "party": "feeds",
+        "since": "2026-10-03",
+        "version": "v3"
+      },
+      {
+        "kind": "feed",
+        "name": "eol",
+        "party": "feeds",
+        "since": "2026-09-08",
+        "version": "v2"
+      }
+    ],
+    "pins": {
+      ".github/platform-tools-pin.yaml": [
+        {
+          "gates": null,
+          "identity": null,
+          "name": "platform-tools",
+          "ref": {
+            "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+            "tag": "v4.0.0"
+          }
+        }
+      ],
+      "gitops/composed/composed-set.yaml": [
+        {
+          "gates": "flux-system/composed-v5-0-0,flux-system/composed-machinery",
+          "identity": "^https://github\\.com/policy-as-versioned-ludlow/ludlow/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "name": "ludlow-composed",
+          "ref": {
+            "commit": "45b3fbd21d2838f8882dfa6265b3a6e8fa61b3a9",
+            "tag": "v3.0.0"
+          }
+        }
+      ],
+      "gitops/flux-system/gotk-sync-feeds.yaml": [
+        {
+          "gates": null,
+          "identity": "^https://github\\.com/policy-as-versioned-feeds/feeds/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "name": "feeds",
+          "ref": {
+            "commit": "69c89b0732a0c9e4e6013d2656d755c5d916a815",
+            "tag": "threat-register/v1.0.0"
+          }
+        }
+      ],
+      "gitops/flux-system/gotk-sync.yaml": [
+        {
+          "gates": null,
+          "identity": null,
+          "name": "ludlow",
+          "ref": {
+            "commit": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+            "tag": "v3.0.1"
+          }
+        }
+      ],
+      "gitops/platform/platform-pin.yaml": [
+        {
+          "gates": null,
+          "identity": "^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "name": "platform",
+          "ref": {
+            "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+            "tag": "v4.0.0"
+          }
+        }
+      ]
+    }
+  },
+  "tuppence": {
+    "declared_engine": "1.18.2",
+    "inventory_sha256": "b100844ba2f1b5e776eec6415e677704045fa01d3d0f860f74adacf4b472df18",
+    "parents": [
+      {
+        "kind": "implementations",
+        "party": "platform",
+        "since": "2026-08-28",
+        "version": "4.0.0"
+      },
+      {
+        "kind": "controls",
+        "party": "nist",
+        "since": "2026-08-28",
+        "version": "1.1.0"
+      },
+      {
+        "kind": "feed",
+        "name": "penalty-schema",
+        "party": "ico",
+        "since": "2026-08-28",
+        "version": "v3"
+      },
+      {
+        "kind": "feed",
+        "name": "threat-register",
+        "party": "feeds",
+        "since": "2026-08-28",
+        "version": "v1"
+      },
+      {
+        "kind": "feed",
+        "name": "cve",
+        "party": "feeds",
+        "since": "2026-09-08",
+        "version": "v3"
+      }
+    ],
+    "pins": {
+      ".github/platform-tools-pin.yaml": [
+        {
+          "gates": null,
+          "identity": null,
+          "name": "platform-tools",
+          "ref": {
+            "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+            "tag": "v4.0.0"
+          }
+        }
+      ],
+      "gitops/composed/composed-set.yaml": [
+        {
+          "gates": "flux-system/composed-v5-0-0,flux-system/composed-machinery",
+          "identity": "^https://github\\.com/policy-as-versioned-tuppence/tuppence/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "name": "tuppence-composed",
+          "ref": {
+            "commit": "3d64a4d65d5eb5d81deedc10a0826c8b02d0ad39",
+            "tag": "v3.0.0"
+          }
+        }
+      ],
+      "gitops/flux-system/gotk-sync-feeds.yaml": [
+        {
+          "gates": null,
+          "identity": "^https://github\\.com/policy-as-versioned-feeds/feeds/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "name": "feeds",
+          "ref": {
+            "commit": "69c89b0732a0c9e4e6013d2656d755c5d916a815",
+            "tag": "threat-register/v1.0.0"
+          }
+        }
+      ],
+      "gitops/flux-system/gotk-sync.yaml": [
+        {
+          "gates": null,
+          "identity": null,
+          "name": "tuppence",
+          "ref": {
+            "commit": "d8dead25e0e5e275172640b1a637562e45edb15d",
+            "tag": "v3.0.1"
+          }
+        }
+      ],
+      "gitops/platform/platform-pin.yaml": [
+        {
+          "gates": null,
+          "identity": "^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "name": "platform",
+          "ref": {
+            "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+            "tag": "v4.0.0"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "baseline": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+  "trigger": "Actual Ludlow producer replay accepted filing date 2025-12-31 with August2026 FX; invalid output removed before adopter publication.",
+  "contract": "A dated FX payload covers only its own calendar month; no rate outside it is a missing instrument, never a neighbouring rate.",
+  "red": {
+    "command": ".venv/bin/python -m pytest tests/test_valuation_currency.py -n 0 -q",
+    "passed": 1,
+    "failed": 6,
+    "reason": "mismatched month accepted, invalid dates accepted, missing date KeyError"
+  },
+  "green": {
+    "same_command": true,
+    "passed": 7,
+    "failed": 0,
+    "seconds": 0.03,
+    "valuation_mypy": "Success: no issues found in 1 source file"
+  },
+  "same_currency": "No date or FX requirement; the native currency early return remains.",
+  "source_sha256": {
+    "twin/valuation.py": "d859628b0e82315defecd2ad085bb6df754107b91ac123d78a8958828c259ccf",
+    "tests/test_valuation_currency.py": "f57bab8ca237795a1faaac16d528261c96353a1ffa4ee9745604bd667472e4b2",
+    "tests/test_loophole_adr_0026.py": "fd05d371b9a7b05e444abdbfe34f0f7cb19d1ff1c8dadd88fc9f8df304fc2350"
+  },
+  "matching_primary_rate": "HMRC December2025 CSV, USD1.3126 per GBP; prospective authentic fx2 not yet published at this checkpoint.",
+  "ci_limit": "Prior real hub6ed CI15FAIL:14fixture dependency failures and1unchanged livecoveragefloor; fixture repair has27PASS on old/new source. No overall green claim.",
+  "full_CI_style_mypy": {
+    "source_files": 205,
+    "result": "PASS"
+  }
+}

@@ -1,0 +1,424 @@
+FF....FFFFFFF.FFFF.F......                                               [100%]
+=================================== FAILURES ===================================
+___ test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier ___
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_implementing_a_weighted_c0')
+
+    def test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier(tmp_path):
+        """Survivor 1, round 1 `overreach-6`, repaired by eco-system ticket 121. tuppence is composed
+        against its real pinned parents three times: as it is, with its own claim on `pl-2` alone,
+        and with its own claim on every control the pinned regulator weights name. The partition on
+        the entry does not change: every line keeps its share and the lines still sum to `total`.
+        The entry's amount is the sum of the lines still open. Claiming `pl-2` takes exactly its
+        line off the entry and off the exposure total. Claiming every weighted control takes the
+        whole entry to zero, and the regime's tier drops to the rung a zero residual selects under
+        tuppence's own floor. Every other entry keeps its tier."""
+        comp = _composition()
+        before, before_rendered = comp.compose(_tuppence(tmp_path / "before"), _trees())
+>       assert before["outcome"] == "composed", before["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:345: AssertionError
+_____ test_removing_an_implemented_control_puts_its_line_back_on_the_price _____
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_removing_an_implemented_c0')
+
+    def test_removing_an_implemented_control_puts_its_line_back_on_the_price(tmp_path):
+        """Ticket 121's consequence for ADR-0026 point 5. The regulator prices a control whether or
+        not the adopter selects it, so only a selected, claimed control comes off the entry. tuppence
+        claims `ra-3` under MODERATE, and its line comes off. Against a nist copy whose LOW drops
+        `ra-3`, tuppence on LOW keeps the claim, the line reads `unselected`, and the entry is the
+        whole partition again."""
+        comp = _composition()
+        nist = tmp_path / "nist"
+        shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+        low = nist / "catalog" / "NIST_SP-800-53_rev5.2.0_LOW-baseline_profile.json"
+        profile = json.loads(low.read_text())
+        for imp in profile["profile"]["imports"]:
+            for inc in imp.get("include-controls", []):
+                if "ra-3" in inc.get("with-ids", []):
+                    inc["with-ids"].remove("ra-3")
+        low.write_text(json.dumps(profile))
+        trees = _trees(nist=nist)
+    
+        claimed, _ = _claiming(comp, tmp_path / "moderate", ["ra-3"], trees)
+>       assert claimed["outcome"] == "composed", claimed["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:399: AssertionError
+_ test_an_overlay_or_a_claim_naming_a_withdrawn_status_control_refuses_as_unknown _
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_an_overlay_or_a_claim_nam0')
+
+    def test_an_overlay_or_a_claim_naming_a_withdrawn_status_control_refuses_as_unknown(tmp_path):
+        """Eco-system ticket 126. NIST's pinned catalogue keeps ac-2.10 under `status: withdrawn`.
+        tuppence naming it in `overlay.controls` refuses `unknown-control-id`, the instrument fault
+        ADR-0026's Consequences name for an adopter still naming a withdrawn control. A claim on it
+        in tuppence's own component-definition refuses the same way. Neither is selected nor priced
+        as held."""
+        assert _status(ESTATE / "nist", OWN_WITHDRAWN_STATUS) == "withdrawn"
+        comp = _composition()
+        work = _tuppence(tmp_path / "overlay")
+        _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[OWN_WITHDRAWN_STATUS]))
+        doc, _ = comp.compose(work, _trees())
+        assert doc["outcome"] == "refused", doc["deltas"]
+>       assert [(r["kind"], r["subject"]) for r in doc["refusals"]] == [
+            ("unknown-control-id", f"tuppence overlay.controls: {OWN_WITHDRAWN_STATUS}")], doc["refusals"]
+E       AssertionError: [{'detail': "'ac-2.10' is in nist's catalogue under status: withdrawn -- the regulator no longer defines it, so nothin...ted inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert [('unknown-co..., 'tuppence')] == [('unknown-co...ls: ac-2.10')]
+E         
+E         Left contains one more item: ('missing-instrument', 'tuppence')
+E         Use -v to get more diff
+
+tests/test_loophole_adr_0026.py:736: AssertionError
+_ test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[overlay-recorded] _
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_an_adopters_own_removal_o0')
+legacy_header = False
+
+    @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+    def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal(tmp_path, legacy_header):
+        """Ticket 123, review round, kept by ticket 126. A composer from before ticket 126 signed a
+        header in which tuppence's overlay selected ac-2.10, which NIST's pinned catalogue already
+        keeps under `status: withdrawn`. The adopter drops it; the nist pin does not move. That is
+        the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
+        happen. A last header with no `overlay-controls` must not change the answer. The new header
+        records `withdrawn-selectable: false`."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:763: AssertionError
+_ test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[legacy-header] _
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_an_adopters_own_removal_o1')
+legacy_header = True
+
+    @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+    def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal(tmp_path, legacy_header):
+        """Ticket 123, review round, kept by ticket 126. A composer from before ticket 126 signed a
+        header in which tuppence's overlay selected ac-2.10, which NIST's pinned catalogue already
+        keeps under `status: withdrawn`. The adopter drops it; the nist pin does not move. That is
+        the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
+        happen. A last header with no `overlay-controls` must not change the answer. The new header
+        records `withdrawn-selectable: false`."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:763: AssertionError
+_ test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[overlay-recorded] _
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_an_adopters_own_removal_o2')
+legacy_header = False
+
+    @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+    def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path, legacy_header):
+        """Ticket 123, review round, and ticket 126's legacy-header case. A composer from before
+        ticket 126 signed a header in which tuppence's overlay selected ac-2.10, already under
+        `status: withdrawn`. In one run NIST's next tag withdraws another selected control and
+        tuppence drops ac-2.10. That header cannot prove ac-2.10 was defined when it was selected,
+        so its removal is the adopter's, with or without `overlay-controls`.
+    
+        The other control differs by header. With `overlay-controls` recorded, it came from the
+        baseline, so it left with NIST's bump: a `withdrawn-control`. With a legacy header nothing
+        says whether it came from the baseline or from an overlay that selected it while already
+        withdrawn, so it stays the adopter's `removed-control` for this one run (ticket 123
+        decision 4's default, applied to the withdrawn status by ticket 126)."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:791: AssertionError
+_ test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[legacy-header] _
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_an_adopters_own_removal_o3')
+legacy_header = True
+
+    @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+    def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path, legacy_header):
+        """Ticket 123, review round, and ticket 126's legacy-header case. A composer from before
+        ticket 126 signed a header in which tuppence's overlay selected ac-2.10, already under
+        `status: withdrawn`. In one run NIST's next tag withdraws another selected control and
+        tuppence drops ac-2.10. That header cannot prove ac-2.10 was defined when it was selected,
+        so its removal is the adopter's, with or without `overlay-controls`.
+    
+        The other control differs by header. With `overlay-controls` recorded, it came from the
+        baseline, so it left with NIST's bump: a `withdrawn-control`. With a legacy header nothing
+        says whether it came from the baseline or from an overlay that selected it while already
+        withdrawn, so it stays the adopter's `removed-control` for this one run (ticket 123
+        decision 4's default, applied to the withdrawn status by ticket 126)."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:791: AssertionError
+_ test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators _
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_a_control_the_regulator_w0')
+
+    def test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators(tmp_path):
+        """Eco-system ticket 126. tuppence's overlay selects a control NIST defines outside
+        MODERATE, and composes under the new rule, so its header records `withdrawn-selectable:
+        false`. NIST's next tag marks that control `status: withdrawn`. tuppence keeping it in its
+        overlay refuses `unknown-control-id`. tuppence dropping it composes, and the control prints
+        as NIST's `withdrawn-control`: the last overlay would no longer select it against the new
+        catalogue, and the header proves it was defined when it was selected."""
+        comp = _composition()
+        moderate = comp._baseline_ids(ESTATE / "nist", "MODERATE")
+        extra = sorted(comp._baseline_ids(ESTATE / "nist", "HIGH") - moderate)[0]
+        assert _status(ESTATE / "nist", extra) is None
+        work = _tuppence(tmp_path / "tuppence")
+        _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[extra]))
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:822: AssertionError
+_ test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal _
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_a_weights_feed_that_names0')
+
+    def test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal(tmp_path):
+        """Ticket 123 item 2, against tuppence's real pinned parents. NIST withdraws a control the
+        way its catalogue already marks 182 of them: the control stays in the catalogue with
+        `status: withdrawn` and leaves every baseline. The pinned ico weights still name it. That is
+        the feed's own fact to fix in its next version (ADR-0026). The composition does not refuse
+        and does not re-partition: the regime entry keeps its amount, its line for the control reads
+        `withdrawn`, and the `withdrawn-control` delta carries the price the hole carried."""
+        comp = _composition()
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, _trees())
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:859: AssertionError
+___ test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one ___
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_a_narrowing_prices_a_weig0')
+
+    def test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one(tmp_path):
+        """Round 2 `loophole-1`: a mass removal of unweighted controls prints only absences. True,
+        and it is what ADR-0026 says: no pinned weight prices those controls, so the pound they
+        carry is nothing any regulator named. The weighted pound is the regime entry, and a removal
+        does not move it. tuppence narrows from MODERATE to LOW against a nist copy whose LOW also
+        drops the weighted `ra-3`. The one weighted removal prints the price its hole carried; every
+        other removal is a named absence; the summary delta counts both; the regime entry and its
+        `ra-3` line keep their amounts, and the line reads `unselected`."""
+        comp = _composition()
+        nist = tmp_path / "nist"
+        shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+        low = nist / "catalog" / "NIST_SP-800-53_rev5.2.0_LOW-baseline_profile.json"
+        profile = json.loads(low.read_text())
+        for imp in profile["profile"]["imports"]:
+            for inc in imp.get("include-controls", []):
+                if "ra-3" in inc.get("with-ids", []):
+                    inc["with-ids"].remove("ra-3")
+        low.write_text(json.dumps(profile))
+        trees = _trees(nist=nist)
+    
+        work = _tuppence(tmp_path / "tuppence")
+        first, rendered = comp.compose(work, trees)
+>       assert first["outcome"] == "composed", first["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:950: AssertionError
+_______ test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier ________
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_a_bespoke_hole_is_priced_0')
+
+    def test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier(tmp_path):
+        """Round 1 `loophole-1`, round 3 `loophole-1`. Both need a bespoke control's price to move
+        something that a later removal or a cheaper replacement could move back. A bespoke hole is
+        priced, on its own line, by the adopter's own scenario, and nothing reads that line: the
+        regime entry, the exposure total and every tier match the composition without it. Ticket
+        38 D5 named this limit ("priced but not yet tiered"), so the place is already held. The
+        withdrawal both candidates need composes since ticket 124 and prints a `removed-control`
+        delta at the scenario's own residual, so the withdrawn pound is on the record."""
+        comp = _composition()
+        plain, plain_rendered = comp.compose(_tuppence(tmp_path / "plain"), _trees())
+    
+        work = _tuppence(tmp_path / "bespoke")
+        _edit_party(work, lambda d: (d["inherits"].append({"party": "tuppence", "kind": "controls", "version": "1.0.0"}),
+                                     d.setdefault("overlay", {}).update(controls=["tuppence:vendor-review"])))
+        comp._write_small_catalog(work, {"vendor-review": {"scenario": "scenarios/vendor-review.json"}})
+        (work / "scenarios").mkdir()
+        shutil.copy(PLATFORM / "policy" / "scenarios" / "driftwood-root-residual.json",
+                    work / "scenarios" / "vendor-review.json")
+        bespoke, bespoke_rendered = comp.compose(work, _trees())
+>       assert bespoke["outcome"] == "composed", bespoke["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:996: AssertionError
+_____ test_a_bespoke_id_never_covers_the_regulators_control_of_the_same_id _____
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_a_bespoke_id_never_covers0')
+
+    def test_a_bespoke_id_never_covers_the_regulators_control_of_the_same_id(tmp_path):
+        """Round 1 `loophole-3`, round 2 `loophole-2`, round 3 `overreach-5`. tuppence publishes a
+        bespoke `pl-2`, one of the regulator's weighted ids, and claims it. The claim covers
+        `tuppence:pl-2` only. The regulator's `pl-2` stays a hole and its weighted line is not
+        `covered`. The header lists both keys, one bare and one with its source, so one id from two
+        sources is two selected controls: nothing collapses them."""
+        comp = _composition()
+        work = _tuppence(tmp_path)
+    
+        def edit(doc: dict[str, Any]) -> None:
+            doc["inherits"].append({"party": "tuppence", "kind": "controls", "version": "1.0.0"})
+            overlay = doc.setdefault("overlay", {})
+            overlay["controls"] = ["tuppence:pl-2"]
+            overlay.setdefault("add", []).append(_own_member(comp, "own-plan"))
+    
+        _edit_party(work, edit)
+        comp._write_small_catalog(work, {"pl-2": {"scenario": "scenarios/pl-2.json"}})
+        comp._write_component_definition(work / comp.ADOPTER_CLAIMS_FILE, [("pl-2", "own-plan")],
+                                         source="catalog/catalog.json")
+        doc, rendered = comp.compose(work, _trees())
+>       assert doc["outcome"] == "composed", doc["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:1036: AssertionError
+_ test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier _
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_an_ungoverned_namespace_i0')
+
+    def test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier(tmp_path):
+        """Round 1 `overreach-5`, round 3 `overreach-6`. A directory of manifests is not a
+        Namespace: the walk reads `kind: Namespace` documents and the Namespace a workload names.
+        Since ticket 119 a scratch Job that names a Namespace makes it an ungoverned Namespace, as
+        the candidates say, because silence buys no exemption and neither does intent. An ungoverned
+        Namespace with no workload prices at zero. One that is deleted closes and carries no price.
+        One with workloads is priced, and that price moves no tier and no exposure total."""
+        comp = _composition()
+        scratch = tmp_path / "scratch-dir"
+        (scratch / "gitops" / "scratch").mkdir(parents=True)
+        (scratch / "gitops" / "scratch" / "notes.yaml").write_text(yaml.safe_dump(
+            {"apiVersion": "v1", "kind": "ConfigMap", "metadata": {"name": "grant"}}))
+        assert comp.ungoverned_namespaces(scratch) == [], "a directory was read as a Namespace"
+        (scratch / "gitops" / "scratch" / "job.yaml").write_text(yaml.safe_dump(
+            {"apiVersion": "batch/v1", "kind": "Job", "metadata": {"name": "grant", "namespace": "scratch"}}))
+        assert comp.ungoverned_namespaces(scratch) == ["scratch"], "a Namespace a workload names went unpriced"
+    
+        empty = [{"namespace": "side", "status": "new"}]
+        repo = tmp_path / "empty"
+        (repo / "gitops").mkdir(parents=True)
+        (repo / "gitops" / "ns.yaml").write_text(yaml.safe_dump(
+            {"apiVersion": "v1", "kind": "Namespace", "metadata": {"name": "side", "labels": {INSTITUTION: "x"}}}))
+        comp.price_ungoverned(empty, repo, "adopter", "GBP", 10_000.0, "2026-09-01")
+        assert empty[0]["price"]["amount"] == 0.0, empty
+    
+        deleted = comp.compute_ungoverned(set(), {"side"})
+        comp.price_ungoverned(deleted, repo, "adopter", "GBP", 10_000.0, "2026-09-01")
+        assert deleted == [{"namespace": "side", "status": "closed"}], deleted
+    
+        plain, plain_rendered = comp.compose(_tuppence(tmp_path / "plain"), _trees())
+        work = _tuppence(tmp_path / "sprawl")
+        _namespaces(work, "sprawl")
+        sprawl, sprawl_rendered = comp.compose(work, _trees())
+        priced = next(e for e in sprawl["ungoverned"] if e["namespace"] == "sprawl")
+>       assert priced["price"]["amount"] and priced["price"]["amount"] > 0, priced
+E       AssertionError: {'namespace': 'sprawl', 'price': {'amount': None, 'as_of': '2026-09-08', 'base': None, 'bounded': False, ...}, 'status': 'recorded'}
+E       assert (None)
+
+tests/test_loophole_adr_0026.py:1080: AssertionError
+_____ test_a_mistranscribed_weight_moves_the_price_of_what_is_implemented ______
+
+tmp_path = PosixPath('/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-fqcs1zup/pytest/test_a_mistranscribed_weight_m0')
+
+    def test_a_mistranscribed_weight_moves_the_price_of_what_is_implemented(tmp_path):
+        """Round 2 `overreach-6`. A clone of the regulator's repo carries a wrong partition: 0.7 on
+        one lower-tier control and 0.1 on the others. With nothing implemented, tuppence composed
+        against it prices the regime entry, the exposure and every tier exactly as against the
+        published weights: a weight splits the entry, and every line is open. Since ticket 121 the
+        entry is the sum of its open lines, so a wrong weight moves the price once the adopter
+        implements a control it names. Claiming that control takes 0.7 of the entry off instead of
+        its published share. The recourse the candidate asks for exists: the adopter's own pin holds
+        the version it priced against, and a correction is a pull request to the publisher's repo."""
+        comp = _composition()
+        right, right_rendered = comp.compose(_tuppence(tmp_path / "right"), _trees())
+        ico = tmp_path / "ico"
+        subprocess.run(["git", "clone", "-q", str(ESTATE / "ico"), str(ico)], check=True, capture_output=True)
+        feed = ico / "penalty-schema" / "v3" / "feed.json"
+        doc = json.loads(feed.read_text())
+        lower = (doc.get("payload") or doc)["control_weights"]["uk-gdpr"]["lower-tier"]
+        published = {w["id"]: float(w["weight"]) for w in lower}
+        for i, w in enumerate(lower):
+            w["weight"] = 0.7 if i == 0 else round(0.3 / (len(lower) - 1), 10)
+        feed.write_text(json.dumps(doc, indent=2))
+        wrong, wrong_rendered = comp.compose(_tuppence(tmp_path / "wrong"), _trees(ico=ico))
+>       assert wrong["outcome"] == "composed", wrong["refusals"]
+E       AssertionError: [{'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'kind': 'missing-instrument', 'needs_composition': True, 'subject': 'tuppence'}]
+E       assert 'refused' == 'composed'
+E         
+E         - composed
+E         + refused
+
+tests/test_loophole_adr_0026.py:1126: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_loophole_adr_0026.py::test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier
+FAILED tests/test_loophole_adr_0026.py::test_removing_an_implemented_control_puts_its_line_back_on_the_price
+FAILED tests/test_loophole_adr_0026.py::test_an_overlay_or_a_claim_naming_a_withdrawn_status_control_refuses_as_unknown
+FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[overlay-recorded]
+FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[legacy-header]
+FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[overlay-recorded]
+FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[legacy-header]
+FAILED tests/test_loophole_adr_0026.py::test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators
+FAILED tests/test_loophole_adr_0026.py::test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal
+FAILED tests/test_loophole_adr_0026.py::test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one
+FAILED tests/test_loophole_adr_0026.py::test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier
+FAILED tests/test_loophole_adr_0026.py::test_a_bespoke_id_never_covers_the_regulators_control_of_the_same_id
+FAILED tests/test_loophole_adr_0026.py::test_an_ungoverned_namespace_is_a_workload_share_while_it_exists_and_moves_no_tier
+FAILED tests/test_loophole_adr_0026.py::test_a_mistranscribed_weight_moves_the_price_of_what_is_implemented
+14 failed, 12 passed in 34.27s

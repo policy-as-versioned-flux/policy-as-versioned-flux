@@ -1,0 +1,151 @@
+{
+  "hub_commit": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+  "published_main_merge": "e62194b0c700f0d8a94787e6a2f7063608862ace",
+  "published_main_contains_exact_pin": true,
+  "hub_signature_verification": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0\n",
+  "scope": "actual unmodified producer --check in disposable copies, clean exact published hub, genuine feeds; no external mutation",
+  "adopters": {
+    "driftwood": {
+      "producer_emit_exit": 0,
+      "producer_emit_stdout": "wrote twin/forward-intel/v2/feed.json (2396 bytes)\n",
+      "exit": 0,
+      "stdout": "ok  twin/forward-intel/v2/feed.json is byte-identical to a fresh render of the overlay\n",
+      "stderr": "",
+      "pin": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+      "derived_feed_refresh": [],
+      "source_forward_intel_unchanged": true
+    },
+    "tuppence": {
+      "producer_emit_exit": 0,
+      "producer_emit_stdout": "wrote twin/forward-intel/v1/feed.json (3593 bytes)\n",
+      "exit": 0,
+      "stdout": "ok  twin/forward-intel/v1/feed.json is byte-identical to a fresh render of the overlay\n",
+      "stderr": "",
+      "pin": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+      "derived_feed_refresh": [],
+      "source_forward_intel_unchanged": true
+    },
+    "ludlow": {
+      "producer_emit_exit": 0,
+      "producer_emit_stdout": "wrote twin/forward-intel/v1/feed.json (4084 bytes)\n",
+      "exit": 0,
+      "stdout": "ok  twin/forward-intel/v1/feed.json is byte-identical to a fresh render of the overlay\n",
+      "stderr": "",
+      "pin": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+      "derived_feed_refresh": [
+        {
+          "path": "twin/forward-intel/v1/feed.json",
+          "before_sha256": null,
+          "after_sha256": "2135f78d471ac12f2ce82bedf23654172e1a3a8104584e33eb09408f5be3a144",
+          "payload_delta": {
+            "claim_scope": {
+              "old": null,
+              "new": {
+                "included": [
+                  "hipaa"
+                ],
+                "excluded": [
+                  "uk-gdpr",
+                  "pci-dss"
+                ],
+                "note": "The shock is an exfiltration of the member health record store, scoped to the one regime this plan is supervised under. UK data protection and the card schemes are carved out: this party administers a US health plan and no publisher in its inherits[] prices either, so a number here would have no instrument behind it."
+              }
+            },
+            "currency": {
+              "old": null,
+              "new": "GBP"
+            },
+            "perspective": {
+              "old": null,
+              "new": "ludlow"
+            },
+            "curve": {
+              "old": null,
+              "new": [
+                {
+                  "account": "baseline",
+                  "net_cost_of_risk": 4819083.08
+                },
+                {
+                  "account": "restricted",
+                  "net_cost_of_risk": 4820583.08
+                },
+                {
+                  "account": "quarantine",
+                  "net_cost_of_risk": 4824583.08
+                },
+                {
+                  "account": "isolated",
+                  "net_cost_of_risk": 4833583.08
+                }
+              ]
+            },
+            "derived_from": {
+              "old": null,
+              "new": [
+                {
+                  "party": "feeds",
+                  "kind": "feed",
+                  "name": "threat-register",
+                  "version": "4"
+                },
+                {
+                  "party": "ludlow",
+                  "kind": "feed",
+                  "name": "forward-intel",
+                  "version": "1.0.0",
+                  "ref": "a323f1a2dac96b3e093df8a889d70bc8d6a67261"
+                }
+              ]
+            },
+            "register": {
+              "old": null,
+              "new": []
+            },
+            "horizon": {
+              "old": null,
+              "new": 1
+            },
+            "lm": {
+              "old": null,
+              "new": [
+                1204645.77,
+                4818583.08,
+                13504713.1
+              ]
+            },
+            "rests_on_grade": {
+              "old": null,
+              "new": 3
+            },
+            "valuation": {
+              "old": null,
+              "new": {
+                "amount": 6340240891.748336,
+                "currency": "GBP",
+                "native_amount": 8475000000.0,
+                "native_currency": "USD",
+                "party_fact": "size.turnover",
+                "fx": {
+                  "published_by": "feeds",
+                  "version": "1.1.0",
+                  "period": "2026-08",
+                  "valuation_date": "2025-12-31",
+                  "source": "HMRC monthly exchange rates",
+                  "from_rate": 1.3367,
+                  "to_rate": 1.0
+                }
+              }
+            },
+            "shock": {
+              "old": null,
+              "new": "An exfiltration of the member record store suppresses plan administration fees over the following year.\nTHE TRIPLE IS AN ANCHOR, NOT A MEASUREMENT, and it is graded 3 for exactly that reason. This institution has no incident of its own to measure, so the three numbers are arithmetic on the most thoroughly litigated plan-administrator breach on the public record, nested from the narrowest settled track to the widest:\n\n  min  0.00019 =  16,000,000 / 84,194,000,000   (the regulator's own settlement alone)\n  mode 0.00076 =  64,200,000 / 84,194,000,000   (regulator + the multistate settlement)\n  max  0.00213 = 179,200,000 / 84,194,000,000   (both, plus the class-action settlement)\n\n16,000,000 USD is the federal civil-rights regulator (HHS OCR) settlement with Anthem, Inc.; 48,200,000 USD the multistate attorneys-general settlement; 115,000,000 USD the class-action settlement, all on the same 2015 breach of the records of 78.8 million individuals, the regulated record category this plan holds. 84,194,000,000 USD is total operating revenue for the fiscal year ended 2016-12-31 in that company's own SEC Form 10-K. Sources are recorded in the hub's .scratch/ecosystem/research/94-studied-firms.md. Numerator and denominator are USD from the same record, so the ratio is dimensionless and carries no FX claim -- which matters, because this party reports in GBP.\nWhat it is NOT: a settlement is not a suppression of administration fees, and that company is not this one. Grade 3 on the published ladder is \"an established mechanism from published work, not observed here\", which is precisely the claim being made. Grade 3 is OUTSIDE the ladder's path_admission_threshold of 2, so no impact enters this perspective's pound through this edge and emit-forward-intel.py refuses to emit a priced payload while it is the only causal edge here. A grade-1 or grade-2 replacement is this institution's own dated incident record, and a regrade event has to record who moved it and why (twin/evidence.py)."
+            }
+          }
+        }
+      ],
+      "source_forward_intel_unchanged": false
+    }
+  },
+  "clean_hub_tracked_tree_unchanged": true
+}

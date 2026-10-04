@@ -1,0 +1,11 @@
+# Hub valuation date and fixture Standards review — 2026-10-04
+
+PASS for the inspected three-file repair, bound to the source hashes and patch digest in the [machine proof](hub-valuation-date-fixture-standards-review.json). No reviewer source edits or broad suite repeat.
+
+The real published `fx/payload.schema.json` says a date outside its period has no rate; `converters/fx.py` keys the requested date to that month. The minimal `twin/valuation.py:45–57` guard restores that contract: foreign conversion requires a string in ISO YYYY-MM-DD form, an actual calendar date, and the exact FX period. Missing, invalid or mismatched dates raise typed `MissingInstrument` before money is converted. The existing same-currency early return still needs no date or FX. No rate, signature boundary or frozen feed is changed. The former test explicitly accepted the wrong Aug2026/Dec2025 pair; the replacement requires refusal. Root reports meaningful6-red/7-green and one-file mypy PASS.
+
+The fixture delta in `tests/test_loophole_adr_0026.py:196` copies real inventory when present; on genuine old source without it, only the unrelated CVE subscription is removed in a disposable control-hole fixture. The added public-composer negative at `:346` reinstates the real subscription and requires the missing-inventory refusal. No fabricated scan or production guard weakening. Exact saved old/new layouts each pass27 cases, using released tools5; the runner asserts every case received its isolated estate.
+
+Independent raw-byte/hash and CSV checks confirm the saved official Dec2025 table uses USD1.3126 per GBP1 and all164 rows cover Dec2025. The published rule measured a currency withdrawal VES and therefore major2.0.0, not minor. It remains research until authentic signed release.
+
+Follow-up: let normal PR CI report configured pytest/invariants/mypy; the unchanged coverage guard45 still measures3/1966 and must remain honestly red. After publication, review all3 exact hub pin moves and replay actual producers with authentic signed FX2; until then missing instruments remain CANNOT LOOK exit3. Bind fresh composition/candidate heads, then separately verify authentic composition B before Stage2 activation.

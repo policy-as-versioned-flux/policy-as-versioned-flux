@@ -1,0 +1,229 @@
+{
+  "result": {
+    "composed_bump": "major",
+    "declared_bump": "major",
+    "added": [
+      "6.0.0",
+      "7.0.0"
+    ],
+    "retired": [],
+    "reasons": [
+      "6.0.0: publisher declared 'major', computed 'major'",
+      "7.0.0: publisher declared 'major', computed 'major'",
+      "acceptance: 6.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-6.0.0.yaml at aa923631de95)",
+      "acceptance: 7.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-7.0.0.yaml at aa923631de95)"
+    ],
+    "weaker_than_declared": false,
+    "acceptance": {
+      "admitted": true,
+      "accepted": [
+        {
+          "version": "6.0.0",
+          "record": "accepted-majors/platform-6.0.0.yaml",
+          "accepted_by": "chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator",
+          "accepted_on": "2026-10-03"
+        },
+        {
+          "version": "7.0.0",
+          "record": "accepted-majors/platform-7.0.0.yaml",
+          "accepted_by": "chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator",
+          "accepted_on": "2026-10-03"
+        }
+      ],
+      "unaccepted": [],
+      "retired": [],
+      "lines": [
+        "6.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-6.0.0.yaml at aa923631de95)",
+        "7.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-7.0.0.yaml at aa923631de95)"
+      ]
+    }
+  },
+  "evidence": {
+    "6.0.0": {
+      "outcome": {
+        "result": "passed",
+        "reason": null
+      },
+      "bump": {
+        "declared": "major",
+        "computed": "major"
+      },
+      "movement": [
+        {
+          "policy": "cage-tier.yaml",
+          "verdict": "major",
+          "entries": [
+            "ns-declares-59829f76d3b29fcf",
+            "ns-declares-cd63cae85c704526",
+            "ns-declares-e26bc608d993079b",
+            "ns-declares-e8aeacb70872dd4f",
+            "pin-ns-8193685ebe9e7df6",
+            "pin-ns-cd63cae85c704526",
+            "tier-ns-1d7cc48d73927cc4",
+            "tier-ns-416fc5dec79317c2",
+            "tier-ns-7822fc1973cd9a67",
+            "tier-ns-cd63cae85c704526",
+            "tier-ns-dcd899efe48bd12d"
+          ],
+          "expressions": [
+            "{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-6-0-0',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},\n 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-6-0-0','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},\n 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-6-0-0','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},\n 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-6-0-0',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]",
+            "namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'\n  ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('')\n  : ''",
+            "variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']\n  ? variables.nsTier\n  : 'isolated'"
+          ],
+          "detail": "ns-declares-59829f76d3b29fcf (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; ns-declares-cd63cae85c704526 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; ns-declares-e26bc608d993079b (tier=baseline): runAsNonRoot no longer written over the workload's own value; ns-declares-e8aeacb70872dd4f (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed, runAsNonRoot no longer written over the workload's own value; pin-ns-8193685ebe9e7df6 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; pin-ns-cd63cae85c704526 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-1d7cc48d73927cc4 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-416fc5dec79317c2 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-7822fc1973cd9a67 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-cd63cae85c704526 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-dcd899efe48bd12d (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed"
+        },
+        {
+          "policy": "posture-trust-boundary.yaml",
+          "verdict": "none",
+          "entries": [],
+          "expressions": [
+            "variables.posture == variables.claimed"
+          ],
+          "detail": "no fixture in the corpus moved"
+        },
+        {
+          "policy": "require-nonroot.yaml",
+          "verdict": "none",
+          "entries": [],
+          "expressions": [
+            "variables.nonroot || (variables.attested && variables.hardened)"
+          ],
+          "detail": "no fixture in the corpus moved"
+        }
+      ],
+      "counts": {
+        "old": 174,
+        "new": 168,
+        "union": 180
+      },
+      "generator_version": "0.3.0",
+      "corpus_checksum": "sha256:4c8a1112fc472cd19c550a2aa9b193bfc00491dea5bc25062b17021bca158da2",
+      "wall_clock": 85.873443815,
+      "coverage": {
+        "cells": 36,
+        "pairs": 180,
+        "pairwise_gap": "axes were combined pairwise (predicate-expression x version-pin, predicate-expression x tier-label, and every pair among version-pin, tier-label, namespace and workload-declares), so no three-way interaction was built; predicate-expression x namespace was not built because no subject predicate reads a Namespace (corpus_generator fails generation the day one does), and predicate-expression x workload-declares was not built because the declared-hardening axis writes the same container securityContext fields the expression axis's own probes already write"
+      },
+      "not_looked_at": [],
+      "limits": [
+        {
+          "name": "cage-ratchet-one-way",
+          "description": "the cage only ever tightens or holds under this rule -- nothing widens it back automatically once a workload's posture recovers, a structural one-way ratchet (cage_engine.py's RANK table). Kept open by decision, not by this count reaching zero.",
+          "count": 0,
+          "status": "open"
+        },
+        {
+          "name": "cage-removal-scores-patch",
+          "description": "the rule reads only the workload's own side of the comparison, so removing or loosening enforcement classifies no higher than patch even though it widens what is admitted. Kept open by decision.",
+          "count": 0,
+          "status": "open"
+        },
+        {
+          "name": "cage-not-priced-residual",
+          "description": "nothing in this corpus maps a pod to a priced residual -- the tier axis is synthetic (corpus_generator.TIER_VALUES), so the cage half of Track 2 is proved on synthetic input, never a real infrastructure capture. The check that would remove it: witness_set's real-infrastructure witnesses.",
+          "count": 6,
+          "status": "open"
+        }
+      ],
+      "matrix": {},
+      "matrix_note": "empty at the publisher, on purpose (ticket 18 Answer 4): each institution fills its own row by running this published computed-semver package inside its own adopter-gate.py, against its own claimed policy versions with its own workloads as extra corpus entries, and lands the row in its own composed evidence. The publisher never reads an adopter repository (NORTH-STAR \u00a72).",
+      "declared": "6.0.0",
+      "subject_dir": "distribution/policies/v6.0.0",
+      "old_subject_dir": "distribution/policies/v5.0.0",
+      "computed_bump": "major"
+    },
+    "7.0.0": {
+      "outcome": {
+        "result": "passed",
+        "reason": null
+      },
+      "bump": {
+        "declared": "major",
+        "computed": "major"
+      },
+      "movement": [
+        {
+          "policy": "cage-tier.yaml",
+          "verdict": "major",
+          "entries": [
+            "ns-declares-28955523c77f855d",
+            "ns-declares-531316544e990e91",
+            "ns-declares-93c210e53bf892ee",
+            "ns-declares-c901ace43256a7aa",
+            "pin-ns-531316544e990e91",
+            "pin-ns-8193685ebe9e7df6",
+            "tier-ns-0c49faad75bc25ee",
+            "tier-ns-531316544e990e91",
+            "tier-ns-5ae980404530734f",
+            "tier-ns-74cb718cb9db0321",
+            "tier-ns-bf9ac596bfe8bff4"
+          ],
+          "expressions": [
+            "{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-7-0-0',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},\n 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-7-0-0','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},\n 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-7-0-0','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},\n 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-7-0-0',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]",
+            "namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'\n  ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('')\n  : ''",
+            "variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']\n  ? variables.nsTier\n  : 'isolated'"
+          ],
+          "detail": "ns-declares-28955523c77f855d (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; ns-declares-531316544e990e91 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; ns-declares-93c210e53bf892ee (tier=baseline): runAsNonRoot no longer written over the workload's own value; ns-declares-c901ace43256a7aa (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed, runAsNonRoot no longer written over the workload's own value; pin-ns-531316544e990e91 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; pin-ns-8193685ebe9e7df6 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-0c49faad75bc25ee (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-531316544e990e91 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-5ae980404530734f (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-74cb718cb9db0321 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-bf9ac596bfe8bff4 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed"
+        },
+        {
+          "policy": "posture-trust-boundary.yaml",
+          "verdict": "removed",
+          "entries": [],
+          "expressions": [
+            "variables.posture == variables.claimed"
+          ],
+          "detail": "policy dropped"
+        },
+        {
+          "policy": "require-nonroot.yaml",
+          "verdict": "none",
+          "entries": [],
+          "expressions": [
+            "variables.nonroot || (variables.attested && variables.hardened)"
+          ],
+          "detail": "no fixture in the corpus moved"
+        }
+      ],
+      "counts": {
+        "old": 174,
+        "new": 140,
+        "union": 180
+      },
+      "generator_version": "0.3.0",
+      "corpus_checksum": "sha256:488de902f1feeb73b0a5efd9dd5c5cca04bc9ba29ec342f9724c603d21e45977",
+      "wall_clock": 150.34663598900002,
+      "coverage": {
+        "cells": 27,
+        "pairs": 180,
+        "pairwise_gap": "axes were combined pairwise (predicate-expression x version-pin, predicate-expression x tier-label, and every pair among version-pin, tier-label, namespace and workload-declares), so no three-way interaction was built; predicate-expression x namespace was not built because no subject predicate reads a Namespace (corpus_generator fails generation the day one does), and predicate-expression x workload-declares was not built because the declared-hardening axis writes the same container securityContext fields the expression axis's own probes already write"
+      },
+      "not_looked_at": [],
+      "limits": [
+        {
+          "name": "cage-ratchet-one-way",
+          "description": "the cage only ever tightens or holds under this rule -- nothing widens it back automatically once a workload's posture recovers, a structural one-way ratchet (cage_engine.py's RANK table). Kept open by decision, not by this count reaching zero.",
+          "count": 1,
+          "status": "open"
+        },
+        {
+          "name": "cage-removal-scores-patch",
+          "description": "the rule reads only the workload's own side of the comparison, so removing or loosening enforcement classifies no higher than patch even though it widens what is admitted. Kept open by decision.",
+          "count": 1,
+          "status": "open"
+        },
+        {
+          "name": "cage-not-priced-residual",
+          "description": "nothing in this corpus maps a pod to a priced residual -- the tier axis is synthetic (corpus_generator.TIER_VALUES), so the cage half of Track 2 is proved on synthetic input, never a real infrastructure capture. The check that would remove it: witness_set's real-infrastructure witnesses.",
+          "count": 6,
+          "status": "open"
+        }
+      ],
+      "matrix": {},
+      "matrix_note": "empty at the publisher, on purpose (ticket 18 Answer 4): each institution fills its own row by running this published computed-semver package inside its own adopter-gate.py, against its own claimed policy versions with its own workloads as extra corpus entries, and lands the row in its own composed evidence. The publisher never reads an adopter repository (NORTH-STAR \u00a72).",
+      "declared": "7.0.0",
+      "subject_dir": "distribution/policies/v7.0.0",
+      "old_subject_dir": "distribution/policies/v6.0.0",
+      "computed_bump": "major"
+    }
+  }
+}

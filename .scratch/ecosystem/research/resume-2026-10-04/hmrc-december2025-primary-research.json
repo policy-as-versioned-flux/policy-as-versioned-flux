@@ -1,0 +1,53 @@
+{
+  "source_url": "https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_2025-12.csv",
+  "official_month_page": "https://www.trade-tariff.service.gov.uk/exchange_rates/view/2025-12",
+  "raw_sha256": "48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26",
+  "raw_bytes": 8629,
+  "raw_byte_confirmation": "two official CSV GETs byte exact",
+  "full_row_count": 164,
+  "unique_currency_count": 142,
+  "all_row_start_date": "2025-12-01",
+  "all_row_end_date": "2025-12-31",
+  "usd_row": {
+    "Country/Territories": "USA",
+    "Currency": "Dollar",
+    "Currency Code": "USD",
+    "Currency Units per \u00a31": "1.3126",
+    "Start date": "01/12/2025",
+    "End date": "31/12/2025"
+  },
+  "units": "currency units per GBP1",
+  "GBP_base_rate": 1,
+  "normalization": "actual published fetch/fx.py parse(raw, 2025-12, officialURL), no inferred rates",
+  "normalized_payload_sha256": "5d0cc698e4b85657ffdd882c50a900ac87fbe535b50c2e0db4225782ebdb07ef",
+  "immutable_august_baseline": {
+    "tag": "fx/v1.1.0",
+    "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "tag_object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+    "period": "2026-08",
+    "USD": 1.3367
+  },
+  "actual_published_rule_bump": "major",
+  "removed_currency_codes": [
+    "VES"
+  ],
+  "added_currency_codes": [
+    "BGN",
+    "VED"
+  ],
+  "prospective_ordinary_namespace_release": "fx/v2.0.0",
+  "prospective_only": true,
+  "candidate_feed_envelope_saved": false,
+  "existing_converter_and_emitter_major_paths": "tag major parsed to fx/vMAJOR/feed.json; namespace already accepts fx2",
+  "illustrative_arithmetic_only_until_signed_snapshot": {
+    "native_USD": "8475000000",
+    "date": "2025-12-31",
+    "official_USD_per_GBP": "1.3126",
+    "GBP_formula": "native_USD / USD_per_GBP",
+    "GBP": "6456650921.834526893189090355",
+    "not_a_current_served_or_signed_price": true
+  },
+  "no_repo_mutations": "research files only; no feed/adopter source or tags changed",
+  "actual_matching_signed_feed_available": false,
+  "current_Ludlow_result": "MissingInstrument -> CANNOT LOOK exit3 until authentic matching signed feed exists"
+}

@@ -1,0 +1,59 @@
+{
+  "driftwood": {
+    "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/feeds",
+    "head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "tags": {
+      "cve/v3.0.0": {
+        "object": "647f4961eb02d0858092ee6f91a43cb1657bdd97",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "fx/v1.1.0": {
+        "object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "threat-register/v4.0.0": {
+        "object": "57cfe4af7aa85301e27dc720f0227834bfd0574f",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      }
+    },
+    "clean": true
+  },
+  "tuppence": {
+    "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/feeds",
+    "head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "tags": {
+      "cve/v3.0.0": {
+        "object": "647f4961eb02d0858092ee6f91a43cb1657bdd97",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "fx/v1.1.0": {
+        "object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "threat-register/v4.0.0": {
+        "object": "57cfe4af7aa85301e27dc720f0227834bfd0574f",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      }
+    },
+    "clean": true
+  },
+  "ludlow": {
+    "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/feeds",
+    "head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "tags": {
+      "cve/v3.0.0": {
+        "object": "647f4961eb02d0858092ee6f91a43cb1657bdd97",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "fx/v1.1.0": {
+        "object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "threat-register/v4.0.0": {
+        "object": "57cfe4af7aa85301e27dc720f0227834bfd0574f",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      }
+    },
+    "clean": true
+  }
+}

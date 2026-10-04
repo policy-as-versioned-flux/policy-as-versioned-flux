@@ -1,0 +1,481 @@
+{
+  "driftwood": {
+    "exit": 0,
+    "outcome": "composed",
+    "parents": [
+      {
+        "party": "platform",
+        "kind": "implementations",
+        "version": "5.0.0",
+        "sha": "703eff6aee959843c4160aa54fd03413f62858cc"
+      },
+      {
+        "party": "nist",
+        "kind": "controls",
+        "version": "1.1.0",
+        "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819"
+      },
+      {
+        "party": "ico",
+        "kind": "feed",
+        "name": "penalty-schema",
+        "version": "v3",
+        "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e"
+      },
+      {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "threat-register",
+        "version": "v4",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+      },
+      {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "cve",
+        "version": "v3",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+      },
+      {
+        "party": "insurer",
+        "kind": "feed",
+        "name": "quote-driftwood",
+        "version": "v1",
+        "sha": "db767055119292e400edd63ed260785ce605eb4e"
+      }
+    ],
+    "refusals": [],
+    "engine": {
+      "declared": {
+        "engine": "kyverno",
+        "version": "1.18.2",
+        "file": "gitops/engine/kyverno.yaml"
+      },
+      "file": "gitops/engine/kyverno.yaml",
+      "pairings": [
+        {
+          "subject": "platform policy 5.0.0",
+          "party": "platform",
+          "line": "5.0.0",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/versions.yaml",
+          "tested_engines": [
+            "1.18.2"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol",
+            "cage-tier",
+            "posture-trust-boundary",
+            "require-nonroot",
+            "stamp-posture"
+          ],
+          "controls": [
+            "ac-4",
+            "ac-6",
+            "cm-6"
+          ]
+        },
+        {
+          "subject": "platform policy 6.0.0",
+          "party": "platform",
+          "line": "6.0.0",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/versions.yaml",
+          "tested_engines": [
+            "1.18.2"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol",
+            "cage-tier",
+            "posture-trust-boundary",
+            "require-nonroot",
+            "stamp-posture"
+          ],
+          "controls": [
+            "ac-4",
+            "ac-6",
+            "cm-6"
+          ]
+        },
+        {
+          "subject": "platform policy 7.0.0",
+          "party": "platform",
+          "line": "7.0.0",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/versions.yaml",
+          "tested_engines": [
+            "1.18.2",
+            "1.19.1"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol",
+            "cage-tier",
+            "require-nonroot",
+            "stamp-posture"
+          ],
+          "controls": [
+            "ac-4",
+            "ac-6",
+            "cm-6"
+          ]
+        },
+        {
+          "subject": "platform machinery",
+          "party": "platform",
+          "line": "machinery",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/machinery.yaml",
+          "tested_engines": [
+            "1.18.2",
+            "1.19.1"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol-bottom-rung",
+            "governed-namespace-cage-holds",
+            "governed-namespace-requires-claim",
+            "governed-namespace-unclaimed-report",
+            "policy-version-orphan-cage",
+            "policy-version-orphan-cage-holds",
+            "policy-version-orphan-guard"
+          ],
+          "controls": [
+            "ac-4",
+            "cm-6"
+          ]
+        }
+      ]
+    },
+    "policy_versions": [
+      "5.0.0",
+      "6.0.0",
+      "7.0.0"
+    ],
+    "rendered_file_count": 53,
+    "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-authenticated-compose.log"
+  },
+  "tuppence": {
+    "exit": 0,
+    "outcome": "composed",
+    "parents": [
+      {
+        "party": "platform",
+        "kind": "implementations",
+        "version": "5.0.0",
+        "sha": "703eff6aee959843c4160aa54fd03413f62858cc"
+      },
+      {
+        "party": "nist",
+        "kind": "controls",
+        "version": "1.1.0",
+        "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819"
+      },
+      {
+        "party": "ico",
+        "kind": "feed",
+        "name": "penalty-schema",
+        "version": "v3",
+        "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e"
+      },
+      {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "threat-register",
+        "version": "v4",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+      },
+      {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "cve",
+        "version": "v3",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+      }
+    ],
+    "refusals": [],
+    "engine": {
+      "declared": {
+        "engine": "kyverno",
+        "version": "1.18.2",
+        "file": "gitops/engine/kyverno.yaml"
+      },
+      "file": "gitops/engine/kyverno.yaml",
+      "pairings": [
+        {
+          "subject": "platform policy 5.0.0",
+          "party": "platform",
+          "line": "5.0.0",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/versions.yaml",
+          "tested_engines": [
+            "1.18.2"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol",
+            "cage-tier",
+            "posture-trust-boundary",
+            "require-nonroot",
+            "stamp-posture"
+          ],
+          "controls": [
+            "ac-4",
+            "ac-6",
+            "cm-6"
+          ]
+        },
+        {
+          "subject": "platform policy 6.0.0",
+          "party": "platform",
+          "line": "6.0.0",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/versions.yaml",
+          "tested_engines": [
+            "1.18.2"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol",
+            "cage-tier",
+            "posture-trust-boundary",
+            "require-nonroot",
+            "stamp-posture"
+          ],
+          "controls": [
+            "ac-4",
+            "ac-6",
+            "cm-6"
+          ]
+        },
+        {
+          "subject": "platform policy 7.0.0",
+          "party": "platform",
+          "line": "7.0.0",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/versions.yaml",
+          "tested_engines": [
+            "1.18.2",
+            "1.19.1"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol",
+            "cage-tier",
+            "require-nonroot",
+            "stamp-posture"
+          ],
+          "controls": [
+            "ac-4",
+            "ac-6",
+            "cm-6"
+          ]
+        },
+        {
+          "subject": "platform machinery",
+          "party": "platform",
+          "line": "machinery",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/machinery.yaml",
+          "tested_engines": [
+            "1.18.2",
+            "1.19.1"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol-bottom-rung",
+            "governed-namespace-cage-holds",
+            "governed-namespace-requires-claim",
+            "governed-namespace-unclaimed-report",
+            "policy-version-orphan-cage",
+            "policy-version-orphan-cage-holds",
+            "policy-version-orphan-guard"
+          ],
+          "controls": [
+            "ac-4",
+            "cm-6"
+          ]
+        }
+      ]
+    },
+    "policy_versions": [
+      "5.0.0",
+      "6.0.0",
+      "7.0.0"
+    ],
+    "rendered_file_count": 50,
+    "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-authenticated-compose.log"
+  },
+  "ludlow": {
+    "exit": 0,
+    "outcome": "composed",
+    "parents": [
+      {
+        "party": "platform",
+        "kind": "implementations",
+        "version": "5.0.0",
+        "sha": "703eff6aee959843c4160aa54fd03413f62858cc"
+      },
+      {
+        "party": "nist",
+        "kind": "controls",
+        "version": "1.1.0",
+        "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819"
+      },
+      {
+        "party": "ico",
+        "kind": "feed",
+        "name": "penalty-schema",
+        "version": "v3",
+        "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e"
+      },
+      {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "threat-register",
+        "version": "v4",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+      },
+      {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "cve",
+        "version": "v3",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+      },
+      {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "eol",
+        "version": "v2",
+        "sha": "330fbf06872c2ec2c8637863b624cd902d5534ca"
+      }
+    ],
+    "refusals": [],
+    "engine": {
+      "declared": {
+        "engine": "kyverno",
+        "version": "1.18.2",
+        "file": "gitops/engine/kyverno.yaml"
+      },
+      "file": "gitops/engine/kyverno.yaml",
+      "pairings": [
+        {
+          "subject": "platform policy 5.0.0",
+          "party": "platform",
+          "line": "5.0.0",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/versions.yaml",
+          "tested_engines": [
+            "1.18.2"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol",
+            "cage-tier",
+            "posture-trust-boundary",
+            "require-nonroot",
+            "stamp-posture"
+          ],
+          "controls": [
+            "ac-4",
+            "ac-6",
+            "cm-6"
+          ]
+        },
+        {
+          "subject": "platform policy 6.0.0",
+          "party": "platform",
+          "line": "6.0.0",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/versions.yaml",
+          "tested_engines": [
+            "1.18.2"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol",
+            "cage-tier",
+            "posture-trust-boundary",
+            "require-nonroot",
+            "stamp-posture"
+          ],
+          "controls": [
+            "ac-4",
+            "ac-6",
+            "cm-6"
+          ]
+        },
+        {
+          "subject": "platform policy 7.0.0",
+          "party": "platform",
+          "line": "7.0.0",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/versions.yaml",
+          "tested_engines": [
+            "1.18.2",
+            "1.19.1"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol",
+            "cage-tier",
+            "require-nonroot",
+            "stamp-posture"
+          ],
+          "controls": [
+            "ac-4",
+            "ac-6",
+            "cm-6"
+          ]
+        },
+        {
+          "subject": "platform machinery",
+          "party": "platform",
+          "line": "machinery",
+          "tree": "platform@5.0.0",
+          "read_from": "distribution/machinery.yaml",
+          "tested_engines": [
+            "1.18.2",
+            "1.19.1"
+          ],
+          "status": "supported",
+          "reason": null,
+          "bodies": [
+            "cage-netpol-bottom-rung",
+            "governed-namespace-cage-holds",
+            "governed-namespace-requires-claim",
+            "governed-namespace-unclaimed-report",
+            "policy-version-orphan-cage",
+            "policy-version-orphan-cage-holds",
+            "policy-version-orphan-guard"
+          ],
+          "controls": [
+            "ac-4",
+            "cm-6"
+          ]
+        }
+      ]
+    },
+    "policy_versions": [
+      "5.0.0",
+      "6.0.0",
+      "7.0.0"
+    ],
+    "rendered_file_count": 54,
+    "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-authenticated-compose.log"
+  }
+}

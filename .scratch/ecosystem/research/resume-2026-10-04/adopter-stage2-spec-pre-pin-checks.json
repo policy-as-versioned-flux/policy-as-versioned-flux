@@ -1,0 +1,167 @@
+{
+  "checked_at": "2026-10-04T07:49:53.181645+00:00",
+  "scope": "Independent source/pre-pin Spec review; no final composition approval",
+  "adopters": {
+    "driftwood": {
+      "baseline": "17302ecd20041df61a52428e67246c330294d2a6",
+      "apps_tag": "v3.0.1",
+      "apps_commit": "17302ecd20041df61a52428e67246c330294d2a6",
+      "apps_tag_object": "4cdf9152d2af61d9e476f5e0f487d85a2808f42f",
+      "images": [
+        "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+        "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+        "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+      ],
+      "primary_raw_trim_matches": true,
+      "inventory_sha256": "3673e27a8447f33a48430ec6b586ffd7732a352363b7cc533c5df23af428ecca",
+      "upstream_apps_observations_unchanged": true,
+      "retained_upstream_paths": 14,
+      "declared_workload_restatement_bindings": 0,
+      "engine": {
+        "schema": 1,
+        "engine": "kyverno",
+        "version": "1.18.2",
+        "install": {
+          "url": "https://github.com/kyverno/kyverno/releases/download/v1.18.2/install.yaml",
+          "sha256": "3dcd43eaf11f0719084217148cd0c82a8fa49faa9b1a783ea5bea2cf84041bda"
+        },
+        "cli": {
+          "linux_x86_64": {
+            "file": "kyverno-cli_v1.18.2_linux_x86_64.tar.gz",
+            "sha256": "cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b"
+          }
+        }
+      },
+      "selfchecks": {
+        "five-facts.py": {
+          "rc": 0,
+          "stdout": "ok  three falsifiers declared; verdict is tri-state; 3 sources read from gitops/; fact 2 grades the identity; a hand-typed sample is refused; the two cage facts and their six falsifiers are pre-registered in window.yaml; a cage that refuses or leaks is observed false; a reference the cage selects, a fall-closed rung that is not the ladder's bottom, and a cluster whose reference reaches nothing either are each unmeasured rather than a cage that held; a sample older than the registration reads could-not-look on facts 6 and 7; and a cage fact null on 3 samples since the registration is a fall\n",
+          "stderr": ""
+        },
+        "served_apps.py": {
+          "rc": 0,
+          "stdout": "ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict\n",
+          "stderr": ""
+        },
+        "oscal_lane.py": {
+          "rc": 0,
+          "stdout": "ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not\n",
+          "stderr": ""
+        }
+      },
+      "reviewed_source_sha256": {
+        "party.yaml": "5886cc23919f9e35b3c8f597edaca1ee88c865aaabe4bb628a83900567a108c2",
+        "gitops/flux-system/gotk-sync.yaml": "1ef771ce6175c4fae4af409ac7949f7505d2678f68a51734b8ce381bacf81ad7",
+        "drift/served_apps.py": "4b5484a79f1e02554d5fd20186796235f682c238e597f887765202857304686e",
+        "drift/oscal_lane.py": "9b1e21bd1d9c69396d7be9038fc7dd41f540d9a42b33ba3390d61ef2cc891b70",
+        "drift/window.yaml": "9b060c6afb24619297c1419274813e5f81c787fa0b511cb9b311b9cc1e277312"
+      }
+    },
+    "tuppence": {
+      "baseline": "d8dead25e0e5e275172640b1a637562e45edb15d",
+      "apps_tag": "v3.0.1",
+      "apps_commit": "d8dead25e0e5e275172640b1a637562e45edb15d",
+      "apps_tag_object": "bc6ee99a1cda20e9fe0365feb25c3086aad7f5a5",
+      "images": [
+        "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5"
+      ],
+      "primary_raw_trim_matches": true,
+      "inventory_sha256": "b100844ba2f1b5e776eec6415e677704045fa01d3d0f860f74adacf4b472df18",
+      "upstream_apps_observations_unchanged": true,
+      "retained_upstream_paths": 14,
+      "declared_workload_restatement_bindings": 0,
+      "engine": {
+        "schema": 1,
+        "engine": "kyverno",
+        "version": "1.18.2",
+        "install": {
+          "url": "https://github.com/kyverno/kyverno/releases/download/v1.18.2/install.yaml",
+          "sha256": "3dcd43eaf11f0719084217148cd0c82a8fa49faa9b1a783ea5bea2cf84041bda"
+        },
+        "cli": {
+          "linux_x86_64": {
+            "file": "kyverno-cli_v1.18.2_linux_x86_64.tar.gz",
+            "sha256": "cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b"
+          }
+        }
+      },
+      "selfchecks": {
+        "five-facts.py": {
+          "rc": 0,
+          "stdout": "ok  three falsifiers declared; verdict is tri-state; 3 sources read from gitops/; fact 2 grades the identity; a hand-typed sample is refused; the two cage facts and their six falsifiers are pre-registered in window.yaml; a cage that refuses or leaks is observed false; a reference the cage selects, a fall-closed rung that is not the ladder's bottom, and a cluster whose reference reaches nothing either are each unmeasured rather than a cage that held; a sample older than the registration reads could-not-look on facts 6 and 7; and a cage fact null on 3 samples since the registration is a fall\n",
+          "stderr": ""
+        },
+        "served_apps.py": {
+          "rc": 0,
+          "stdout": "ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict\n",
+          "stderr": ""
+        },
+        "oscal_lane.py": {
+          "rc": 0,
+          "stdout": "ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not\n",
+          "stderr": ""
+        }
+      },
+      "reviewed_source_sha256": {
+        "party.yaml": "c55ecad06ecaa428e6c8102f017e2f03291e32470ef9cc8c48f737fae07d03dd",
+        "gitops/flux-system/gotk-sync.yaml": "92415e7e5c5cb987b0ef5cfa913ace6e4b03bbadddfa4f337b099940f3b06bc7",
+        "drift/served_apps.py": "4b5484a79f1e02554d5fd20186796235f682c238e597f887765202857304686e",
+        "drift/oscal_lane.py": "9b1e21bd1d9c69396d7be9038fc7dd41f540d9a42b33ba3390d61ef2cc891b70",
+        "drift/window.yaml": "21c35bdb02507bb75d01fd306a41befac0a5ec71aad7c643c1aeecee7d2a7ddc"
+      }
+    },
+    "ludlow": {
+      "baseline": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+      "apps_tag": "v3.0.1",
+      "apps_commit": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+      "apps_tag_object": "2cc62f42b297f1f7ed65babc381a6dad561f3240",
+      "images": [
+        "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+      ],
+      "primary_raw_trim_matches": true,
+      "inventory_sha256": "7095e7debc03b48adf87a668b267f9898c9586432bb0259d97251a475aee7d35",
+      "upstream_apps_observations_unchanged": true,
+      "retained_upstream_paths": 13,
+      "declared_workload_restatement_bindings": 0,
+      "engine": {
+        "schema": 1,
+        "engine": "kyverno",
+        "version": "1.18.2",
+        "install": {
+          "url": "https://github.com/kyverno/kyverno/releases/download/v1.18.2/install.yaml",
+          "sha256": "3dcd43eaf11f0719084217148cd0c82a8fa49faa9b1a783ea5bea2cf84041bda"
+        },
+        "cli": {
+          "linux_x86_64": {
+            "file": "kyverno-cli_v1.18.2_linux_x86_64.tar.gz",
+            "sha256": "cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b"
+          }
+        }
+      },
+      "selfchecks": {
+        "five-facts.py": {
+          "rc": 0,
+          "stdout": "ok  three falsifiers declared; verdict is tri-state; 3 sources read from gitops/; fact 2 grades the identity; a hand-typed sample is refused; the two cage facts and their six falsifiers are pre-registered in window.yaml; a cage that refuses or leaks is observed false; a reference the cage selects, a fall-closed rung that is not the ladder's bottom, and a cluster whose reference reaches nothing either are each unmeasured rather than a cage that held; a sample older than the registration reads could-not-look on facts 6 and 7; and a cage fact null on 3 samples since the registration is a fall\n",
+          "stderr": ""
+        },
+        "served_apps.py": {
+          "rc": 0,
+          "stdout": "ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict\n",
+          "stderr": ""
+        },
+        "oscal_lane.py": {
+          "rc": 0,
+          "stdout": "ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not\n",
+          "stderr": ""
+        }
+      },
+      "reviewed_source_sha256": {
+        "party.yaml": "0229d55d02865295e7a545a2faf0f90dfc64261110f755ac99b19ee1b857a566",
+        "gitops/flux-system/gotk-sync.yaml": "7884df0e2b2119899d5d79c34cef9dcd2e8c84aa30f0a0e68487f256556f4d25",
+        "drift/served_apps.py": "4b5484a79f1e02554d5fd20186796235f682c238e597f887765202857304686e",
+        "drift/oscal_lane.py": "9b1e21bd1d9c69396d7be9038fc7dd41f540d9a42b33ba3390d61ef2cc891b70",
+        "drift/window.yaml": "c3727d68afcb06d1d5f4d3de089eae89eb6363a58eae8d3251c7bf7f84ed3266"
+      }
+    }
+  }
+}

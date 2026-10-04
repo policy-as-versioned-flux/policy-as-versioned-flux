@@ -1,0 +1,169 @@
+{
+  "scope": "independent authentic final7/tools5 receipt and cryptographic-output binding; no publication by reviewer",
+  "cut_run": 37185354470,
+  "cut_source": "b55f643d3bb012658ddb00a26bcfb219c7f3ea12",
+  "tags": {
+    "policy/v6.0.0": {
+      "object": "53e1be9c04bbf3fe9437115386198e63ca95e894",
+      "commit": "59ec7ce39bcd658c2454b23ce1cc26082e737fdd"
+    },
+    "policy/v7.0.0": {
+      "object": "e7e211c3bfbb78a31d9385adf77a6ebaaa760f7a",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc"
+    },
+    "v5.0.0": {
+      "object": "6ab1d49cf4ded25b4939ba16f8e8e741a5c2b8f0",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc"
+    }
+  },
+  "shared_final_tag_target_B": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "evidence_commit_A": "393a40f707f2b23a3a174696a0c84a8473297ca9",
+  "tag_target_parent_is_evidence_commit": true,
+  "evidence_commit_parent_is_reviewed_merge": true,
+  "outcome": {
+    "result": "passed",
+    "reason": null
+  },
+  "bump": {
+    "declared": "major",
+    "computed": "major"
+  },
+  "declared": "7.0.0",
+  "evidence_sha256": "7c59e9af16341792411380b4ec7b586a8bbfe6bbd5bbb3c7b7a067e5af6ed820",
+  "bundle_sha256": "bb563937e4b77d0b077628166f3952b63bd33dbe1f94603db3570472d5279fa8",
+  "source_to_evidence_delta": [
+    "computed-semver/evidence/7.0.0.json",
+    "computed-semver/evidence/7.0.0.json.bundle"
+  ],
+  "evidence_to_metadata_delta": [
+    "distribution/versions.yaml"
+  ],
+  "authentic6_array_retained_byte_exact": true,
+  "authentic6_tag_unchanged": true,
+  "authentic6_evidence_retained_byte_exact": true,
+  "frozen_policy_sha256": {
+    "distribution/policies/v5.0.0/cage-netpol.yaml": "2f2b08fe6dace31742ff98a367f5100ea3220ef77bf43034aef30d2496439187",
+    "distribution/policies/v5.0.0/cage-tier.yaml": "8088165d2909fe15880d696629e5d8e8431901156b9585c9954289e3346a28de",
+    "distribution/policies/v5.0.0/kustomization.yaml": "da5215f7ecc9bd864d75574eda831622eda18688caaf6436682180d9c9206ec4",
+    "distribution/policies/v5.0.0/posture-trust-boundary.yaml": "877d087ffddb990240277a6723628074024eb058afec05576d7a9df6c5eac81a",
+    "distribution/policies/v5.0.0/priorityclasses.yaml": "79cc16a3e06d0a9120e3ee4d101aa91226dfa1fff7c174d72ec28828a746e251",
+    "distribution/policies/v5.0.0/require-nonroot.yaml": "83910bf37ef0d4125aca667370c267a9be4a8246ea2710d91d81b54c5e3501d7",
+    "distribution/policies/v5.0.0/stamp-posture.yaml": "a5cb056c1dd132a002858b88d857eaadef86a4d2686fb0aae8ca782c40993c91",
+    "distribution/policies/v6.0.0/cage-netpol.yaml": "3a376d55be88757aa57102eb84c744890c40bf43a5241eb790004d852d03d24d",
+    "distribution/policies/v6.0.0/cage-tier.yaml": "5bb6c6a3cbdb211000cda7e401742d89ac7eed0c91b04f47192e9a745c5c69bf",
+    "distribution/policies/v6.0.0/kustomization.yaml": "da5215f7ecc9bd864d75574eda831622eda18688caaf6436682180d9c9206ec4",
+    "distribution/policies/v6.0.0/posture-trust-boundary.yaml": "1e8125c437767d42fbd0f0fc04a1fdccb97ffddde21e3a5015b0516b175903ed",
+    "distribution/policies/v6.0.0/priorityclasses.yaml": "2f110954934d887999ae4fed0a7c52b3613d25473c670b54ac92bc66a4a73d45",
+    "distribution/policies/v6.0.0/require-nonroot.yaml": "46e394ea0f5551290c30dd7a884307330ef9f702923e7120ac9abb4ef6024a90",
+    "distribution/policies/v6.0.0/stamp-posture.yaml": "a0b54890cb5dcb73261d839e96e1083a6796ae2bf39c87f5b01c3a2ba175f7e2"
+  },
+  "policy_subtrees_A_B_source_equal": {
+    "5.0.0": {
+      "b55f643d3bb012658ddb00a26bcfb219c7f3ea12": "a8468fb3e156f91f826750dd543ba6e1bfa99439",
+      "393a40f707f2b23a3a174696a0c84a8473297ca9": "a8468fb3e156f91f826750dd543ba6e1bfa99439",
+      "703eff6aee959843c4160aa54fd03413f62858cc": "a8468fb3e156f91f826750dd543ba6e1bfa99439"
+    },
+    "6.0.0": {
+      "b55f643d3bb012658ddb00a26bcfb219c7f3ea12": "3e0cf747eeecba8947a6f9f67b417dbd23137376",
+      "393a40f707f2b23a3a174696a0c84a8473297ca9": "3e0cf747eeecba8947a6f9f67b417dbd23137376",
+      "703eff6aee959843c4160aa54fd03413f62858cc": "3e0cf747eeecba8947a6f9f67b417dbd23137376"
+    },
+    "7.0.0": {
+      "b55f643d3bb012658ddb00a26bcfb219c7f3ea12": "9af2c788bf22701a89de763104b18f98d387a1f1",
+      "393a40f707f2b23a3a174696a0c84a8473297ca9": "9af2c788bf22701a89de763104b18f98d387a1f1",
+      "703eff6aee959843c4160aa54fd03413f62858cc": "9af2c788bf22701a89de763104b18f98d387a1f1"
+    }
+  },
+  "verdict": "PASS: authentic policy6\u2192policy7/tools5 delivery, exact main signer/issuer, clean major, preserved supported5/6 and genuine6 metadata",
+  "cut_execution_checks": {
+    "engine cells -- every line and the machinery pass on every engine they list, before any tag is signed": "success",
+    "create the signed annotated tags (ambient Actions identity, no interactive login)": "success",
+    "push every tag in one atomic push (git push only -- never the git-data REST API)": "success"
+  },
+  "supported_policy_window": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "actual_release_verification": {
+    "policy7": {
+      "run": 37187107091,
+      "url": "https://github.com/policy-as-versioned-platform/platform/actions/runs/37187107091",
+      "head": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "conclusion": "success",
+      "identity": "https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "git_signature": true,
+      "rekor_entry": true,
+      "certificate_claims": true,
+      "cosign_evidence": true,
+      "saved_log_sha256": "d851e4e2b9003a69c5a7ee46e79ed8283fe9dba75c3890f78a18c970af845231",
+      "proof_lines": [
+        {
+          "line": 208,
+          "text": "2026-10-04T07:52:31.8211197Z HEAD is now at 703eff6 cs-27: point versions.yaml commit field(s) at the evidence commit 393a40f707f2b23a3a174696a0c84a8473297ca9 (policy/v7.0.0)"
+        },
+        {
+          "line": 2759,
+          "text": "2026-10-04T07:52:47.6096261Z gitsign: Good signature from [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)"
+        },
+        {
+          "line": 2760,
+          "text": "2026-10-04T07:52:47.6097705Z Validated Git signature: true"
+        },
+        {
+          "line": 2761,
+          "text": "2026-10-04T07:52:47.6098827Z Validated Rekor entry: true"
+        },
+        {
+          "line": 2762,
+          "text": "2026-10-04T07:52:47.6099494Z Validated Certificate claims: true"
+        },
+        {
+          "line": 2788,
+          "text": "2026-10-04T07:52:48.2736430Z Verified OK"
+        },
+        {
+          "line": 2789,
+          "text": "2026-10-04T07:52:48.2956808Z ok  policy/v7.0.0: cosign signature identity-pinned, evidence outcome passed, declared matches the tag"
+        }
+      ]
+    },
+    "tools5": {
+      "run": 37187106297,
+      "url": "https://github.com/policy-as-versioned-platform/platform/actions/runs/37187106297",
+      "head": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "conclusion": "success",
+      "identity": "https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "git_signature": true,
+      "rekor_entry": true,
+      "certificate_claims": true,
+      "cosign_evidence": "not applicable: tools tag",
+      "saved_log_sha256": "e97aae5368109c6f518fdc792e562e448984510c76a25fe4a7302c57413c2c74",
+      "proof_lines": [
+        {
+          "line": 208,
+          "text": "2026-10-04T07:52:29.5266868Z HEAD is now at 703eff6 cs-27: point versions.yaml commit field(s) at the evidence commit 393a40f707f2b23a3a174696a0c84a8473297ca9 (policy/v7.0.0)"
+        },
+        {
+          "line": 2759,
+          "text": "2026-10-04T07:52:40.3598530Z gitsign: Good signature from [https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)"
+        },
+        {
+          "line": 2760,
+          "text": "2026-10-04T07:52:40.3599117Z Validated Git signature: true"
+        },
+        {
+          "line": 2761,
+          "text": "2026-10-04T07:52:40.3599326Z Validated Rekor entry: true"
+        },
+        {
+          "line": 2762,
+          "text": "2026-10-04T07:52:40.3599531Z Validated Certificate claims: true"
+        }
+      ]
+    }
+  },
+  "crypto_basis": "Saved genuine immutable-ref release runs check out exactB, independently bound to exact local annotated tag objects and evidence hashes. No separate local crypto invocation or cache modification by reviewer."
+}

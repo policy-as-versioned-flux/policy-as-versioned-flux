@@ -1,0 +1,38 @@
+{
+  "authorization": "explicit-publication-authorization.json",
+  "source_merge": "885ec98cf11b6326bf2e1f47f9f17089db8bc4a9",
+  "security6": {
+    "tag": "policy/v6.0.0",
+    "tag_commit": "59ec7ce39bcd658c2454b23ce1cc26082e737fdd",
+    "evidence_commit": "b18a0d8946f9dbeb5fbcf6bbe5233b9c919a7c8c",
+    "cut_run": 37173718506,
+    "cut_outcome": "passed",
+    "computed_bump": "major",
+    "release_run": 37184431028,
+    "release_outcome": "success",
+    "release_checkout": "immutable tag",
+    "workflow_authentication": "existing owner workflow login; the other-hand App performs review and merge and has no Actions dispatch permission"
+  },
+  "compatibility7": {
+    "review_branch": "resume/2026-10-04-compatibility7",
+    "candidate_commit": "e0b6f9f3cb33e90e9208c59affdff5afb89fc637",
+    "delta": "reviewed five-file reversal, retaining the authentic populated policy6 metadata",
+    "state": "published and verified",
+    "source_merge": "b55f643d3bb012658ddb00a26bcfb219c7f3ea12",
+    "cut_run": 37185354470,
+    "tag_commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+    "policy_tag_object": "e7e211c3bfbb78a31d9385adf77a6ebaaa760f7a",
+    "tools_tag_object": "6ab1d49cf4ded25b4939ba16f8e8e741a5c2b8f0",
+    "policy_release_run": 37187107091,
+    "tools_release_run": 37187106297,
+    "evidence_commit": "393a40f707f2b23a3a174696a0c84a8473297ca9",
+    "policy_release_outcome": "success",
+    "tools_release_outcome": "success",
+    "declared_bump": "major",
+    "computed_bump": "major",
+    "publisher_outcome": "passed",
+    "engine_cells": 6,
+    "tag_identity": "https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main",
+    "issuer": "https://token.actions.githubusercontent.com"
+  }
+}

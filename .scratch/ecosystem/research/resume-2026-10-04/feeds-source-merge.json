@@ -1,0 +1,14 @@
+{
+  "pr": "https://github.com/policy-as-versioned-feeds/feeds/pull/10",
+  "head": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+  "merge_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+  "merged_at": "2026-10-03T23:14:35Z",
+  "merged_by": "pavc-other-hand[bot]",
+  "main_after": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+  "tree_matches_reviewed_head": true,
+  "tree": "e70d9c00caea6313cc0b3c4f65ee0205fc42c709",
+  "parents": [
+    "ff3ac9ab00bdc73e1bbf83cabf91c767d35b8e88",
+    "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+  ]
+}

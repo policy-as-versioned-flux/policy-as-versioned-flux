@@ -193,15 +193,28 @@ def _trees(**override: Path) -> dict[str, Path]:
 
 
 def _tuppence(root: Path) -> Path:
-    """A copy of tuppence's party artefact, gitops, inventory and workflows: what composition
-    reads, with its apps source committed and no composed history yet."""
+    """A control-hole fixture with real source/inventory and no composed history yet.
+
+    Before inventory adoption, isolate the unrelated legacy CVE subscription;
+    its missing-instrument refusal is tested separately below.
+    """
     work = root / "tuppence"
     work.mkdir(parents=True)
     src = ESTATE / "tuppence"
     shutil.copy(src / "party.yaml", work / "party.yaml")
     shutil.copytree(src / "gitops", work / "gitops")
     shutil.copytree(src / ".github", work / ".github")
-    shutil.copytree(src / "inventory", work / "inventory")
+    if (src / "inventory").is_dir():
+        shutil.copytree(src / "inventory", work / "inventory")
+    else:
+        # Published apps3.0.1 still declares CVEv2 without an inventory. That
+        # source legitimately refuses under tools5, independently of ADR-0026.
+        # Drop only that edge in this copied fixture; never invent a scan.
+        party = yaml.safe_load((work / "party.yaml").read_text())
+        party["inherits"] = [edge for edge in party["inherits"]
+                             if not (edge.get("party") == "feeds" and edge.get("kind") == "feed"
+                                     and edge.get("name") == "cve")]
+        (work / "party.yaml").write_text(yaml.safe_dump(party, sort_keys=False))
     # This fixture composes the proposed manifests and their real matching scan,
     # so give that tree its own immutable apps pin. Production remains pinned to
     # its published tag until release; no scan is relabelled as that old tree.
@@ -328,6 +341,25 @@ def _claiming(comp: ModuleType, root: Path, ids: list[str], trees: dict[str, Pat
 def _floor() -> str | None:
     doc = yaml.safe_load((ESTATE / "tuppence" / "party.yaml").read_text())
     return (doc.get("overlay") or {}).get("floor")
+
+
+def test_cve_subscription_without_inventory_remains_a_missing_instrument(tmp_path):
+    """Fixture scope isolation must not replace the production inventory refusal."""
+    comp = _composition()
+    work = _tuppence(tmp_path)
+    if (work / "inventory").is_dir():
+        shutil.rmtree(work / "inventory")
+    original = yaml.safe_load((ESTATE / "tuppence" / "party.yaml").read_text())
+    cve = next(edge for edge in original["inherits"]
+               if edge.get("party") == "feeds" and edge.get("kind") == "feed"
+               and edge.get("name") == "cve")
+    _edit_party(work, lambda party: party.update(inherits=[
+        edge for edge in party["inherits"] if edge.get("name") != "cve"] + [cve]))
+    document, _ = comp.compose(work, _trees())
+    assert document["outcome"] == "refused"
+    assert any(refusal["kind"] == "missing-instrument" and
+               "cve subscription has no committed inventory/images.json" in refusal["detail"]
+               for refusal in document["refusals"]), document["refusals"]
 
 
 def test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier(tmp_path):

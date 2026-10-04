@@ -1,0 +1,67 @@
+{
+  "driftwood": {
+    "platform_and_tools": {
+      "tag": "v5.0.0",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc"
+    },
+    "accepted_policy_member": "7.0.0",
+    "claims_paths": [
+      "deploy/pod.yaml",
+      "gitops/apps/api.yaml",
+      "gitops/apps/pod.yaml",
+      "gitops/apps/storefront.yaml"
+    ],
+    "feed_checkout": {
+      "tag": "threat-register/v4.0.0",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+    },
+    "cve": "cve/v3.0.0",
+    "fx": "fx/v1.1.0",
+    "engine": "1.18.2",
+    "apps_source": "actualv3.0.1 retained until signed adopter source release",
+    "composed_source": "actualv3.0.0 retained until signed matching delivery release",
+    "cloud_opt_in": false
+  },
+  "tuppence": {
+    "platform_and_tools": {
+      "tag": "v5.0.0",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc"
+    },
+    "accepted_policy_member": "7.0.0",
+    "claims_paths": [
+      "deploy/pod.yaml",
+      "gitops/apps/ledger.yaml"
+    ],
+    "feed_checkout": {
+      "tag": "threat-register/v4.0.0",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+    },
+    "cve": "cve/v3.0.0",
+    "fx": "fx/v1.1.0",
+    "engine": "1.18.2",
+    "apps_source": "actualv3.0.1 retained until signed adopter source release",
+    "composed_source": "actualv3.0.0 retained until signed matching delivery release",
+    "cloud_opt_in": false
+  },
+  "ludlow": {
+    "platform_and_tools": {
+      "tag": "v5.0.0",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc"
+    },
+    "accepted_policy_member": "7.0.0",
+    "claims_paths": [
+      "deploy/pod.yaml",
+      "gitops/apps/reports.yaml"
+    ],
+    "feed_checkout": {
+      "tag": "threat-register/v4.0.0",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+    },
+    "cve": "cve/v3.0.0",
+    "fx": "fx/v1.1.0",
+    "engine": "1.18.2",
+    "apps_source": "actualv3.0.1 retained until signed adopter source release",
+    "composed_source": "actualv3.0.0 retained until signed matching delivery release",
+    "cloud_opt_in": false
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "driftwood": {
+    "apps_graph": [
+      "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+      "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+      "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+    ],
+    "candidate_validator_only": true,
+    "foundation_authentication": "pending actual immutable releases",
+    "original_primary_replay": [
+      {
+        "image": "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+        "native_trim_replay": true,
+        "raw_sha256": "6c754e86c5c836aecb298ca1552da48117264fd2b7f2d375631204c8d411da2e"
+      },
+      {
+        "image": "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+        "native_trim_replay": true,
+        "raw_sha256": "040ee55b4b031ba4939c1c9ce14bc65b7aa9c7fcebf08db0c0dce3283cf6f788"
+      },
+      {
+        "image": "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2",
+        "native_trim_replay": true,
+        "raw_sha256": "649bd0f4bde00c38aa1b48e6168aa2cd6fab8a73f250f1c095b3fd3823f428f0"
+      }
+    ],
+    "selfchecks": {
+      "drift/five-facts.py": {
+        "rc": 0,
+        "stdout": "ok  three falsifiers declared; verdict is tri-state; 3 sources read from gitops/; fact 2 grades the identity; a hand-typed sample is refused; the two cage facts and their six falsifiers are pre-registered in window.yaml; a cage that refuses or leaks is observed false; a reference the cage selects, a fall-closed rung that is not the ladder's bottom, and a cluster whose reference reaches nothing either are each unmeasured rather than a cage that held; a sample older than the registration reads could-not-look on facts 6 and 7; and a cage fact null on 3 samples since the registration is a fall\n"
+      },
+      "drift/oscal_lane.py": {
+        "rc": 0,
+        "stdout": "ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not\n"
+      },
+      "drift/served_apps.py": {
+        "rc": 0,
+        "stdout": "ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict\n"
+      }
+    },
+    "whole_inventory_matches": true
+  },
+  "ludlow": {
+    "apps_graph": [
+      "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+    ],
+    "candidate_validator_only": true,
+    "foundation_authentication": "pending actual immutable releases",
+    "original_primary_replay": [
+      {
+        "image": "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2",
+        "native_trim_replay": true,
+        "raw_sha256": "817d7fbb2673d4bb38721d4e8be7d556e50927ed00d17b2e9bfa986920cdede2"
+      }
+    ],
+    "selfchecks": {
+      "drift/five-facts.py": {
+        "rc": 0,
+        "stdout": "ok  three falsifiers declared; verdict is tri-state; 3 sources read from gitops/; fact 2 grades the identity; a hand-typed sample is refused; the two cage facts and their six falsifiers are pre-registered in window.yaml; a cage that refuses or leaks is observed false; a reference the cage selects, a fall-closed rung that is not the ladder's bottom, and a cluster whose reference reaches nothing either are each unmeasured rather than a cage that held; a sample older than the registration reads could-not-look on facts 6 and 7; and a cage fact null on 3 samples since the registration is a fall\n"
+      },
+      "drift/oscal_lane.py": {
+        "rc": 0,
+        "stdout": "ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not\n"
+      },
+      "drift/served_apps.py": {
+        "rc": 0,
+        "stdout": "ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict\n"
+      }
+    },
+    "whole_inventory_matches": true
+  },
+  "tuppence": {
+    "apps_graph": [
+      "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5"
+    ],
+    "candidate_validator_only": true,
+    "foundation_authentication": "pending actual immutable releases",
+    "original_primary_replay": [
+      {
+        "image": "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5",
+        "native_trim_replay": true,
+        "raw_sha256": "e34bb1e33c0676a9599d69921e7b4bbb890660d9e5f1e9f864e0ef1e0f790190"
+      }
+    ],
+    "selfchecks": {
+      "drift/five-facts.py": {
+        "rc": 0,
+        "stdout": "ok  three falsifiers declared; verdict is tri-state; 3 sources read from gitops/; fact 2 grades the identity; a hand-typed sample is refused; the two cage facts and their six falsifiers are pre-registered in window.yaml; a cage that refuses or leaks is observed false; a reference the cage selects, a fall-closed rung that is not the ladder's bottom, and a cluster whose reference reaches nothing either are each unmeasured rather than a cage that held; a sample older than the registration reads could-not-look on facts 6 and 7; and a cage fact null on 3 samples since the registration is a fall\n"
+      },
+      "drift/oscal_lane.py": {
+        "rc": 0,
+        "stdout": "ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not\n"
+      },
+      "drift/served_apps.py": {
+        "rc": 0,
+        "stdout": "ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict\n"
+      }
+    },
+    "whole_inventory_matches": true
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "hub_commit": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+  "published_main_merge": "e62194b0c700f0d8a94787e6a2f7063608862ace",
+  "published_main_contains_exact_pin": true,
+  "hub_signature_verification": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0\n",
+  "scope": "actual unmodified producer --check in disposable copies, clean exact published hub, genuine feeds; no external mutation",
+  "adopters": {
+    "driftwood": {
+      "producer_emit_exit": 0,
+      "producer_emit_stdout": "wrote twin/forward-intel/v2/feed.json (2396 bytes)\n",
+      "exit": 0,
+      "stdout": "ok  twin/forward-intel/v2/feed.json is byte-identical to a fresh render of the overlay\n",
+      "stderr": "",
+      "pin": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+      "derived_feed_refresh": [
+        {
+          "path": "twin/forward-intel/v2/feed.json",
+          "before_sha256": "bec7f5a37eb2f79eb46d0ddd1c29bb164f5ee7b58d71822327714e40a0ed11ba",
+          "after_sha256": "5c7385f77834496dd17dbbbfeb13098f92df4e0759d9fd0721a8b5d88c070729",
+          "payload_delta": {
+            "derived_from": {
+              "old": [
+                {
+                  "party": "feeds",
+                  "kind": "feed",
+                  "name": "threat-register",
+                  "version": "2"
+                },
+                {
+                  "party": "driftwood",
+                  "kind": "feed",
+                  "name": "forward-intel",
+                  "version": "2.0.0",
+                  "ref": "0b348f4a66facee1cc7823204d7fa13a7295e7ef"
+                }
+              ],
+              "new": [
+                {
+                  "party": "feeds",
+                  "kind": "feed",
+                  "name": "threat-register",
+                  "version": "4"
+                },
+                {
+                  "party": "driftwood",
+                  "kind": "feed",
+                  "name": "forward-intel",
+                  "version": "2.0.0",
+                  "ref": "0b348f4a66facee1cc7823204d7fa13a7295e7ef"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "source_forward_intel_unchanged": false
+    },
+    "tuppence": {
+      "producer_emit_exit": 0,
+      "producer_emit_stdout": "wrote twin/forward-intel/v1/feed.json (3593 bytes)\n",
+      "exit": 0,
+      "stdout": "ok  twin/forward-intel/v1/feed.json is byte-identical to a fresh render of the overlay\n",
+      "stderr": "",
+      "pin": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+      "derived_feed_refresh": [
+        {
+          "path": "twin/forward-intel/v1/feed.json",
+          "before_sha256": "852684b6abfb16369ca3d446f473e5b2a75128187a05382643bbc2de4d522c5c",
+          "after_sha256": "bb4be44c159ef941944027fbf37b48245124155a9bdb3cc857d3568aab626e8d",
+          "payload_delta": {
+            "derived_from": {
+              "old": [
+                {
+                  "party": "feeds",
+                  "kind": "feed",
+                  "name": "threat-register",
+                  "version": "1"
+                },
+                {
+                  "party": "tuppence",
+                  "kind": "feed",
+                  "name": "forward-intel",
+                  "version": "1.0.0",
+                  "ref": "65543b43e7fbf69902ae5f07b7b4881c0e0494c0"
+                }
+              ],
+              "new": [
+                {
+                  "party": "feeds",
+                  "kind": "feed",
+                  "name": "threat-register",
+                  "version": "4"
+                },
+                {
+                  "party": "tuppence",
+                  "kind": "feed",
+                  "name": "forward-intel",
+                  "version": "1.0.0",
+                  "ref": "65543b43e7fbf69902ae5f07b7b4881c0e0494c0"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "source_forward_intel_unchanged": false
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "feeds-cut-release.yml": "0c9547888632513283306f33a5b6764c1ad9a5fc74c7f3aa89205e86c1a2d105",
+  "feeds-cut-runs.json": "dc73a4e4c724a38a3a3aa91c63b87789bfd1a47885e7938b8c7e8018744afd69",
+  "feeds-cve-v3.0.0-signature.log": "305328fe478e7e29f0861f1065c1abef29aba470478544d8e03667c6efe5b48d",
+  "feeds-cve-v3.0.0.tag-object.txt": "534fb35ae96a9c4740f44196ff96dad5aff6321a8b5c4c6263681e24b67cf627",
+  "feeds-delivery-checkpoint.json": "5c3f7245f09202edcafa068bc42389650ecf8eab76615afb4fa1c36745cfa14f",
+  "feeds-fx-release-verification.log": "f0dbd9f292e54a91f9b3c205db75a6d06e3d7b6936621f41b4d01934345ecf5e",
+  "feeds-fx-v1.1.0-signature.log": "bd12978c3e3d85946645191f9a756260bb3090eb6352484e539997b7eb7d48a4",
+  "feeds-fx-v1.1.0.tag-object.txt": "4b1b1792f4c2b1e84dc9fa9eb06aa50908ba5e4a62a266e311223bc68dce4aae",
+  "feeds-github-release-receipts.json": "77c3e10b8c6f7c7e60032497ff78563905c160c7fa973609dfcd6f354f53b92e",
+  "feeds-publication-complete.json": "362eeb139ac60c373e33783830df05670bd1ba5bf6c85a186dc6f865dad4d86b",
+  "feeds-publication-complete.md": "58b8febcd96eb555eff33e335bf92e9b5e97c9c903ffb19dcca177f411ede774",
+  "feeds-release-runs.json": "8d473346ab386206a85314e561c1701486f0c857ee26a2cbabb0e1333fa1a79e",
+  "feeds-release.yml": "00b4bf909ce99a93cfaab3ec2d814293dadf265f09ab73dc4d953bc607e7ee72",
+  "feeds-source-merge.json": "852c7c45ed1582adf89a7070e52d7a2fcc15623b6a61fe95ae992598e8a0daf8",
+  "feeds-tag-signature-proof.json": "d14fd1410a37703707f44fc87519452d313500094de44f550876b08713d5b604",
+  "feeds-threat-register-v4.0.0-signature.log": "fc2c59f43d44434bf8bdd81c080d84759fa7f6d698975b9cb6d1c01f9b8b6f57",
+  "feeds-threat-register-v4.0.0.tag-object.txt": "611f5f3d62a202dda7de8cba7e9430e8d49e6afacd320bd2701cb1d44fbd974e",
+  "feeds-workflow-source-proof.json": "bbcdfe5973664c6688a8524b80dc0ad52db650011d04cccc26ecce6d1f1a9ccd"
+}
