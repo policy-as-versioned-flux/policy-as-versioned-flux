@@ -193,16 +193,40 @@ def _trees(**override: Path) -> dict[str, Path]:
 
 
 def _tuppence(root: Path) -> Path:
-    """A copy of tuppence's party artefact, its gitops tree and its workflows: what composition
-    reads, with nothing committed yet, so the run is a first composition and no history moves
-    a status."""
+    """A copy of tuppence's party artefact, gitops, inventory and workflows: what composition
+    reads, with its apps source committed and no composed history yet."""
     work = root / "tuppence"
     work.mkdir(parents=True)
     src = ESTATE / "tuppence"
     shutil.copy(src / "party.yaml", work / "party.yaml")
     shutil.copytree(src / "gitops", work / "gitops")
     shutil.copytree(src / ".github", work / ".github")
+    shutil.copytree(src / "inventory", work / "inventory")
+    # This fixture composes the proposed manifests and their real matching scan,
+    # so give that tree its own immutable apps pin. Production remains pinned to
+    # its published tag until release; no scan is relabelled as that old tree.
+    _git(work, "init", "-q")
+    _git(work, "add", "-A")
+    _git(work, "commit", "-q", "-m", "fixture apps source")
+    _git(work, "tag", "fixture-apps")
+    commit = subprocess.run(["git", "-C", str(work), "rev-parse", "HEAD"],
+                            check=True, capture_output=True, text=True).stdout.strip()
+    sync = work / "gitops/flux-system/gotk-sync.yaml"
+    documents = list(yaml.safe_load_all(sync.read_text()))
+    for document in documents:
+        if isinstance(document, dict) and document.get("kind") == "GitRepository":
+            document["spec"]["ref"] = {"tag": "fixture-apps", "commit": commit}
+    sync.write_text(yaml.safe_dump_all(documents, sort_keys=False))
     return work
+
+
+
+def _record_header(comp: ModuleType, work: Path, rendered: dict[str, str]) -> None:
+    """Record the comparison header in the fixture's own repository."""
+    comp._commit_header(work, rendered)
+    if (work / ".git").exists():
+        _git(work, "add", "--", "composed/HEADER.yaml")
+        _git(work, "commit", "-q", "-m", "fixture comparison header")
 
 
 def _edit_party(work: Path, edit: Any) -> None:
@@ -598,7 +622,7 @@ def test_a_regulator_withdrawal_prints_as_the_regulators_bump(tmp_path):
     comp._write_fixture_adopter(work, "SMALL")
     first, rendered = comp.compose(work, trees)
     assert first["outcome"] == "composed", first["refusals"]
-    comp._commit_header(work, rendered)
+    _record_header(comp, work, rendered)
 
     _withdraw(trees["fixture-nist"], "aa-2", from_catalogue=True, baselines=("SMALL", "BIG"))
     party_before = (work / "party.yaml").read_text()
@@ -638,7 +662,7 @@ def test_a_baseline_the_regulator_narrows_under_the_same_name_is_its_withdrawal(
     first, rendered = comp.compose(work, trees)
     assert first["outcome"] == "composed", first["refusals"]
     assert yaml.safe_load(rendered["composed/HEADER.yaml"])["overlay-controls"] == []
-    comp._commit_header(work, rendered)
+    _record_header(comp, work, rendered)
 
     _withdraw(trees["fixture-nist"], "aa-1.1", from_catalogue=False, baselines=("SMALL",))
     second, _ = comp.compose(work, trees)
@@ -661,7 +685,7 @@ def test_an_adopters_own_removal_stays_a_removal_beside_a_withdrawal(tmp_path):
     first, rendered = comp.compose(work, trees)
     assert first["outcome"] == "composed", first["refusals"]
     assert yaml.safe_load(rendered["composed/HEADER.yaml"])["overlay-controls"] == ["aa-3"]
-    comp._commit_header(work, rendered)
+    _record_header(comp, work, rendered)
 
     _withdraw(trees["fixture-nist"], "aa-1.1", from_catalogue=False, baselines=("SMALL",))
     _edit_party(work, lambda doc: doc["overlay"].update(controls=[]))
@@ -736,7 +760,7 @@ def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal
     work = _tuppence(tmp_path / "tuppence")
     first, rendered = comp.compose(work, _trees())
     assert first["outcome"] == "composed", first["refusals"]
-    comp._commit_header(work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
+    _record_header(comp, work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
 
     second, second_rendered = comp.compose(work, _trees())
     assert second["outcome"] == "composed", second["refusals"]
@@ -765,7 +789,7 @@ def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bum
     first, rendered = comp.compose(work, _trees())
     assert first["outcome"] == "composed", first["refusals"]
     other = next(c for c in yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"])
-    comp._commit_header(work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
+    _record_header(comp, work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
 
     nist = tmp_path / "nist"
     shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
@@ -797,7 +821,7 @@ def test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_
     assert first["outcome"] == "composed", first["refusals"]
     header = yaml.safe_load(rendered["composed/HEADER.yaml"])
     assert header["overlay-controls"] == [extra] and header["withdrawn-selectable"] is False, header
-    comp._commit_header(work, rendered)
+    _record_header(comp, work, rendered)
 
     nist = tmp_path / "nist"
     shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
@@ -835,7 +859,7 @@ def test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_wi
     entry = _regime_entry(first)
     selected = set(yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"])
     line = next(h for h in entry["holes"] if h["id"] in selected)
-    comp._commit_header(work, rendered)
+    _record_header(comp, work, rendered)
 
     nist = tmp_path / "nist"
     shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
@@ -875,7 +899,7 @@ def test_a_removal_composes_and_prints_as_priced_deltas(tmp_path):
     comp._write_fixture_adopter(work, "SMALL")
     first, rendered = comp.compose(work, trees)
     assert first["outcome"] == "composed", first["refusals"]
-    comp._commit_header(work, rendered)
+    _record_header(comp, work, rendered)
     _edit_party(work, lambda d: d.update(baseline="TINY"))
     comp._write_baseline_configmap(work, "TINY")
     narrowed, narrowed_rendered = comp.compose(work, trees)
@@ -924,7 +948,7 @@ def test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one(tmp
     first, rendered = comp.compose(work, trees)
     assert first["outcome"] == "composed", first["refusals"]
     ra3 = next(h for h in _regime_entry(first)["holes"] if h["id"] == "ra-3")
-    comp._commit_header(work, rendered)
+    _record_header(comp, work, rendered)
     before = set(yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"])
 
     _edit_party(work, lambda d: d.update(baseline="LOW"))
@@ -976,7 +1000,7 @@ def test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier(tmp_path):
     assert _exposure_total(bespoke_rendered) == _exposure_total(plain_rendered)
     assert _tiers(bespoke) == _tiers(plain)
 
-    comp._commit_header(work, bespoke_rendered)
+    _record_header(comp, work, bespoke_rendered)
     _edit_party(work, lambda d: d["overlay"].update(controls=[]))
     withdrawn, _ = comp.compose(work, _trees())
     assert withdrawn["outcome"] == "composed", withdrawn["refusals"]

@@ -1,0 +1,116 @@
+{
+  "checked_at": "2026-10-03T18:40:49.652Z",
+  "scope": "stage1 app-only reviewed release; no stage2",
+  "metadata": {
+    "driftwood": {
+      "repository": "policy-as-versioned-driftwood/driftwood",
+      "visibility": "public",
+      "private": false,
+      "admin": true,
+      "archived": false,
+      "default_branch": "main",
+      "signed_commit": "a14c4a9305c05a46b349389feab9932035cb1aad",
+      "signature_status": "G",
+      "changed_files": [
+        "composed/HEADER.yaml",
+        "deploy/pod.yaml",
+        "gitops/apps/api.yaml",
+        "gitops/apps/kustomization.yaml",
+        "gitops/apps/pod.yaml",
+        "gitops/apps/storefront.yaml"
+      ],
+      "stage1_existing_pins_preserved": true,
+      "inventory_absent": true
+    },
+    "tuppence": {
+      "repository": "policy-as-versioned-tuppence/tuppence",
+      "visibility": "public",
+      "private": false,
+      "admin": true,
+      "archived": false,
+      "default_branch": "main",
+      "signed_commit": "ff5eef841ce3c1c9fa819c3612f0b9891da36814",
+      "signature_status": "G",
+      "changed_files": [
+        "composed/HEADER.yaml",
+        "gitops/apps/ledger.yaml"
+      ],
+      "stage1_existing_pins_preserved": true,
+      "inventory_absent": true
+    },
+    "ludlow": {
+      "repository": "policy-as-versioned-ludlow/ludlow",
+      "visibility": "public",
+      "private": false,
+      "admin": true,
+      "archived": false,
+      "default_branch": "main",
+      "signed_commit": "df322153d3a327725d9b55f020713541b2ec5a3a",
+      "signature_status": "G",
+      "changed_files": [
+        "composed/HEADER.yaml",
+        "gitops/apps/reports.yaml"
+      ],
+      "stage1_existing_pins_preserved": true,
+      "inventory_absent": true
+    }
+  },
+  "latest_rebased": {
+    "driftwood": {
+      "directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/driftwood-estate/driftwood",
+      "head": "c9eff7a354ccb7eef4c51bde38e2915b4b686b95",
+      "base": "bd93eb5c0e30bb07f0849dd13ac34d63f7f75311",
+      "signature": "G",
+      "changed_files": [
+        "composed/HEADER.yaml",
+        "deploy/pod.yaml",
+        "gitops/apps/api.yaml",
+        "gitops/apps/kustomization.yaml",
+        "gitops/apps/pod.yaml",
+        "gitops/apps/storefront.yaml"
+      ],
+      "compose_replay": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs",
+      "clean": true
+    },
+    "tuppence": {
+      "directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/tuppence-estate/tuppence",
+      "head": "7cd3d34b9006ebff76ace4598aa10a5563d122b9",
+      "base": "797505ea087af67fe543479aa4a2d382dcc0ef60",
+      "signature": "G",
+      "changed_files": [
+        "composed/HEADER.yaml",
+        "gitops/apps/ledger.yaml"
+      ],
+      "compose_replay": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs",
+      "clean": true
+    },
+    "ludlow": {
+      "directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/ludlow-estate/ludlow",
+      "head": "5893d40b15cff047680ae6ea8cac0af18e9cb17b",
+      "base": "3cc1981da60cbd0ff2d885df8f6ada064346155c",
+      "signature": "G",
+      "changed_files": [
+        "composed/HEADER.yaml",
+        "gitops/apps/reports.yaml"
+      ],
+      "compose_replay": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs",
+      "clean": true
+    }
+  },
+  "remote_branch_and_tag_unused": {
+    "checked_at": "2026-10-03T18:44:04.506Z",
+    "branches": "refs/heads/bootstrap-apps-inventory",
+    "release": "refs/tags/v3.0.1",
+    "all_three": true
+  },
+  "independent_review": {
+    "agent": "bootstrap_payload_review",
+    "blocking_findings": [],
+    "matching_heads": {
+      "driftwood": "c9eff7a354ccb7eef4c51bde38e2915b4b686b95",
+      "tuppence": "7cd3d34b9006ebff76ace4598aa10a5563d122b9",
+      "ludlow": "5893d40b15cff047680ae6ea8cac0af18e9cb17b"
+    },
+    "findings": "Valid ordinary SSH signatures; rebased payload identical; only app manifests/membership, deploy mirror and derived HEADER hash; no credentials/private payload; unchanged source/parent/tools declarations and absent inventory."
+  }
+}

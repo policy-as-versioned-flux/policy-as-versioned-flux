@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "observed_at": "2026-10-03T14:22:20.028326+00:00",
+  "repositories": {
+    "policy-as-versioned-flux": {
+      "full_name": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "archived": false
+    },
+    "apps": {
+      "full_name": "policy-as-versioned-flux/apps",
+      "archived": true
+    },
+    "readiness-collector": {
+      "full_name": "policy-as-versioned-flux/readiness-collector",
+      "archived": false
+    },
+    "pr-gate-action": {
+      "full_name": "policy-as-versioned-flux/pr-gate-action",
+      "archived": false
+    },
+    "renovate-config": {
+      "full_name": "policy-as-versioned-flux/renovate-config",
+      "archived": false
+    },
+    "handbook-generator": {
+      "full_name": "policy-as-versioned-flux/handbook-generator",
+      "archived": false
+    },
+    "ledger": {
+      "full_name": "policy-as-versioned-tuppence/ledger",
+      "archived": false
+    },
+    "storefront": {
+      "full_name": "policy-as-versioned-driftwood/storefront",
+      "archived": false
+    },
+    "api": {
+      "full_name": "policy-as-versioned-driftwood/api",
+      "archived": false
+    },
+    "reports": {
+      "full_name": "policy-as-versioned-ludlow/reports",
+      "archived": false
+    },
+    "c2p-collector": {
+      "full_name": "policy-as-versioned-flux/c2p-collector",
+      "archived": false
+    },
+    "datastore": {
+      "full_name": "policy-as-versioned-flux/datastore",
+      "archived": false
+    },
+    "cloud": {
+      "full_name": "policy-as-versioned-flux/cloud",
+      "archived": false
+    },
+    "governance-agent": {
+      "full_name": "policy-as-versioned-flux/governance-agent",
+      "archived": false
+    },
+    "policy": {
+      "full_name": "policy-as-versioned-flux/policy",
+      "archived": false
+    },
+    "fleet": {
+      "full_name": "policy-as-versioned-flux/fleet",
+      "archived": false
+    }
+  },
+  "images": [
+    {
+      "image": "ghcr.io/policy-as-versioned-flux/ledger@sha256:9709e1075a503fe59ca85deae2b748fcbbfd80b464e56d2e1f82ec8182268111",
+      "pullable": true,
+      "status": 200,
+      "digest": "sha256:9709e1075a503fe59ca85deae2b748fcbbfd80b464e56d2e1f82ec8182268111"
+    },
+    {
+      "image": "ghcr.io/policy-as-versioned-flux/readiness-collector:v1.0.0",
+      "pullable": true,
+      "status": 200,
+      "digest": "sha256:8c5d78146351822a31935cf5e7cfc54bb855d7a1300bdb56ff0311b9d84786cd"
+    },
+    {
+      "image": "ghcr.io/policy-as-versioned-flux/reports@sha256:36dc3d7d1bd5193f46a55d57b505beb5e99d7925f65b0fad3c1f7d1aeafefcf5",
+      "pullable": true,
+      "status": 200,
+      "digest": "sha256:36dc3d7d1bd5193f46a55d57b505beb5e99d7925f65b0fad3c1f7d1aeafefcf5"
+    },
+    {
+      "image": "ghcr.io/policy-as-versioned-flux/storefront@sha256:ef53f41d380af4f56aa3e1f1e4ad922fa64e8f47361a41e83822fa8ace0f96bc",
+      "pullable": true,
+      "status": 200,
+      "digest": "sha256:ef53f41d380af4f56aa3e1f1e4ad922fa64e8f47361a41e83822fa8ace0f96bc"
+    }
+  ]
+}

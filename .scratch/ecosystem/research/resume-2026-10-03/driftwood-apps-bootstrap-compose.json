@@ -1,0 +1,3418 @@
+{
+  "outcome": "composed",
+  "party_artefact_errors": [],
+  "parents": [
+    {
+      "party": "platform",
+      "kind": "implementations",
+      "version": "4.0.0",
+      "sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71"
+    },
+    {
+      "party": "nist",
+      "kind": "controls",
+      "version": "1.1.0",
+      "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819"
+    },
+    {
+      "party": "ico",
+      "kind": "feed",
+      "name": "penalty-schema",
+      "version": "v3",
+      "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e"
+    },
+    {
+      "party": "feeds",
+      "kind": "feed",
+      "name": "threat-register",
+      "version": "v2",
+      "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268"
+    },
+    {
+      "party": "insurer",
+      "kind": "feed",
+      "name": "quote-driftwood",
+      "version": "v1",
+      "sha": "db767055119292e400edd63ed260785ce605eb4e"
+    }
+  ],
+  "members": [
+    {
+      "family": "graded-enforcement",
+      "name": "cage-baseline",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-netpol",
+      "kind": "GeneratingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-quarantine",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-restricted",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-tier",
+      "kind": "MutatingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "posture",
+      "name": "posture-trust-boundary",
+      "kind": "ValidatingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": "Deny"
+    },
+    {
+      "family": "posture",
+      "name": "stamp-posture",
+      "kind": "MutatingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "require-nonroot",
+      "name": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": "Audit"
+    },
+    {
+      "family": "platform-machinery",
+      "name": "policy-version-orphan-guard",
+      "kind": "ValidatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "governed-namespace-requires-claim",
+      "kind": "MutatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "policy-version-orphan-cage",
+      "kind": "MutatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "policy-version-orphan-cage-holds",
+      "kind": "MutatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "governed-namespace-cage-holds",
+      "kind": "MutatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "governed-namespace-unclaimed-report",
+      "kind": "ValidatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "cage-netpol-bottom-rung",
+      "kind": "GeneratingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "action": null
+    }
+  ],
+  "refusals": [],
+  "restatements": [],
+  "cages": [],
+  "holes": [
+    {
+      "source": "nist",
+      "control_id": "ac-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-11.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-12",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-14",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17.4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-18",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-18.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-18.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-19",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-19.5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.13",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-20",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-20.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-20.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-21",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-22",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-2.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-2.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-12",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-3.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-6.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-6.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-7.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-9.4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 357435.41503435693,
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.2"
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-2.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-7.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-7.4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-12",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-12.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-2.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-2.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-2.7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-3.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-3.4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-4.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-7.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-7.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-7.5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-8.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-8.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-10.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-2.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-2.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-2.8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-4.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-6.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-6.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-7.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-7.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-7.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-8.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-8.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-9.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-9.8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-12",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-12.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-12.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-12.5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2.12",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2.8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-4.4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-5.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-5.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-5.6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-8.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-8.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-8.4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-3.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-4.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-6.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-6.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-7.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 357435.41503435693,
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.2"
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-3.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-3.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-3.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-12",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-13",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-13.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-14",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-15",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-16",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-17",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-6.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 536153.1225515354,
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.3"
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-4.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 536153.1225515354,
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.3"
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-3.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-5.11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-5.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-5.5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-15",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-15.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-22",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4.10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4.9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-9",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-9.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-12",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-13",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-15",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-17",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-18",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-20",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-21",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-22",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-23",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-28",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-28.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-39",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-8.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-12",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-16",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-2.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-4.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-4.4",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-4.5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-7.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-7.7",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-8.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-10",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-11",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-11.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-11.2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-12",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-2",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-2.1",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-3",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-5",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-6",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-8",
+      "status": "recorded",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    }
+  ],
+  "ungoverned": [],
+  "prices": [
+    {
+      "source": "ico",
+      "kind": "feed",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 1787177.0751717847,
+      "per_customer": {
+        "amount": 7.446571146549103,
+        "currency": "GBP"
+      },
+      "name": "penalty-schema",
+      "old_version": "v3",
+      "new_version": "v3",
+      "old_price": 1787177.0751717845,
+      "new_price": 1787177.0751717847,
+      "old_tier": "isolated",
+      "proposed_tier": "isolated",
+      "changed": false,
+      "lef": [
+        1,
+        2,
+        4
+      ],
+      "lef_basis": "lm sourced from ICO (Information Commissioner's Office) real public fines (UK GDPR / Data Protection Act 2018 s157). warn/deny lef are editorial (schema doesn't carry frequency). Scaled to a subscriber turnover of 86,000,000.00 GBP.",
+      "proposed_as": "label",
+      "holes": [
+        {
+          "source": "nist",
+          "id": "pl-2",
+          "weight": 0.3,
+          "amount": 536153.1225515354,
+          "status": "recorded"
+        },
+        {
+          "source": "nist",
+          "id": "ra-3",
+          "weight": 0.3,
+          "amount": 536153.1225515354,
+          "status": "recorded"
+        },
+        {
+          "source": "nist",
+          "id": "ca-2",
+          "weight": 0.2,
+          "amount": 357435.41503435693,
+          "status": "recorded"
+        },
+        {
+          "source": "nist",
+          "id": "ir-8",
+          "weight": 0.2,
+          "amount": 357435.41503435693,
+          "status": "recorded"
+        }
+      ],
+      "total": 1787177.0751717847,
+      "pin_signature": {
+        "state": "signed",
+        "tag": "v3.0.0",
+        "detail": "tag v3.0.0 on the ico checkout carries a signature block"
+      },
+      "hole": null,
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+      "superseded": {
+        "state": "behind",
+        "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut; this checkout carries no directory for v4.0.0, so the line is priced from the signed tags alone"
+      }
+    },
+    {
+      "source": "ico",
+      "kind": "supersede",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 0.0,
+      "per_customer": {
+        "amount": 0.0,
+        "currency": "GBP"
+      },
+      "name": "penalty-schema",
+      "version": "v3",
+      "newer": {
+        "version": "v4",
+        "tag": "v4.0.0",
+        "tagged": "2026-09-10",
+        "published_at": null,
+        "readable": false,
+        "since_tag": "v4.0.0",
+        "since": "2026-09-10"
+      },
+      "since": "2026-09-10",
+      "as_of": "2026-08-28",
+      "ramp": 1.0,
+      "base": 1787177.0751717847,
+      "proposed_tier": null,
+      "changed": false,
+      "basis": "the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge the feeds module's EOL ramp puts on a version its publisher has superseded, +1x per year behind and capped at +4x, where `since` is the day the newer major's signing tag was cut; zero on that day, printed with both dates, and never summed into the exposure the line itself is already in",
+      "limits": [
+        "zero (as_of 2026-08-28 precedes the tag day 2026-09-10): the signed artefact's as-of is its newest signed input; only a re-composition --as-of a later day (the scheduled proposer's) grows this line",
+        "the pinned checkout carries no directory for v4.0.0, so the newer major's content is unread here: this line is priced from the signed tags alone, and no retirement to v4 is proposed until the ico pin reaches a commit that carries it"
+      ],
+      "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut; this checkout carries no directory for v4.0.0, so the line is priced from the signed tags alone"
+    },
+    {
+      "source": "feeds",
+      "kind": "feed",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 19558.549772440045,
+      "per_customer": {
+        "amount": 0.08149395738516685,
+        "currency": "GBP"
+      },
+      "name": "threat-register",
+      "old_version": "v2",
+      "new_version": "v2",
+      "old_price": 19558.549772440045,
+      "new_price": 19558.549772440045,
+      "old_tier": "baseline",
+      "proposed_tier": "baseline",
+      "changed": false,
+      "lef": [
+        2.0,
+        4.0,
+        9.0
+      ],
+      "lef_basis": "cart/checkout PII exfiltration (e-commerce, short-life cart data, high traffic/low sensitivity per-record). lef sourced from DBIR retail-sector web-app-attack base rate, editorial midpoint. MAGNITUDE UNSOURCED: the impact per event (1000.0, 4000.0, 9000.0) GBP is not in payload version v2, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
+      "proposed_as": "label",
+      "holes": [],
+      "total": null,
+      "pin_signature": {
+        "state": "signed",
+        "tag": "threat-register/v2.0.0",
+        "detail": "tag threat-register/v2.0.0 on the feeds checkout carries a signature block"
+      },
+      "hole": null,
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+      "superseded": {
+        "state": "behind",
+        "detail": "tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v2; behind since 2026-09-10, the day threat-register/v3.0.0 was cut; this checkout carries no directory for threat-register/v3.0.0, so the line is priced from the signed tags alone"
+      }
+    },
+    {
+      "source": "feeds",
+      "kind": "supersede",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 0.0,
+      "per_customer": {
+        "amount": 0.0,
+        "currency": "GBP"
+      },
+      "name": "threat-register",
+      "version": "v2",
+      "newer": {
+        "version": "v3",
+        "tag": "threat-register/v3.0.0",
+        "tagged": "2026-09-10",
+        "published_at": null,
+        "readable": false,
+        "since_tag": "threat-register/v3.0.0",
+        "since": "2026-09-10"
+      },
+      "since": "2026-09-10",
+      "as_of": "2026-08-28",
+      "ramp": 1.0,
+      "base": 19558.549772440045,
+      "proposed_tier": null,
+      "changed": false,
+      "basis": "the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge the feeds module's EOL ramp puts on a version its publisher has superseded, +1x per year behind and capped at +4x, where `since` is the day the newer major's signing tag was cut; zero on that day, printed with both dates, and never summed into the exposure the line itself is already in",
+      "limits": [
+        "zero (as_of 2026-08-28 precedes the tag day 2026-09-10): the signed artefact's as-of is its newest signed input; only a re-composition --as-of a later day (the scheduled proposer's) grows this line",
+        "the pinned checkout carries no directory for threat-register/v3.0.0, so the newer major's content is unread here: this line is priced from the signed tags alone, and no retirement to v3 is proposed until the feeds pin reaches a commit that carries it"
+      ],
+      "detail": "tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v2; behind since 2026-09-10, the day threat-register/v3.0.0 was cut; this checkout carries no directory for threat-register/v3.0.0, so the line is priced from the signed tags alone"
+    },
+    {
+      "source": "insurer",
+      "kind": "premium",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 113403.3,
+      "per_customer": {
+        "amount": 0.47251375,
+        "currency": "GBP"
+      },
+      "name": "quote-driftwood",
+      "old_version": "v1",
+      "new_version": "v1",
+      "quote_version": "1.0.0",
+      "attachment": {
+        "amount": 40000.0,
+        "currency": "GBP"
+      },
+      "limit": {
+        "amount": 3000000,
+        "currency": "GBP"
+      },
+      "exclusions": [
+        {
+          "regime": "uk-gdpr",
+          "control_ids": [
+            "pl-2",
+            "ra-3"
+          ],
+          "why": "Governance-of-record failures. The share of the uk-gdpr lower-tier exposure that ico's published control weights put on the system security plan (pl-2) and the risk assessment (ra-3) is retained by the insured: this cover attaches to breach consequence, not to the insured's own documentation of its programme."
+        }
+      ],
+      "conditions": [
+        {
+          "source": "nist",
+          "id": "ac-6",
+          "consequence": "void",
+          "why": "Least privilege enforced on the governed namespace. This estate implements ac-6; cover is written on the assumption it stays implemented."
+        },
+        {
+          "source": "nist",
+          "id": "cm-6",
+          "consequence": "uplift",
+          "uplift": {
+            "amount": 25000,
+            "currency": "GBP"
+          },
+          "why": "Configuration settings enforced. A lapse is survivable but re-rates the account by the stated amount at the next re-quote."
+        }
+      ],
+      "valid_from": "2026-08-28",
+      "valid_until": "2027-08-28",
+      "priced_against": [
+        {
+          "party": "platform",
+          "kind": "implementations",
+          "version": "1.1.1"
+        },
+        {
+          "party": "driftwood",
+          "kind": "feed",
+          "name": "exposure",
+          "version": "v1.1.0",
+          "exposure_sha256": "sha256:397abe81d6cbdbd7b27a5d2516dd9c35417e9922f995b8b6af7d1fca34829820"
+        }
+      ],
+      "pin_signature": {
+        "state": "signed",
+        "tag": "v1.0.0",
+        "detail": "tag v1.0.0 on the insurer checkout carries a signature block"
+      },
+      "hole": null
+    },
+    {
+      "source": "twin",
+      "kind": "twin",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 1897646.1130078766,
+      "per_customer": {
+        "amount": 7.906858804199485,
+        "currency": "GBP"
+      },
+      "name": "forward-intel",
+      "feed_version": "1.0.0",
+      "tail": "bounded-pert",
+      "policy_version": "1.1.0",
+      "policy_basis": "loosest tier whose caged residual (37952.92 GBP) is within the tolerance (40000.00 GBP)",
+      "residual_basis": "platform-cage-tiers@1.0.0",
+      "residuals": {
+        "baseline": 1328352.2791055136,
+        "restricted": 569293.8339023631,
+        "quarantine": 151811.68904063004,
+        "isolated": 37952.92226015757
+      },
+      "curve_hash": "sha256:70e5e9f6dee9d0d08e3d7f4ff4eb96ebb2c5320e659eced417cfd96901d2858e",
+      "shock": "An exfiltration of the cart record store suppresses checkout conversion for a quarter.",
+      "horizon": 1,
+      "lef": [
+        2.0,
+        4.0,
+        9.0
+      ],
+      "lef_basis": "cart/checkout PII exfiltration (e-commerce, short-life cart data, high traffic/low sensitivity per-record). lef sourced from DBIR retail-sector web-app-attack base rate, editorial midpoint. MAGNITUDE UNSOURCED: the impact per event (1000.0, 4000.0, 9000.0) GBP is not in payload version v2, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
+      "lef_from": "threat-register",
+      "old_tier": "isolated",
+      "proposed_tier": "isolated",
+      "changed": false,
+      "proposed_as": "label"
+    },
+    {
+      "source": "ico",
+      "kind": "switching",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 1787177.0751717845,
+      "per_customer": {
+        "amount": 7.446571146549102,
+        "currency": "GBP"
+      },
+      "name": "penalty-schema",
+      "version": "v3",
+      "since": "2026-08-28",
+      "as_of": "2026-08-28",
+      "pin_life_months": 0,
+      "over_pin_life": 0.0,
+      "could_not_look": null,
+      "alternates": [],
+      "unpriceable": [
+        {
+          "kind": "feed",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 1787177.0751717847
+        },
+        {
+          "kind": "supersede",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 0.0
+        }
+      ],
+      "sized": true,
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "dropped_edges": [
+        "ico/feed:penalty-schema@v3"
+      ]
+    },
+    {
+      "source": "feeds",
+      "kind": "switching",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": null,
+      "per_customer": null,
+      "name": "threat-register",
+      "version": "v2",
+      "since": "2026-08-28",
+      "as_of": "2026-08-28",
+      "pin_life_months": 0,
+      "over_pin_life": null,
+      "could_not_look": "missing instrument: twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at",
+      "alternates": [],
+      "unpriceable": [
+        {
+          "kind": "feed",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 1787177.0751717847
+        },
+        {
+          "kind": "supersede",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 0.0
+        },
+        {
+          "kind": "feed",
+          "source": "feeds",
+          "name": "threat-register",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 19558.549772440045
+        },
+        {
+          "kind": "supersede",
+          "source": "feeds",
+          "name": "threat-register",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 0.0
+        },
+        {
+          "kind": "premium",
+          "source": "insurer",
+          "name": "quote-driftwood",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 113403.3
+        },
+        {
+          "kind": "twin",
+          "source": "twin",
+          "name": "forward-intel",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 1897646.1130078766
+        }
+      ],
+      "sized": true,
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "dropped_edges": [
+        "feeds/feed:threat-register@v2"
+      ]
+    },
+    {
+      "source": "insurer",
+      "kind": "switching",
+      "perspective": "driftwood",
+      "currency": "GBP",
+      "amount": 0.0,
+      "per_customer": {
+        "amount": 0.0,
+        "currency": "GBP"
+      },
+      "name": "quote-driftwood",
+      "version": "v1",
+      "since": "2026-08-28",
+      "as_of": "2026-08-28",
+      "pin_life_months": 0,
+      "over_pin_life": 0.0,
+      "could_not_look": null,
+      "alternates": [],
+      "unpriceable": [
+        {
+          "kind": "premium",
+          "source": "insurer",
+          "name": "quote-driftwood",
+          "perspective": "driftwood",
+          "currency": "GBP",
+          "amount": 113403.3
+        }
+      ],
+      "sized": true,
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "dropped_edges": [
+        "insurer/feed:quote-driftwood@v1"
+      ]
+    }
+  ],
+  "deltas": [],
+  "floor_change": {
+    "schema": 1,
+    "before": {
+      "known": false
+    },
+    "after": {
+      "known": true,
+      "value": null
+    },
+    "changed": null,
+    "basis": "floor-only counterfactual at current publisher, scenario, appetite and selection inputs",
+    "residual_basis": "platform-cage-tiers@1.0.0",
+    "lines": [
+      {
+        "source": "ico",
+        "kind": "feed",
+        "name": "penalty-schema",
+        "perspective": "driftwood",
+        "currency": "GBP",
+        "uncaged_amount": 1787177.0751717847,
+        "before_tier": null,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "after_residual": 35743.54150343573,
+        "residual_delta": null
+      },
+      {
+        "source": "feeds",
+        "kind": "feed",
+        "name": "threat-register",
+        "perspective": "driftwood",
+        "currency": "GBP",
+        "uncaged_amount": 19558.549772440045,
+        "before_tier": null,
+        "after_tier": "baseline",
+        "before_residual": null,
+        "after_residual": 13690.98484070803,
+        "residual_delta": null
+      },
+      {
+        "source": "twin",
+        "kind": "twin",
+        "name": "forward-intel",
+        "perspective": "driftwood",
+        "currency": "GBP",
+        "uncaged_amount": 1897646.1130078766,
+        "before_tier": null,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "after_residual": 37952.92226015757,
+        "residual_delta": null
+      }
+    ],
+    "could_not_look": "previous floor was not recorded; absence of history is not an absent floor",
+    "limit": "selection evidence, not an enacted Namespace tier; platform reductions are self-declared calibration, not measured effectiveness"
+  },
+  "limits": [
+    {
+      "name": "two-publisher-conflict",
+      "detail": "the cross-party rule-conflict path above is only exercised in the real estate once a second implementations publisher is pinned",
+      "count": 1,
+      "status": "open"
+    },
+    {
+      "name": "pinned-parent-lacks-rendered-versions",
+      "detail": "the composed set renders policy versions the pinned parent commit does not contain; the header names a parent release that holds none of these trees. every rendered version is present at the pinned commit",
+      "count": 0,
+      "checked": 1,
+      "status": "closed"
+    },
+    {
+      "name": "publisher-clone-absent",
+      "detail": "every priced feed was read from its publisher's own pinned tree",
+      "count": 0,
+      "checked": 3,
+      "status": "closed"
+    }
+  ],
+  "vendored": [
+    {
+      "party": "ico",
+      "kind": "feed",
+      "name": "penalty-schema",
+      "version": "v3",
+      "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e",
+      "feed_path": "penalty-schema/v3/feed.json",
+      "party_artefact": "party.yaml",
+      "converter": "penalty-schema/to_fair_scenario.py",
+      "converter_from": "ico",
+      "invocation": [
+        "build",
+        "uk-gdpr",
+        "lower-tier",
+        "--turnover",
+        "86000000.00"
+      ],
+      "scenario_sha256": "1a7219f32bce9410cd6bd7776360348e88d0a1c5058e6ee299743f4b086ab534",
+      "payload_version_key": "schema_version",
+      "published_at": "2026-08-28",
+      "files": {
+        "party.yaml": "6f7e82a9616ee49ba2bbe1f2824b43458f8f72fd859216e2d5ba32577364ac72",
+        "penalty-schema/to_fair_scenario.py": "560a38c04397e8e98d56a279ca5b88cb2b2707a8a22a5c8d71a9be74946bb982",
+        "penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda"
+      },
+      "publisher_observation": {
+        "schema": 1,
+        "party": "ico",
+        "name": "penalty-schema",
+        "version": "v3",
+        "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "v3.0.0",
+          "detail": "tag v3.0.0 on the ico checkout carries a signature block"
+        },
+        "newer": {
+          "version": "v4",
+          "tag": "v4.0.0",
+          "tagged": "2026-09-10",
+          "published_at": null,
+          "readable": false,
+          "since_tag": "v4.0.0",
+          "since": "2026-09-10"
+        },
+        "superseded": {
+          "state": "behind",
+          "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut; this checkout carries no directory for v4.0.0, so the line is priced from the signed tags alone"
+        }
+      },
+      "path": "composed/feeds/ico/penalty-schema/v3"
+    },
+    {
+      "party": "feeds",
+      "kind": "feed",
+      "name": "threat-register",
+      "version": "v2",
+      "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268",
+      "feed_path": "threat-register/v2/feed.json",
+      "party_artefact": "party.yaml",
+      "converter": "threat-register/to_fair_scenario.py",
+      "converter_from": "platform",
+      "invocation": [
+        "threat",
+        "driftwood"
+      ],
+      "scenario_sha256": "6046699614c5d4ebc35e0bb00b3c521d1c4e5ab07930527cdc595c745d2a008c",
+      "payload_version_key": "feed_version",
+      "published_at": "2026-07-31",
+      "files": {
+        "party.yaml": "204f41b1138803ed5a43f7a7f910627d428d9f3ead7232c48b926da62f427e48",
+        "threat-register/to_fair_scenario.py": "10e2f5b412b09a16ff8bff2e1fe108938c79b25ac20b95b4047b4e17631bcbe7",
+        "threat-register/v2/feed.json": "c94ae8335d13edcbdc63b2d8f7c7cda3fbefd4d80e78022be51aba30d70b9a6c"
+      },
+      "publisher_observation": {
+        "schema": 1,
+        "party": "feeds",
+        "name": "threat-register",
+        "version": "v2",
+        "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "threat-register/v2.0.0",
+          "detail": "tag threat-register/v2.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": {
+          "version": "v3",
+          "tag": "threat-register/v3.0.0",
+          "tagged": "2026-09-10",
+          "published_at": null,
+          "readable": false,
+          "since_tag": "threat-register/v3.0.0",
+          "since": "2026-09-10"
+        },
+        "superseded": {
+          "state": "behind",
+          "detail": "tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v2; behind since 2026-09-10, the day threat-register/v3.0.0 was cut; this checkout carries no directory for threat-register/v3.0.0, so the line is priced from the signed tags alone"
+        }
+      },
+      "path": "composed/feeds/feeds/threat-register/v2"
+    },
+    {
+      "party": "insurer",
+      "kind": "feed",
+      "name": "quote-driftwood",
+      "version": "v1",
+      "sha": "db767055119292e400edd63ed260785ce605eb4e",
+      "feed_path": "quote/driftwood/v1/feed.json",
+      "party_artefact": "party.yaml",
+      "converter": null,
+      "converter_from": null,
+      "invocation": null,
+      "scenario_sha256": null,
+      "payload_version_key": null,
+      "published_at": "2026-08-28",
+      "files": {
+        "party.yaml": "c35a3abee4bd822a5356ba6c3a8f67603561f99caabc9f7fe5a7dc3e4160a7e5",
+        "quote/driftwood/v1/feed.json": "e1c39816a12a13cfe21ff137073ce33492e89abc044423372c85284dc3760329"
+      },
+      "publisher_observation": {
+        "schema": 1,
+        "party": "insurer",
+        "name": "quote-driftwood",
+        "version": "v1",
+        "sha": "db767055119292e400edd63ed260785ce605eb4e",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "v1.0.0",
+          "detail": "tag v1.0.0 on the insurer checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form quote-driftwood/vN.x.y with N > 1 on the insurer checkout, so the pinned v1 is the newest published major"
+        }
+      },
+      "path": "composed/feeds/insurer/quote-driftwood/v1"
+    }
+  ]
+}

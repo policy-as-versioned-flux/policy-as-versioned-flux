@@ -1,0 +1,16 @@
+--- a/gitops/flux-system/gotk-sync.yaml
++++ b/gitops/flux-system/gotk-sync.yaml
+@@ -18,10 +18,10 @@
+   interval: 1m
+   url: https://github.com/policy-as-versioned-driftwood/driftwood
+   ref:
+-    tag: v3.0.0
+-    commit: bf9889aa6a6d979c87a5633240a1447765d73503
++    tag: v3.0.1
++    commit: 17302ecd20041df61a52428e67246c330294d2a6
+     # commit pinned at release (belt-and-braces immutability, ADR-0001) --
+-    # the resolved SHA driftwood's own v1.0.0 tag points to. Not covered by the
++    # the resolved SHA driftwood's own signed v3.0.1 apps release points to. Not covered by the
+     # Renovate customManagers in renovate.json (those track nist and platform
+     # only); a self-pin bump is a reviewed PR that moves both fields together.
+ ---

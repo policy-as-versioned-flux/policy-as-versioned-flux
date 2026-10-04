@@ -1,0 +1,41 @@
+{
+  "driftwood": {
+    "before_status": " M .github/workflows/drift-sample.yml\n M .github/workflows/propose-tier.yml\n M .github/workflows/shift-left.yml\n M .github/workflows/twin-sweep.yml\n M .gitignore\n D apps/storefront/Dockerfile\n D apps/storefront/README.md\n D apps/storefront/package.json\n D apps/storefront/public/index.html\n M deploy/pod.yaml\n M drift/README.md\n A drift/api-image-note.md\n A drift/cage_probe.py\n M drift/five-facts.py\n A drift/oscal_lane.py\n A drift/served_apps.py\n M drift/window.yaml\n A gitops/apps/api.yaml\n M gitops/apps/kustomization.yaml\n M gitops/apps/pod.yaml\n M gitops/apps/storefront.yaml\n M gitops/flux-system/gotk-sync.yaml\n M party.yaml\n M renovate.json\n M twin/PIN.yaml\n M twin/emit-forward-intel.py\n M twin/forward-intel/bump.yaml\n M twin/forward-intel/payload.schema.json\n M twin/orgs/driftwood/edges/cart-pii-loss-cuts-checkout-revenue.yaml\n M twin/orgs/driftwood/perspectives/driftwood.yaml\n M twin/orgs/driftwood/responses/run-the-checkout-at-baseline.yaml\n M twin/orgs/driftwood/responses/run-the-checkout-at-isolated.yaml\n M twin/orgs/driftwood/responses/run-the-checkout-at-quarantine.yaml\n M twin/orgs/driftwood/responses/run-the-checkout-at-restricted.yaml\n M twin/verify-twin-sweep-moved.sh\n A verify-cage-probe.sh\n?? .github/requirements/\n?? .github/tests/test_twin_sweep_split.py\n?? accepted-majors/platform-6.0.0.yaml\n?? accepted-majors/platform-6.0.1-superseded.md\n?? accepted-majors/platform-7.0.0.yaml\n?? inventory/\n?? twin/forward-intel/v2/\n",
+    "edited_before": {
+      "gitops/flux-system/gotk-sync.yaml": "1047bd1e6594170571eb22ad6e40f8ee249bf6fd59d2ad85cd4c00f0f5a1847a",
+      "inventory/images.json": "3673e27a8447f33a48430ec6b586ffd7732a352363b7cc533c5df23af428ecca"
+    },
+    "protected_hashes": {
+      ".github/platform-tools-pin.yaml": "dbfeb0976a90b5ee47d36896792e268295eb4549140c55def038c3ba6a4d50be",
+      "gitops/composed/composed-set.yaml": "0ba77134b5d82e7df0bd8a571fc43ba532c910130e7dc670e9eac51b3ee8cd1e",
+      "gitops/platform/platform-pin.yaml": "e0774e2e866b0244cd0ab8f3ccd97f1af9fa5144920498743513de41474fc703",
+      "party.yaml": "5886cc23919f9e35b3c8f597edaca1ee88c865aaabe4bb628a83900567a108c2"
+    }
+  },
+  "ludlow": {
+    "before_status": " M .github/scripts/twin-sweep.py\n M .github/workflows/drift-sample.yml\n M .github/workflows/propose-tier.yml\n M .github/workflows/shift-left.yml\n M .github/workflows/twin-sweep.yml\n M .gitignore\n D apps/reports/Dockerfile\n D apps/reports/README.md\n D apps/reports/app.py\n D apps/reports/requirements.txt\n M drift/README.md\n A drift/cage_probe.py\n M drift/five-facts.py\n A drift/oscal_lane.py\n A drift/served_apps.py\n M drift/window.yaml\n M gitops/apps/reports.yaml\n M gitops/flux-system/gotk-sync.yaml\n M party.yaml\n M renovate.json\n M tests/test_twin_clock.py\n M twin/PIN.yaml\n M twin/emit-forward-intel.py\n M twin/forward-intel/payload.schema.json\n M twin/orgs/ludlow/perspectives/ludlow.yaml\n A verify-cage-probe.sh\n?? .github/requirements/\n?? accepted-majors/platform-6.0.0.yaml\n?? accepted-majors/platform-6.0.1-superseded.md\n?? accepted-majors/platform-7.0.0.yaml\n?? inventory/\n?? selection-policy/\n?? twin/forward-intel/bump.yaml\n?? twin/forward-intel/rule.yaml\n",
+    "edited_before": {
+      "gitops/flux-system/gotk-sync.yaml": "471a9b130463ba696559a0d2cd0471c1f94ef1ec075c15515091a1fe4e48dfef",
+      "inventory/images.json": "7095e7debc03b48adf87a668b267f9898c9586432bb0259d97251a475aee7d35"
+    },
+    "protected_hashes": {
+      ".github/platform-tools-pin.yaml": "dbfeb0976a90b5ee47d36896792e268295eb4549140c55def038c3ba6a4d50be",
+      "gitops/composed/composed-set.yaml": "96d99b2a4f177b08f91dd64247ad5df1aa11af6e080fbfb2665b60ee74210e55",
+      "gitops/platform/platform-pin.yaml": "63b5e31e82af9517f7c9215088b71d7f7607bdd855d0e0612990648d73d5661b",
+      "party.yaml": "0229d55d02865295e7a545a2faf0f90dfc64261110f755ac99b19ee1b857a566"
+    }
+  },
+  "tuppence": {
+    "before_status": " M .github/scripts/twin-sweep.py\n M .github/workflows/drift-sample.yml\n M .github/workflows/propose-tier.yml\n M .github/workflows/shift-left.yml\n M .github/workflows/twin-sweep.yml\n M .gitignore\n D apps/ledger/Dockerfile\n D apps/ledger/README.md\n D apps/ledger/pom.xml\n D apps/ledger/src/main/java/com/mycompany/ledger/Ledger.java\n D apps/ledger/src/main/resources/log4j2.xml\n M drift/README.md\n A drift/cage_probe.py\n M drift/five-facts.py\n A drift/oscal_lane.py\n A drift/served_apps.py\n M drift/window.yaml\n M gitops/apps/ledger.yaml\n M gitops/flux-system/gotk-sync.yaml\n M party.yaml\n M renovate.json\n M tests/test_twin_clock.py\n M twin/PIN.yaml\n M twin/emit-forward-intel.py\n M twin/forward-intel/payload.schema.json\n M twin/orgs/tuppence/perspectives/tuppence.yaml\n A verify-cage-probe.sh\n?? .github/requirements/\n?? accepted-majors/platform-6.0.0.yaml\n?? accepted-majors/platform-6.0.1-superseded.md\n?? accepted-majors/platform-7.0.0.yaml\n?? gitops/cloud/\n?? inventory/\n?? selection-policy/\n?? twin/forward-intel/bump.yaml\n?? twin/forward-intel/rule.yaml\n?? twin/forward-intel/v1/\n",
+    "edited_before": {
+      "gitops/flux-system/gotk-sync.yaml": "bcd4b2cf6f57ceaf5293fcdd5457638685131323e77bfe99c0eac055f3649dcc",
+      "inventory/images.json": "b100844ba2f1b5e776eec6415e677704045fa01d3d0f860f74adacf4b472df18"
+    },
+    "protected_hashes": {
+      ".github/platform-tools-pin.yaml": "dbfeb0976a90b5ee47d36896792e268295eb4549140c55def038c3ba6a4d50be",
+      "gitops/composed/composed-set.yaml": "be1216bfb2b92705d08c85d07fc30f1d05fcafad928c848bbee5b9d803b96752",
+      "gitops/platform/platform-pin.yaml": "1a22c5e9f223b521d8ea163d30df2bda1c320a255986f1c18a3849b487ee1f8c",
+      "party.yaml": "c55ecad06ecaa428e6c8102f017e2f03291e32470ef9cc8c48f737fae07d03dd"
+    }
+  }
+}

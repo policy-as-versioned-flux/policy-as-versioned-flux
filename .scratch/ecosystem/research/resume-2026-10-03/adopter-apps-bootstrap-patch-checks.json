@@ -1,0 +1,14 @@
+{
+  "driftwood": {
+    "apply_to_published_base": "PASS",
+    "staged_whitespace": "PASS"
+  },
+  "tuppence": {
+    "apply_to_published_base": "PASS",
+    "staged_whitespace": "PASS"
+  },
+  "ludlow": {
+    "apply_to_published_base": "PASS",
+    "staged_whitespace": "PASS"
+  }
+}

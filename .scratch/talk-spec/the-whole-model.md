@@ -277,3 +277,7 @@ institution, because the £ differs) → the **living loop** (the estate war-gam
   penalties-as-code as an *industry* norm; the full insurance-underwriting / board-balance-sheet
   consumption; post-quantum + the commodity-attack-cost-collapse as *worked scenarios* the war-gamer
   runs (we did one by hand — ransomware/PQ — live-runnable, not a slide).
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

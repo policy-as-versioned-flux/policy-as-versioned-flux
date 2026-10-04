@@ -1,0 +1,28 @@
+{
+  "scope": "manifest source bytes, not a signed rollout receipt",
+  "manifests": [
+    {
+      "file": "kyverno-1.18.2-install.yaml",
+      "version": "1.18.2",
+      "bytes": 5699651,
+      "sha256": "3dcd43eaf11f0719084217148cd0c82a8fa49faa9b1a783ea5bea2cf84041bda",
+      "upstream": "https://github.com/kyverno/kyverno/releases/download/v1.18.2/install.yaml",
+      "retained": "ignored local downloaded capture; installation and admission result logs are checked in",
+      "public_release_asset_api": "https://api.github.com/repos/kyverno/kyverno/releases/tags/v1.18.2",
+      "github_asset_digest": "sha256:3dcd43eaf11f0719084217148cd0c82a8fa49faa9b1a783ea5bea2cf84041bda",
+      "github_asset_digest_and_size_match": true
+    },
+    {
+      "file": "kyverno-1.19.1-install.yaml",
+      "version": "1.19.1",
+      "bytes": 5848699,
+      "sha256": "d3322cb346d3d42dd0f41e230b0d1d7bc5619960e1c36fdac4d9151d724b88e6",
+      "upstream": "https://github.com/kyverno/kyverno/releases/download/v1.19.1/install.yaml",
+      "retained": "ignored local downloaded capture; installation and admission result logs are checked in",
+      "public_release_asset_api": "https://api.github.com/repos/kyverno/kyverno/releases/tags/v1.19.1",
+      "github_asset_digest": "sha256:d3322cb346d3d42dd0f41e230b0d1d7bc5619960e1c36fdac4d9151d724b88e6",
+      "github_asset_digest_and_size_match": true
+    }
+  ],
+  "public_asset_metadata_read": "2026-10-03, GitHub release assets API, both exact installation hashes and byte sizes match"
+}

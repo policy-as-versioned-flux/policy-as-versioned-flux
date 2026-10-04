@@ -1,7 +1,7 @@
 # 160 — A fact that is never looked at is a fall
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: 161
 
 ## Question
@@ -17,3 +17,7 @@ The five facts have no registration by section today. The guard over `drift/wind
 Graduated 2026-09-25 from ticket 152, Q10 and Q11. Blocked by 161 so that the rule's form is settled on the cage facts first. Definition of done: `grade` reports FAIL for any of the five facts that is null on three samples in a row, a selfcheck branch proves it, and the adopters' checks under `talk/verify-all.sh` carry it.
 
 On tuppence, fact 2 changes between null and true (ticket 157). A single null between two trues must stay a could-not-look. A run of five nulls, 2026-09-17 to 09-21, would be a fall under this rule.
+
+## Answer
+
+**Local implementation, 2026-10-03.** Built the three-null fall rule for facts 1–5 separately for each source, using the three newest sample timestamps. Missing facts count as unmeasured; a true or observed false breaks the null streak; a single null between trues remains a wait. This changes grading without moving the original registration. A regression at the existing selfcheck seam failed before implementation, then passed on all three adopters. Rollout and a scheduled lane sample carrying the new grade remain pending.

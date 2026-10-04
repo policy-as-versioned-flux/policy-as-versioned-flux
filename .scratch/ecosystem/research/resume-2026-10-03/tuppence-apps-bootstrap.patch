@@ -1,0 +1,35 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index 220a0fa..8fa3ed3 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -618,7 +618,7 @@ ungoverned-namespaces:
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: 5c02d43310ad328b6a623142b798975291f42653abbb2fb1f9a5fafb63a1a0a4
++  after: 36b53400d4aa5e8af20da5d9944abbf9c00ba6c4f79d0b41c929de1927ccb6d1
+   before:
+     header:
+       parents:
+diff --git a/gitops/apps/ledger.yaml b/gitops/apps/ledger.yaml
+index 0179741..6d79a4f 100644
+--- a/gitops/apps/ledger.yaml
++++ b/gitops/apps/ledger.yaml
+@@ -6,7 +6,7 @@
+ # only because that list names it. A workload file sitting in this directory unlisted is served
+ # to nobody; the hub's verify/lifted-apps/ check reads the path and the list, not the directory.
+ #
+-# NOT YET SERVED FROM THE PIN. The same file's GitRepository pins `ref: {tag: v1.0.0, commit:
++# HISTORICAL CEILING, before ticket 155 moves the self-pin. The same file's GitRepository pins `ref: {tag: v1.0.0, commit:
+ # ...}`, and that tree's kustomization does not list this file, so a cluster reconciling the pin
+ # today is served nothing from here until tuppence cuts a tag and moves its own pin -- which no
+ # renovate customManager bumps (they cover the parents only). The hub check counts that on every
+@@ -75,7 +75,7 @@ spec:
+     runAsUser: 1000
+   containers:
+     - name: ledger
+-      image: ghcr.io/policy-as-versioned-flux/ledger@sha256:9709e1075a503fe59ca85deae2b748fcbbfd80b464e56d2e1f82ec8182268111
++      image: ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5
+       ports:
+         - containerPort: 8080
+       securityContext:

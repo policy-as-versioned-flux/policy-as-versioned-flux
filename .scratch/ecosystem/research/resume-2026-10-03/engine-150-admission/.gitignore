@@ -1,0 +1,3 @@
+# Downloaded upstream installation manifests are reproducible local captures.
+kyverno-1.18.2-install.yaml
+kyverno-1.19.1-install.yaml

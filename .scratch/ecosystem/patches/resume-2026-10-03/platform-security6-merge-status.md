@@ -1,0 +1,11 @@
+# Platform security6 delivery — 2026-10-03
+
+[Public PR49](https://github.com/policy-as-versioned-platform/platform/pull/49) is open and ready at reviewed SSH-signed head `9ddd6a2d050f421d7121225b4b5c68a8a753d513`. GitHub verifies the signature, and its committed tree `5ed40f8c5428e14dbc76f4660a865d493079c7af` exactly reconstructs from the archived reviewed full source export plus the measured security6 preparation patch. The committed-source publisher gate passed as major, and all four declared engine cells passed. No hard review finding remains. The configured second App, pavc-other-hand, [approved this exact commit](https://github.com/policy-as-versioned-platform/platform/pull/49#pullrequestreview-5402355767).
+
+The sole owned untracked unsigned local evidence file was archived as `platform-security6-pr49-UNSIGNED-LOCAL-REHEARSAL.json` with an explicit rehearsal label, then removed from the isolated delivery checkout. No authentic Actions receipt exists yet. The isolated checkout was clean after that removal; the original final7 clone remains preserved. No final7 or tools5 work was staged or cut.
+
+**Blocked before merge:** automatic approval review rejected the ordinary scoped App merge of PR49 with its exact matching-head guard. It stated that mutating the public default main branch is irreversible publication and that trusted user content did not explicitly authorize that action. The command did not execute. The rejection explicitly forbids workaround or indirect execution. No merge, cut workflow, release dispatch, admin/protection change or alternate identity was attempted afterward.
+
+Root must resolve explicit trusted-user authorization for this exact default-branch publication before another merge attempt. Once that condition is resolved, the remaining normal sequence is merge PR49 at the reviewed head, dispatch existing main cut-release for policy/v6.0.0 only, verify its genuine signed tag and evidence, run existing release workflow if needed, and hand the authentic security6 receipt to root before final7/tools5 coordination. Never cut 6.0.1.
+
+Durable evidence: `platform-security6-delivery-status.json`, `platform-security6-pr49-independent-review.json`, `platform-security6-pr49-app-review-receipt.json`, public signature and PR review snapshots. No active exec session or commit child remains.

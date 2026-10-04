@@ -64,3 +64,7 @@ most legible, reviewable expression of "what is the policy and what version is i
   multi-parent composition is still one gitsign-signed tag; the parents it composed are declared by
   their already-pinned commit SHAs, not a second digest scheme. See
   [ADR-0012](0012-composed-artefact-self-signed-pinned-sha.md).
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

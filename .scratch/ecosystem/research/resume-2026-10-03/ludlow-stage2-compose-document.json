@@ -1,0 +1,4380 @@
+{
+  "cages": [],
+  "deltas": [
+    {
+      "amount": null,
+      "control_id": "ac-4",
+      "currency": "GBP",
+      "detail": "nist:ac-4 was a recorded hole and a claim now covers it; no pinned instrument names a price for it",
+      "kind": "closed-hole",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist"
+    }
+  ],
+  "engine": {
+    "declared": {
+      "engine": "kyverno",
+      "file": "gitops/engine/kyverno.yaml",
+      "version": "1.18.2"
+    },
+    "file": "gitops/engine/kyverno.yaml",
+    "pairings": [
+      {
+        "bodies": [
+          "cage-netpol",
+          "cage-tier",
+          "posture-trust-boundary",
+          "require-nonroot",
+          "stamp-posture"
+        ],
+        "controls": [
+          "ac-4",
+          "ac-6",
+          "cm-6"
+        ],
+        "line": "5.0.0",
+        "party": "platform",
+        "read_from": "distribution/versions.yaml",
+        "reason": null,
+        "status": "supported",
+        "subject": "platform policy 5.0.0",
+        "tested_engines": [
+          "1.18.2"
+        ],
+        "tree": "platform@4.0.0"
+      },
+      {
+        "bodies": [
+          "cage-netpol",
+          "cage-tier",
+          "posture-trust-boundary",
+          "require-nonroot",
+          "stamp-posture"
+        ],
+        "controls": [
+          "ac-4",
+          "ac-6",
+          "cm-6"
+        ],
+        "line": "6.0.0",
+        "party": "platform",
+        "read_from": "distribution/versions.yaml",
+        "reason": null,
+        "status": "supported",
+        "subject": "platform policy 6.0.0",
+        "tested_engines": [
+          "1.18.2"
+        ],
+        "tree": "platform@4.0.0"
+      },
+      {
+        "bodies": [
+          "cage-netpol",
+          "cage-tier",
+          "require-nonroot",
+          "stamp-posture"
+        ],
+        "controls": [
+          "ac-4",
+          "ac-6",
+          "cm-6"
+        ],
+        "line": "7.0.0",
+        "party": "platform",
+        "read_from": "distribution/versions.yaml",
+        "reason": null,
+        "status": "supported",
+        "subject": "platform policy 7.0.0",
+        "tested_engines": [
+          "1.18.2",
+          "1.19.1"
+        ],
+        "tree": "platform@4.0.0"
+      },
+      {
+        "bodies": [
+          "cage-netpol-bottom-rung",
+          "governed-namespace-cage-holds",
+          "governed-namespace-requires-claim",
+          "governed-namespace-unclaimed-report",
+          "policy-version-orphan-cage",
+          "policy-version-orphan-cage-holds",
+          "policy-version-orphan-guard"
+        ],
+        "controls": [
+          "ac-4",
+          "cm-6"
+        ],
+        "line": "machinery",
+        "party": "platform",
+        "read_from": "distribution/machinery.yaml",
+        "reason": null,
+        "status": "supported",
+        "subject": "platform machinery",
+        "tested_engines": [
+          "1.18.2",
+          "1.19.1"
+        ],
+        "tree": "platform@4.0.0"
+      }
+    ]
+  },
+  "floor_change": {
+    "after": {
+      "known": true,
+      "value": null
+    },
+    "basis": "floor-only counterfactual at current publisher, scenario, appetite and selection inputs",
+    "before": {
+      "known": false
+    },
+    "changed": null,
+    "could_not_look": "previous floor was not recorded; absence of history is not an absent floor",
+    "limit": "selection evidence, not an enacted Namespace tier; platform reductions are self-declared calibration, not measured effectiveness",
+    "lines": [
+      {
+        "after_residual": 60528927.50469108,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "before_tier": null,
+        "currency": "GBP",
+        "kind": "feed",
+        "name": "penalty-schema",
+        "perspective": "ludlow",
+        "residual_delta": null,
+        "source": "ico",
+        "uncaged_amount": 3026446375.2345514
+      },
+      {
+        "after_residual": 6364.59557170018,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "before_tier": null,
+        "currency": "GBP",
+        "kind": "feed",
+        "name": "threat-register",
+        "perspective": "ludlow",
+        "residual_delta": null,
+        "source": "feeds",
+        "uncaged_amount": 318229.7785850087
+      },
+      {
+        "after_residual": null,
+        "after_tier": null,
+        "before_residual": null,
+        "before_tier": null,
+        "currency": "GBP",
+        "kind": "feed",
+        "name": "cve",
+        "perspective": "ludlow",
+        "residual_delta": null,
+        "source": "feeds",
+        "uncaged_amount": null
+      },
+      {
+        "after_residual": 15744.556549478619,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "before_tier": null,
+        "currency": "GBP",
+        "kind": "feed",
+        "name": "eol",
+        "perspective": "ludlow",
+        "residual_delta": null,
+        "source": "feeds",
+        "uncaged_amount": 787227.8274739302
+      }
+    ],
+    "residual_basis": "platform-cage-tiers@1.0.0",
+    "schema": 1
+  },
+  "holes": [
+    {
+      "amount": null,
+      "control_id": "ac-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-11.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-12",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-14",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-17",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-17.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-17.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-17.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-17.4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-18",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-18.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-18.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-19",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-19.5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-2.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-2.13",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-2.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-2.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-2.4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-2.5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-20",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-20.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-20.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-21",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-22",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-6.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-6.10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-6.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-6.5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-6.7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-6.9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "at-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "at-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "at-2.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "at-2.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "at-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "at-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-12",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-3.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-6.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-6.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-7.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "au-9.4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ca-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": 605289275.0469103,
+      "control_id": "ca-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.2",
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ca-2.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ca-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ca-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ca-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ca-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ca-7.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ca-7.4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ca-9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-12",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-12.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-2.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-2.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-2.7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-3.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-3.4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-4.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-7.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-7.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-7.5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-8.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-8.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cm-9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-10.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-2.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-2.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-2.8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-4.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-6.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-6.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-7.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-7.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-7.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-8.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-8.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-9.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "cp-9.8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-12",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-12.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-12.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-12.5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-2.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-2.12",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-2.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-2.8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-4.4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-5.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-5.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-5.6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-8.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-8.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ia-8.4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-3.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-4.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-6.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-6.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ir-7.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": 605289275.0469103,
+      "control_id": "ir-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.2",
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ma-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ma-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ma-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ma-3.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ma-3.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ma-3.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ma-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ma-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ma-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "mp-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "mp-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "mp-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "mp-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "mp-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "mp-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "mp-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-12",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-13",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-13.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-14",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-15",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-16",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-17",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-6.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pe-9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pl-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pl-10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pl-11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": 907933912.5703654,
+      "control_id": "pl-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.3",
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pl-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pl-4.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "pl-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ps-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ps-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ps-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ps-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ps-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ps-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ps-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ps-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ps-9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ra-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ra-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": 907933912.5703654,
+      "control_id": "ra-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.3",
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ra-3.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ra-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ra-5.11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ra-5.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ra-5.5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ra-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ra-9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-15",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-15.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-22",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-4.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-4.10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-4.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-4.9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-9",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sa-9.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-12",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-13",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-15",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-17",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-18",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-20",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-21",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-22",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-23",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-28",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-28.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-39",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-7.3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-7.4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-7.5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-7.7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-7.8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sc-8.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-12",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-16",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-2.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-4.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-4.4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-4.5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-7.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-7.7",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "si-8.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-10",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-11",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-11.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-11.2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-12",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-2",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-2.1",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-3",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-5",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-6",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "sr-8",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "recorded"
+    },
+    {
+      "amount": null,
+      "control_id": "ac-4",
+      "currency": "GBP",
+      "perspective": "ludlow",
+      "priced_by": null,
+      "source": "nist",
+      "status": "closed"
+    }
+  ],
+  "limits": [
+    {
+      "count": 1,
+      "detail": "the cross-party rule-conflict path above is only exercised in the real estate once a second implementations publisher is pinned",
+      "name": "two-publisher-conflict",
+      "status": "open"
+    },
+    {
+      "checked": 3,
+      "count": 2,
+      "detail": "the composed set renders policy versions the pinned parent commit does not contain; the header names a parent release that holds none of these trees. platform@4.0.0 (557c1538) does not contain distribution/policies/v6.0.0; platform@4.0.0 (557c1538) does not contain distribution/policies/v7.0.0",
+      "name": "pinned-parent-lacks-rendered-versions",
+      "status": "open"
+    },
+    {
+      "checked": 4,
+      "count": 0,
+      "detail": "every priced feed was read from its publisher's own pinned tree",
+      "name": "publisher-clone-absent",
+      "status": "closed"
+    }
+  ],
+  "members": [
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-baseline",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "5.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-isolated",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "5.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "GeneratingPolicy",
+      "name": "cage-netpol",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "5.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-quarantine",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "5.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-restricted",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "5.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "MutatingPolicy",
+      "name": "cage-tier",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "5.0.0"
+    },
+    {
+      "action": "Deny",
+      "family": "posture",
+      "kind": "ValidatingPolicy",
+      "name": "posture-trust-boundary",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "5.0.0"
+    },
+    {
+      "action": null,
+      "family": "posture",
+      "kind": "MutatingPolicy",
+      "name": "stamp-posture",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "5.0.0"
+    },
+    {
+      "action": "Audit",
+      "family": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "name": "require-nonroot",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "5.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-baseline",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "6.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-isolated",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "6.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "GeneratingPolicy",
+      "name": "cage-netpol",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "6.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-quarantine",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "6.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-restricted",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "6.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "MutatingPolicy",
+      "name": "cage-tier",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "6.0.0"
+    },
+    {
+      "action": "Deny",
+      "family": "posture",
+      "kind": "ValidatingPolicy",
+      "name": "posture-trust-boundary",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "6.0.0"
+    },
+    {
+      "action": null,
+      "family": "posture",
+      "kind": "MutatingPolicy",
+      "name": "stamp-posture",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "6.0.0"
+    },
+    {
+      "action": "Audit",
+      "family": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "name": "require-nonroot",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "6.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-baseline",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "7.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-isolated",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "7.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "GeneratingPolicy",
+      "name": "cage-netpol",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "7.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-quarantine",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "7.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "PriorityClass",
+      "name": "cage-restricted",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "7.0.0"
+    },
+    {
+      "action": null,
+      "family": "graded-enforcement",
+      "kind": "MutatingPolicy",
+      "name": "cage-tier",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "7.0.0"
+    },
+    {
+      "action": null,
+      "family": "posture",
+      "kind": "MutatingPolicy",
+      "name": "stamp-posture",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "7.0.0"
+    },
+    {
+      "action": "Audit",
+      "family": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "name": "require-nonroot",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "7.0.0"
+    },
+    {
+      "action": null,
+      "family": "platform-machinery",
+      "kind": "ValidatingPolicy",
+      "name": "policy-version-orphan-guard",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": null
+    },
+    {
+      "action": null,
+      "family": "platform-machinery",
+      "kind": "MutatingPolicy",
+      "name": "governed-namespace-requires-claim",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": null
+    },
+    {
+      "action": null,
+      "family": "platform-machinery",
+      "kind": "MutatingPolicy",
+      "name": "policy-version-orphan-cage",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": null
+    },
+    {
+      "action": null,
+      "family": "platform-machinery",
+      "kind": "MutatingPolicy",
+      "name": "policy-version-orphan-cage-holds",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": null
+    },
+    {
+      "action": null,
+      "family": "platform-machinery",
+      "kind": "MutatingPolicy",
+      "name": "governed-namespace-cage-holds",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": null
+    },
+    {
+      "action": null,
+      "family": "platform-machinery",
+      "kind": "ValidatingPolicy",
+      "name": "governed-namespace-unclaimed-report",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": null
+    },
+    {
+      "action": null,
+      "family": "platform-machinery",
+      "kind": "GeneratingPolicy",
+      "name": "cage-netpol-bottom-rung",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": null
+    },
+    {
+      "action": null,
+      "family": "platform-machinery",
+      "kind": "PriorityClass",
+      "name": "cage-isolated",
+      "source_party": "platform",
+      "source_sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": null
+    }
+  ],
+  "outcome": "composed",
+  "parents": [
+    {
+      "kind": "implementations",
+      "party": "platform",
+      "sha": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "version": "4.0.0"
+    },
+    {
+      "kind": "controls",
+      "party": "nist",
+      "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+      "version": "1.1.0"
+    },
+    {
+      "kind": "feed",
+      "name": "penalty-schema",
+      "party": "ico",
+      "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e",
+      "version": "v3"
+    },
+    {
+      "kind": "feed",
+      "name": "threat-register",
+      "party": "feeds",
+      "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268",
+      "version": "v1"
+    },
+    {
+      "kind": "feed",
+      "name": "cve",
+      "party": "feeds",
+      "sha": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+      "version": "v3"
+    },
+    {
+      "kind": "feed",
+      "name": "eol",
+      "party": "feeds",
+      "sha": "330fbf06872c2ec2c8637863b624cd902d5534ca",
+      "version": "v2"
+    }
+  ],
+  "party_artefact_errors": [],
+  "prices": [
+    {
+      "amount": 3026446375.2345514,
+      "changed": false,
+      "currency": "GBP",
+      "hole": null,
+      "holes": [
+        {
+          "amount": 907933912.5703654,
+          "id": "pl-2",
+          "source": "nist",
+          "status": "recorded",
+          "weight": 0.3
+        },
+        {
+          "amount": 907933912.5703654,
+          "id": "ra-3",
+          "source": "nist",
+          "status": "recorded",
+          "weight": 0.3
+        },
+        {
+          "amount": 605289275.0469103,
+          "id": "ca-2",
+          "source": "nist",
+          "status": "recorded",
+          "weight": 0.2
+        },
+        {
+          "amount": 605289275.0469103,
+          "id": "ir-8",
+          "source": "nist",
+          "status": "recorded",
+          "weight": 0.2
+        }
+      ],
+      "kind": "feed",
+      "lef": [
+        1,
+        2,
+        4
+      ],
+      "lef_basis": "lm sourced from ICO (Information Commissioner's Office) real public fines (UK GDPR / Data Protection Act 2018 s157). Scaled to a subscriber turnover of 147,814,767,711.53 GBP, clamped at the statutory maximum max(cap, rate x turnover). FINALITY UNCHECKED: no example in payload version v3 carries a `status`, so whether any of the 2 figure(s) below is the FINAL collected penalty or a notice figure since reduced, set aside or never collected could not be looked at. From major 4 every example carries `status`, `final_as_of` and `litigation` (eco-system ticket 79 item 1). A named could-not-look. FREQUENCY UNSOURCED: this line annualises at (1, 2, 4) events/yr, which is this converter's editorial default and not a counted rate. Payload version v3 predates the publisher's `frequency` field, so no basis and no denominator could be read for it; from major 4 the basis belongs on regimes.uk-gdpr.violation_types.lower-tier.frequency.basis. A named could-not-look (eco-system ticket 79 item 3), never a bare number.",
+      "name": "penalty-schema",
+      "new_price": 3026446375.2345514,
+      "new_version": "v3",
+      "old_price": 3026446375.2345514,
+      "old_tier": "isolated",
+      "old_version": "v3",
+      "per_customer": {
+        "amount": 66.9094087202545,
+        "currency": "GBP"
+      },
+      "perspective": "ludlow",
+      "pin_signature": {
+        "detail": "tag v3.0.0 on the ico checkout carries a signature block",
+        "state": "signed",
+        "tag": "v3.0.0"
+      },
+      "proposed_as": "label",
+      "proposed_tier": "isolated",
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+      "source": "ico",
+      "superseded": {
+        "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut",
+        "state": "behind"
+      },
+      "total": 3026446375.2345514
+    },
+    {
+      "amount": 190707579.80930072,
+      "as_of": "2026-10-03",
+      "base": 3026446375.2345514,
+      "basis": "the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge the feeds module's EOL ramp puts on a version its publisher has superseded, +1x per year behind and capped at +4x, where `since` is the day the newer major's signing tag was cut; zero on that day, printed with both dates, and never summed into the exposure the line itself is already in",
+      "changed": false,
+      "currency": "GBP",
+      "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut",
+      "kind": "supersede",
+      "limits": [],
+      "name": "penalty-schema",
+      "newer": {
+        "published_at": "2026-09-09",
+        "since": "2026-09-10",
+        "since_tag": "v4.0.0",
+        "tag": "v4.0.0",
+        "tagged": "2026-09-10",
+        "version": "v4"
+      },
+      "per_customer": {
+        "amount": 4.216209316618781,
+        "currency": "GBP"
+      },
+      "perspective": "ludlow",
+      "proposed_tier": null,
+      "ramp": 1.063013698630137,
+      "since": "2026-09-10",
+      "source": "ico",
+      "version": "v3"
+    },
+    {
+      "amount": 318229.7785850087,
+      "changed": false,
+      "currency": "GBP",
+      "hole": null,
+      "holes": [],
+      "kind": "feed",
+      "lef": [
+        1.0,
+        2.0,
+        5.0
+      ],
+      "lef_basis": "confidential health-record exfiltration (HIPAA, decades-confidential, HNDL/harvest-now-decrypt-later exposure). lef sourced from DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon. MAGNITUDE UNSOURCED: the impact per event (20000.0, 100000.0, 400000.0) GBP is not in payload version v1, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
+      "name": "threat-register",
+      "new_price": 318229.7785850087,
+      "new_version": "v1",
+      "old_price": 318229.7785850087,
+      "old_tier": "isolated",
+      "old_version": "v1",
+      "per_customer": {
+        "amount": 0.0070355009414796756,
+        "currency": "GBP"
+      },
+      "perspective": "ludlow",
+      "pin_signature": {
+        "detail": "tag threat-register/v1.0.0 on the feeds checkout carries a signature block",
+        "state": "signed",
+        "tag": "threat-register/v1.0.0"
+      },
+      "proposed_as": "label",
+      "proposed_tier": "isolated",
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+      "source": "feeds",
+      "superseded": {
+        "detail": "tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v1; behind since 2026-09-01, the day threat-register/v2.0.0 was cut",
+        "state": "behind"
+      },
+      "total": null
+    },
+    {
+      "amount": 27899.597026630927,
+      "as_of": "2026-10-03",
+      "base": 318229.7785850087,
+      "basis": "the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge the feeds module's EOL ramp puts on a version its publisher has superseded, +1x per year behind and capped at +4x, where `since` is the day the newer major's signing tag was cut; zero on that day, printed with both dates, and never summed into the exposure the line itself is already in",
+      "changed": false,
+      "currency": "GBP",
+      "detail": "tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v1; behind since 2026-09-01, the day threat-register/v2.0.0 was cut",
+      "kind": "supersede",
+      "limits": [],
+      "name": "threat-register",
+      "newer": {
+        "published_at": "2026-09-09",
+        "since": "2026-09-01",
+        "since_tag": "threat-register/v2.0.0",
+        "tag": "threat-register/v3.0.0",
+        "tagged": "2026-09-10",
+        "version": "v3"
+      },
+      "per_customer": {
+        "amount": 0.0006168110414447941,
+        "currency": "GBP"
+      },
+      "perspective": "ludlow",
+      "proposed_tier": null,
+      "ramp": 1.0876712328767124,
+      "since": "2026-09-01",
+      "source": "feeds",
+      "version": "v1"
+    },
+    {
+      "absence_count": 109,
+      "absence_only": true,
+      "absences": [
+        {
+          "amount": null,
+          "id": "CVE-2005-2541",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2007-5686",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2010-4756",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2011-3374",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2011-4116",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2013-4392",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2017-18018",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2018-20796",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2019-1010022",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2019-1010023",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2019-1010024",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2019-1010025",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2019-9192",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2021-45346",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2022-0563",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2023-23934",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2023-25577",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2023-30861",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2023-31437",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2023-31438",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2023-31439",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2024-22195",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2024-34064",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2024-34069",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2024-49766",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2024-56326",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2024-56433",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2025-27516",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2025-5278",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2025-6141",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2025-66221",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2025-69720",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2025-70873",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2025-8869",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-102010",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-102473",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-102474",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-103111",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-13346",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-15059",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-15534",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-16742",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-1703",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-18374",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-18477",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-18508",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-19487",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-19499",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-19542",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-21860",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-23949",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-24049",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-27171",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-27199",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-27205",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-3184",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-3219",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-35189",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-35191",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-40228",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-42250",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-42772",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-50812",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-50813",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-53910",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-5435",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-54369",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-54370",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-54371",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-54411",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-54872",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-54873",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-54875",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-56391",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-56392",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-5704",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-59890",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-6238",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-6357",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-6368",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-6791",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-72897",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-75804",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-75805",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-75806",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-76642",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-77117",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-77696",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-78408",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-78409",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-78410",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-80489",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-82560",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-84782",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-84784",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-85091",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-8643",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-8674",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-86805",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-89092",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-9538",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-95619",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-95818",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "CVE-2026-97399",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "TEMP-0290435-0B57B5",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "TEMP-0517018-A83CE6",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "TEMP-0628843-DBAD28",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "TEMP-0841856-B18BAF",
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "amount": null,
+          "id": "TEMP-1147318-639065",
+          "reason": "outside pinned KEV feed"
+        }
+      ],
+      "amount": null,
+      "changed": false,
+      "could_not_look": "No scanned CVE is in the pinned KEV feed; 109 scanned CVE(s) outside it are named absences carrying no amount.",
+      "currency": "GBP",
+      "hole": null,
+      "holes": [],
+      "intersection_count": 0,
+      "inventory_cve_count": 109,
+      "kind": "feed",
+      "lef": null,
+      "lef_basis": "No scanned CVE is in the pinned KEV feed; 109 scanned CVE(s) outside it are named absences carrying no amount.",
+      "name": "cve",
+      "new_price": null,
+      "new_version": "v3",
+      "old_absence_only": true,
+      "old_could_not_look": "No scanned CVE is in the pinned KEV feed; 109 scanned CVE(s) outside it are named absences carrying no amount.",
+      "old_price": null,
+      "old_tier": null,
+      "old_version": "v3",
+      "per_customer": null,
+      "perspective": "ludlow",
+      "pin_signature": {
+        "detail": "no signed tag cve/v3.x.y (or v3.x.y) exists on the feeds parent's checkout, which carries 3 tag(s) of its own",
+        "state": "untagged",
+        "tag": null
+      },
+      "priced_cve": null,
+      "proposed_tier": null,
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+      "source": "feeds",
+      "superseded": {
+        "detail": "the pinned v3 of cve carries no signed tag of its own (see pin_signature), and nothing signed is ahead of it either; it is a hole, not a current pin",
+        "state": "unpublished"
+      },
+      "total": null
+    },
+    {
+      "amount": 787227.8274739302,
+      "changed": false,
+      "currency": "GBP",
+      "hole": {
+        "amount": 787227.8274739302,
+        "currency": "GBP",
+        "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 3 tag(s) of its own",
+        "kind": "untagged-pin",
+        "name": "eol",
+        "perspective": "ludlow",
+        "priced_by": "feeds eol@v2: the exposure the pin prices, read off a feed no signed tag carries",
+        "source": "feeds",
+        "status": "recorded",
+        "version": "v2"
+      },
+      "holes": [],
+      "kind": "feed",
+      "lef": [
+        7.232876712328767,
+        18.082191780821915,
+        36.16438356164383
+      ],
+      "lef_basis": "eol_date=2024-02-21, as_of=2026-10-03, ramp=3.62x. Source: endoflife.date/istio. headline entry istio-1.18 of 4 (largest mode-product entry, mode lef x mode lm -- an ordinal proxy, not fair.py's PERT expectation; ticket 75 Q4); not priced by this line: kyverno-1.10, ubuntu-20.04, python-3.9.",
+      "name": "eol",
+      "new_price": 787227.8274739302,
+      "new_version": "v2",
+      "old_price": 787227.8274739302,
+      "old_tier": "isolated",
+      "old_version": "v2",
+      "per_customer": {
+        "amount": 0.017404223281613243,
+        "currency": "GBP"
+      },
+      "perspective": "ludlow",
+      "pin_signature": {
+        "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 3 tag(s) of its own",
+        "state": "untagged",
+        "tag": null
+      },
+      "proposed_as": "label",
+      "proposed_tier": "isolated",
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+      "source": "feeds",
+      "superseded": {
+        "detail": "the pinned v2 of eol carries no signed tag of its own (see pin_signature), and nothing signed is ahead of it either; it is a hole, not a current pin",
+        "state": "unpublished"
+      },
+      "total": null
+    },
+    {
+      "amount": null,
+      "changed": false,
+      "cost": {
+        "amount": 0.0,
+        "basis": "0 in cash at every rung: Actions minutes are free on a public repository and the local clock runs on the owner's own subscription (ticket 30 decision 15); booked in tcor, never read by the selection",
+        "currency": "GBP"
+      },
+      "could_not_look": "missing instrument: ludlow composes no `source: twin` line, so there is no residual at the loosest and at the selected pod rung to take the loss magnitude from (ticket 30 decision 12; the line arrives with eco-system ticket 144)",
+      "currency": "GBP",
+      "kind": "agent-cage",
+      "name": "twin-agent",
+      "old_amount": null,
+      "old_tier": null,
+      "per_customer": null,
+      "perspective": "ludlow",
+      "proposed_as": "evidence",
+      "proposed_tier": null,
+      "residual_basis": "platform-twin-agent-table@1.0.0",
+      "source": "platform",
+      "subject": "twin-agent",
+      "window": {
+        "assumes": [
+          "the truth run fires once a day as scheduled; the delay GitHub adds to a cron run (measured at up to ~5h on the estate's first firings) is not in the figure",
+          "the loss runs until detection, not until repair: a red gate is acted on the day it is read",
+          "one day is the schedule's whole interval, the upper bound on the wait for the next run; the mean wait is half of it"
+        ],
+        "days": 1.0,
+        "detects": "a push to main or a merge made by a scheduled identity (verify/schedules/lane.py, eco-system ticket 142a) and a served declaration looser than the strictest priced line (verify/tier-binding)",
+        "source": "the hub's .github/workflows/truth.yml `schedule: cron: '47 5 * * *'` (once a day), read 2026-09-26 at policy-as-versioned-flux/policy-as-versioned-flux origin/main 9c3b1f22"
+      }
+    },
+    {
+      "alternates": [],
+      "amount": 3026446375.2345514,
+      "as_of": "2026-10-03",
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "could_not_look": null,
+      "currency": "GBP",
+      "dropped_edges": [
+        "ico/feed:penalty-schema@v3"
+      ],
+      "kind": "switching",
+      "name": "penalty-schema",
+      "over_pin_life": 504407729.2057586,
+      "per_customer": {
+        "amount": 66.9094087202545,
+        "currency": "GBP"
+      },
+      "perspective": "ludlow",
+      "pin_life_months": 2,
+      "since": "2026-08-28",
+      "sized": true,
+      "source": "ico",
+      "unpriceable": [
+        {
+          "amount": 3026446375.2345514,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "penalty-schema",
+          "perspective": "ludlow",
+          "source": "ico"
+        },
+        {
+          "amount": 190707579.80930072,
+          "currency": "GBP",
+          "kind": "supersede",
+          "name": "penalty-schema",
+          "perspective": "ludlow",
+          "source": "ico"
+        }
+      ],
+      "version": "v3"
+    },
+    {
+      "alternates": [],
+      "amount": 1105457.6060590744,
+      "as_of": "2026-10-03",
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "could_not_look": null,
+      "currency": "GBP",
+      "dropped_edges": [
+        "feeds/feed:threat-register@v1",
+        "feeds/feed:cve@v3",
+        "feeds/feed:eol@v2"
+      ],
+      "kind": "switching",
+      "name": "threat-register",
+      "over_pin_life": 184242.93434317908,
+      "per_customer": {
+        "amount": 0.024439724223095913,
+        "currency": "GBP"
+      },
+      "perspective": "ludlow",
+      "pin_life_months": 2,
+      "since": "2026-08-28",
+      "sized": true,
+      "source": "feeds",
+      "unpriceable": [
+        {
+          "amount": 318229.7785850087,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "threat-register",
+          "perspective": "ludlow",
+          "source": "feeds"
+        },
+        {
+          "amount": 27899.597026630927,
+          "currency": "GBP",
+          "kind": "supersede",
+          "name": "threat-register",
+          "perspective": "ludlow",
+          "source": "feeds"
+        },
+        {
+          "amount": null,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "cve",
+          "perspective": "ludlow",
+          "source": "feeds"
+        },
+        {
+          "amount": 787227.8274739302,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "eol",
+          "perspective": "ludlow",
+          "source": "feeds"
+        }
+      ],
+      "version": "v1"
+    },
+    {
+      "alternates": [],
+      "amount": 1105457.6060590744,
+      "as_of": "2026-10-03",
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "could_not_look": null,
+      "currency": "GBP",
+      "dropped_edges": [
+        "feeds/feed:threat-register@v1",
+        "feeds/feed:cve@v3",
+        "feeds/feed:eol@v2"
+      ],
+      "kind": "switching",
+      "name": "cve",
+      "over_pin_life": 0.0,
+      "per_customer": {
+        "amount": 0.024439724223095913,
+        "currency": "GBP"
+      },
+      "perspective": "ludlow",
+      "pin_life_months": 0,
+      "since": "2026-10-03",
+      "sized": true,
+      "source": "feeds",
+      "unpriceable": [
+        {
+          "amount": 318229.7785850087,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "threat-register",
+          "perspective": "ludlow",
+          "source": "feeds"
+        },
+        {
+          "amount": 27899.597026630927,
+          "currency": "GBP",
+          "kind": "supersede",
+          "name": "threat-register",
+          "perspective": "ludlow",
+          "source": "feeds"
+        },
+        {
+          "amount": null,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "cve",
+          "perspective": "ludlow",
+          "source": "feeds"
+        },
+        {
+          "amount": 787227.8274739302,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "eol",
+          "perspective": "ludlow",
+          "source": "feeds"
+        }
+      ],
+      "version": "v3"
+    },
+    {
+      "alternates": [],
+      "amount": 1105457.6060590744,
+      "as_of": "2026-10-03",
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "could_not_look": null,
+      "currency": "GBP",
+      "dropped_edges": [
+        "feeds/feed:threat-register@v1",
+        "feeds/feed:cve@v3",
+        "feeds/feed:eol@v2"
+      ],
+      "kind": "switching",
+      "name": "eol",
+      "over_pin_life": 92121.46717158954,
+      "per_customer": {
+        "amount": 0.024439724223095913,
+        "currency": "GBP"
+      },
+      "perspective": "ludlow",
+      "pin_life_months": 1,
+      "since": "2026-09-08",
+      "sized": true,
+      "source": "feeds",
+      "unpriceable": [
+        {
+          "amount": 318229.7785850087,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "threat-register",
+          "perspective": "ludlow",
+          "source": "feeds"
+        },
+        {
+          "amount": 27899.597026630927,
+          "currency": "GBP",
+          "kind": "supersede",
+          "name": "threat-register",
+          "perspective": "ludlow",
+          "source": "feeds"
+        },
+        {
+          "amount": null,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "cve",
+          "perspective": "ludlow",
+          "source": "feeds"
+        },
+        {
+          "amount": 787227.8274739302,
+          "currency": "GBP",
+          "kind": "feed",
+          "name": "eol",
+          "perspective": "ludlow",
+          "source": "feeds"
+        }
+      ],
+      "version": "v2"
+    }
+  ],
+  "refusals": [],
+  "restatements": [],
+  "ungoverned": [],
+  "vendored": [
+    {
+      "converter": "penalty-schema/to_fair_scenario.py",
+      "converter_from": "ico",
+      "feed_path": "penalty-schema/v3/feed.json",
+      "files": {
+        "party.yaml": "5c07030a7a02883fdaf217e43fb5aefb423153f8e10817097c7a74094e3fff56",
+        "penalty-schema/to_fair_scenario.py": "4d313e86d2d139788b5e46d43d534f3ce64b6ec49b9da8f10dcc9ad8d7ca4d6f",
+        "penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda"
+      },
+      "invocation": [
+        "build",
+        "uk-gdpr",
+        "lower-tier",
+        "--turnover",
+        "147814767711.53"
+      ],
+      "kind": "feed",
+      "name": "penalty-schema",
+      "party": "ico",
+      "party_artefact": "party.yaml",
+      "path": "composed/feeds/ico/penalty-schema/v3",
+      "payload_version_key": "schema_version",
+      "published_at": "2026-08-28",
+      "publisher_observation": {
+        "name": "penalty-schema",
+        "newer": {
+          "published_at": "2026-09-09",
+          "since": "2026-09-10",
+          "since_tag": "v4.0.0",
+          "tag": "v4.0.0",
+          "tagged": "2026-09-10",
+          "version": "v4"
+        },
+        "party": "ico",
+        "pin_signature": {
+          "detail": "tag v3.0.0 on the ico checkout carries a signature block",
+          "state": "signed",
+          "tag": "v3.0.0"
+        },
+        "schema": 1,
+        "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e",
+        "superseded": {
+          "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut",
+          "state": "behind"
+        },
+        "version": "v3"
+      },
+      "scenario_sha256": "873807e119d1c58d21a7b94c97a361128118c03d607fd6fc568b69d49851e60c",
+      "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e",
+      "version": "v3"
+    },
+    {
+      "converter": "threat-register/to_fair_scenario.py",
+      "converter_from": "feeds",
+      "feed_path": "threat-register/v1/feed.json",
+      "files": {
+        "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+        "threat-register/to_fair_scenario.py": "5b58162dd42404c0afc0ad3d063aeb4cd71a7076baca7ed7f7875e781d509d41",
+        "threat-register/v1/feed.json": "50af335e60b247d2a202fa747fd3a2b80c485fc587896dc0ab4841f0e54a8b60"
+      },
+      "invocation": [
+        "threat",
+        "ludlow"
+      ],
+      "kind": "feed",
+      "name": "threat-register",
+      "party": "feeds",
+      "party_artefact": "party.yaml",
+      "path": "composed/feeds/feeds/threat-register/v1",
+      "payload_version_key": "feed_version",
+      "published_at": "2026-07-31",
+      "publisher_observation": {
+        "name": "threat-register",
+        "newer": {
+          "published_at": "2026-09-09",
+          "since": "2026-09-01",
+          "since_tag": "threat-register/v2.0.0",
+          "tag": "threat-register/v3.0.0",
+          "tagged": "2026-09-10",
+          "version": "v3"
+        },
+        "party": "feeds",
+        "pin_signature": {
+          "detail": "tag threat-register/v1.0.0 on the feeds checkout carries a signature block",
+          "state": "signed",
+          "tag": "threat-register/v1.0.0"
+        },
+        "schema": 1,
+        "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268",
+        "superseded": {
+          "detail": "tag threat-register/v3.0.0, signed 2026-09-10, publishes threat-register v3 ahead of the pinned v1; behind since 2026-09-01, the day threat-register/v2.0.0 was cut",
+          "state": "behind"
+        },
+        "version": "v1"
+      },
+      "scenario_sha256": "c7d81c0ce0abc18d6f5d2d3e8304289e1019da28073615baab4daacbb83356d6",
+      "sha": "50a0b330a730f4f9ee9520561b0c05c8be4c9268",
+      "version": "v1"
+    },
+    {
+      "converter": "cve/to_fair_scenario.py",
+      "converter_from": "platform",
+      "feed_path": "cve/v3/feed.json",
+      "files": {
+        "cve/to_fair_scenario.py": "b83f29a6778a53dec94c752f6101a80adeb788a4f1f1d20ac2584a5d6ff34b7b",
+        "cve/v3/feed.json": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+        "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823"
+      },
+      "invocation": [
+        "cve",
+        "--inventory-json",
+        "{\"images\":[{\"database_date\":\"2026-10-03T07:01:46.027466673Z\",\"digest\":\"sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2\",\"image\":\"ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2\",\"scanner_version\":\"0.69.3\",\"vulnerabilities\":[{\"fixed_version\":\"\",\"id\":\"CVE-2005-2541\",\"installed_version\":\"1.35+dfsg-3.1\",\"package\":\"tar\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2007-5686\",\"installed_version\":\"1:4.17.4-2\",\"package\":\"login.defs\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2007-5686\",\"installed_version\":\"1:4.17.4-2\",\"package\":\"passwd\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2010-4756\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2010-4756\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2011-3374\",\"installed_version\":\"3.0.3\",\"package\":\"apt\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2011-3374\",\"installed_version\":\"3.0.3\",\"package\":\"libapt-pkg7.0\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2011-4116\",\"installed_version\":\"5.40.1-6+deb13u1\",\"package\":\"perl-base\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2013-4392\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libsystemd0\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2013-4392\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libudev1\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2017-18018\",\"installed_version\":\"9.7-3\",\"package\":\"coreutils\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2018-20796\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2018-20796\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-1010022\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-1010022\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-1010023\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-1010023\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-1010024\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-1010024\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-1010025\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-1010025\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-9192\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2019-9192\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2021-45346\",\"installed_version\":\"3.46.1-7+deb13u2\",\"package\":\"libsqlite3-0\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2022-0563\",\"installed_version\":\"1:2.41.5-0+deb13u1\",\"package\":\"bsdutils\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2022-0563\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libblkid1\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2022-0563\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"liblastlog2-2\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2022-0563\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libmount1\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2022-0563\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libsmartcols1\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2022-0563\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libuuid1\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2022-0563\",\"installed_version\":\"1:4.16.0-2+really2.41.5-0+deb13u1\",\"package\":\"login\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2022-0563\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"mount\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2022-0563\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"util-linux\",\"severity\":\"LOW\"},{\"fixed_version\":\"2.2.3\",\"id\":\"CVE-2023-23934\",\"installed_version\":\"1.0.1\",\"package\":\"Werkzeug\",\"severity\":\"LOW\"},{\"fixed_version\":\"2.2.3\",\"id\":\"CVE-2023-25577\",\"installed_version\":\"1.0.1\",\"package\":\"Werkzeug\",\"severity\":\"HIGH\"},{\"fixed_version\":\"2.3.2, 2.2.5\",\"id\":\"CVE-2023-30861\",\"installed_version\":\"1.1.4\",\"package\":\"Flask\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2023-31437\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libsystemd0\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2023-31437\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libudev1\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2023-31438\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libsystemd0\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2023-31438\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libudev1\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2023-31439\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libsystemd0\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2023-31439\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libudev1\",\"severity\":\"LOW\"},{\"fixed_version\":\"3.1.3\",\"id\":\"CVE-2024-22195\",\"installed_version\":\"2.11.3\",\"package\":\"Jinja2\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.1.4\",\"id\":\"CVE-2024-34064\",\"installed_version\":\"2.11.3\",\"package\":\"Jinja2\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.0.3\",\"id\":\"CVE-2024-34069\",\"installed_version\":\"1.0.1\",\"package\":\"Werkzeug\",\"severity\":\"HIGH\"},{\"fixed_version\":\"3.0.6\",\"id\":\"CVE-2024-49766\",\"installed_version\":\"1.0.1\",\"package\":\"Werkzeug\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.1.5\",\"id\":\"CVE-2024-56326\",\"installed_version\":\"2.11.3\",\"package\":\"Jinja2\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2024-56433\",\"installed_version\":\"1:4.17.4-2\",\"package\":\"login.defs\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2024-56433\",\"installed_version\":\"1:4.17.4-2\",\"package\":\"passwd\",\"severity\":\"LOW\"},{\"fixed_version\":\"3.1.6\",\"id\":\"CVE-2025-27516\",\"installed_version\":\"2.11.3\",\"package\":\"Jinja2\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-5278\",\"installed_version\":\"9.7-3\",\"package\":\"coreutils\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-6141\",\"installed_version\":\"6.5+20250216-2\",\"package\":\"libncursesw6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-6141\",\"installed_version\":\"6.5+20250216-2\",\"package\":\"libtinfo6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-6141\",\"installed_version\":\"6.5+20250216-2\",\"package\":\"ncurses-base\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-6141\",\"installed_version\":\"6.5+20250216-2\",\"package\":\"ncurses-bin\",\"severity\":\"LOW\"},{\"fixed_version\":\"3.1.4\",\"id\":\"CVE-2025-66221\",\"installed_version\":\"1.0.1\",\"package\":\"Werkzeug\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-69720\",\"installed_version\":\"6.5+20250216-2\",\"package\":\"libncursesw6\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-69720\",\"installed_version\":\"6.5+20250216-2\",\"package\":\"libtinfo6\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-69720\",\"installed_version\":\"6.5+20250216-2\",\"package\":\"ncurses-base\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-69720\",\"installed_version\":\"6.5+20250216-2\",\"package\":\"ncurses-bin\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2025-70873\",\"installed_version\":\"3.46.1-7+deb13u2\",\"package\":\"libsqlite3-0\",\"severity\":\"LOW\"},{\"fixed_version\":\"25.3\",\"id\":\"CVE-2025-8869\",\"installed_version\":\"24.0\",\"package\":\"pip\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-102010\",\"installed_version\":\"14.2.0-19\",\"package\":\"gcc-14-base\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-102010\",\"installed_version\":\"14.2.0-19\",\"package\":\"libgcc-s1\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-102010\",\"installed_version\":\"14.2.0-19\",\"package\":\"libstdc++6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-102473\",\"installed_version\":\"0.5.12-12\",\"package\":\"dash\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-102474\",\"installed_version\":\"0.5.12-12\",\"package\":\"dash\",\"severity\":\"LOW\"},{\"fixed_version\":\"10.46-1~deb13u3\",\"id\":\"CVE-2026-103111\",\"installed_version\":\"10.46-1~deb13u2\",\"package\":\"libpcre2-8-0\",\"severity\":\"HIGH\"},{\"fixed_version\":\"26.2.0\",\"id\":\"CVE-2026-13346\",\"installed_version\":\"24.0\",\"package\":\"pip\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-15059\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libsystemd0\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-15059\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libudev1\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-15534\",\"installed_version\":\"5.40.1-6+deb13u1\",\"package\":\"perl-base\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-16742\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libsystemd0\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-16742\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libudev1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"26.0\",\"id\":\"CVE-2026-1703\",\"installed_version\":\"24.0\",\"package\":\"pip\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-18374\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-18374\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-18477\",\"installed_version\":\"1.35+dfsg-3.1\",\"package\":\"tar\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-18508\",\"installed_version\":\"1.35+dfsg-3.1\",\"package\":\"tar\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-19487\",\"installed_version\":\"5.40.1-6+deb13u1\",\"package\":\"perl-base\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-19499\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-19499\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-19542\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-19542\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.1.5\",\"id\":\"CVE-2026-21860\",\"installed_version\":\"1.0.1\",\"package\":\"Werkzeug\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"6.1.0\",\"id\":\"CVE-2026-23949\",\"installed_version\":\"5.3.0\",\"package\":\"jaraco.context\",\"severity\":\"HIGH\"},{\"fixed_version\":\"0.46.2\",\"id\":\"CVE-2026-24049\",\"installed_version\":\"0.45.1\",\"package\":\"wheel\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-27171\",\"installed_version\":\"1:1.3.dfsg+really1.3.1-1+b1\",\"package\":\"zlib1g\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.1.6\",\"id\":\"CVE-2026-27199\",\"installed_version\":\"1.0.1\",\"package\":\"Werkzeug\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.1.3\",\"id\":\"CVE-2026-27205\",\"installed_version\":\"1.1.4\",\"package\":\"Flask\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-3184\",\"installed_version\":\"1:2.41.5-0+deb13u1\",\"package\":\"bsdutils\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-3184\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libblkid1\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-3184\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"liblastlog2-2\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-3184\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libmount1\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-3184\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libsmartcols1\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-3184\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libuuid1\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-3184\",\"installed_version\":\"1:4.16.0-2+really2.41.5-0+deb13u1\",\"package\":\"login\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-3184\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"mount\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-3184\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"util-linux\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"26.1\",\"id\":\"CVE-2026-3219\",\"installed_version\":\"24.0\",\"package\":\"pip\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-35189\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"LOW\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-35189\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"LOW\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-35189\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"LOW\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-35191\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"LOW\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-35191\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"LOW\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-35191\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-40228\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libsystemd0\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-40228\",\"installed_version\":\"257.13-1~deb13u1\",\"package\":\"libudev1\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-42250\",\"installed_version\":\"1.0.8-6\",\"package\":\"libbz2-1.0\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-42772\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-42772\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-42772\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-50812\",\"installed_version\":\"3.46.1-7+deb13u2\",\"package\":\"libsqlite3-0\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-50813\",\"installed_version\":\"3.46.1-7+deb13u2\",\"package\":\"libsqlite3-0\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-53910\",\"installed_version\":\"1:3.10-4\",\"package\":\"diffutils\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-5435\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-5435\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-54369\",\"installed_version\":\"2.3.2-2+b1\",\"package\":\"libacl1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-54370\",\"installed_version\":\"2.3.2-2+b1\",\"package\":\"libacl1\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-54371\",\"installed_version\":\"1:2.5.2-3\",\"package\":\"libattr1\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-54411\",\"installed_version\":\"1.7.0-5\",\"package\":\"libpam-modules\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-54411\",\"installed_version\":\"1.7.0-5\",\"package\":\"libpam-modules-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-54411\",\"installed_version\":\"1.7.0-5\",\"package\":\"libpam-runtime\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-54411\",\"installed_version\":\"1.7.0-5\",\"package\":\"libpam0g\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-54872\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-54872\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-54872\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-54873\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-54873\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-54873\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-54875\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-54875\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-54875\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-56391\",\"installed_version\":\"9.7-3\",\"package\":\"coreutils\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-56392\",\"installed_version\":\"9.7-3\",\"package\":\"coreutils\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-5704\",\"installed_version\":\"1.35+dfsg-3.1\",\"package\":\"tar\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"83.0.0\",\"id\":\"CVE-2026-59890\",\"installed_version\":\"79.0.1\",\"package\":\"setuptools\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-6238\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-6238\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"26.1\",\"id\":\"CVE-2026-6357\",\"installed_version\":\"24.0\",\"package\":\"pip\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-6368\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-6368\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-6791\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-6791\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-72897\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-72897\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-72897\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-75804\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"HIGH\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-75804\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"HIGH\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-75804\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"HIGH\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-75805\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-75805\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-75805\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-75806\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-75806\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-75806\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-76642\",\"installed_version\":\"1:2.41.5-0+deb13u1\",\"package\":\"bsdutils\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-76642\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libblkid1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-76642\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"liblastlog2-2\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-76642\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libmount1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-76642\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libsmartcols1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-76642\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libuuid1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-76642\",\"installed_version\":\"1:4.16.0-2+really2.41.5-0+deb13u1\",\"package\":\"login\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-76642\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"mount\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-76642\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"util-linux\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-77117\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-77117\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-77696\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-77696\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-77696\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78408\",\"installed_version\":\"1:2.41.5-0+deb13u1\",\"package\":\"bsdutils\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78408\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libblkid1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78408\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"liblastlog2-2\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78408\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libmount1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78408\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libsmartcols1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78408\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libuuid1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78408\",\"installed_version\":\"1:4.16.0-2+really2.41.5-0+deb13u1\",\"package\":\"login\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78408\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"mount\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78408\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"util-linux\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78409\",\"installed_version\":\"1:2.41.5-0+deb13u1\",\"package\":\"bsdutils\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78409\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libblkid1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78409\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"liblastlog2-2\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78409\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libmount1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78409\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libsmartcols1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78409\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libuuid1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78409\",\"installed_version\":\"1:4.16.0-2+really2.41.5-0+deb13u1\",\"package\":\"login\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78409\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"mount\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78409\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"util-linux\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78410\",\"installed_version\":\"1:2.41.5-0+deb13u1\",\"package\":\"bsdutils\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78410\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libblkid1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78410\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"liblastlog2-2\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78410\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libmount1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78410\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libsmartcols1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78410\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"libuuid1\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78410\",\"installed_version\":\"1:4.16.0-2+really2.41.5-0+deb13u1\",\"package\":\"login\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78410\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"mount\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-78410\",\"installed_version\":\"2.41.5-0+deb13u1\",\"package\":\"util-linux\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-80489\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-80489\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-82560\",\"installed_version\":\"5.40.1-6+deb13u1\",\"package\":\"perl-base\",\"severity\":\"UNKNOWN\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-84782\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"HIGH\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-84782\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"HIGH\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-84782\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"HIGH\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-84784\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"libssl3t64\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-84784\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"3.5.7-1~deb13u3\",\"id\":\"CVE-2026-84784\",\"installed_version\":\"3.5.7-1~deb13u2\",\"package\":\"openssl-provider-legacy\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-85091\",\"installed_version\":\"1:1.3.dfsg+really1.3.1-1+b1\",\"package\":\"zlib1g\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"26.1.2\",\"id\":\"CVE-2026-8643\",\"installed_version\":\"24.0\",\"package\":\"pip\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-8674\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-8674\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-86805\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-86805\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-89092\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-89092\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-9538\",\"installed_version\":\"5.40.1-6+deb13u1\",\"package\":\"perl-base\",\"severity\":\"HIGH\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-95619\",\"installed_version\":\"14.2.0-19\",\"package\":\"gcc-14-base\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-95619\",\"installed_version\":\"14.2.0-19\",\"package\":\"libgcc-s1\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-95619\",\"installed_version\":\"14.2.0-19\",\"package\":\"libstdc++6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-95818\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-95818\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-97399\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc-bin\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"CVE-2026-97399\",\"installed_version\":\"2.41-12+deb13u4\",\"package\":\"libc6\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"TEMP-0290435-0B57B5\",\"installed_version\":\"1.35+dfsg-3.1\",\"package\":\"tar\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"TEMP-0517018-A83CE6\",\"installed_version\":\"3.14-4\",\"package\":\"sysvinit-utils\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"TEMP-0628843-DBAD28\",\"installed_version\":\"1:4.17.4-2\",\"package\":\"login.defs\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"TEMP-0628843-DBAD28\",\"installed_version\":\"1:4.17.4-2\",\"package\":\"passwd\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"TEMP-0841856-B18BAF\",\"installed_version\":\"5.2.37-2+b10\",\"package\":\"bash\",\"severity\":\"LOW\"},{\"fixed_version\":\"\",\"id\":\"TEMP-1147318-639065\",\"installed_version\":\"5.8.1-1+deb13u1\",\"package\":\"liblzma5\",\"severity\":\"UNKNOWN\"}]}],\"schema_version\":\"1.0.0\"}"
+      ],
+      "kind": "feed",
+      "name": "cve",
+      "party": "feeds",
+      "party_artefact": "party.yaml",
+      "path": "composed/feeds/feeds/cve/v3",
+      "payload_version_key": "feed_version",
+      "published_at": "2026-10-03",
+      "publisher_observation": {
+        "name": "cve",
+        "newer": null,
+        "party": "feeds",
+        "pin_signature": {
+          "detail": "no signed tag cve/v3.x.y (or v3.x.y) exists on the feeds parent's checkout, which carries 3 tag(s) of its own",
+          "state": "untagged",
+          "tag": null
+        },
+        "schema": 1,
+        "sha": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+        "superseded": {
+          "detail": "no signed tag of the form cve/vN.x.y with N > 3 on the feeds checkout, so the pinned v3 is the newest published major",
+          "state": "current"
+        },
+        "version": "v3"
+      },
+      "scenario_sha256": "8ce7f06ac0f7b52b844d4cf941fc3eec287f1487a274e41d2d22d74ae4b70691",
+      "sha": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+      "version": "v3"
+    },
+    {
+      "converter": "eol/to_fair_scenario.py",
+      "converter_from": "platform",
+      "feed_path": "eol/v2/feed.json",
+      "files": {
+        "eol/to_fair_scenario.py": "b83f29a6778a53dec94c752f6101a80adeb788a4f1f1d20ac2584a5d6ff34b7b",
+        "eol/v2/feed.json": "401f564c7b370833888c74d612afffee80f947d7522e63b2be66d1a41b6f533b",
+        "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823"
+      },
+      "invocation": [
+        "eol",
+        "--as-of",
+        "2026-10-03"
+      ],
+      "kind": "feed",
+      "name": "eol",
+      "party": "feeds",
+      "party_artefact": "party.yaml",
+      "path": "composed/feeds/feeds/eol/v2",
+      "payload_version_key": "feed_version",
+      "published_at": "2026-07-31",
+      "publisher_observation": {
+        "name": "eol",
+        "newer": null,
+        "party": "feeds",
+        "pin_signature": {
+          "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 3 tag(s) of its own",
+          "state": "untagged",
+          "tag": null
+        },
+        "schema": 1,
+        "sha": "330fbf06872c2ec2c8637863b624cd902d5534ca",
+        "superseded": {
+          "detail": "no signed tag of the form eol/vN.x.y with N > 2 on the feeds checkout, so the pinned v2 is the newest published major",
+          "state": "current"
+        },
+        "version": "v2"
+      },
+      "scenario_sha256": "5813362c76a7a831ff726375c5ccf6ef75accc89ae9f0dff26e771a994454318",
+      "sha": "330fbf06872c2ec2c8637863b624cd902d5534ca",
+      "version": "v2"
+    }
+  ]
+}

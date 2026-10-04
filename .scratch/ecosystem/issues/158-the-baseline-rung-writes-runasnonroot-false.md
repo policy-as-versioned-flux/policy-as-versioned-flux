@@ -1,7 +1,7 @@
 # 158 — The baseline rung writes runAsNonRoot false
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -23,3 +23,9 @@ Graduated 2026-09-25 from ticket 152, Q11. Found by the offline proof in [resear
 `require-nonroot-5-0-0` reads only the pod-level field, so it does not see this. Definition of done: the new body is served by each adopter and a check in `talk/verify-all.sh` grades the corpus entry. A new signed policy tag needs the owner's authorisation.
 
 This does not touch ticket 161. The cage does not mutate the reference workload.
+
+## Resume implementation, 2026-10-03
+
+The uncut security candidate preserves a pod-level runAsNonRoot declaration when the container does not override it. The original fixture was red on that case and the new fixture passes all 18 assertions on 1.18.2. Frozen 5.0.0 is unchanged. The measured generated corpus computes a major security bump; per-adopter exact acceptance records are prepared under the owner’s delegated instruction. Publication and adoption remain pending.
+
+The owner delegated the implementing decisions on 2026-10-03: "you tell me, you control them all, you don't need me to answer". This is recorded as delegated, not as an invented institution signature.

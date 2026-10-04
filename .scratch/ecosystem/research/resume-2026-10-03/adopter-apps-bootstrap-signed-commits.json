@@ -1,0 +1,20 @@
+{
+  "driftwood": {
+    "directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/driftwood-estate/driftwood",
+    "commit_and_signature": "a14c4a9305c05a46b349389feab9932035cb1aad G",
+    "status": "ordinary source commit created; compiler authentication and publication pending",
+    "prospective_release": "v3.0.1"
+  },
+  "tuppence": {
+    "directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/tuppence-estate/tuppence",
+    "commit_and_signature": "ff5eef841ce3c1c9fa819c3612f0b9891da36814 G",
+    "status": "ordinary source commit created; compiler authentication and publication pending",
+    "prospective_release": "v3.0.1"
+  },
+  "ludlow": {
+    "directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/ludlow-estate/ludlow",
+    "commit_and_signature": "df322153d3a327725d9b55f020713541b2ec5a3a G",
+    "status": "ordinary source commit created; compiler authentication and publication pending",
+    "prospective_release": "v3.0.1"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "driftwood": {
+    "apps_images": [
+      "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+      "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+      "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+    ],
+    "inventory_complete_set": true,
+    "inventory_sha256": "3673e27a8447f33a48430ec6b586ffd7732a352363b7cc533c5df23af428ecca",
+    "peeled_commit": "17302ecd20041df61a52428e67246c330294d2a6",
+    "tag_object": "4cdf9152d2af61d9e476f5e0f487d85a2808f42f",
+    "tag_type": "tag"
+  },
+  "ludlow": {
+    "apps_images": [
+      "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+    ],
+    "inventory_complete_set": true,
+    "inventory_sha256": "7095e7debc03b48adf87a668b267f9898c9586432bb0259d97251a475aee7d35",
+    "peeled_commit": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+    "tag_object": "2cc62f42b297f1f7ed65babc381a6dad561f3240",
+    "tag_type": "tag"
+  },
+  "tuppence": {
+    "apps_images": [
+      "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5"
+    ],
+    "inventory_complete_set": true,
+    "inventory_sha256": "b100844ba2f1b5e776eec6415e677704045fa01d3d0f860f74adacf4b472df18",
+    "peeled_commit": "d8dead25e0e5e275172640b1a637562e45edb15d",
+    "tag_object": "bc6ee99a1cda20e9fe0365feb25c3086aad7f5a5",
+    "tag_type": "tag"
+  }
+}

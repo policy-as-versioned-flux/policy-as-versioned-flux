@@ -1,0 +1,249 @@
+{
+  "active_sessions": [],
+  "candidate_composition": {
+    "driftwood": "composed",
+    "ludlow": "composed",
+    "tuppence": "composed"
+  },
+  "compiler_alias_review": "independent standards review and three alias regressions passed",
+  "foundation_adoption": "WAIT: real policy7/tools5/feed3 publications and exact authenticated pin moves remain required",
+  "offline_probes": {
+    "driftwood": 0,
+    "ludlow": 0,
+    "tuppence": 0
+  },
+  "patches": {
+    "driftwood": {
+      "applies_to_local_base": "529e159397d3e64f94b0270cc7de69c235580961",
+      "apply_check": true,
+      "full_payload_paths": [
+        "gitops/flux-system/gotk-sync.yaml",
+        "inventory/images.json",
+        "inventory/PROVENANCE.json"
+      ],
+      "incremental_pin_delta": ".scratch/ecosystem/research/resume-2026-10-03/driftwood-stage2-apps-pin-delta.patch",
+      "inventory_images_unchanged": true,
+      "own_changes": [
+        "gitops/flux-system/gotk-sync.yaml",
+        "inventory/PROVENANCE.json"
+      ],
+      "patch": ".scratch/ecosystem/research/resume-2026-10-03/driftwood-stage2-apps-inventory.patch",
+      "patch_sha256": "599659a626ef1bfd755141db32094954ab4302b99b789900e82b1e2b02759098"
+    },
+    "ludlow": {
+      "applies_to_local_base": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+      "apply_check": true,
+      "full_payload_paths": [
+        "gitops/flux-system/gotk-sync.yaml",
+        "inventory/images.json",
+        "inventory/PROVENANCE.json"
+      ],
+      "incremental_pin_delta": ".scratch/ecosystem/research/resume-2026-10-03/ludlow-stage2-apps-pin-delta.patch",
+      "inventory_images_unchanged": true,
+      "own_changes": [
+        "gitops/flux-system/gotk-sync.yaml",
+        "inventory/PROVENANCE.json"
+      ],
+      "patch": ".scratch/ecosystem/research/resume-2026-10-03/ludlow-stage2-apps-inventory.patch",
+      "patch_sha256": "d1d23499e26e54b07b73b5d8f1db82eda2468695a9f06e44e1b976de12120f1c"
+    },
+    "tuppence": {
+      "applies_to_local_base": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+      "apply_check": true,
+      "full_payload_paths": [
+        "gitops/flux-system/gotk-sync.yaml",
+        "inventory/images.json",
+        "inventory/PROVENANCE.json"
+      ],
+      "incremental_pin_delta": ".scratch/ecosystem/research/resume-2026-10-03/tuppence-stage2-apps-pin-delta.patch",
+      "inventory_images_unchanged": true,
+      "own_changes": [
+        "gitops/flux-system/gotk-sync.yaml",
+        "inventory/PROVENANCE.json"
+      ],
+      "patch": ".scratch/ecosystem/research/resume-2026-10-03/tuppence-stage2-apps-inventory.patch",
+      "patch_sha256": "e4cfe86a8d50d91a92668896b7d80fb0734592713b3e20a6c9f909cdee46f487"
+    }
+  },
+  "prerequisites": [
+    "A real independently authenticated platform tools 5 release and exact peeled commit. Existing compiler pins remain v4.0.0.",
+    "A real signed policy 7 implementation publication and its exact supported array. Existing policy parent pins remain v4.0.0.",
+    "The real signed individual feeds releases, including cve/v3, with exact tag and commit. A threat-register tag does not establish a cve tag.",
+    "Composition and byte replay with those authenticated, immutable trees before the reviewed stage2 merge and normal cut. Only afterward may the composed source move to the actual resulting signed release commit.",
+    "Cloud activation needs the qualifying modern e2e step 4 signed-clock PASS, a signed cloud package, actual vendor schemas, and signed tuppence composed delivery paths.",
+    "The engine upgrade needs a scheduled 1.18.2 PolicyReport baseline followed by the scheduled 1.19.1 comparison. The current declared engine remains 1.18.2."
+  ],
+  "primary_scans": {
+    "adopters": {
+      "driftwood": {
+        "images": [
+          {
+            "database_date": "2026-10-03T07:01:46.027466673Z",
+            "existing_row_sha256": "c2c81147c77903a6e9ca520d2ea82578d88a1a6d0e0f2c9b388d220ed56c0a36",
+            "existing_vulnerability_rows": 0,
+            "normalized_matches_existing": true,
+            "observed_repo_digests": [
+              "ghcr.io/policy-as-versioned-driftwood/api@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3"
+            ],
+            "primary_trimmed_row_sha256": "c2c81147c77903a6e9ca520d2ea82578d88a1a6d0e0f2c9b388d220ed56c0a36",
+            "primary_vulnerability_rows": 0,
+            "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/api.json",
+            "raw_report_sha256": "6c754e86c5c836aecb298ca1552da48117264fd2b7f2d375631204c8d411da2e",
+            "reported_artifact": "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+            "requested_image": "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+            "scanner_version": "0.69.3"
+          },
+          {
+            "database_date": "2026-10-03T07:01:46.027466673Z",
+            "existing_row_sha256": "eabb22338328b029efd152378b0e79337b3d0c808eec56edfee8d28669606576",
+            "existing_vulnerability_rows": 212,
+            "normalized_matches_existing": true,
+            "observed_repo_digests": [
+              "ghcr.io/policy-as-versioned-driftwood/storefront@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6"
+            ],
+            "primary_trimmed_row_sha256": "eabb22338328b029efd152378b0e79337b3d0c808eec56edfee8d28669606576",
+            "primary_vulnerability_rows": 212,
+            "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/storefront.json",
+            "raw_report_sha256": "040ee55b4b031ba4939c1c9ce14bc65b7aa9c7fcebf08db0c0dce3283cf6f788",
+            "reported_artifact": "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+            "requested_image": "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+            "scanner_version": "0.69.3"
+          },
+          {
+            "database_date": "2026-10-03T07:01:46.027466673Z",
+            "existing_row_sha256": "8129272c7d3c8b857ad4dfacd1196dc996041ca976bb9d8f3fa24cf9608dbde2",
+            "existing_vulnerability_rows": 395,
+            "normalized_matches_existing": true,
+            "observed_repo_digests": [
+              "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+            ],
+            "primary_trimmed_row_sha256": "8129272c7d3c8b857ad4dfacd1196dc996041ca976bb9d8f3fa24cf9608dbde2",
+            "primary_vulnerability_rows": 395,
+            "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/nginx.json",
+            "raw_report_sha256": "649bd0f4bde00c38aa1b48e6168aa2cd6fab8a73f250f1c095b3fd3823f428f0",
+            "reported_artifact": "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2",
+            "requested_image": "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2",
+            "scanner_version": "0.69.3"
+          }
+        ],
+        "inventory_rows_unchanged": true,
+        "whole_tagged_graph_matches_inventory": true
+      },
+      "ludlow": {
+        "images": [
+          {
+            "database_date": "2026-10-03T07:01:46.027466673Z",
+            "existing_row_sha256": "f6b1f52d143584a6df8aeb1f046d3114648a604129f09a0b1f76ef72a73f333d",
+            "existing_vulnerability_rows": 228,
+            "normalized_matches_existing": true,
+            "observed_repo_digests": [
+              "ghcr.io/policy-as-versioned-ludlow/reports@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+            ],
+            "primary_trimmed_row_sha256": "f6b1f52d143584a6df8aeb1f046d3114648a604129f09a0b1f76ef72a73f333d",
+            "primary_vulnerability_rows": 228,
+            "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/reports.json",
+            "raw_report_sha256": "817d7fbb2673d4bb38721d4e8be7d556e50927ed00d17b2e9bfa986920cdede2",
+            "reported_artifact": "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2",
+            "requested_image": "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2",
+            "scanner_version": "0.69.3"
+          }
+        ],
+        "inventory_rows_unchanged": true,
+        "whole_tagged_graph_matches_inventory": true
+      },
+      "tuppence": {
+        "images": [
+          {
+            "database_date": "2026-10-03T07:01:46.027466673Z",
+            "existing_row_sha256": "54a860ef5fae28ba89eb71e2e23558a79af82f9e5a5e39b57374fc8b35a5f0b0",
+            "existing_vulnerability_rows": 9,
+            "normalized_matches_existing": true,
+            "observed_repo_digests": [
+              "ghcr.io/policy-as-versioned-tuppence/ledger@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5"
+            ],
+            "primary_trimmed_row_sha256": "54a860ef5fae28ba89eb71e2e23558a79af82f9e5a5e39b57374fc8b35a5f0b0",
+            "primary_vulnerability_rows": 9,
+            "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/ledger.json",
+            "raw_report_sha256": "e34bb1e33c0676a9599d69921e7b4bbb890660d9e5f1e9f864e0ef1e0f790190",
+            "reported_artifact": "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5",
+            "requested_image": "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5",
+            "scanner_version": "0.69.3"
+          }
+        ],
+        "inventory_rows_unchanged": true,
+        "whole_tagged_graph_matches_inventory": true
+      }
+    },
+    "cached_database_unchanged": true,
+    "captured_at": "2026-10-03T19:23:16.006536+00:00",
+    "scan_options": [
+      "image",
+      "--timeout",
+      "10m",
+      "--scanners",
+      "vuln",
+      "--format",
+      "json",
+      "--quiet",
+      "--skip-db-update",
+      "--skip-java-db-update"
+    ],
+    "scanner": {
+      "archive_checksum_matches": true,
+      "archive_sha256": "a2f2179afd4f8bb265ca3c7aefb56a666bc4a9a411663bc0f22c3549fbc643a5",
+      "executable": "/private/tmp/pavc-trivy-0.69.3/trivy",
+      "executable_sha256": "bef08bfe2644873257d75585dd62e1409eb5c53403075c4bc83d54279dffd812",
+      "matching_checksum_line": [
+        "a2f2179afd4f8bb265ca3c7aefb56a666bc4a9a411663bc0f22c3549fbc643a5  trivy_0.69.3_macOS-ARM64.tar.gz"
+      ],
+      "version": {
+        "JavaDB": {
+          "DownloadedAt": "2026-10-03T14:34:28.219965Z",
+          "NextUpdate": "2026-10-06T01:07:11.83014273Z",
+          "UpdatedAt": "2026-10-03T01:07:11.830142851Z",
+          "Version": 1
+        },
+        "Version": "0.69.3",
+        "VulnerabilityDB": {
+          "DownloadedAt": "2026-10-03T14:32:53.331883Z",
+          "NextUpdate": "2026-10-04T07:01:46.027466402Z",
+          "UpdatedAt": "2026-10-03T07:01:46.027466673Z",
+          "Version": 2
+        }
+      }
+    }
+  },
+  "protected_sources_final_check": true,
+  "published": false,
+  "relocated_byte_replay": {
+    "driftwood": true,
+    "ludlow": true,
+    "tuppence": true
+  },
+  "source": {
+    "driftwood": {
+      "apps_commit": "17302ecd20041df61a52428e67246c330294d2a6",
+      "apps_tag": "v3.0.1",
+      "inventory_bytes_unchanged": true,
+      "new_primary_provenance": "inventory/PROVENANCE.json",
+      "protected_source_hashes_unchanged": true
+    },
+    "ludlow": {
+      "apps_commit": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+      "apps_tag": "v3.0.1",
+      "inventory_bytes_unchanged": true,
+      "new_primary_provenance": "inventory/PROVENANCE.json",
+      "protected_source_hashes_unchanged": true
+    },
+    "tuppence": {
+      "apps_commit": "d8dead25e0e5e275172640b1a637562e45edb15d",
+      "apps_tag": "v3.0.1",
+      "inventory_bytes_unchanged": true,
+      "new_primary_provenance": "inventory/PROVENANCE.json",
+      "protected_source_hashes_unchanged": true
+    }
+  },
+  "source_provenance_review": "Measured source, tag-object, scanner, digest and hash checks passed; independent provenance review is recorded separately by the standards owner.",
+  "stage": "preparation_complete",
+  "updated_at": "2026-10-03T19:56:27.586529+00:00"
+}

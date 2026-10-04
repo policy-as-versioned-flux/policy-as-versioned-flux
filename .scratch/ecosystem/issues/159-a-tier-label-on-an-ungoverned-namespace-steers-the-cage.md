@@ -1,7 +1,7 @@
 # 159 — A tier label on an ungoverned namespace steers the cage
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -20,3 +20,19 @@ Ticket 152's review recommended (a). Option (a) keeps "a tier is declared on the
 Graduated 2026-09-25 from ticket 152, Q11. Found by the offline proof in [research/ticket-152-fact-7-reference/](../research/ticket-152-fact-7-reference/README.md): candidates RA (governed, tier `baseline`) and RC (tier `baseline`, not governed) render identical pods.
 
 A Namespace created at run time is not checked against the signed manifests at admission. That is the same gap, seen from the other side. Definition of done: a check in `talk/verify-all.sh` grades the chosen rule on the served bodies. A new signed policy tag needs the owner's authorisation.
+
+## Implementation prepared, 2026-10-03
+
+**Delegated decision under ADR-0025: (a).** A claiming pod may read a tier only from a
+Namespace carrying `policy-as-versioned.dev/governed: "true"`. A tier label alone falls to
+`isolated`. This preserves the signed governed Namespace as the tier declaration and tightens
+the previously loose case. No doctrine change was chosen.
+
+The public cage-tier fixture observed the old body fail the ungoverned-baseline case, then
+observed the corrected body pass. The uncut6.0.0 candidate carries this and ticket158's pod-level
+non-root fallback; the uncut6.0.1 candidate carries their same behavior with ticket149's engine
+compatibility changes. Full pairwise-spine comparison computesmajor for5.0.0 ->6.0.0.
+The current signed5.0.0 body and adopter artefacts remain unchanged. Signed release, owner major
+acceptance, adoption and the served-body truth check remain outstanding.
+
+Evidence and durable platform diff: [engine report](../patches/resume-2026-10-03/engine-report.md).

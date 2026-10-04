@@ -258,20 +258,15 @@ def test_operations_mode_refuses_even_the_other_hand_merge(
     }) is not None
 
 
-@pytest.mark.parametrize("where", ["env", "file"])
-def test_development_is_still_the_one_word_escape_hatch(
-    where: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+def test_environment_cannot_loosen_the_checked_in_mode(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    """The 2026-08-25 instruction's hatch is untouched: one word, either place, and the guard is
-    off. Asserted so that "we flipped the default" never quietly becomes "we removed the mode"."""
-    monkeypatch.delenv("TWIN_ENACT_MODE", raising=False)
-    if where == "env":
-        monkeypatch.setenv("TWIN_ENACT_MODE", "development")
-    else:
-        (tmp_path / "ENACT_MODE").write_text("development\n", encoding="utf-8")
-        monkeypatch.setattr(enact_guard, "ENACT_MODE_FILE", tmp_path / "ENACT_MODE")
-    assert enact_guard.enact_mode() == "development"
-    assert enact_guard.decide("Bash", {"command": "gh pr merge 42 --squash"}) is None
+    """Ticket 97: an ambient variable can tighten the declaration, never loosen it."""
+    _set_mode(monkeypatch, tmp_path, "operations")
+    monkeypatch.setenv("TWIN_ENACT_MODE", "development")
+    assert enact_guard.enact_mode() == "operations"
+    reason = enact_guard.decide("Bash", {"command": "gh pr merge 42 --squash"})
+    assert reason is not None and "ignored" in reason and "development" in reason
 
 
 # -- layer 2: the tool-call boundary -----------------------------------------------------------

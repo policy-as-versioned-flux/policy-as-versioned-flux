@@ -1,0 +1,4 @@
+priorityclass.scheduling.k8s.io/cage-baseline-5-0-0 created
+priorityclass.scheduling.k8s.io/cage-restricted-5-0-0 created
+priorityclass.scheduling.k8s.io/cage-quarantine-5-0-0 created
+priorityclass.scheduling.k8s.io/cage-isolated-5-0-0 created

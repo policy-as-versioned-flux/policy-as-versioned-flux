@@ -1,7 +1,7 @@
 # 154 — One repo per app, in its adopter's org
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -21,3 +21,9 @@ Graduated 2026-09-25 from ticket 35, round 2 Q4, Q5 and Q9. Definition of done i
 Facts on 2026-09-25: each adopter org held one repo only, so no name collides. Each incumbent `release.yml` publishes to `ghcr.io/${{ github.repository }}`. The Mend `renovate` app and `pavc-other-hand` are installed on all repos in each adopter org. The app's installation does not carry a repo's inherited Renovate config across orgs. `pavc-other-hand` holds `contents`, `pull_requests` and `workflows` write there. GitHub keeps a container package in the old account when its repo moves, so the four old packages stay in the incumbent org.
 
 Order: this ticket before ticket 155 is preferred, so the lane runs the image each adopter builds. Ticket 153 does not wait on it. But a dependency bump moves a price only after this ticket, because only then does a bump change the served digest.
+
+## Answer
+
+**Local implementation, 2026-10-03.** The earlier four transfers, signed v1.0.1 app tags and public packages were already completed and independently verified in the Claude sessions on 2026-09-26. On 2026-10-03 anonymous GHCR reads returned HTTP 200 for all four v1.0.1 manifests; exact immutable digests are recorded in [transferred-image-digests.json](../research/resume-2026-10-03/transferred-image-digests.json). The adopter manifests now name those packages, bundled app sources are dropped, and app tag+digest Renovate managers are added. Driftwood lists API beside checkout-svc and storefront; its claim is 5.0.0 in the governed Namespace. The simple nginx Pod is digest-pinned too. Apps self-pins move from v1.0.0 to the newest existing signed v3.0.0 tag/commit. Today's new images/API are not yet in that older signed tree: another reviewed signed adopter tag and self-pin move remain required. The historical API eight-HIGH finding is recorded; its new image inventory is not guessed. Hub lifted-app grading and app-repo configuration/correction are coordinated by the integrator. No external push or release was made by this continuation.
+
+**Delivered later in this continuation.** Four independent-app maintenance PRs are reviewed and merged: ledger #12, storefront #16, API #6 and reports #11. The app-only adopter PRs driftwood #53, tuppence #51 and ludlow #48 are reviewed and merged, and all three normal cut/release workflows pass. Their genuine signed **v3.0.1** tags now contain the proposed app graph: driftwood `17302ecd20041df61a52428e67246c330294d2a6`, tuppence `d8dead25e0e5e275172640b1a637562e45edb15d`, ludlow `5ff463673cf05af71a5db2ed0c38deaf263464d2`. Exact signature, Rekor and Actions identity checks pass. The stage2 source apps declarations bind to those real tags; all three immutable inventory graph validators pass. Subsequent policy/inventory composition and self-pin delivery still depend on the foundational signed releases. See [delivery evidence](../research/resume-2026-10-03/adopter-apps-bootstrap-final-delivery.json).

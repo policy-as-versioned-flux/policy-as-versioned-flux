@@ -128,7 +128,7 @@ cd ../pavf-policy && git tag -l | sort -V | tr '\n' ' '; echo
 ```
 
 The money shot — the gate catching a **spoofed** bump (declares 2.2.1 but the tag still renders
-2.2.0). This is reproducible from the `pr-gate-action` repo's `pr-gate-check.sh`; the canned result:
+2.2.0). This is a historical capture from `pr-gate-action/pr-gate-check.sh`; that action is dropped under ADR-0036. The current adopter shift-left workflows verify their own pins. Historical result:
 
 ```
 FAIL: 2.2.1/require-department-label renders mycompany.com/policy-version=2.2.0, array declares 2.2.1
@@ -204,3 +204,7 @@ out loud, because it *is* the thesis in action — the gates and the audit trail
 ./down.sh   # kind delete cluster
 ```
 Grafana anonymous access, the port-forward, and all four apps come back automatically on `up.sh`.
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

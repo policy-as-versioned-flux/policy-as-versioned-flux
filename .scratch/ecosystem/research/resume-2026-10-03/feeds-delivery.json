@@ -1,0 +1,17 @@
+{
+  "cuts": [
+    "cve/v3.0.0",
+    "fx/v1.1.0",
+    "threat-register/v4.0.0"
+  ],
+  "head": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+  "pr": 10,
+  "pr_ci": "no checks attached; both offline release gates passed and will rerun in workflows",
+  "repository": "policy-as-versioned-feeds/feeds",
+  "source_signature": "GitHub verified SSH signature, reason valid",
+  "status": "ready; pavc-other-hand App approved exact reviewed head; ordinary merge AUTO-REVIEW REJECTED before execution",
+  "review": {"actor": "pavc-other-hand[bot]", "id": 5402174262, "state": "APPROVED", "commit": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6", "url": "https://github.com/policy-as-versioned-feeds/feeds/pull/10#pullrequestreview-5402174262"},
+  "merge_rejection": "Trusted user content did not specifically authorize publishing this large payload into the default branch despite the reviewed head and safeguards. No workaround or indirect execution is permitted.",
+  "workflows": "No cut or release workflow dispatched; no feed tags created by this agent",
+  "url": "https://github.com/policy-as-versioned-feeds/feeds/pull/10"
+}

@@ -1,0 +1,9 @@
+{
+  "scope": "exact committed source tree reconstructed from canonical full export plus security6 transition; not a release receipt",
+  "base": "cb680f22eb46b0fab5e56844758242a2ab200975",
+  "head": "e18d0e2faca3b8ae5c1c4c8a03a9560008a42b5e",
+  "reconstructed_tree": "c01b5e7c945c0347fcf55d7d6eeadcd24308aa5f",
+  "committed_tree": "c01b5e7c945c0347fcf55d7d6eeadcd24308aa5f",
+  "match": true,
+  "real_index_changed": false
+}

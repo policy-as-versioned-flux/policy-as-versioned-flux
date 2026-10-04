@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-03T19:23:29.837351+00:00",
+  "adopter": "driftwood",
+  "outcome": "composed",
+  "compose": "actual public compose with default local parent trees; no disk render write",
+  "unpriced_regimes": [
+    {
+      "index": 2,
+      "source": "feeds",
+      "feed": "cve",
+      "name": "cve",
+      "amount": null
+    }
+  ],
+  "total": null,
+  "handbook_unpriced_identities_and_absences": "passed",
+  "missing_total_not_rendered_as_zero": "passed",
+  "limits": [
+    "Local mixed-candidate composition only; no delivered platform pin or live admission claim"
+  ]
+}

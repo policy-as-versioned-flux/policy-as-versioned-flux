@@ -1,0 +1,29 @@
+{
+  "reviewed_at": "2026-10-03T19:14:11.311531+00:00",
+  "repo": "policy-as-versioned-platform/platform",
+  "pr": 49,
+  "head": "9ddd6a2d050f421d7121225b4b5c68a8a753d513",
+  "github_signature": "verified valid",
+  "local_signature": "G",
+  "reconstructed_from": "archived full final7 source export plus measured security6 preparation patch",
+  "reconstructed_tree": "5ed40f8c5428e14dbc76f4660a865d493079c7af",
+  "committed_tree": "5ed40f8c5428e14dbc76f4660a865d493079c7af",
+  "tree_match": true,
+  "source_export_secret_scan": "no filename or high-confidence content hits; export SHA256 matches reviewed checkpoint",
+  "diff_check": "passed",
+  "supported_lines": [
+    "5.0.0",
+    "6.0.0"
+  ],
+  "uncut_undeclared_candidate": "7.0.0",
+  "publisher_gate": "committed-source major passed",
+  "engine_cells": "committed-source 4/4 passed",
+  "rehearsal_archived": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-03/platform-security6-pr49-UNSIGNED-LOCAL-REHEARSAL.json",
+  "rehearsal_label": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-03/platform-security6-pr49-UNSIGNED-LOCAL-REHEARSAL.md",
+  "delivery_checkout_clean_after_owned_rehearsal_removal": true,
+  "hard_findings": [],
+  "limits": [
+    "No live admission or rollout inferred",
+    "Final7 and tools5 remain subsequent work after authentic security6 receipt"
+  ]
+}

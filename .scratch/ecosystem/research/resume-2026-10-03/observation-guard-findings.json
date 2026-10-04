@@ -1,0 +1,18 @@
+{
+  "scope": "local observation guards; not scheduled truth evidence",
+  "ok": false,
+  "results": [
+    {
+      "name": "drift_window_is_actually_being_sampled",
+      "status": "FAIL",
+      "detail": "the window is open and the newest sample is 7 day(s) old (2026-09-26T11:28:18+00:00). The probe has stopped, and a stopped probe writes no `unreachable` sample either \u2014 the silence is indistinguishable from stability",
+      "invariant": false
+    },
+    {
+      "name": "flux_coverage_floor_is_still_reachable",
+      "status": "FAIL",
+      "detail": "the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sample(s), only 33 days, 7:33:59.871028 of window left to take them in, a ceiling of 36.7%. The continuous-state branch closes `unmeasured`, so build ticket 65's primary falsifier is unanswerable and the residual branch cannot be concluded either. Chris Nesbitt-Smith owns the probe; window.yaml's `operation.crontab` is the line that was never installed. **This guard staying red is the finding, not a defect in it** \u2014 see build ticket 70's finding 1. It goes green only if the floor is actually reached",
+      "invariant": false
+    }
+  ]
+}

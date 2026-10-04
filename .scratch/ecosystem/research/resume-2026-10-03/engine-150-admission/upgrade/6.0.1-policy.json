@@ -1,0 +1,78 @@
+{
+    "apiVersion": "policies.kyverno.io/v1",
+    "kind": "MutatingPolicy",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"policies.kyverno.io/v1\",\"kind\":\"MutatingPolicy\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/part-of\":\"platform\",\"policy-as-versioned.dev/policy\":\"graded-enforcement\",\"policy-as-versioned.dev/policy-version\":\"6.0.1\"},\"name\":\"cage-tier-6-0-1\"},\"spec\":{\"matchConditions\":[{\"expression\":\"object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != ''\",\"name\":\"claims-a-policy-version\"},{\"expression\":\"object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '6.0.1'\",\"name\":\"only-this-policy-version\"}],\"matchConstraints\":{\"resourceRules\":[{\"apiGroups\":[\"\"],\"apiVersions\":[\"v1\"],\"operations\":[\"CREATE\",\"UPDATE\"],\"resources\":[\"pods\"]}]},\"mutations\":[{\"applyConfiguration\":{\"expression\":\"Object{\\n  metadata: Object.metadata{ labels: {\\n    \\\"posture.acme.io/caged\\\": \\\"true\\\",\\n    \\\"posture.acme.io/tier\\\": string(variables.tier)\\n  } },\\n  spec: Object.spec{\\n    hostNetwork: false,\\n    hostPID: false,\\n    hostIPC: false,\\n    priorityClassName: variables.dial.pc,\\n    priority: int(variables.dial.prio),\\n    preemptionPolicy: \\\"Never\\\",\\n    containers: object.spec.containers.filter(c, c.name != \\\"waf-sidecar\\\").map(c, Object.spec.containers{\\n      name: c.name,\\n      resources: Object.spec.containers.resources{\\n        limits: {\\n          \\\"cpu\\\": (has(c.resources) \\u0026\\u0026 c.resources.?limits[\\\"cpu\\\"].hasValue() \\u0026\\u0026\\n                  quantity(string(c.resources.limits[\\\"cpu\\\"])).isLessThan(quantity(variables.dial.cpu)))\\n                   ? string(c.resources.limits[\\\"cpu\\\"]) : variables.dial.cpu,\\n          \\\"memory\\\": (has(c.resources) \\u0026\\u0026 c.resources.?limits[\\\"memory\\\"].hasValue() \\u0026\\u0026\\n                  quantity(string(c.resources.limits[\\\"memory\\\"])).isLessThan(quantity(variables.dial.mem)))\\n                   ? string(c.resources.limits[\\\"memory\\\"]) : variables.dial.mem\\n        }\\n      },\\n      securityContext: Object.spec.containers.securityContext{\\n        readOnlyRootFilesystem: variables.dial.harden == 'true' ||\\n          (has(c.securityContext) \\u0026\\u0026 c.securityContext.?readOnlyRootFilesystem.orValue(false)),\\n        runAsNonRoot: variables.dial.harden == 'true' ||\\n          c.?securityContext.?runAsNonRoot.orValue(object.spec.?securityContext.?runAsNonRoot.orValue(false)),\\n        allowPrivilegeEscalation: false,\\n        privileged: false\\n      }\\n    }) + (variables.dial.wafCpu != '0' ? [Object.spec.containers{\\n      name: \\\"waf-sidecar\\\",\\n      image: \\\"ghcr.io/acme/coraza-waf:cage\\\",\\n      resources: Object.spec.containers.resources{\\n        limits: {\\\"cpu\\\": variables.dial.wafCpu, \\\"memory\\\": variables.dial.wafMem}\\n      },\\n      securityContext: Object.spec.containers.securityContext{\\n        readOnlyRootFilesystem: true, runAsNonRoot: true,\\n        allowPrivilegeEscalation: false, privileged: false\\n      }\\n    }] : [])\\n  }\\n}\"},\"patchType\":\"ApplyConfiguration\"},{\"jsonPatch\":{\"expression\":\"variables.dial.harden == 'true'\\n  ? object.spec.containers.map(c,\\n      JSONPatch{\\n        op: \\\"add\\\",\\n        path: \\\"/spec/containers/\\\" + string(object.spec.containers.indexOf(c)) + \\\"/securityContext/capabilities\\\",\\n        value: {\\\"drop\\\": [\\\"ALL\\\"]}\\n      })\\n  : []\"},\"patchType\":\"JSONPatch\"}],\"variables\":[{\"expression\":\"namespaceObject != null \\u0026\\u0026 namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'\\n  ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('')\\n  : ''\",\"name\":\"nsTier\"},{\"expression\":\"variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']\\n  ? variables.nsTier\\n  : 'isolated'\",\"name\":\"tier\"},{\"expression\":\"{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-6-0-1',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},\\n 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-6-0-1','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},\\n 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-6-0-1','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},\\n 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-6-0-1',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]\",\"name\":\"dial\"}]}}\n"
+        },
+        "creationTimestamp": "2026-10-03T14:44:35Z",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/part-of": "platform",
+            "policy-as-versioned.dev/policy": "graded-enforcement",
+            "policy-as-versioned.dev/policy-version": "6.0.1"
+        },
+        "name": "cage-tier-6-0-1",
+        "resourceVersion": "1628",
+        "uid": "8b678b64-561a-4413-9aa2-dbe27e3c9c7f"
+    },
+    "spec": {
+        "matchConditions": [
+            {
+                "expression": "object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') != ''",
+                "name": "claims-a-policy-version"
+            },
+            {
+                "expression": "object.metadata.?labels['policy-as-versioned.dev/policy-version'].orValue('') == '6.0.1'",
+                "name": "only-this-policy-version"
+            }
+        ],
+        "matchConstraints": {
+            "resourceRules": [
+                {
+                    "apiGroups": [
+                        ""
+                    ],
+                    "apiVersions": [
+                        "v1"
+                    ],
+                    "operations": [
+                        "CREATE",
+                        "UPDATE"
+                    ],
+                    "resources": [
+                        "pods"
+                    ]
+                }
+            ]
+        },
+        "mutations": [
+            {
+                "applyConfiguration": {
+                    "expression": "Object{\n  metadata: Object.metadata{ labels: {\n    \"posture.acme.io/caged\": \"true\",\n    \"posture.acme.io/tier\": string(variables.tier)\n  } },\n  spec: Object.spec{\n    hostNetwork: false,\n    hostPID: false,\n    hostIPC: false,\n    priorityClassName: variables.dial.pc,\n    priority: int(variables.dial.prio),\n    preemptionPolicy: \"Never\",\n    containers: object.spec.containers.filter(c, c.name != \"waf-sidecar\").map(c, Object.spec.containers{\n      name: c.name,\n      resources: Object.spec.containers.resources{\n        limits: {\n          \"cpu\": (has(c.resources) \u0026\u0026 c.resources.?limits[\"cpu\"].hasValue() \u0026\u0026\n                  quantity(string(c.resources.limits[\"cpu\"])).isLessThan(quantity(variables.dial.cpu)))\n                   ? string(c.resources.limits[\"cpu\"]) : variables.dial.cpu,\n          \"memory\": (has(c.resources) \u0026\u0026 c.resources.?limits[\"memory\"].hasValue() \u0026\u0026\n                  quantity(string(c.resources.limits[\"memory\"])).isLessThan(quantity(variables.dial.mem)))\n                   ? string(c.resources.limits[\"memory\"]) : variables.dial.mem\n        }\n      },\n      securityContext: Object.spec.containers.securityContext{\n        readOnlyRootFilesystem: variables.dial.harden == 'true' ||\n          (has(c.securityContext) \u0026\u0026 c.securityContext.?readOnlyRootFilesystem.orValue(false)),\n        runAsNonRoot: variables.dial.harden == 'true' ||\n          c.?securityContext.?runAsNonRoot.orValue(object.spec.?securityContext.?runAsNonRoot.orValue(false)),\n        allowPrivilegeEscalation: false,\n        privileged: false\n      }\n    }) + (variables.dial.wafCpu != '0' ? [Object.spec.containers{\n      name: \"waf-sidecar\",\n      image: \"ghcr.io/acme/coraza-waf:cage\",\n      resources: Object.spec.containers.resources{\n        limits: {\"cpu\": variables.dial.wafCpu, \"memory\": variables.dial.wafMem}\n      },\n      securityContext: Object.spec.containers.securityContext{\n        readOnlyRootFilesystem: true, runAsNonRoot: true,\n        allowPrivilegeEscalation: false, privileged: false\n      }\n    }] : [])\n  }\n}"
+                },
+                "patchType": "ApplyConfiguration"
+            },
+            {
+                "jsonPatch": {
+                    "expression": "variables.dial.harden == 'true'\n  ? object.spec.containers.map(c,\n      JSONPatch{\n        op: \"add\",\n        path: \"/spec/containers/\" + string(object.spec.containers.indexOf(c)) + \"/securityContext/capabilities\",\n        value: {\"drop\": [\"ALL\"]}\n      })\n  : []"
+                },
+                "patchType": "JSONPatch"
+            }
+        ],
+        "variables": [
+            {
+                "expression": "namespaceObject != null \u0026\u0026 namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'\n  ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('')\n  : ''",
+                "name": "nsTier"
+            },
+            {
+                "expression": "variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']\n  ? variables.nsTier\n  : 'isolated'",
+                "name": "tier"
+            },
+            {
+                "expression": "{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-6-0-1',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},\n 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-6-0-1','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},\n 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-6-0-1','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},\n 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-6-0-1',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]",
+                "name": "dial"
+            }
+        ]
+    }
+}

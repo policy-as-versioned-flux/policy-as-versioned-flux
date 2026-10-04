@@ -1,0 +1,2 @@
+fx: upstream (https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_{year}-{month}.csv) vs published v1.1.0 under rule.yaml (a new monthly period, a currency added or withdrawn, or any published rate corrected) -> none
+{"bump": "none", "feed": "fx", "observed_at": "2026-10-03T17:10:08+00:00", "payload_sha256": "646ed6176b18642670623d855278c915aae0ebb8a7c21d81bff9f1a6bbd9df2c", "published_version": "1.1.0"}

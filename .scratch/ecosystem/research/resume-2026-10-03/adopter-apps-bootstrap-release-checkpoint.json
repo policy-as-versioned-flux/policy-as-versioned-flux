@@ -1,0 +1,200 @@
+{
+  "at": "2026-10-03T19:05:21.907Z",
+  "prs": {
+    "driftwood": {
+      "number": 53,
+      "url": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/53"
+    },
+    "tuppence": {
+      "number": 51,
+      "url": "https://github.com/policy-as-versioned-tuppence/tuppence/pull/51"
+    },
+    "ludlow": {
+      "number": 48,
+      "url": "https://github.com/policy-as-versioned-ludlow/ludlow/pull/48"
+    }
+  },
+  "reviewed_heads": {
+    "driftwood": {
+      "directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/driftwood-estate/driftwood",
+      "head": "c9eff7a354ccb7eef4c51bde38e2915b4b686b95",
+      "base": "bd93eb5c0e30bb07f0849dd13ac34d63f7f75311",
+      "signature": "G",
+      "changed_files": [
+        "composed/HEADER.yaml",
+        "deploy/pod.yaml",
+        "gitops/apps/api.yaml",
+        "gitops/apps/kustomization.yaml",
+        "gitops/apps/pod.yaml",
+        "gitops/apps/storefront.yaml"
+      ],
+      "compose_replay": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs",
+      "clean": true
+    },
+    "tuppence": {
+      "directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/tuppence-estate/tuppence",
+      "head": "7cd3d34b9006ebff76ace4598aa10a5563d122b9",
+      "base": "797505ea087af67fe543479aa4a2d382dcc0ef60",
+      "signature": "G",
+      "changed_files": [
+        "composed/HEADER.yaml",
+        "gitops/apps/ledger.yaml"
+      ],
+      "compose_replay": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs",
+      "clean": true
+    },
+    "ludlow": {
+      "directory": "/private/tmp/pavf-apps-bootstrap-lnuADR/ludlow-estate/ludlow",
+      "head": "5893d40b15cff047680ae6ea8cac0af18e9cb17b",
+      "base": "3cc1981da60cbd0ff2d885df8f6ada064346155c",
+      "signature": "G",
+      "changed_files": [
+        "composed/HEADER.yaml",
+        "gitops/apps/reports.yaml"
+      ],
+      "compose_replay": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs",
+      "clean": true
+    }
+  },
+  "stage": "COMPLETE: all three app-only PRs reviewed/merged; real signed v3.0.1 tags and verified GitHub releases published; no stage2 performed",
+  "sessions": [],
+  "cut_runs": {
+    "driftwood": {
+      "id": 37146159741,
+      "url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37146159741",
+      "head": "17302ecd20041df61a52428e67246c330294d2a6"
+    },
+    "tuppence": {
+      "id": 37146160185,
+      "url": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37146160185",
+      "head": "d8dead25e0e5e275172640b1a637562e45edb15d"
+    },
+    "ludlow": {
+      "id": 37146159801,
+      "url": "https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/37146159801",
+      "head": "5ff463673cf05af71a5db2ed0c38deaf263464d2"
+    }
+  },
+  "actual_tags": {
+    "driftwood": {
+      "tag": "v3.0.1",
+      "tag_object": "4cdf9152d2af61d9e476f5e0f487d85a2808f42f",
+      "commit": "17302ecd20041df61a52428e67246c330294d2a6",
+      "tag_tree": "https://github.com/policy-as-versioned-driftwood/driftwood/tree/v3.0.1",
+      "reviewed_app_payload_identical": true,
+      "signature": {
+        "git": true,
+        "rekor": true,
+        "certificate_claims": true,
+        "identity": "https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main",
+        "issuer": "https://token.actions.githubusercontent.com",
+        "tlog_index": "3075511413",
+        "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511413"
+      },
+      "release": {
+        "isDraft": false,
+        "isPrerelease": false,
+        "name": "v3.0.1",
+        "publishedAt": "2026-10-03T19:01:56Z",
+        "tagName": "v3.0.1",
+        "targetCommitish": "main",
+        "url": "https://github.com/policy-as-versioned-driftwood/driftwood/releases/tag/v3.0.1"
+      },
+      "release_workflow": {
+        "conclusion": "success",
+        "headSha": "17302ecd20041df61a52428e67246c330294d2a6",
+        "id": 37146414256,
+        "jobs": [
+          {
+            "conclusion": "success",
+            "failed_steps": [],
+            "name": "release",
+            "status": "completed"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37146414256"
+      }
+    },
+    "tuppence": {
+      "tag": "v3.0.1",
+      "tag_object": "bc6ee99a1cda20e9fe0365feb25c3086aad7f5a5",
+      "commit": "d8dead25e0e5e275172640b1a637562e45edb15d",
+      "tag_tree": "https://github.com/policy-as-versioned-tuppence/tuppence/tree/v3.0.1",
+      "reviewed_app_payload_identical": true,
+      "signature": {
+        "git": true,
+        "rekor": true,
+        "certificate_claims": true,
+        "identity": "https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main",
+        "issuer": "https://token.actions.githubusercontent.com",
+        "tlog_index": "3075511590",
+        "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511590"
+      },
+      "release": {
+        "isDraft": false,
+        "isPrerelease": false,
+        "name": "v3.0.1",
+        "publishedAt": "2026-10-03T19:01:57Z",
+        "tagName": "v3.0.1",
+        "targetCommitish": "main",
+        "url": "https://github.com/policy-as-versioned-tuppence/tuppence/releases/tag/v3.0.1"
+      },
+      "release_workflow": {
+        "conclusion": "success",
+        "headSha": "d8dead25e0e5e275172640b1a637562e45edb15d",
+        "id": 37146413222,
+        "jobs": [
+          {
+            "conclusion": "success",
+            "failed_steps": [],
+            "name": "release",
+            "status": "completed"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37146413222"
+      }
+    },
+    "ludlow": {
+      "tag": "v3.0.1",
+      "tag_object": "2cc62f42b297f1f7ed65babc381a6dad561f3240",
+      "commit": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+      "tag_tree": "https://github.com/policy-as-versioned-ludlow/ludlow/tree/v3.0.1",
+      "reviewed_app_payload_identical": true,
+      "signature": {
+        "git": true,
+        "rekor": true,
+        "certificate_claims": true,
+        "identity": "https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main",
+        "issuer": "https://token.actions.githubusercontent.com",
+        "tlog_index": "3075511349",
+        "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511349"
+      },
+      "release": {
+        "isDraft": false,
+        "isPrerelease": false,
+        "name": "v3.0.1",
+        "publishedAt": "2026-10-03T19:01:57Z",
+        "tagName": "v3.0.1",
+        "targetCommitish": "main",
+        "url": "https://github.com/policy-as-versioned-ludlow/ludlow/releases/tag/v3.0.1"
+      },
+      "release_workflow": {
+        "conclusion": "success",
+        "headSha": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+        "id": 37146414184,
+        "jobs": [
+          {
+            "conclusion": "success",
+            "failed_steps": [],
+            "name": "release",
+            "status": "completed"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/37146414184"
+      }
+    }
+  }
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "repository": "policy-as-versioned-tuppence/ledger",
+    "github": {
+      "full_name": "policy-as-versioned-tuppence/ledger",
+      "owner": "policy-as-versioned-tuppence",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    },
+    "proposed_diff": "diff --git a/renovate.json b/renovate.json\nindex 7190a60..44619ef 100644\n--- a/renovate.json\n+++ b/renovate.json\n@@ -1,3 +1,8 @@\n {\n-  \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\"\n+  \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\",\n+  \"extends\": [\n+    \"config:recommended\"\n+  ],\n+  \"dependencyDashboard\": true,\n+  \"automerge\": false\n }\n"
+  },
+  {
+    "repository": "policy-as-versioned-driftwood/storefront",
+    "github": {
+      "full_name": "policy-as-versioned-driftwood/storefront",
+      "owner": "policy-as-versioned-driftwood",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    },
+    "proposed_diff": "diff --git a/renovate.json b/renovate.json\nindex 7190a60..44619ef 100644\n--- a/renovate.json\n+++ b/renovate.json\n@@ -1,3 +1,8 @@\n {\n-  \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\"\n+  \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\",\n+  \"extends\": [\n+    \"config:recommended\"\n+  ],\n+  \"dependencyDashboard\": true,\n+  \"automerge\": false\n }\n"
+  },
+  {
+    "repository": "policy-as-versioned-driftwood/api",
+    "github": {
+      "full_name": "policy-as-versioned-driftwood/api",
+      "owner": "policy-as-versioned-driftwood",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    },
+    "proposed_diff": "diff --git a/README.md b/README.md\nindex 13bd577..dea8915 100644\n--- a/README.md\n+++ b/README.md\n@@ -12,3 +12,7 @@ very different dependency hygiene, both visible on the estate dashboard.\n \n Push a `vX.Y.Z` tag; `.github/workflows/release.yml` builds and publishes\n `ghcr.io/policy-as-versioned-flux/api:vX.Y.Z` and prints the digest in the run summary.\n+\n+## Correction, 2026-10-03 (eco-system ticket 154)\n+\n+The historical description \"good citizen\" describes policy declarations, not vulnerability health. The 2026-09-25 scan found eight HIGH CVEs in Go 1.26.5 and an end-of-support Alpine 3.20.10 base. New inventory records grade the served image digest; the label does not assert a clean scan.\ndiff --git a/renovate.json b/renovate.json\nindex 7190a60..44619ef 100644\n--- a/renovate.json\n+++ b/renovate.json\n@@ -1,3 +1,8 @@\n {\n-  \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\"\n+  \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\",\n+  \"extends\": [\n+    \"config:recommended\"\n+  ],\n+  \"dependencyDashboard\": true,\n+  \"automerge\": false\n }\n"
+  },
+  {
+    "repository": "policy-as-versioned-ludlow/reports",
+    "github": {
+      "full_name": "policy-as-versioned-ludlow/reports",
+      "owner": "policy-as-versioned-ludlow",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": false
+    },
+    "proposed_diff": "diff --git a/renovate.json b/renovate.json\nindex 7190a60..44619ef 100644\n--- a/renovate.json\n+++ b/renovate.json\n@@ -1,3 +1,8 @@\n {\n-  \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\"\n+  \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\",\n+  \"extends\": [\n+    \"config:recommended\"\n+  ],\n+  \"dependencyDashboard\": true,\n+  \"automerge\": false\n }\n"
+  }
+]

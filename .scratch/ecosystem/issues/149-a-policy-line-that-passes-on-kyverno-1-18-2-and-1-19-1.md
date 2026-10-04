@@ -1,7 +1,7 @@
 # 149 — A policy line that passes on Kyverno 1.18.2 and 1.19.1
 
 Type: task
-Status: open
+Status: claimed
 Blocked by: 146, and the owner's authorisation for the signed policy tag
 
 ## Question
@@ -89,3 +89,11 @@ the fix yet. The engine still returns no result on a `matchConditions` miss. Whe
 the fix, a `result: skip` row passes again as `Pass / Excluded`, which does not compare the status
 word. So item 4 stands: the fixture compares generated documents. Details are in the research
 README, section "Upstream status".
+
+## Resume implementation, 2026-10-03
+
+The compatibility candidate uses v1 policy APIs, string-typed tier output and a generated-document proof, and retires the candidate posture Deny body. The exact 1.18.2 and 1.19.1 cells pass. The isolated 6.0.0 to 6.0.1 pairwise comparison computes patch; the full publisher window is being measured separately before any cut. No signed candidate release is claimed.
+
+The owner delegated the implementing decisions on 2026-10-03: "you tell me, you control them all, you don't need me to answer". This is recorded as delegated, not as an invented institution signature.
+
+**Full-window correction, 2026-10-03.** The actual publisher retains both 5 and 6 when grading the compatibility candidate. That complete supported window computes a major bump and would quarantine a declared 6.0.1 patch. The final candidate therefore declares **7.0.0**; its publisher dry run passes cleanly as major and all six declared engine cells pass. The security-only intermediate remains 6.0.0, with four passing cells. All three adopters have explicitly delegated major-7 acceptance records. Frozen 5 and 6 bodies are unchanged. The old 6.0.1 receipts above are historical measurements, not a release target. Signed delivery is tracked in the dated implementation status and platform delivery records.

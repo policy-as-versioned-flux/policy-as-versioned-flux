@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    policy-as-versioned.dev/policy-version: 0.0.0-outside-array
+    posture.acme.io/tier: baseline
+  name: corpus
+spec:
+  containers:
+  - image: nginx:1.25
+    name: app
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true

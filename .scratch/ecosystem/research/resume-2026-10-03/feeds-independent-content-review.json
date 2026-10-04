@@ -1,0 +1,51 @@
+{
+  "reviewer": "root independent content review",
+  "repository": {
+    "full_name": "policy-as-versioned-feeds/feeds",
+    "permissions": {
+      "admin": true,
+      "maintain": true,
+      "pull": true,
+      "push": true,
+      "triage": true
+    },
+    "private": false
+  },
+  "reviewed_source_files": [
+    "README.md",
+    "bump.py",
+    "fetch/cve.py",
+    "fetch/fx.py",
+    "fetch/lib.py",
+    "threat-register/to_fair_scenario.py",
+    "verify-feeds.sh",
+    "verify-market-and-news.sh"
+  ],
+  "dataset_fields": {
+    "capture": [
+      "epss",
+      "epss_date",
+      "kev",
+      "nvd",
+      "provenance",
+      "replay_note"
+    ],
+    "NVD_cve_fields": [
+      "id",
+      "metrics",
+      "published"
+    ]
+  },
+  "primary_capture_rows": 1733,
+  "replay_note": "Lossless projection of the fetched primary instruments onto build() input fields; original complete upstream response digests remain in provenance.",
+  "credentials": "NVD_API_KEY is read from the environment only for a constant official NVD endpoint request header; headers and key values are absent from captures and provenance",
+  "content": "Public CISA KEV/NVD/FIRST facts, HMRC rates, schema/bump metadata, and cited threat rows for the already-public fictional demonstration adopters. New code implements ordinary primary-data readers and validation; no private customer data, workstation files or credentials are included.",
+  "sensitivity_checks": [
+    "complete 19-path secret-negative scan",
+    "strict primary-source capture shape",
+    "exact constant public primary provenance endpoints",
+    "source credential handling reviewed",
+    "authentic captured corpus rebuild matches",
+    "old public payloads preserved"
+  ]
+}

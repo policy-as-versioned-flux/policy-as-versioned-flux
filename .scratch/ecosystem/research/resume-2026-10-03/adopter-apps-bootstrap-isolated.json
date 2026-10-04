@@ -1,0 +1,101 @@
+{
+  "root": "/private/tmp/pavf-apps-bootstrap-lnuADR",
+  "adopters": {
+    "driftwood": {
+      "estate": "/private/tmp/pavf-apps-bootstrap-lnuADR/driftwood-estate",
+      "dir": "/private/tmp/pavf-apps-bootstrap-lnuADR/driftwood-estate/driftwood",
+      "pins": {
+        "platform": {
+          "tag": "v4.0.0",
+          "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+          "file": "gitops/platform/platform-pin.yaml"
+        },
+        "nist": {
+          "tag": "v1.1.0",
+          "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+          "file": "gitops/flux-system/gotk-sync-nist.yaml"
+        },
+        "ico": {
+          "tag": "v3.0.0",
+          "commit": "9d09222117dde1257e5b43401caa43342f47bae3",
+          "file": "gitops/flux-system/gotk-sync-ico.yaml"
+        },
+        "feeds": {
+          "tag": "threat-register/v2.0.0",
+          "commit": "69c89b0732a0c9e4e6013d2656d755c5d916a815",
+          "file": "gitops/flux-system/gotk-sync-feeds.yaml"
+        },
+        "insurer": {
+          "tag": "v1.0.0",
+          "commit": "632db22c92003b048795cea1f5d5bf6e08dcf386",
+          "file": "gitops/flux-system/gotk-sync-insurer.yaml"
+        }
+      },
+      "appFiles": [
+        "gitops/apps/pod.yaml",
+        "gitops/apps/storefront.yaml",
+        "gitops/apps/api.yaml",
+        "gitops/apps/kustomization.yaml",
+        "deploy/pod.yaml"
+      ]
+    },
+    "tuppence": {
+      "estate": "/private/tmp/pavf-apps-bootstrap-lnuADR/tuppence-estate",
+      "dir": "/private/tmp/pavf-apps-bootstrap-lnuADR/tuppence-estate/tuppence",
+      "pins": {
+        "platform": {
+          "tag": "v4.0.0",
+          "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+          "file": "gitops/platform/platform-pin.yaml"
+        },
+        "nist": {
+          "tag": "v1.1.0",
+          "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+          "file": "gitops/flux-system/gotk-sync-nist.yaml"
+        },
+        "ico": {
+          "tag": "v3.0.0",
+          "commit": "9d09222117dde1257e5b43401caa43342f47bae3",
+          "file": "gitops/flux-system/gotk-sync-ico.yaml"
+        },
+        "feeds": {
+          "tag": "threat-register/v1.0.0",
+          "commit": "69c89b0732a0c9e4e6013d2656d755c5d916a815",
+          "file": "gitops/flux-system/gotk-sync-feeds.yaml"
+        }
+      },
+      "appFiles": [
+        "gitops/apps/ledger.yaml"
+      ]
+    },
+    "ludlow": {
+      "estate": "/private/tmp/pavf-apps-bootstrap-lnuADR/ludlow-estate",
+      "dir": "/private/tmp/pavf-apps-bootstrap-lnuADR/ludlow-estate/ludlow",
+      "pins": {
+        "platform": {
+          "tag": "v4.0.0",
+          "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+          "file": "gitops/platform/platform-pin.yaml"
+        },
+        "nist": {
+          "tag": "v1.1.0",
+          "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+          "file": "gitops/flux-system/gotk-sync-nist.yaml"
+        },
+        "ico": {
+          "tag": "v3.0.0",
+          "commit": "9d09222117dde1257e5b43401caa43342f47bae3",
+          "file": "gitops/flux-system/gotk-sync-ico.yaml"
+        },
+        "feeds": {
+          "tag": "threat-register/v1.0.0",
+          "commit": "69c89b0732a0c9e4e6013d2656d755c5d916a815",
+          "file": "gitops/flux-system/gotk-sync-feeds.yaml"
+        }
+      },
+      "appFiles": [
+        "gitops/apps/reports.yaml"
+      ]
+    }
+  }
+}

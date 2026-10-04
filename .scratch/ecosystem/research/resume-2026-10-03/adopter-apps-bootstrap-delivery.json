@@ -1,0 +1,86 @@
+{
+  "isolated": {
+    "driftwood": {
+      "isolated_dir": "/private/tmp/pavf-apps-bootstrap-lnuADR/driftwood-estate/driftwood",
+      "base": "529e159397d3e64f94b0270cc7de69c235580961",
+      "head": "529e159397d3e64f94b0270cc7de69c235580961",
+      "normal_commit_created": false,
+      "patch": "driftwood-apps-bootstrap.patch",
+      "body": "driftwood-apps-bootstrap-pr.md",
+      "files": [
+        "composed/HEADER.yaml",
+        "deploy/pod.yaml",
+        "gitops/apps/api.yaml",
+        "gitops/apps/kustomization.yaml",
+        "gitops/apps/pod.yaml",
+        "gitops/apps/storefront.yaml"
+      ],
+      "source_verify": "PASS",
+      "declared_engine": "1.18.2",
+      "shift_left": "PASS",
+      "ordinary_bump": "none",
+      "prospective_release": "v3.0.1",
+      "local_tag_unused": true,
+      "wrapper_signature": "WAIT",
+      "normal_signing_commit": "WAIT: normal commit timed out; no hooks/signing override"
+    },
+    "tuppence": {
+      "isolated_dir": "/private/tmp/pavf-apps-bootstrap-lnuADR/tuppence-estate/tuppence",
+      "base": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+      "head": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+      "normal_commit_created": false,
+      "patch": "tuppence-apps-bootstrap.patch",
+      "body": "tuppence-apps-bootstrap-pr.md",
+      "files": [
+        "composed/HEADER.yaml",
+        "gitops/apps/ledger.yaml"
+      ],
+      "source_verify": "PASS",
+      "declared_engine": "1.18.2",
+      "shift_left": "PASS",
+      "ordinary_bump": "none",
+      "prospective_release": "v3.0.1",
+      "local_tag_unused": true,
+      "wrapper_signature": "WAIT",
+      "normal_signing_commit": "WAIT: normal commit timed out; no hooks/signing override"
+    },
+    "ludlow": {
+      "isolated_dir": "/private/tmp/pavf-apps-bootstrap-lnuADR/ludlow-estate/ludlow",
+      "base": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+      "head": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+      "normal_commit_created": false,
+      "patch": "ludlow-apps-bootstrap.patch",
+      "body": "ludlow-apps-bootstrap-pr.md",
+      "files": [
+        "composed/HEADER.yaml",
+        "gitops/apps/reports.yaml"
+      ],
+      "source_verify": "PASS",
+      "declared_engine": "1.18.2",
+      "shift_left": "PASS",
+      "ordinary_bump": "none",
+      "prospective_release": "v3.0.1",
+      "local_tag_unused": true,
+      "wrapper_signature": "WAIT",
+      "normal_signing_commit": "WAIT: normal commit timed out; no hooks/signing override"
+    }
+  },
+  "source_clones": {
+    "driftwood": {
+      "head": "529e159397d3e64f94b0270cc7de69c235580961",
+      "origin_main": "529e159397d3e64f94b0270cc7de69c235580961",
+      "status_unchanged": true
+    },
+    "tuppence": {
+      "head": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+      "origin_main": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+      "status_unchanged": true
+    },
+    "ludlow": {
+      "head": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+      "origin_main": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+      "status_unchanged": true
+    }
+  },
+  "process_note": "Normal git commands were timeout-killed by execFile; no unified exec sessions. Process inventory unavailable in sandbox; no unknown process terminated."
+}

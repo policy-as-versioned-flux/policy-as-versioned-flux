@@ -1,0 +1,59 @@
+{
+  "scope": "in-memory candidate composition; no signed/live publication proof",
+  "results": {
+    "driftwood": {
+      "outcome": "composed",
+      "refusals": [],
+      "rendered_count": 53,
+      "cve": {
+        "old_version": "v3",
+        "new_version": "v3",
+        "old_price": null,
+        "new_price": null,
+        "old_tier": null,
+        "proposed_tier": null,
+        "absence_only": true,
+        "old_absence_only": true,
+        "old_could_not_look": "No scanned CVE is in the pinned KEV feed; 334 scanned CVE(s) outside it are named absences carrying no amount.",
+        "priced_cve": null,
+        "intersection_count": 0
+      }
+    },
+    "tuppence": {
+      "outcome": "composed",
+      "refusals": [],
+      "rendered_count": 50,
+      "cve": {
+        "old_version": "v2",
+        "new_version": "v3",
+        "old_price": null,
+        "new_price": 437107.3377948303,
+        "old_tier": null,
+        "proposed_tier": "isolated",
+        "absence_only": null,
+        "old_absence_only": true,
+        "old_could_not_look": "No scanned CVE is in the pinned KEV feed; 9 scanned CVE(s) outside it are named absences carrying no amount.",
+        "priced_cve": "CVE-2021-44228",
+        "intersection_count": 2
+      }
+    },
+    "ludlow": {
+      "outcome": "composed",
+      "refusals": [],
+      "rendered_count": 54,
+      "cve": {
+        "old_version": "v3",
+        "new_version": "v3",
+        "old_price": null,
+        "new_price": null,
+        "old_tier": null,
+        "proposed_tier": null,
+        "absence_only": true,
+        "old_absence_only": true,
+        "old_could_not_look": "No scanned CVE is in the pinned KEV feed; 109 scanned CVE(s) outside it are named absences carrying no amount.",
+        "priced_cve": null,
+        "intersection_count": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "driftwood": {
+    "composition": {
+      "authenticated_foundation_adoption": false,
+      "candidate_only": true,
+      "outcome": "composed",
+      "refusals": [],
+      "rendered_files_count": 53,
+      "temporary_copy_byte_replay": true,
+      "wrote_composed": false
+    },
+    "exact_foundation_pins_current": {
+      "compiler": {
+        "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+        "tag": "v4.0.0"
+      },
+      "policy": {
+        "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+        "tag": "v4.0.0"
+      }
+    },
+    "historical_composition_before_compiler_fixes": {
+      "outcome": "composed",
+      "party_artefact_errors": [],
+      "refusals": [],
+      "rendered_files_count": 53,
+      "wrote_composed": false
+    },
+    "pinned_workloads": {
+      "pods": [
+        {
+          "images": [
+            "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+          ],
+          "manifest": "gitops/apps/pod.yaml",
+          "name": "checkout-svc"
+        },
+        {
+          "images": [
+            "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6"
+          ],
+          "manifest": "gitops/apps/storefront.yaml",
+          "name": "storefront"
+        },
+        {
+          "images": [
+            "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3"
+          ],
+          "manifest": "gitops/apps/api.yaml",
+          "name": "api"
+        }
+      ],
+      "tag": "v3.0.1"
+    },
+    "selfchecks": {
+      "drift/five-facts.py": {
+        "rc": 0,
+        "stderr": "",
+        "stdout": "ok  three falsifiers declared; verdict is tri-state; 3 sources read from gitops/; fact 2 grades the identity; a hand-typed sample is refused; the two cage facts and their six falsifiers are pre-registered in window.yaml; a cage that refuses or leaks is observed false; a reference the cage selects, a fall-closed rung that is not the ladder's bottom, and a cluster whose reference reaches nothing either are each unmeasured rather than a cage that held; a sample older than the registration reads could-not-look on facts 6 and 7; and a cage fact null on 3 samples since the registration is a fall\n"
+      },
+      "drift/oscal_lane.py": {
+        "rc": 0,
+        "stderr": "",
+        "stdout": "ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not\n"
+      },
+      "drift/served_apps.py": {
+        "rc": 0,
+        "stderr": "",
+        "stdout": "ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict\n"
+      }
+    }
+  },
+  "ludlow": {
+    "composition": {
+      "authenticated_foundation_adoption": false,
+      "candidate_only": true,
+      "outcome": "composed",
+      "refusals": [],
+      "rendered_files_count": 54,
+      "temporary_copy_byte_replay": true,
+      "wrote_composed": false
+    },
+    "exact_foundation_pins_current": {
+      "compiler": {
+        "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+        "tag": "v4.0.0"
+      },
+      "policy": {
+        "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+        "tag": "v4.0.0"
+      }
+    },
+    "historical_composition_before_compiler_fixes": {
+      "outcome": "composed",
+      "party_artefact_errors": [],
+      "refusals": [],
+      "rendered_files_count": 54,
+      "wrote_composed": false
+    },
+    "pinned_workloads": {
+      "pods": [
+        {
+          "images": [
+            "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+          ],
+          "manifest": "gitops/apps/reports.yaml",
+          "name": "reports"
+        }
+      ],
+      "tag": "v3.0.1"
+    },
+    "selfchecks": {
+      "drift/five-facts.py": {
+        "rc": 0,
+        "stderr": "",
+        "stdout": "ok  three falsifiers declared; verdict is tri-state; 3 sources read from gitops/; fact 2 grades the identity; a hand-typed sample is refused; the two cage facts and their six falsifiers are pre-registered in window.yaml; a cage that refuses or leaks is observed false; a reference the cage selects, a fall-closed rung that is not the ladder's bottom, and a cluster whose reference reaches nothing either are each unmeasured rather than a cage that held; a sample older than the registration reads could-not-look on facts 6 and 7; and a cage fact null on 3 samples since the registration is a fall\n"
+      },
+      "drift/oscal_lane.py": {
+        "rc": 0,
+        "stderr": "",
+        "stdout": "ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not\n"
+      },
+      "drift/served_apps.py": {
+        "rc": 0,
+        "stderr": "",
+        "stdout": "ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict\n"
+      }
+    }
+  },
+  "tuppence": {
+    "composition": {
+      "authenticated_foundation_adoption": false,
+      "candidate_only": true,
+      "outcome": "composed",
+      "refusals": [],
+      "rendered_files_count": 50,
+      "temporary_copy_byte_replay": true,
+      "wrote_composed": false
+    },
+    "exact_foundation_pins_current": {
+      "compiler": {
+        "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+        "tag": "v4.0.0"
+      },
+      "policy": {
+        "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+        "tag": "v4.0.0"
+      }
+    },
+    "historical_composition_before_compiler_fixes": {
+      "exception": "SystemExit: scenario has no 'warn' block and no top-level lef/lm",
+      "outcome": "instrument_error",
+      "traceback": "Traceback (most recent call last):\n  File \"<stdin>\", line 13, in <module>\n  File \"/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py\", line 5669, in compose\n    prices = compute_prices(\n        edges, adopter_party, band[\"amount\"], parent_trees, prev_header,\n    ...<3 lines>...\n        prev_prices=prev_prices, as_of=as_of, observations=observations,\n        implemented=implemented)\n  File \"/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py\", line 5235, in compute_prices\n    entry = price_parent(\n        edge, adopter_party, tolerance, edge_tree(edge, parent_trees), prev_version,\n    ...<2 lines>...\n        composition_as_of=comp_as_of, prev_prices=prev_prices, observation=observation,\n        implemented=implemented, inventory=_cve_inventory(adopter_dir) if _feed_name(edge) == \"cve\" else None)\n  File \"/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py\", line 3617, in price_parent\n    old = cage.select(old_sc, adopter_party, band_native, mode=\"warn\", floor=floor)\n  File \"/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/cage.py\", line 363, in select\n    st = fair.state(scenario, mode)\n  File \"/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform/graded/../fair/fair.py\", line 259, in state\n    sys.exit(f\"scenario has no '{mode}' block and no top-level lef/lm\")\n    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSystemExit: scenario has no 'warn' block and no top-level lef/lm\n",
+      "wrote_composed": false
+    },
+    "pinned_workloads": {
+      "pods": [
+        {
+          "images": [
+            "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5"
+          ],
+          "manifest": "gitops/apps/ledger.yaml",
+          "name": "ledger"
+        }
+      ],
+      "tag": "v3.0.1"
+    },
+    "selfchecks": {
+      "drift/five-facts.py": {
+        "rc": 0,
+        "stderr": "",
+        "stdout": "ok  three falsifiers declared; verdict is tri-state; 3 sources read from gitops/; fact 2 grades the identity; a hand-typed sample is refused; the two cage facts and their six falsifiers are pre-registered in window.yaml; a cage that refuses or leaks is observed false; a reference the cage selects, a fall-closed rung that is not the ladder's bottom, and a cluster whose reference reaches nothing either are each unmeasured rather than a cage that held; a sample older than the registration reads could-not-look on facts 6 and 7; and a cage fact null on 3 samples since the registration is a fall\n"
+      },
+      "drift/oscal_lane.py": {
+        "rc": 0,
+        "stderr": "",
+        "stdout": "ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not\n"
+      },
+      "drift/served_apps.py": {
+        "rc": 0,
+        "stderr": "",
+        "stdout": "ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict\n"
+      }
+    }
+  }
+}

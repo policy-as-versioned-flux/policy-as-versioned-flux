@@ -1,0 +1,5 @@
+{
+  "event": "APPROVE",
+  "commit_id": "5893d40b15cff047680ae6ea8cac0af18e9cb17b",
+  "body": "Independent content review is bound to this exact signed head. The payload changes only the intended digest-pinned app manifests/resource membership and the rederived composed comparison-input hash. No credential/private payload, inventory or future pin is introduced; compiler, policy/feed parents, party declaration and current self-pin are unchanged. The complete served app graph keeps policy5.0.0 claims. Published-source composition replay, ordinary no-movement bump grading, declared-engine shift-left and both GitHub PR checks passed. This app-containing signed release is the prerequisite for the later exact-tag inventory adoption."
+}

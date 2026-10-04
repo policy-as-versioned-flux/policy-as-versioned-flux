@@ -1,7 +1,7 @@
 # 148 — Composition prices an unsupported pairing
 
 Type: task
-Status: open
+Status: claimed
 Blocked by: 146, 147, and the owner's authorisation for a platform tools tag and the adopter tags
 
 ## Question
@@ -64,3 +64,9 @@ The hub check passes on its planted cases. The truth run after the recomposes re
 - The composer reads the substrate from the platform's `engine/namespaces.yaml`, never from the
   adopter (ticket 119). The engine version is the adopter's own fact, so it is read from the
   adopter.
+
+## Resume implementation, 2026-10-03
+
+Composition prices unsupported and undeclared engine pairings as named holes, with the exact engine declaration in the composed header. Engine-pairing tests pass (13 assertions). The hub priced-hole vocabulary carries both new kinds. Publication and adopter recomposition remain pending.
+
+The owner delegated the implementing decisions on 2026-10-03: "you tell me, you control them all, you don't need me to answer". This is recorded as delegated, not as an invented institution signature.

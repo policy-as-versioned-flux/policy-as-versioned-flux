@@ -1,7 +1,7 @@
 # 144 — The twins price on published comparable evidence
 
 Type: task
-Status: open
+Status: claimed
 Blocked by: 141
 
 ## Question
@@ -70,3 +70,9 @@ Consequences for this ticket, each **delegated** (ADR-0025):
    conversion today, so this ticket adds one.
 6. The labels differ from driftwood's meaning: Starling's customers are accounts, Elevance's are
    members, and Starling's headcount is an average. Each `size:` block carries a note that says so.
+
+## Resume implementation, 2026-10-03
+
+Published comparison inputs and explicit pricing grades are prepared for the three adopters. Currency conversion uses the authentic August 2026 HMRC payload, with the filing date and conversion month recorded separately. The valuation tests pass. Signed publication, recomposition and scheduled twin observations remain pending.
+
+The owner delegated the implementing decisions on 2026-10-03: "you tell me, you control them all, you don't need me to answer". This is recorded as delegated, not as an invented institution signature.

@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-03T19:25:37.199296+00:00",
+  "files": [
+    "compose/handbook.py",
+    "compose/test_handbook_unpriced.py"
+  ],
+  "patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-03/platform-handbook-unpriced-only.patch",
+  "patch_sha256": "852fac0e3bb60eeced694fcc8ae0ae4f6e882999fc4dc17611314fa9349c0bc9",
+  "red": "Public render regression failed twice at handbook.py:521 with CannotRender amount None; exact original driftwood compose reproduced same failure",
+  "green": {
+    "focused_regression": "3 tests, 4 cases passed",
+    "handbook_selfcheck": "58 checks passed",
+    "focused_mypy": "Success: no issues found in 2 source files",
+    "original_driftwood_compose": "composed; null CVE amount explicitly unpriced, missing total not replaced"
+  },
+  "strict_money_formatter": "unchanged; nonnumeric present amount still refused and measured zero rendered as money",
+  "delivery_patch_check": "passed without applying",
+  "reverse_patch_check": "passed against changed original source",
+  "reviewed_delivery_head_unchanged": "9ddd6a2d050f421d7121225b4b5c68a8a753d513",
+  "reviewed_delivery_checkout": "clean",
+  "external_actions": "none",
+  "active_sessions": []
+}

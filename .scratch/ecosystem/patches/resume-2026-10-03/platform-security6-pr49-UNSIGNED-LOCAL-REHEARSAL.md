@@ -1,0 +1,1 @@
+This JSON is unsigned local publisher dry-run output from committed source 9ddd6a2d050f421d7121225b4b5c68a8a753d513. It is rehearsal evidence only, not an authentic Actions receipt. It was archived before fetching any authentic policy6 evidence.

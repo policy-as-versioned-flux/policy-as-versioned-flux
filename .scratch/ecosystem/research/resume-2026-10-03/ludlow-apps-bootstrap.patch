@@ -1,0 +1,35 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index bed3e92..af883c6 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -616,7 +616,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: e821ad0ed25fccf8063a2f6aa303827839935610bb47f4e5ce26be84d37a94f3
++  after: 5dba1a9c1c6d3113f40e1bb16c8f64704be69683b2a232187b57fdb5e862440e
+   before:
+     header:
+       parents:
+diff --git a/gitops/apps/reports.yaml b/gitops/apps/reports.yaml
+index e4ba891..72976a7 100644
+--- a/gitops/apps/reports.yaml
++++ b/gitops/apps/reports.yaml
+@@ -6,7 +6,7 @@
+ # only because that list names it. A workload file sitting in this directory unlisted is served
+ # to nobody; the hub's verify/lifted-apps/ check reads the path and the list, not the directory.
+ #
+-# NOT YET SERVED FROM THE PIN. The same file's GitRepository pins `ref: {tag: v1.0.0, commit:
++# HISTORICAL CEILING, before ticket 155 moves the self-pin. The same file's GitRepository pins `ref: {tag: v1.0.0, commit:
+ # ...}`, and that tree's kustomization does not list this file, so a cluster reconciling the pin
+ # today is served nothing from here until ludlow cuts a tag and moves its own pin -- which no
+ # renovate customManager bumps (they cover the parents only). The hub check counts that on every
+@@ -63,7 +63,7 @@ spec:
+     runAsUser: 1000
+   containers:
+     - name: reports
+-      image: ghcr.io/policy-as-versioned-flux/reports@sha256:36dc3d7d1bd5193f46a55d57b505beb5e99d7925f65b0fad3c1f7d1aeafefcf5
++      image: ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2
+       ports:
+         - containerPort: 8080
+       securityContext:

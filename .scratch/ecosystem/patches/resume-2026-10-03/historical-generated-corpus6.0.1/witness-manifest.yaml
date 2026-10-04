@@ -1,0 +1,136 @@
+counts:
+  rederive-fixtures: 5
+  real-infrastructure-committed: 0
+  real-infrastructure-missing: 6
+entries:
+- witness: fully-compliant
+  kind: rederive-fixture
+  file: computed-semver/corpus/fixtures/fully-compliant.yaml
+  shape:
+    outcomes:
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    pin_inside: false
+  present_in_spine: true
+- witness: legal-department
+  kind: rederive-fixture
+  file: computed-semver/corpus/fixtures/legal-department.yaml
+  shape:
+    outcomes:
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    pin_inside: false
+  present_in_spine: true
+- witness: no-department
+  kind: rederive-fixture
+  file: computed-semver/corpus/fixtures/no-department.yaml
+  shape:
+    outcomes:
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    pin_inside: false
+  present_in_spine: true
+- witness: no-owner
+  kind: rederive-fixture
+  file: computed-semver/corpus/fixtures/no-owner.yaml
+  shape:
+    outcomes:
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    pin_inside: false
+  present_in_spine: true
+- witness: unknown-department
+  kind: rederive-fixture
+  file: computed-semver/corpus/fixtures/unknown-department.yaml
+  shape:
+    outcomes:
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    - absent
+    pin_inside: false
+  present_in_spine: true
+- witness: spire
+  kind: real-infrastructure
+  file: null
+  shape: null
+  present_in_spine: null
+  status: not-yet-committed
+- witness: istio
+  kind: real-infrastructure
+  file: null
+  shape: null
+  present_in_spine: null
+  status: not-yet-committed
+- witness: openbao
+  kind: real-infrastructure
+  file: null
+  shape: null
+  present_in_spine: null
+  status: not-yet-committed
+- witness: pomerium
+  kind: real-infrastructure
+  file: null
+  shape: null
+  present_in_spine: null
+  status: not-yet-committed
+- witness: dex
+  kind: real-infrastructure
+  file: null
+  shape: null
+  present_in_spine: null
+  status: not-yet-committed
+- witness: git-server
+  kind: real-infrastructure
+  file: null
+  shape: null
+  present_in_spine: null
+  status: not-yet-committed

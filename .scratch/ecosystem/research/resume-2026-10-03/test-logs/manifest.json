@@ -1,0 +1,48 @@
+{
+  "scope": "actual local test and release dry-run outputs; no scheduled or signed release claim",
+  "logs": [
+    {
+      "name": "pavf-resume-full-pytest.out",
+      "bytes": 55935,
+      "sha256": "73d9be14d6c42b43fc371c6b3c3e66a9b513b6c7f661f876be7a44c5fbfa476f",
+      "retained": true
+    },
+    {
+      "name": "pavf-loophole-rerun-4.out",
+      "bytes": 143,
+      "sha256": "cf475986a6ec733a566137c51e58100295a378c93e188cc8e68fa437427f4cff",
+      "retained": true
+    },
+    {
+      "name": "pavf-final-type-seam-2.out",
+      "bytes": 208,
+      "sha256": "5ae819c3bb6791a366e89e2ee67accbd3be2d83305c8dba05d89b34fa6c7f0f0",
+      "retained": true
+    },
+    {
+      "name": "pavf-final-realengine-root.out",
+      "bytes": 143,
+      "sha256": "ab4a0c70f45ae036d8789ef8d8456c9bbafbac5000bc3532bc6038023c7cbcce",
+      "retained": true
+    },
+    {
+      "name": "pavf-real-security6-publisher.out",
+      "bytes": 409,
+      "sha256": "59ef596144b97542132de871fa233dcda9aead7c34b3796689aeed35a6fca30d",
+      "retained": true
+    },
+    {
+      "name": "pavf-real-security6-engine.out",
+      "bytes": 34999,
+      "sha256": "9983cf607ca49a2d4bcf594c6cd48079da404a93fdbf8123ab444f0592697053",
+      "retained": true
+    },
+    {
+      "name": "root-loophole-after-final-composition-fixes.out",
+      "bytes": 110,
+      "sha256": "3a6f0c3b8191c63129cc28c50d52c88a620bcb90e05a8523044592a2012281ac",
+      "retained": true,
+      "result": "26 passed after the final composition fixes"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-03T19:59:02.531429+00:00",
+  "inventory_provenance": "passed all 3 tag/source graphs and 5 raw/normalized joins; exact prior verified tag proof bound",
+  "price_transition": "7 public tests independently passed; no hard finding",
+  "alias_relocation": "closed: narrow source review and 3 focused tests passed independently; original all-three public compose/relocated-byte replay passed",
+  "source_owner": "spec_review owns _portable_reason and test_portable_reason.py",
+  "standards_source_edits": [],
+  "external_mutations": [],
+  "active_sessions": [],
+  "report": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-03/standards-stage2-inventory-price-review.md",
+  "cloud_replay_session": null,
+  "all_original_replays": "driftwood53/tuppence50/ludlow54 rendered files; all byte replay passed",
+  "hard_findings": [],
+  "typecheck": "131 unchanged baseline diagnostics; no introduced diagnostics; not clean",
+  "alias_patch_sha256": "a1e0a5d81c1e7673c67d4ee65d3b5060ba15a5794f29f8fb54427500839f801b"
+}

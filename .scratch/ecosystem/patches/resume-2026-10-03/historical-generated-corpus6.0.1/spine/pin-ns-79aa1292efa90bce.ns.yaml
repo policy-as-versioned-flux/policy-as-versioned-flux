@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    policy-as-versioned.dev/governed: 'true'
+    posture.acme.io/tier: quarantine
+  name: corpus-governed-quarantine

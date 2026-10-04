@@ -260,3 +260,7 @@ demands `(see 03 §4c–4d)`.
   has retired), given the original demonstrated that silent-un-guarding gap but never guarded against it?
 - Minimal vs Full: which are we actually building first? The ledger assumes MVP = vanilla Flux + OCI +
   Renovate + Kyverno, no image-automation/Terraform/flux-operator. Is that the right floor?
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

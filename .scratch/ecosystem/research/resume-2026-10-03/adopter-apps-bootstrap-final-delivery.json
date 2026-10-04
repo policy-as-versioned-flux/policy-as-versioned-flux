@@ -1,0 +1,196 @@
+{
+  "completed_at": "2026-10-03T19:05:21.904Z",
+  "scope": "stage1 app-containing signed releases only; no stage2/pin changes",
+  "adopters": {
+    "driftwood": {
+      "tag": "v3.0.1",
+      "tag_object": "4cdf9152d2af61d9e476f5e0f487d85a2808f42f",
+      "commit": "17302ecd20041df61a52428e67246c330294d2a6",
+      "tag_tree": "https://github.com/policy-as-versioned-driftwood/driftwood/tree/v3.0.1",
+      "reviewed_app_payload_identical": true,
+      "signature": {
+        "git": true,
+        "rekor": true,
+        "certificate_claims": true,
+        "identity": "https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main",
+        "issuer": "https://token.actions.githubusercontent.com",
+        "tlog_index": "3075511413",
+        "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511413"
+      },
+      "source_commit": "c9eff7a354ccb7eef4c51bde38e2915b4b686b95",
+      "source_signature": "G",
+      "pr": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/53",
+      "merged_by": "app/pavc-other-hand",
+      "review": {
+        "actor": "pavc-other-hand[bot]",
+        "commit_id": "c9eff7a354ccb7eef4c51bde38e2915b4b686b95",
+        "id": 5402250147,
+        "url": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/53#pullrequestreview-5402250147",
+        "state": "APPROVED"
+      },
+      "cut_workflow": {
+        "id": 37146159741,
+        "url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37146159741",
+        "head": "17302ecd20041df61a52428e67246c330294d2a6",
+        "conclusion": "success"
+      },
+      "release_workflow": {
+        "conclusion": "success",
+        "headSha": "17302ecd20041df61a52428e67246c330294d2a6",
+        "id": 37146414256,
+        "jobs": [
+          {
+            "conclusion": "success",
+            "failed_steps": [],
+            "name": "release",
+            "status": "completed"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37146414256"
+      },
+      "release": {
+        "isDraft": false,
+        "isPrerelease": false,
+        "name": "v3.0.1",
+        "publishedAt": "2026-10-03T19:01:56Z",
+        "tagName": "v3.0.1",
+        "targetCommitish": "main",
+        "url": "https://github.com/policy-as-versioned-driftwood/driftwood/releases/tag/v3.0.1"
+      },
+      "ordinary_composed_bump": "none",
+      "compiler": "v4.0.0 / 557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "policy_claim": "5.0.0",
+      "apps_source_self_pin": "unchanged v1.0.0; final real v3.0.1 pin is stage2",
+      "inventory": "absent and unchanged in stage1"
+    },
+    "tuppence": {
+      "tag": "v3.0.1",
+      "tag_object": "bc6ee99a1cda20e9fe0365feb25c3086aad7f5a5",
+      "commit": "d8dead25e0e5e275172640b1a637562e45edb15d",
+      "tag_tree": "https://github.com/policy-as-versioned-tuppence/tuppence/tree/v3.0.1",
+      "reviewed_app_payload_identical": true,
+      "signature": {
+        "git": true,
+        "rekor": true,
+        "certificate_claims": true,
+        "identity": "https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main",
+        "issuer": "https://token.actions.githubusercontent.com",
+        "tlog_index": "3075511590",
+        "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511590"
+      },
+      "source_commit": "7cd3d34b9006ebff76ace4598aa10a5563d122b9",
+      "source_signature": "G",
+      "pr": "https://github.com/policy-as-versioned-tuppence/tuppence/pull/51",
+      "merged_by": "app/pavc-other-hand",
+      "review": {
+        "actor": "pavc-other-hand[bot]",
+        "commit_id": "7cd3d34b9006ebff76ace4598aa10a5563d122b9",
+        "html_url": "https://github.com/policy-as-versioned-tuppence/tuppence/pull/51#pullrequestreview-5402255984",
+        "id": 5402255984,
+        "state": "APPROVED"
+      },
+      "cut_workflow": {
+        "id": 37146160185,
+        "url": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37146160185",
+        "head": "d8dead25e0e5e275172640b1a637562e45edb15d",
+        "conclusion": "success"
+      },
+      "release_workflow": {
+        "conclusion": "success",
+        "headSha": "d8dead25e0e5e275172640b1a637562e45edb15d",
+        "id": 37146413222,
+        "jobs": [
+          {
+            "conclusion": "success",
+            "failed_steps": [],
+            "name": "release",
+            "status": "completed"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37146413222"
+      },
+      "release": {
+        "isDraft": false,
+        "isPrerelease": false,
+        "name": "v3.0.1",
+        "publishedAt": "2026-10-03T19:01:57Z",
+        "tagName": "v3.0.1",
+        "targetCommitish": "main",
+        "url": "https://github.com/policy-as-versioned-tuppence/tuppence/releases/tag/v3.0.1"
+      },
+      "ordinary_composed_bump": "none",
+      "compiler": "v4.0.0 / 557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "policy_claim": "5.0.0",
+      "apps_source_self_pin": "unchanged v1.0.0; final real v3.0.1 pin is stage2",
+      "inventory": "absent and unchanged in stage1"
+    },
+    "ludlow": {
+      "tag": "v3.0.1",
+      "tag_object": "2cc62f42b297f1f7ed65babc381a6dad561f3240",
+      "commit": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+      "tag_tree": "https://github.com/policy-as-versioned-ludlow/ludlow/tree/v3.0.1",
+      "reviewed_app_payload_identical": true,
+      "signature": {
+        "git": true,
+        "rekor": true,
+        "certificate_claims": true,
+        "identity": "https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main",
+        "issuer": "https://token.actions.githubusercontent.com",
+        "tlog_index": "3075511349",
+        "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511349"
+      },
+      "source_commit": "5893d40b15cff047680ae6ea8cac0af18e9cb17b",
+      "source_signature": "G",
+      "pr": "https://github.com/policy-as-versioned-ludlow/ludlow/pull/48",
+      "merged_by": "app/pavc-other-hand",
+      "review": {
+        "actor": "pavc-other-hand[bot]",
+        "commit_id": "5893d40b15cff047680ae6ea8cac0af18e9cb17b",
+        "html_url": "https://github.com/policy-as-versioned-ludlow/ludlow/pull/48#pullrequestreview-5402255372",
+        "id": 5402255372,
+        "state": "APPROVED"
+      },
+      "cut_workflow": {
+        "id": 37146159801,
+        "url": "https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/37146159801",
+        "head": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+        "conclusion": "success"
+      },
+      "release_workflow": {
+        "conclusion": "success",
+        "headSha": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+        "id": 37146414184,
+        "jobs": [
+          {
+            "conclusion": "success",
+            "failed_steps": [],
+            "name": "release",
+            "status": "completed"
+          }
+        ],
+        "status": "completed",
+        "url": "https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/37146414184"
+      },
+      "release": {
+        "isDraft": false,
+        "isPrerelease": false,
+        "name": "v3.0.1",
+        "publishedAt": "2026-10-03T19:01:57Z",
+        "tagName": "v3.0.1",
+        "targetCommitish": "main",
+        "url": "https://github.com/policy-as-versioned-ludlow/ludlow/releases/tag/v3.0.1"
+      },
+      "ordinary_composed_bump": "none",
+      "compiler": "v4.0.0 / 557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "policy_claim": "5.0.0",
+      "apps_source_self_pin": "unchanged v1.0.0; final real v3.0.1 pin is stage2",
+      "inventory": "absent and unchanged in stage1"
+    }
+  },
+  "source_clones": "Untouched by this task; all branch, fetch and tag verification operations occurred in isolated /private/tmp checkouts",
+  "credentials": "App token injected only into scoped process environment; no credentials retained in artifacts",
+  "sessions": [],
+  "approval_rejections": []
+}

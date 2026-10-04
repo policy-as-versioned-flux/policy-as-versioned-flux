@@ -137,3 +137,5 @@ The 41 re-grills were answered on 2026-08-28. The record is [REGRILL-ANSWERS.md]
 
 17. The incumbent org shrinks to the hub: its app repos transfer into their adopters' orgs, and every other repo except the hub is archived when its register row passes (delegated, with the owner's authorisations to archive and to transfer, 2026-09-25; ticket 35, ADR-0036).
 18. A CVE is priced from the adopter's own scan, against a KEV-scoped feed (delegated, 2026-09-25; ticket 35, ADR-0035).
+
+> Correction, 2026-10-03 (ticket 97): the development guard admits direct enactment in the authorized development window; it does not enforce two distinct identities. The deployment continues to use the other hand for reviews and merges. `verify/enact-record/` catches an accidental unrecorded flip and the expiry; it cannot authenticate a quote written by the assistant. The window and its exact owner words remain those decided on 2026-09-24, ending 2026-10-22.

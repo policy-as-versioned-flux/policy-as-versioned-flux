@@ -1,0 +1,95 @@
+[
+  {
+    "file": "cloud-release.yml",
+    "name": "cloud-release",
+    "triggers": {
+      "workflow_dispatch": {
+        "inputs": {
+          "version": {
+            "description": "Cloud package semver matching implementations/cloud/VERSION",
+            "required": true
+          },
+          "hub_record": {
+            "description": "Full signed hub clock commit carrying a modern e2e4 PASS",
+            "required": true
+          },
+          "message": {
+            "description": "What changed and why",
+            "required": true
+          }
+        }
+      }
+    },
+    "jobs": [
+      "release"
+    ]
+  },
+  {
+    "file": "cut-release.yml",
+    "name": "cut-release",
+    "triggers": {
+      "workflow_dispatch": {
+        "inputs": {
+          "version": {
+            "description": "single-tag form: semver tag to cut, e.g. v1.0.0 (omit if using `tags`)",
+            "required": false
+          },
+          "message": {
+            "description": "single-tag form: annotated tag message -- what changed and why (omit if using `tags`)",
+            "required": false
+          },
+          "tags": {
+            "description": "multi-tag form: JSON array of {\"tag\":\"vX.Y.Z\",\"message\":\"...\"} objects, all cut on this commit (omit if using `version`/`message`)",
+            "required": false
+          },
+          "backfill_evidence_only": {
+            "description": "policy-composition ticket 18: when \"true\", run the gate and commit signed evidence for the named policy/v* tag(s), but create no tag and push commits (not tags) straight to this branch instead -- for a version cut before the publisher gate (cs-27) existed, so it never got evidence. The gate computes against the REAL, already- committed distribution/policies/v<version> tree (build_current_subject reads real files, not the tag object itself), so this is a genuine, reproducible computation -- not a fabricated value -- generated today rather than at original release. Tags stay immutable; only evidence files are added.",
+            "required": false,
+            "default": "false"
+          }
+        }
+      }
+    },
+    "jobs": [
+      "cut"
+    ]
+  },
+  {
+    "file": "fetch.yml",
+    "name": "fetch",
+    "triggers": {
+      "schedule": [
+        {
+          "cron": "23 1 * * *"
+        }
+      ],
+      "workflow_dispatch": {}
+    },
+    "jobs": [
+      "fetch"
+    ]
+  },
+  {
+    "file": "release.yml",
+    "name": "release",
+    "triggers": {
+      "push": {
+        "tags": [
+          "v*.*.*",
+          "policy/v*.*.*"
+        ]
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "tag": {
+            "description": "tag to verify + publish (workflow_dispatch path only)",
+            "required": true
+          }
+        }
+      }
+    },
+    "jobs": [
+      "release"
+    ]
+  }
+]

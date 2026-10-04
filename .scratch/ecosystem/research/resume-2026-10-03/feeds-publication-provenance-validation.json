@@ -1,0 +1,52 @@
+{
+  "bumps": {
+    "cve": "major",
+    "fx": "minor",
+    "threat-register": "major"
+  },
+  "cisa_catalog_version": "2026.10.02",
+  "cve_provenance": {
+    "epss": {
+      "sha256": "fad78a8dfbf5903599abd19824578b074990a90ca44a0716d45d0d41a5660fb5",
+      "url": "https://epss.cyentia.com/epss_scores-current.csv.gz"
+    },
+    "kev": {
+      "sha256": "d2c8c6cb23291b46ff2b086197641a6b1fa35e6b746bba714cc280a1778f9e48",
+      "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
+    },
+    "nvd": {
+      "pages": [
+        {
+          "sha256": "dea226236365bc2547423890e3b4c92a0c45ab5ffe4516742969a0f499c13664",
+          "startIndex": 0
+        }
+      ],
+      "url": "https://services.nvd.nist.gov/rest/json/cves/2.0?hasKev&resultsPerPage=2000"
+    }
+  },
+  "cve_rows": 1733,
+  "epss_score_date": "2026-10-03",
+  "exact_rebuilds": [
+    "CVE primary corpus",
+    "FX saved HMRC CSV"
+  ],
+  "frozen_feed_bytes": "9 old payloads unchanged",
+  "fx_period": "2026-08",
+  "fx_rate_count": 141,
+  "fx_raw_sha256": "8da9e83a830282c94cbcb31779cbeb93d7a2a739d1bb898cbec62182b7b29fad",
+  "model_guard": "NVD data credential allowed; model credential rejected",
+  "public_destination": {
+    "private": false,
+    "repository": "policy-as-versioned-feeds/feeds",
+    "visibility": "public"
+  },
+  "release_gate_platform": {
+    "commit": "533dccb0a823001b396fd60ab08014bf75065a37",
+    "tag": "v2.0.1"
+  },
+  "release_gates": [
+    "verify-feeds.sh: PASS",
+    "verify-market-and-news.sh: PASS"
+  ],
+  "replay": "CVE and FX unchanged replay none; dated EPSS preserved"
+}

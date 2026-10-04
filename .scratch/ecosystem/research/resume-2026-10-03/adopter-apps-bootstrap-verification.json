@@ -1,0 +1,94 @@
+{
+  "source_verifications": {
+    "driftwood": {
+      "exit": 0,
+      "stdout": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs\n",
+      "stderr": ""
+    },
+    "tuppence": {
+      "exit": 0,
+      "stdout": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs\n",
+      "stderr": ""
+    },
+    "ludlow": {
+      "exit": 0,
+      "stdout": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs\n",
+      "stderr": ""
+    }
+  },
+  "ordinary_bump_grades": {
+    "driftwood": {
+      "base": "529e159397d3e64f94b0270cc7de69c235580961",
+      "old_versions": [
+        "5.0.0"
+      ],
+      "new_versions": [
+        "5.0.0"
+      ],
+      "grading": {
+        "composed_bump": "none",
+        "declared_bump": "none",
+        "added": [],
+        "retired": [],
+        "reasons": [],
+        "weaker_than_declared": false
+      }
+    },
+    "tuppence": {
+      "base": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+      "old_versions": [
+        "5.0.0"
+      ],
+      "new_versions": [
+        "5.0.0"
+      ],
+      "grading": {
+        "composed": "none",
+        "added": [],
+        "retired": [],
+        "elements": []
+      }
+    },
+    "ludlow": {
+      "base": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+      "old_versions": [
+        "5.0.0"
+      ],
+      "new_versions": [
+        "5.0.0"
+      ],
+      "grading": {
+        "composed_bump": "none",
+        "results": []
+      }
+    }
+  },
+  "isolated_scope": {
+    "driftwood": {
+      "status": "M composed/HEADER.yaml\n M deploy/pod.yaml\n M gitops/apps/kustomization.yaml\n M gitops/apps/pod.yaml\n M gitops/apps/storefront.yaml\n?? gitops/apps/api.yaml",
+      "gpgsign": "true",
+      "gpgformat": "ssh",
+      "signer": "(unset)",
+      "hooksPath": "/Users/cns/.git/hooks",
+      "unused_v3_0_1": true
+    },
+    "tuppence": {
+      "status": "M composed/HEADER.yaml\n M gitops/apps/ledger.yaml",
+      "gpgsign": "true",
+      "gpgformat": "ssh",
+      "signer": "(unset)",
+      "hooksPath": "/Users/cns/.git/hooks",
+      "unused_v3_0_1": true
+    },
+    "ludlow": {
+      "status": "M composed/HEADER.yaml\n M gitops/apps/reports.yaml",
+      "gpgsign": "true",
+      "gpgformat": "ssh",
+      "signer": "(unset)",
+      "hooksPath": "/Users/cns/.git/hooks",
+      "unused_v3_0_1": true
+    }
+  },
+  "authenticated_wrapper": "WAIT: installed verifier attempts online Rekor lookup despite published wrapper offline input; current TUF freshness not claimed",
+  "normal_commit": "WAIT: keyless signing is configured; no network/signing/hook override authorized"
+}

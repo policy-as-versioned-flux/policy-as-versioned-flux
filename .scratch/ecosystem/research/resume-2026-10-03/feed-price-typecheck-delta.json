@@ -1,0 +1,14 @@
+{
+  "scope": "exact pre/post narrow fix; all imports skipped, missing stubs ignored; legacy file type debt retained",
+  "command": "python -m mypy --follow-imports=skip --ignore-missing-imports --no-incremental <composition.py>",
+  "before": {
+    "exit": 1,
+    "error_count": 131
+  },
+  "after": {
+    "exit": 1,
+    "error_count": 131
+  },
+  "introduced_diagnostics": [],
+  "removed_diagnostics": []
+}

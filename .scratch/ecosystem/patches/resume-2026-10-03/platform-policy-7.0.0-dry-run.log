@@ -1,0 +1,13 @@
+Unsigned offline clean-major rehearsal after synthetic annotated policy/v6.0.0 tag; supported window retains5+6.
+Publisher CLI: /private/tmp/pavf-kyverno-engines/1.18.2/kyverno; SHA256 e22e36099762401ad1c82ebe00c0b80aac0317c5e11396d613b407a7668107df
+dry run: wrote computed-semver/evidence/7.0.0.json, signed nothing
+## Publisher gate
+
+| tag | declared | computed | outcome | reason |
+| --- | --- | --- | --- | --- |
+| `policy/v7.0.0` | major | major | passed |  |
+
+GATE: cut-release.yml must cut policy/v7.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
+GATE: passed for policy/v7.0.0
+
+Exit: 0

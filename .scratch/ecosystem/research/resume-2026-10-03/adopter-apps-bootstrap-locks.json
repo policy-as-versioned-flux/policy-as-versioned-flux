@@ -1,0 +1,14 @@
+{
+  "driftwood": {
+    "index_lock": false,
+    "head_lock": false
+  },
+  "tuppence": {
+    "index_lock": false,
+    "head_lock": false
+  },
+  "ludlow": {
+    "index_lock": false,
+    "head_lock": false
+  }
+}

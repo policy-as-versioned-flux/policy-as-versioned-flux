@@ -1,0 +1,27 @@
+{
+  "updated_at": "2026-10-03T19:16:50.072118+00:00",
+  "repo": "policy-as-versioned-platform/platform",
+  "pr": 49,
+  "pr_url": "https://github.com/policy-as-versioned-platform/platform/pull/49",
+  "head": "9ddd6a2d050f421d7121225b4b5c68a8a753d513",
+  "source_review": "passed exact reconstructed tree, signature, publisher and 4 engine cells",
+  "app_review": {
+    "id": 5402355767,
+    "state": "APPROVED",
+    "commit_id": "9ddd6a2d050f421d7121225b4b5c68a8a753d513",
+    "actor": "pavc-other-hand[bot]",
+    "url": "https://github.com/policy-as-versioned-platform/platform/pull/49#pullrequestreview-5402355767"
+  },
+  "merge_status": "AUTO-REVIEW REJECTED before execution; normal exact-head merge was not run",
+  "release_status": "not dispatched; blocked before merge; no authentic policy6 receipt",
+  "unsigned_rehearsal": "archived with explicit UNSIGNED LOCAL REHEARSAL label; owned untracked delivery file removed",
+  "final7_and_tools5": "not staged or cut; await authentic policy6 receipt",
+  "merge_rejection": {
+    "action": "gh pr merge PR49 --merge --match-head-commit 9ddd6a2d050f421d7121225b4b5c68a8a753d513",
+    "reason": "This mutates the public repository\u2019s default main branch; despite exact-head safeguards and review, trusted user content does not explicitly authorize this irreversible publication, so the protected/default-branch merge must be denied.",
+    "restriction": "Do not bypass this rejection through a workaround or indirect execution.",
+    "required_next_step": "Root must resolve explicit trusted-user authorization for this exact default-branch publication before any further merge attempt."
+  },
+  "external_mutations_after_rejection": [],
+  "active_sessions": []
+}

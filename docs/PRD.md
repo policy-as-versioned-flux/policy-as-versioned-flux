@@ -107,7 +107,7 @@ The build is accepted only when each is demonstrably true:
 | "-able" | Mechanism | Demonstrable evidence |
 |---|---|---|
 | **visible** | Policy in a public git repo; every cluster's `GitRepository` makes "what/which version/where" queryable | `flux get sources git`, `gotk_resource_info{revision}` |
-| **communicable** | Semver tags + release notes + advisory rationale; notification-controller broadcasts version changes | Alert fires on new tag; release notes render |
+| **communicable** | Semver tags + release notes + advisory rationale and compose-time handbook | Release notes and the adopter handbook render |
 | **consumable** | A consumer adds one label (workload) / the cluster adds one [`ResourceSet`](https://fluxoperator.dev/docs/crd/resourceset/) input | A new app onboards by setting one `policy-version` label |
 | **testable** | `kyverno test` fixtures (pass/fail) double as worked examples | CI runs fixtures; fixtures readable as docs |
 | **usable** | `flux build … --dry-run \| kyverno apply` locally and in CI; in-cluster SSA dry-run | A dev reproduces the admission verdict on their laptop, against the same pinned policy versions the cluster runs |
@@ -146,7 +146,7 @@ flowchart TD
 
   MERGE --> RS
   VP -->|PolicyReport| OBS["Policy Reporter -> Prometheus"]
-  KS -->|reconcile event| NC["notification-controller"]
+  KS -->|scheduled observation| LANE["adopter drift lane"]
   OBS -->|PolicyReports both planes| C2P["C2P result2oscal\n-> OSCAL assessment-results"]
   OBS & C2P & SRC --> DASH["one dashboard (4 panels, shared cluster+version var):\nversion-per-estate x passing? x controls satisfied? x adoption"]
 ```
@@ -185,7 +185,7 @@ policy-as-versioned-flux/
 
 `GitRepository` (pinned per version, gitsign-signed source) · `Kustomization` (`dependsOn` engine,
 `wait`, `prune`) · `HelmRelease` (Kyverno) · Kyverno [`ValidatingPolicy`](https://kyverno.io/docs/policy-types/validating-policy/) (CEL; Audit/Deny) ·
-`FluxInstance` + `ResourceSet` (+ `ResourceSetInputProvider`) · `Provider`/`Alert` (notifications) ·
+`FluxInstance` + `ResourceSet` (+ `ResourceSetInputProvider`) · signed source checks and scheduled lane samples ·
 Crossplane provider CRs + managed resources (cloud plane).
 
 ---
@@ -209,8 +209,7 @@ verified. Renovate's `customManager` (§6.2, `git-refs` datasource) therefore wr
 **commit SHA** alongside the tag; Flux pins that immutable commit. Flux gives `spec.ref.commit`
 precedence, so the tag field is human documentation — CI additionally asserts the tag still
 resolves to the pinned SHA, so the pair cannot silently disagree. Release tags are additionally
-**forge-protected/immutable** (GitHub ruleset / Immutable Releases), and `notification-controller`
-broadcasts every revision change (an audit trail on which any drift is visible).
+**forge-protected/immutable** (GitHub ruleset / Immutable Releases). Each adopter's scheduled lane records source verification and the applied revision; the truth surface grades the record.
 
 **Known limitation (accepted, ADR-0001):** Flux `GitRepository.spec.verify` is PGP-only (v2.9, Jun
 2026, added SSH — still not Sigstore/gitsign) and cannot verify gitsign today, so there is **no
@@ -475,3 +474,7 @@ sources behind this PRD:
 - [sigstore/gitsign](https://github.com/sigstore/gitsign) and [sigstore/cosign](https://github.com/sigstore/cosign) — keyless signing
 - [controlplaneio/collie](https://github.com/controlplaneio/collie) and its [announcement](https://control-plane.io/posts/collie-open-source-release/) — the cloud plane
 - [OSCAL](https://pages.nist.gov/OSCAL) and [OSCAL Compass / Compliance-to-Policy (C2P)](https://github.com/oscal-compass/compliance-to-policy-go) — compliance ground-truth (PolicyReports → OSCAL assessment-results); see ADR-0009 on why not [Lula](https://github.com/defenseunicorns/lula)
+
+## Correction, 2026-10-03 (eco-system ticket 156)
+
+ADR-0036 drops the incumbent notification spine and `pr-gate-action`. Commit-status notifications are historical design, not the ecosystem's compliance instrument. Each adopter's shift-left workflow verifies its signed pin, and its scheduled drift lane observes reconciled state. The truth surface grades those observations. The incumbent archive register names each replacement and the check that permits its archive; archive eligibility does not assert that the action already happened.

@@ -1,0 +1,33 @@
+{
+  "scope": "local declared-source diagnostic portability; no pricing, frequency, handbook or adopter declaration change",
+  "changed_paths": [
+    "compose/composition.py:_portable_reason",
+    "compose/test_portable_reason.py"
+  ],
+  "red_tests": 3,
+  "green_tests": 20,
+  "green_subtests": 27,
+  "original_replay": "cloud owns final three-adopter relocated byte replay",
+  "strict_mapping": "only declared adopter, parent and feed-specific roots; lexical absolute and resolved spellings, longest prefix first",
+  "patch": ".scratch/ecosystem/patches/resume-2026-10-03/portable-reason-alias-fix.patch",
+  "patch_sha256": "a1e0a5d81c1e7673c67d4ee65d3b5060ba15a5794f29f8fb54427500839f801b",
+  "file_sha256": {
+    "compose/composition.py": "35008c0d75ef00d8b0907703182244f19ba60fd4b3c4d58dc474ce5b5c58bd5c",
+    "compose/test_portable_reason.py": "c31d9f9a9e77a1de237aebde935d9af6048e67f6f9d8ec31105aac995b70aa23"
+  },
+  "sessions": [],
+  "typecheck": {
+    "scope": "exact pre/post alias delta; file legacy diagnostics retained",
+    "before": {
+      "exit": 1,
+      "error_count": 131
+    },
+    "after": {
+      "exit": 1,
+      "error_count": 131
+    },
+    "introduced_diagnostics": [],
+    "removed_diagnostics": []
+  },
+  "patch_reverse_check": "passed"
+}

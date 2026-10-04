@@ -1,0 +1,55 @@
+{
+  "scope": "actual source repository diffs, preserved patch/context captures checked as artifacts separately",
+  "results": [
+    {
+      "repository": ".",
+      "ok": true,
+      "warning_locations": []
+    },
+    {
+      "repository": "platform",
+      "ok": true,
+      "warning_locations": []
+    },
+    {
+      "repository": "feeds",
+      "ok": true,
+      "warning_locations": []
+    },
+    {
+      "repository": "driftwood",
+      "ok": true,
+      "warning_locations": []
+    },
+    {
+      "repository": "tuppence",
+      "ok": true,
+      "warning_locations": []
+    },
+    {
+      "repository": "ludlow",
+      "ok": true,
+      "warning_locations": []
+    },
+    {
+      "repository": "ledger",
+      "ok": true,
+      "warning_locations": []
+    },
+    {
+      "repository": "storefront",
+      "ok": true,
+      "warning_locations": []
+    },
+    {
+      "repository": "api",
+      "ok": true,
+      "warning_locations": []
+    },
+    {
+      "repository": "reports",
+      "ok": true,
+      "warning_locations": []
+    }
+  ]
+}

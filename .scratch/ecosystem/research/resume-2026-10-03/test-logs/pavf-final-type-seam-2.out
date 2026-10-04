@@ -1,0 +1,2 @@
+tests/test_sensor_admission.py:1288: note: By default the bodies of untyped functions are not checked, consider using --check-untyped-defs  [annotation-unchecked]
+Success: no issues found in 210 source files

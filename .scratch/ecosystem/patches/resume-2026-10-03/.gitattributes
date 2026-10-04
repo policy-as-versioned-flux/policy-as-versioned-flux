@@ -1,0 +1,2 @@
+# Diff context markers preserve exact patch bytes; source diffs are checked separately.
+*.patch -whitespace

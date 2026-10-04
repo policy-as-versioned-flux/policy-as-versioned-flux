@@ -1,0 +1,100 @@
+{
+  "outcome": {
+    "result": "degraded",
+    "reason": "declared bump 'patch' is weaker than the computed bump 'major' (window: 5.0.0, 6.0.0) -- cage-tier.yaml: ns-declares-078d977f4fbf4807, ns-declares-12974bf7ed29b34f, ns-declares-6e30210d6b79f1f6, ns-declares-f944f13747b62d01, pin-ns-8193685ebe9e7df6, pin-ns-f944f13747b62d01, tier-ns-2f46a2c16736bf08, tier-ns-a993f817e721f6b9, tier-ns-af0822801a2a79f7, tier-ns-ce5f5fb79b076e9e, tier-ns-f944f13747b62d01 via `{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-6-0-1',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},\n 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-6-0-1','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},\n 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-6-0-1','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},\n 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-6-0-1',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]; namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'\n  ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('')\n  : ''; variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']\n  ? variables.nsTier\n  : 'isolated'`. Published DEGRADED at tier 'quarantine' with a prerelease suffix on the declared number; the adopter prices the tier, nothing is refused"
+  },
+  "bump": {
+    "declared": "patch",
+    "computed": "major"
+  },
+  "movement": [
+    {
+      "policy": "cage-tier.yaml",
+      "verdict": "major",
+      "entries": [
+        "ns-declares-078d977f4fbf4807",
+        "ns-declares-12974bf7ed29b34f",
+        "ns-declares-6e30210d6b79f1f6",
+        "ns-declares-f944f13747b62d01",
+        "pin-ns-8193685ebe9e7df6",
+        "pin-ns-f944f13747b62d01",
+        "tier-ns-2f46a2c16736bf08",
+        "tier-ns-a993f817e721f6b9",
+        "tier-ns-af0822801a2a79f7",
+        "tier-ns-ce5f5fb79b076e9e",
+        "tier-ns-f944f13747b62d01"
+      ],
+      "expressions": [
+        "{'baseline':  {'cpu':'500m','mem':'256Mi','pc':'cage-baseline-6-0-1',  'prio':'-10',   'harden':'false','wafCpu':'0',   'wafMem':'0'},\n 'restricted':{'cpu':'250m','mem':'128Mi','pc':'cage-restricted-6-0-1','prio':'-100',  'harden':'true', 'wafCpu':'100m','wafMem':'128Mi'},\n 'quarantine':{'cpu':'100m','mem':'64Mi', 'pc':'cage-quarantine-6-0-1','prio':'-1000', 'harden':'true', 'wafCpu':'250m','wafMem':'256Mi'},\n 'isolated':  {'cpu':'100m','mem':'64Mi', 'pc':'cage-isolated-6-0-1',  'prio':'-10000','harden':'true', 'wafCpu':'250m','wafMem':'256Mi'}}[variables.tier]",
+        "namespaceObject != null && namespaceObject.metadata.?labels['policy-as-versioned.dev/governed'].orValue('') == 'true'\n  ? namespaceObject.metadata.?labels['posture.acme.io/tier'].orValue('')\n  : ''",
+        "variables.nsTier in ['baseline', 'restricted', 'quarantine', 'isolated']\n  ? variables.nsTier\n  : 'isolated'"
+      ],
+      "detail": "ns-declares-078d977f4fbf4807 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed, runAsNonRoot no longer written over the workload's own value; ns-declares-12974bf7ed29b34f (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; ns-declares-6e30210d6b79f1f6 (tier=baseline): runAsNonRoot no longer written over the workload's own value; ns-declares-f944f13747b62d01 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; pin-ns-8193685ebe9e7df6 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; pin-ns-f944f13747b62d01 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-2f46a2c16736bf08 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-a993f817e721f6b9 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-af0822801a2a79f7 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-ce5f5fb79b076e9e (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed; tier-ns-f944f13747b62d01 (tier baseline->isolated): cpu, mem, priorityClass, dropAll, readOnlyRootFs, waf narrowed"
+    },
+    {
+      "policy": "posture-trust-boundary.yaml",
+      "verdict": "removed",
+      "entries": [],
+      "expressions": [
+        "variables.posture == variables.claimed"
+      ],
+      "detail": "policy dropped"
+    },
+    {
+      "policy": "require-nonroot.yaml",
+      "verdict": "none",
+      "entries": [],
+      "expressions": [
+        "variables.nonroot || (variables.attested && variables.hardened)"
+      ],
+      "detail": "no fixture in the corpus moved"
+    }
+  ],
+  "counts": {
+    "old": 174,
+    "new": 140,
+    "union": 180
+  },
+  "generator_version": "0.3.0",
+  "corpus_checksum": "sha256:b2ace9ed3793d82021ad0919b8a60ac42372be896c000a2b1aa29d295a841071",
+  "wall_clock": 91.26042195800073,
+  "coverage": {
+    "cells": 27,
+    "pairs": 180,
+    "pairwise_gap": "axes were combined pairwise (predicate-expression x version-pin, predicate-expression x tier-label, and every pair among version-pin, tier-label, namespace and workload-declares), so no three-way interaction was built; predicate-expression x namespace was not built because no subject predicate reads a Namespace (corpus_generator fails generation the day one does), and predicate-expression x workload-declares was not built because the declared-hardening axis writes the same container securityContext fields the expression axis's own probes already write"
+  },
+  "not_looked_at": [],
+  "limits": [
+    {
+      "name": "cage-ratchet-one-way",
+      "description": "the cage only ever tightens or holds under this rule -- nothing widens it back automatically once a workload's posture recovers, a structural one-way ratchet (cage_engine.py's RANK table). Kept open by decision, not by this count reaching zero.",
+      "count": 1,
+      "status": "open"
+    },
+    {
+      "name": "cage-removal-scores-patch",
+      "description": "the rule reads only the workload's own side of the comparison, so removing or loosening enforcement classifies no higher than patch even though it widens what is admitted. Kept open by decision.",
+      "count": 1,
+      "status": "open"
+    },
+    {
+      "name": "cage-not-priced-residual",
+      "description": "nothing in this corpus maps a pod to a priced residual -- the tier axis is synthetic (corpus_generator.TIER_VALUES), so the cage half of Track 2 is proved on synthetic input, never a real infrastructure capture. The check that would remove it: witness_set's real-infrastructure witnesses.",
+      "count": 6,
+      "status": "open"
+    }
+  ],
+  "matrix": {},
+  "matrix_note": "empty at the publisher, on purpose (ticket 18 Answer 4): each institution fills its own row by running this published computed-semver package inside its own adopter-gate.py, against its own claimed policy versions with its own workloads as extra corpus entries, and lands the row in its own composed evidence. The publisher never reads an adopter repository (NORTH-STAR \u00a72).",
+  "degraded": {
+    "tier": "quarantine",
+    "computed_bump": "major",
+    "declared_bump": "patch",
+    "suffix": "quarantine"
+  },
+  "declared": "6.0.1",
+  "subject_dir": "distribution/policies/v6.0.1",
+  "old_subject_dir": "distribution/policies/v6.0.0",
+  "computed_bump": "major",
+  "published_as": "6.0.1-quarantine.1"
+}

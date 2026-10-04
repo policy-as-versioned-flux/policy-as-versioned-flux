@@ -1,0 +1,109 @@
+diff --git a/verify/cve-inventory/cve_inventory.py b/verify/cve-inventory/cve_inventory.py
+new file mode 100644
+index 00000000..8628ffa0
+--- /dev/null
++++ b/verify/cve-inventory/cve_inventory.py
+@@ -0,0 +1,103 @@
++#!/usr/bin/env python3
++"""Grade served inventory/CVE intersection against ADR-0035; never proposal bytes."""
++from __future__ import annotations
++import argparse
++import importlib.util
++import json
++import subprocess
++import tarfile
++import tempfile
++from pathlib import Path
++from typing import Any
++import yaml
++
++ROOT = Path(__file__).resolve().parents[2]
++
++def module(path: Path, name: str) -> Any:
++    spec = importlib.util.spec_from_file_location(name, path)
++    if spec is None or spec.loader is None:
++        raise ValueError('missing instrument: ' + str(path))
++    result = importlib.util.module_from_spec(spec); spec.loader.exec_module(result); return result
++
++def grade(adopter: Path, platform: Path, *, repository: Path | None = None) -> list[str]:
++    faults: list[str] = []
++    try:
++        party = yaml.safe_load((adopter / 'party.yaml').read_text())
++        edges = [edge for edge in party.get('inherits', []) if edge.get('kind') == 'feed' and edge.get('name') == 'cve']
++        if len(edges) != 1:
++            return ['party declares no single feeds/cve subscription']
++        scanner = module(platform / 'wargamer/inventory.py', '_inventory_checker')
++        converter = module(platform / 'feeds/to_fair_scenario.py', '_inventory_converter')
++        inventory = json.loads((adopter / 'inventory/images.json').read_text())
++        scanner.validate(adopter, inventory, repository=repository)
++        edge = edges[0]
++        base = adopter / 'composed/feeds' / str(edge['party']) / 'cve' / str(edge['version'])
++        provenance = json.loads((base / 'PROVENANCE.json').read_text())
++        envelope = json.loads((base / provenance['feed_path']).read_text())
++        feed = envelope['payload']; feed.setdefault('feed_version', envelope['version'])
++        scenario = converter.cve_scenario(feed, inventory=inventory)
++        evidence = json.loads((adopter / 'composed/evidence.json').read_text())
++        rows = [row for row in evidence.get('prices', []) if row.get('name') == 'cve' and row.get('kind') == 'feed']
++        if len(rows) != 1:
++            return ['composed evidence declares no single CVE line']
++        row = rows[0]
++        for key in ('priced_cve', 'absence_count', 'intersection_count', 'inventory_cve_count', 'absences'):
++            if row.get(key) != scenario.get(key):
++                faults.append('CVE line disagrees with scanned/pinned feed intersection: ' + key)
++        if scenario['priced_cve'] is None and row.get('amount') is not None:
++            faults.append('empty scanned KEV intersection carries an invented amount')
++        if any(absence.get('amount') is not None for absence in row.get('absences', [])):
++            faults.append('a CVE outside the feed carries an invented amount')
++        workflow = yaml.safe_load((adopter / '.github/workflows/propose-tier.yml').read_text())
++        steps = [step for job in workflow.get('jobs', {}).values() for step in job.get('steps', [])]
++        inventory_steps = [step for step in steps if step.get('env', {}).get('PROPOSAL_KIND') == 'inventory']
++        if len(inventory_steps) != 1 or not all(token in str(inventory_steps[0].get('run', '')) for token in ('inventory.py scan', 'inventory.py propose', 'sha256sum --check', 'TRIVY_VERSION')):
++            faults.append('propose-tier clock carries no native checksum-pinned inventory proposal kind')
++    except (OSError, ValueError, KeyError, TypeError, SystemExit, yaml.YAMLError) as exc:
++        faults.append('missing served CVE instrument: ' + str(exc))
++    return faults
++
++def snapshot(repo: Path, destination: Path) -> None:
++    """origin/main is the claim, including first inventories only after merge."""
++    archive = subprocess.run(['git', '-C', str(repo), 'archive', 'origin/main'], capture_output=True, check=True)
++    import io
++    with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as tar:
++        tar.extractall(destination, filter='data')
++
++def selfcheck(platform: Path) -> None:
++    converter = module(platform / 'feeds/to_fair_scenario.py', '_intersection_selfcheck')
++    inventory = converter._fixture_inventory(['CVE-A', 'CVE-OUTSIDE'])
++    feed = {'feed_version':'fixture', 'severity_lm_gbp':{'high':[1,2,3]}, 'cves':{'CVE-A':{'component':'fixture','cvss':7,'severity':'high','epss':0.5,'source':'fixture'}}}
++    scenario = converter.cve_scenario(feed, inventory=inventory)
++    assert scenario['priced_cve'] == 'CVE-A' and scenario['absences'] == [{'id':'CVE-OUTSIDE','amount':None,'reason':'outside pinned KEV feed'}]
++    clean = converter.cve_scenario(feed, inventory=converter._fixture_inventory(['CVE-OUTSIDE']))
++    assert clean['priced_cve'] is None and clean['amount'] is None
++    try:
++        converter.cve_scenario(feed)
++    except SystemExit as exc:
++        assert 'missing instrument' in str(exc)
++    else:
++        raise AssertionError('missing inventory priced')
++    print('PASS: CVE intersection selfcheck -- outside-feed CVE has no amount and missing inventory refuses')
++
++def main() -> int:
++    ap = argparse.ArgumentParser(description=__doc__); ap.add_argument('command',choices=('check','selfcheck'));ap.add_argument('--estate',type=Path,default=ROOT/'.estate-clone');args=ap.parse_args()
++    platform = args.estate / 'platform'
++    if args.command == 'selfcheck':
++        selfcheck(platform); return 0
++    failures = 0
++    with tempfile.TemporaryDirectory() as temp:
++        for org in ('driftwood','tuppence','ludlow'):
++            path = Path(temp)/org; path.mkdir()
++            snapshot(args.estate/org,path)
++            faults = grade(path,platform,repository=args.estate/org)
++            for fault in faults:
++                print('FAIL: '+org+' served CVE inventory: '+fault)
++            if faults:
++                failures += 1
++            else:
++                print('PASS: '+org+' served CVE line prices its digest-matched inventory intersection')
++    return 1 if failures else 0
++
++if __name__ == '__main__':
++    raise SystemExit(main())

@@ -140,11 +140,12 @@ EOF
   # the word the guard was at. Proved by RUNNING the gate once per mode and reading its line
   # back, because what this file emits is the thing under test.
   for m in development operations other-hand; do
+    expected="$(TWIN_ENACT_MODE="$m" python3 -c 'from twin.enact_guard import enact_mode; print(enact_mode())')"
     mout="$(env -u GITHUB_RUN_NUMBER TWIN_ENACT_MODE="$m" VERIFY_SCRIPTS_FROM="$t/scripts.txt" \
              VERIFY_MANIFEST="$t/manifest.txt" VERIFY_EXCLUSIONS="$t/exclusions.txt" \
              VERIFY_CAPDIR="$t/captures" bash "$ROOT/talk/verify-all.sh")"
-    printf '%s\n' "$mout" | grep -qE "^TRUTH .* hub=[0-9a-f]+ enact=$m units=" \
-      || { echo "selfcheck: a run at TWIN_ENACT_MODE=$m printed no 'enact=$m' on its TRUTH line"; good=0; }
+    printf '%s\n' "$mout" | grep -qE "^TRUTH .* hub=[0-9a-f]+ enact=$expected units=" \
+      || { echo "selfcheck: TWIN_ENACT_MODE=$m resolves to $expected, but its TRUTH line disagrees"; good=0; }
   done
   if [ "$good" = 1 ]; then
     echo "PASS: selfcheck: a pass, a declared never, a declared waits, a fail, an undeclared skip, a script with no manifest line, an exclusion and a never that passes each grade as they should, the split and the ceiling add up, --live turns declared skips red, a declared reason past character 160 is still judged whole while the printed row stays cut, a stale or malformed manifest line is a fail, an exclusion reason containing an apostrophe survives the trim whole, a unit line this checkout does not carry is a note, and a run at each of the three enactment modes prints that mode on its own TRUTH line"
@@ -181,6 +182,16 @@ if [ -n "$FIXTURE" ]; then
 else
   # -L: a builder's worktree symlinks the unit clones in; the clock's are real directories.
   mapfile -t SCRIPTS < <(find -L .estate-clone verify -name 'verify*.sh' -not -path '*/.work/*' -not -path '*/.git/*' | sort)
+  # Archive eligibility consumes this run's prerequisite grades, after all of them have run.
+  declare -a before_archive=() archive_check=()
+  for s in "${SCRIPTS[@]}"; do
+    if [ "$s" = "verify/incumbent-org/verify-incumbent-org.sh" ]; then
+      archive_check+=("$s")
+    else
+      before_archive+=("$s")
+    fi
+  done
+  SCRIPTS=("${before_archive[@]}" "${archive_check[@]}")
 fi
 
 # the manifest: validated once, in both directions, before anything runs.
@@ -213,7 +224,7 @@ for s in "${SCRIPTS[@]}"; do
   slug="$(echo "$s" | sed -e 's#^\./##' -e 's#/#_#g' -e 's#\.sh$##')"
   cap="$CAPDIR/${slug}.out"; caprel="${cap#"$ROOT"/}"
   SECONDS=0
-  timeout "$TIMEOUT" bash "$s" >"$cap" 2>&1; rc=$?
+  INCUMBENT_GRADES="$RESULTS" timeout "$TIMEOUT" bash "$s" >"$cap" 2>&1; rc=$?
   durs+=("$SECONDS $s")
   # judged whole, displayed cut. The 160-character cut keeps the grade table readable; it must
   # never reach truth_manifest.py judge, because a declared reason that sits past character 160

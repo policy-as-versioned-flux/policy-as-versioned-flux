@@ -1,0 +1,161 @@
+{
+  "driftwood": {
+    "headRefOid": "c9eff7a354ccb7eef4c51bde38e2915b4b686b95",
+    "mergeCommit": {
+      "oid": "17302ecd20041df61a52428e67246c330294d2a6"
+    },
+    "mergedAt": "2026-10-03T18:55:06Z",
+    "mergedBy": {
+      "is_bot": true,
+      "login": "app/pavc-other-hand"
+    },
+    "number": 53,
+    "reviews": [
+      {
+        "id": "PRR_kwDOT-3Nm88AAAABQf_Low",
+        "author": {
+          "login": "pavc-other-hand"
+        },
+        "authorAssociation": "CONTRIBUTOR",
+        "body": "Independent content review is bound to this exact signed head. The payload changes only the intended digest-pinned app manifests/resource membership, the deploy nginx mirror and the rederived composed comparison-input hash. No credential/private payload, inventory or future pin is introduced; compiler, policy/feed parents, party declaration and current self-pin are unchanged. The complete served app graph keeps policy5.0.0 claims. Published-source composition replay, ordinary no-movement bump grading, declared-engine shift-left and both GitHub PR checks passed. This app-containing signed release is the prerequisite for the later exact-tag inventory adoption.",
+        "submittedAt": "2026-10-03T18:53:03Z",
+        "includesCreatedEdit": false,
+        "reactionGroups": [],
+        "state": "APPROVED",
+        "commit": {
+          "oid": "c9eff7a354ccb7eef4c51bde38e2915b4b686b95"
+        }
+      }
+    ],
+    "state": "MERGED",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-03T18:45:50Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37145403813/job/111268176989",
+        "name": "shift-left",
+        "startedAt": "2026-10-03T18:45:32Z",
+        "status": "COMPLETED",
+        "workflowName": "shift-left policy check"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-03T18:46:13Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37145403813/job/111268176949",
+        "name": "compose-check",
+        "startedAt": "2026-10-03T18:45:32Z",
+        "status": "COMPLETED",
+        "workflowName": "shift-left policy check"
+      }
+    ],
+    "url": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/53"
+  },
+  "tuppence": {
+    "headRefOid": "7cd3d34b9006ebff76ace4598aa10a5563d122b9",
+    "mergeCommit": {
+      "oid": "d8dead25e0e5e275172640b1a637562e45edb15d"
+    },
+    "mergedAt": "2026-10-03T18:55:57Z",
+    "mergedBy": {
+      "is_bot": true,
+      "login": "app/pavc-other-hand"
+    },
+    "number": 51,
+    "reviews": [
+      {
+        "id": "PRR_kwDOT-3OVM8AAAABQf_icA",
+        "author": {
+          "login": "pavc-other-hand"
+        },
+        "authorAssociation": "CONTRIBUTOR",
+        "body": "Independent content review is bound to this exact signed head. The payload changes only the intended digest-pinned app manifests/resource membership and the rederived composed comparison-input hash. No credential/private payload, inventory or future pin is introduced; compiler, policy/feed parents, party declaration and current self-pin are unchanged. The complete served app graph keeps policy5.0.0 claims. Published-source composition replay, ordinary no-movement bump grading, declared-engine shift-left and both GitHub PR checks passed. This app-containing signed release is the prerequisite for the later exact-tag inventory adoption.",
+        "submittedAt": "2026-10-03T18:53:54Z",
+        "includesCreatedEdit": false,
+        "reactionGroups": [],
+        "state": "APPROVED",
+        "commit": {
+          "oid": "7cd3d34b9006ebff76ace4598aa10a5563d122b9"
+        }
+      }
+    ],
+    "state": "MERGED",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-03T18:45:50Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37145404570/job/111268179475",
+        "name": "shift-left",
+        "startedAt": "2026-10-03T18:45:33Z",
+        "status": "COMPLETED",
+        "workflowName": "shift-left policy check"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-03T18:46:00Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37145404570/job/111268179694",
+        "name": "compose-check",
+        "startedAt": "2026-10-03T18:45:33Z",
+        "status": "COMPLETED",
+        "workflowName": "shift-left policy check"
+      }
+    ],
+    "url": "https://github.com/policy-as-versioned-tuppence/tuppence/pull/51"
+  },
+  "ludlow": {
+    "headRefOid": "5893d40b15cff047680ae6ea8cac0af18e9cb17b",
+    "mergeCommit": {
+      "oid": "5ff463673cf05af71a5db2ed0c38deaf263464d2"
+    },
+    "mergedAt": "2026-10-03T18:56:16Z",
+    "mergedBy": {
+      "is_bot": true,
+      "login": "app/pavc-other-hand"
+    },
+    "number": 48,
+    "reviews": [
+      {
+        "id": "PRR_kwDOT-3Onc8AAAABQf_gDA",
+        "author": {
+          "login": "pavc-other-hand"
+        },
+        "authorAssociation": "CONTRIBUTOR",
+        "body": "Independent content review is bound to this exact signed head. The payload changes only the intended digest-pinned app manifests/resource membership and the rederived composed comparison-input hash. No credential/private payload, inventory or future pin is introduced; compiler, policy/feed parents, party declaration and current self-pin are unchanged. The complete served app graph keeps policy5.0.0 claims. Published-source composition replay, ordinary no-movement bump grading, declared-engine shift-left and both GitHub PR checks passed. This app-containing signed release is the prerequisite for the later exact-tag inventory adoption.",
+        "submittedAt": "2026-10-03T18:53:49Z",
+        "includesCreatedEdit": false,
+        "reactionGroups": [],
+        "state": "APPROVED",
+        "commit": {
+          "oid": "5893d40b15cff047680ae6ea8cac0af18e9cb17b"
+        }
+      }
+    ],
+    "state": "MERGED",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-03T18:45:55Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/37145405563/job/111268182159",
+        "name": "shift-left",
+        "startedAt": "2026-10-03T18:45:35Z",
+        "status": "COMPLETED",
+        "workflowName": "shift-left policy check"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-03T18:46:04Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/37145405563/job/111268182042",
+        "name": "compose-check",
+        "startedAt": "2026-10-03T18:45:34Z",
+        "status": "COMPLETED",
+        "workflowName": "shift-left policy check"
+      }
+    ],
+    "url": "https://github.com/policy-as-versioned-ludlow/ludlow/pull/48"
+  }
+}

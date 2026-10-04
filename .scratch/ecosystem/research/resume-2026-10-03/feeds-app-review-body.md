@@ -1,0 +1,5 @@
+Independent root review covered fixed source head `37dfe4a2de50f1a1fd7aeb6348d819373188e0e6` and the complete 19-path public payload. The source commit has a valid verified SSH signature. The corpus contains public CISA KEV/NVD/FIRST facts and captured HMRC rates, with original provenance hashes; no credentials or private user data were found.
+
+Both offline release gates passed against the exact workflow-pinned platform v2.0.1 ruler. Exact CVE/HMRC rebuilds, dated EPSS replay, release-bump rules, nine frozen payload comparisons and the model-credential negative probe passed. This repository attaches no PR CI checks; the signing/release workflows will rerun their gates.
+
+Approved for the declared CVE 3.0.0, FX 1.1.0 and threat-register 4.0.0 rollout. Existing headline magnitudes remain unchanged; the new threat row requires subscriber-owned magnitude. No adopter pin or workload binding is granted. This review is recorded by the second machine identity, pavc-other-hand, with no human at the keyboard.

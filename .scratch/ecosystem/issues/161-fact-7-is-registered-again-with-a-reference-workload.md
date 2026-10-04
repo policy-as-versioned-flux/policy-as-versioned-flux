@@ -1,7 +1,7 @@
 # 161 — Fact 7 is registered again with a reference workload
 
 Type: task (AFK)
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
@@ -43,3 +43,7 @@ The offline proof that an unclaimed pod in a Namespace that declares nothing is 
 **Changed 2026-09-26, after ticket 71's round 5.** Ticket 71 no longer adds an engine fact to the drift lane, so no ticket from it edits `drift/five-facts.py` or `drift/window.yaml`. Ticket 147 creates `gitops/engine/kyverno.yaml` in each adopter, and item 4.2 reads it. The `KYVERNO_CLI` variable is decided here, delegated under ADR-0025, and was agreed with the session that owns ticket 71.
 
 This ticket blocks ticket 151, and the fleet, policy and governance-agent row of ticket 156's register.
+
+## Answer
+
+**Local implementation, 2026-10-03.** Recovered the interrupted reference-workload implementation onto all three adopter mains after ticket 147. The declaration files stay intact. Facts 6/7 use the newest committed cage-section registration; old samples remain could-not-look. The reference is unclaimed and its Namespace declares no rung; bottom checks use live priorities and selecting NetworkPolicies; three post-registration nulls become a fall. Each served-document probe is wired after the declared CLI install, with the pinned tag fetched by shift-left. The hub has three self-proof manifest rows, reference terminology in narration/deck, and the existing platform-body test docstring. Local selfchecks pass. The public ludlow probe passes on the checksum-verified 1.18.2 CLI at v3.0.0 and HEAD. Rollout, recomposition and the first post-registration scheduled behavior sample remain required; this ticket is not resolved.

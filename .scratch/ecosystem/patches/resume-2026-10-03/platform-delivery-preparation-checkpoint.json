@@ -1,0 +1,33 @@
+{
+  "source_head": "cb680f22eb46b0fab5e56844758242a2ab200975",
+  "source_export_tree": "670858b127454ec769379dad31dd663eb2c8731f",
+  "source_original_index_sha256": "33d27ffda873e16f8be5e045ef1f50aafba38119d90a5e2b67fe453b5c20a7f6",
+  "full_diff_sha256": "7094abeaeaa71c4a773f707c08fee9605938cf8c959cea69ce36f188f3080cb1",
+  "full_diff_path": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-03/platform-full-final7-working-tree.patch",
+  "latest_remote_head": "cb680f22eb46b0fab5e56844758242a2ab200975",
+  "upstream_changed_paths": [],
+  "overlaps": [],
+  "origin": "https://github.com/policy-as-versioned-platform/platform",
+  "delivery_checkout": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/platform",
+  "changed_path_count": 304,
+  "secret_scan": {
+    "filename_hits": [],
+    "high_confidence_content_hits": [],
+    "scanned_changed_paths": 304
+  },
+  "full_diff_apply": "passed",
+  "security_preparation_apply": "passed",
+  "local_commit_status": "blocked by ordinary SSH signer passphrase interaction; no commit created",
+  "diff_check": "passed",
+  "local_helper": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-03/platform-delivery-local-commit.sh",
+  "pr_body": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-03/platform-security6-pr-body.md",
+  "upstream_ci": "No PR/branch-push workflows and no named required status checks; release workflows are dispatch/tag gated.",
+  "signing_failure_log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-03/platform-delivery-local-commit.log",
+  "final_source_preserved": true,
+  "draft_body_finalized": true,
+  "draft_body_title": "Prepare security policy 6.0.0 and ecosystem tooling",
+  "signing_handoff": "Root owns ordinary signed commit in its SSH-agent environment; this agent has stopped commit retries and changed no signing/hooks.",
+  "staged_path_count_before_root_commit": 301,
+  "no_active_commit_child_or_exec_session": true,
+  "finalized_draft_at": "2026-10-03T18:15:21.734Z"
+}
