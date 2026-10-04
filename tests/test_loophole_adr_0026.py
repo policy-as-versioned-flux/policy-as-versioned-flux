@@ -49,6 +49,7 @@ candidates point at one place, the earliest by (round, key) is credited and the 
 
 from __future__ import annotations
 
+import ast
 import re
 import importlib.util
 import json
@@ -239,7 +240,50 @@ def _record_header(comp: ModuleType, work: Path, rendered: dict[str, str]) -> No
     comp._commit_header(work, rendered)
     if (work / ".git").exists():
         _git(work, "add", "--", "composed/HEADER.yaml")
-        _git(work, "commit", "-q", "-m", "fixture comparison header")
+        staged = subprocess.run(["git", "-C", str(work), "diff", "--cached", "--quiet"],
+                                capture_output=True)
+        if staged.returncode not in (0, 1):
+            staged.check_returncode()
+        if staged.returncode == 1:
+            _git(work, "commit", "-q", "-m", "fixture comparison header")
+        committed = subprocess.run(["git", "-C", str(work), "show", "HEAD:composed/HEADER.yaml"],
+                                   check=True, capture_output=True).stdout
+        assert committed == rendered["composed/HEADER.yaml"].encode("utf-8")
+
+
+@pytest.mark.parametrize("writer_ref", ["v5.0.0", "HEAD"], ids=["published-write-only", "current-auto-commit"])
+def test_record_header_preserves_real_writer_history(tmp_path, monkeypatch, writer_ref):
+    """The genuine old/new fixture writers both record exactly one comparison point."""
+    source = subprocess.run(["git", "-C", str(PLATFORM), "show", f"{writer_ref}:compose/composition.py"],
+                            check=True, capture_output=True, text=True).stdout
+    function = next(node for node in ast.parse(source).body
+                    if isinstance(node, ast.FunctionDef) and node.name == "_commit_header")
+    comp = ModuleType("actual_fixture_header_writer")
+    comp.__dict__["Path"] = Path
+    exec(compile(ast.Module(body=[function], type_ignores=[]), "actual_fixture_header_writer", "exec"),
+         comp.__dict__)
+    monkeypatch.syspath_prepend(str(PLATFORM / "compose"))
+    monkeypatch.delitem(sys.modules, "fixture_inventory", raising=False)
+    work = tmp_path / "declared-fixture"
+    work.mkdir()
+    (work / "fixture.txt").write_text("Declared test state, not evidence\n")
+    _git(work, "init", "-q")
+    _git(work, "add", "-A")
+    _git(work, "commit", "-qm", "fixture source")
+    (work / "fixture.txt").write_text("Declared next comparison state, not evidence\n")
+    _git(work, "add", "fixture.txt")
+    rendered = {"composed/HEADER.yaml": "fixture: explicit comparison state\n"}
+    _record_header(comp, work, rendered)
+    def read(*args):
+        return subprocess.run(["git", "-C", str(work), *args], check=True,
+                              capture_output=True, text=True).stdout
+    assert read("show", "HEAD:composed/HEADER.yaml") == rendered["composed/HEADER.yaml"]
+    assert read("show", "HEAD:fixture.txt") == (work / "fixture.txt").read_text()
+    assert read("rev-list", "--count", "HEAD").strip() == "2"
+    before = read("rev-parse", "HEAD")
+    _record_header(comp, work, rendered)
+    assert read("rev-parse", "HEAD") == before
+    assert read("status", "--porcelain") == ""
 
 
 def _edit_party(work: Path, edit: Any) -> None:

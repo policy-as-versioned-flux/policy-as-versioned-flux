@@ -4,6 +4,9 @@ set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "${HERE}/../.." && pwd)"
 PY="${PYTHON:-${ROOT}/.venv/bin/python}"
+if [ -z "${PYTHON:-}" ] && [ ! -x "$PY" ]; then
+  PY="$(command -v python3 || true)"
+fi
 [ -x "$PY" ] || { echo 'SKIP: no hub interpreter for the workload lane'; exit 3; }
 INSTRUMENT="${1:-served_apps.py}"
 case "$INSTRUMENT" in served_apps.py|oscal_lane.py) ;; *) echo "FAIL: unknown lane instrument $INSTRUMENT"; exit 1 ;; esac

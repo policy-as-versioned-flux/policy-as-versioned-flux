@@ -3,8 +3,8 @@
 adopter's own party.yaml — the one edit a merged Renovate PR makes — changes that adopter's
 prices[].
 
-Never touches a real repo: the adopter's committed tree is copied into a temp directory (minus
-.git), composed once to install a header to compare against, the pin is edited from the pinned
+Never touches a real repo: the adopter's committed tree and immutable Git objects are cloned
+into a temp directory, composed once to install a header to compare against, the pin is edited from the pinned
 version to the next version present locally, and it is composed again. The two prices[]
 documents are diffed. The copy is thrown away; nothing is restored because nothing real moved.
 
@@ -16,8 +16,8 @@ from __future__ import annotations
 import glob
 import json
 import os
+from pathlib import Path
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -27,6 +27,7 @@ import yaml
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 from _estate import ESTATE  # noqa: E402
+from _snapshot import committed_repository  # noqa: E402
 
 # The gate never passes this. It exists so this step can be smoke-tested against a scratch
 # estate (a fixture with the not-yet-published files planted) without touching a real unit.
@@ -149,11 +150,10 @@ def try_bump(adopter, edge, pinned, newer):
     name = edge["name"]
     print(f"    {adopter} pins {edge['party']}/{name} at {pinned}; {newer} is on disk")
     with tempfile.TemporaryDirectory() as tmp:
-        # The whole committed tree, minus git and scratch: the party artefact's own check()
-        # reads workflows and pin files, not just party.yaml.
+        # The committed tree plus real tag/history objects: immutable apps inventory
+        # and dated source facts must resolve exactly as they do in the adopter repo.
         work = os.path.join(tmp, adopter)
-        shutil.copytree(os.path.join(ESTATE, adopter), work,
-                        ignore=shutil.ignore_patterns(".git", ".work", "__pycache__"))
+        committed_repository(Path(ESTATE) / adopter, Path(work))
 
         before = compose(work, work, f"{adopter} at {pinned}")["prices"]
 

@@ -68,13 +68,14 @@ import sys
 import tarfile
 import tempfile
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Iterable
 
 import yaml
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 from _estate import ESTATE as DEFAULT_ESTATE  # noqa: E402
+from _snapshot import committed_repository  # noqa: E402
 
 LINES: list[str] = []
 ENGINE_FILE = "gitops/engine/kyverno.yaml"
@@ -321,7 +322,7 @@ class Estate:
 
     def adopter_copy(self, name: str, label: str) -> Path:
         dest = self.work / "adopters" / label / name
-        _export(self.root / name, dest)
+        committed_repository(self.root / name, dest)
         return dest
 
 
@@ -365,6 +366,11 @@ def _baseline_source(party: dict) -> str:
                  if e.get("kind") == "controls" and e.get("party") != party.get("party")), "")
 
 
+def unsupported_pairing_engines(table: Iterable[str], support: dict[str, list[str] | None]) -> list[str]:
+    """A real engine may support one carried line and be unsupported by another."""
+    return sorted(v for v in table if any(v not in (listed or []) for listed in support.values()))
+
+
 def planted_and_forward(estate: Estate) -> None:
     served = estate.scratch("served")
     where = f"platform {estate.commit}'s composer and tree"
@@ -404,7 +410,7 @@ def planted_and_forward(estate: Estate) -> None:
     lines_v = sorted(v for v in bodies if v != MACHINERY)
     support = _support_at(estate.platform, None, lines_v)
     # 2. an engine the composed line does not list: a row of the engine table, never invented.
-    unlisted = sorted(v for v in estate.rows if all(v not in (support[l] or []) for l in lines_v))
+    unlisted = unsupported_pairing_engines(estate.rows, {line: support[line] for line in lines_v})
     if not unlisted:
         out("SKIP", "planted: every row of the engine table is listed by every composed line, so no "
                     "unsupported engine can be planted from the table")
