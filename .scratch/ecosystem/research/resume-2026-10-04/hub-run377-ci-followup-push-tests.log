@@ -1,0 +1,1597 @@
+﻿2026-10-04T15:46:17.3824853Z Current runner version: '2.337.0'
+2026-10-04T15:46:17.3846860Z ##[group]Runner Image Provisioner
+2026-10-04T15:46:17.3847594Z Hosted Compute Agent
+2026-10-04T15:46:17.3848055Z Version: 20260901.588
+2026-10-04T15:46:17.3848649Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-04T15:46:17.3849242Z Build Date: 2026-09-01T19:56:44Z
+2026-10-04T15:46:17.3849853Z Worker ID: {57aeb061-f4ee-4a6f-9b53-494370277f0e}
+2026-10-04T15:46:17.3850446Z Azure Region: eastus
+2026-10-04T15:46:17.3850911Z ##[endgroup]
+2026-10-04T15:46:17.3852127Z ##[group]Operating System
+2026-10-04T15:46:17.3852846Z Ubuntu
+2026-10-04T15:46:17.3853578Z 24.04.5
+2026-10-04T15:46:17.3854173Z LTS
+2026-10-04T15:46:17.3854762Z ##[endgroup]
+2026-10-04T15:46:17.3855415Z ##[group]Runner Image
+2026-10-04T15:46:17.3856088Z Image: ubuntu-24.04
+2026-10-04T15:46:17.3856913Z Version: 20260927.320.1
+2026-10-04T15:46:17.3858013Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-04T15:46:17.3859286Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+2026-10-04T15:46:17.3860063Z ##[endgroup]
+2026-10-04T15:46:17.3861038Z ##[group]GITHUB_TOKEN Permissions
+2026-10-04T15:46:17.3862804Z Contents: read
+2026-10-04T15:46:17.3863333Z Metadata: read
+2026-10-04T15:46:17.3863803Z ##[endgroup]
+2026-10-04T15:46:17.3865852Z Secret source: Actions
+2026-10-04T15:46:17.3867003Z Cache mode: write
+2026-10-04T15:46:17.3867753Z Prepare workflow directory
+2026-10-04T15:46:17.4126617Z Prepare all required actions
+2026-10-04T15:46:17.4164552Z Getting action download info
+2026-10-04T15:46:17.6233643Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-04T15:46:17.7986253Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-04T15:46:18.0055306Z Complete job name: tests
+2026-10-04T15:46:18.0647036Z ##[group]Run actions/checkout@v4
+2026-10-04T15:46:18.0647706Z with:
+2026-10-04T15:46:18.0648105Z   fetch-depth: 0
+2026-10-04T15:46:18.0648523Z   persist-credentials: false
+2026-10-04T15:46:18.0649089Z   repository: policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:46:18.0652537Z   token: ***
+2026-10-04T15:46:18.0652934Z   ssh-strict: true
+2026-10-04T15:46:18.0653327Z   ssh-user: git
+2026-10-04T15:46:18.0653708Z   clean: true
+2026-10-04T15:46:18.0654105Z   sparse-checkout-cone-mode: true
+2026-10-04T15:46:18.0654555Z   fetch-tags: false
+2026-10-04T15:46:18.0654957Z   show-progress: true
+2026-10-04T15:46:18.0655347Z   lfs: false
+2026-10-04T15:46:18.0655723Z   submodules: false
+2026-10-04T15:46:18.0656298Z   set-safe-directory: true
+2026-10-04T15:46:18.0656749Z   allow-unsafe-pr-checkout: false
+2026-10-04T15:46:18.0657391Z ##[endgroup]
+2026-10-04T15:46:18.1447040Z Syncing repository: policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:46:18.1449504Z ##[group]Getting Git version info
+2026-10-04T15:46:18.1450418Z Working directory is '/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux'
+2026-10-04T15:46:18.1451553Z [command]/usr/bin/git version
+2026-10-04T15:46:18.1626523Z git version 2.55.0
+2026-10-04T15:46:18.1649030Z ##[endgroup]
+2026-10-04T15:46:18.1657516Z Temporarily overriding HOME='/home/runner/work/_temp/f6933e0b-761b-4760-b94a-354aa7b3342b' before making global git config changes
+2026-10-04T15:46:18.1659373Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-04T15:46:18.1662704Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:46:18.1707764Z Deleting the contents of '/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux'
+2026-10-04T15:46:18.1710719Z ##[group]Initializing the repository
+2026-10-04T15:46:18.1715071Z [command]/usr/bin/git init /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:46:18.1787431Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-04T15:46:18.1788850Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-04T15:46:18.1789598Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-04T15:46:18.1790181Z hint: call:
+2026-10-04T15:46:18.1790507Z hint:
+2026-10-04T15:46:18.1790919Z hint: 	git config --global init.defaultBranch <name>
+2026-10-04T15:46:18.1791417Z hint:
+2026-10-04T15:46:18.1791870Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-04T15:46:18.1792590Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-04T15:46:18.1793159Z hint:
+2026-10-04T15:46:18.1793485Z hint: 	git branch -m <name>
+2026-10-04T15:46:18.1793863Z hint:
+2026-10-04T15:46:18.1794352Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-04T15:46:18.1799172Z Initialized empty Git repository in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.git/
+2026-10-04T15:46:18.1806736Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:46:18.1848030Z ##[endgroup]
+2026-10-04T15:46:18.1848677Z ##[group]Disabling automatic garbage collection
+2026-10-04T15:46:18.1849237Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-04T15:46:18.1878502Z ##[endgroup]
+2026-10-04T15:46:18.1879719Z ##[group]Setting up auth
+2026-10-04T15:46:18.1883763Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-04T15:46:18.1914193Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-04T15:46:18.2217391Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-04T15:46:18.2248055Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-04T15:46:18.2434944Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-04T15:46:18.2464644Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-04T15:46:18.2650804Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-04T15:46:18.2685255Z ##[endgroup]
+2026-10-04T15:46:18.2686097Z ##[group]Fetching the repository
+2026-10-04T15:46:18.2693291Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-10-04T15:46:24.5412490Z From https://github.com/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:46:24.5414129Z  * [new branch]      chart-125-seam1-signature-flake -> origin/chart-125-seam1-signature-flake
+2026-10-04T15:46:24.5416082Z  * [new branch]      chart-127-128-129       -> origin/chart-127-128-129
+2026-10-04T15:46:24.5417604Z  * [new branch]      chart-130-root-machinery -> origin/chart-130-root-machinery
+2026-10-04T15:46:24.5418979Z  * [new branch]      chart-131-132-133       -> origin/chart-131-132-133
+2026-10-04T15:46:24.5420571Z  * [new branch]      chart-134-identity-lane -> origin/chart-134-identity-lane
+2026-10-04T15:46:24.5422283Z  * [new branch]      chart-135-136           -> origin/chart-135-136
+2026-10-04T15:46:24.5423942Z  * [new branch]      chart-138-as-of         -> origin/chart-138-as-of
+2026-10-04T15:46:24.5426596Z  * [new branch]      chart-2026-09-05-a-branch-run-records-nothing -> origin/chart-2026-09-05-a-branch-run-records-nothing
+2026-10-04T15:46:24.5429919Z  * [new branch]      chart-2026-09-05-refusal-by-another-name -> origin/chart-2026-09-05-refusal-by-another-name
+2026-10-04T15:46:24.5433131Z  * [new branch]      chart-2026-09-05-the-adopter-gate-grades-the-change -> origin/chart-2026-09-05-the-adopter-gate-grades-the-change
+2026-10-04T15:46:24.5437626Z  * [new branch]      chart-2026-09-10-the-map-line-and-the-moving-count -> origin/chart-2026-09-10-the-map-line-and-the-moving-count
+2026-10-04T15:46:24.5440818Z  * [new branch]      chart-2026-09-21-the-cage-names-what-it-does-not-deliver -> origin/chart-2026-09-21-the-cage-names-what-it-does-not-deliver
+2026-10-04T15:46:24.5443751Z  * [new branch]      ci-2026-09-04-the-hub-tests-itself -> origin/ci-2026-09-04-the-hub-tests-itself
+2026-10-04T15:46:24.5446456Z  * [new branch]      close-111-86-chart-140  -> origin/close-111-86-chart-140
+2026-10-04T15:46:24.5448009Z  * [new branch]      close-113-phase-b       -> origin/close-113-phase-b
+2026-10-04T15:46:24.5449424Z  * [new branch]      close-133-134-137       -> origin/close-133-134-137
+2026-10-04T15:46:24.5450749Z  * [new branch]      close-140               -> origin/close-140
+2026-10-04T15:46:24.5452329Z  * [new branch]      cs-06-cross-party-composition -> origin/cs-06-cross-party-composition
+2026-10-04T15:46:24.5454347Z  * [new branch]      fix-2026-09-05-refresh-keeps-work -> origin/fix-2026-09-05-refresh-keeps-work
+2026-10-04T15:46:24.5456672Z  * [new branch]      fix-2026-09-05-tickets-96-97-crossref -> origin/fix-2026-09-05-tickets-96-97-crossref
+2026-10-04T15:46:24.5458850Z  * [new branch]      fix-2026-09-06-served-only-comment -> origin/fix-2026-09-06-served-only-comment
+2026-10-04T15:46:24.5461165Z  * [new branch]      fix-local-gates-drop-github-markers -> origin/fix-local-gates-drop-github-markers
+2026-10-04T15:46:24.5463256Z  * [new branch]      fix-phase-b-stale-records -> origin/fix-phase-b-stale-records
+2026-10-04T15:46:24.5465100Z  * [new branch]      fix-verify-before-tag-test -> origin/fix-verify-before-tag-test
+2026-10-04T15:46:24.5467399Z  * [new branch]      implement-2026-09-10-next -> origin/implement-2026-09-10-next
+2026-10-04T15:46:24.5470540Z  * [new branch]      implement-2026-09-10-remaining -> origin/implement-2026-09-10-remaining
+2026-10-04T15:46:24.5473770Z  * [new branch]      implement-2026-09-10-rollout -> origin/implement-2026-09-10-rollout
+2026-10-04T15:46:24.5477170Z  * [new branch]      implement-observation-reader-20260910 -> origin/implement-observation-reader-20260910
+2026-10-04T15:46:24.5481282Z  * [new branch]      implement-release-clock-record-20260910 -> origin/implement-release-clock-record-20260910
+2026-10-04T15:46:24.5484083Z  * [new branch]      main                    -> origin/main
+2026-10-04T15:46:24.5486587Z  * [new branch]      record-2026-09-04-the-62-77-landing -> origin/record-2026-09-04-the-62-77-landing
+2026-10-04T15:46:24.5488940Z  * [new branch]      record-2026-09-04-the-app-and-workflows -> origin/record-2026-09-04-the-app-and-workflows
+2026-10-04T15:46:24.5491324Z  * [new branch]      record-2026-09-06-stale-blockers -> origin/record-2026-09-06-stale-blockers
+2026-10-04T15:46:24.5494258Z  * [new branch]      record-2026-09-09-a-cancelled-branch-run -> origin/record-2026-09-09-a-cancelled-branch-run
+2026-10-04T15:46:24.5496707Z  * [new branch]      record-2026-09-09-run-197-fall -> origin/record-2026-09-09-run-197-fall
+2026-10-04T15:46:24.5499069Z  * [new branch]      record-2026-09-10-the-cuts-and-what-they-cost -> origin/record-2026-09-10-the-cuts-and-what-they-cost
+2026-10-04T15:46:24.5502734Z  * [new branch]      record-2026-09-10-ticket-107-the-lane-answered -> origin/record-2026-09-10-ticket-107-the-lane-answered
+2026-10-04T15:46:24.5506257Z  * [new branch]      record-fixes-2026-09-23 -> origin/record-fixes-2026-09-23
+2026-10-04T15:46:24.5509241Z  * [new branch]      record-run-277-supersede-echo -> origin/record-run-277-supersede-echo
+2026-10-04T15:46:24.5512154Z  * [new branch]      record-run-290-priced-holes -> origin/record-run-290-priced-holes
+2026-10-04T15:46:24.5515055Z  * [new branch]      record-run-339          -> origin/record-run-339
+2026-10-04T15:46:24.5518215Z  * [new branch]      redo-rescue-as-cherry-picks -> origin/redo-rescue-as-cherry-picks
+2026-10-04T15:46:24.5521244Z  * [new branch]      repair-2026-09-04-gate-regressions -> origin/repair-2026-09-04-gate-regressions
+2026-10-04T15:46:24.5524660Z  * [new branch]      repair/run377-hub-verifiers-20261004 -> origin/repair/run377-hub-verifiers-20261004
+2026-10-04T15:46:24.5527365Z  * [new branch]      rescue-run-101          -> origin/rescue-run-101
+2026-10-04T15:46:24.5528936Z  * [new branch]      rescue-runs-76-84-88    -> origin/rescue-runs-76-84-88
+2026-10-04T15:46:24.5530760Z  * [new branch]      resume/2026-10-04-claude-handoff -> origin/resume/2026-10-04-claude-handoff
+2026-10-04T15:46:24.5532949Z  * [new branch]      resume/2026-10-04-valuation-date -> origin/resume/2026-10-04-valuation-date
+2026-10-04T15:46:24.5536154Z  * [new branch]      ticket-100-a-branch-run-says-what-it-can-record -> origin/ticket-100-a-branch-run-says-what-it-can-record
+2026-10-04T15:46:24.5539075Z  * [new branch]      ticket-101-the-gates-verify-a-real-signature -> origin/ticket-101-the-gates-verify-a-real-signature
+2026-10-04T15:46:24.5542044Z  * [new branch]      ticket-102-the-cited-tree-names-who-added-the-check -> origin/ticket-102-the-cited-tree-names-who-added-the-check
+2026-10-04T15:46:24.5544854Z  * [new branch]      ticket-103-release-gate-computes-the-bump -> origin/ticket-103-release-gate-computes-the-bump
+2026-10-04T15:46:24.5547254Z  * [new branch]      ticket-105-pinned-trust-roots -> origin/ticket-105-pinned-trust-roots
+2026-10-04T15:46:24.5549778Z  * [new branch]      ticket-106-composition-selfcheck-fixture-namespace -> origin/ticket-106-composition-selfcheck-fixture-namespace
+2026-10-04T15:46:24.5552649Z  * [new branch]      ticket-107-the-sampler-waits-for-what-exists -> origin/ticket-107-the-sampler-waits-for-what-exists
+2026-10-04T15:46:24.5555107Z  * [new branch]      ticket-108-the-recording-commit -> origin/ticket-108-the-recording-commit
+2026-10-04T15:46:24.5558102Z  * [new branch]      ticket-110-rollout-measured -> origin/ticket-110-rollout-measured
+2026-10-04T15:46:24.5561739Z  * [new branch]      ticket-111-the-cage-delivers-its-classes -> origin/ticket-111-the-cage-delivers-its-classes
+2026-10-04T15:46:24.5565366Z  * [new branch]      ticket-112-threshold-states-corpus -> origin/ticket-112-threshold-states-corpus
+2026-10-04T15:46:24.5568965Z  * [new branch]      ticket-113-infra-is-a-role-not-a-rung -> origin/ticket-113-infra-is-a-role-not-a-rung
+2026-10-04T15:46:24.5571393Z  * [new branch]      ticket-113-release-gate-one-line -> origin/ticket-113-release-gate-one-line
+2026-10-04T15:46:24.5573647Z  * [new branch]      ticket-114-unobserved-party-not-green -> origin/ticket-114-unobserved-party-not-green
+2026-10-04T15:46:24.5576123Z  * [new branch]      ticket-115-loophole-procedure -> origin/ticket-115-loophole-procedure
+2026-10-04T15:46:24.5578934Z  * [new branch]      ticket-116-twelve-loophole-candidates -> origin/ticket-116-twelve-loophole-candidates
+2026-10-04T15:46:24.5581530Z  * [new branch]      ticket-117-two-tickets-share-the-number-111 -> origin/ticket-117-two-tickets-share-the-number-111
+2026-10-04T15:46:24.5583846Z  * [new branch]      ticket-118-luck-may-not-promote -> origin/ticket-118-luck-may-not-promote
+2026-10-04T15:46:24.5586289Z  * [new branch]      ticket-119-unlabelled-namespace-is-priced -> origin/ticket-119-unlabelled-namespace-is-priced
+2026-10-04T15:46:24.5589404Z  * [new branch]      ticket-120-adr-0026-candidates -> origin/ticket-120-adr-0026-candidates
+2026-10-04T15:46:24.5593223Z  * [new branch]      ticket-121-implementing-a-control-moves-the-price -> origin/ticket-121-implementing-a-control-moves-the-price
+2026-10-04T15:46:24.5597290Z  * [new branch]      ticket-122-ramp-survives-rename -> origin/ticket-122-ramp-survives-rename
+2026-10-04T15:46:24.5600859Z  * [new branch]      ticket-123-a-withdrawal-is-the-regulators -> origin/ticket-123-a-withdrawal-is-the-regulators
+2026-10-04T15:46:24.5603116Z  * [new branch]      ticket-124-price-the-removal -> origin/ticket-124-price-the-removal
+2026-10-04T15:46:24.5604939Z  * [new branch]      ticket-125-signature-leak -> origin/ticket-125-signature-leak
+2026-10-04T15:46:24.5607490Z  * [new branch]      ticket-126-a-withdrawn-control-is-not-selectable -> origin/ticket-126-a-withdrawn-control-is-not-selectable
+2026-10-04T15:46:24.5610815Z  * [new branch]      ticket-127-pound-seam-switching-price -> origin/ticket-127-pound-seam-switching-price
+2026-10-04T15:46:24.5613108Z  * [new branch]      ticket-128-behind-a-major-unreadable -> origin/ticket-128-behind-a-major-unreadable
+2026-10-04T15:46:24.5615303Z  * [new branch]      ticket-129-major-acceptance-record -> origin/ticket-129-major-acceptance-record
+2026-10-04T15:46:24.5618083Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+2026-10-04T15:46:24.5620699Z  * [new branch]      ticket-130-the-composed-set-moves -> origin/ticket-130-the-composed-set-moves
+2026-10-04T15:46:24.5622935Z  * [new branch]      ticket-131-sibling-cut-release -> origin/ticket-131-sibling-cut-release
+2026-10-04T15:46:24.5625426Z  * [new branch]      ticket-132-adopter-gate-reads-acceptance -> origin/ticket-132-adopter-gate-reads-acceptance
+2026-10-04T15:46:24.5628294Z  * [new branch]      ticket-134-clock-observation-comparison -> origin/ticket-134-clock-observation-comparison
+2026-10-04T15:46:24.5630691Z  * [new branch]      ticket-135-lifted-app-verdict -> origin/ticket-135-lifted-app-verdict
+2026-10-04T15:46:24.5632794Z  * [new branch]      ticket-136-selfcheck-driftwood -> origin/ticket-136-selfcheck-driftwood
+2026-10-04T15:46:24.5635081Z  * [new branch]      ticket-137-parent-tree-per-feed-edge -> origin/ticket-137-parent-tree-per-feed-edge
+2026-10-04T15:46:24.5637283Z  * [new branch]      ticket-138-grader-as-of -> origin/ticket-138-grader-as-of
+2026-10-04T15:46:24.5639376Z  * [new branch]      ticket-139-ungoverned-namespace-born -> origin/ticket-139-ungoverned-namespace-born
+2026-10-04T15:46:24.5641705Z  * [new branch]      ticket-140-fact4-defaulted-false -> origin/ticket-140-fact4-defaulted-false
+2026-10-04T15:46:24.5644235Z  * [new branch]      ticket-141-declared-pricing-threshold -> origin/ticket-141-declared-pricing-threshold
+2026-10-04T15:46:24.5647098Z  * [new branch]      ticket-142a-schedule-blind-spots-and-clock-cage -> origin/ticket-142a-schedule-blind-spots-and-clock-cage
+2026-10-04T15:46:24.5649600Z  * [new branch]      ticket-143a-twin-sweep-split -> origin/ticket-143a-twin-sweep-split
+2026-10-04T15:46:24.5651593Z  * [new branch]      ticket-145-agent-cage-price -> origin/ticket-145-agent-cage-price
+2026-10-04T15:46:24.5653416Z  * [new branch]      ticket-146-engine-cells -> origin/ticket-146-engine-cells
+2026-10-04T15:46:24.5655100Z  * [new branch]      ticket-146-resolved     -> origin/ticket-146-resolved
+2026-10-04T15:46:24.5656853Z  * [new branch]      ticket-146-tags-read-only -> origin/ticket-146-tags-read-only
+2026-10-04T15:46:24.5658594Z  * [new branch]      ticket-147-declared-engine -> origin/ticket-147-declared-engine
+2026-10-04T15:46:24.5660495Z  * [new branch]      ticket-148-unsupported-pairing -> origin/ticket-148-unsupported-pairing
+2026-10-04T15:46:24.5662146Z  * [new branch]      ticket-152-grill        -> origin/ticket-152-grill
+2026-10-04T15:46:24.5663657Z  * [new branch]      ticket-161-engine-pin   -> origin/ticket-161-engine-pin
+2026-10-04T15:46:24.5665328Z  * [new branch]      ticket-161-reference-workload -> origin/ticket-161-reference-workload
+2026-10-04T15:46:24.5667879Z  * [new branch]      ticket-17-twin-follow-ups-from-the-aug-05-itemisation -> origin/ticket-17-twin-follow-ups-from-the-aug-05-itemisation
+2026-10-04T15:46:24.5670127Z  * [new branch]      ticket-30-grill         -> origin/ticket-30-grill
+2026-10-04T15:46:24.5671650Z  * [new branch]      ticket-31-sensor-admission -> origin/ticket-31-sensor-admission
+2026-10-04T15:46:24.5673755Z  * [new branch]      ticket-33-lift-ledger-storefront-and-reports -> origin/ticket-33-lift-ledger-storefront-and-reports
+2026-10-04T15:46:24.5676043Z  * [new branch]      ticket-34-followup-2026-09-08 -> origin/ticket-34-followup-2026-09-08
+2026-10-04T15:46:24.5678190Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+2026-10-04T15:46:24.5680257Z  * [new branch]      ticket-35-grill         -> origin/ticket-35-grill
+2026-10-04T15:46:24.5681691Z  * [new branch]      ticket-35-review-fixes  -> origin/ticket-35-review-fixes
+2026-10-04T15:46:24.5683594Z  * [new branch]      ticket-38-priced-holes-in-composition -> origin/ticket-38-priced-holes-in-composition
+2026-10-04T15:46:24.5685789Z  * [new branch]      ticket-39-supersede-adr-0013-0017-0018 -> origin/ticket-39-supersede-adr-0013-0017-0018
+2026-10-04T15:46:24.5688593Z  * [new branch]      ticket-44-eco-system-misuse-catalogue-graded-by-the-gate -> origin/ticket-44-eco-system-misuse-catalogue-graded-by-the-gate
+2026-10-04T15:46:24.5691531Z  * [new branch]      ticket-45-switching-cost-computed-in-composition -> origin/ticket-45-switching-cost-computed-in-composition
+2026-10-04T15:46:24.5693959Z  * [new branch]      ticket-48-the-demos-remaining-beats -> origin/ticket-48-the-demos-remaining-beats
+2026-10-04T15:46:24.5696370Z  * [new branch]      ticket-51-the-supply-constraint-actor-path -> origin/ticket-51-the-supply-constraint-actor-path
+2026-10-04T15:46:24.5699099Z  * [new branch]      ticket-53-the-release-pushes-tags-but-not-the-branch -> origin/ticket-53-the-release-pushes-tags-but-not-the-branch
+2026-10-04T15:46:24.5702351Z  * [new branch]      ticket-55-every-red-on-the-clock-is-real-explained-and-finishable -> origin/ticket-55-every-red-on-the-clock-is-real-explained-and-finishable
+2026-10-04T15:46:24.5705227Z  * [new branch]      ticket-56-and-85-the-clocks-are-graded -> origin/ticket-56-and-85-the-clocks-are-graded
+2026-10-04T15:46:24.5708262Z  * [new branch]      ticket-57-feeds-and-insurer-become-runnable-workflows-registered -> origin/ticket-57-feeds-and-insurer-become-runnable-workflows-registered
+2026-10-04T15:46:24.5711532Z  * [new branch]      ticket-59-a-fall-blocks-and-status-is-derived -> origin/ticket-59-a-fall-blocks-and-status-is-derived
+2026-10-04T15:46:24.5714065Z  * [new branch]      ticket-62-and-77-pins-are-checked-for-content -> origin/ticket-62-and-77-pins-are-checked-for-content
+2026-10-04T15:46:24.5716853Z  * [new branch]      ticket-63-the-unlabelled-default-flips-to-isolated -> origin/ticket-63-the-unlabelled-default-flips-to-isolated
+2026-10-04T15:46:24.5719293Z  * [new branch]      ticket-64-the-twin-is-three-adopters -> origin/ticket-64-the-twin-is-three-adopters
+2026-10-04T15:46:24.5721641Z  * [new branch]      ticket-65-enact-guard-closes-the-git-dir-family -> origin/ticket-65-enact-guard-closes-the-git-dir-family
+2026-10-04T15:46:24.5724653Z  * [new branch]      ticket-66-the-deck-check-grades-the-run-its-own-truth-line-names -> origin/ticket-66-the-deck-check-grades-the-run-its-own-truth-line-names
+2026-10-04T15:46:24.5727646Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+2026-10-04T15:46:24.5729961Z  * [new branch]      ticket-69-an-untagged-pin-is-a-priced-hole -> origin/ticket-69-an-untagged-pin-is-a-priced-hole
+2026-10-04T15:46:24.5732878Z  * [new branch]      ticket-70-the-observation-lane-is-detectively-enforced-and-honest -> origin/ticket-70-the-observation-lane-is-detectively-enforced-and-honest
+2026-10-04T15:46:24.5735301Z  * [new branch]      ticket-71-grill         -> origin/ticket-71-grill
+2026-10-04T15:46:24.5736873Z  * [new branch]      ticket-71-upstream-status -> origin/ticket-71-upstream-status
+2026-10-04T15:46:24.5739302Z  * [new branch]      ticket-72-a-feed-bump-re-renders-the-twin-s-derived-artefacts -> origin/ticket-72-a-feed-bump-re-renders-the-twin-s-derived-artefacts
+2026-10-04T15:46:24.5741884Z  * [new branch]      ticket-73-verifier-trust-instant -> origin/ticket-73-verifier-trust-instant
+2026-10-04T15:46:24.5744044Z  * [new branch]      ticket-76-every-green-rests-on-an-observation -> origin/ticket-76-every-green-rests-on-an-observation
+2026-10-04T15:46:24.5746511Z  * [new branch]      ticket-78-the-proposer-can-only-tighten -> origin/ticket-78-the-proposer-can-only-tighten
+2026-10-04T15:46:24.5748564Z  * [new branch]      ticket-79-the-pound-inputs -> origin/ticket-79-the-pound-inputs
+2026-10-04T15:46:24.5750056Z  * [new branch]      ticket-80-follow-up     -> origin/ticket-80-follow-up
+2026-10-04T15:46:24.5751771Z  * [new branch]      ticket-80-the-record-matches-the-code -> origin/ticket-80-the-record-matches-the-code
+2026-10-04T15:46:24.5753684Z  * [new branch]      ticket-81-record-round-3-landed -> origin/ticket-81-record-round-3-landed
+2026-10-04T15:46:24.5756040Z  * [new branch]      ticket-81-round-3-of-the-sampler-wait-order-lands -> origin/ticket-81-round-3-of-the-sampler-wait-order-lands
+2026-10-04T15:46:24.5758641Z  * [new branch]      ticket-82-licence-attribution-and-disclaimers -> origin/ticket-82-licence-attribution-and-disclaimers
+2026-10-04T15:46:24.5761096Z  * [new branch]      ticket-83-the-truth-line-says-what-it-measured -> origin/ticket-83-the-truth-line-says-what-it-measured
+2026-10-04T15:46:24.5763585Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+2026-10-04T15:46:24.5765969Z  * [new branch]      ticket-86-the-cage-enters-the-citable-number -> origin/ticket-86-the-cage-enters-the-citable-number
+2026-10-04T15:46:24.5768290Z  * [new branch]      ticket-87-the-forge-enforces-the-review -> origin/ticket-87-the-forge-enforces-the-review
+2026-10-04T15:46:24.5770199Z  * [new branch]      ticket-89-deny-is-not-a-rung -> origin/ticket-89-deny-is-not-a-rung
+2026-10-04T15:46:24.5772175Z  * [new branch]      ticket-91-the-currency-controller-is-owned -> origin/ticket-91-the-currency-controller-is-owned
+2026-10-04T15:46:24.5774374Z  * [new branch]      ticket-92-follow-up-trailers-and-hooks -> origin/ticket-92-follow-up-trailers-and-hooks
+2026-10-04T15:46:24.5776316Z  * [new branch]      ticket-92-the-local-clock -> origin/ticket-92-the-local-clock
+2026-10-04T15:46:24.5778165Z  * [new branch]      ticket-92-the-local-clock-round-4 -> origin/ticket-92-the-local-clock-round-4
+2026-10-04T15:46:24.5780260Z  * [new branch]      ticket-92-tidy-trailer-space-and-102-answer -> origin/ticket-92-tidy-trailer-space-and-102-answer
+2026-10-04T15:46:24.5782524Z  * [new branch]      ticket-93-the-twin-derives-a-probability -> origin/ticket-93-the-twin-derives-a-probability
+2026-10-04T15:46:24.5784714Z  * [new branch]      ticket-96-the-citable-line-says-the-mode -> origin/ticket-96-the-citable-line-says-the-mode
+2026-10-04T15:46:24.5787163Z  * [new branch]      ticket-98-a-refusal-by-another-name-is-graded -> origin/ticket-98-a-refusal-by-another-name-is-graded
+2026-10-04T15:46:24.5789525Z  * [new branch]      ticket-99-the-adopter-gate-grades-the-change -> origin/ticket-99-the-adopter-gate-grades-the-change
+2026-10-04T15:46:24.5791504Z  * [new branch]      tidy-2026-09-08-tickets-33-45 -> origin/tidy-2026-09-08-tickets-33-45
+2026-10-04T15:46:24.5793232Z  * [new branch]      wayfinder-laya-loophole-20260921 -> origin/wayfinder-laya-loophole-20260921
+2026-10-04T15:46:24.5796603Z [command]/usr/bin/git branch --list --remote origin/repair/run377-hub-verifiers-20261004
+2026-10-04T15:46:24.5798003Z   origin/repair/run377-hub-verifiers-20261004
+2026-10-04T15:46:24.5800196Z [command]/usr/bin/git rev-parse refs/remotes/origin/repair/run377-hub-verifiers-20261004
+2026-10-04T15:46:24.5801619Z 7fa013805f1e8bdd58e5a0390997c38211c5e087
+2026-10-04T15:46:24.5803686Z ##[endgroup]
+2026-10-04T15:46:24.5804761Z ##[group]Determining the checkout info
+2026-10-04T15:46:24.5806088Z ##[endgroup]
+2026-10-04T15:46:24.5806856Z [command]/usr/bin/git sparse-checkout disable
+2026-10-04T15:46:24.5808951Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-04T15:46:24.5811408Z ##[group]Checking out the ref
+2026-10-04T15:46:24.5813239Z [command]/usr/bin/git checkout --progress --force -B repair/run377-hub-verifiers-20261004 refs/remotes/origin/repair/run377-hub-verifiers-20261004
+2026-10-04T15:46:25.7983894Z Updating files:  71% (2537/3554)
+2026-10-04T15:46:25.7997677Z Updating files:  72% (2559/3554)
+2026-10-04T15:46:25.9197011Z Updating files:  73% (2595/3554)
+2026-10-04T15:46:25.9449922Z Updating files:  74% (2630/3554)
+2026-10-04T15:46:26.0817304Z Updating files:  75% (2666/3554)
+2026-10-04T15:46:26.0906639Z Updating files:  76% (2702/3554)
+2026-10-04T15:46:26.0922491Z Updating files:  77% (2737/3554)
+2026-10-04T15:46:26.0942317Z Updating files:  78% (2773/3554)
+2026-10-04T15:46:26.0969157Z Updating files:  79% (2808/3554)
+2026-10-04T15:46:26.1006691Z Updating files:  80% (2844/3554)
+2026-10-04T15:46:26.1030455Z Updating files:  81% (2879/3554)
+2026-10-04T15:46:26.1058526Z Updating files:  82% (2915/3554)
+2026-10-04T15:46:26.1075203Z Updating files:  83% (2950/3554)
+2026-10-04T15:46:26.1094998Z Updating files:  84% (2986/3554)
+2026-10-04T15:46:26.1109702Z Updating files:  85% (3021/3554)
+2026-10-04T15:46:26.1132518Z Updating files:  86% (3057/3554)
+2026-10-04T15:46:26.1155165Z Updating files:  87% (3092/3554)
+2026-10-04T15:46:26.1200071Z Updating files:  88% (3128/3554)
+2026-10-04T15:46:26.1240057Z Updating files:  89% (3164/3554)
+2026-10-04T15:46:26.1281461Z Updating files:  90% (3199/3554)
+2026-10-04T15:46:26.1316508Z Updating files:  91% (3235/3554)
+2026-10-04T15:46:26.1340316Z Updating files:  92% (3270/3554)
+2026-10-04T15:46:26.1364497Z Updating files:  93% (3306/3554)
+2026-10-04T15:46:26.1411242Z Updating files:  94% (3341/3554)
+2026-10-04T15:46:26.1442109Z Updating files:  95% (3377/3554)
+2026-10-04T15:46:26.1476949Z Updating files:  96% (3412/3554)
+2026-10-04T15:46:26.1514725Z Updating files:  97% (3448/3554)
+2026-10-04T15:46:26.1565278Z Updating files:  98% (3483/3554)
+2026-10-04T15:46:26.1606850Z Updating files:  99% (3519/3554)
+2026-10-04T15:46:26.1607364Z Updating files: 100% (3554/3554)
+2026-10-04T15:46:26.1678083Z Updating files: 100% (3554/3554), done.
+2026-10-04T15:46:26.1678970Z Switched to a new branch 'repair/run377-hub-verifiers-20261004'
+2026-10-04T15:46:26.1690246Z branch 'repair/run377-hub-verifiers-20261004' set up to track 'origin/repair/run377-hub-verifiers-20261004'.
+2026-10-04T15:46:26.1737646Z ##[endgroup]
+2026-10-04T15:46:26.1787873Z [command]/usr/bin/git log -1 --format=%H
+2026-10-04T15:46:26.1812188Z 7fa013805f1e8bdd58e5a0390997c38211c5e087
+2026-10-04T15:46:26.1820925Z ##[group]Removing auth
+2026-10-04T15:46:26.1823749Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-04T15:46:26.1850271Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-04T15:46:26.2042962Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-04T15:46:26.2072015Z http.https://github.com/.extraheader
+2026-10-04T15:46:26.2077931Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-04T15:46:26.2108069Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-04T15:46:26.2296921Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-04T15:46:26.2323757Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-04T15:46:26.2507019Z ##[endgroup]
+2026-10-04T15:46:26.2709318Z ##[group]Run actions/setup-python@v5
+2026-10-04T15:46:26.2709575Z with:
+2026-10-04T15:46:26.2709749Z   python-version: 3.12
+2026-10-04T15:46:26.2709934Z   check-latest: false
+2026-10-04T15:46:26.2712005Z   token: ***
+2026-10-04T15:46:26.2712187Z   update-environment: true
+2026-10-04T15:46:26.2712396Z   allow-prereleases: false
+2026-10-04T15:46:26.2712583Z   freethreaded: false
+2026-10-04T15:46:26.2712776Z ##[endgroup]
+2026-10-04T15:46:26.3727437Z ##[group]Installed versions
+2026-10-04T15:46:26.3788682Z (node:2173) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-04T15:46:26.3789732Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-04T15:46:26.3790203Z Successfully set up CPython (3.12.14)
+2026-10-04T15:46:26.3790627Z ##[endgroup]
+2026-10-04T15:46:26.3935034Z ##[group]Run pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516' 'jsonschema==4.23.0'
+2026-10-04T15:46:26.3935782Z [36;1mpip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516' 'jsonschema==4.23.0'[0m
+2026-10-04T15:46:26.4182124Z shell: /usr/bin/bash -e {0}
+2026-10-04T15:46:26.4182396Z env:
+2026-10-04T15:46:26.4182644Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:26.4183018Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-04T15:46:26.4183358Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:26.4183660Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:26.4183989Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:26.4184287Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-04T15:46:26.4184605Z ##[endgroup]
+2026-10-04T15:46:27.2535661Z Collecting pyyaml==6.0.3
+2026-10-04T15:46:27.2939214Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-10-04T15:46:27.3119018Z Collecting pytest==9.0.0
+2026-10-04T15:46:27.3160632Z   Downloading pytest-9.0.0-py3-none-any.whl.metadata (7.6 kB)
+2026-10-04T15:46:27.3289066Z Collecting pytest-xdist==3.8.0
+2026-10-04T15:46:27.3319429Z   Downloading pytest_xdist-3.8.0-py3-none-any.whl.metadata (3.0 kB)
+2026-10-04T15:46:27.4140275Z Collecting mypy==1.14.1
+2026-10-04T15:46:27.4190029Z   Downloading mypy-1.14.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl.metadata (2.1 kB)
+2026-10-04T15:46:27.4310021Z Collecting types-PyYAML==6.0.12.20250516
+2026-10-04T15:46:27.4360395Z   Downloading types_pyyaml-6.0.12.20250516-py3-none-any.whl.metadata (1.8 kB)
+2026-10-04T15:46:27.4499015Z Collecting jsonschema==4.23.0
+2026-10-04T15:46:27.4531089Z   Downloading jsonschema-4.23.0-py3-none-any.whl.metadata (7.9 kB)
+2026-10-04T15:46:27.4628979Z Collecting iniconfig>=1.0.1 (from pytest==9.0.0)
+2026-10-04T15:46:27.4660898Z   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-04T15:46:27.4774001Z Collecting packaging>=22 (from pytest==9.0.0)
+2026-10-04T15:46:27.4818253Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-04T15:46:27.4910965Z Collecting pluggy<2,>=1.5 (from pytest==9.0.0)
+2026-10-04T15:46:27.4956910Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+2026-10-04T15:46:27.5196071Z Collecting pygments>=2.7.2 (from pytest==9.0.0)
+2026-10-04T15:46:27.5236385Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-04T15:46:27.5330882Z Collecting execnet>=2.1 (from pytest-xdist==3.8.0)
+2026-10-04T15:46:27.5366462Z   Downloading execnet-2.1.2-py3-none-any.whl.metadata (2.9 kB)
+2026-10-04T15:46:27.5503293Z Collecting typing_extensions>=4.6.0 (from mypy==1.14.1)
+2026-10-04T15:46:27.5545243Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+2026-10-04T15:46:27.5799094Z Collecting mypy_extensions>=1.0.0 (from mypy==1.14.1)
+2026-10-04T15:46:27.5830886Z   Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+2026-10-04T15:46:27.5931488Z Collecting attrs>=22.2.0 (from jsonschema==4.23.0)
+2026-10-04T15:46:27.5961854Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+2026-10-04T15:46:27.6069799Z Collecting jsonschema-specifications>=2023.03.6 (from jsonschema==4.23.0)
+2026-10-04T15:46:27.6104283Z   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+2026-10-04T15:46:27.6304598Z Collecting referencing>=0.28.4 (from jsonschema==4.23.0)
+2026-10-04T15:46:27.6341206Z   Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+2026-10-04T15:46:27.8152977Z Collecting rpds-py>=0.7.1 (from jsonschema==4.23.0)
+2026-10-04T15:46:27.8200095Z   Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+2026-10-04T15:46:27.8342136Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-10-04T15:46:27.8577916Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 67.1 MB/s  0:00:00
+2026-10-04T15:46:27.8655742Z Downloading pytest-9.0.0-py3-none-any.whl (373 kB)
+2026-10-04T15:46:27.8735369Z Downloading pytest_xdist-3.8.0-py3-none-any.whl (46 kB)
+2026-10-04T15:46:27.8801994Z Downloading mypy-1.14.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl (12.9 MB)
+2026-10-04T15:46:28.0248648Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.9/12.9 MB 88.3 MB/s  0:00:00
+2026-10-04T15:46:28.0281990Z Downloading types_pyyaml-6.0.12.20250516-py3-none-any.whl (20 kB)
+2026-10-04T15:46:28.0329460Z Downloading jsonschema-4.23.0-py3-none-any.whl (88 kB)
+2026-10-04T15:46:28.0381557Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+2026-10-04T15:46:28.0442590Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+2026-10-04T15:46:28.0488773Z Downloading execnet-2.1.2-py3-none-any.whl (40 kB)
+2026-10-04T15:46:28.0535466Z Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+2026-10-04T15:46:28.0583631Z Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+2026-10-04T15:46:28.0641871Z Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+2026-10-04T15:46:28.0692313Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-04T15:46:28.0754542Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-10-04T15:46:28.0854705Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 122.6 MB/s  0:00:00
+2026-10-04T15:46:28.0887610Z Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+2026-10-04T15:46:28.0934839Z Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (366 kB)
+2026-10-04T15:46:28.1012126Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-10-04T15:46:28.1841754Z Installing collected packages: typing_extensions, types-PyYAML, rpds-py, pyyaml, pygments, pluggy, packaging, mypy_extensions, iniconfig, execnet, attrs, referencing, pytest, mypy, pytest-xdist, jsonschema-specifications, jsonschema
+2026-10-04T15:46:30.3838166Z 
+2026-10-04T15:46:30.3854415Z Successfully installed attrs-26.1.0 execnet-2.1.2 iniconfig-2.3.0 jsonschema-4.23.0 jsonschema-specifications-2025.9.1 mypy-1.14.1 mypy_extensions-1.1.0 packaging-26.3 pluggy-1.6.0 pygments-2.21.0 pytest-9.0.0 pytest-xdist-3.8.0 pyyaml-6.0.3 referencing-0.37.0 rpds-py-2026.6.3 types-PyYAML-6.0.12.20250516 typing_extensions-4.16.0
+2026-10-04T15:46:30.4459370Z ##[group]Run bash clone-estate.sh
+2026-10-04T15:46:30.4459659Z [36;1mbash clone-estate.sh[0m
+2026-10-04T15:46:30.4518036Z shell: /usr/bin/bash -e {0}
+2026-10-04T15:46:30.4518250Z env:
+2026-10-04T15:46:30.4518473Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:30.4518835Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-04T15:46:30.4519167Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:30.4519461Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:30.4519756Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:30.4520053Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-04T15:46:30.4520312Z ##[endgroup]
+2026-10-04T15:46:30.4641055Z ==> cloning policy-as-versioned-platform/platform
+2026-10-04T15:46:30.9032438Z ==> cloning policy-as-versioned-driftwood/driftwood
+2026-10-04T15:46:31.1491371Z ==> cloning policy-as-versioned-tuppence/tuppence
+2026-10-04T15:46:31.4389190Z ==> cloning policy-as-versioned-ludlow/ludlow
+2026-10-04T15:46:31.7036104Z ==> cloning policy-as-versioned-nist/nist
+2026-10-04T15:46:31.9553438Z ==> cloning policy-as-versioned-ico/ico
+2026-10-04T15:46:32.1370111Z ==> cloning policy-as-versioned-feeds/feeds
+2026-10-04T15:46:32.3327242Z ==> cloning policy-as-versioned-insurer/insurer
+2026-10-04T15:46:32.5818671Z OK: 8 units in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone
+2026-10-04T15:46:33.3376254Z OK: four independent application repositories in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-apps
+2026-10-04T15:46:33.3407294Z ##[group]Run python -m pytest -q
+2026-10-04T15:46:33.3407562Z [36;1mpython -m pytest -q[0m
+2026-10-04T15:46:33.3463634Z shell: /usr/bin/bash -e {0}
+2026-10-04T15:46:33.3463837Z env:
+2026-10-04T15:46:33.3464051Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:33.3464393Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-04T15:46:33.3464725Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:33.3465014Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:33.3465298Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:46:33.3465604Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-04T15:46:33.3465995Z ##[endgroup]
+2026-10-04T15:46:39.9586697Z bringing up nodes...
+2026-10-04T15:46:39.9589596Z bringing up nodes...
+2026-10-04T15:46:39.9591199Z 
+2026-10-04T15:46:40.3111030Z ........................................................................ [  2%]
+2026-10-04T15:46:41.3700637Z ........................................................................ [  4%]
+2026-10-04T15:46:42.8384662Z ........................................................................ [  7%]
+2026-10-04T15:46:45.0518711Z ........................................................................ [  9%]
+2026-10-04T15:46:47.5918050Z ........................................................................ [ 12%]
+2026-10-04T15:46:49.4831813Z ..................................ssssssss..........................ss.. [ 14%]
+2026-10-04T15:46:54.6823027Z ...........ssss.ssss.................................................... [ 17%]
+2026-10-04T15:46:56.6807431Z ........................................................................ [ 19%]
+2026-10-04T15:46:58.3524188Z ........................................................................ [ 22%]
+2026-10-04T15:47:01.1605012Z ........................................................................ [ 24%]
+2026-10-04T15:47:01.3757330Z ........................................................................ [ 27%]
+2026-10-04T15:47:04.5729279Z ........................................................................ [ 29%]
+2026-10-04T15:47:05.2917295Z ........................................................................ [ 31%]
+2026-10-04T15:47:11.5990435Z ........................................................................ [ 34%]
+2026-10-04T15:47:14.3383542Z ........................................................................ [ 36%]
+2026-10-04T15:47:24.2986980Z ........................................................................ [ 39%]
+2026-10-04T15:47:29.7057454Z ........................................................................ [ 41%]
+2026-10-04T15:47:34.9916059Z ........................................................................ [ 44%]
+2026-10-04T15:47:37.4896244Z ........................................................................ [ 46%]
+2026-10-04T15:47:44.1052656Z ........................................................................ [ 49%]
+2026-10-04T15:47:57.1177222Z ........................................F.............F................. [ 51%]
+2026-10-04T15:48:12.5923927Z ...............F...............F....................F............F...... [ 54%]
+2026-10-04T15:48:15.4823062Z ........................................................................ [ 56%]
+2026-10-04T15:48:26.4656938Z .F........................................................F.....F....... [ 58%]
+2026-10-04T15:48:40.6097017Z ........................................................................ [ 61%]
+2026-10-04T15:48:48.0136676Z ........................................................................ [ 63%]
+2026-10-04T15:48:49.0284876Z ......................ss.....s.sss...................................... [ 66%]
+2026-10-04T15:48:58.5243367Z ........................................................................ [ 68%]
+2026-10-04T15:49:04.3153938Z ........................................................................ [ 71%]
+2026-10-04T15:49:06.8614621Z ........................................................................ [ 73%]
+2026-10-04T15:49:08.6442946Z ........................................................................ [ 76%]
+2026-10-04T15:49:11.5787043Z ........................................................................ [ 78%]
+2026-10-04T15:49:13.4431984Z ........................................................................ [ 81%]
+2026-10-04T15:49:14.3659544Z ........................................................................ [ 83%]
+2026-10-04T15:49:17.1703972Z ........................................................................ [ 85%]
+2026-10-04T15:49:19.0626761Z ........................................................................ [ 88%]
+2026-10-04T15:49:25.5709225Z ........................................................................ [ 90%]
+2026-10-04T15:49:28.3998793Z ........................................................................ [ 93%]
+2026-10-04T15:49:30.4912590Z ........................................................................ [ 95%]
+2026-10-04T15:49:48.9723727Z ..........................................uu............................ [ 98%]
+2026-10-04T15:49:49.4516797Z .....................................................                    [100%]
+2026-10-04T15:49:49.4517202Z =================================== FAILURES ===================================
+2026-10-04T15:49:49.4517680Z _ test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[overlay-recorded] _
+2026-10-04T15:49:49.4518392Z [gw1] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:49:49.4518802Z 
+2026-10-04T15:49:49.4519132Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o0')
+2026-10-04T15:49:49.4519622Z legacy_header = False
+2026-10-04T15:49:49.4519775Z 
+2026-10-04T15:49:49.4520104Z     @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+2026-10-04T15:49:49.4520973Z     def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal(tmp_path, legacy_header):
+2026-10-04T15:49:49.4537313Z         """Ticket 123, review round, kept by ticket 126. A composer from before ticket 126 signed a
+2026-10-04T15:49:49.4537826Z         header in which tuppence's overlay selected ac-2.10, which NIST's pinned catalogue already
+2026-10-04T15:49:49.4538302Z         keeps under `status: withdrawn`. The adopter drops it; the nist pin does not move. That is
+2026-10-04T15:49:49.4538782Z         the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
+2026-10-04T15:49:49.4539248Z         happen. A last header with no `overlay-controls` must not change the answer. The new header
+2026-10-04T15:49:49.4539624Z         records `withdrawn-selectable: false`."""
+2026-10-04T15:49:49.4539874Z         comp = _composition()
+2026-10-04T15:49:49.4540089Z         work = _tuppence(tmp_path / "tuppence")
+2026-10-04T15:49:49.4540460Z         first, rendered = comp.compose(work, _trees())
+2026-10-04T15:49:49.4540866Z         assert first["outcome"] == "composed", first["refusals"]
+2026-10-04T15:49:49.4541503Z >       _record_header(comp, work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
+2026-10-04T15:49:49.4541991Z 
+2026-10-04T15:49:49.4542115Z tests/test_loophole_adr_0026.py:795: 
+2026-10-04T15:49:49.4542503Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4542971Z tests/test_loophole_adr_0026.py:242: in _record_header
+2026-10-04T15:49:49.4543460Z     _git(work, "commit", "-q", "-m", "fixture comparison header")
+2026-10-04T15:49:49.4544200Z tests/test_loophole_adr_0026.py:288: in _git
+2026-10-04T15:49:49.4544712Z     subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+2026-10-04T15:49:49.4545275Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4545551Z 
+2026-10-04T15:49:49.4548872Z input = None, capture_output = True, timeout = None, check = True
+2026-10-04T15:49:49.4550073Z popenargs = (['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', ...],)
+2026-10-04T15:49:49.4551874Z kwargs = {'env': {'ACCEPT_EULA': 'Y', 'ACTIONS_ORCHESTRATION_ID': 'a441ac0f-6fc7-8640-bf12-ceb1dcd178b5.tests.__default', 'ACTI...ACHE': '/opt/actionarchivecache', 'ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED': '1', ...}, 'stderr': -1, 'stdout': -1}
+2026-10-04T15:49:49.4552834Z process = <Popen: returncode: 1 args: ['git', '-c', 'core.hooksPath=/tmp/pytest-of-run...>
+2026-10-04T15:49:49.4553263Z stdout = b'On branch master\nnothing to commit, working tree clean\n'
+2026-10-04T15:49:49.4553543Z stderr = b'', retcode = 1
+2026-10-04T15:49:49.4553665Z 
+2026-10-04T15:49:49.4553741Z     def run(*popenargs,
+2026-10-04T15:49:49.4554007Z             input=None, capture_output=False, timeout=None, check=False, **kwargs):
+2026-10-04T15:49:49.4554386Z         """Run command with arguments and return a CompletedProcess instance.
+2026-10-04T15:49:49.4554664Z     
+2026-10-04T15:49:49.4554899Z         The returned instance will have attributes args, returncode, stdout and
+2026-10-04T15:49:49.4555280Z         stderr. By default, stdout and stderr are not captured, and those attributes
+2026-10-04T15:49:49.4555661Z         will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+2026-10-04T15:49:49.4556196Z         or pass capture_output=True to capture both.
+2026-10-04T15:49:49.4556524Z     
+2026-10-04T15:49:49.4556767Z         If check is True and the exit code was non-zero, it raises a
+2026-10-04T15:49:49.4557129Z         CalledProcessError. The CalledProcessError object will have the return code
+2026-10-04T15:49:49.4557538Z         in the returncode attribute, and output & stderr attributes if those streams
+2026-10-04T15:49:49.4557845Z         were captured.
+2026-10-04T15:49:49.4558005Z     
+2026-10-04T15:49:49.4558214Z         If timeout (seconds) is given and the process takes too long,
+2026-10-04T15:49:49.4558504Z          a TimeoutExpired exception will be raised.
+2026-10-04T15:49:49.4558719Z     
+2026-10-04T15:49:49.4558916Z         There is an optional argument "input", allowing you to
+2026-10-04T15:49:49.4559244Z         pass bytes or a string to the subprocess's stdin.  If you use this argument
+2026-10-04T15:49:49.4559599Z         you may not also use the Popen constructor's "stdin" argument, as
+2026-10-04T15:49:49.4559874Z         it will be used internally.
+2026-10-04T15:49:49.4560067Z     
+2026-10-04T15:49:49.4560293Z         By default, all communication is in bytes, and therefore any "input" should
+2026-10-04T15:49:49.4560657Z         be bytes, and the stdout and stderr will be bytes. If in text mode, any
+2026-10-04T15:49:49.4561014Z         "input" should be a string, and stdout and stderr will be strings decoded
+2026-10-04T15:49:49.4561368Z         according to locale encoding, or by "encoding" if set. Text mode is
+2026-10-04T15:49:49.4561720Z         triggered by setting any of text, encoding, errors or universal_newlines.
+2026-10-04T15:49:49.4561987Z     
+2026-10-04T15:49:49.4562192Z         The other arguments are the same as for the Popen constructor.
+2026-10-04T15:49:49.4562447Z         """
+2026-10-04T15:49:49.4562607Z         if input is not None:
+2026-10-04T15:49:49.4562809Z             if kwargs.get('stdin') is not None:
+2026-10-04T15:49:49.4563100Z                 raise ValueError('stdin and input arguments may not both be used.')
+2026-10-04T15:49:49.4563388Z             kwargs['stdin'] = PIPE
+2026-10-04T15:49:49.4563573Z     
+2026-10-04T15:49:49.4563943Z         if capture_output:
+2026-10-04T15:49:49.4564201Z             if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+2026-10-04T15:49:49.4564546Z                 raise ValueError('stdout and stderr arguments may not be used '
+2026-10-04T15:49:49.4564838Z                                  'with capture_output.')
+2026-10-04T15:49:49.4565150Z             kwargs['stdout'] = PIPE
+2026-10-04T15:49:49.4565348Z             kwargs['stderr'] = PIPE
+2026-10-04T15:49:49.4565524Z     
+2026-10-04T15:49:49.4565695Z         with Popen(*popenargs, **kwargs) as process:
+2026-10-04T15:49:49.4566077Z             try:
+2026-10-04T15:49:49.4566308Z                 stdout, stderr = process.communicate(input, timeout=timeout)
+2026-10-04T15:49:49.4566589Z             except TimeoutExpired as exc:
+2026-10-04T15:49:49.4566803Z                 process.kill()
+2026-10-04T15:49:49.4566984Z                 if _mswindows:
+2026-10-04T15:49:49.4567207Z                     # Windows accumulates the output in a single blocking
+2026-10-04T15:49:49.4567512Z                     # read() call run on child threads, with the timeout
+2026-10-04T15:49:49.4567808Z                     # being done in a join() on those threads.  communicate()
+2026-10-04T15:49:49.4568107Z                     # _after_ kill() is required to collect that and add it
+2026-10-04T15:49:49.4568441Z                     # to the exception.
+2026-10-04T15:49:49.4568824Z                     exc.stdout, exc.stderr = process.communicate()
+2026-10-04T15:49:49.4569200Z                 else:
+2026-10-04T15:49:49.4569483Z                     # POSIX _communicate already populated the output so
+2026-10-04T15:49:49.4569769Z                     # far into the TimeoutExpired exception.
+2026-10-04T15:49:49.4570008Z                     process.wait()
+2026-10-04T15:49:49.4570195Z                 raise
+2026-10-04T15:49:49.4570433Z             except:  # Including KeyboardInterrupt, communicate handled that.
+2026-10-04T15:49:49.4570710Z                 process.kill()
+2026-10-04T15:49:49.4570955Z                 # We don't call process.wait() as .__exit__ does that for us.
+2026-10-04T15:49:49.4571200Z                 raise
+2026-10-04T15:49:49.4571373Z             retcode = process.poll()
+2026-10-04T15:49:49.4571574Z             if check and retcode:
+2026-10-04T15:49:49.4571811Z >               raise CalledProcessError(retcode, process.args,
+2026-10-04T15:49:49.4572083Z                                          output=stdout, stderr=stderr)
+2026-10-04T15:49:49.4573228Z E               subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o0/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.4574217Z 
+2026-10-04T15:49:49.4574426Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py:571: CalledProcessError
+2026-10-04T15:49:49.4574909Z _ test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[legacy-header] _
+2026-10-04T15:49:49.4575344Z [gw1] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:49:49.4575570Z 
+2026-10-04T15:49:49.4575786Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o1')
+2026-10-04T15:49:49.4576286Z legacy_header = True
+2026-10-04T15:49:49.4576392Z 
+2026-10-04T15:49:49.4576619Z     @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+2026-10-04T15:49:49.4577126Z     def test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal(tmp_path, legacy_header):
+2026-10-04T15:49:49.4577602Z         """Ticket 123, review round, kept by ticket 126. A composer from before ticket 126 signed a
+2026-10-04T15:49:49.4578045Z         header in which tuppence's overlay selected ac-2.10, which NIST's pinned catalogue already
+2026-10-04T15:49:49.4578804Z         keeps under `status: withdrawn`. The adopter drops it; the nist pin does not move. That is
+2026-10-04T15:49:49.4579523Z         the adopter's `removed-control`, never a `withdrawn-control` naming a bump that did not
+2026-10-04T15:49:49.4580073Z         happen. A last header with no `overlay-controls` must not change the answer. The new header
+2026-10-04T15:49:49.4580436Z         records `withdrawn-selectable: false`."""
+2026-10-04T15:49:49.4580670Z         comp = _composition()
+2026-10-04T15:49:49.4580880Z         work = _tuppence(tmp_path / "tuppence")
+2026-10-04T15:49:49.4581126Z         first, rendered = comp.compose(work, _trees())
+2026-10-04T15:49:49.4581400Z         assert first["outcome"] == "composed", first["refusals"]
+2026-10-04T15:49:49.4581802Z >       _record_header(comp, work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
+2026-10-04T15:49:49.4582094Z 
+2026-10-04T15:49:49.4582181Z tests/test_loophole_adr_0026.py:795: 
+2026-10-04T15:49:49.4582432Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4582717Z tests/test_loophole_adr_0026.py:242: in _record_header
+2026-10-04T15:49:49.4583005Z     _git(work, "commit", "-q", "-m", "fixture comparison header")
+2026-10-04T15:49:49.4583277Z tests/test_loophole_adr_0026.py:288: in _git
+2026-10-04T15:49:49.4583592Z     subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+2026-10-04T15:49:49.4583932Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4584108Z 
+2026-10-04T15:49:49.4584233Z input = None, capture_output = True, timeout = None, check = True
+2026-10-04T15:49:49.4584822Z popenargs = (['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o1/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', ...],)
+2026-10-04T15:49:49.4585828Z kwargs = {'env': {'ACCEPT_EULA': 'Y', 'ACTIONS_ORCHESTRATION_ID': 'a441ac0f-6fc7-8640-bf12-ceb1dcd178b5.tests.__default', 'ACTI...ACHE': '/opt/actionarchivecache', 'ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED': '1', ...}, 'stderr': -1, 'stdout': -1}
+2026-10-04T15:49:49.4586788Z process = <Popen: returncode: 1 args: ['git', '-c', 'core.hooksPath=/tmp/pytest-of-run...>
+2026-10-04T15:49:49.4587192Z stdout = b'On branch master\nnothing to commit, working tree clean\n'
+2026-10-04T15:49:49.4587519Z stderr = b'', retcode = 1
+2026-10-04T15:49:49.4587633Z 
+2026-10-04T15:49:49.4587709Z     def run(*popenargs,
+2026-10-04T15:49:49.4587971Z             input=None, capture_output=False, timeout=None, check=False, **kwargs):
+2026-10-04T15:49:49.4588466Z         """Run command with arguments and return a CompletedProcess instance.
+2026-10-04T15:49:49.4588914Z     
+2026-10-04T15:49:49.4589271Z         The returned instance will have attributes args, returncode, stdout and
+2026-10-04T15:49:49.4589850Z         stderr. By default, stdout and stderr are not captured, and those attributes
+2026-10-04T15:49:49.4590237Z         will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+2026-10-04T15:49:49.4590557Z         or pass capture_output=True to capture both.
+2026-10-04T15:49:49.4590772Z     
+2026-10-04T15:49:49.4590969Z         If check is True and the exit code was non-zero, it raises a
+2026-10-04T15:49:49.4591320Z         CalledProcessError. The CalledProcessError object will have the return code
+2026-10-04T15:49:49.4591716Z         in the returncode attribute, and output & stderr attributes if those streams
+2026-10-04T15:49:49.4592014Z         were captured.
+2026-10-04T15:49:49.4592195Z     
+2026-10-04T15:49:49.4592409Z         If timeout (seconds) is given and the process takes too long,
+2026-10-04T15:49:49.4592695Z          a TimeoutExpired exception will be raised.
+2026-10-04T15:49:49.4592908Z     
+2026-10-04T15:49:49.4593098Z         There is an optional argument "input", allowing you to
+2026-10-04T15:49:49.4593421Z         pass bytes or a string to the subprocess's stdin.  If you use this argument
+2026-10-04T15:49:49.4593897Z         you may not also use the Popen constructor's "stdin" argument, as
+2026-10-04T15:49:49.4594181Z         it will be used internally.
+2026-10-04T15:49:49.4594371Z     
+2026-10-04T15:49:49.4594604Z         By default, all communication is in bytes, and therefore any "input" should
+2026-10-04T15:49:49.4595071Z         be bytes, and the stdout and stderr will be bytes. If in text mode, any
+2026-10-04T15:49:49.4595466Z         "input" should be a string, and stdout and stderr will be strings decoded
+2026-10-04T15:49:49.4595834Z         according to locale encoding, or by "encoding" if set. Text mode is
+2026-10-04T15:49:49.4596358Z         triggered by setting any of text, encoding, errors or universal_newlines.
+2026-10-04T15:49:49.4596642Z     
+2026-10-04T15:49:49.4596854Z         The other arguments are the same as for the Popen constructor.
+2026-10-04T15:49:49.4597117Z         """
+2026-10-04T15:49:49.4597272Z         if input is not None:
+2026-10-04T15:49:49.4597482Z             if kwargs.get('stdin') is not None:
+2026-10-04T15:49:49.4597786Z                 raise ValueError('stdin and input arguments may not both be used.')
+2026-10-04T15:49:49.4598078Z             kwargs['stdin'] = PIPE
+2026-10-04T15:49:49.4598264Z     
+2026-10-04T15:49:49.4598413Z         if capture_output:
+2026-10-04T15:49:49.4598692Z             if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+2026-10-04T15:49:49.4599058Z                 raise ValueError('stdout and stderr arguments may not be used '
+2026-10-04T15:49:49.4599368Z                                  'with capture_output.')
+2026-10-04T15:49:49.4599599Z             kwargs['stdout'] = PIPE
+2026-10-04T15:49:49.4599798Z             kwargs['stderr'] = PIPE
+2026-10-04T15:49:49.4599976Z     
+2026-10-04T15:49:49.4600154Z         with Popen(*popenargs, **kwargs) as process:
+2026-10-04T15:49:49.4600378Z             try:
+2026-10-04T15:49:49.4600613Z                 stdout, stderr = process.communicate(input, timeout=timeout)
+2026-10-04T15:49:49.4600908Z             except TimeoutExpired as exc:
+2026-10-04T15:49:49.4601126Z                 process.kill()
+2026-10-04T15:49:49.4601318Z                 if _mswindows:
+2026-10-04T15:49:49.4601542Z                     # Windows accumulates the output in a single blocking
+2026-10-04T15:49:49.4601843Z                     # read() call run on child threads, with the timeout
+2026-10-04T15:49:49.4602146Z                     # being done in a join() on those threads.  communicate()
+2026-10-04T15:49:49.4602454Z                     # _after_ kill() is required to collect that and add it
+2026-10-04T15:49:49.4602713Z                     # to the exception.
+2026-10-04T15:49:49.4602959Z                     exc.stdout, exc.stderr = process.communicate()
+2026-10-04T15:49:49.4603198Z                 else:
+2026-10-04T15:49:49.4603414Z                     # POSIX _communicate already populated the output so
+2026-10-04T15:49:49.4603696Z                     # far into the TimeoutExpired exception.
+2026-10-04T15:49:49.4603932Z                     process.wait()
+2026-10-04T15:49:49.4604115Z                 raise
+2026-10-04T15:49:49.4604351Z             except:  # Including KeyboardInterrupt, communicate handled that.
+2026-10-04T15:49:49.4604624Z                 process.kill()
+2026-10-04T15:49:49.4604864Z                 # We don't call process.wait() as .__exit__ does that for us.
+2026-10-04T15:49:49.4605111Z                 raise
+2026-10-04T15:49:49.4605284Z             retcode = process.poll()
+2026-10-04T15:49:49.4605489Z             if check and retcode:
+2026-10-04T15:49:49.4605729Z >               raise CalledProcessError(retcode, process.args,
+2026-10-04T15:49:49.4606160Z                                          output=stdout, stderr=stderr)
+2026-10-04T15:49:49.4607300Z E               subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o1/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o1/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.4608473Z 
+2026-10-04T15:49:49.4608676Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py:571: CalledProcessError
+2026-10-04T15:49:49.4609255Z _ test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[overlay-recorded] _
+2026-10-04T15:49:49.4609705Z [gw1] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:49:49.4609926Z 
+2026-10-04T15:49:49.4610143Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o2')
+2026-10-04T15:49:49.4610484Z legacy_header = False
+2026-10-04T15:49:49.4610588Z 
+2026-10-04T15:49:49.4610812Z     @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+2026-10-04T15:49:49.4611324Z     def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path, legacy_header):
+2026-10-04T15:49:49.4611804Z         """Ticket 123, review round, and ticket 126's legacy-header case. A composer from before
+2026-10-04T15:49:49.4612228Z         ticket 126 signed a header in which tuppence's overlay selected ac-2.10, already under
+2026-10-04T15:49:49.4612650Z         `status: withdrawn`. In one run NIST's next tag withdraws another selected control and
+2026-10-04T15:49:49.4613076Z         tuppence drops ac-2.10. That header cannot prove ac-2.10 was defined when it was selected,
+2026-10-04T15:49:49.4613472Z         so its removal is the adopter's, with or without `overlay-controls`.
+2026-10-04T15:49:49.4613739Z     
+2026-10-04T15:49:49.4614004Z         The other control differs by header. With `overlay-controls` recorded, it came from the
+2026-10-04T15:49:49.4614442Z         baseline, so it left with NIST's bump: a `withdrawn-control`. With a legacy header nothing
+2026-10-04T15:49:49.4614874Z         says whether it came from the baseline or from an overlay that selected it while already
+2026-10-04T15:49:49.4615306Z         withdrawn, so it stays the adopter's `removed-control` for this one run (ticket 123
+2026-10-04T15:49:49.4615705Z         decision 4's default, applied to the withdrawn status by ticket 126)."""
+2026-10-04T15:49:49.4616174Z         comp = _composition()
+2026-10-04T15:49:49.4616387Z         work = _tuppence(tmp_path / "tuppence")
+2026-10-04T15:49:49.4616637Z         first, rendered = comp.compose(work, _trees())
+2026-10-04T15:49:49.4616911Z         assert first["outcome"] == "composed", first["refusals"]
+2026-10-04T15:49:49.4617288Z         other = next(c for c in yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"])
+2026-10-04T15:49:49.4617771Z >       _record_header(comp, work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
+2026-10-04T15:49:49.4618062Z 
+2026-10-04T15:49:49.4618148Z tests/test_loophole_adr_0026.py:824: 
+2026-10-04T15:49:49.4618397Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4618674Z tests/test_loophole_adr_0026.py:242: in _record_header
+2026-10-04T15:49:49.4618972Z     _git(work, "commit", "-q", "-m", "fixture comparison header")
+2026-10-04T15:49:49.4619242Z tests/test_loophole_adr_0026.py:288: in _git
+2026-10-04T15:49:49.4619557Z     subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+2026-10-04T15:49:49.4619893Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4620067Z 
+2026-10-04T15:49:49.4620192Z input = None, capture_output = True, timeout = None, check = True
+2026-10-04T15:49:49.4620787Z popenargs = (['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o2/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', ...],)
+2026-10-04T15:49:49.4621799Z kwargs = {'env': {'ACCEPT_EULA': 'Y', 'ACTIONS_ORCHESTRATION_ID': 'a441ac0f-6fc7-8640-bf12-ceb1dcd178b5.tests.__default', 'ACTI...ACHE': '/opt/actionarchivecache', 'ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED': '1', ...}, 'stderr': -1, 'stdout': -1}
+2026-10-04T15:49:49.4622703Z process = <Popen: returncode: 1 args: ['git', '-c', 'core.hooksPath=/tmp/pytest-of-run...>
+2026-10-04T15:49:49.4623173Z stdout = b'On branch master\nnothing to commit, working tree clean\n'
+2026-10-04T15:49:49.4623450Z stderr = b'', retcode = 1
+2026-10-04T15:49:49.4623567Z 
+2026-10-04T15:49:49.4623639Z     def run(*popenargs,
+2026-10-04T15:49:49.4623904Z             input=None, capture_output=False, timeout=None, check=False, **kwargs):
+2026-10-04T15:49:49.4624266Z         """Run command with arguments and return a CompletedProcess instance.
+2026-10-04T15:49:49.4624534Z     
+2026-10-04T15:49:49.4624766Z         The returned instance will have attributes args, returncode, stdout and
+2026-10-04T15:49:49.4625143Z         stderr. By default, stdout and stderr are not captured, and those attributes
+2026-10-04T15:49:49.4625518Z         will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+2026-10-04T15:49:49.4625837Z         or pass capture_output=True to capture both.
+2026-10-04T15:49:49.4626201Z     
+2026-10-04T15:49:49.4626401Z         If check is True and the exit code was non-zero, it raises a
+2026-10-04T15:49:49.4626763Z         CalledProcessError. The CalledProcessError object will have the return code
+2026-10-04T15:49:49.4627148Z         in the returncode attribute, and output & stderr attributes if those streams
+2026-10-04T15:49:49.4627437Z         were captured.
+2026-10-04T15:49:49.4627599Z     
+2026-10-04T15:49:49.4627801Z         If timeout (seconds) is given and the process takes too long,
+2026-10-04T15:49:49.4628082Z          a TimeoutExpired exception will be raised.
+2026-10-04T15:49:49.4628291Z     
+2026-10-04T15:49:49.4628480Z         There is an optional argument "input", allowing you to
+2026-10-04T15:49:49.4628801Z         pass bytes or a string to the subprocess's stdin.  If you use this argument
+2026-10-04T15:49:49.4629155Z         you may not also use the Popen constructor's "stdin" argument, as
+2026-10-04T15:49:49.4629432Z         it will be used internally.
+2026-10-04T15:49:49.4629623Z     
+2026-10-04T15:49:49.4629850Z         By default, all communication is in bytes, and therefore any "input" should
+2026-10-04T15:49:49.4630211Z         be bytes, and the stdout and stderr will be bytes. If in text mode, any
+2026-10-04T15:49:49.4630565Z         "input" should be a string, and stdout and stderr will be strings decoded
+2026-10-04T15:49:49.4630921Z         according to locale encoding, or by "encoding" if set. Text mode is
+2026-10-04T15:49:49.4631276Z         triggered by setting any of text, encoding, errors or universal_newlines.
+2026-10-04T15:49:49.4631545Z     
+2026-10-04T15:49:49.4631756Z         The other arguments are the same as for the Popen constructor.
+2026-10-04T15:49:49.4632014Z         """
+2026-10-04T15:49:49.4632170Z         if input is not None:
+2026-10-04T15:49:49.4632373Z             if kwargs.get('stdin') is not None:
+2026-10-04T15:49:49.4632662Z                 raise ValueError('stdin and input arguments may not both be used.')
+2026-10-04T15:49:49.4632947Z             kwargs['stdin'] = PIPE
+2026-10-04T15:49:49.4633130Z     
+2026-10-04T15:49:49.4633279Z         if capture_output:
+2026-10-04T15:49:49.4633538Z             if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+2026-10-04T15:49:49.4633886Z                 raise ValueError('stdout and stderr arguments may not be used '
+2026-10-04T15:49:49.4634178Z                                  'with capture_output.')
+2026-10-04T15:49:49.4634400Z             kwargs['stdout'] = PIPE
+2026-10-04T15:49:49.4634598Z             kwargs['stderr'] = PIPE
+2026-10-04T15:49:49.4634776Z     
+2026-10-04T15:49:49.4634948Z         with Popen(*popenargs, **kwargs) as process:
+2026-10-04T15:49:49.4635164Z             try:
+2026-10-04T15:49:49.4635391Z                 stdout, stderr = process.communicate(input, timeout=timeout)
+2026-10-04T15:49:49.4635788Z             except TimeoutExpired as exc:
+2026-10-04T15:49:49.4636159Z                 process.kill()
+2026-10-04T15:49:49.4636344Z                 if _mswindows:
+2026-10-04T15:49:49.4636563Z                     # Windows accumulates the output in a single blocking
+2026-10-04T15:49:49.4636955Z                     # read() call run on child threads, with the timeout
+2026-10-04T15:49:49.4637282Z                     # being done in a join() on those threads.  communicate()
+2026-10-04T15:49:49.4637619Z                     # _after_ kill() is required to collect that and add it
+2026-10-04T15:49:49.4637875Z                     # to the exception.
+2026-10-04T15:49:49.4638118Z                     exc.stdout, exc.stderr = process.communicate()
+2026-10-04T15:49:49.4638355Z                 else:
+2026-10-04T15:49:49.4638565Z                     # POSIX _communicate already populated the output so
+2026-10-04T15:49:49.4638845Z                     # far into the TimeoutExpired exception.
+2026-10-04T15:49:49.4639079Z                     process.wait()
+2026-10-04T15:49:49.4639259Z                 raise
+2026-10-04T15:49:49.4639490Z             except:  # Including KeyboardInterrupt, communicate handled that.
+2026-10-04T15:49:49.4639758Z                 process.kill()
+2026-10-04T15:49:49.4639990Z                 # We don't call process.wait() as .__exit__ does that for us.
+2026-10-04T15:49:49.4640236Z                 raise
+2026-10-04T15:49:49.4640406Z             retcode = process.poll()
+2026-10-04T15:49:49.4640609Z             if check and retcode:
+2026-10-04T15:49:49.4640843Z >               raise CalledProcessError(retcode, process.args,
+2026-10-04T15:49:49.4641111Z                                          output=stdout, stderr=stderr)
+2026-10-04T15:49:49.4642234Z E               subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o2/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o2/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.4643233Z 
+2026-10-04T15:49:49.4643430Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py:571: CalledProcessError
+2026-10-04T15:49:49.4643899Z _ test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[legacy-header] _
+2026-10-04T15:49:49.4644324Z [gw1] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:49:49.4644546Z 
+2026-10-04T15:49:49.4644754Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o3')
+2026-10-04T15:49:49.4645092Z legacy_header = True
+2026-10-04T15:49:49.4645193Z 
+2026-10-04T15:49:49.4645417Z     @pytest.mark.parametrize("legacy_header", [False, True], ids=["overlay-recorded", "legacy-header"])
+2026-10-04T15:49:49.4646083Z     def test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump(tmp_path, legacy_header):
+2026-10-04T15:49:49.4646565Z         """Ticket 123, review round, and ticket 126's legacy-header case. A composer from before
+2026-10-04T15:49:49.4646984Z         ticket 126 signed a header in which tuppence's overlay selected ac-2.10, already under
+2026-10-04T15:49:49.4647408Z         `status: withdrawn`. In one run NIST's next tag withdraws another selected control and
+2026-10-04T15:49:49.4647839Z         tuppence drops ac-2.10. That header cannot prove ac-2.10 was defined when it was selected,
+2026-10-04T15:49:49.4648241Z         so its removal is the adopter's, with or without `overlay-controls`.
+2026-10-04T15:49:49.4648502Z     
+2026-10-04T15:49:49.4648765Z         The other control differs by header. With `overlay-controls` recorded, it came from the
+2026-10-04T15:49:49.4649199Z         baseline, so it left with NIST's bump: a `withdrawn-control`. With a legacy header nothing
+2026-10-04T15:49:49.4649623Z         says whether it came from the baseline or from an overlay that selected it while already
+2026-10-04T15:49:49.4650186Z         withdrawn, so it stays the adopter's `removed-control` for this one run (ticket 123
+2026-10-04T15:49:49.4650584Z         decision 4's default, applied to the withdrawn status by ticket 126)."""
+2026-10-04T15:49:49.4650873Z         comp = _composition()
+2026-10-04T15:49:49.4651173Z         work = _tuppence(tmp_path / "tuppence")
+2026-10-04T15:49:49.4651419Z         first, rendered = comp.compose(work, _trees())
+2026-10-04T15:49:49.4651697Z         assert first["outcome"] == "composed", first["refusals"]
+2026-10-04T15:49:49.4652066Z         other = next(c for c in yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"])
+2026-10-04T15:49:49.4652539Z >       _record_header(comp, work, _old_rule_header(comp, rendered, OWN_WITHDRAWN_STATUS, legacy=legacy_header))
+2026-10-04T15:49:49.4652829Z 
+2026-10-04T15:49:49.4652916Z tests/test_loophole_adr_0026.py:824: 
+2026-10-04T15:49:49.4653159Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4653438Z tests/test_loophole_adr_0026.py:242: in _record_header
+2026-10-04T15:49:49.4653720Z     _git(work, "commit", "-q", "-m", "fixture comparison header")
+2026-10-04T15:49:49.4653987Z tests/test_loophole_adr_0026.py:288: in _git
+2026-10-04T15:49:49.4654297Z     subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+2026-10-04T15:49:49.4654631Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4654804Z 
+2026-10-04T15:49:49.4654928Z input = None, capture_output = True, timeout = None, check = True
+2026-10-04T15:49:49.4655514Z popenargs = (['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o3/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', ...],)
+2026-10-04T15:49:49.4656616Z kwargs = {'env': {'ACCEPT_EULA': 'Y', 'ACTIONS_ORCHESTRATION_ID': 'a441ac0f-6fc7-8640-bf12-ceb1dcd178b5.tests.__default', 'ACTI...ACHE': '/opt/actionarchivecache', 'ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED': '1', ...}, 'stderr': -1, 'stdout': -1}
+2026-10-04T15:49:49.4657407Z process = <Popen: returncode: 1 args: ['git', '-c', 'core.hooksPath=/tmp/pytest-of-run...>
+2026-10-04T15:49:49.4657783Z stdout = b'On branch master\nnothing to commit, working tree clean\n'
+2026-10-04T15:49:49.4658056Z stderr = b'', retcode = 1
+2026-10-04T15:49:49.4658171Z 
+2026-10-04T15:49:49.4658241Z     def run(*popenargs,
+2026-10-04T15:49:49.4658501Z             input=None, capture_output=False, timeout=None, check=False, **kwargs):
+2026-10-04T15:49:49.4658864Z         """Run command with arguments and return a CompletedProcess instance.
+2026-10-04T15:49:49.4659132Z     
+2026-10-04T15:49:49.4659357Z         The returned instance will have attributes args, returncode, stdout and
+2026-10-04T15:49:49.4659731Z         stderr. By default, stdout and stderr are not captured, and those attributes
+2026-10-04T15:49:49.4660106Z         will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+2026-10-04T15:49:49.4660422Z         or pass capture_output=True to capture both.
+2026-10-04T15:49:49.4660635Z     
+2026-10-04T15:49:49.4660829Z         If check is True and the exit code was non-zero, it raises a
+2026-10-04T15:49:49.4661179Z         CalledProcessError. The CalledProcessError object will have the return code
+2026-10-04T15:49:49.4661567Z         in the returncode attribute, and output & stderr attributes if those streams
+2026-10-04T15:49:49.4661863Z         were captured.
+2026-10-04T15:49:49.4662025Z     
+2026-10-04T15:49:49.4662229Z         If timeout (seconds) is given and the process takes too long,
+2026-10-04T15:49:49.4662515Z          a TimeoutExpired exception will be raised.
+2026-10-04T15:49:49.4662729Z     
+2026-10-04T15:49:49.4662917Z         There is an optional argument "input", allowing you to
+2026-10-04T15:49:49.4663242Z         pass bytes or a string to the subprocess's stdin.  If you use this argument
+2026-10-04T15:49:49.4663598Z         you may not also use the Popen constructor's "stdin" argument, as
+2026-10-04T15:49:49.4663990Z         it will be used internally.
+2026-10-04T15:49:49.4664182Z     
+2026-10-04T15:49:49.4664410Z         By default, all communication is in bytes, and therefore any "input" should
+2026-10-04T15:49:49.4664863Z         be bytes, and the stdout and stderr will be bytes. If in text mode, any
+2026-10-04T15:49:49.4665229Z         "input" should be a string, and stdout and stderr will be strings decoded
+2026-10-04T15:49:49.4665584Z         according to locale encoding, or by "encoding" if set. Text mode is
+2026-10-04T15:49:49.4666020Z         triggered by setting any of text, encoding, errors or universal_newlines.
+2026-10-04T15:49:49.4666296Z     
+2026-10-04T15:49:49.4666585Z         The other arguments are the same as for the Popen constructor.
+2026-10-04T15:49:49.4666844Z         """
+2026-10-04T15:49:49.4667002Z         if input is not None:
+2026-10-04T15:49:49.4667206Z             if kwargs.get('stdin') is not None:
+2026-10-04T15:49:49.4667497Z                 raise ValueError('stdin and input arguments may not both be used.')
+2026-10-04T15:49:49.4667784Z             kwargs['stdin'] = PIPE
+2026-10-04T15:49:49.4667967Z     
+2026-10-04T15:49:49.4668111Z         if capture_output:
+2026-10-04T15:49:49.4668371Z             if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+2026-10-04T15:49:49.4668722Z                 raise ValueError('stdout and stderr arguments may not be used '
+2026-10-04T15:49:49.4669016Z                                  'with capture_output.')
+2026-10-04T15:49:49.4669242Z             kwargs['stdout'] = PIPE
+2026-10-04T15:49:49.4669439Z             kwargs['stderr'] = PIPE
+2026-10-04T15:49:49.4669617Z     
+2026-10-04T15:49:49.4669790Z         with Popen(*popenargs, **kwargs) as process:
+2026-10-04T15:49:49.4670008Z             try:
+2026-10-04T15:49:49.4670250Z                 stdout, stderr = process.communicate(input, timeout=timeout)
+2026-10-04T15:49:49.4670532Z             except TimeoutExpired as exc:
+2026-10-04T15:49:49.4670746Z                 process.kill()
+2026-10-04T15:49:49.4670934Z                 if _mswindows:
+2026-10-04T15:49:49.4671158Z                     # Windows accumulates the output in a single blocking
+2026-10-04T15:49:49.4671453Z                     # read() call run on child threads, with the timeout
+2026-10-04T15:49:49.4671755Z                     # being done in a join() on those threads.  communicate()
+2026-10-04T15:49:49.4672058Z                     # _after_ kill() is required to collect that and add it
+2026-10-04T15:49:49.4672311Z                     # to the exception.
+2026-10-04T15:49:49.4672553Z                     exc.stdout, exc.stderr = process.communicate()
+2026-10-04T15:49:49.4672792Z                 else:
+2026-10-04T15:49:49.4673017Z                     # POSIX _communicate already populated the output so
+2026-10-04T15:49:49.4673313Z                     # far into the TimeoutExpired exception.
+2026-10-04T15:49:49.4673565Z                     process.wait()
+2026-10-04T15:49:49.4673756Z                 raise
+2026-10-04T15:49:49.4673991Z             except:  # Including KeyboardInterrupt, communicate handled that.
+2026-10-04T15:49:49.4674266Z                 process.kill()
+2026-10-04T15:49:49.4674504Z                 # We don't call process.wait() as .__exit__ does that for us.
+2026-10-04T15:49:49.4674753Z                 raise
+2026-10-04T15:49:49.4674926Z             retcode = process.poll()
+2026-10-04T15:49:49.4675131Z             if check and retcode:
+2026-10-04T15:49:49.4675367Z >               raise CalledProcessError(retcode, process.args,
+2026-10-04T15:49:49.4675638Z                                          output=stdout, stderr=stderr)
+2026-10-04T15:49:49.4676860Z E               subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o3/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o3/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.4678011Z 
+2026-10-04T15:49:49.4678218Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py:571: CalledProcessError
+2026-10-04T15:49:49.4678779Z _ test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators _
+2026-10-04T15:49:49.4679204Z [gw1] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:49:49.4679425Z 
+2026-10-04T15:49:49.4679643Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_control_the_regulator_w0')
+2026-10-04T15:49:49.4679917Z 
+2026-10-04T15:49:49.4680145Z     def test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators(tmp_path):
+2026-10-04T15:49:49.4680609Z         """Eco-system ticket 126. tuppence's overlay selects a control NIST defines outside
+2026-10-04T15:49:49.4681047Z         MODERATE, and composes under the new rule, so its header records `withdrawn-selectable:
+2026-10-04T15:49:49.4681494Z         false`. NIST's next tag marks that control `status: withdrawn`. tuppence keeping it in its
+2026-10-04T15:49:49.4681956Z         overlay refuses `unknown-control-id`. tuppence dropping it composes, and the control prints
+2026-10-04T15:49:49.4682424Z         as NIST's `withdrawn-control`: the last overlay would no longer select it against the new
+2026-10-04T15:49:49.4682826Z         catalogue, and the header proves it was defined when it was selected."""
+2026-10-04T15:49:49.4683119Z         comp = _composition()
+2026-10-04T15:49:49.4683366Z         moderate = comp._baseline_ids(ESTATE / "nist", "MODERATE")
+2026-10-04T15:49:49.4683710Z         extra = sorted(comp._baseline_ids(ESTATE / "nist", "HIGH") - moderate)[0]
+2026-10-04T15:49:49.4684029Z         assert _status(ESTATE / "nist", extra) is None
+2026-10-04T15:49:49.4684280Z         work = _tuppence(tmp_path / "tuppence")
+2026-10-04T15:49:49.4684607Z         _edit_party(work, lambda doc: doc.setdefault("overlay", {}).update(controls=[extra]))
+2026-10-04T15:49:49.4684953Z         first, rendered = comp.compose(work, _trees())
+2026-10-04T15:49:49.4685223Z         assert first["outcome"] == "composed", first["refusals"]
+2026-10-04T15:49:49.4685519Z         header = yaml.safe_load(rendered["composed/HEADER.yaml"])
+2026-10-04T15:49:49.4686063Z         assert header["overlay-controls"] == [extra] and header["withdrawn-selectable"] is False, header
+2026-10-04T15:49:49.4686429Z >       _record_header(comp, work, rendered)
+2026-10-04T15:49:49.4686577Z 
+2026-10-04T15:49:49.4686661Z tests/test_loophole_adr_0026.py:856: 
+2026-10-04T15:49:49.4686904Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4687179Z tests/test_loophole_adr_0026.py:242: in _record_header
+2026-10-04T15:49:49.4687461Z     _git(work, "commit", "-q", "-m", "fixture comparison header")
+2026-10-04T15:49:49.4687722Z tests/test_loophole_adr_0026.py:288: in _git
+2026-10-04T15:49:49.4688035Z     subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+2026-10-04T15:49:49.4688371Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4688548Z 
+2026-10-04T15:49:49.4688671Z input = None, capture_output = True, timeout = None, check = True
+2026-10-04T15:49:49.4689264Z popenargs = (['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_control_the_regulator_w0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', ...],)
+2026-10-04T15:49:49.4690282Z kwargs = {'env': {'ACCEPT_EULA': 'Y', 'ACTIONS_ORCHESTRATION_ID': 'a441ac0f-6fc7-8640-bf12-ceb1dcd178b5.tests.__default', 'ACTI...ACHE': '/opt/actionarchivecache', 'ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED': '1', ...}, 'stderr': -1, 'stdout': -1}
+2026-10-04T15:49:49.4691065Z process = <Popen: returncode: 1 args: ['git', '-c', 'core.hooksPath=/tmp/pytest-of-run...>
+2026-10-04T15:49:49.4691441Z stdout = b'On branch master\nnothing to commit, working tree clean\n'
+2026-10-04T15:49:49.4691833Z stderr = b'', retcode = 1
+2026-10-04T15:49:49.4691947Z 
+2026-10-04T15:49:49.4692018Z     def run(*popenargs,
+2026-10-04T15:49:49.4692278Z             input=None, capture_output=False, timeout=None, check=False, **kwargs):
+2026-10-04T15:49:49.4692732Z         """Run command with arguments and return a CompletedProcess instance.
+2026-10-04T15:49:49.4693010Z     
+2026-10-04T15:49:49.4693247Z         The returned instance will have attributes args, returncode, stdout and
+2026-10-04T15:49:49.4693619Z         stderr. By default, stdout and stderr are not captured, and those attributes
+2026-10-04T15:49:49.4693999Z         will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+2026-10-04T15:49:49.4694317Z         or pass capture_output=True to capture both.
+2026-10-04T15:49:49.4694528Z     
+2026-10-04T15:49:49.4694725Z         If check is True and the exit code was non-zero, it raises a
+2026-10-04T15:49:49.4695077Z         CalledProcessError. The CalledProcessError object will have the return code
+2026-10-04T15:49:49.4695500Z         in the returncode attribute, and output & stderr attributes if those streams
+2026-10-04T15:49:49.4695799Z         were captured.
+2026-10-04T15:49:49.4696045Z     
+2026-10-04T15:49:49.4696246Z         If timeout (seconds) is given and the process takes too long,
+2026-10-04T15:49:49.4696532Z          a TimeoutExpired exception will be raised.
+2026-10-04T15:49:49.4696741Z     
+2026-10-04T15:49:49.4696928Z         There is an optional argument "input", allowing you to
+2026-10-04T15:49:49.4697250Z         pass bytes or a string to the subprocess's stdin.  If you use this argument
+2026-10-04T15:49:49.4697593Z         you may not also use the Popen constructor's "stdin" argument, as
+2026-10-04T15:49:49.4697867Z         it will be used internally.
+2026-10-04T15:49:49.4698055Z     
+2026-10-04T15:49:49.4698284Z         By default, all communication is in bytes, and therefore any "input" should
+2026-10-04T15:49:49.4698642Z         be bytes, and the stdout and stderr will be bytes. If in text mode, any
+2026-10-04T15:49:49.4698999Z         "input" should be a string, and stdout and stderr will be strings decoded
+2026-10-04T15:49:49.4699354Z         according to locale encoding, or by "encoding" if set. Text mode is
+2026-10-04T15:49:49.4699712Z         triggered by setting any of text, encoding, errors or universal_newlines.
+2026-10-04T15:49:49.4699984Z     
+2026-10-04T15:49:49.4700187Z         The other arguments are the same as for the Popen constructor.
+2026-10-04T15:49:49.4700443Z         """
+2026-10-04T15:49:49.4700602Z         if input is not None:
+2026-10-04T15:49:49.4700811Z             if kwargs.get('stdin') is not None:
+2026-10-04T15:49:49.4701098Z                 raise ValueError('stdin and input arguments may not both be used.')
+2026-10-04T15:49:49.4701383Z             kwargs['stdin'] = PIPE
+2026-10-04T15:49:49.4701572Z     
+2026-10-04T15:49:49.4701719Z         if capture_output:
+2026-10-04T15:49:49.4701977Z             if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+2026-10-04T15:49:49.4702327Z                 raise ValueError('stdout and stderr arguments may not be used '
+2026-10-04T15:49:49.4702620Z                                  'with capture_output.')
+2026-10-04T15:49:49.4702843Z             kwargs['stdout'] = PIPE
+2026-10-04T15:49:49.4703044Z             kwargs['stderr'] = PIPE
+2026-10-04T15:49:49.4703221Z     
+2026-10-04T15:49:49.4703392Z         with Popen(*popenargs, **kwargs) as process:
+2026-10-04T15:49:49.4703607Z             try:
+2026-10-04T15:49:49.4703831Z                 stdout, stderr = process.communicate(input, timeout=timeout)
+2026-10-04T15:49:49.4704112Z             except TimeoutExpired as exc:
+2026-10-04T15:49:49.4704321Z                 process.kill()
+2026-10-04T15:49:49.4704505Z                 if _mswindows:
+2026-10-04T15:49:49.4704729Z                     # Windows accumulates the output in a single blocking
+2026-10-04T15:49:49.4705019Z                     # read() call run on child threads, with the timeout
+2026-10-04T15:49:49.4705439Z                     # being done in a join() on those threads.  communicate()
+2026-10-04T15:49:49.4705743Z                     # _after_ kill() is required to collect that and add it
+2026-10-04T15:49:49.4706089Z                     # to the exception.
+2026-10-04T15:49:49.4706423Z                     exc.stdout, exc.stderr = process.communicate()
+2026-10-04T15:49:49.4706667Z                 else:
+2026-10-04T15:49:49.4706884Z                     # POSIX _communicate already populated the output so
+2026-10-04T15:49:49.4707159Z                     # far into the TimeoutExpired exception.
+2026-10-04T15:49:49.4707390Z                     process.wait()
+2026-10-04T15:49:49.4707577Z                 raise
+2026-10-04T15:49:49.4707814Z             except:  # Including KeyboardInterrupt, communicate handled that.
+2026-10-04T15:49:49.4708084Z                 process.kill()
+2026-10-04T15:49:49.4708318Z                 # We don't call process.wait() as .__exit__ does that for us.
+2026-10-04T15:49:49.4708566Z                 raise
+2026-10-04T15:49:49.4708734Z             retcode = process.poll()
+2026-10-04T15:49:49.4708936Z             if check and retcode:
+2026-10-04T15:49:49.4709166Z >               raise CalledProcessError(retcode, process.args,
+2026-10-04T15:49:49.4709444Z                                          output=stdout, stderr=stderr)
+2026-10-04T15:49:49.4710577Z E               subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_control_the_regulator_w0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_control_the_regulator_w0/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.4711570Z 
+2026-10-04T15:49:49.4711773Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py:571: CalledProcessError
+2026-10-04T15:49:49.4712220Z _ test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal _
+2026-10-04T15:49:49.4712621Z [gw1] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:49:49.4712840Z 
+2026-10-04T15:49:49.4713049Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_weights_feed_that_names0')
+2026-10-04T15:49:49.4713328Z 
+2026-10-04T15:49:49.4713545Z     def test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal(tmp_path):
+2026-10-04T15:49:49.4714010Z         """Ticket 123 item 2, against tuppence's real pinned parents. NIST withdraws a control the
+2026-10-04T15:49:49.4714441Z         way its catalogue already marks 182 of them: the control stays in the catalogue with
+2026-10-04T15:49:49.4714892Z         `status: withdrawn` and leaves every baseline. The pinned ico weights still name it. That is
+2026-10-04T15:49:49.4715335Z         the feed's own fact to fix in its next version (ADR-0026). The composition does not refuse
+2026-10-04T15:49:49.4715769Z         and does not re-partition: the regime entry keeps its amount, its line for the control reads
+2026-10-04T15:49:49.4716721Z         `withdrawn`, and the `withdrawn-control` delta carries the price the hole carried."""
+2026-10-04T15:49:49.4717062Z         comp = _composition()
+2026-10-04T15:49:49.4717278Z         work = _tuppence(tmp_path / "tuppence")
+2026-10-04T15:49:49.4717530Z         first, rendered = comp.compose(work, _trees())
+2026-10-04T15:49:49.4717806Z         assert first["outcome"] == "composed", first["refusals"]
+2026-10-04T15:49:49.4718057Z         entry = _regime_entry(first)
+2026-10-04T15:49:49.4718367Z         selected = set(yaml.safe_load(rendered["composed/HEADER.yaml"])["selected-controls"])
+2026-10-04T15:49:49.4718736Z         line = next(h for h in entry["holes"] if h["id"] in selected)
+2026-10-04T15:49:49.4719002Z >       _record_header(comp, work, rendered)
+2026-10-04T15:49:49.4719149Z 
+2026-10-04T15:49:49.4719234Z tests/test_loophole_adr_0026.py:894: 
+2026-10-04T15:49:49.4719608Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4719889Z tests/test_loophole_adr_0026.py:242: in _record_header
+2026-10-04T15:49:49.4720169Z     _git(work, "commit", "-q", "-m", "fixture comparison header")
+2026-10-04T15:49:49.4720436Z tests/test_loophole_adr_0026.py:288: in _git
+2026-10-04T15:49:49.4720838Z     subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+2026-10-04T15:49:49.4721180Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4721356Z 
+2026-10-04T15:49:49.4721481Z input = None, capture_output = True, timeout = None, check = True
+2026-10-04T15:49:49.4722092Z popenargs = (['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_weights_feed_that_names0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', ...],)
+2026-10-04T15:49:49.4723103Z kwargs = {'env': {'ACCEPT_EULA': 'Y', 'ACTIONS_ORCHESTRATION_ID': 'a441ac0f-6fc7-8640-bf12-ceb1dcd178b5.tests.__default', 'ACTI...ACHE': '/opt/actionarchivecache', 'ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED': '1', ...}, 'stderr': -1, 'stdout': -1}
+2026-10-04T15:49:49.4723892Z process = <Popen: returncode: 1 args: ['git', '-c', 'core.hooksPath=/tmp/pytest-of-run...>
+2026-10-04T15:49:49.4724270Z stdout = b'On branch master\nnothing to commit, working tree clean\n'
+2026-10-04T15:49:49.4724540Z stderr = b'', retcode = 1
+2026-10-04T15:49:49.4724654Z 
+2026-10-04T15:49:49.4724724Z     def run(*popenargs,
+2026-10-04T15:49:49.4724987Z             input=None, capture_output=False, timeout=None, check=False, **kwargs):
+2026-10-04T15:49:49.4725353Z         """Run command with arguments and return a CompletedProcess instance.
+2026-10-04T15:49:49.4725621Z     
+2026-10-04T15:49:49.4725852Z         The returned instance will have attributes args, returncode, stdout and
+2026-10-04T15:49:49.4726402Z         stderr. By default, stdout and stderr are not captured, and those attributes
+2026-10-04T15:49:49.4726793Z         will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+2026-10-04T15:49:49.4727109Z         or pass capture_output=True to capture both.
+2026-10-04T15:49:49.4727322Z     
+2026-10-04T15:49:49.4727519Z         If check is True and the exit code was non-zero, it raises a
+2026-10-04T15:49:49.4727877Z         CalledProcessError. The CalledProcessError object will have the return code
+2026-10-04T15:49:49.4728265Z         in the returncode attribute, and output & stderr attributes if those streams
+2026-10-04T15:49:49.4728556Z         were captured.
+2026-10-04T15:49:49.4728714Z     
+2026-10-04T15:49:49.4728916Z         If timeout (seconds) is given and the process takes too long,
+2026-10-04T15:49:49.4729201Z          a TimeoutExpired exception will be raised.
+2026-10-04T15:49:49.4729411Z     
+2026-10-04T15:49:49.4729601Z         There is an optional argument "input", allowing you to
+2026-10-04T15:49:49.4729927Z         pass bytes or a string to the subprocess's stdin.  If you use this argument
+2026-10-04T15:49:49.4730285Z         you may not also use the Popen constructor's "stdin" argument, as
+2026-10-04T15:49:49.4730561Z         it will be used internally.
+2026-10-04T15:49:49.4730748Z     
+2026-10-04T15:49:49.4730976Z         By default, all communication is in bytes, and therefore any "input" should
+2026-10-04T15:49:49.4731339Z         be bytes, and the stdout and stderr will be bytes. If in text mode, any
+2026-10-04T15:49:49.4731692Z         "input" should be a string, and stdout and stderr will be strings decoded
+2026-10-04T15:49:49.4732046Z         according to locale encoding, or by "encoding" if set. Text mode is
+2026-10-04T15:49:49.4732401Z         triggered by setting any of text, encoding, errors or universal_newlines.
+2026-10-04T15:49:49.4732680Z     
+2026-10-04T15:49:49.4732891Z         The other arguments are the same as for the Popen constructor.
+2026-10-04T15:49:49.4733146Z         """
+2026-10-04T15:49:49.4733304Z         if input is not None:
+2026-10-04T15:49:49.4733628Z             if kwargs.get('stdin') is not None:
+2026-10-04T15:49:49.4733918Z                 raise ValueError('stdin and input arguments may not both be used.')
+2026-10-04T15:49:49.4734201Z             kwargs['stdin'] = PIPE
+2026-10-04T15:49:49.4734384Z     
+2026-10-04T15:49:49.4734530Z         if capture_output:
+2026-10-04T15:49:49.4734877Z             if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+2026-10-04T15:49:49.4735233Z                 raise ValueError('stdout and stderr arguments may not be used '
+2026-10-04T15:49:49.4735531Z                                  'with capture_output.')
+2026-10-04T15:49:49.4735752Z             kwargs['stdout'] = PIPE
+2026-10-04T15:49:49.4736088Z             kwargs['stderr'] = PIPE
+2026-10-04T15:49:49.4736269Z     
+2026-10-04T15:49:49.4736446Z         with Popen(*popenargs, **kwargs) as process:
+2026-10-04T15:49:49.4736662Z             try:
+2026-10-04T15:49:49.4736891Z                 stdout, stderr = process.communicate(input, timeout=timeout)
+2026-10-04T15:49:49.4737176Z             except TimeoutExpired as exc:
+2026-10-04T15:49:49.4737389Z                 process.kill()
+2026-10-04T15:49:49.4737579Z                 if _mswindows:
+2026-10-04T15:49:49.4737802Z                     # Windows accumulates the output in a single blocking
+2026-10-04T15:49:49.4738097Z                     # read() call run on child threads, with the timeout
+2026-10-04T15:49:49.4738393Z                     # being done in a join() on those threads.  communicate()
+2026-10-04T15:49:49.4738694Z                     # _after_ kill() is required to collect that and add it
+2026-10-04T15:49:49.4738946Z                     # to the exception.
+2026-10-04T15:49:49.4739190Z                     exc.stdout, exc.stderr = process.communicate()
+2026-10-04T15:49:49.4739427Z                 else:
+2026-10-04T15:49:49.4739640Z                     # POSIX _communicate already populated the output so
+2026-10-04T15:49:49.4739919Z                     # far into the TimeoutExpired exception.
+2026-10-04T15:49:49.4740154Z                     process.wait()
+2026-10-04T15:49:49.4740335Z                 raise
+2026-10-04T15:49:49.4740567Z             except:  # Including KeyboardInterrupt, communicate handled that.
+2026-10-04T15:49:49.4740836Z                 process.kill()
+2026-10-04T15:49:49.4741076Z                 # We don't call process.wait() as .__exit__ does that for us.
+2026-10-04T15:49:49.4741322Z                 raise
+2026-10-04T15:49:49.4741491Z             retcode = process.poll()
+2026-10-04T15:49:49.4741693Z             if check and retcode:
+2026-10-04T15:49:49.4741929Z >               raise CalledProcessError(retcode, process.args,
+2026-10-04T15:49:49.4742199Z                                          output=stdout, stderr=stderr)
+2026-10-04T15:49:49.4743331Z E               subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_weights_feed_that_names0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_weights_feed_that_names0/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.4744331Z 
+2026-10-04T15:49:49.4744530Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py:571: CalledProcessError
+2026-10-04T15:49:49.4744963Z ___ test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one ___
+2026-10-04T15:49:49.4745345Z [gw1] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:49:49.4745560Z 
+2026-10-04T15:49:49.4745777Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_narrowing_prices_a_weig0')
+2026-10-04T15:49:49.4746159Z 
+2026-10-04T15:49:49.4746355Z     def test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one(tmp_path):
+2026-10-04T15:49:49.4746803Z         """Round 2 `loophole-1`: a mass removal of unweighted controls prints only absences. True,
+2026-10-04T15:49:49.4747392Z         and it is what ADR-0026 says: no pinned weight prices those controls, so the pound they
+2026-10-04T15:49:49.4747834Z         carry is nothing any regulator named. The weighted pound is the regime entry, and a removal
+2026-10-04T15:49:49.4748281Z         does not move it. tuppence narrows from MODERATE to LOW against a nist copy whose LOW also
+2026-10-04T15:49:49.4748838Z         drops the weighted `ra-3`. The one weighted removal prints the price its hole carried; every
+2026-10-04T15:49:49.4749292Z         other removal is a named absence; the summary delta counts both; the regime entry and its
+2026-10-04T15:49:49.4749677Z         `ra-3` line keep their amounts, and the line reads `unselected`."""
+2026-10-04T15:49:49.4749950Z         comp = _composition()
+2026-10-04T15:49:49.4750141Z         nist = tmp_path / "nist"
+2026-10-04T15:49:49.4750426Z         shutil.copytree(ESTATE / "nist", nist, ignore=shutil.ignore_patterns(".git"))
+2026-10-04T15:49:49.4750816Z         low = nist / "catalog" / "NIST_SP-800-53_rev5.2.0_LOW-baseline_profile.json"
+2026-10-04T15:49:49.4751118Z         profile = json.loads(low.read_text())
+2026-10-04T15:49:49.4751357Z         for imp in profile["profile"]["imports"]:
+2026-10-04T15:49:49.4751612Z             for inc in imp.get("include-controls", []):
+2026-10-04T15:49:49.4751860Z                 if "ra-3" in inc.get("with-ids", []):
+2026-10-04T15:49:49.4752091Z                     inc["with-ids"].remove("ra-3")
+2026-10-04T15:49:49.4752318Z         low.write_text(json.dumps(profile))
+2026-10-04T15:49:49.4752534Z         trees = _trees(nist=nist)
+2026-10-04T15:49:49.4752721Z     
+2026-10-04T15:49:49.4752888Z         work = _tuppence(tmp_path / "tuppence")
+2026-10-04T15:49:49.4753129Z         first, rendered = comp.compose(work, trees)
+2026-10-04T15:49:49.4753397Z         assert first["outcome"] == "composed", first["refusals"]
+2026-10-04T15:49:49.4753714Z         ra3 = next(h for h in _regime_entry(first)["holes"] if h["id"] == "ra-3")
+2026-10-04T15:49:49.4754001Z >       _record_header(comp, work, rendered)
+2026-10-04T15:49:49.4754143Z 
+2026-10-04T15:49:49.4754335Z tests/test_loophole_adr_0026.py:983: 
+2026-10-04T15:49:49.4754719Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4755104Z tests/test_loophole_adr_0026.py:242: in _record_header
+2026-10-04T15:49:49.4755699Z     _git(work, "commit", "-q", "-m", "fixture comparison header")
+2026-10-04T15:49:49.4756204Z tests/test_loophole_adr_0026.py:288: in _git
+2026-10-04T15:49:49.4756662Z     subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+2026-10-04T15:49:49.4757152Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4757403Z 
+2026-10-04T15:49:49.4757562Z input = None, capture_output = True, timeout = None, check = True
+2026-10-04T15:49:49.4758306Z popenargs = (['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_narrowing_prices_a_weig0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', ...],)
+2026-10-04T15:49:49.4768759Z kwargs = {'env': {'ACCEPT_EULA': 'Y', 'ACTIONS_ORCHESTRATION_ID': 'a441ac0f-6fc7-8640-bf12-ceb1dcd178b5.tests.__default', 'ACTI...ACHE': '/opt/actionarchivecache', 'ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED': '1', ...}, 'stderr': -1, 'stdout': -1}
+2026-10-04T15:49:49.4769609Z process = <Popen: returncode: 1 args: ['git', '-c', 'core.hooksPath=/tmp/pytest-of-run...>
+2026-10-04T15:49:49.4770021Z stdout = b'On branch master\nnothing to commit, working tree clean\n'
+2026-10-04T15:49:49.4770304Z stderr = b'', retcode = 1
+2026-10-04T15:49:49.4770431Z 
+2026-10-04T15:49:49.4770505Z     def run(*popenargs,
+2026-10-04T15:49:49.4770775Z             input=None, capture_output=False, timeout=None, check=False, **kwargs):
+2026-10-04T15:49:49.4771148Z         """Run command with arguments and return a CompletedProcess instance.
+2026-10-04T15:49:49.4771431Z     
+2026-10-04T15:49:49.4771668Z         The returned instance will have attributes args, returncode, stdout and
+2026-10-04T15:49:49.4772251Z         stderr. By default, stdout and stderr are not captured, and those attributes
+2026-10-04T15:49:49.4772640Z         will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+2026-10-04T15:49:49.4772962Z         or pass capture_output=True to capture both.
+2026-10-04T15:49:49.4773178Z     
+2026-10-04T15:49:49.4773472Z         If check is True and the exit code was non-zero, it raises a
+2026-10-04T15:49:49.4773831Z         CalledProcessError. The CalledProcessError object will have the return code
+2026-10-04T15:49:49.4774215Z         in the returncode attribute, and output & stderr attributes if those streams
+2026-10-04T15:49:49.4774513Z         were captured.
+2026-10-04T15:49:49.4774678Z     
+2026-10-04T15:49:49.4774883Z         If timeout (seconds) is given and the process takes too long,
+2026-10-04T15:49:49.4775169Z          a TimeoutExpired exception will be raised.
+2026-10-04T15:49:49.4775380Z     
+2026-10-04T15:49:49.4775571Z         There is an optional argument "input", allowing you to
+2026-10-04T15:49:49.4776040Z         pass bytes or a string to the subprocess's stdin.  If you use this argument
+2026-10-04T15:49:49.4776409Z         you may not also use the Popen constructor's "stdin" argument, as
+2026-10-04T15:49:49.4776687Z         it will be used internally.
+2026-10-04T15:49:49.4776881Z     
+2026-10-04T15:49:49.4777114Z         By default, all communication is in bytes, and therefore any "input" should
+2026-10-04T15:49:49.4777472Z         be bytes, and the stdout and stderr will be bytes. If in text mode, any
+2026-10-04T15:49:49.4777828Z         "input" should be a string, and stdout and stderr will be strings decoded
+2026-10-04T15:49:49.4778182Z         according to locale encoding, or by "encoding" if set. Text mode is
+2026-10-04T15:49:49.4778537Z         triggered by setting any of text, encoding, errors or universal_newlines.
+2026-10-04T15:49:49.4778808Z     
+2026-10-04T15:49:49.4779014Z         The other arguments are the same as for the Popen constructor.
+2026-10-04T15:49:49.4779281Z         """
+2026-10-04T15:49:49.4779446Z         if input is not None:
+2026-10-04T15:49:49.4779653Z             if kwargs.get('stdin') is not None:
+2026-10-04T15:49:49.4779944Z                 raise ValueError('stdin and input arguments may not both be used.')
+2026-10-04T15:49:49.4780237Z             kwargs['stdin'] = PIPE
+2026-10-04T15:49:49.4780423Z     
+2026-10-04T15:49:49.4780572Z         if capture_output:
+2026-10-04T15:49:49.4780828Z             if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+2026-10-04T15:49:49.4781172Z                 raise ValueError('stdout and stderr arguments may not be used '
+2026-10-04T15:49:49.4781466Z                                  'with capture_output.')
+2026-10-04T15:49:49.4781698Z             kwargs['stdout'] = PIPE
+2026-10-04T15:49:49.4781896Z             kwargs['stderr'] = PIPE
+2026-10-04T15:49:49.4782078Z     
+2026-10-04T15:49:49.4782254Z         with Popen(*popenargs, **kwargs) as process:
+2026-10-04T15:49:49.4782477Z             try:
+2026-10-04T15:49:49.4782708Z                 stdout, stderr = process.communicate(input, timeout=timeout)
+2026-10-04T15:49:49.4782991Z             except TimeoutExpired as exc:
+2026-10-04T15:49:49.4783206Z                 process.kill()
+2026-10-04T15:49:49.4783392Z                 if _mswindows:
+2026-10-04T15:49:49.4783620Z                     # Windows accumulates the output in a single blocking
+2026-10-04T15:49:49.4783919Z                     # read() call run on child threads, with the timeout
+2026-10-04T15:49:49.4784219Z                     # being done in a join() on those threads.  communicate()
+2026-10-04T15:49:49.4784522Z                     # _after_ kill() is required to collect that and add it
+2026-10-04T15:49:49.4784779Z                     # to the exception.
+2026-10-04T15:49:49.4785023Z                     exc.stdout, exc.stderr = process.communicate()
+2026-10-04T15:49:49.4785261Z                 else:
+2026-10-04T15:49:49.4785473Z                     # POSIX _communicate already populated the output so
+2026-10-04T15:49:49.4785981Z                     # far into the TimeoutExpired exception.
+2026-10-04T15:49:49.4786220Z                     process.wait()
+2026-10-04T15:49:49.4786408Z                 raise
+2026-10-04T15:49:49.4786642Z             except:  # Including KeyboardInterrupt, communicate handled that.
+2026-10-04T15:49:49.4787050Z                 process.kill()
+2026-10-04T15:49:49.4787291Z                 # We don't call process.wait() as .__exit__ does that for us.
+2026-10-04T15:49:49.4787538Z                 raise
+2026-10-04T15:49:49.4787706Z             retcode = process.poll()
+2026-10-04T15:49:49.4787908Z             if check and retcode:
+2026-10-04T15:49:49.4788139Z >               raise CalledProcessError(retcode, process.args,
+2026-10-04T15:49:49.4788411Z                                          output=stdout, stderr=stderr)
+2026-10-04T15:49:49.4789553Z E               subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_narrowing_prices_a_weig0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_narrowing_prices_a_weig0/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.4790557Z 
+2026-10-04T15:49:49.4790765Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py:571: CalledProcessError
+2026-10-04T15:49:49.4791189Z _______ test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier ________
+2026-10-04T15:49:49.4791560Z [gw1] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:49:49.4791777Z 
+2026-10-04T15:49:49.4791990Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_bespoke_hole_is_priced_0')
+2026-10-04T15:49:49.4792269Z 
+2026-10-04T15:49:49.4792438Z     def test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier(tmp_path):
+2026-10-04T15:49:49.4792848Z         """Round 1 `loophole-1`, round 3 `loophole-1`. Both need a bespoke control's price to move
+2026-10-04T15:49:49.4793290Z         something that a later removal or a cheaper replacement could move back. A bespoke hole is
+2026-10-04T15:49:49.4793724Z         priced, on its own line, by the adopter's own scenario, and nothing reads that line: the
+2026-10-04T15:49:49.4794149Z         regime entry, the exposure total and every tier match the composition without it. Ticket
+2026-10-04T15:49:49.4794579Z         38 D5 named this limit ("priced but not yet tiered"), so the place is already held. The
+2026-10-04T15:49:49.4795021Z         withdrawal both candidates need composes since ticket 124 and prints a `removed-control`
+2026-10-04T15:49:49.4795496Z         delta at the scenario's own residual, so the withdrawn pound is on the record."""
+2026-10-04T15:49:49.4795810Z         comp = _composition()
+2026-10-04T15:49:49.4796294Z         plain, plain_rendered = comp.compose(_tuppence(tmp_path / "plain"), _trees())
+2026-10-04T15:49:49.4796597Z     
+2026-10-04T15:49:49.4796766Z         work = _tuppence(tmp_path / "bespoke")
+2026-10-04T15:49:49.4797151Z         _edit_party(work, lambda d: (d["inherits"].append({"party": "tuppence", "kind": "controls", "version": "1.0.0"}),
+2026-10-04T15:49:49.4797655Z                                      d.setdefault("overlay", {}).update(controls=["tuppence:vendor-review"])))
+2026-10-04T15:49:49.4798129Z         comp._write_small_catalog(work, {"vendor-review": {"scenario": "scenarios/vendor-review.json"}})
+2026-10-04T15:49:49.4798490Z         (work / "scenarios").mkdir()
+2026-10-04T15:49:49.4798811Z         shutil.copy(PLATFORM / "policy" / "scenarios" / "driftwood-root-residual.json",
+2026-10-04T15:49:49.4799170Z                     work / "scenarios" / "vendor-review.json")
+2026-10-04T15:49:49.4799466Z         bespoke, bespoke_rendered = comp.compose(work, _trees())
+2026-10-04T15:49:49.4799775Z         assert bespoke["outcome"] == "composed", bespoke["refusals"]
+2026-10-04T15:49:49.4800251Z         hole = next(h for h in bespoke["holes"] if h["source"] == "tuppence")
+2026-10-04T15:49:49.4800607Z         assert hole["control_id"] == "vendor-review" and hole["amount"] > 0, hole
+2026-10-04T15:49:49.4800880Z     
+2026-10-04T15:49:49.4801107Z         assert _regime_entry(bespoke)["amount"] == _regime_entry(plain)["amount"]
+2026-10-04T15:49:49.4801572Z         assert _exposure_total(bespoke_rendered) == _exposure_total(plain_rendered)
+2026-10-04T15:49:49.4801896Z         assert _tiers(bespoke) == _tiers(plain)
+2026-10-04T15:49:49.4802107Z     
+2026-10-04T15:49:49.4802279Z >       _record_header(comp, work, bespoke_rendered)
+2026-10-04T15:49:49.4802441Z 
+2026-10-04T15:49:49.4802522Z tests/test_loophole_adr_0026.py:1035: 
+2026-10-04T15:49:49.4802766Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4803048Z tests/test_loophole_adr_0026.py:242: in _record_header
+2026-10-04T15:49:49.4803331Z     _git(work, "commit", "-q", "-m", "fixture comparison header")
+2026-10-04T15:49:49.4803610Z tests/test_loophole_adr_0026.py:288: in _git
+2026-10-04T15:49:49.4803923Z     subprocess.run(["git", "-c", f"core.hooksPath={hooks}", "-c", "commit.gpgSign=false",
+2026-10-04T15:49:49.4804263Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2026-10-04T15:49:49.4804434Z 
+2026-10-04T15:49:49.4804567Z input = None, capture_output = True, timeout = None, check = True
+2026-10-04T15:49:49.4805164Z popenargs = (['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_bespoke_hole_is_priced_0/bespoke/no-hooks', '-c', 'commit.gpgSign=false', '-c', ...],)
+2026-10-04T15:49:49.4806352Z kwargs = {'env': {'ACCEPT_EULA': 'Y', 'ACTIONS_ORCHESTRATION_ID': 'a441ac0f-6fc7-8640-bf12-ceb1dcd178b5.tests.__default', 'ACTI...ACHE': '/opt/actionarchivecache', 'ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED': '1', ...}, 'stderr': -1, 'stdout': -1}
+2026-10-04T15:49:49.4807153Z process = <Popen: returncode: 1 args: ['git', '-c', 'core.hooksPath=/tmp/pytest-of-run...>
+2026-10-04T15:49:49.4807537Z stdout = b'On branch master\nnothing to commit, working tree clean\n'
+2026-10-04T15:49:49.4807813Z stderr = b'', retcode = 1
+2026-10-04T15:49:49.4807927Z 
+2026-10-04T15:49:49.4808005Z     def run(*popenargs,
+2026-10-04T15:49:49.4808268Z             input=None, capture_output=False, timeout=None, check=False, **kwargs):
+2026-10-04T15:49:49.4808631Z         """Run command with arguments and return a CompletedProcess instance.
+2026-10-04T15:49:49.4808904Z     
+2026-10-04T15:49:49.4809138Z         The returned instance will have attributes args, returncode, stdout and
+2026-10-04T15:49:49.4809520Z         stderr. By default, stdout and stderr are not captured, and those attributes
+2026-10-04T15:49:49.4809898Z         will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+2026-10-04T15:49:49.4810211Z         or pass capture_output=True to capture both.
+2026-10-04T15:49:49.4810420Z     
+2026-10-04T15:49:49.4810616Z         If check is True and the exit code was non-zero, it raises a
+2026-10-04T15:49:49.4810969Z         CalledProcessError. The CalledProcessError object will have the return code
+2026-10-04T15:49:49.4811356Z         in the returncode attribute, and output & stderr attributes if those streams
+2026-10-04T15:49:49.4811646Z         were captured.
+2026-10-04T15:49:49.4811811Z     
+2026-10-04T15:49:49.4812018Z         If timeout (seconds) is given and the process takes too long,
+2026-10-04T15:49:49.4812307Z          a TimeoutExpired exception will be raised.
+2026-10-04T15:49:49.4812515Z     
+2026-10-04T15:49:49.4812702Z         There is an optional argument "input", allowing you to
+2026-10-04T15:49:49.4813023Z         pass bytes or a string to the subprocess's stdin.  If you use this argument
+2026-10-04T15:49:49.4813371Z         you may not also use the Popen constructor's "stdin" argument, as
+2026-10-04T15:49:49.4813645Z         it will be used internally.
+2026-10-04T15:49:49.4813840Z     
+2026-10-04T15:49:49.4814085Z         By default, all communication is in bytes, and therefore any "input" should
+2026-10-04T15:49:49.4814603Z         be bytes, and the stdout and stderr will be bytes. If in text mode, any
+2026-10-04T15:49:49.4814963Z         "input" should be a string, and stdout and stderr will be strings decoded
+2026-10-04T15:49:49.4815410Z         according to locale encoding, or by "encoding" if set. Text mode is
+2026-10-04T15:49:49.4815775Z         triggered by setting any of text, encoding, errors or universal_newlines.
+2026-10-04T15:49:49.4816220Z     
+2026-10-04T15:49:49.4816429Z         The other arguments are the same as for the Popen constructor.
+2026-10-04T15:49:49.4816690Z         """
+2026-10-04T15:49:49.4816849Z         if input is not None:
+2026-10-04T15:49:49.4817058Z             if kwargs.get('stdin') is not None:
+2026-10-04T15:49:49.4817359Z                 raise ValueError('stdin and input arguments may not both be used.')
+2026-10-04T15:49:49.4817652Z             kwargs['stdin'] = PIPE
+2026-10-04T15:49:49.4817837Z     
+2026-10-04T15:49:49.4817992Z         if capture_output:
+2026-10-04T15:49:49.4818255Z             if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+2026-10-04T15:49:49.4818604Z                 raise ValueError('stdout and stderr arguments may not be used '
+2026-10-04T15:49:49.4818898Z                                  'with capture_output.')
+2026-10-04T15:49:49.4819126Z             kwargs['stdout'] = PIPE
+2026-10-04T15:49:49.4819327Z             kwargs['stderr'] = PIPE
+2026-10-04T15:49:49.4819513Z     
+2026-10-04T15:49:49.4819687Z         with Popen(*popenargs, **kwargs) as process:
+2026-10-04T15:49:49.4819905Z             try:
+2026-10-04T15:49:49.4820131Z                 stdout, stderr = process.communicate(input, timeout=timeout)
+2026-10-04T15:49:49.4820410Z             except TimeoutExpired as exc:
+2026-10-04T15:49:49.4820629Z                 process.kill()
+2026-10-04T15:49:49.4820814Z                 if _mswindows:
+2026-10-04T15:49:49.4821036Z                     # Windows accumulates the output in a single blocking
+2026-10-04T15:49:49.4821336Z                     # read() call run on child threads, with the timeout
+2026-10-04T15:49:49.4821641Z                     # being done in a join() on those threads.  communicate()
+2026-10-04T15:49:49.4821945Z                     # _after_ kill() is required to collect that and add it
+2026-10-04T15:49:49.4822201Z                     # to the exception.
+2026-10-04T15:49:49.4822444Z                     exc.stdout, exc.stderr = process.communicate()
+2026-10-04T15:49:49.4822683Z                 else:
+2026-10-04T15:49:49.4822892Z                     # POSIX _communicate already populated the output so
+2026-10-04T15:49:49.4823168Z                     # far into the TimeoutExpired exception.
+2026-10-04T15:49:49.4823401Z                     process.wait()
+2026-10-04T15:49:49.4823582Z                 raise
+2026-10-04T15:49:49.4823822Z             except:  # Including KeyboardInterrupt, communicate handled that.
+2026-10-04T15:49:49.4824095Z                 process.kill()
+2026-10-04T15:49:49.4824332Z                 # We don't call process.wait() as .__exit__ does that for us.
+2026-10-04T15:49:49.4824577Z                 raise
+2026-10-04T15:49:49.4824750Z             retcode = process.poll()
+2026-10-04T15:49:49.4824958Z             if check and retcode:
+2026-10-04T15:49:49.4825197Z >               raise CalledProcessError(retcode, process.args,
+2026-10-04T15:49:49.4825472Z                                          output=stdout, stderr=stderr)
+2026-10-04T15:49:49.4826702Z E               subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_bespoke_hole_is_priced_0/bespoke/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_bespoke_hole_is_priced_0/bespoke/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.4827702Z 
+2026-10-04T15:49:49.4827911Z /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py:571: CalledProcessError
+2026-10-04T15:49:49.4828433Z ___________________________ test_the_suite_is_green ____________________________
+2026-10-04T15:49:49.4828787Z [gw0] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:49:49.4829003Z 
+2026-10-04T15:49:49.4829739Z suite_results = ({'a_challenge_to_a_constituent_survives_an_unrelated_resolution': Result(number=12, name='a_challenge_to_a_constituen...88888.89 vs 366666.67); xi>=1 refuses at the shape boundary and xi=0.99 still computes', invariant=False), ...}, False)
+2026-10-04T15:49:49.4830380Z 
+2026-10-04T15:49:49.4830557Z     def test_the_suite_is_green(suite_results: tuple[dict[str, Result], bool]) -> None:
+2026-10-04T15:49:49.4830876Z         by_name, ok = suite_results
+2026-10-04T15:49:49.4831123Z         failed = [r for r in by_name.values() if r.status == FAIL]
+2026-10-04T15:49:49.4831427Z >       assert not failed, [f"{r.name}: {r.detail}" for r in failed]
+2026-10-04T15:49:49.4832588Z E       AssertionError: ["flux_coverage_floor_is_still_reachable: the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sa... finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached"]
+2026-10-04T15:49:49.4833931Z E       assert not [Result(number=45, name='flux_coverage_floor_is_still_reachable', status='FAIL', detail="the pre-registered coverage f...fect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached", invariant=False)]
+2026-10-04T15:49:49.4834561Z 
+2026-10-04T15:49:49.4834670Z tests/test_invariant_suite.py:43: AssertionError
+2026-10-04T15:49:49.4834972Z ---------------------------- Captured stdout setup -----------------------------
+2026-10-04T15:49:49.4835482Z ==> netflix: would-the-twin-have-flagged-it rewound to 2011-08-01 — scoring-eligible under as-consumed
+2026-10-04T15:49:49.4836143Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/threat.json
+2026-10-04T15:49:49.4836711Z   attestation  threat.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4837141Z   sha256       de508f4550148b82262bbf9f89886d53796e70137281a34f0f86d4e8b3b57776
+2026-10-04T15:49:49.4837429Z   depth        full
+2026-10-04T15:49:49.4837675Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4838005Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4838321Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4838666Z ==> netflix as at 2011-08-01: commit 3d1fb95e715d, committed 2011-07-26T21:00:00Z
+2026-10-04T15:49:49.4838963Z   3 components, 2 edges, 0 causal
+2026-10-04T15:49:49.4839250Z   a model state, not a filtered view: everything downstream reads it unchanged
+2026-10-04T15:49:49.4839698Z rewound-model -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/rewind.json
+2026-10-04T15:49:49.4840248Z   attestation  rewind.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4840681Z   sha256       b204e47519ce3b432a45dee96ccae520affc274e4f23a78a59de6535ae3a4b38
+2026-10-04T15:49:49.4840968Z   depth        full
+2026-10-04T15:49:49.4841200Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4841513Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4841829Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4842214Z ==> gameplay sweep across 1 repo(s), 1 org(s): 1 opportunity candidate(s) pulled, 3 signal(s) pushed
+2026-10-04T15:49:49.4842700Z opportunity-sweep -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/sweep.json
+2026-10-04T15:49:49.4843242Z   attestation  sweep.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4843661Z   sha256       1104a8e18f44087395c05ac7989131633b5cd14495a9cdae13fd1b78c439fcfc
+2026-10-04T15:49:49.4844089Z   depth        full
+2026-10-04T15:49:49.4844321Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4844660Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4845065Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4845450Z ==> netflix: 3 option(s) considered for 'the-operator', 2 priced, 1 removed before pricing
+2026-10-04T15:49:49.4846272Z   removed  rank-domestic-members-by-cancellation-risk forbidden — no-individual-level-output (universal tier), no figure
+2026-10-04T15:49:49.4846929Z   priced   hold-the-bundled-price-for-one-quarter 30000000.0/45000000.0/70000000.0 mean 46666666.6667, sampled p50 46287011.5481
+2026-10-04T15:49:49.4847593Z   priced   ship-one-bill-and-one-sign-in-across-the-two-plans 10000000.0/15000000.0/22000000.0 mean 15333333.3333, sampled p50 15142499.58
+2026-10-04T15:49:49.4848135Z   a constraint is not a very large price: a removed option carries no number at all
+2026-10-04T15:49:49.4848632Z priced-option-set -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/options-head.json
+2026-10-04T15:49:49.4849224Z   attestation  options-head.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4849669Z   sha256       7b359d9cfe0573089d0863a582b7c384f220be3a96527bb58a0f7fb98a3e85d6
+2026-10-04T15:49:49.4849954Z   depth        full
+2026-10-04T15:49:49.4850184Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+2026-10-04T15:49:49.4850512Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4850821Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4851142Z ==> netflix: a shock at 'dvd-by-mail', priced under 1 perspective(s)
+2026-10-04T15:49:49.4851400Z   the-operator
+2026-10-04T15:49:49.4851639Z     price    streaming-service        23,800,000 / 47,600,000 / 95,200,000  grade 1
+2026-10-04T15:49:49.4852041Z     option   hold-the-bundled-price-for-one-quarter cost 46,666,667, credit 19,040,000
+2026-10-04T15:49:49.4852648Z     option   ship-one-bill-and-one-sign-in-across-the-two-plans cost 15,333,333, the-mitigation-claim-is-graded-outside-the-pricing-threshold
+2026-10-04T15:49:49.4853348Z   prices, costs and credits in one unit, in the order they were authored. Nothing marks one option best and nothing recommends one
+2026-10-04T15:49:49.4853909Z priced-impact -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/price.json
+2026-10-04T15:49:49.4854444Z   attestation  price.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4854876Z   sha256       f45c9cb3ecc9aa4211799fa0e30745bdfa8a2ef973b4e21ab2ae3cb6f004a564
+2026-10-04T15:49:49.4855172Z   depth        full
+2026-10-04T15:49:49.4855412Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+2026-10-04T15:49:49.4855759Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+2026-10-04T15:49:49.4856287Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4856603Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4856970Z ==> netflix/the-operator: a shock at 'dvd-by-mail', 2 response(s) across 3 account(s)
+2026-10-04T15:49:49.4857721Z   hold-the-bundled-price-for-one-quarter range=57,120,000  (the-damage-was-mostly-the-rebrand=35,480,000, the-shock-crossed-to-the-streaming-side=-21,640,000, the-shock-stayed-on-the-dvd-side=25,960,000)
+2026-10-04T15:49:49.4858770Z   ship-one-bill-and-one-sign-in-across-the-two-plans range=0  (the-damage-was-mostly-the-rebrand=15,000,000, the-shock-crossed-to-the-streaming-side=15,000,000, the-shock-stayed-on-the-dvd-side=15,000,000)
+2026-10-04T15:49:49.4860050Z   agreement  unanimous=False  the named accounts disagree about which response is cheapest — reported here rather than smoothed into the default below, because a credible disagreement about the mechanism is the most decision-relevant fact on the page
+2026-10-04T15:49:49.4861990Z   default    hold-the-bundled-price-for-one-quarter — the option whose mean net cost of risk across the named accounts is lowest — a default point for a reader who wants one, computed rather than declared, and not a recommendation. No account is privileged, so the mean rather than any one account's own figure is what breaks the tie; naming or dropping a rival account can move it
+2026-10-04T15:49:49.4863229Z trade-off-curve -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/curve.json
+2026-10-04T15:49:49.4863789Z   attestation  curve.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4864215Z   sha256       05a68f85989616026b4ac38a96b0b15858499b45227ea4cd3001bdb9436e943a
+2026-10-04T15:49:49.4864505Z   depth        full
+2026-10-04T15:49:49.4864735Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+2026-10-04T15:49:49.4865076Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+2026-10-04T15:49:49.4865411Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4865720Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4866189Z ==> netflix: proposes hold-the-bundled-price-for-one-quarter via the 'record' channel
+2026-10-04T15:49:49.4867106Z   means      the verification substrate — a lever that is not code, carrying a versioned signed record that it was enacted without being enforced by policy. Most levers are this one, and the £ engine's cross-domain comparison depends on it
+2026-10-04T15:49:49.4867863Z   disposed   a human, out of band — this tool has no path to it
+2026-10-04T15:49:49.4868144Z   layer      structural absence   twin/enact.py
+2026-10-04T15:49:49.4868460Z     holds      no merge code path exists; the module's public surface is an allow-list
+2026-10-04T15:49:49.4869177Z     fails when the twin is composed with a shell tool, an MCP GitHub server or a subagent with `gh` — the absence still holds and the guarantee is gone, with no diff to twin/ at all
+2026-10-04T15:49:49.4869790Z   layer      tool-call boundary   twin/enact_guard.py, registered as a PreToolUse hook
+2026-10-04T15:49:49.4870199Z     holds      a disposing tool call is refused before it runs, including a subagent's own
+2026-10-04T15:49:49.4870925Z     fails when the registration is deleted, or the twin is driven by a runner that does not honour hooks — a policy check is a call site, and a forgotten call site fails open in silence
+2026-10-04T15:49:49.4871892Z   dependency 20 cross-repository pin(s) (3 self-sync, counted separately): driftwood-composed, feeds, fx, ico, insurer, ludlow-composed, nist, platform, tuppence-composed consumed by driftwood, insurer, ludlow, tuppence
+2026-10-04T15:49:49.4872937Z     limit      0 of 23 pins name a tag and no commit, so the pin is only as immutable as the tag. Every commit line in this estate is a commented-out placeholder; until one is filled in, 'pinned' means 'pinned to a movable name'.
+2026-10-04T15:49:49.4873886Z     limit      3 of 23 pins are a repository syncing itself rather than consuming anybody's policy, and are counted separately: only the 20 cross-repository pins evidence a dependency at all.
+2026-10-04T15:49:49.4875253Z     limit      the signature is the sources' own declaration, checked by nothing here: no tag is verified, no Rekor entry is looked up, and estate/verify/provenance/verify-provenance.sh records that this repository's own commits are not keyless-signed either. 'Signed' is therefore a property of the design, not an observation, and the word does no work until something verifies it.
+2026-10-04T15:49:49.4877412Z     limit      the consumer repositories are separate by URL and not yet by existence: estate/README.md describes a monorepo-style working tree whose top-level directories become their own GitHub repositories *at split*, and each up.sh rewrites the pinned URL to an in-cluster git server for the offline demo. The pins name real separate repositories; whether those repositories are live is a question this code does not ask.
+2026-10-04T15:49:49.4879325Z     limit      read from committed sources, not from a running cluster: this evidences what the repositories declare they consume, never that a control is in force right now. Whether continuous proof of force is required at all is build ticket 65's question and is still open.
+2026-10-04T15:49:49.4880801Z     limit      these pins are read from this tool's own repository (.estate-clone), not from any repository 'netflix' owns. The dependency block above evidences what THIS estate consumes; it names no pin, tag or repository belonging to the subject the proposal is about, and 'netflix' is not assumed to have an estate under Flux at all.
+2026-10-04T15:49:49.4882406Z   narrowed   Policy-as-code is AN enactment arm, not THE definition of governance. Responses are priced by the FAIR factor they modify and most levers are not code, so if versioned policy were the shape of governance the cross-domain comparison the £ engine exists for could not exist.
+2026-10-04T15:49:49.4883381Z enactment-proposal -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/proposal.json
+2026-10-04T15:49:49.4883969Z   attestation  proposal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4884408Z   sha256       102afa73298a28c288a220d444814ccf5af3b3eb37484cc616fa582929866e40
+2026-10-04T15:49:49.4884700Z   depth        full
+2026-10-04T15:49:49.4884927Z     enactment          full     5/5 of decision ticket 18  unchecked: -
+2026-10-04T15:49:49.4885275Z ==> netflix: substrate fidelity at 2011-10-24, detection scored at 2011-10-24
+2026-10-04T15:49:49.4885585Z   signal_to_noise      0.121  within [0.05, 0.25]
+2026-10-04T15:49:49.4885829Z   plant_difficulty     0.275  within [0.05, 0.5]
+2026-10-04T15:49:49.4886246Z   plant_difficulty_spread 0.600  within [0.05, 1.0]
+2026-10-04T15:49:49.4886500Z   spine_consistency    1.000  within [1.0, 1.0]
+2026-10-04T15:49:49.4886735Z   reporting_asymmetry  0.667  within [0.6, 0.95]
+2026-10-04T15:49:49.4886965Z   mundanity            0.879  within [0.7, 1.0]
+2026-10-04T15:49:49.4887191Z   contamination        0.000  within [0.0, 0.0]
+2026-10-04T15:49:49.4887670Z   free-running         28 line(s) against 5 anchored — the diff-against-the-spine attack has somewhere to hide a plant
+2026-10-04T15:49:49.4888063Z   hit rate             25%, mean score 0.250
+2026-10-04T15:49:49.4888589Z     events           missed  horizon 2011-09-30  not detected: no detection at events[3] ('an unusual incident review opens after hours, examining access to the member billing export')
+2026-10-04T15:49:49.4889453Z     communications   missed  horizon 2011-10-24  not detected: no detection at communications[3] ('a press query is withdrawn abruptly, days after an earlier complaint thread was escalated')
+2026-10-04T15:49:49.4890281Z     hr               timely  horizon 2011-11-15  detected at 2011-10-24, on or before the actionability horizon 2011-11-15 — still actionable
+2026-10-04T15:49:49.4891013Z     telemetry        missed  horizon 2011-09-20  not detected: no detection at telemetry[3] ('an overnight export of the member table runs outside the scheduled batch, with no ticket raised')
+2026-10-04T15:49:49.4892323Z   limitation:  planter and detector are the same model family and share model priors (decision ticket 12 Q2): a synthetic result is never evidence the twin anticipates the world, only evidence that the detection machinery works. The detector may find a plant because it thinks like the planter, not because the signal was findable by an independently-minded reader.
+2026-10-04T15:49:49.4893471Z substrate-report -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/substrate.json
+2026-10-04T15:49:49.4894042Z   attestation  substrate.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4894478Z   sha256       186420ffbed97daf866204328e573c3f9a601155f3a1ec474627fac73d1b1729
+2026-10-04T15:49:49.4894898Z   depth        full
+2026-10-04T15:49:49.4895174Z     synthetic-substrate full     7/7 of decision ticket 12  unchecked: -
+2026-10-04T15:49:49.4895520Z ==> sweep across 1 repo(s): 2 execution(s), 4 forecast(s), 0 failure(s)
+2026-10-04T15:49:49.4896163Z sweep -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/intel-forecast-guard/sweep.json
+2026-10-04T15:49:49.4896569Z   attestation  sweep.json.att.json (agent-signed (origin only))
+2026-10-04T15:49:49.4896942Z   sha256       9dfe5ec7212febd0999f0534de08030f5cb5f86f46215135978f241e63cd9573
+2026-10-04T15:49:49.4897231Z   depth        full
+2026-10-04T15:49:49.4897457Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4897771Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4898084Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4898620Z ==> intel: does-the-14a-bet-land-a-named-customer under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:49:49.4899164Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/intel-forecast-guard/run.json
+2026-10-04T15:49:49.4899569Z   attestation  run.json.att.json (agent-signed (origin only))
+2026-10-04T15:49:49.4899925Z   sha256       3c891bc1da4eef0c1ccc0a6031a1a699297752a8e67b71fc420a342224df6740
+2026-10-04T15:49:49.4900214Z   depth        full
+2026-10-04T15:49:49.4900429Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4900735Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4901045Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4901476Z ==> netflix: dvd-decline-2011 rewound to 2026-01-01 — scoring-eligible under as-consumed
+2026-10-04T15:49:49.4901910Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/guard-backtest.json
+2026-10-04T15:49:49.4902453Z   attestation  guard-backtest.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4902906Z   sha256       5d7231a5720c7c1a8b3ade68f94a1e564cd470b4c9246da46d8ec0bf2ed20de8
+2026-10-04T15:49:49.4903187Z   depth        full
+2026-10-04T15:49:49.4903405Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4903712Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4904021Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4904463Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:49:49.4904897Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/guard-run.json
+2026-10-04T15:49:49.4905387Z   attestation  guard-run.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4905811Z   sha256       bd21812ad2bafa8bad618651731ab65f3c7b13df22b3340f45347ec7fd58001d
+2026-10-04T15:49:49.4906191Z   depth        full
+2026-10-04T15:49:49.4906405Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4906710Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4907024Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4907513Z ==> royal-mail: would-the-twin-have-flagged-it rewound to 2018-06-01 — scoring-eligible under as-consumed
+2026-10-04T15:49:49.4908009Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/forecast-bundle.json
+2026-10-04T15:49:49.4908558Z   attestation  forecast-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4908998Z   sha256       a03e55a0e10a54e13e3f6b716863d811cc42d09876d5d765bd429ecab8e73af8
+2026-10-04T15:49:49.4909281Z   depth        full
+2026-10-04T15:49:49.4909491Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4909918Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4910226Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4910729Z ==> carillion: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:49:49.4911339Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/carillion-bundle.json
+2026-10-04T15:49:49.4911908Z   attestation  carillion-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4912352Z   sha256       74725f047f6294fb56d800313ed2db8548597e6dbeedf2baaa54f9513afedd62
+2026-10-04T15:49:49.4912635Z   depth        full
+2026-10-04T15:49:49.4912847Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4913151Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4913456Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4913838Z ==> carillion-collapse-resolved: observed=True, resolved 2018-01-15, contamination low
+2026-10-04T15:49:49.4914350Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+2026-10-04T15:49:49.4914800Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+2026-10-04T15:49:49.4915165Z     market-consensus-2016        p=0.05   brier=0.9025   log-loss=2.9957   [as-consumed]
+2026-10-04T15:49:49.4915579Z score-card -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/carillion-card.json
+2026-10-04T15:49:49.4916245Z   attestation  carillion-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4916688Z   sha256       d8f40a7156283f60cb87d15da97533d82433bd3b4d9753921475801fbc2a0938
+2026-10-04T15:49:49.4916970Z   depth        full
+2026-10-04T15:49:49.4917189Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4917503Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4917810Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+2026-10-04T15:49:49.4918294Z ==> enron: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:49:49.4918791Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/enron-bundle.json
+2026-10-04T15:49:49.4919322Z   attestation  enron-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4919753Z   sha256       4e375f00c56348baa430db99564f0af08f244c64e896a9f3ab7898ac0c69600d
+2026-10-04T15:49:49.4920033Z   depth        full
+2026-10-04T15:49:49.4920247Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4920550Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4920869Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4921254Z ==> enron-bankruptcy-resolved: observed=True, resolved 2001-12-02, contamination control
+2026-10-04T15:49:49.4921754Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+2026-10-04T15:49:49.4922188Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+2026-10-04T15:49:49.4922545Z     market-consensus-2001        p=0.03   brier=0.9409   log-loss=3.5066   [as-consumed]
+2026-10-04T15:49:49.4922725Z score-card -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/enron-card.json
+2026-10-04T15:49:49.4922983Z   attestation  enron-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4923143Z   sha256       ac0d90d27d6f1d64e9cb2e39893bfb416562c40178c59d42b25a677f1c28d808
+2026-10-04T15:49:49.4923209Z   depth        full
+2026-10-04T15:49:49.4923334Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4923459Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4923704Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+2026-10-04T15:49:49.4923986Z ==> netflix: dvd-decline-2011 under with-hindsight — not scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:49:49.4924287Z   ingestion history unavailable: every fact in the repository today was visible to this execution
+2026-10-04T15:49:49.4924520Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/with-hindsight-bundle.json
+2026-10-04T15:49:49.4924835Z   attestation  with-hindsight-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4924993Z   sha256       082a734b44847c068b1fc4900ed56f6b78e53f41d706471faac16afb6804c4f9
+2026-10-04T15:49:49.4925063Z   depth        full
+2026-10-04T15:49:49.4925196Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4925327Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4925466Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4925720Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 1 fact(s) withheld by date
+2026-10-04T15:49:49.4926045Z   withheld dvd-decline-2011-resolved          outcomes, dated 2012-12-31
+2026-10-04T15:49:49.4926682Z   ingestion history unavailable: the ingestion-history filter did not run: this repository has no commit at or before the execution time, so `as-consumed` here rests on fact dates alone. A fact ingested late but dated early is not detectable from this repository.
+2026-10-04T15:49:49.4926912Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/as-consumed-bundle.json
+2026-10-04T15:49:49.4927224Z   attestation  as-consumed-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4927392Z   sha256       c90b827b7e1705fceb8ac1b6822fb54d36c9b2d86f97fa301de96b9aab80447b
+2026-10-04T15:49:49.4927463Z   depth        full
+2026-10-04T15:49:49.4927603Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4927729Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.4927855Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:49:49.4928011Z bound-signal -> /tmp/twin-substrate-guard-x4th8hbe/bound-signal.json
+2026-10-04T15:49:49.4928289Z   attestation  bound-signal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:49:49.4928445Z   sha256       deecec484590202429548d21ee4596781bf6ee01002dec48b700f892cb211083
+2026-10-04T15:49:49.4928514Z   depth        full
+2026-10-04T15:49:49.4928636Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:49:49.4928760Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:49:49.5058538Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+2026-10-04T15:49:49.5058734Z =========================== short test summary info ============================
+2026-10-04T15:49:49.5060694Z FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[overlay-recorded] - subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o0/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.5062899Z FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_stays_its_removal[legacy-header] - subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o1/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o1/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.5065014Z FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[overlay-recorded] - subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o2/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o2/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.5066487Z FAILED tests/test_loophole_adr_0026.py::test_an_adopters_own_removal_of_a_withdrawn_status_control_beside_a_real_bump[legacy-header] - subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o3/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_an_adopters_own_removal_o3/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.5067735Z FAILED tests/test_loophole_adr_0026.py::test_a_control_the_regulator_withdraws_after_the_overlay_selected_it_is_the_regulators - subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_control_the_regulator_w0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_control_the_regulator_w0/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.5068958Z FAILED tests/test_loophole_adr_0026.py::test_a_weights_feed_that_names_a_withdrawn_control_keeps_its_price_on_the_withdrawal - subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_weights_feed_that_names0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_weights_feed_that_names0/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.5070155Z FAILED tests/test_loophole_adr_0026.py::test_a_narrowing_prices_a_weighted_removal_and_names_each_unweighted_one - subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_narrowing_prices_a_weig0/tuppence/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_narrowing_prices_a_weig0/tuppence/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.5071337Z FAILED tests/test_loophole_adr_0026.py::test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier - subprocess.CalledProcessError: Command '['git', '-c', 'core.hooksPath=/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_bespoke_hole_is_priced_0/bespoke/no-hooks', '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-C', '/tmp/pytest-of-runner/pytest-0/popen-gw1/test_a_bespoke_hole_is_priced_0/bespoke/tuppence', 'commit', '-q', '-m', 'fixture comparison header']' returned non-zero exit status 1.
+2026-10-04T15:49:49.5072328Z FAILED tests/test_invariant_suite.py::test_the_suite_is_green - AssertionError: ["flux_coverage_floor_is_still_reachable: the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sa... finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached"]
+2026-10-04T15:49:49.5073003Z assert not [Result(number=45, name='flux_coverage_floor_is_still_reachable', status='FAIL', detail="the pre-registered coverage f...fect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached", invariant=False)]
+2026-10-04T15:49:49.5073315Z 9 failed, 2898 passed, 24 skipped, 2 subtests passed in 195.80s (0:03:15)
+2026-10-04T15:49:49.5561126Z ##[error]Process completed with exit code 1.
+2026-10-04T15:49:49.5673574Z Post job cleanup.
+2026-10-04T15:49:49.6360779Z [command]/usr/bin/git version
+2026-10-04T15:49:49.6394361Z git version 2.55.0
+2026-10-04T15:49:49.6422087Z Temporarily overriding HOME='/home/runner/work/_temp/1593fde4-e064-494d-aee5-0b0632ccf230' before making global git config changes
+2026-10-04T15:49:49.6423264Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-04T15:49:49.6426576Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:49:49.6458332Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-04T15:49:49.6486524Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-04T15:49:49.6711367Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-04T15:49:49.6743910Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-04T15:49:49.6963088Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-04T15:49:49.6997224Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-04T15:49:49.7358620Z Cleaning up orphan processes
+2026-10-04T15:49:49.7613656Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

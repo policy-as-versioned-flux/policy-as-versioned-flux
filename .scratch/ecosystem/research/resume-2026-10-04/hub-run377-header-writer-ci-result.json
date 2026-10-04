@@ -1,0 +1,51 @@
+{
+  "recorded_at": "2026-10-04T16:35:38.821906+00:00",
+  "head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "runs": [
+    {
+      "kind": "pr",
+      "run_id": 37216897669,
+      "log": "hub-run377-header-writer-pr-failed-jobs.log",
+      "sha256": "b06b7192d94beef814e620b8bfe9ea9713fa5dbf0284219f62404ac3251a5242",
+      "failed_test_names": [
+        "tests/test_invariant_suite.py::test_the_suite_is_green"
+      ],
+      "test_summary": [
+        "1 failed, 2908 passed, 24 skipped, 2 subtests passed in 200.51s (0:03:20)"
+      ],
+      "invariant_summary": [
+        "72 passed, 1 failed, 2 skipped (0 pending invariants, 2 skipped and not faked)"
+      ],
+      "invariant_failed_names": [
+        "flux_coverage_floor_is_still_reachable"
+      ]
+    },
+    {
+      "kind": "push",
+      "run_id": 37216893838,
+      "log": "hub-run377-header-writer-push-failed-jobs.log",
+      "sha256": "01497c26a3223257fac488bfd7b35b0c363166a19d6c7dd6bcb9a1e2a27c3a43",
+      "failed_test_names": [
+        "tests/test_invariant_suite.py::test_the_suite_is_green"
+      ],
+      "test_summary": [
+        "1 failed, 2908 passed, 24 skipped, 2 subtests passed in 204.60s (0:03:24)"
+      ],
+      "invariant_summary": [
+        "72 passed, 1 failed, 2 skipped (0 pending invariants, 2 skipped and not faked)"
+      ],
+      "invariant_failed_names": [
+        "flux_coverage_floor_is_still_reachable"
+      ]
+    }
+  ],
+  "owned_header_fixture_failures_cleared": true,
+  "owned_alias_and_loader_failures_cleared": true,
+  "remaining_failure": "unchanged flux_coverage_floor_is_still_reachable",
+  "all_other_status_checks_success": true,
+  "main_active_rules_receipt": "hub-run377-header-writer-main-rules.json",
+  "main_rule_requires_one_review": true,
+  "main_rule_has_required_status_checks": false,
+  "floor_waived": false,
+  "ordinary_matching_head_merge_pending": true
+}

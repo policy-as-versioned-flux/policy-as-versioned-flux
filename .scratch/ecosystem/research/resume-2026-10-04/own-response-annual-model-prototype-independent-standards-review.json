@@ -1,0 +1,77 @@
+{
+  "review_axis": "Standards",
+  "status": "PASS",
+  "findings": [],
+  "reviewed_at": "2026-10-04T15:28:36.114166+00:00",
+  "head": "c1bbb13a5124baa06247fe45845a425399908611",
+  "tree": "a69892493ae59f3e7e8658eb270526ef3d5bc25f",
+  "parent": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "repository": "https://github.com/policy-as-versioned-platform/platform",
+  "candidate_packet_sha256": "3ddec82e46a9422a2e6fe2f4dd2a4fcc901e74b0b908d553410597176e303c7e",
+  "standards_sources": [
+    "README.md",
+    "compose/README.md",
+    "compose/OWN-RESPONSE-MODEL.md",
+    ".agents/skills/code-review/SKILL.md smell baseline"
+  ],
+  "normal_SSH_signature_independently_verified": true,
+  "clean_checkout": true,
+  "exact_added_files": [
+    "compose/OWN-RESPONSE-MODEL.md",
+    "compose/fixtures/own-response-model/PROVENANCE.json",
+    "compose/fixtures/own-response-model/ludlow-v1-feed.json",
+    "compose/fixtures/own-response-model/ludlow-v4-response-sources.json",
+    "compose/fixtures/own-response-model/tuppence-v1-feed.json",
+    "compose/fixtures/own-response-model/tuppence-v4-response-sources.json",
+    "compose/own_response_model.py",
+    "compose/own_response_model_cli.py",
+    "compose/test_own_response_model.py",
+    "compose/test_own_response_model_cli.py",
+    "feeds/forward-intel.v3.payload.schema.json"
+  ],
+  "all11_source_sha256_independently_joined": true,
+  "source_sha256": {
+    "compose/OWN-RESPONSE-MODEL.md": "47f17983c4c41e9ff2c1ab59f3802ab56652c0801c4898247e31c926910afe38",
+    "compose/fixtures/own-response-model/PROVENANCE.json": "d73a47963193e7ef7e2c919a334e23acbe849d5c2630a38278b2cc9e583dc662",
+    "compose/fixtures/own-response-model/ludlow-v1-feed.json": "16adebe89e4b689e13cb432e21f5b4861df4c4067102e02409c00772589c8dc2",
+    "compose/fixtures/own-response-model/ludlow-v4-response-sources.json": "6352906b4d76824e1da70a0ed027d7b18d387d04e23184139860288dcd107a0e",
+    "compose/fixtures/own-response-model/tuppence-v1-feed.json": "bc7e7948829fb7056522ecef071a498984ca7b4ba4cd7207a425d425b1aaf76f",
+    "compose/fixtures/own-response-model/tuppence-v4-response-sources.json": "914bd0877f033d1e126ce303210b4572e691d4c4ecb4548a79334ea33a6082f7",
+    "compose/own_response_model.py": "c7f79cb8b7c12ab9fb4d50770bdb6f9ae1dad78aa6b390202964eafe438d7355",
+    "compose/own_response_model_cli.py": "1149727763ed460f97b6ce89109911370b6a9829dbc5d2deda2588d68c5d1002",
+    "compose/test_own_response_model.py": "2f1cc5eba67db40347bec70e9603470038e869f560f65ac0d33b7a0bda1cb982",
+    "compose/test_own_response_model_cli.py": "f8172a78c3805a540645c4d4223502f37000babeb710945214441f885adad0ed",
+    "feeds/forward-intel.v3.payload.schema.json": "172a248f7d780dbee32be482ad72e6e5e8da4f6e078ce9e4fed3003d5c8e5917"
+  },
+  "patch_sha256": "f73fb4f9650b168197271291d137d228a24cbdba85508d2e14bb891166809ff2",
+  "primary_check_log_and_linked_receipt_hashes_verified": true,
+  "independent_validation": {
+    "public_unittest_discovery": {
+      "passed": 17,
+      "skipped": 0,
+      "exit": 0,
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s compose -p test_own_response_model*.py -v"
+    },
+    "focused_mypy": {
+      "source_files": 2,
+      "exit": 0,
+      "command": ".venv/bin/python -m mypy --cache-dir /private/tmp/pavf-own-response-standards-mypy-20261004 compose/own_response_model.py compose/own_response_model_cli.py"
+    }
+  },
+  "genuine_fixture_source_joins": {
+    "ludlow": {
+      "feed_v4_tag_exact": true,
+      "native_response_blobs": 4
+    },
+    "tuppence": {
+      "feed_v4_tag_exact": true,
+      "native_response_blobs": 4
+    }
+  },
+  "receipt_repository_label_correction_verified": true,
+  "existing_source_files_or_versions_modified": false,
+  "native_cost_grades_or_budgets_invented": false,
+  "prototype_published": false,
+  "reviewer_source_or_index_mutations": false,
+  "limitations": "Standards source review only; Spec remains separate. Caller authenticates instruments. No new native monetary evidence, release, selection integration, enforcement or live observation is claimed. Original d06 root data remains HOLD."
+}

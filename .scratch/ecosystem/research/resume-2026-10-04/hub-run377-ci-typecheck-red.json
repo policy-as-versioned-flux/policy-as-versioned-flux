@@ -1,0 +1,20 @@
+{
+  "recorded_at": "2026-10-04T15:10:32.830501+00:00",
+  "cwd": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "mypy",
+    "twin",
+    "tests",
+    "conftest.py",
+    "--ignore-missing-imports",
+    "--warn-unused-ignores"
+  ],
+  "exit_code": 1,
+  "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-ci-typecheck-red.log",
+  "log_sha256": "098d8ceef231969e126cce149f3d97041ddbf06287f9f546346ebc60035f2792",
+  "source_sha256": "5a6e2ebf9585fc2d0d18f807d2da93723cd87a0ca004c392c50db3df19d8f713",
+  "reason": "four actual mypy errors from optional importlib ModuleSpec/loader, identical to authentic CI job111464349815"
+}

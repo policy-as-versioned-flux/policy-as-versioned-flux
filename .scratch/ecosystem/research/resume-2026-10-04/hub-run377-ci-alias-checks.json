@@ -1,0 +1,73 @@
+{
+  "recorded_at": "2026-10-04T15:25:41.489131+00:00",
+  "cwd": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "original_source": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "checks": [
+    {
+      "name": "red-original-test",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_enact.py::test_the_dependency_pins_are_real_and_report_what_they_do_not_establish",
+        "-q"
+      ],
+      "exit_code": 1,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-ci-alias-red-original-test.log",
+      "log_sha256": "aee8e0d82b680c858eea0075f418281d3e1ba1c114e20bd2a5d0b5612ad893cc"
+    },
+    {
+      "name": "green-real-pins",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_enact.py::test_the_dependency_pins_are_real_and_report_what_they_do_not_establish",
+        "-q"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-ci-alias-green-real-pins.log",
+      "log_sha256": "62bffe7e0af8e285bbb28e8dd800c23cea0950e5009b2ec1cc7a6e7409604831"
+    },
+    {
+      "name": "negative-unknown-url-repository",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_enact.py::test_the_dependency_pins_are_real_and_report_what_they_do_not_establish",
+        "-q"
+      ],
+      "exit_code": 1,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-ci-alias-negative-unknown-url-repository.log",
+      "log_sha256": "38e7881af9d803dba88100c164f3d511dbaada249079add250b5b845e3444597"
+    },
+    {
+      "name": "green-full-typecheck",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "mypy",
+        "twin",
+        "tests",
+        "conftest.py",
+        "--ignore-missing-imports",
+        "--warn-unused-ignores"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-ci-alias-green-full-typecheck.log",
+      "log_sha256": "3efc0e170174bf1eacbd391b4e67ae0597b59f89e8023c21d253c40c13dc02f0"
+    }
+  ],
+  "source_sha256": "cae329b9ab23ce7b916326bdeea3d89b7eeaa1861ed56e8a5b7539bbba5b232e",
+  "inputs_receipt": "hub-run377-ci-alias-fixture-inputs.json",
+  "fixture_scope": "actual immutable local gitops blob copies only; broken URL is an explicitly restored negative fixture, no primary measurement",
+  "expected_exits": [
+    1,
+    0,
+    1,
+    0
+  ],
+  "actual_matches_expected": true,
+  "coverage_guard_waiver": false
+}

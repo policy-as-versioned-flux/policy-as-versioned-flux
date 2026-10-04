@@ -1,0 +1,23 @@
+{
+  "review_axis": "Standards",
+  "status": "PASS",
+  "findings": [],
+  "reviewed_at": "2026-10-04T15:30:51.215853+00:00",
+  "head": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "tree": "4042ec2099f70807d916f4b72f74938bb8167806",
+  "base": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "source_sha256": {
+    "tests/test_enact.py": "cae329b9ab23ce7b916326bdeea3d89b7eeaa1861ed56e8a5b7539bbba5b232e",
+    "tests/test_map_observation_ownership.py": "f02e9ed2178f750671ffd07fbf39b41e89214bc0d0f9802344bf5f7f411cb8c6"
+  },
+  "followup_patch_sha256": "3643c2c38a06cc565ae80b1d612475e75afbc63a39b2d97bfe1dfdd736628658",
+  "complete_patch_sha256": "f9186cac576dc117db0acfef2356fd980dbc4bb3eaa9dc073b6e61cb9108b593",
+  "candidate_packet_sha256": "d6934e1f6f3c975e7fc542182c3f21083a7900c534407b17b25a3a52adceffab",
+  "independent_checks_sha256": "e25c0005d890626615b15ebdc5a70a2ce861c7b19770aeea8da1427702f06fda",
+  "independent_targeted_tests": 2,
+  "normal_SSH_signature_verified": true,
+  "clean_source_tree": true,
+  "coverage_floor_waiver": false,
+  "source_logic_changes": false,
+  "limitations": "Test-only source review. Full remote CI and normal merge are separate; actual historical floor failure remains recorded."
+}

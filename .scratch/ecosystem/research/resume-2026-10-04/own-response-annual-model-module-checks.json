@@ -1,0 +1,30 @@
+{
+  "green": {
+    "argv": [
+      "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "compose",
+      "-p",
+      "test_own_response_model.py",
+      "-v"
+    ],
+    "exit": 0,
+    "log_sha256": "3984f2927fffc1024e254e813fbe297f30b9e1a46ccaceee6a0819a9e86812f5"
+  },
+  "mypy": {
+    "argv": [
+      "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+      "-m",
+      "mypy",
+      "--explicit-package-bases",
+      "--follow-imports=silent",
+      "--ignore-missing-imports",
+      "compose/own_response_model.py"
+    ],
+    "exit": 0,
+    "log_sha256": "5d4b6d285b77932e3d08212c3b4974d0a803f98ec60408ac6ccf6a063fa6c19e"
+  }
+}

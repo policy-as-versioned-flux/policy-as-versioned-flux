@@ -1,0 +1,56 @@
+{
+  "status": "PASS_TWO_FILE_READ_RACE_CLOSED",
+  "observed_at": "2026-10-04T15:59:08.719302+00:00",
+  "initial_audit": {
+    "path": ".scratch/ecosystem/research/resume-2026-10-04/evidence-publication-final-spec-audit.json",
+    "sha256": "1b16fb30643a7495a8bc71287d675e4d2ad81c49db101ad310e3245c44175550",
+    "preserved_status": "FINDINGS_AT_CUTOFF",
+    "sole_initial_findings": [
+      ".scratch/ecosystem/research/resume-2026-10-04/root-data-final-draft-independent-spec-review.json",
+      ".scratch/ecosystem/research/resume-2026-10-04/root-data-final-draft-independent-spec-review.md"
+    ],
+    "unchanged_after_check": true
+  },
+  "credential_patterns_source": {
+    "path": ".scratch/ecosystem/research/resume-2026-10-04/audit-delivered-publication-data.py",
+    "sha256": "295a3f0f77c761fc484232753f7bebac44dca2f7c0fa3537f4043e9065bc7d90",
+    "source_assignment": "PATTERNS",
+    "all_original_patterns_used": true,
+    "pattern_names": [
+      "private-key-material",
+      "github-token",
+      "aws-access-key-id",
+      "google-api-key",
+      "slack-token",
+      "openai-api-key",
+      "credential-bearing-url",
+      "literal-aws-secret"
+    ],
+    "extraction": "Read-only AST literals; original audit not executed or edited"
+  },
+  "files": [
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/root-data-final-draft-independent-spec-review.md",
+      "bytes": 1786,
+      "sha256": "b7dd6b85b9ffc3aa54f97fbfffb8d9e6d84a20fc70af75b195f6ecc70b64b963",
+      "strict_json_valid": false,
+      "utf8_valid": true,
+      "symlink": false
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/root-data-final-draft-independent-spec-review.json",
+      "bytes": 7990,
+      "sha256": "a399a939eae2a4bb795c5e2fd198aa4e8b08a6f4c371935f216fafcb48733183",
+      "strict_json_valid": true,
+      "utf8_valid": true,
+      "symlink": false
+    }
+  ],
+  "two_reads_byte_equal": true,
+  "expected_final_hashes_match": true,
+  "strict_json_failures": [],
+  "credential_findings": [],
+  "source_or_primary_mutations": false,
+  "network_calls": 0,
+  "limitations": "Closes only the two-file cutoff read race. Preserves original FINDINGS receipt. Later CI/publication receipts and final signed-root inclusion require their own incremental binding; no live grade or absence of every possible secret claimed."
+}

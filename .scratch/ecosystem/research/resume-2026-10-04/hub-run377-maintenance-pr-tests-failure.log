@@ -1,0 +1,758 @@
+﻿2026-10-04T15:07:42.8099000Z Current runner version: '2.337.0'
+2026-10-04T15:07:42.8127677Z ##[group]Runner Image Provisioner
+2026-10-04T15:07:42.8128602Z Hosted Compute Agent
+2026-10-04T15:07:42.8129195Z Version: 20260901.588
+2026-10-04T15:07:42.8129896Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-04T15:07:42.8130674Z Build Date: 2026-09-01T19:56:44Z
+2026-10-04T15:07:42.8131442Z Worker ID: {b55db6ab-ff76-49f2-b892-5d459608251c}
+2026-10-04T15:07:42.8132191Z Azure Region: westus
+2026-10-04T15:07:42.8132986Z ##[endgroup]
+2026-10-04T15:07:42.8134645Z ##[group]Operating System
+2026-10-04T15:07:42.8135312Z Ubuntu
+2026-10-04T15:07:42.8135827Z 24.04.5
+2026-10-04T15:07:42.8136401Z LTS
+2026-10-04T15:07:42.8136947Z ##[endgroup]
+2026-10-04T15:07:42.8137539Z ##[group]Runner Image
+2026-10-04T15:07:42.8138226Z Image: ubuntu-24.04
+2026-10-04T15:07:42.8138773Z Version: 20260927.320.1
+2026-10-04T15:07:42.8140121Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-04T15:07:42.8141697Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+2026-10-04T15:07:42.8142913Z ##[endgroup]
+2026-10-04T15:07:42.8144081Z ##[group]GITHUB_TOKEN Permissions
+2026-10-04T15:07:42.8146071Z Contents: read
+2026-10-04T15:07:42.8146666Z Metadata: read
+2026-10-04T15:07:42.8147378Z ##[endgroup]
+2026-10-04T15:07:42.8149519Z Secret source: Actions
+2026-10-04T15:07:42.8150586Z Cache mode: write
+2026-10-04T15:07:42.8151307Z Prepare workflow directory
+2026-10-04T15:07:42.8515178Z Prepare all required actions
+2026-10-04T15:07:42.8589035Z Getting action download info
+2026-10-04T15:07:43.2380247Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-04T15:07:43.3542281Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-04T15:07:43.5436539Z Complete job name: tests
+2026-10-04T15:07:43.6241886Z ##[group]Run actions/checkout@v4
+2026-10-04T15:07:43.6243330Z with:
+2026-10-04T15:07:43.6243816Z   fetch-depth: 0
+2026-10-04T15:07:43.6244289Z   persist-credentials: false
+2026-10-04T15:07:43.6244957Z   repository: policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:43.6249002Z   token: ***
+2026-10-04T15:07:43.6249442Z   ssh-strict: true
+2026-10-04T15:07:43.6249884Z   ssh-user: git
+2026-10-04T15:07:43.6250299Z   clean: true
+2026-10-04T15:07:43.6250735Z   sparse-checkout-cone-mode: true
+2026-10-04T15:07:43.6251255Z   fetch-tags: false
+2026-10-04T15:07:43.6251700Z   show-progress: true
+2026-10-04T15:07:43.6252152Z   lfs: false
+2026-10-04T15:07:43.6252563Z   submodules: false
+2026-10-04T15:07:43.6253177Z   set-safe-directory: true
+2026-10-04T15:07:43.6253694Z   allow-unsafe-pr-checkout: false
+2026-10-04T15:07:43.6254566Z ##[endgroup]
+2026-10-04T15:07:43.7346765Z Syncing repository: policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:43.7349071Z ##[group]Getting Git version info
+2026-10-04T15:07:43.7350171Z Working directory is '/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux'
+2026-10-04T15:07:43.7351666Z [command]/usr/bin/git version
+2026-10-04T15:07:43.7441158Z git version 2.55.0
+2026-10-04T15:07:43.7463017Z ##[endgroup]
+2026-10-04T15:07:43.7478366Z Temporarily overriding HOME='/home/runner/work/_temp/39268ac9-b3b5-4c35-a271-a37d8f5aebac' before making global git config changes
+2026-10-04T15:07:43.7480872Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-04T15:07:43.7484007Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:43.7537719Z Deleting the contents of '/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux'
+2026-10-04T15:07:43.7546244Z ##[group]Initializing the repository
+2026-10-04T15:07:43.7547764Z [command]/usr/bin/git init /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:43.7664272Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-04T15:07:43.7666291Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-04T15:07:43.7667791Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-04T15:07:43.7668986Z hint: call:
+2026-10-04T15:07:43.7669617Z hint:
+2026-10-04T15:07:43.7670418Z hint: 	git config --global init.defaultBranch <name>
+2026-10-04T15:07:43.7671401Z hint:
+2026-10-04T15:07:43.7672319Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-04T15:07:43.7674169Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-04T15:07:43.7675467Z hint:
+2026-10-04T15:07:43.7676157Z hint: 	git branch -m <name>
+2026-10-04T15:07:43.7676950Z hint:
+2026-10-04T15:07:43.7678019Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-04T15:07:43.7680056Z Initialized empty Git repository in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.git/
+2026-10-04T15:07:43.7690461Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:43.7756106Z ##[endgroup]
+2026-10-04T15:07:43.7758726Z ##[group]Disabling automatic garbage collection
+2026-10-04T15:07:43.7760562Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-04T15:07:43.7790381Z ##[endgroup]
+2026-10-04T15:07:43.7792074Z ##[group]Setting up auth
+2026-10-04T15:07:43.7799650Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-04T15:07:43.7858179Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-04T15:07:43.8256040Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-04T15:07:43.8294211Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-04T15:07:43.8526398Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-04T15:07:43.8564721Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-04T15:07:43.8814370Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-04T15:07:43.8864334Z ##[endgroup]
+2026-10-04T15:07:43.8865260Z ##[group]Fetching the repository
+2026-10-04T15:07:43.8880413Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +55d6fee61ff75f94193d05eedd0782dc3a553b2c:refs/remotes/pull/155/merge
+2026-10-04T15:07:50.5515071Z From https://github.com/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:50.5518259Z  * [new branch]      chart-125-seam1-signature-flake          -> origin/chart-125-seam1-signature-flake
+2026-10-04T15:07:50.5520213Z  * [new branch]      chart-127-128-129                        -> origin/chart-127-128-129
+2026-10-04T15:07:50.5522215Z  * [new branch]      chart-130-root-machinery                 -> origin/chart-130-root-machinery
+2026-10-04T15:07:50.5524892Z  * [new branch]      chart-131-132-133                        -> origin/chart-131-132-133
+2026-10-04T15:07:50.5527084Z  * [new branch]      chart-134-identity-lane                  -> origin/chart-134-identity-lane
+2026-10-04T15:07:50.5529153Z  * [new branch]      chart-135-136                            -> origin/chart-135-136
+2026-10-04T15:07:50.5530925Z  * [new branch]      chart-138-as-of                          -> origin/chart-138-as-of
+2026-10-04T15:07:50.5533843Z  * [new branch]      chart-2026-09-05-a-branch-run-records-nothing -> origin/chart-2026-09-05-a-branch-run-records-nothing
+2026-10-04T15:07:50.5537185Z  * [new branch]      chart-2026-09-05-refusal-by-another-name -> origin/chart-2026-09-05-refusal-by-another-name
+2026-10-04T15:07:50.5541062Z  * [new branch]      chart-2026-09-05-the-adopter-gate-grades-the-change -> origin/chart-2026-09-05-the-adopter-gate-grades-the-change
+2026-10-04T15:07:50.5545382Z  * [new branch]      chart-2026-09-10-the-map-line-and-the-moving-count -> origin/chart-2026-09-10-the-map-line-and-the-moving-count
+2026-10-04T15:07:50.5549813Z  * [new branch]      chart-2026-09-21-the-cage-names-what-it-does-not-deliver -> origin/chart-2026-09-21-the-cage-names-what-it-does-not-deliver
+2026-10-04T15:07:50.5554018Z  * [new branch]      ci-2026-09-04-the-hub-tests-itself       -> origin/ci-2026-09-04-the-hub-tests-itself
+2026-10-04T15:07:50.5556813Z  * [new branch]      close-111-86-chart-140                   -> origin/close-111-86-chart-140
+2026-10-04T15:07:50.5560205Z  * [new branch]      close-113-phase-b                        -> origin/close-113-phase-b
+2026-10-04T15:07:50.5564024Z  * [new branch]      close-133-134-137                        -> origin/close-133-134-137
+2026-10-04T15:07:50.5567086Z  * [new branch]      close-140                                -> origin/close-140
+2026-10-04T15:07:50.5569874Z  * [new branch]      cs-06-cross-party-composition            -> origin/cs-06-cross-party-composition
+2026-10-04T15:07:50.5573087Z  * [new branch]      fix-2026-09-05-refresh-keeps-work        -> origin/fix-2026-09-05-refresh-keeps-work
+2026-10-04T15:07:50.5576160Z  * [new branch]      fix-2026-09-05-tickets-96-97-crossref    -> origin/fix-2026-09-05-tickets-96-97-crossref
+2026-10-04T15:07:50.5579314Z  * [new branch]      fix-2026-09-06-served-only-comment       -> origin/fix-2026-09-06-served-only-comment
+2026-10-04T15:07:50.5582536Z  * [new branch]      fix-local-gates-drop-github-markers      -> origin/fix-local-gates-drop-github-markers
+2026-10-04T15:07:50.5586289Z  * [new branch]      fix-phase-b-stale-records                -> origin/fix-phase-b-stale-records
+2026-10-04T15:07:50.5589351Z  * [new branch]      fix-verify-before-tag-test               -> origin/fix-verify-before-tag-test
+2026-10-04T15:07:50.5592041Z  * [new branch]      implement-2026-09-10-next                -> origin/implement-2026-09-10-next
+2026-10-04T15:07:50.5595565Z  * [new branch]      implement-2026-09-10-remaining           -> origin/implement-2026-09-10-remaining
+2026-10-04T15:07:50.5598425Z  * [new branch]      implement-2026-09-10-rollout             -> origin/implement-2026-09-10-rollout
+2026-10-04T15:07:50.5601832Z  * [new branch]      implement-observation-reader-20260910    -> origin/implement-observation-reader-20260910
+2026-10-04T15:07:50.5605667Z  * [new branch]      implement-release-clock-record-20260910  -> origin/implement-release-clock-record-20260910
+2026-10-04T15:07:50.5608412Z  * [new branch]      main                                     -> origin/main
+2026-10-04T15:07:50.5610869Z  * [new branch]      record-2026-09-04-the-62-77-landing      -> origin/record-2026-09-04-the-62-77-landing
+2026-10-04T15:07:50.5614993Z  * [new branch]      record-2026-09-04-the-app-and-workflows  -> origin/record-2026-09-04-the-app-and-workflows
+2026-10-04T15:07:50.5618149Z  * [new branch]      record-2026-09-06-stale-blockers         -> origin/record-2026-09-06-stale-blockers
+2026-10-04T15:07:50.5621231Z  * [new branch]      record-2026-09-09-a-cancelled-branch-run -> origin/record-2026-09-09-a-cancelled-branch-run
+2026-10-04T15:07:50.5624869Z  * [new branch]      record-2026-09-09-run-197-fall           -> origin/record-2026-09-09-run-197-fall
+2026-10-04T15:07:50.5628605Z  * [new branch]      record-2026-09-10-the-cuts-and-what-they-cost -> origin/record-2026-09-10-the-cuts-and-what-they-cost
+2026-10-04T15:07:50.5632646Z  * [new branch]      record-2026-09-10-ticket-107-the-lane-answered -> origin/record-2026-09-10-ticket-107-the-lane-answered
+2026-10-04T15:07:50.5636563Z  * [new branch]      record-fixes-2026-09-23                  -> origin/record-fixes-2026-09-23
+2026-10-04T15:07:50.5639331Z  * [new branch]      record-run-277-supersede-echo            -> origin/record-run-277-supersede-echo
+2026-10-04T15:07:50.5642949Z  * [new branch]      record-run-290-priced-holes              -> origin/record-run-290-priced-holes
+2026-10-04T15:07:50.5645542Z  * [new branch]      record-run-339                           -> origin/record-run-339
+2026-10-04T15:07:50.5648105Z  * [new branch]      redo-rescue-as-cherry-picks              -> origin/redo-rescue-as-cherry-picks
+2026-10-04T15:07:50.5651046Z  * [new branch]      repair-2026-09-04-gate-regressions       -> origin/repair-2026-09-04-gate-regressions
+2026-10-04T15:07:50.5654245Z  * [new branch]      repair/run377-hub-verifiers-20261004     -> origin/repair/run377-hub-verifiers-20261004
+2026-10-04T15:07:50.5656910Z  * [new branch]      rescue-run-101                           -> origin/rescue-run-101
+2026-10-04T15:07:50.5659209Z  * [new branch]      rescue-runs-76-84-88                     -> origin/rescue-runs-76-84-88
+2026-10-04T15:07:50.5661873Z  * [new branch]      resume/2026-10-04-claude-handoff         -> origin/resume/2026-10-04-claude-handoff
+2026-10-04T15:07:50.5665313Z  * [new branch]      resume/2026-10-04-valuation-date         -> origin/resume/2026-10-04-valuation-date
+2026-10-04T15:07:50.5669320Z  * [new branch]      ticket-100-a-branch-run-says-what-it-can-record -> origin/ticket-100-a-branch-run-says-what-it-can-record
+2026-10-04T15:07:50.5674004Z  * [new branch]      ticket-101-the-gates-verify-a-real-signature -> origin/ticket-101-the-gates-verify-a-real-signature
+2026-10-04T15:07:50.5678456Z  * [new branch]      ticket-102-the-cited-tree-names-who-added-the-check -> origin/ticket-102-the-cited-tree-names-who-added-the-check
+2026-10-04T15:07:50.5682787Z  * [new branch]      ticket-103-release-gate-computes-the-bump -> origin/ticket-103-release-gate-computes-the-bump
+2026-10-04T15:07:50.5686528Z  * [new branch]      ticket-105-pinned-trust-roots            -> origin/ticket-105-pinned-trust-roots
+2026-10-04T15:07:50.5690876Z  * [new branch]      ticket-106-composition-selfcheck-fixture-namespace -> origin/ticket-106-composition-selfcheck-fixture-namespace
+2026-10-04T15:07:50.5695560Z  * [new branch]      ticket-107-the-sampler-waits-for-what-exists -> origin/ticket-107-the-sampler-waits-for-what-exists
+2026-10-04T15:07:50.5699295Z  * [new branch]      ticket-108-the-recording-commit          -> origin/ticket-108-the-recording-commit
+2026-10-04T15:07:50.5702512Z  * [new branch]      ticket-110-rollout-measured              -> origin/ticket-110-rollout-measured
+2026-10-04T15:07:50.5706242Z  * [new branch]      ticket-111-the-cage-delivers-its-classes -> origin/ticket-111-the-cage-delivers-its-classes
+2026-10-04T15:07:50.5710059Z  * [new branch]      ticket-112-threshold-states-corpus       -> origin/ticket-112-threshold-states-corpus
+2026-10-04T15:07:50.5713744Z  * [new branch]      ticket-113-infra-is-a-role-not-a-rung    -> origin/ticket-113-infra-is-a-role-not-a-rung
+2026-10-04T15:07:50.5717251Z  * [new branch]      ticket-113-release-gate-one-line         -> origin/ticket-113-release-gate-one-line
+2026-10-04T15:07:50.5720747Z  * [new branch]      ticket-114-unobserved-party-not-green    -> origin/ticket-114-unobserved-party-not-green
+2026-10-04T15:07:50.5724300Z  * [new branch]      ticket-115-loophole-procedure            -> origin/ticket-115-loophole-procedure
+2026-10-04T15:07:50.5727666Z  * [new branch]      ticket-116-twelve-loophole-candidates    -> origin/ticket-116-twelve-loophole-candidates
+2026-10-04T15:07:50.5731136Z  * [new branch]      ticket-117-two-tickets-share-the-number-111 -> origin/ticket-117-two-tickets-share-the-number-111
+2026-10-04T15:07:50.5734551Z  * [new branch]      ticket-118-luck-may-not-promote          -> origin/ticket-118-luck-may-not-promote
+2026-10-04T15:07:50.5737620Z  * [new branch]      ticket-119-unlabelled-namespace-is-priced -> origin/ticket-119-unlabelled-namespace-is-priced
+2026-10-04T15:07:50.5740808Z  * [new branch]      ticket-120-adr-0026-candidates           -> origin/ticket-120-adr-0026-candidates
+2026-10-04T15:07:50.5744367Z  * [new branch]      ticket-121-implementing-a-control-moves-the-price -> origin/ticket-121-implementing-a-control-moves-the-price
+2026-10-04T15:07:50.5747971Z  * [new branch]      ticket-122-ramp-survives-rename          -> origin/ticket-122-ramp-survives-rename
+2026-10-04T15:07:50.5750998Z  * [new branch]      ticket-123-a-withdrawal-is-the-regulators -> origin/ticket-123-a-withdrawal-is-the-regulators
+2026-10-04T15:07:50.5754313Z  * [new branch]      ticket-124-price-the-removal             -> origin/ticket-124-price-the-removal
+2026-10-04T15:07:50.5756903Z  * [new branch]      ticket-125-signature-leak                -> origin/ticket-125-signature-leak
+2026-10-04T15:07:50.5760023Z  * [new branch]      ticket-126-a-withdrawn-control-is-not-selectable -> origin/ticket-126-a-withdrawn-control-is-not-selectable
+2026-10-04T15:07:50.5763649Z  * [new branch]      ticket-127-pound-seam-switching-price    -> origin/ticket-127-pound-seam-switching-price
+2026-10-04T15:07:50.5766746Z  * [new branch]      ticket-128-behind-a-major-unreadable     -> origin/ticket-128-behind-a-major-unreadable
+2026-10-04T15:07:50.5769720Z  * [new branch]      ticket-129-major-acceptance-record       -> origin/ticket-129-major-acceptance-record
+2026-10-04T15:07:50.5772910Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+2026-10-04T15:07:50.5775968Z  * [new branch]      ticket-130-the-composed-set-moves        -> origin/ticket-130-the-composed-set-moves
+2026-10-04T15:07:50.5778716Z  * [new branch]      ticket-131-sibling-cut-release           -> origin/ticket-131-sibling-cut-release
+2026-10-04T15:07:50.5782032Z  * [new branch]      ticket-132-adopter-gate-reads-acceptance -> origin/ticket-132-adopter-gate-reads-acceptance
+2026-10-04T15:07:50.5785462Z  * [new branch]      ticket-134-clock-observation-comparison  -> origin/ticket-134-clock-observation-comparison
+2026-10-04T15:07:50.5788550Z  * [new branch]      ticket-135-lifted-app-verdict            -> origin/ticket-135-lifted-app-verdict
+2026-10-04T15:07:50.5791270Z  * [new branch]      ticket-136-selfcheck-driftwood           -> origin/ticket-136-selfcheck-driftwood
+2026-10-04T15:07:50.5794289Z  * [new branch]      ticket-137-parent-tree-per-feed-edge     -> origin/ticket-137-parent-tree-per-feed-edge
+2026-10-04T15:07:50.5796922Z  * [new branch]      ticket-138-grader-as-of                  -> origin/ticket-138-grader-as-of
+2026-10-04T15:07:50.5799573Z  * [new branch]      ticket-139-ungoverned-namespace-born     -> origin/ticket-139-ungoverned-namespace-born
+2026-10-04T15:07:50.5802390Z  * [new branch]      ticket-140-fact4-defaulted-false         -> origin/ticket-140-fact4-defaulted-false
+2026-10-04T15:07:50.5805372Z  * [new branch]      ticket-141-declared-pricing-threshold    -> origin/ticket-141-declared-pricing-threshold
+2026-10-04T15:07:50.5808638Z  * [new branch]      ticket-142a-schedule-blind-spots-and-clock-cage -> origin/ticket-142a-schedule-blind-spots-and-clock-cage
+2026-10-04T15:07:50.5811680Z  * [new branch]      ticket-143a-twin-sweep-split             -> origin/ticket-143a-twin-sweep-split
+2026-10-04T15:07:50.5814329Z  * [new branch]      ticket-145-agent-cage-price              -> origin/ticket-145-agent-cage-price
+2026-10-04T15:07:50.5816752Z  * [new branch]      ticket-146-engine-cells                  -> origin/ticket-146-engine-cells
+2026-10-04T15:07:50.5818988Z  * [new branch]      ticket-146-resolved                      -> origin/ticket-146-resolved
+2026-10-04T15:07:50.5821285Z  * [new branch]      ticket-146-tags-read-only                -> origin/ticket-146-tags-read-only
+2026-10-04T15:07:50.5823907Z  * [new branch]      ticket-147-declared-engine               -> origin/ticket-147-declared-engine
+2026-10-04T15:07:50.5826466Z  * [new branch]      ticket-148-unsupported-pairing           -> origin/ticket-148-unsupported-pairing
+2026-10-04T15:07:50.5828799Z  * [new branch]      ticket-152-grill                         -> origin/ticket-152-grill
+2026-10-04T15:07:50.5830942Z  * [new branch]      ticket-161-engine-pin                    -> origin/ticket-161-engine-pin
+2026-10-04T15:07:50.5833693Z  * [new branch]      ticket-161-reference-workload            -> origin/ticket-161-reference-workload
+2026-10-04T15:07:50.5836919Z  * [new branch]      ticket-17-twin-follow-ups-from-the-aug-05-itemisation -> origin/ticket-17-twin-follow-ups-from-the-aug-05-itemisation
+2026-10-04T15:07:50.5839852Z  * [new branch]      ticket-30-grill                          -> origin/ticket-30-grill
+2026-10-04T15:07:50.5842049Z  * [new branch]      ticket-31-sensor-admission               -> origin/ticket-31-sensor-admission
+2026-10-04T15:07:50.5845051Z  * [new branch]      ticket-33-lift-ledger-storefront-and-reports -> origin/ticket-33-lift-ledger-storefront-and-reports
+2026-10-04T15:07:50.5847928Z  * [new branch]      ticket-34-followup-2026-09-08            -> origin/ticket-34-followup-2026-09-08
+2026-10-04T15:07:50.5850784Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+2026-10-04T15:07:50.5853510Z  * [new branch]      ticket-35-grill                          -> origin/ticket-35-grill
+2026-10-04T15:07:50.5855641Z  * [new branch]      ticket-35-review-fixes                   -> origin/ticket-35-review-fixes
+2026-10-04T15:07:50.5858236Z  * [new branch]      ticket-38-priced-holes-in-composition    -> origin/ticket-38-priced-holes-in-composition
+2026-10-04T15:07:50.5861083Z  * [new branch]      ticket-39-supersede-adr-0013-0017-0018   -> origin/ticket-39-supersede-adr-0013-0017-0018
+2026-10-04T15:07:50.5864740Z  * [new branch]      ticket-44-eco-system-misuse-catalogue-graded-by-the-gate -> origin/ticket-44-eco-system-misuse-catalogue-graded-by-the-gate
+2026-10-04T15:07:50.5868623Z  * [new branch]      ticket-45-switching-cost-computed-in-composition -> origin/ticket-45-switching-cost-computed-in-composition
+2026-10-04T15:07:50.5871965Z  * [new branch]      ticket-48-the-demos-remaining-beats      -> origin/ticket-48-the-demos-remaining-beats
+2026-10-04T15:07:50.5875090Z  * [new branch]      ticket-51-the-supply-constraint-actor-path -> origin/ticket-51-the-supply-constraint-actor-path
+2026-10-04T15:07:50.5878588Z  * [new branch]      ticket-53-the-release-pushes-tags-but-not-the-branch -> origin/ticket-53-the-release-pushes-tags-but-not-the-branch
+2026-10-04T15:07:50.5883000Z  * [new branch]      ticket-55-every-red-on-the-clock-is-real-explained-and-finishable -> origin/ticket-55-every-red-on-the-clock-is-real-explained-and-finishable
+2026-10-04T15:07:50.5886780Z  * [new branch]      ticket-56-and-85-the-clocks-are-graded   -> origin/ticket-56-and-85-the-clocks-are-graded
+2026-10-04T15:07:50.5890504Z  * [new branch]      ticket-57-feeds-and-insurer-become-runnable-workflows-registered -> origin/ticket-57-feeds-and-insurer-become-runnable-workflows-registered
+2026-10-04T15:07:50.5894608Z  * [new branch]      ticket-59-a-fall-blocks-and-status-is-derived -> origin/ticket-59-a-fall-blocks-and-status-is-derived
+2026-10-04T15:07:50.5897852Z  * [new branch]      ticket-62-and-77-pins-are-checked-for-content -> origin/ticket-62-and-77-pins-are-checked-for-content
+2026-10-04T15:07:50.5901278Z  * [new branch]      ticket-63-the-unlabelled-default-flips-to-isolated -> origin/ticket-63-the-unlabelled-default-flips-to-isolated
+2026-10-04T15:07:50.5904747Z  * [new branch]      ticket-64-the-twin-is-three-adopters     -> origin/ticket-64-the-twin-is-three-adopters
+2026-10-04T15:07:50.5907790Z  * [new branch]      ticket-65-enact-guard-closes-the-git-dir-family -> origin/ticket-65-enact-guard-closes-the-git-dir-family
+2026-10-04T15:07:50.5911724Z  * [new branch]      ticket-66-the-deck-check-grades-the-run-its-own-truth-line-names -> origin/ticket-66-the-deck-check-grades-the-run-its-own-truth-line-names
+2026-10-04T15:07:50.5915567Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+2026-10-04T15:07:50.5918544Z  * [new branch]      ticket-69-an-untagged-pin-is-a-priced-hole -> origin/ticket-69-an-untagged-pin-is-a-priced-hole
+2026-10-04T15:07:50.5922329Z  * [new branch]      ticket-70-the-observation-lane-is-detectively-enforced-and-honest -> origin/ticket-70-the-observation-lane-is-detectively-enforced-and-honest
+2026-10-04T15:07:50.5925911Z  * [new branch]      ticket-71-grill                          -> origin/ticket-71-grill
+2026-10-04T15:07:50.5928017Z  * [new branch]      ticket-71-upstream-status                -> origin/ticket-71-upstream-status
+2026-10-04T15:07:50.5931279Z  * [new branch]      ticket-72-a-feed-bump-re-renders-the-twin-s-derived-artefacts -> origin/ticket-72-a-feed-bump-re-renders-the-twin-s-derived-artefacts
+2026-10-04T15:07:50.5934994Z  * [new branch]      ticket-73-verifier-trust-instant         -> origin/ticket-73-verifier-trust-instant
+2026-10-04T15:07:50.5937840Z  * [new branch]      ticket-76-every-green-rests-on-an-observation -> origin/ticket-76-every-green-rests-on-an-observation
+2026-10-04T15:07:50.5940873Z  * [new branch]      ticket-78-the-proposer-can-only-tighten  -> origin/ticket-78-the-proposer-can-only-tighten
+2026-10-04T15:07:50.5943717Z  * [new branch]      ticket-79-the-pound-inputs               -> origin/ticket-79-the-pound-inputs
+2026-10-04T15:07:50.5945916Z  * [new branch]      ticket-80-follow-up                      -> origin/ticket-80-follow-up
+2026-10-04T15:07:50.5948305Z  * [new branch]      ticket-80-the-record-matches-the-code    -> origin/ticket-80-the-record-matches-the-code
+2026-10-04T15:07:50.6027671Z  * [new branch]      ticket-81-record-round-3-landed          -> origin/ticket-81-record-round-3-landed
+2026-10-04T15:07:50.6033168Z  * [new branch]      ticket-81-round-3-of-the-sampler-wait-order-lands -> origin/ticket-81-round-3-of-the-sampler-wait-order-lands
+2026-10-04T15:07:50.6039203Z  * [new branch]      ticket-82-licence-attribution-and-disclaimers -> origin/ticket-82-licence-attribution-and-disclaimers
+2026-10-04T15:07:50.6044225Z  * [new branch]      ticket-83-the-truth-line-says-what-it-measured -> origin/ticket-83-the-truth-line-says-what-it-measured
+2026-10-04T15:07:50.6047409Z  * [new branch]      ticket-84-being-behind-costs-something   -> origin/ticket-84-being-behind-costs-something
+2026-10-04T15:07:50.6050400Z  * [new branch]      ticket-86-the-cage-enters-the-citable-number -> origin/ticket-86-the-cage-enters-the-citable-number
+2026-10-04T15:07:50.6053772Z  * [new branch]      ticket-87-the-forge-enforces-the-review  -> origin/ticket-87-the-forge-enforces-the-review
+2026-10-04T15:07:50.6056420Z  * [new branch]      ticket-89-deny-is-not-a-rung             -> origin/ticket-89-deny-is-not-a-rung
+2026-10-04T15:07:50.6059118Z  * [new branch]      ticket-91-the-currency-controller-is-owned -> origin/ticket-91-the-currency-controller-is-owned
+2026-10-04T15:07:50.6062011Z  * [new branch]      ticket-92-follow-up-trailers-and-hooks   -> origin/ticket-92-follow-up-trailers-and-hooks
+2026-10-04T15:07:50.6064839Z  * [new branch]      ticket-92-the-local-clock                -> origin/ticket-92-the-local-clock
+2026-10-04T15:07:50.6067302Z  * [new branch]      ticket-92-the-local-clock-round-4        -> origin/ticket-92-the-local-clock-round-4
+2026-10-04T15:07:50.6070102Z  * [new branch]      ticket-92-tidy-trailer-space-and-102-answer -> origin/ticket-92-tidy-trailer-space-and-102-answer
+2026-10-04T15:07:50.6073329Z  * [new branch]      ticket-93-the-twin-derives-a-probability -> origin/ticket-93-the-twin-derives-a-probability
+2026-10-04T15:07:50.6076246Z  * [new branch]      ticket-96-the-citable-line-says-the-mode -> origin/ticket-96-the-citable-line-says-the-mode
+2026-10-04T15:07:50.6079282Z  * [new branch]      ticket-98-a-refusal-by-another-name-is-graded -> origin/ticket-98-a-refusal-by-another-name-is-graded
+2026-10-04T15:07:50.6082425Z  * [new branch]      ticket-99-the-adopter-gate-grades-the-change -> origin/ticket-99-the-adopter-gate-grades-the-change
+2026-10-04T15:07:50.6085344Z  * [new branch]      tidy-2026-09-08-tickets-33-45            -> origin/tidy-2026-09-08-tickets-33-45
+2026-10-04T15:07:50.6087783Z  * [new branch]      wayfinder-laya-loophole-20260921         -> origin/wayfinder-laya-loophole-20260921
+2026-10-04T15:07:50.6090199Z  * [new ref]         55d6fee61ff75f94193d05eedd0782dc3a553b2c -> pull/155/merge
+2026-10-04T15:07:50.6094062Z ##[endgroup]
+2026-10-04T15:07:50.6095444Z ##[group]Determining the checkout info
+2026-10-04T15:07:50.6097009Z ##[endgroup]
+2026-10-04T15:07:50.6097916Z [command]/usr/bin/git sparse-checkout disable
+2026-10-04T15:07:50.6100506Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-04T15:07:50.6103885Z ##[group]Checking out the ref
+2026-10-04T15:07:50.6105321Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/155/merge
+2026-10-04T15:07:52.0134873Z Updating files:  71% (2533/3554)
+2026-10-04T15:07:52.0154309Z Updating files:  72% (2559/3554)
+2026-10-04T15:07:52.1537512Z Updating files:  73% (2595/3554)
+2026-10-04T15:07:52.1839519Z Updating files:  74% (2630/3554)
+2026-10-04T15:07:52.3457999Z Updating files:  75% (2666/3554)
+2026-10-04T15:07:52.3565675Z Updating files:  76% (2702/3554)
+2026-10-04T15:07:52.3585638Z Updating files:  77% (2737/3554)
+2026-10-04T15:07:52.3610235Z Updating files:  78% (2773/3554)
+2026-10-04T15:07:52.3643020Z Updating files:  79% (2808/3554)
+2026-10-04T15:07:52.3688961Z Updating files:  80% (2844/3554)
+2026-10-04T15:07:52.3718526Z Updating files:  81% (2879/3554)
+2026-10-04T15:07:52.3753032Z Updating files:  82% (2915/3554)
+2026-10-04T15:07:52.3773826Z Updating files:  83% (2950/3554)
+2026-10-04T15:07:52.3798237Z Updating files:  84% (2986/3554)
+2026-10-04T15:07:52.3816308Z Updating files:  85% (3021/3554)
+2026-10-04T15:07:52.3837452Z Updating files:  86% (3057/3554)
+2026-10-04T15:07:52.3858309Z Updating files:  87% (3092/3554)
+2026-10-04T15:07:52.3899001Z Updating files:  88% (3128/3554)
+2026-10-04T15:07:52.3933080Z Updating files:  89% (3164/3554)
+2026-10-04T15:07:52.3970953Z Updating files:  90% (3199/3554)
+2026-10-04T15:07:52.4004110Z Updating files:  91% (3235/3554)
+2026-10-04T15:07:52.4040986Z Updating files:  92% (3270/3554)
+2026-10-04T15:07:52.4070652Z Updating files:  93% (3306/3554)
+2026-10-04T15:07:52.4129002Z Updating files:  94% (3341/3554)
+2026-10-04T15:07:52.4170642Z Updating files:  95% (3377/3554)
+2026-10-04T15:07:52.4213670Z Updating files:  96% (3412/3554)
+2026-10-04T15:07:52.4247937Z Updating files:  97% (3448/3554)
+2026-10-04T15:07:52.4293564Z Updating files:  98% (3483/3554)
+2026-10-04T15:07:52.4335606Z Updating files:  99% (3519/3554)
+2026-10-04T15:07:52.4336315Z Updating files: 100% (3554/3554)
+2026-10-04T15:07:52.4336939Z Updating files: 100% (3554/3554), done.
+2026-10-04T15:07:52.4379904Z Note: switching to 'refs/remotes/pull/155/merge'.
+2026-10-04T15:07:52.4380341Z 
+2026-10-04T15:07:52.4380591Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-04T15:07:52.4381528Z changes and commit them, and you can discard any commits you make in this
+2026-10-04T15:07:52.4382399Z state without impacting any branches by switching back to a branch.
+2026-10-04T15:07:52.4383213Z 
+2026-10-04T15:07:52.4383653Z If you want to create a new branch to retain commits you create, you may
+2026-10-04T15:07:52.4384543Z do so (now or later) by using -c with the switch command. Example:
+2026-10-04T15:07:52.4385027Z 
+2026-10-04T15:07:52.4385257Z   git switch -c <new-branch-name>
+2026-10-04T15:07:52.4385600Z 
+2026-10-04T15:07:52.4385814Z Or undo this operation with:
+2026-10-04T15:07:52.4386137Z 
+2026-10-04T15:07:52.4386327Z   git switch -
+2026-10-04T15:07:52.4386584Z 
+2026-10-04T15:07:52.4386925Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-04T15:07:52.4387285Z 
+2026-10-04T15:07:52.4387688Z HEAD is now at 55d6fee Merge 4c4b53c7163b0da7e11e9d0574057bcbc24e298d into 48324860b8b9f7dc4762e9c9f841206881a28705
+2026-10-04T15:07:52.4504741Z ##[endgroup]
+2026-10-04T15:07:52.4508995Z [command]/usr/bin/git log -1 --format=%H
+2026-10-04T15:07:52.4539536Z 55d6fee61ff75f94193d05eedd0782dc3a553b2c
+2026-10-04T15:07:52.4549770Z ##[group]Removing auth
+2026-10-04T15:07:52.4554197Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-04T15:07:52.4589400Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-04T15:07:52.4817430Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-04T15:07:52.4845151Z http.https://github.com/.extraheader
+2026-10-04T15:07:52.4851824Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-04T15:07:52.4892688Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-04T15:07:52.5112549Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-04T15:07:52.5147821Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-04T15:07:52.5361808Z ##[endgroup]
+2026-10-04T15:07:52.5622033Z ##[group]Run actions/setup-python@v5
+2026-10-04T15:07:52.5622396Z with:
+2026-10-04T15:07:52.5622645Z   python-version: 3.12
+2026-10-04T15:07:52.5623245Z   check-latest: false
+2026-10-04T15:07:52.5625864Z   token: ***
+2026-10-04T15:07:52.5626132Z   update-environment: true
+2026-10-04T15:07:52.5626429Z   allow-prereleases: false
+2026-10-04T15:07:52.5626720Z   freethreaded: false
+2026-10-04T15:07:52.5626977Z ##[endgroup]
+2026-10-04T15:07:52.6961849Z ##[group]Installed versions
+2026-10-04T15:07:52.7044877Z (node:2390) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-04T15:07:52.7046394Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-04T15:07:52.7047254Z Successfully set up CPython (3.12.14)
+2026-10-04T15:07:52.7048206Z ##[endgroup]
+2026-10-04T15:07:52.7243612Z ##[group]Run pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516' 'jsonschema==4.23.0'
+2026-10-04T15:07:52.7244678Z [36;1mpip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516' 'jsonschema==4.23.0'[0m
+2026-10-04T15:07:52.7558872Z shell: /usr/bin/bash -e {0}
+2026-10-04T15:07:52.7559312Z env:
+2026-10-04T15:07:52.7559732Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:52.7560386Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-04T15:07:52.7561025Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:52.7561597Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:52.7562163Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:52.7562939Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-04T15:07:52.7563501Z ##[endgroup]
+2026-10-04T15:07:53.6329824Z Collecting pyyaml==6.0.3
+2026-10-04T15:07:53.6812600Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-10-04T15:07:53.7061730Z Collecting pytest==9.0.0
+2026-10-04T15:07:53.7109276Z   Downloading pytest-9.0.0-py3-none-any.whl.metadata (7.6 kB)
+2026-10-04T15:07:53.7283447Z Collecting pytest-xdist==3.8.0
+2026-10-04T15:07:53.7316037Z   Downloading pytest_xdist-3.8.0-py3-none-any.whl.metadata (3.0 kB)
+2026-10-04T15:07:53.8690573Z Collecting mypy==1.14.1
+2026-10-04T15:07:53.8731962Z   Downloading mypy-1.14.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl.metadata (2.1 kB)
+2026-10-04T15:07:53.8882153Z Collecting types-PyYAML==6.0.12.20250516
+2026-10-04T15:07:53.8930088Z   Downloading types_pyyaml-6.0.12.20250516-py3-none-any.whl.metadata (1.8 kB)
+2026-10-04T15:07:53.9111090Z Collecting jsonschema==4.23.0
+2026-10-04T15:07:53.9145148Z   Downloading jsonschema-4.23.0-py3-none-any.whl.metadata (7.9 kB)
+2026-10-04T15:07:53.9274850Z Collecting iniconfig>=1.0.1 (from pytest==9.0.0)
+2026-10-04T15:07:53.9308177Z   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-04T15:07:53.9484024Z Collecting packaging>=22 (from pytest==9.0.0)
+2026-10-04T15:07:53.9520983Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-04T15:07:53.9641201Z Collecting pluggy<2,>=1.5 (from pytest==9.0.0)
+2026-10-04T15:07:53.9677966Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+2026-10-04T15:07:53.9858255Z Collecting pygments>=2.7.2 (from pytest==9.0.0)
+2026-10-04T15:07:53.9893555Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-04T15:07:54.0016815Z Collecting execnet>=2.1 (from pytest-xdist==3.8.0)
+2026-10-04T15:07:54.0051569Z   Downloading execnet-2.1.2-py3-none-any.whl.metadata (2.9 kB)
+2026-10-04T15:07:54.0227605Z Collecting typing_extensions>=4.6.0 (from mypy==1.14.1)
+2026-10-04T15:07:54.0258949Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+2026-10-04T15:07:54.0382990Z Collecting mypy_extensions>=1.0.0 (from mypy==1.14.1)
+2026-10-04T15:07:54.0417544Z   Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+2026-10-04T15:07:54.0553048Z Collecting attrs>=22.2.0 (from jsonschema==4.23.0)
+2026-10-04T15:07:54.0587423Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+2026-10-04T15:07:54.0718361Z Collecting jsonschema-specifications>=2023.03.6 (from jsonschema==4.23.0)
+2026-10-04T15:07:54.0753590Z   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+2026-10-04T15:07:54.1032176Z Collecting referencing>=0.28.4 (from jsonschema==4.23.0)
+2026-10-04T15:07:54.1084690Z   Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+2026-10-04T15:07:54.3503680Z Collecting rpds-py>=0.7.1 (from jsonschema==4.23.0)
+2026-10-04T15:07:54.3540391Z   Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+2026-10-04T15:07:54.3704525Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-10-04T15:07:54.3832354Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 83.1 MB/s  0:00:00
+2026-10-04T15:07:54.3883432Z Downloading pytest-9.0.0-py3-none-any.whl (373 kB)
+2026-10-04T15:07:54.3958844Z Downloading pytest_xdist-3.8.0-py3-none-any.whl (46 kB)
+2026-10-04T15:07:54.4029091Z Downloading mypy-1.14.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl (12.9 MB)
+2026-10-04T15:07:54.5865372Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.9/12.9 MB 69.7 MB/s  0:00:00
+2026-10-04T15:07:54.5917408Z Downloading types_pyyaml-6.0.12.20250516-py3-none-any.whl (20 kB)
+2026-10-04T15:07:54.5973962Z Downloading jsonschema-4.23.0-py3-none-any.whl (88 kB)
+2026-10-04T15:07:54.6031657Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+2026-10-04T15:07:54.6089393Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+2026-10-04T15:07:54.6144302Z Downloading execnet-2.1.2-py3-none-any.whl (40 kB)
+2026-10-04T15:07:54.6194398Z Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+2026-10-04T15:07:54.6242057Z Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+2026-10-04T15:07:54.6295369Z Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+2026-10-04T15:07:54.6342897Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-04T15:07:54.6399442Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-10-04T15:07:54.6471721Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 212.4 MB/s  0:00:00
+2026-10-04T15:07:54.6505305Z Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+2026-10-04T15:07:54.6557474Z Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (366 kB)
+2026-10-04T15:07:54.6617136Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-10-04T15:07:54.7754798Z Installing collected packages: typing_extensions, types-PyYAML, rpds-py, pyyaml, pygments, pluggy, packaging, mypy_extensions, iniconfig, execnet, attrs, referencing, pytest, mypy, pytest-xdist, jsonschema-specifications, jsonschema
+2026-10-04T15:07:57.7012852Z 
+2026-10-04T15:07:57.7036561Z Successfully installed attrs-26.1.0 execnet-2.1.2 iniconfig-2.3.0 jsonschema-4.23.0 jsonschema-specifications-2025.9.1 mypy-1.14.1 mypy_extensions-1.1.0 packaging-26.3 pluggy-1.6.0 pygments-2.21.0 pytest-9.0.0 pytest-xdist-3.8.0 pyyaml-6.0.3 referencing-0.37.0 rpds-py-2026.6.3 types-PyYAML-6.0.12.20250516 typing_extensions-4.16.0
+2026-10-04T15:07:57.7849986Z ##[group]Run bash clone-estate.sh
+2026-10-04T15:07:57.7850338Z [36;1mbash clone-estate.sh[0m
+2026-10-04T15:07:57.7916652Z shell: /usr/bin/bash -e {0}
+2026-10-04T15:07:57.7916912Z env:
+2026-10-04T15:07:57.7917178Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:57.7917627Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-04T15:07:57.7918070Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:57.7918453Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:57.7918868Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:57.7919259Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-04T15:07:57.7919584Z ##[endgroup]
+2026-10-04T15:07:57.8066487Z ==> cloning policy-as-versioned-platform/platform
+2026-10-04T15:07:58.7156992Z ==> cloning policy-as-versioned-driftwood/driftwood
+2026-10-04T15:07:59.4192396Z ==> cloning policy-as-versioned-tuppence/tuppence
+2026-10-04T15:07:59.9986988Z ==> cloning policy-as-versioned-ludlow/ludlow
+2026-10-04T15:08:00.5565522Z ==> cloning policy-as-versioned-nist/nist
+2026-10-04T15:08:01.1449472Z ==> cloning policy-as-versioned-ico/ico
+2026-10-04T15:08:01.5811368Z ==> cloning policy-as-versioned-feeds/feeds
+2026-10-04T15:08:02.0757770Z ==> cloning policy-as-versioned-insurer/insurer
+2026-10-04T15:08:02.6531392Z OK: 8 units in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone
+2026-10-04T15:08:04.3906565Z OK: four independent application repositories in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-apps
+2026-10-04T15:08:04.3943387Z ##[group]Run python -m pytest -q
+2026-10-04T15:08:04.3943737Z [36;1mpython -m pytest -q[0m
+2026-10-04T15:08:04.4009486Z shell: /usr/bin/bash -e {0}
+2026-10-04T15:08:04.4009744Z env:
+2026-10-04T15:08:04.4010020Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:08:04.4010466Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-04T15:08:04.4010909Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:08:04.4011298Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:08:04.4011687Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:08:04.4012077Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-04T15:08:04.4012411Z ##[endgroup]
+2026-10-04T15:08:13.1490847Z bringing up nodes...
+2026-10-04T15:08:13.1513435Z bringing up nodes...
+2026-10-04T15:08:13.1555815Z 
+2026-10-04T15:08:13.8103385Z ........................................................................ [  2%]
+2026-10-04T15:08:15.0341198Z ........................................................................ [  4%]
+2026-10-04T15:08:17.1031154Z ........................................................................ [  7%]
+2026-10-04T15:08:20.0984915Z .............F.......................................................... [  9%]
+2026-10-04T15:08:23.1156775Z .....................................................................sss [ 12%]
+2026-10-04T15:08:25.4556846Z sssss........................................................ss......... [ 14%]
+2026-10-04T15:08:32.6132034Z ......sss.sssss......................................................... [ 17%]
+2026-10-04T15:08:36.8531745Z ........................................................................ [ 19%]
+2026-10-04T15:08:38.7062369Z ........................................................................ [ 22%]
+2026-10-04T15:08:39.4754114Z ........................................................................ [ 24%]
+2026-10-04T15:08:39.9753020Z ........................................................................ [ 27%]
+2026-10-04T15:08:46.0265974Z ........................................................................ [ 29%]
+2026-10-04T15:08:48.4989526Z ........................................................................ [ 31%]
+2026-10-04T15:08:57.2234355Z ........................................................................ [ 34%]
+2026-10-04T15:08:59.5750215Z ........................................................................ [ 36%]
+2026-10-04T15:09:03.4561686Z ........................................................................ [ 39%]
+2026-10-04T15:09:13.3984923Z .....................................................................ss. [ 41%]
+2026-10-04T15:09:15.2322122Z .....s.sss.............................................................. [ 44%]
+2026-10-04T15:09:28.1115708Z ........................................................................ [ 46%]
+2026-10-04T15:09:38.6652679Z ........................................................................ [ 49%]
+2026-10-04T15:09:43.6064138Z ........................................................................ [ 51%]
+2026-10-04T15:10:05.3383981Z ........................................................................ [ 54%]
+2026-10-04T15:10:21.0167880Z ........................................................................ [ 56%]
+2026-10-04T15:10:28.0755044Z ........................................................................ [ 58%]
+2026-10-04T15:10:33.8578640Z ........................................................................ [ 61%]
+2026-10-04T15:10:43.7422015Z .....................................................F.................. [ 63%]
+2026-10-04T15:11:00.4889785Z ........................................................................ [ 66%]
+2026-10-04T15:11:20.5447305Z ........................................................................ [ 68%]
+2026-10-04T15:11:27.0764140Z ........................................................................ [ 71%]
+2026-10-04T15:11:28.7064659Z ........................................................................ [ 73%]
+2026-10-04T15:11:32.4133843Z ........................................................................ [ 76%]
+2026-10-04T15:11:34.6743990Z ........................................................................ [ 78%]
+2026-10-04T15:11:36.4092677Z ........................................................................ [ 81%]
+2026-10-04T15:11:40.3852489Z ........................................................................ [ 83%]
+2026-10-04T15:11:47.9406381Z ........................................................................ [ 85%]
+2026-10-04T15:11:56.6423940Z ........................................................................ [ 88%]
+2026-10-04T15:11:59.1367356Z ........................................................................ [ 90%]
+2026-10-04T15:12:03.8353432Z .....................................................................uu. [ 93%]
+2026-10-04T15:12:12.7113319Z ........................................................................ [ 95%]
+2026-10-04T15:12:17.7212540Z ........................................................................ [ 98%]
+2026-10-04T15:12:55.9653105Z .....................................................                    [100%]
+2026-10-04T15:12:55.9654160Z =================================== FAILURES ===================================
+2026-10-04T15:12:55.9654991Z ___ test_the_dependency_pins_are_real_and_report_what_they_do_not_establish ____
+2026-10-04T15:12:55.9655974Z [gw3] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:12:55.9656546Z 
+2026-10-04T15:12:55.9657976Z proposal = Artefact(kind='enactment-proposal', mark='derived', command=['twin', 'propose'], pins={'model_repo': {'root': '', 'com...e-out and not an exception: all of it is derived, machine-signed and reproducible, and none of it changes the world.'})
+2026-10-04T15:12:55.9659517Z 
+2026-10-04T15:12:55.9660437Z     def test_the_dependency_pins_are_real_and_report_what_they_do_not_establish(proposal: Artefact) -> None:
+2026-10-04T15:12:55.9661653Z         """Consumed by real separate repositories is a claim about files, so it is read from them."""
+2026-10-04T15:12:55.9662516Z         dependency = proposal.body["dependency"]
+2026-10-04T15:12:55.9663578Z         # NOT a frozen census of the estate any more (2026-08-29). This assertion has been re-pinned
+2026-10-04T15:12:55.9664657Z         # by hand at least three times -- insurer's platform pin, driftwood's composed source, then
+2026-10-04T15:12:55.9665723Z         # tuppence's and ludlow's -- and each re-pin was a test being dragged along behind a wider
+2026-10-04T15:12:55.9666772Z         # estate rather than a test catching anything. Widening the slice to a fourth adopter is the
+2026-10-04T15:12:55.9667853Z         # eco-system working; it is not a regression in `dependency_pins`, and a test that goes red on
+2026-10-04T15:12:55.9668985Z         # it teaches everyone to re-pin the number without reading why. What is asserted instead is
+2026-10-04T15:12:55.9670049Z         # what the docstring above actually claims -- that these are FILES, read, not described:
+2026-10-04T15:12:55.9671137Z         # every reported figure is re-derived from the pins themselves, every name resolves to a real
+2026-10-04T15:12:55.9672196Z         # directory or a composed source belonging to one, and the floors say the estate did not
+2026-10-04T15:12:55.9673180Z         # quietly empty out.
+2026-10-04T15:12:55.9673595Z         pins = dependency["pins"]
+2026-10-04T15:12:55.9674142Z         consumed = [p for p in pins if p["cross_repository"]]
+2026-10-04T15:12:55.9674866Z         assert dependency["cross_repository_pins"] == len(consumed) >= 8
+2026-10-04T15:12:55.9675694Z         assert dependency["self_sync_pins"] == len(pins) - len(consumed) >= 3
+2026-10-04T15:12:55.9676611Z         assert set(dependency["consumer_repositories"]) == {p["consumer"] for p in consumed}
+2026-10-04T15:12:55.9677872Z         assert set(dependency["dependencies"]) == {p["dependency"] for p in consumed}
+2026-10-04T15:12:55.9678830Z         # The three adopters and the insurer consume policy they did not write; that is the claim.
+2026-10-04T15:12:55.9679841Z         assert {"driftwood", "tuppence", "ludlow", "insurer"} <= set(dependency["consumer_repositories"])
+2026-10-04T15:12:55.9680705Z         estate = {p.name for p in enact.ESTATE_DIR.iterdir() if p.is_dir()}
+2026-10-04T15:12:55.9681333Z         for name in dependency["consumer_repositories"]:
+2026-10-04T15:12:55.9682032Z             assert name in estate, f"{name} is reported as a consumer and is not a repository"
+2026-10-04T15:12:55.9682957Z         for name in dependency["dependencies"]:
+2026-10-04T15:12:55.9683710Z             # `<adopter>-composed` is that adopter's own rendered set consumed as a source (ticket 40).
+2026-10-04T15:12:55.9684527Z >           assert name in estate or name.rsplit("-", 1)[0] in estate, name
+2026-10-04T15:12:55.9685102Z E           AssertionError: fx
+2026-10-04T15:12:55.9686002Z E           assert ('fx' in {'driftwood', 'feeds', 'ico', 'insurer', 'ludlow', 'nist', ...} or 'fx' in {'driftwood', 'feeds', 'ico', 'insurer', 'ludlow', 'nist', ...})
+2026-10-04T15:12:55.9686775Z 
+2026-10-04T15:12:55.9686936Z tests/test_enact.py:881: AssertionError
+2026-10-04T15:12:55.9687490Z ___________________________ test_the_suite_is_green ____________________________
+2026-10-04T15:12:55.9688213Z [gw0] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+2026-10-04T15:12:55.9688680Z 
+2026-10-04T15:12:55.9689907Z suite_results = ({'a_challenge_to_a_constituent_survives_an_unrelated_resolution': Result(number=12, name='a_challenge_to_a_constituen...88888.89 vs 366666.67); xi>=1 refuses at the shape boundary and xi=0.99 still computes', invariant=False), ...}, False)
+2026-10-04T15:12:55.9691271Z 
+2026-10-04T15:12:55.9691612Z     def test_the_suite_is_green(suite_results: tuple[dict[str, Result], bool]) -> None:
+2026-10-04T15:12:55.9692420Z         by_name, ok = suite_results
+2026-10-04T15:12:55.9693121Z         failed = [r for r in by_name.values() if r.status == FAIL]
+2026-10-04T15:12:55.9693726Z >       assert not failed, [f"{r.name}: {r.detail}" for r in failed]
+2026-10-04T15:12:55.9695816Z E       AssertionError: ["flux_coverage_floor_is_still_reachable: the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sa... finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached"]
+2026-10-04T15:12:55.9698708Z E       assert not [Result(number=45, name='flux_coverage_floor_is_still_reachable', status='FAIL', detail="the pre-registered coverage f...fect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached", invariant=False)]
+2026-10-04T15:12:55.9700080Z 
+2026-10-04T15:12:55.9700278Z tests/test_invariant_suite.py:43: AssertionError
+2026-10-04T15:12:55.9700872Z ---------------------------- Captured stdout setup -----------------------------
+2026-10-04T15:12:55.9701921Z ==> netflix: would-the-twin-have-flagged-it rewound to 2011-08-01 — scoring-eligible under as-consumed
+2026-10-04T15:12:55.9703175Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/threat.json
+2026-10-04T15:12:55.9704308Z   attestation  threat.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9705168Z   sha256       de508f4550148b82262bbf9f89886d53796e70137281a34f0f86d4e8b3b57776
+2026-10-04T15:12:55.9705757Z   depth        full
+2026-10-04T15:12:55.9706201Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9706857Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9707519Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9708234Z ==> netflix as at 2011-08-01: commit 3d1fb95e715d, committed 2011-07-26T21:00:00Z
+2026-10-04T15:12:55.9708832Z   3 components, 2 edges, 0 causal
+2026-10-04T15:12:55.9709599Z   a model state, not a filtered view: everything downstream reads it unchanged
+2026-10-04T15:12:55.9710513Z rewound-model -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/rewind.json
+2026-10-04T15:12:55.9711655Z   attestation  rewind.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9712561Z   sha256       b204e47519ce3b432a45dee96ccae520affc274e4f23a78a59de6535ae3a4b38
+2026-10-04T15:12:55.9713354Z   depth        full
+2026-10-04T15:12:55.9713793Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9714438Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9715091Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9715896Z ==> gameplay sweep across 1 repo(s), 1 org(s): 1 opportunity candidate(s) pulled, 3 signal(s) pushed
+2026-10-04T15:12:55.9716956Z opportunity-sweep -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/sweep.json
+2026-10-04T15:12:55.9718102Z   attestation  sweep.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9718958Z   sha256       1104a8e18f44087395c05ac7989131633b5cd14495a9cdae13fd1b78c439fcfc
+2026-10-04T15:12:55.9719545Z   depth        full
+2026-10-04T15:12:55.9719976Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9720627Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9721301Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9722083Z ==> netflix: 3 option(s) considered for 'the-operator', 2 priced, 1 removed before pricing
+2026-10-04T15:12:55.9723596Z   removed  rank-domestic-members-by-cancellation-risk forbidden — no-individual-level-output (universal tier), no figure
+2026-10-04T15:12:55.9724976Z   priced   hold-the-bundled-price-for-one-quarter 30000000.0/45000000.0/70000000.0 mean 46666666.6667, sampled p50 46287011.5481
+2026-10-04T15:12:55.9726558Z   priced   ship-one-bill-and-one-sign-in-across-the-two-plans 10000000.0/15000000.0/22000000.0 mean 15333333.3333, sampled p50 15142499.58
+2026-10-04T15:12:55.9727685Z   a constraint is not a very large price: a removed option carries no number at all
+2026-10-04T15:12:55.9728681Z priced-option-set -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/options-head.json
+2026-10-04T15:12:55.9729924Z   attestation  options-head.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9730834Z   sha256       7b359d9cfe0573089d0863a582b7c384f220be3a96527bb58a0f7fb98a3e85d6
+2026-10-04T15:12:55.9731425Z   depth        full
+2026-10-04T15:12:55.9731880Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+2026-10-04T15:12:55.9732539Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9733383Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9734041Z ==> netflix: a shock at 'dvd-by-mail', priced under 1 perspective(s)
+2026-10-04T15:12:55.9734555Z   the-operator
+2026-10-04T15:12:55.9735018Z     price    streaming-service        23,800,000 / 47,600,000 / 95,200,000  grade 1
+2026-10-04T15:12:55.9735830Z     option   hold-the-bundled-price-for-one-quarter cost 46,666,667, credit 19,040,000
+2026-10-04T15:12:55.9737067Z     option   ship-one-bill-and-one-sign-in-across-the-two-plans cost 15,333,333, the-mitigation-claim-is-graded-outside-the-pricing-threshold
+2026-10-04T15:12:55.9738592Z   prices, costs and credits in one unit, in the order they were authored. Nothing marks one option best and nothing recommends one
+2026-10-04T15:12:55.9739748Z priced-impact -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/price.json
+2026-10-04T15:12:55.9740849Z   attestation  price.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9741880Z   sha256       f45c9cb3ecc9aa4211799fa0e30745bdfa8a2ef973b4e21ab2ae3cb6f004a564
+2026-10-04T15:12:55.9742508Z   depth        full
+2026-10-04T15:12:55.9743145Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+2026-10-04T15:12:55.9743817Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+2026-10-04T15:12:55.9744477Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9745114Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9745799Z ==> netflix/the-operator: a shock at 'dvd-by-mail', 2 response(s) across 3 account(s)
+2026-10-04T15:12:55.9747304Z   hold-the-bundled-price-for-one-quarter range=57,120,000  (the-damage-was-mostly-the-rebrand=35,480,000, the-shock-crossed-to-the-streaming-side=-21,640,000, the-shock-stayed-on-the-dvd-side=25,960,000)
+2026-10-04T15:12:55.9749603Z   ship-one-bill-and-one-sign-in-across-the-two-plans range=0  (the-damage-was-mostly-the-rebrand=15,000,000, the-shock-crossed-to-the-streaming-side=15,000,000, the-shock-stayed-on-the-dvd-side=15,000,000)
+2026-10-04T15:12:55.9752329Z   agreement  unanimous=False  the named accounts disagree about which response is cheapest — reported here rather than smoothed into the default below, because a credible disagreement about the mechanism is the most decision-relevant fact on the page
+2026-10-04T15:12:55.9756152Z   default    hold-the-bundled-price-for-one-quarter — the option whose mean net cost of risk across the named accounts is lowest — a default point for a reader who wants one, computed rather than declared, and not a recommendation. No account is privileged, so the mean rather than any one account's own figure is what breaks the tie; naming or dropping a rival account can move it
+2026-10-04T15:12:55.9758616Z trade-off-curve -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/curve.json
+2026-10-04T15:12:55.9759721Z   attestation  curve.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9760767Z   sha256       05a68f85989616026b4ac38a96b0b15858499b45227ea4cd3001bdb9436e943a
+2026-10-04T15:12:55.9761326Z   depth        full
+2026-10-04T15:12:55.9761757Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+2026-10-04T15:12:55.9762423Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+2026-10-04T15:12:55.9763268Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9763898Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9764647Z ==> netflix: proposes hold-the-bundled-price-for-one-quarter via the 'record' channel
+2026-10-04T15:12:55.9766518Z   means      the verification substrate — a lever that is not code, carrying a versioned signed record that it was enacted without being enforced by policy. Most levers are this one, and the £ engine's cross-domain comparison depends on it
+2026-10-04T15:12:55.9768094Z   disposed   a human, out of band — this tool has no path to it
+2026-10-04T15:12:55.9768661Z   layer      structural absence   twin/enact.py
+2026-10-04T15:12:55.9769286Z     holds      no merge code path exists; the module's public surface is an allow-list
+2026-10-04T15:12:55.9770733Z     fails when the twin is composed with a shell tool, an MCP GitHub server or a subagent with `gh` — the absence still holds and the guarantee is gone, with no diff to twin/ at all
+2026-10-04T15:12:55.9771992Z   layer      tool-call boundary   twin/enact_guard.py, registered as a PreToolUse hook
+2026-10-04T15:12:55.9773078Z     holds      a disposing tool call is refused before it runs, including a subagent's own
+2026-10-04T15:12:55.9774682Z     fails when the registration is deleted, or the twin is driven by a runner that does not honour hooks — a policy check is a call site, and a forgotten call site fails open in silence
+2026-10-04T15:12:55.9777033Z   dependency 20 cross-repository pin(s) (3 self-sync, counted separately): driftwood-composed, feeds, fx, ico, insurer, ludlow-composed, nist, platform, tuppence-composed consumed by driftwood, insurer, ludlow, tuppence
+2026-10-04T15:12:55.9779327Z     limit      0 of 23 pins name a tag and no commit, so the pin is only as immutable as the tag. Every commit line in this estate is a commented-out placeholder; until one is filled in, 'pinned' means 'pinned to a movable name'.
+2026-10-04T15:12:55.9781431Z     limit      3 of 23 pins are a repository syncing itself rather than consuming anybody's policy, and are counted separately: only the 20 cross-repository pins evidence a dependency at all.
+2026-10-04T15:12:55.9784584Z     limit      the signature is the sources' own declaration, checked by nothing here: no tag is verified, no Rekor entry is looked up, and estate/verify/provenance/verify-provenance.sh records that this repository's own commits are not keyless-signed either. 'Signed' is therefore a property of the design, not an observation, and the word does no work until something verifies it.
+2026-10-04T15:12:55.9788778Z     limit      the consumer repositories are separate by URL and not yet by existence: estate/README.md describes a monorepo-style working tree whose top-level directories become their own GitHub repositories *at split*, and each up.sh rewrites the pinned URL to an in-cluster git server for the offline demo. The pins name real separate repositories; whether those repositories are live is a question this code does not ask.
+2026-10-04T15:12:55.9792349Z     limit      read from committed sources, not from a running cluster: this evidences what the repositories declare they consume, never that a control is in force right now. Whether continuous proof of force is required at all is build ticket 65's question and is still open.
+2026-10-04T15:12:55.9795647Z     limit      these pins are read from this tool's own repository (.estate-clone), not from any repository 'netflix' owns. The dependency block above evidences what THIS estate consumes; it names no pin, tag or repository belonging to the subject the proposal is about, and 'netflix' is not assumed to have an estate under Flux at all.
+2026-10-04T15:12:55.9799369Z   narrowed   Policy-as-code is AN enactment arm, not THE definition of governance. Responses are priced by the FAIR factor they modify and most levers are not code, so if versioned policy were the shape of governance the cross-domain comparison the £ engine exists for could not exist.
+2026-10-04T15:12:55.9801379Z enactment-proposal -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/proposal.json
+2026-10-04T15:12:55.9802642Z   attestation  proposal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9803842Z   sha256       102afa73298a28c288a220d444814ccf5af3b3eb37484cc616fa582929866e40
+2026-10-04T15:12:55.9804445Z   depth        full
+2026-10-04T15:12:55.9804895Z     enactment          full     5/5 of decision ticket 18  unchecked: -
+2026-10-04T15:12:55.9805605Z ==> netflix: substrate fidelity at 2011-10-24, detection scored at 2011-10-24
+2026-10-04T15:12:55.9806264Z   signal_to_noise      0.121  within [0.05, 0.25]
+2026-10-04T15:12:55.9806762Z   plant_difficulty     0.275  within [0.05, 0.5]
+2026-10-04T15:12:55.9807256Z   plant_difficulty_spread 0.600  within [0.05, 1.0]
+2026-10-04T15:12:55.9807749Z   spine_consistency    1.000  within [1.0, 1.0]
+2026-10-04T15:12:55.9808225Z   reporting_asymmetry  0.667  within [0.6, 0.95]
+2026-10-04T15:12:55.9808695Z   mundanity            0.879  within [0.7, 1.0]
+2026-10-04T15:12:55.9809156Z   contamination        0.000  within [0.0, 0.0]
+2026-10-04T15:12:55.9810120Z   free-running         28 line(s) against 5 anchored — the diff-against-the-spine attack has somewhere to hide a plant
+2026-10-04T15:12:55.9810932Z   hit rate             25%, mean score 0.250
+2026-10-04T15:12:55.9812047Z     events           missed  horizon 2011-09-30  not detected: no detection at events[3] ('an unusual incident review opens after hours, examining access to the member billing export')
+2026-10-04T15:12:55.9814292Z     communications   missed  horizon 2011-10-24  not detected: no detection at communications[3] ('a press query is withdrawn abruptly, days after an earlier complaint thread was escalated')
+2026-10-04T15:12:55.9816077Z     hr               timely  horizon 2011-11-15  detected at 2011-10-24, on or before the actionability horizon 2011-11-15 — still actionable
+2026-10-04T15:12:55.9817647Z     telemetry        missed  horizon 2011-09-20  not detected: no detection at telemetry[3] ('an overnight export of the member table runs outside the scheduled batch, with no ticket raised')
+2026-10-04T15:12:55.9820472Z   limitation:  planter and detector are the same model family and share model priors (decision ticket 12 Q2): a synthetic result is never evidence the twin anticipates the world, only evidence that the detection machinery works. The detector may find a plant because it thinks like the planter, not because the signal was findable by an independently-minded reader.
+2026-10-04T15:12:55.9823261Z substrate-report -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/substrate.json
+2026-10-04T15:12:55.9824533Z   attestation  substrate.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9825486Z   sha256       186420ffbed97daf866204328e573c3f9a601155f3a1ec474627fac73d1b1729
+2026-10-04T15:12:55.9826077Z   depth        full
+2026-10-04T15:12:55.9826561Z     synthetic-substrate full     7/7 of decision ticket 12  unchecked: -
+2026-10-04T15:12:55.9827263Z ==> sweep across 1 repo(s): 2 execution(s), 4 forecast(s), 0 failure(s)
+2026-10-04T15:12:55.9828072Z sweep -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/intel-forecast-guard/sweep.json
+2026-10-04T15:12:55.9828879Z   attestation  sweep.json.att.json (agent-signed (origin only))
+2026-10-04T15:12:55.9829601Z   sha256       9dfe5ec7212febd0999f0534de08030f5cb5f86f46215135978f241e63cd9573
+2026-10-04T15:12:55.9830220Z   depth        full
+2026-10-04T15:12:55.9830672Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9831537Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9832220Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9833808Z ==> intel: does-the-14a-bet-land-a-named-customer under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:12:55.9834764Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/intel-forecast-guard/run.json
+2026-10-04T15:12:55.9835456Z   attestation  run.json.att.json (agent-signed (origin only))
+2026-10-04T15:12:55.9836024Z   sha256       3c891bc1da4eef0c1ccc0a6031a1a699297752a8e67b71fc420a342224df6740
+2026-10-04T15:12:55.9836497Z   depth        full
+2026-10-04T15:12:55.9836863Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9837394Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9837916Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9838642Z ==> netflix: dvd-decline-2011 rewound to 2026-01-01 — scoring-eligible under as-consumed
+2026-10-04T15:12:55.9839366Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/guard-backtest.json
+2026-10-04T15:12:55.9840256Z   attestation  guard-backtest.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9841008Z   sha256       5d7231a5720c7c1a8b3ade68f94a1e564cd470b4c9246da46d8ec0bf2ed20de8
+2026-10-04T15:12:55.9841478Z   depth        full
+2026-10-04T15:12:55.9841829Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9842358Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9843090Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9843827Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:12:55.9844567Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/guard-run.json
+2026-10-04T15:12:55.9845621Z   attestation  guard-run.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9846227Z   sha256       bd21812ad2bafa8bad618651731ab65f3c7b13df22b3340f45347ec7fd58001d
+2026-10-04T15:12:55.9846611Z   depth        full
+2026-10-04T15:12:55.9846905Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9847331Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9847758Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9848415Z ==> royal-mail: would-the-twin-have-flagged-it rewound to 2018-06-01 — scoring-eligible under as-consumed
+2026-10-04T15:12:55.9849093Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/forecast-bundle.json
+2026-10-04T15:12:55.9849828Z   attestation  forecast-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9850440Z   sha256       a03e55a0e10a54e13e3f6b716863d811cc42d09876d5d765bd429ecab8e73af8
+2026-10-04T15:12:55.9850812Z   depth        full
+2026-10-04T15:12:55.9851098Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9851507Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9851918Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9852583Z ==> carillion: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:12:55.9853451Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/carillion-bundle.json
+2026-10-04T15:12:55.9854199Z   attestation  carillion-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9854797Z   sha256       74725f047f6294fb56d800313ed2db8548597e6dbeedf2baaa54f9513afedd62
+2026-10-04T15:12:55.9855176Z   depth        full
+2026-10-04T15:12:55.9855693Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9856104Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9856519Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9857014Z ==> carillion-collapse-resolved: observed=True, resolved 2018-01-15, contamination low
+2026-10-04T15:12:55.9857696Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+2026-10-04T15:12:55.9858268Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+2026-10-04T15:12:55.9858743Z     market-consensus-2016        p=0.05   brier=0.9025   log-loss=2.9957   [as-consumed]
+2026-10-04T15:12:55.9859318Z score-card -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/carillion-card.json
+2026-10-04T15:12:55.9860034Z   attestation  carillion-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9860634Z   sha256       d8f40a7156283f60cb87d15da97533d82433bd3b4d9753921475801fbc2a0938
+2026-10-04T15:12:55.9861012Z   depth        full
+2026-10-04T15:12:55.9861297Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9861709Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9862106Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+2026-10-04T15:12:55.9862873Z ==> enron: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:12:55.9863540Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/enron-bundle.json
+2026-10-04T15:12:55.9864245Z   attestation  enron-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9864826Z   sha256       4e375f00c56348baa430db99564f0af08f244c64e896a9f3ab7898ac0c69600d
+2026-10-04T15:12:55.9865205Z   depth        full
+2026-10-04T15:12:55.9865620Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9866042Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9866452Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9866950Z ==> enron-bankruptcy-resolved: observed=True, resolved 2001-12-02, contamination control
+2026-10-04T15:12:55.9867616Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+2026-10-04T15:12:55.9868234Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+2026-10-04T15:12:55.9868709Z     market-consensus-2001        p=0.03   brier=0.9409   log-loss=3.5066   [as-consumed]
+2026-10-04T15:12:55.9869252Z score-card -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/enron-card.json
+2026-10-04T15:12:55.9869914Z   attestation  enron-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9870489Z   sha256       ac0d90d27d6f1d64e9cb2e39893bfb416562c40178c59d42b25a677f1c28d808
+2026-10-04T15:12:55.9870880Z   depth        full
+2026-10-04T15:12:55.9871165Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9871577Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9871974Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+2026-10-04T15:12:55.9872577Z ==> netflix: dvd-decline-2011 under with-hindsight — not scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:12:55.9873397Z   ingestion history unavailable: every fact in the repository today was visible to this execution
+2026-10-04T15:12:55.9874070Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/with-hindsight-bundle.json
+2026-10-04T15:12:55.9874895Z   attestation  with-hindsight-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9875533Z   sha256       082a734b44847c068b1fc4900ed56f6b78e53f41d706471faac16afb6804c4f9
+2026-10-04T15:12:55.9876184Z   depth        full
+2026-10-04T15:12:55.9876484Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9876910Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9877345Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9877940Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 1 fact(s) withheld by date
+2026-10-04T15:12:55.9878489Z   withheld dvd-decline-2011-resolved          outcomes, dated 2012-12-31
+2026-10-04T15:12:55.9879588Z   ingestion history unavailable: the ingestion-history filter did not run: this repository has no commit at or before the execution time, so `as-consumed` here rests on fact dates alone. A fact ingested late but dated early is not detectable from this repository.
+2026-10-04T15:12:55.9880793Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/as-consumed-bundle.json
+2026-10-04T15:12:55.9881573Z   attestation  as-consumed-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9882191Z   sha256       c90b827b7e1705fceb8ac1b6822fb54d36c9b2d86f97fa301de96b9aab80447b
+2026-10-04T15:12:55.9882582Z   depth        full
+2026-10-04T15:12:55.9883022Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9883444Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:55.9883864Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:12:55.9884309Z bound-signal -> /tmp/twin-substrate-guard-zma377nn/bound-signal.json
+2026-10-04T15:12:55.9884936Z   attestation  bound-signal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:12:55.9885520Z   sha256       deecec484590202429548d21ee4596781bf6ee01002dec48b700f892cb211083
+2026-10-04T15:12:55.9885901Z   depth        full
+2026-10-04T15:12:55.9886190Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:12:55.9886730Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:12:56.0148465Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+2026-10-04T15:12:56.0149090Z =========================== short test summary info ============================
+2026-10-04T15:12:56.0150092Z FAILED tests/test_enact.py::test_the_dependency_pins_are_real_and_report_what_they_do_not_establish - AssertionError: fx
+2026-10-04T15:12:56.0151317Z assert ('fx' in {'driftwood', 'feeds', 'ico', 'insurer', 'ludlow', 'nist', ...} or 'fx' in {'driftwood', 'feeds', 'ico', 'insurer', 'ludlow', 'nist', ...})
+2026-10-04T15:12:56.0154293Z FAILED tests/test_invariant_suite.py::test_the_suite_is_green - AssertionError: ["flux_coverage_floor_is_still_reachable: the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sa... finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached"]
+2026-10-04T15:12:56.0157025Z assert not [Result(number=45, name='flux_coverage_floor_is_still_reachable', status='FAIL', detail="the pre-registered coverage f...fect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached", invariant=False)]
+2026-10-04T15:12:56.0158230Z 2 failed, 2905 passed, 24 skipped, 2 subtests passed in 291.15s (0:04:51)
+2026-10-04T15:12:56.0610890Z ##[error]Process completed with exit code 1.
+2026-10-04T15:12:56.0752522Z Post job cleanup.
+2026-10-04T15:12:56.1632235Z [command]/usr/bin/git version
+2026-10-04T15:12:56.1675414Z git version 2.55.0
+2026-10-04T15:12:56.1715573Z Temporarily overriding HOME='/home/runner/work/_temp/4757bdbb-d181-43a1-bb35-1905f8f0222b' before making global git config changes
+2026-10-04T15:12:56.1716862Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-04T15:12:56.1721695Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:12:56.1759495Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-04T15:12:56.1794284Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-04T15:12:56.2054634Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-04T15:12:56.2091515Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-04T15:12:56.2368827Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-04T15:12:56.2408299Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-04T15:12:56.2820393Z Cleaning up orphan processes
+2026-10-04T15:12:56.3155489Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

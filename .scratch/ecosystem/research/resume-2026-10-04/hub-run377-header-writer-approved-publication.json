@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-10-04T16:29:43.886314+00:00",
+  "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+  "pr": 155,
+  "url": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/155",
+  "head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "body_sha256": "c31f7c58c958341acee2a2879947aa4cc91107378797585bb1f5a3e4befb2972",
+  "remote_body_matches_saved_ignoring_trailing_newline": true,
+  "same_previously_rejected_normal_push_now_succeeded": true,
+  "exact_user_approval_receipt": "hub-run377-header-writer-exact-publication-approval.json",
+  "historical_rejection_preserved": "hub-run377-header-writer-publication-stop.json",
+  "public_pr_receipt_sha256": "ece498e835368bf3fc5cee0fdfe03c905d2c9c9870f0e25358f39c94076cc300",
+  "matching_head_app_review_or_merge_performed": false,
+  "actual_ci_required": true
+}

@@ -1,0 +1,61 @@
+{
+  "recorded_at": "2026-10-04T15:28:11.446166+00:00",
+  "repository": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux",
+  "checkout": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "branch": "repair/run377-hub-verifiers-20261004",
+  "head": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "tree": "4042ec2099f70807d916f4b72f74938bb8167806",
+  "parent": "6684f683bb6f9a9f7b83fed7e4b5f539ae7a3b11",
+  "reviewed_public_base": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "original_main_base": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "signature": "G",
+  "status_porcelain": "",
+  "followup_changed_paths": [
+    "tests/test_enact.py",
+    "tests/test_map_observation_ownership.py"
+  ],
+  "complete_changed_paths": [
+    "talk/verify-manifest.txt",
+    "tests/test_enact.py",
+    "tests/test_map_observation_ownership.py",
+    "tests/test_refusal_by_another_name.py",
+    "tests/test_verifier_snapshots.py",
+    "tests/test_workload_lane_entrypoint.py",
+    "verify/_snapshot.py",
+    "verify/e2e/step2_reprice.py",
+    "verify/engine-pairing/engine_pairing.py",
+    "verify/map-surface/map_surface.py",
+    "verify/refusal-by-another-name/refusal_scan.py",
+    "verify/refusal-by-another-name/register.yaml",
+    "verify/served-workloads/verify-served-workloads.sh"
+  ],
+  "source_sha256": {
+    "tests/test_enact.py": "cae329b9ab23ce7b916326bdeea3d89b7eeaa1861ed56e8a5b7539bbba5b232e",
+    "tests/test_map_observation_ownership.py": "f02e9ed2178f750671ffd07fbf39b41e89214bc0d0f9802344bf5f7f411cb8c6"
+  },
+  "followup_patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-04/hub-run377-ci-combined-followup.patch",
+  "followup_patch_sha256": "3643c2c38a06cc565ae80b1d612475e75afbc63a39b2d97bfe1dfdd736628658",
+  "complete_patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-04/hub-run377-maintenance-ci-repaired-complete.patch",
+  "complete_patch_sha256": "f9186cac576dc117db0acfef2356fd980dbc4bb3eaa9dc073b6e61cb9108b593",
+  "check_receipts": {
+    "hub-run377-ci-typecheck-red.json": "55ba6462ae2445d5618c51d0aee91313df3e27922eef597eb2afac2bc9e67672",
+    "hub-run377-ci-followup-checks.json": "fbb944161fae69ff44e4a2499b92f62a206f165d63a67536eb55e2b4c8320401",
+    "hub-run377-ci-alias-fixture-inputs.json": "0d9ec39aaf110d70dadff2ad14eec85c4312c5b236e8bf28dafc3d7ac1d89599",
+    "hub-run377-ci-alias-checks.json": "345a1ba559dff97a77e63f3f455ce941bf00e670505af6a359f7b0d8229fef12"
+  },
+  "actual_original_ci_logs": {
+    "hub-run377-maintenance-push-typecheck-failure.log": "41c7747dfa2f4a2d666d7d2c5b67fd1664b9238f4f48395568b0146905e246f9",
+    "hub-run377-maintenance-pr-tests-failure.log": "35af4be46a2c4ea9a8b0b1a89a783d41ec71eeb22fc3dc9855904713319a9239",
+    "hub-run377-maintenance-pr-invariants-failure.log": "4ac02c41f19e4140447337a975bbebb5571c947b46e75c18724735765ab08267"
+  },
+  "claims": [
+    "optional ModuleSpec/loader explicitly narrowed, full208-source mypyPASS",
+    "actual fx dependency alias resolves through its real feeds URL; no synthetic scan or changed monetary contract",
+    "copied genuine gitops test originalfxFAIL -> fixedPASS; nonexistent URL repository still refuses",
+    "all census floors, actual consumer/source/tag/commit checks retained",
+    "historical floor guard unchanged; actual original4c4 CI includes floor failure"
+  ],
+  "external_followup_publication": false,
+  "source_pr": 155,
+  "independent_review_required": true
+}

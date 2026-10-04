@@ -1,0 +1,589 @@
+tests	Run python -m pytest -q	﻿2026-10-04T16:28:57.1025870Z ##[group]Run python -m pytest -q
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1026507Z ^[[36;1mpython -m pytest -q^[[0m
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1082147Z shell: /usr/bin/bash -e {0}
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1082369Z env:
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1082600Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1082953Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1083287Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1083581Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1083868Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1084176Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+tests	Run python -m pytest -q	2026-10-04T16:28:57.1084437Z ##[endgroup]
+tests	Run python -m pytest -q	2026-10-04T16:29:04.6727366Z bringing up nodes...
+tests	Run python -m pytest -q	2026-10-04T16:29:04.6746643Z bringing up nodes...
+tests	Run python -m pytest -q	2026-10-04T16:29:04.6746964Z 
+tests	Run python -m pytest -q	2026-10-04T16:29:05.1090288Z ........................................................................ [  2%]
+tests	Run python -m pytest -q	2026-10-04T16:29:06.0578656Z ........................................................................ [  4%]
+tests	Run python -m pytest -q	2026-10-04T16:29:07.6447415Z ........................................................................ [  7%]
+tests	Run python -m pytest -q	2026-10-04T16:29:09.8811106Z ........................................................................ [  9%]
+tests	Run python -m pytest -q	2026-10-04T16:29:12.3217077Z ........................................................................ [ 12%]
+tests	Run python -m pytest -q	2026-10-04T16:29:14.5086539Z ....................................ssssssss.......................ss... [ 14%]
+tests	Run python -m pytest -q	2026-10-04T16:29:19.9394543Z ............ssssssss.................................................... [ 17%]
+tests	Run python -m pytest -q	2026-10-04T16:29:21.4157986Z ........................................................................ [ 19%]
+tests	Run python -m pytest -q	2026-10-04T16:29:23.3986841Z ........................................................................ [ 22%]
+tests	Run python -m pytest -q	2026-10-04T16:29:27.2791261Z ........................................................................ [ 24%]
+tests	Run python -m pytest -q	2026-10-04T16:29:27.4442037Z ........................................................................ [ 27%]
+tests	Run python -m pytest -q	2026-10-04T16:29:29.9677065Z ........................................................................ [ 29%]
+tests	Run python -m pytest -q	2026-10-04T16:29:30.1697424Z ........................................................................ [ 31%]
+tests	Run python -m pytest -q	2026-10-04T16:29:37.0494353Z ........................................................................ [ 34%]
+tests	Run python -m pytest -q	2026-10-04T16:29:39.5617110Z ........................................................................ [ 36%]
+tests	Run python -m pytest -q	2026-10-04T16:29:49.8969656Z ........................................................................ [ 39%]
+tests	Run python -m pytest -q	2026-10-04T16:29:55.9999528Z ........................................................................ [ 41%]
+tests	Run python -m pytest -q	2026-10-04T16:30:00.5867257Z ........................................................................ [ 44%]
+tests	Run python -m pytest -q	2026-10-04T16:30:04.1798111Z ........................................................................ [ 46%]
+tests	Run python -m pytest -q	2026-10-04T16:30:10.1866987Z ........................................................................ [ 49%]
+tests	Run python -m pytest -q	2026-10-04T16:30:24.3505746Z ........................................................................ [ 51%]
+tests	Run python -m pytest -q	2026-10-04T16:30:40.5459876Z ........................................................................ [ 54%]
+tests	Run python -m pytest -q	2026-10-04T16:30:44.4160477Z ........................................................................ [ 56%]
+tests	Run python -m pytest -q	2026-10-04T16:30:55.8563330Z .........................................................F.............. [ 58%]
+tests	Run python -m pytest -q	2026-10-04T16:31:07.9462165Z ........................................................................ [ 61%]
+tests	Run python -m pytest -q	2026-10-04T16:31:20.5086899Z ........................................................................ [ 63%]
+tests	Run python -m pytest -q	2026-10-04T16:31:30.5786972Z ........................................................................ [ 66%]
+tests	Run python -m pytest -q	2026-10-04T16:31:40.8997130Z ........................................................................ [ 68%]
+tests	Run python -m pytest -q	2026-10-04T16:31:47.2224875Z ...........................................................ss.......s..s [ 71%]
+tests	Run python -m pytest -q	2026-10-04T16:31:47.5867959Z ss...................................................................... [ 73%]
+tests	Run python -m pytest -q	2026-10-04T16:31:49.0381968Z ........................................................................ [ 76%]
+tests	Run python -m pytest -q	2026-10-04T16:31:50.5459397Z ........................................................................ [ 78%]
+tests	Run python -m pytest -q	2026-10-04T16:31:51.4211099Z ........................................................................ [ 81%]
+tests	Run python -m pytest -q	2026-10-04T16:31:53.2368923Z ........................................................................ [ 83%]
+tests	Run python -m pytest -q	2026-10-04T16:31:54.5367690Z ........................................................................ [ 85%]
+tests	Run python -m pytest -q	2026-10-04T16:31:58.1233686Z ........................................................................ [ 88%]
+tests	Run python -m pytest -q	2026-10-04T16:32:02.8112508Z ........................................................................ [ 90%]
+tests	Run python -m pytest -q	2026-10-04T16:32:06.5874293Z ........................................................................ [ 93%]
+tests	Run python -m pytest -q	2026-10-04T16:32:08.6956335Z ........................................................................ [ 95%]
+tests	Run python -m pytest -q	2026-10-04T16:32:21.5667360Z ............................................uu.......................... [ 98%]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0308544Z .......................................................                  [100%]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0309049Z =================================== FAILURES ===================================
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0309544Z ___________________________ test_the_suite_is_green ____________________________
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0310030Z [gw0] linux -- Python 3.12.14 /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0310374Z 
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0311304Z suite_results = ({'a_challenge_to_a_constituent_survives_an_unrelated_resolution': Result(number=12, name='a_challenge_to_a_constituen...88888.89 vs 366666.67); xi>=1 refuses at the shape boundary and xi=0.99 still computes', invariant=False), ...}, False)
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0312273Z 
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0312577Z     def test_the_suite_is_green(suite_results: tuple[dict[str, Result], bool]) -> None:
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0313124Z         by_name, ok = suite_results
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0313486Z         failed = [r for r in by_name.values() if r.status == FAIL]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0331232Z >       assert not failed, [f"{r.name}: {r.detail}" for r in failed]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0333179Z E       AssertionError: ["flux_coverage_floor_is_still_reachable: the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sa... finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached"]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0335582Z E       assert not [Result(number=45, name='flux_coverage_floor_is_still_reachable', status='FAIL', detail="the pre-registered coverage f...fect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached", invariant=False)]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0336956Z 
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0337132Z tests/test_invariant_suite.py:43: AssertionError
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0337638Z ---------------------------- Captured stdout setup -----------------------------
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0338515Z ==> netflix: would-the-twin-have-flagged-it rewound to 2011-08-01 — scoring-eligible under as-consumed
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0339239Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/threat.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0339861Z   attestation  threat.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0340353Z   sha256       de508f4550148b82262bbf9f89886d53796e70137281a34f0f86d4e8b3b57776
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0340655Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0341168Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0341537Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0341889Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0342273Z ==> netflix as at 2011-08-01: commit 3d1fb95e715d, committed 2011-07-26T21:00:00Z
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0342740Z   3 components, 2 edges, 0 causal
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0343058Z   a model state, not a filtered view: everything downstream reads it unchanged
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0343558Z rewound-model -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/rewind.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0344176Z   attestation  rewind.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0344648Z   sha256       b204e47519ce3b432a45dee96ccae520affc274e4f23a78a59de6535ae3a4b38
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0344957Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0345212Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0345578Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0346080Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0346573Z ==> gameplay sweep across 1 repo(s), 1 org(s): 1 opportunity candidate(s) pulled, 3 signal(s) pushed
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0347136Z opportunity-sweep -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/sweep.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0347735Z   attestation  sweep.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0348182Z   sha256       1104a8e18f44087395c05ac7989131633b5cd14495a9cdae13fd1b78c439fcfc
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0348480Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0348736Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0349089Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0349438Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0349869Z ==> netflix: 3 option(s) considered for 'the-operator', 2 priced, 1 removed before pricing
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0350542Z   removed  rank-domestic-members-by-cancellation-risk forbidden — no-individual-level-output (universal tier), no figure
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0351252Z   priced   hold-the-bundled-price-for-one-quarter 30000000.0/45000000.0/70000000.0 mean 46666666.6667, sampled p50 46287011.5481
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0351967Z   priced   ship-one-bill-and-one-sign-in-across-the-two-plans 10000000.0/15000000.0/22000000.0 mean 15333333.3333, sampled p50 15142499.58
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0352554Z   a constraint is not a very large price: a removed option carries no number at all
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0353093Z priced-option-set -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/options-head.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0353737Z   attestation  options-head.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0354226Z   sha256       7b359d9cfe0573089d0863a582b7c384f220be3a96527bb58a0f7fb98a3e85d6
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0354532Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0354792Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0355151Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0355497Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0355848Z ==> netflix: a shock at 'dvd-by-mail', priced under 1 perspective(s)
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0356293Z   the-operator
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0356553Z     price    streaming-service        23,800,000 / 47,600,000 / 95,200,000  grade 1
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0356975Z     option   hold-the-bundled-price-for-one-quarter cost 46,666,667, credit 19,040,000
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0357620Z     option   ship-one-bill-and-one-sign-in-across-the-two-plans cost 15,333,333, the-mitigation-claim-is-graded-outside-the-pricing-threshold
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0358510Z   prices, costs and credits in one unit, in the order they were authored. Nothing marks one option best and nothing recommends one
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0359132Z priced-impact -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/price.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0359722Z   attestation  price.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0360362Z   sha256       f45c9cb3ecc9aa4211799fa0e30745bdfa8a2ef973b4e21ab2ae3cb6f004a564
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0360669Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0360913Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0361274Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0361625Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0361961Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0362353Z ==> netflix/the-operator: a shock at 'dvd-by-mail', 2 response(s) across 3 account(s)
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0363159Z   hold-the-bundled-price-for-one-quarter range=57,120,000  (the-damage-was-mostly-the-rebrand=35,480,000, the-shock-crossed-to-the-streaming-side=-21,640,000, the-shock-stayed-on-the-dvd-side=25,960,000)
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0364299Z   ship-one-bill-and-one-sign-in-across-the-two-plans range=0  (the-damage-was-mostly-the-rebrand=15,000,000, the-shock-crossed-to-the-streaming-side=15,000,000, the-shock-stayed-on-the-dvd-side=15,000,000)
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0365690Z   agreement  unanimous=False  the named accounts disagree about which response is cheapest — reported here rather than smoothed into the default below, because a credible disagreement about the mechanism is the most decision-relevant fact on the page
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0367762Z   default    hold-the-bundled-price-for-one-quarter — the option whose mean net cost of risk across the named accounts is lowest — a default point for a reader who wants one, computed rather than declared, and not a recommendation. No account is privileged, so the mean rather than any one account's own figure is what breaks the tie; naming or dropping a rival account can move it
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0369082Z trade-off-curve -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/curve.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0369675Z   attestation  curve.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0370139Z   sha256       05a68f85989616026b4ac38a96b0b15858499b45227ea4cd3001bdb9436e943a
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0370440Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0370687Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0371047Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0371396Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0371728Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0372140Z ==> netflix: proposes hold-the-bundled-price-for-one-quarter via the 'record' channel
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0373123Z   means      the verification substrate — a lever that is not code, carrying a versioned signed record that it was enacted without being enforced by policy. Most levers are this one, and the £ engine's cross-domain comparison depends on it
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0373983Z   disposed   a human, out of band — this tool has no path to it
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0374303Z   layer      structural absence   twin/enact.py
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0374651Z     holds      no merge code path exists; the module's public surface is an allow-list
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0375429Z     fails when the twin is composed with a shell tool, an MCP GitHub server or a subagent with `gh` — the absence still holds and the guarantee is gone, with no diff to twin/ at all
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0376245Z   layer      tool-call boundary   twin/enact_guard.py, registered as a PreToolUse hook
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0376701Z     holds      a disposing tool call is refused before it runs, including a subagent's own
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0377642Z     fails when the registration is deleted, or the twin is driven by a runner that does not honour hooks — a policy check is a call site, and a forgotten call site fails open in silence
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0378709Z   dependency 20 cross-repository pin(s) (3 self-sync, counted separately): driftwood-composed, feeds, fx, ico, insurer, ludlow-composed, nist, platform, tuppence-composed consumed by driftwood, insurer, ludlow, tuppence
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0379981Z     limit      0 of 23 pins name a tag and no commit, so the pin is only as immutable as the tag. Every commit line in this estate is a commented-out placeholder; until one is filled in, 'pinned' means 'pinned to a movable name'.
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0381024Z     limit      3 of 23 pins are a repository syncing itself rather than consuming anybody's policy, and are counted separately: only the 20 cross-repository pins evidence a dependency at all.
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0382517Z     limit      the signature is the sources' own declaration, checked by nothing here: no tag is verified, no Rekor entry is looked up, and estate/verify/provenance/verify-provenance.sh records that this repository's own commits are not keyless-signed either. 'Signed' is therefore a property of the design, not an observation, and the word does no work until something verifies it.
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0384630Z     limit      the consumer repositories are separate by URL and not yet by existence: estate/README.md describes a monorepo-style working tree whose top-level directories become their own GitHub repositories *at split*, and each up.sh rewrites the pinned URL to an in-cluster git server for the offline demo. The pins name real separate repositories; whether those repositories are live is a question this code does not ask.
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0386582Z     limit      read from committed sources, not from a running cluster: this evidences what the repositories declare they consume, never that a control is in force right now. Whether continuous proof of force is required at all is build ticket 65's question and is still open.
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0388177Z     limit      these pins are read from this tool's own repository (.estate-clone), not from any repository 'netflix' owns. The dependency block above evidences what THIS estate consumes; it names no pin, tag or repository belonging to the subject the proposal is about, and 'netflix' is not assumed to have an estate under Flux at all.
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0389972Z   narrowed   Policy-as-code is AN enactment arm, not THE definition of governance. Responses are priced by the FAIR factor they modify and most levers are not code, so if versioned policy were the shape of governance the cross-domain comparison the £ engine exists for could not exist.
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0391018Z enactment-proposal -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/proposal.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0391642Z   attestation  proposal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0392117Z   sha256       102afa73298a28c288a220d444814ccf5af3b3eb37484cc616fa582929866e40
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0392419Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0392666Z     enactment          full     5/5 of decision ticket 18  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0393043Z ==> netflix: substrate fidelity at 2011-10-24, detection scored at 2011-10-24
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0393397Z   signal_to_noise      0.121  within [0.05, 0.25]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0393659Z   plant_difficulty     0.275  within [0.05, 0.5]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0393925Z   plant_difficulty_spread 0.600  within [0.05, 1.0]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0394195Z   spine_consistency    1.000  within [1.0, 1.0]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0394451Z   reporting_asymmetry  0.667  within [0.6, 0.95]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0394695Z   mundanity            0.879  within [0.7, 1.0]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0394935Z   contamination        0.000  within [0.0, 0.0]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0395436Z   free-running         28 line(s) against 5 anchored — the diff-against-the-spine attack has somewhere to hide a plant
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0396134Z   hit rate             25%, mean score 0.250
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0396712Z     events           missed  horizon 2011-09-30  not detected: no detection at events[3] ('an unusual incident review opens after hours, examining access to the member billing export')
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0397787Z     communications   missed  horizon 2011-10-24  not detected: no detection at communications[3] ('a press query is withdrawn abruptly, days after an earlier complaint thread was escalated')
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0398688Z     hr               timely  horizon 2011-11-15  detected at 2011-10-24, on or before the actionability horizon 2011-11-15 — still actionable
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0399485Z     telemetry        missed  horizon 2011-09-20  not detected: no detection at telemetry[3] ('an overnight export of the member table runs outside the scheduled batch, with no ticket raised')
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0400934Z   limitation:  planter and detector are the same model family and share model priors (decision ticket 12 Q2): a synthetic result is never evidence the twin anticipates the world, only evidence that the detection machinery works. The detector may find a plant because it thinks like the planter, not because the signal was findable by an independently-minded reader.
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0402224Z substrate-report -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/netflix-engine-guard/substrate.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0402846Z   attestation  substrate.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0403312Z   sha256       186420ffbed97daf866204328e573c3f9a601155f3a1ec474627fac73d1b1729
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0403613Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0403880Z     synthetic-substrate full     7/7 of decision ticket 12  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0404263Z ==> sweep across 1 repo(s): 2 execution(s), 4 forecast(s), 0 failure(s)
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0404710Z sweep -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/intel-forecast-guard/sweep.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0405144Z   attestation  sweep.json.att.json (agent-signed (origin only))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0405520Z   sha256       9dfe5ec7212febd0999f0534de08030f5cb5f86f46215135978f241e63cd9573
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0405818Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0406194Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0406547Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0406896Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0407471Z ==> intel: does-the-14a-bet-land-a-named-customer under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0408094Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/intel-forecast-guard/run.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0408614Z   attestation  run.json.att.json (agent-signed (origin only))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0408992Z   sha256       3c891bc1da4eef0c1ccc0a6031a1a699297752a8e67b71fc420a342224df6740
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0409291Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0409532Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0409873Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0410215Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0410691Z ==> netflix: dvd-decline-2011 rewound to 2026-01-01 — scoring-eligible under as-consumed
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0411165Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/guard-backtest.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0411746Z   attestation  guard-backtest.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0412221Z   sha256       5d7231a5720c7c1a8b3ade68f94a1e564cd470b4c9246da46d8ec0bf2ed20de8
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0412514Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0412753Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0413236Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0413581Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0414089Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0414675Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/guard-run.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0415219Z   attestation  guard-run.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0415677Z   sha256       bd21812ad2bafa8bad618651731ab65f3c7b13df22b3340f45347ec7fd58001d
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0416106Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0416348Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0416685Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0417024Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0417565Z ==> royal-mail: would-the-twin-have-flagged-it rewound to 2018-06-01 — scoring-eligible under as-consumed
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0418111Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/forecast-bundle.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0418701Z   attestation  forecast-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0419181Z   sha256       a03e55a0e10a54e13e3f6b716863d811cc42d09876d5d765bd429ecab8e73af8
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0419474Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0419711Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0420043Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0420380Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0420921Z ==> carillion: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0421488Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/carillion-bundle.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0422086Z   attestation  carillion-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0422556Z   sha256       74725f047f6294fb56d800313ed2db8548597e6dbeedf2baaa54f9513afedd62
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0422859Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0423087Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0423419Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0423757Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0424172Z ==> carillion-collapse-resolved: observed=True, resolved 2018-01-15, contamination low
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0424726Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0425208Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0425602Z     market-consensus-2016        p=0.05   brier=0.9025   log-loss=2.9957   [as-consumed]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0426194Z score-card -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/carillion-card.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0426783Z   attestation  carillion-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0427267Z   sha256       d8f40a7156283f60cb87d15da97533d82433bd3b4d9753921475801fbc2a0938
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0427560Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0427802Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0428142Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0428475Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0428994Z ==> enron: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0429698Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/enron-bundle.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0430286Z   attestation  enron-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0430763Z   sha256       4e375f00c56348baa430db99564f0af08f244c64e896a9f3ab7898ac0c69600d
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0431059Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0431405Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0431746Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0432087Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0432504Z ==> enron-bankruptcy-resolved: observed=True, resolved 2001-12-02, contamination control
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0433062Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0433543Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0433939Z     market-consensus-2001        p=0.03   brier=0.9409   log-loss=3.5066   [as-consumed]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0434378Z score-card -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/enron-card.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0434934Z   attestation  enron-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0435410Z   sha256       ac0d90d27d6f1d64e9cb2e39893bfb416562c40178c59d42b25a677f1c28d808
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0435712Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0436094Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0436473Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0436812Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0437324Z ==> netflix: dvd-decline-2011 under with-hindsight — not scoring-eligible, 0 fact(s) withheld by date
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0437868Z   ingestion history unavailable: every fact in the repository today was visible to this execution
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0438420Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/with-hindsight-bundle.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0439059Z   attestation  with-hindsight-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0439559Z   sha256       082a734b44847c068b1fc4900ed56f6b78e53f41d706471faac16afb6804c4f9
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0439871Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0440116Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0440463Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0440809Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0441292Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 1 fact(s) withheld by date
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0441740Z   withheld dvd-decline-2011-resolved          outcomes, dated 2012-12-31
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0442650Z   ingestion history unavailable: the ingestion-history filter did not run: this repository has no commit at or before the execution time, so `as-consumed` here rests on fact dates alone. A fact ingested late but dated early is not detectable from this repository.
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0443620Z forecast-bundle -> /tmp/pytest-of-runner/pytest-0/popen-gw0/verify0/beat/as-consumed-bundle.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0444260Z   attestation  as-consumed-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0444762Z   sha256       c90b827b7e1705fceb8ac1b6822fb54d36c9b2d86f97fa301de96b9aab80447b
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0445070Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0445318Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0445666Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0446172Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0446679Z bound-signal -> /tmp/twin-substrate-guard-puiyhsru/bound-signal.json
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0447218Z   attestation  bound-signal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0447691Z   sha256       deecec484590202429548d21ee4596781bf6ee01002dec48b700f892cb211083
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0447987Z   depth        full
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0448396Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0448734Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0739363Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0739800Z =========================== short test summary info ============================
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0741240Z FAILED tests/test_invariant_suite.py::test_the_suite_is_green - AssertionError: ["flux_coverage_floor_is_still_reachable: the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sa... finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached"]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0742911Z assert not [Result(number=45, name='flux_coverage_floor_is_still_reachable', status='FAIL', detail="the pre-registered coverage f...fect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached", invariant=False)]
+tests	Run python -m pytest -q	2026-10-04T16:32:22.0743752Z 1 failed, 2908 passed, 24 skipped, 2 subtests passed in 204.60s (0:03:24)
+tests	Run python -m pytest -q	2026-10-04T16:32:22.1182384Z ##[error]Process completed with exit code 1.
+invariants	the invariant suite	﻿2026-10-04T16:28:55.5655306Z ##[group]Run ./bin/twin verify
+invariants	the invariant suite	2026-10-04T16:28:55.5655617Z ^[[36;1m./bin/twin verify^[[0m
+invariants	the invariant suite	2026-10-04T16:28:55.5718904Z shell: /usr/bin/bash -e {0}
+invariants	the invariant suite	2026-10-04T16:28:55.5719163Z env:
+invariants	the invariant suite	2026-10-04T16:28:55.5719441Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+invariants	the invariant suite	2026-10-04T16:28:55.5719894Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+invariants	the invariant suite	2026-10-04T16:28:55.5720341Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+invariants	the invariant suite	2026-10-04T16:28:55.5720738Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+invariants	the invariant suite	2026-10-04T16:28:55.5721121Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+invariants	the invariant suite	2026-10-04T16:28:55.5721849Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+invariants	the invariant suite	2026-10-04T16:28:55.5722196Z   TWIN_CHECK_TIMEOUT: 600
+invariants	the invariant suite	2026-10-04T16:28:55.5722422Z ##[endgroup]
+invariants	the invariant suite	2026-10-04T16:29:10.4080361Z ==> twin invariant suite (tool 0.1.0)
+invariants	the invariant suite	2026-10-04T16:29:10.4082310Z ==> netflix: would-the-twin-have-flagged-it rewound to 2011-08-01 — scoring-eligible under as-consumed
+invariants	the invariant suite	2026-10-04T16:29:10.4083791Z forecast-bundle -> /tmp/twin-verify-be5dpvym/netflix-engine-guard/threat.json
+invariants	the invariant suite	2026-10-04T16:29:10.4085331Z   attestation  threat.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:10.4086448Z   sha256       de508f4550148b82262bbf9f89886d53796e70137281a34f0f86d4e8b3b57776
+invariants	the invariant suite	2026-10-04T16:29:10.4086887Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:10.4087250Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4087740Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4088244Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4088788Z ==> netflix as at 2011-08-01: commit 3d1fb95e715d, committed 2011-07-26T21:00:00Z
+invariants	the invariant suite	2026-10-04T16:29:10.4089233Z   3 components, 2 edges, 0 causal
+invariants	the invariant suite	2026-10-04T16:29:10.4089648Z   a model state, not a filtered view: everything downstream reads it unchanged
+invariants	the invariant suite	2026-10-04T16:29:10.4090242Z rewound-model -> /tmp/twin-verify-be5dpvym/netflix-engine-guard/rewind.json
+invariants	the invariant suite	2026-10-04T16:29:10.4091010Z   attestation  rewind.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:10.4091904Z   sha256       b204e47519ce3b432a45dee96ccae520affc274e4f23a78a59de6535ae3a4b38
+invariants	the invariant suite	2026-10-04T16:29:10.4092349Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:10.4092681Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4093163Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4093647Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4094247Z ==> gameplay sweep across 1 repo(s), 1 org(s): 1 opportunity candidate(s) pulled, 3 signal(s) pushed
+invariants	the invariant suite	2026-10-04T16:29:10.4094912Z opportunity-sweep -> /tmp/twin-verify-be5dpvym/netflix-engine-guard/sweep.json
+invariants	the invariant suite	2026-10-04T16:29:10.4095671Z   attestation  sweep.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:10.4096322Z   sha256       1104a8e18f44087395c05ac7989131633b5cd14495a9cdae13fd1b78c439fcfc
+invariants	the invariant suite	2026-10-04T16:29:10.4096696Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:10.4096987Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4097407Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4097856Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4098384Z ==> netflix: 3 option(s) considered for 'the-operator', 2 priced, 1 removed before pricing
+invariants	the invariant suite	2026-10-04T16:29:10.4099203Z   removed  rank-domestic-members-by-cancellation-risk forbidden — no-individual-level-output (universal tier), no figure
+invariants	the invariant suite	2026-10-04T16:29:10.4100107Z   priced   hold-the-bundled-price-for-one-quarter 30000000.0/45000000.0/70000000.0 mean 46666666.6667, sampled p50 46287011.5481
+invariants	the invariant suite	2026-10-04T16:29:10.4101034Z   priced   ship-one-bill-and-one-sign-in-across-the-two-plans 10000000.0/15000000.0/22000000.0 mean 15333333.3333, sampled p50 15142499.58
+invariants	the invariant suite	2026-10-04T16:29:10.4102204Z   a constraint is not a very large price: a removed option carries no number at all
+invariants	the invariant suite	2026-10-04T16:29:10.4102780Z priced-option-set -> /tmp/twin-verify-be5dpvym/netflix-engine-guard/options-head.json
+invariants	the invariant suite	2026-10-04T16:29:10.4103512Z   attestation  options-head.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:10.4104106Z   sha256       7b359d9cfe0573089d0863a582b7c384f220be3a96527bb58a0f7fb98a3e85d6
+invariants	the invariant suite	2026-10-04T16:29:10.4104495Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:10.4104799Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4105231Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4105653Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4106089Z ==> netflix: a shock at 'dvd-by-mail', priced under 1 perspective(s)
+invariants	the invariant suite	2026-10-04T16:29:10.4106434Z   the-operator
+invariants	the invariant suite	2026-10-04T16:29:10.4106745Z     price    streaming-service        23,800,000 / 47,600,000 / 95,200,000  grade 1
+invariants	the invariant suite	2026-10-04T16:29:10.4107281Z     option   hold-the-bundled-price-for-one-quarter cost 46,666,667, credit 19,040,000
+invariants	the invariant suite	2026-10-04T16:29:10.4108250Z     option   ship-one-bill-and-one-sign-in-across-the-two-plans cost 15,333,333, the-mitigation-claim-is-graded-outside-the-pricing-threshold
+invariants	the invariant suite	2026-10-04T16:29:10.4109198Z   prices, costs and credits in one unit, in the order they were authored. Nothing marks one option best and nothing recommends one
+invariants	the invariant suite	2026-10-04T16:29:10.4109878Z priced-impact -> /tmp/twin-verify-be5dpvym/netflix-engine-guard/price.json
+invariants	the invariant suite	2026-10-04T16:29:10.4110533Z   attestation  price.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:10.4111113Z   sha256       f45c9cb3ecc9aa4211799fa0e30745bdfa8a2ef973b4e21ab2ae3cb6f004a564
+invariants	the invariant suite	2026-10-04T16:29:10.4111651Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:10.4111943Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4112373Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4112813Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4113221Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4113704Z ==> netflix/the-operator: a shock at 'dvd-by-mail', 2 response(s) across 3 account(s)
+invariants	the invariant suite	2026-10-04T16:29:10.4115360Z   hold-the-bundled-price-for-one-quarter range=57,120,000  (the-damage-was-mostly-the-rebrand=35,480,000, the-shock-crossed-to-the-streaming-side=-21,640,000, the-shock-stayed-on-the-dvd-side=25,960,000)
+invariants	the invariant suite	2026-10-04T16:29:10.4118143Z   ship-one-bill-and-one-sign-in-across-the-two-plans range=0  (the-damage-was-mostly-the-rebrand=15,000,000, the-shock-crossed-to-the-streaming-side=15,000,000, the-shock-stayed-on-the-dvd-side=15,000,000)
+invariants	the invariant suite	2026-10-04T16:29:10.4121167Z   agreement  unanimous=False  the named accounts disagree about which response is cheapest — reported here rather than smoothed into the default below, because a credible disagreement about the mechanism is the most decision-relevant fact on the page
+invariants	the invariant suite	2026-10-04T16:29:10.4123817Z   default    hold-the-bundled-price-for-one-quarter — the option whose mean net cost of risk across the named accounts is lowest — a default point for a reader who wants one, computed rather than declared, and not a recommendation. No account is privileged, so the mean rather than any one account's own figure is what breaks the tie; naming or dropping a rival account can move it
+invariants	the invariant suite	2026-10-04T16:29:10.4125393Z trade-off-curve -> /tmp/twin-verify-be5dpvym/netflix-engine-guard/curve.json
+invariants	the invariant suite	2026-10-04T16:29:10.4126050Z   attestation  curve.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:10.4126628Z   sha256       05a68f85989616026b4ac38a96b0b15858499b45227ea4cd3001bdb9436e943a
+invariants	the invariant suite	2026-10-04T16:29:10.4127009Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:10.4127309Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4127980Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4128413Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4128834Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:10.4129349Z ==> netflix: proposes hold-the-bundled-price-for-one-quarter via the 'record' channel
+invariants	the invariant suite	2026-10-04T16:29:10.4130589Z   means      the verification substrate — a lever that is not code, carrying a versioned signed record that it was enacted without being enforced by policy. Most levers are this one, and the £ engine's cross-domain comparison depends on it
+invariants	the invariant suite	2026-10-04T16:29:10.4131780Z   disposed   a human, out of band — this tool has no path to it
+invariants	the invariant suite	2026-10-04T16:29:10.4132154Z   layer      structural absence   twin/enact.py
+invariants	the invariant suite	2026-10-04T16:29:10.4132571Z     holds      no merge code path exists; the module's public surface is an allow-list
+invariants	the invariant suite	2026-10-04T16:29:10.4133546Z     fails when the twin is composed with a shell tool, an MCP GitHub server or a subagent with `gh` — the absence still holds and the guarantee is gone, with no diff to twin/ at all
+invariants	the invariant suite	2026-10-04T16:29:10.4134407Z   layer      tool-call boundary   twin/enact_guard.py, registered as a PreToolUse hook
+invariants	the invariant suite	2026-10-04T16:29:10.4135098Z     holds      a disposing tool call is refused before it runs, including a subagent's own
+invariants	the invariant suite	2026-10-04T16:29:10.4136097Z     fails when the registration is deleted, or the twin is driven by a runner that does not honour hooks — a policy check is a call site, and a forgotten call site fails open in silence
+invariants	the invariant suite	2026-10-04T16:29:10.4137444Z   dependency 20 cross-repository pin(s) (3 self-sync, counted separately): driftwood-composed, feeds, fx, ico, insurer, ludlow-composed, nist, platform, tuppence-composed consumed by driftwood, insurer, ludlow, tuppence
+invariants	the invariant suite	2026-10-04T16:29:10.4138917Z     limit      0 of 23 pins name a tag and no commit, so the pin is only as immutable as the tag. Every commit line in this estate is a commented-out placeholder; until one is filled in, 'pinned' means 'pinned to a movable name'.
+invariants	the invariant suite	2026-10-04T16:29:10.4140259Z     limit      3 of 23 pins are a repository syncing itself rather than consuming anybody's policy, and are counted separately: only the 20 cross-repository pins evidence a dependency at all.
+invariants	the invariant suite	2026-10-04T16:29:10.4142327Z     limit      the signature is the sources' own declaration, checked by nothing here: no tag is verified, no Rekor entry is looked up, and estate/verify/provenance/verify-provenance.sh records that this repository's own commits are not keyless-signed either. 'Signed' is therefore a property of the design, not an observation, and the word does no work until something verifies it.
+invariants	the invariant suite	2026-10-04T16:29:19.0442506Z     limit      the consumer repositories are separate by URL and not yet by existence: estate/README.md describes a monorepo-style working tree whose top-level directories become their own GitHub repositories *at split*, and each up.sh rewrites the pinned URL to an in-cluster git server for the offline demo. The pins name real separate repositories; whether those repositories are live is a question this code does not ask.
+invariants	the invariant suite	2026-10-04T16:29:19.0447455Z     limit      read from committed sources, not from a running cluster: this evidences what the repositories declare they consume, never that a control is in force right now. Whether continuous proof of force is required at all is build ticket 65's question and is still open.
+invariants	the invariant suite	2026-10-04T16:29:19.0451272Z     limit      these pins are read from this tool's own repository (.estate-clone), not from any repository 'netflix' owns. The dependency block above evidences what THIS estate consumes; it names no pin, tag or repository belonging to the subject the proposal is about, and 'netflix' is not assumed to have an estate under Flux at all.
+invariants	the invariant suite	2026-10-04T16:29:19.0455950Z   narrowed   Policy-as-code is AN enactment arm, not THE definition of governance. Responses are priced by the FAIR factor they modify and most levers are not code, so if versioned policy were the shape of governance the cross-domain comparison the £ engine exists for could not exist.
+invariants	the invariant suite	2026-10-04T16:29:19.0458698Z enactment-proposal -> /tmp/twin-verify-be5dpvym/netflix-engine-guard/proposal.json
+invariants	the invariant suite	2026-10-04T16:29:19.0460047Z   attestation  proposal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:19.0461194Z   sha256       102afa73298a28c288a220d444814ccf5af3b3eb37484cc616fa582929866e40
+invariants	the invariant suite	2026-10-04T16:29:19.0462201Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0462760Z     enactment          full     5/5 of decision ticket 18  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0463685Z ==> netflix: substrate fidelity at 2011-10-24, detection scored at 2011-10-24
+invariants	the invariant suite	2026-10-04T16:29:19.0464479Z   signal_to_noise      0.121  within [0.05, 0.25]
+invariants	the invariant suite	2026-10-04T16:29:19.0465098Z   plant_difficulty     0.275  within [0.05, 0.5]
+invariants	the invariant suite	2026-10-04T16:29:19.0465742Z   plant_difficulty_spread 0.600  within [0.05, 1.0]
+invariants	the invariant suite	2026-10-04T16:29:19.0466377Z   spine_consistency    1.000  within [1.0, 1.0]
+invariants	the invariant suite	2026-10-04T16:29:19.0467003Z   reporting_asymmetry  0.667  within [0.6, 0.95]
+invariants	the invariant suite	2026-10-04T16:29:19.0467608Z   mundanity            0.879  within [0.7, 1.0]
+invariants	the invariant suite	2026-10-04T16:29:19.0468192Z   contamination        0.000  within [0.0, 0.0]
+invariants	the invariant suite	2026-10-04T16:29:19.0469769Z   free-running         28 line(s) against 5 anchored — the diff-against-the-spine attack has somewhere to hide a plant
+invariants	the invariant suite	2026-10-04T16:29:19.0470812Z   hit rate             25%, mean score 0.250
+invariants	the invariant suite	2026-10-04T16:29:19.0472573Z     events           missed  horizon 2011-09-30  not detected: no detection at events[3] ('an unusual incident review opens after hours, examining access to the member billing export')
+invariants	the invariant suite	2026-10-04T16:29:19.0475050Z     communications   missed  horizon 2011-10-24  not detected: no detection at communications[3] ('a press query is withdrawn abruptly, days after an earlier complaint thread was escalated')
+invariants	the invariant suite	2026-10-04T16:29:19.0477406Z     hr               timely  horizon 2011-11-15  detected at 2011-10-24, on or before the actionability horizon 2011-11-15 — still actionable
+invariants	the invariant suite	2026-10-04T16:29:19.0479479Z     telemetry        missed  horizon 2011-09-20  not detected: no detection at telemetry[3] ('an overnight export of the member table runs outside the scheduled batch, with no ticket raised')
+invariants	the invariant suite	2026-10-04T16:29:19.0483258Z   limitation:  planter and detector are the same model family and share model priors (decision ticket 12 Q2): a synthetic result is never evidence the twin anticipates the world, only evidence that the detection machinery works. The detector may find a plant because it thinks like the planter, not because the signal was findable by an independently-minded reader.
+invariants	the invariant suite	2026-10-04T16:29:19.0486228Z substrate-report -> /tmp/twin-verify-be5dpvym/netflix-engine-guard/substrate.json
+invariants	the invariant suite	2026-10-04T16:29:19.0487633Z   attestation  substrate.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:19.0488798Z   sha256       186420ffbed97daf866204328e573c3f9a601155f3a1ec474627fac73d1b1729
+invariants	the invariant suite	2026-10-04T16:29:19.0489576Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0490177Z     synthetic-substrate full     7/7 of decision ticket 12  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0491080Z ==> sweep across 1 repo(s): 2 execution(s), 4 forecast(s), 0 failure(s)
+invariants	the invariant suite	2026-10-04T16:29:19.0492243Z sweep -> /tmp/twin-verify-be5dpvym/intel-forecast-guard/sweep.json
+invariants	the invariant suite	2026-10-04T16:29:19.0493120Z   attestation  sweep.json.att.json (agent-signed (origin only))
+invariants	the invariant suite	2026-10-04T16:29:19.0494059Z   sha256       9dfe5ec7212febd0999f0534de08030f5cb5f86f46215135978f241e63cd9573
+invariants	the invariant suite	2026-10-04T16:29:19.0494748Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0495247Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0496055Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0496907Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0498347Z ==> intel: does-the-14a-bet-land-a-named-customer under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+invariants	the invariant suite	2026-10-04T16:29:19.0500060Z forecast-bundle -> /tmp/twin-verify-be5dpvym/intel-forecast-guard/run.json
+invariants	the invariant suite	2026-10-04T16:29:19.0501004Z   attestation  run.json.att.json (agent-signed (origin only))
+invariants	the invariant suite	2026-10-04T16:29:19.0502161Z   sha256       3c891bc1da4eef0c1ccc0a6031a1a699297752a8e67b71fc420a342224df6740
+invariants	the invariant suite	2026-10-04T16:29:19.0502933Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0503487Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0504321Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0505168Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0506349Z ==> netflix: dvd-decline-2011 rewound to 2026-01-01 — scoring-eligible under as-consumed
+invariants	the invariant suite	2026-10-04T16:29:19.0507391Z forecast-bundle -> /tmp/twin-verify-be5dpvym/guard-backtest.json
+invariants	the invariant suite	2026-10-04T16:29:19.0508720Z   attestation  guard-backtest.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:19.0509969Z   sha256       5d7231a5720c7c1a8b3ade68f94a1e564cd470b4c9246da46d8ec0bf2ed20de8
+invariants	the invariant suite	2026-10-04T16:29:19.0510808Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0511553Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0512667Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0513528Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0514758Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+invariants	the invariant suite	2026-10-04T16:29:19.0515806Z forecast-bundle -> /tmp/twin-verify-be5dpvym/guard-run.json
+invariants	the invariant suite	2026-10-04T16:29:19.0517010Z   attestation  guard-run.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:19.0518176Z   sha256       bd21812ad2bafa8bad618651731ab65f3c7b13df22b3340f45347ec7fd58001d
+invariants	the invariant suite	2026-10-04T16:29:19.0545280Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0545931Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0546805Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0547671Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0549040Z ==> royal-mail: would-the-twin-have-flagged-it rewound to 2018-06-01 — scoring-eligible under as-consumed
+invariants	the invariant suite	2026-10-04T16:29:19.0550242Z forecast-bundle -> /tmp/twin-verify-be5dpvym/beat/forecast-bundle.json
+invariants	the invariant suite	2026-10-04T16:29:19.0551802Z   attestation  forecast-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:19.0553024Z   sha256       a03e55a0e10a54e13e3f6b716863d811cc42d09876d5d765bd429ecab8e73af8
+invariants	the invariant suite	2026-10-04T16:29:19.0553790Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0554343Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0555170Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0556013Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0557389Z ==> carillion: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+invariants	the invariant suite	2026-10-04T16:29:19.0558617Z forecast-bundle -> /tmp/twin-verify-be5dpvym/beat/carillion-bundle.json
+invariants	the invariant suite	2026-10-04T16:29:19.0559964Z   attestation  carillion-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:19.0561155Z   sha256       74725f047f6294fb56d800313ed2db8548597e6dbeedf2baaa54f9513afedd62
+invariants	the invariant suite	2026-10-04T16:29:19.0562140Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0562706Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0563533Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0564373Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0565356Z ==> carillion-collapse-resolved: observed=True, resolved 2018-01-15, contamination low
+invariants	the invariant suite	2026-10-04T16:29:19.0566697Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+invariants	the invariant suite	2026-10-04T16:29:19.0568145Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+invariants	the invariant suite	2026-10-04T16:29:19.0569069Z     market-consensus-2016        p=0.05   brier=0.9025   log-loss=2.9957   [as-consumed]
+invariants	the invariant suite	2026-10-04T16:29:19.0570031Z score-card -> /tmp/twin-verify-be5dpvym/beat/carillion-card.json
+invariants	the invariant suite	2026-10-04T16:29:19.0571309Z   attestation  carillion-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:19.0572742Z   sha256       d8f40a7156283f60cb87d15da97533d82433bd3b4d9753921475801fbc2a0938
+invariants	the invariant suite	2026-10-04T16:29:19.0573486Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0574042Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0574852Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0575715Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0577000Z ==> enron: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+invariants	the invariant suite	2026-10-04T16:29:19.0578179Z forecast-bundle -> /tmp/twin-verify-be5dpvym/beat/enron-bundle.json
+invariants	the invariant suite	2026-10-04T16:29:19.0579732Z   attestation  enron-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:19.0580891Z   sha256       4e375f00c56348baa430db99564f0af08f244c64e896a9f3ab7898ac0c69600d
+invariants	the invariant suite	2026-10-04T16:29:19.0581890Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:19.0582451Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0583267Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:19.0584092Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6734017Z ==> enron-bankruptcy-resolved: observed=True, resolved 2001-12-02, contamination control
+invariants	the invariant suite	2026-10-04T16:29:43.6735544Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+invariants	the invariant suite	2026-10-04T16:29:43.6736583Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+invariants	the invariant suite	2026-10-04T16:29:43.6737381Z     market-consensus-2001        p=0.03   brier=0.9409   log-loss=3.5066   [as-consumed]
+invariants	the invariant suite	2026-10-04T16:29:43.6738164Z score-card -> /tmp/twin-verify-be5dpvym/beat/enron-card.json
+invariants	the invariant suite	2026-10-04T16:29:43.6739127Z   attestation  enron-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:43.6740058Z   sha256       ac0d90d27d6f1d64e9cb2e39893bfb416562c40178c59d42b25a677f1c28d808
+invariants	the invariant suite	2026-10-04T16:29:43.6740664Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:43.6741117Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6742063Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6742697Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6743646Z ==> netflix: dvd-decline-2011 under with-hindsight — not scoring-eligible, 0 fact(s) withheld by date
+invariants	the invariant suite	2026-10-04T16:29:43.6744677Z   ingestion history unavailable: every fact in the repository today was visible to this execution
+invariants	the invariant suite	2026-10-04T16:29:43.6745570Z forecast-bundle -> /tmp/twin-verify-be5dpvym/beat/with-hindsight-bundle.json
+invariants	the invariant suite	2026-10-04T16:29:43.6746676Z   attestation  with-hindsight-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:43.6747653Z   sha256       082a734b44847c068b1fc4900ed56f6b78e53f41d706471faac16afb6804c4f9
+invariants	the invariant suite	2026-10-04T16:29:43.6748279Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:43.6748735Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6749400Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6750064Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6751007Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 1 fact(s) withheld by date
+invariants	the invariant suite	2026-10-04T16:29:43.6752060Z   withheld dvd-decline-2011-resolved          outcomes, dated 2012-12-31
+invariants	the invariant suite	2026-10-04T16:29:43.6754204Z   ingestion history unavailable: the ingestion-history filter did not run: this repository has no commit at or before the execution time, so `as-consumed` here rests on fact dates alone. A fact ingested late but dated early is not detectable from this repository.
+invariants	the invariant suite	2026-10-04T16:29:43.6756010Z forecast-bundle -> /tmp/twin-verify-be5dpvym/beat/as-consumed-bundle.json
+invariants	the invariant suite	2026-10-04T16:29:43.6757120Z   attestation  as-consumed-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:43.6758128Z   sha256       c90b827b7e1705fceb8ac1b6822fb54d36c9b2d86f97fa301de96b9aab80447b
+invariants	the invariant suite	2026-10-04T16:29:43.6758741Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:43.6759186Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6759840Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6760567Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6761277Z bound-signal -> /tmp/twin-substrate-guard-alw5wzgv/bound-signal.json
+invariants	the invariant suite	2026-10-04T16:29:43.6762501Z   attestation  bound-signal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+invariants	the invariant suite	2026-10-04T16:29:43.6763656Z   sha256       deecec484590202429548d21ee4596781bf6ee01002dec48b700f892cb211083
+invariants	the invariant suite	2026-10-04T16:29:43.6764252Z   depth        full
+invariants	the invariant suite	2026-10-04T16:29:43.6764681Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6765316Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6765937Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+invariants	the invariant suite	2026-10-04T16:29:43.6766706Z   1  PASS  manifest_names_every_invariant                16 invariants, manifest and constitution agree
+invariants	the invariant suite	2026-10-04T16:29:43.6767530Z   2  PASS  live_invariants_have_checks                   16 live, 0 pending
+invariants	the invariant suite	2026-10-04T16:29:43.6768437Z   3  PASS  no_invariant_pending_past_its_ticket          every pending invariant names an open activating ticket
+invariants	the invariant suite	2026-10-04T16:29:43.6769490Z   4  PASS  invariant_bodies_match_manifest_hashes        16 live test bodies match their pinned hashes
+invariants	the invariant suite	2026-10-04T16:29:43.6770583Z   5  PASS  hash_changes_are_authorised                   no unauthorised hash changes against the previous version (0923c960eb6e)
+invariants	the invariant suite	2026-10-04T16:29:43.6771983Z   6  PASS  worksheet_matches_the_pocket_org              82 hand-computed lines match, 0 pending on open tickets
+invariants	the invariant suite	2026-10-04T16:29:43.6773304Z   7  PASS  position_deltas_have_no_privileged_default    3 positions, each dispensable, none privileged; scores stay put when any one is dropped
+invariants	the invariant suite	2026-10-04T16:29:43.6775295Z   8  PASS  credibility_blend_falls_back_to_the_world_prior_alone  payment-fraud-loss (n=0) blends to exactly its prior; identity-store-incident-cost (n=3) moves off it — z=0.932038834951
+invariants	the invariant suite	2026-10-04T16:29:43.6777563Z   9  PASS  a_var_shaped_summary_hides_what_tvar_surfaces  identical VaR (100000.00) at alpha=0.8434 for xi=0.1 and xi=0.7; TVaR diverges (188888.89 vs 366666.67); xi>=1 refuses at the shape boundary and xi=0.99 still computes
+invariants	the invariant suite	2026-10-04T16:29:43.6780080Z  10  PASS  a_constraint_removal_with_no_computed_attractiveness_is_rejected  attractiveness computed as mode=5.0 (not stated); log_removal accepts no raw float; an unlogged removal is rejected and the same removal logged clean verifies
+invariants	the invariant suite	2026-10-04T16:29:43.6783060Z  11  PASS  misuse_catalogues_load_and_every_row_names_a_mechanism  3 catalogues, 30 rows, one loader; 12 eco-system rows carrying ticket 19's four ids, each anchored by path or by the ticket building its price; a row with its mechanism blanked is refused
+invariants	the invariant suite	2026-10-04T16:29:43.6786141Z  12  PASS  a_challenge_to_a_constituent_survives_an_unrelated_resolution  resolve() reproduces its challenge's own claim_path; a hand-built resolution naming a different one is refused; an unrelated resolution on the same artefact leaves the original challenge reported open, not silently closed
+invariants	the invariant suite	2026-10-04T16:29:43.6789526Z  13  PASS  disparate_impact_audit_channel_is_sealed_and_role_gated  a finding naming a protected characteristic is refused; a response from any role but 'disparate-impact-respondent' is refused (checked against three registered roles); the defined respondent, structurally checked, succeeds
+invariants	the invariant suite	2026-10-04T16:29:43.6793267Z  14  PASS  skill_eval_harness_is_agnostic_and_thresholds_are_guarded  6 real skill names absent from every harness function; the fixture skill passes, a degraded one fails, one right on a wrong basis fails and a short corpus is not measurable; no threshold or stated minimum lowered without a citation against the previous version (98caf04a10a9)
+invariants	the invariant suite	2026-10-04T16:29:43.6796183Z  15  PASS  honest_build_inventory_matches_files_and_owning_tickets  18 capabilities classified (10 code, 3 inherited, 5 skill); 5 skill(s) each resolve to a real decision ticket under .scratch/twin/issues/
+invariants	the invariant suite	2026-10-04T16:29:43.6797944Z  16  PASS  skill_score_log_is_append_only                13 line(s) against the previous version (9f4443e7b087) unchanged; 7 new
+invariants	the invariant suite	2026-10-04T16:29:43.6800118Z  17  PASS  signal_classify_is_grade_5_by_construction    no grade-shaped parameter exists on classify(); every call returns evidence_grade 5; the real 23-item labelled corpus clears its threshold (outcome not-measurable) and a degraded classifier fails its threshold
+invariants	the invariant suite	2026-10-04T16:29:43.6804545Z  18  PASS  evolution_judge_output_is_graded_by_construction_and_never_silent  no grade-shaped parameter exists on judge() or override(); judge() always emits grade 5, override() always emits grade 4 and refuses an unregistered role, override() cannot run without an inferred claim first, pushback() is never silent on agreement or disagreement; the real 4-item labelled corpus clears its threshold (outcome not-measurable) and a degraded judge fails its threshold
+invariants	the invariant suite	2026-10-04T16:29:43.6809022Z  19  PASS  causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory  over-grading every item to grade 1 passes the claim metric and fails the grade metric at 0.0; propose() never returns an empty alternatives field; shared_ancestors() finds the real shared dependency on both co-flagship edges
+invariants	the invariant suite	2026-10-04T16:29:43.6813334Z  20  PASS  gameplay_lens_is_grade_5_and_reports_no_recommendation  no grade-shaped parameter exists on propose(); every opportunity carries evidence_grade 5; the real 3-item labelled corpus clears its threshold (outcome not-measurable) and a skill that proposes nothing fails its threshold; the sweep reports 1 opportunity candidate(s) beside 10 signal(s), and no action-shaped field found in it
+invariants	the invariant suite	2026-10-04T16:29:43.6818160Z  21  PASS  substrate_generator_is_mundane_by_default_and_records_measurability_winning  regenerating from the identical recipe reproduces byte-for-byte; a plant-per-channel batch still clears mundane_fraction >= 0.7; the resolution names measurability winning; the real 3-item labelled corpus clears its threshold (outcome not-measurable) and a silent generator fails its threshold
+invariants	the invariant suite	2026-10-04T16:29:43.6822211Z  22  PASS  ingest_runs_unattended_with_provenance_and_measured_throughput  ingest_run's own source calls no confirmation/review/approval step; 60 of 60 declared item(s) classified at grade 5, each carrying full provenance, measured at 33170.9 items/sec
+invariants	the invariant suite	2026-10-04T16:29:43.6825363Z  23  PASS  unbound_pool_retains_a_decayed_signal_rather_than_dropping_it  a signal 9497 days old stays in the pool report (decayed: true, decayed_on 2002-02-17) rather than being dropped, and is excluded from the observable live pool_size/age_distribution rather than double-counted
+invariants	the invariant suite	2026-10-04T16:29:43.6828438Z  24  PASS  retrospective_sweep_rescues_a_decayed_signal_when_a_model_change_binds_it  a signal 945 days old (decayed before rescue: true) stays still_unbound with no matching component, and rebinds the moment a model change adds one
+invariants	the invariant suite	2026-10-04T16:29:43.6832256Z  25  PASS  substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants  a batch missing the 8-fact real Carillion spine fails reconcile(); once anchored it reconciles at every one of the spine's own dated checkpoints; a malformed checkpoint fails through regimes.RegimeError, not a parallel parser; the diff attack leaves the plant beside 24 non-plant decoy(s), while an over-anchored control exposes it as the sole residual
+invariants	the invariant suite	2026-10-04T16:29:43.6837518Z  26  PASS  substrate_fidelity_is_measured_and_tuning_closes_a_real_gap  evaluate_fidelity() returns exactly the 7 declared dimensions; a balanced 50/50 mix genuinely misses reporting_asymmetry; tune() converges in 2 iteration(s) to a batch passing every band, with reporting_asymmetry=0.6206896551724138 skewing negative; a degraded batch fails 3 dimension(s) at once (plant_difficulty, plant_difficulty_spread, reporting_asymmetry)
+invariants	the invariant suite	2026-10-04T16:29:43.6842908Z  27  PASS  planter_detector_scorer_are_structurally_separated_and_late_detection_scores_near_zero  twin/detector.py imports nothing naming 'planter'; detect() returns identical output with and without a decoy ground-truth key present; a plant detected before its actionability horizon scores 1.0, the identical plant detected after it scores 0.05 with the horizon named in the reason, and a missed plant scores 0.0; every result carries the shared-prior limitation verbatim
+invariants	the invariant suite	2026-10-04T16:29:43.6848034Z  28  PASS  netflix_substrate_is_free_running_and_every_plant_carries_a_horizon  the committed Netflix recipe restates none of the spine's 6 facts; all 4 plants carry a declared horizon and reason, and a horizons file drifted from the recipe is refused; every fidelity dimension is inside its band at 2011-10-24; the report reproduces byte-for-byte and scores every plant, misses included, at a hit rate of 0.25
+invariants	the invariant suite	2026-10-04T16:29:43.6856839Z  29  PASS  netflix_runs_both_paths_and_the_curve_keeps_the_disagreement  `twin backtest` and `twin rewind` independently resolved 2011-08-01 to the same commit; 3 rival forecasts (3 distinct) and 1 opportunity pulled from it, with `twin options` refusing the perspective and 0 causal edges at that commit; 'hold-the-bundled-price-for-one-quarter' priced with credit and 'ship-one-bill-and-one-sign-in-across-the-two-plans' refused with a reason, its own net cost of risk unmoved across every account; the accounts disagree (the-damage-was-mostly-the-rebrand->ship-one-bill-and-one-sign-in-across-the-two-plans, the-shock-crossed-to-the-streaming-side->hold-the-bundled-price-for-one-quarter, the-shock-stayed-on-the-dvd-side->ship-one-bill-and-one-sign-in-across-the-two-plans) and dropping any one leaves the rest untouched; enactment proposed on the lever through `record`; 1/8 emitted artefacts claim synthetic-substrate and all carry the limitation
+invariants	the invariant suite	2026-10-04T16:29:43.6865485Z  30  PASS  intel_forecast_is_pinned_signed_and_names_its_own_unscoreability  `twin sweep` and a standalone `twin run` agree byte-for-byte on 'does-the-14a-bet-land-a-named-customer' (2 distinct forecasts); both artefacts are pinned and agent-signed; the emitted body names its own unscoreability, resolution window and checking procedure; the intel overlay carries zero outcomes and `twin score` refuses against it
+invariants	the invariant suite	2026-10-04T16:29:43.6870092Z  31  PASS  benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach  select_questions() reproduces byte-identically against the committed rule; the selected 18-question set spans all 6 declared confidence bins; a clean provenance audit reports no breach; a quarantined id planted in a nested field of an old and a since-elapsed record is caught at both
+invariants	the invariant suite	2026-10-04T16:29:43.6875626Z  32  PASS  forecast_book_is_blind_by_construction_and_observe_only  an emission at or after its resolution window is refused (checked at the boundary and past it); a blind emission records observe_only/position_placed correctly and is_blind() agrees with its own recorded body; the module's public surface is exactly emit, is_blind, score_resolution, none position-shaped; score_resolution() calls scoring.score() and reproduces its output bit for bit; both the emission and the resolution score carry a claim_scope naming what the gate does not evidence
+invariants	the invariant suite	2026-10-04T16:29:43.6880464Z  33  PASS  carillion_answer_key_is_dated_and_adversarial  8 dated signal(s), each citing a live https source and none citing the post-collapse HC 769; the answer key itself does; commit history spans 2016-11-01..2018-05-17 monotonically; the world layer names no tenant
+invariants	the invariant suite	2026-10-04T16:29:43.6883669Z  34  PASS  further_answer_keys_are_dated_and_evidenced   nmc: 5 signal(s), contamination=low; wirecard: 6 signal(s), contamination=high; enron: 4 signal(s), contamination=control; royal-mail: 6 signal(s), contamination=low
+invariants	the invariant suite	2026-10-04T16:29:43.6887374Z  35  PASS  measure_discount_is_computed_not_hardcoded    measure_discount([{'brier': 0.9025, 'log_loss': 2.99573227355}, {'brier': 0.81, 'log_loss': 2.30258509299}], [{'brier': 0.36, 'log_loss': 0.916290731874}, {'brier': 0.16, 'log_loss': 0.510825623766}])=-0.59625 != measure_discount([{'brier': 0.36, 'log_loss': 0.916290731874}, {'brier': 0.16, 'log_loss': 0.510825623766}], [{'brier': 0.9025, 'log_loss': 2.99573227355}, {'brier': 0.81, 'log_loss': 2.30258509299}])=0.59625
+invariants	the invariant suite	2026-10-04T16:29:43.6891284Z  36  PASS  hindsight_resistance_cases_score_a_memorising_system_worse  az: memorising brier=0.7225 > honest brier=0.04; sanofi: memorising brier=0.7225 > honest brier=0.0625; discount without hindsight=-0.0384, with hindsight=0.316425
+invariants	the invariant suite	2026-10-04T16:29:43.6894931Z  37  PASS  backtest_is_a_pure_composition                cmd_backtest's source calls exactly rewind( and verbs.run(, references no propagation, intervention or scoring machinery; an explicit rewind+run and run() alone compute the identical forecast at the same time, differing only in which command produced it
+invariants	the invariant suite	2026-10-04T16:29:43.6898418Z  38  PASS  a_scored_forecast_is_never_silently_dropped   the partition holds on both a scoring card (1 emitted, 1 scored) and an all-unscoreable one (3 named, 0 scored); every scored forecast's own figure reaches stdout; the worst is brier 0.9025 and is printed first, worse than a coin flip and still the headline
+invariants	the invariant suite	2026-10-04T16:29:43.6902115Z  39  PASS  causal_accounts_have_no_privileged_default    3 accounts, each dispensable, none privileged; dropping any one leaves the rest's own figures unmoved; a named account and overlay.graph() reach the same components; a planted author/date field on a causal-account is refused
+invariants	the invariant suite	2026-10-04T16:29:43.6905772Z  40  PASS  trade_off_curve_reports_disagreement_never_a_scalar  expand-the-delivery-network's net cost of risk ranges 4,080,000 across 2 accounts ({'netflix-base-case': 39000000.0, 'rival-cdn-headwind': 43080000.0}), reported per account rather than averaged; no action-shaped field found; the default names its own basis
+invariants	the invariant suite	2026-10-04T16:29:43.6909106Z  41  PASS  unanchored_severity_parameters_are_marked_not_assumed  subject 'data-breach-loss': 3 anchored (mu, sigma, threshold), 2 unanchored (beta, xi); a planted anchored-with-no-method or unanchored-with-no-reason is refused
+invariants	the invariant suite	2026-10-04T16:29:43.6911236Z  42  PASS  graded_edge_fixture_holds_its_contract        4 graded causal edges, one degenerate and flagged; a stripped one is refused
+invariants	the invariant suite	2026-10-04T16:29:43.6912653Z  43  PASS  drift_window_was_declared_before_it_was_measured  window 2026-08-07..2026-11-06 committed 2026-08-07, 2 declared falsifier(s), 108 sample(s), none earlier
+invariants	the invariant suite	2026-10-04T16:29:43.6913574Z  44  PASS  drift_window_is_actually_being_sampled        108 sample(s) in an open window, newest 2026-10-04, 32 day(s) left
+invariants	the invariant suite	2026-10-04T16:29:43.6916475Z  45  FAIL  flux_coverage_floor_is_still_reachable        the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sample(s), only 32 days, 7:30:36.932161 of window left to take them in, a ceiling of 35.6%. The continuous-state branch closes `unmeasured`, so build ticket 65's primary falsifier is unanswerable and the residual branch cannot be concluded either. Chris Nesbitt-Smith owns the probe; window.yaml's `operation.crontab` is the line that was never installed. **This guard staying red is the finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached
+invariants	the invariant suite	2026-10-04T16:29:43.6919171Z  46  PASS  forced_campaign_pre_registered_and_walled_off  4 trial(s) declared, committed 2026-08-14, 464 forced sample(s), none earlier, none leaked into the organic log, no marker contamination
+invariants	the invariant suite	2026-10-04T16:29:43.6920530Z  47  PASS  flux_verdict_is_pre_registered_and_derived    3 branches, floor 90%, amendment drafted; state=pending, residual=pending, action=unmeasured, verdict=none yet
+invariants	the invariant suite	2026-10-04T16:29:43.6923118Z  48  PASS  enactment_is_propose_only_at_both_layers      layer 1 exposes exactly dependency_pins, propose; layer 2 refuses 5 disposition shape(s) and admits 3 proposing one(s), routed by a matcher that admits a tool name revealing nothing about merging; the proposal is derived and refuses a human signature; 20 cross-repository pin(s) across 4 consumers (3 self-sync, counted apart), 6 limit(s) stated. This check FORCED `operations` to test the capability; the estate is running at `development`, which admits every merge and every enactment push
+invariants	the invariant suite	2026-10-04T16:29:43.6926273Z  49  PASS  enforcement_is_a_spectrum_and_never_prices_a_rung  4 rungs, 2 of them changing the outcome; a priced rung and a priced enforcement block are both refused; the same control is one Option at 'observe' and at 'block'; posture-as-identity admitted for 1 control and excluded by name for 3, of 5 named cases; 1 unrecorded move(s) caught in git history; the posture is authored and unsigned reads as unsigned
+invariants	the invariant suite	2026-10-04T16:29:43.6929956Z  50  PASS  enactment_is_sensed_and_corroboration_sets_the_grade  6 channels, none pricing alone (5 independent of the subject); a table that prices alone, one carrying a privileging field and a people-observing channel with no admission ladder are all refused; three self-declared claims across two of the subject's own channels stay at 1 independent channel and grade 4; the reconciler is interchangeable with 4 other machine channel(s); the fixture's corroborated response grades 2 from a strongest-alone of 3 and prices, its self-declared one grades 4 and does not; a claim naming its own grade is refused; both signal kinds sense to bound-signal
+invariants	the invariant suite	2026-10-04T16:29:43.6932782Z  51  PASS  scheduled_emission_ignores_signal_presence    2 scenario(s) across 1 repo(s) emitted 6 forecast(s) on both of two consecutive, unconditional sweeps
+invariants	the invariant suite	2026-10-04T16:29:43.6933907Z  52  PASS  an_intervention_never_reaches_upstream        do(streaming-experience) severs 1 edge(s) and updates nothing upstream; observe() updates 1; the downstream halves are identical
+invariants	the invariant suite	2026-10-04T16:29:43.6935059Z  53  SKIP  cross_architecture_determinism                requires the CI matrix (set TWIN_CI_ARCH_MATRIX=1); the same-machine leg is asserted by identical_pins_identical_bytes
+invariants	the invariant suite	2026-10-04T16:29:43.6936997Z  54  PASS  substrate_regeneration_is_not_deterministic_so_it_is_authored  the pure seeded generator reproduces from an identical recipe; the stand-in live-model generator does not; an authored substrate batch accepts a human signature and a derived reference to it still refuses one; a substrate-referencing sense artefact reproduces from its pins with the substrate bytes never written anywhere twin can read them
+invariants	the invariant suite	2026-10-04T16:29:43.6939420Z  55  PASS  twin_self_reference_is_cut_not_recursed       a component carrying a planted models_graph/nested_twin/twin_of field is refused at load; propagating the twin's own fixture from either side of its self-referential cycle reaches the other component exactly once and the return leg is cut, disclosed, not silent
+invariants	the invariant suite	2026-10-04T16:29:43.6942236Z  56  PASS  ethics_gate_ladder_stops_early_and_fast_improvement_is_never_an_automatic_finding  the ladder stops at its first failing rung without touching the rest; a fully-passing walk carries a justification on every rung; flag_fast_improvement() carries no action/verdict-shaped field or phrase; adjudication refuses an unflagged input and an unregistered role; the real 5-item labelled corpus clears its threshold (outcome not-measurable) and a skill that admits everything fails its threshold
+invariants	the invariant suite	2026-10-04T16:29:43.6944332Z  57  SKIP  does_not_do_register_is_generated_never_typed  every loaded capability is already `full`; there is nothing left to check off
+invariants	the invariant suite	2026-10-04T16:29:43.6945852Z  58  PASS  the_demo_sequence_earns_credibility_before_it_spends_it  royal-mail, intel, netflix in that order; £ absent from the first two beats; propose precedes both price and trade-off in the third
+invariants	the invariant suite	2026-10-04T16:29:43.6947910Z  59  PASS  mitigation_credit_is_gated_on_corroborated_enactment_not_just_claimed_evidence  an identical claim credits against a corroborated option and refuses as NOT_ENACTED (never CLAIM_TOO_WEAK) against an uncorroborated one; the live price artefact credits retrain-the-on-call-rota against its own fixture's corroborated enactment and refuses it the moment that corroboration is stripped from the same fixture
+invariants	the invariant suite	2026-10-04T16:29:43.6949854Z  60  PASS  store_rebuildable_from_git                    index dropped and rebuilt from git alone, identically (df33e237a9f2); 8 aggregate field names have no authored or stored form
+invariants	the invariant suite	2026-10-04T16:29:43.6951072Z  61  PASS  identical_pins_identical_bytes                12 artefacts identical across runs, processes, hash seeds and the committed goldens; a score card reproduces from its pins and a hand-edited one does not
+invariants	the invariant suite	2026-10-04T16:29:43.6952278Z  62  PASS  every_artefact_marked                         all emitted artefacts marked; an unmarked artefact refuses to serialise
+invariants	the invariant suite	2026-10-04T16:29:43.6953163Z  63  PASS  every_capability_depth_graded                 6 capabilities graded by computed checklist; typed grades refused
+invariants	the invariant suite	2026-10-04T16:29:43.6954075Z  64  PASS  world_never_references_overlay                clean fixture is clean; planted violation caught (world/components/tenant-leak.yaml: names a tenant ('netflix'))
+invariants	the invariant suite	2026-10-04T16:29:43.6955151Z  65  PASS  no_collapse_mechanism                         3 forecasts emitted, no collapse affordance anywhere; 3 combined propagation figures, each beside every path it combines
+invariants	the invariant suite	2026-10-04T16:29:43.6956313Z  66  PASS  no_recommended_action_field                   no recommendation field in any artefact; every declared one is refused at emission; 7 map positions carry numbers and no inherited action band
+invariants	the invariant suite	2026-10-04T16:29:43.6957598Z  67  PASS  derived_never_human_signed                    derived artefacts refuse human signatures and a planted one is detected on read; authored artefacts require one; the two signature types never substitute
+invariants	the invariant suite	2026-10-04T16:29:43.6958636Z  68  PASS  only_as_consumed_scores                       3 as-consumed scores; as-knowable and with-hindsight refused explicitly
+invariants	the invariant suite	2026-10-04T16:29:43.6959589Z  69  PASS  no_special_category_slot                      36 Article 9 categories with no representation, at any depth
+invariants	the invariant suite	2026-10-04T16:29:43.6963038Z  70  PASS  grade_5_only_path_never_prices                grades [1, 2] price and 5 never does; 1 admitted on fully-graded paths and brand-goodwill unpriced at grade 5; every perspective registers it without a figure in both the exposure and the priced impact, and the schema refuses one; mitigation credit is gated on the same rule; the blast body is closed with no price slot; the threshold is pinned in the artefact and moving it moves the digest
+invariants	the invariant suite	2026-10-04T16:29:43.6965848Z  71  PASS  ruin_class_absent_not_priced                  2 options removed before pricing at both tiers, carrying no figure; neither a zero nor an absurd cost brings one back; 1 priced, and the ruin-class one still survives the perspective that declares no such boundary
+invariants	the invariant suite	2026-10-04T16:29:43.6967498Z  72  PASS  prefilter_precedes_pricing                    pricing is a method on the pre-filter's product and no free pricing function exists; a hand-built Admitted set is refused; 3 options considered, 2 removed on published constraints and 1 priced
+invariants	the invariant suite	2026-10-04T16:29:43.6968906Z  73  PASS  as_consumed_admits_no_post_T_fact             regime has no default and no schema slot; as-consumed admits 1 of 4 facts and still forecasts; a post-T fact bound to the subject refuses the run
+invariants	the invariant suite	2026-10-04T16:29:43.6970918Z  74  PASS  price_levels_never_probabilities              as_probability refuses every level handed to it, by construction, with no warning path; 2 price-move signals classified against the real fixture graph with no probability-shaped field anywhere in the artefact and the bias evidence cited; a quarantined question id is excluded before classification runs, and build ticket 57's own audit confirms the result clean
+invariants	the invariant suite	2026-10-04T16:29:43.6973755Z  75  PASS  standing_library_covers_committed_classes     the standing library covers all 11 committed classes: ai-model-access, bus-factor-key-person, climate-event, eol-date-passes, insider-coercion, m-and-a, memory-cost, penalty-published, quantum-hndl, sanctions, supply-shock
+invariants	the invariant suite	2026-10-04T16:29:43.6974793Z 
+invariants	the invariant suite	2026-10-04T16:29:43.6975036Z RESULT: 72 passed, 1 failed, 2 skipped (0 pending invariants, 2 skipped and not faked)
+invariants	the invariant suite	2026-10-04T16:29:43.6977780Z   FAIL flux_coverage_floor_is_still_reachable: the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sample(s), only 32 days, 7:30:36.932161 of window left to take them in, a ceiling of 35.6%. The continuous-state branch closes `unmeasured`, so build ticket 65's primary falsifier is unanswerable and the residual branch cannot be concluded either. Chris Nesbitt-Smith owns the probe; window.yaml's `operation.crontab` is the line that was never installed. **This guard staying red is the finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached
+invariants	the invariant suite	2026-10-04T16:29:43.6990467Z ##[error]Process completed with exit code 1.

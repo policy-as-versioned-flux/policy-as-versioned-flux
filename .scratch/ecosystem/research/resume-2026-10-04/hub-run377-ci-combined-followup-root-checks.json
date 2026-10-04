@@ -1,0 +1,24 @@
+{
+  "reviewed_at": "2026-10-04T15:30:16.137689+00:00",
+  "head": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "tree": "4042ec2099f70807d916f4b72f74938bb8167806",
+  "base": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "signed_clean_source_hashes_verified": true,
+  "checks": [
+    {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_enact.py::test_the_dependency_pins_are_real_and_report_what_they_do_not_establish",
+        "tests/test_map_observation_ownership.py",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-ci-combined-followup-root-standards-tests.log",
+      "sha256": "d93a0220cdf1affe8a218e6196248dd0523c3bedc0dccc0883338eaa0180097a"
+    }
+  ]
+}

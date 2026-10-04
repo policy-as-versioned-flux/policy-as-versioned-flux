@@ -1,0 +1,380 @@
+test_admitted_mitigation_uses_its_own_triple_not_the_platform_table (test_own_response_model.AnnualResponses.test_admitted_mitigation_uses_its_own_triple_not_the_platform_table) ... FAIL
+test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) ... 
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='currency') ... FAIL
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='perspective') ... FAIL
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='period') ... FAIL
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='frequency') ... FAIL
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='rests_on_grade') ... FAIL
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='amount') ... FAIL
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (threshold=None) ... FAIL
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (threshold=4) ... FAIL
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (threshold=5) ... FAIL
+  test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (threshold=True) ... FAIL
+test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments (test_own_response_model.AnnualResponses.test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments) ... 
+  test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments (test_own_response_model.AnnualResponses.test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments) (org='ludlow') ... FAIL
+  test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments (test_own_response_model.AnnualResponses.test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments) (org='tuppence') ... FAIL
+test_grade_five_earns_no_credit_and_annual_cost_is_booked_once (test_own_response_model.AnnualResponses.test_grade_five_earns_no_credit_and_annual_cost_is_booked_once) ... FAIL
+test_grade_four_and_five_mitigation_never_change_the_admitted_money (test_own_response_model.AnnualResponses.test_grade_four_and_five_mitigation_never_change_the_admitted_money) ... 
+  test_grade_four_and_five_mitigation_never_change_the_admitted_money (test_own_response_model.AnnualResponses.test_grade_four_and_five_mitigation_never_change_the_admitted_money) (grade=4) ... FAIL
+  test_grade_four_and_five_mitigation_never_change_the_admitted_money (test_own_response_model.AnnualResponses.test_grade_four_and_five_mitigation_never_change_the_admitted_money) (grade=5) ... FAIL
+test_known_zero_and_absent_mitigation_are_explicit (test_own_response_model.AnnualResponses.test_known_zero_and_absent_mitigation_are_explicit) ... ERROR
+test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) ... 
+  test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='period', value=None) ... FAIL
+  test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='evidence_grade', value=None) ... FAIL
+  test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='evidence_grade', value=True) ... FAIL
+  test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='evidence_grade', value=4) ... FAIL
+  test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='evidence_grade', value=5) ... FAIL
+  test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='triple', value=[1, 2]) ... FAIL
+  test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='triple', value=[1, nan, 3]) ... FAIL
+  test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='nature', value=None) ... FAIL
+  test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='basis', value='') ... FAIL
+test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) ... 
+  test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='curve') ... FAIL
+  test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='missing') ... FAIL
+  test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='unknown') ... FAIL
+  test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='duplicate') ... FAIL
+  test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='source') ... FAIL
+
+======================================================================
+ERROR: test_known_zero_and_absent_mitigation_are_explicit (test_own_response_model.AnnualResponses.test_known_zero_and_absent_mitigation_are_explicit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 129, in test_known_zero_and_absent_mitigation_are_explicit
+    self.assertEqual(self.run_model()['annual_total_costs'], dict.fromkeys(LADDER, 0))
+                     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'annual_total_costs'
+
+======================================================================
+FAIL: test_admitted_mitigation_uses_its_own_triple_not_the_platform_table (test_own_response_model.AnnualResponses.test_admitted_mitigation_uses_its_own_triple_not_the_platform_table)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 58, in test_admitted_mitigation_uses_its_own_triple_not_the_platform_table
+    self.assertEqual(r['residuals']['baseline'], 3600000)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2800000.0 != 3600000
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='currency')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 115, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='perspective')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 115, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='period')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 115, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='frequency')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 115, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='rests_on_grade')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 115, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (key='amount')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 115, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (threshold=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 118, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.subTest(threshold=threshold), self.assertRaises(model.MissingInstrument):
+                                            ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (threshold=4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 118, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.subTest(threshold=threshold), self.assertRaises(model.MissingInstrument):
+                                            ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (threshold=5)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 118, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.subTest(threshold=threshold), self.assertRaises(model.MissingInstrument):
+                                            ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) (threshold=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 118, in test_currency_perspective_frequency_and_unit_ambiguity_refuse
+    with self.subTest(threshold=threshold), self.assertRaises(model.MissingInstrument):
+                                            ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments (test_own_response_model.AnnualResponses.test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments) (org='ludlow')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 79, in test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments (test_own_response_model.AnnualResponses.test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments) (org='tuppence')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 79, in test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_grade_five_earns_no_credit_and_annual_cost_is_booked_once (test_own_response_model.AnnualResponses.test_grade_five_earns_no_credit_and_annual_cost_is_booked_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 47, in test_grade_five_earns_no_credit_and_annual_cost_is_booked_once
+    self.assertEqual(r['residuals'], dict.fromkeys(LADDER, 4000000))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'baseline': 2800000.0, 'restricted': 1200000.00000000[62 chars]0007} != {'baseline': 4000000, 'restricted': 4000000, 'quaranti[29 chars]0000}
+- {'baseline': 2800000.0,
+?              ^^     -
+
++ {'baseline': 4000000,
+?              ^
+
+-  'isolated': 80000.00000000007,
+?              ^^^^^^      -----
+
++  'isolated': 4000000,
+?              ^
+
+-  'quarantine': 319999.9999999998,
++  'quarantine': 4000000,
+-  'restricted': 1200000.0000000002}
+?                ^^^^^^^^      ----
+
++  'restricted': 4000000}
+?                ^
+
+
+======================================================================
+FAIL: test_grade_four_and_five_mitigation_never_change_the_admitted_money (test_own_response_model.AnnualResponses.test_grade_four_and_five_mitigation_never_change_the_admitted_money) (grade=4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 66, in test_grade_four_and_five_mitigation_never_change_the_admitted_money
+    self.assertEqual(self.run_model()['residuals'], dict.fromkeys(LADDER, 4000000))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'baseline': 2800000.0, 'restricted': 1200000.00000000[62 chars]0007} != {'baseline': 4000000, 'restricted': 4000000, 'quaranti[29 chars]0000}
+- {'baseline': 2800000.0,
+?              ^^     -
+
++ {'baseline': 4000000,
+?              ^
+
+-  'isolated': 80000.00000000007,
+?              ^^^^^^      -----
+
++  'isolated': 4000000,
+?              ^
+
+-  'quarantine': 319999.9999999998,
++  'quarantine': 4000000,
+-  'restricted': 1200000.0000000002}
+?                ^^^^^^^^      ----
+
++  'restricted': 4000000}
+?                ^
+
+
+======================================================================
+FAIL: test_grade_four_and_five_mitigation_never_change_the_admitted_money (test_own_response_model.AnnualResponses.test_grade_four_and_five_mitigation_never_change_the_admitted_money) (grade=5)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 66, in test_grade_four_and_five_mitigation_never_change_the_admitted_money
+    self.assertEqual(self.run_model()['residuals'], dict.fromkeys(LADDER, 4000000))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'baseline': 2800000.0, 'restricted': 1200000.00000000[62 chars]0007} != {'baseline': 4000000, 'restricted': 4000000, 'quaranti[29 chars]0000}
+- {'baseline': 2800000.0,
+?              ^^     -
+
++ {'baseline': 4000000,
+?              ^
+
+-  'isolated': 80000.00000000007,
+?              ^^^^^^      -----
+
++  'isolated': 4000000,
+?              ^
+
+-  'quarantine': 319999.9999999998,
++  'quarantine': 4000000,
+-  'restricted': 1200000.0000000002}
+?                ^^^^^^^^      ----
+
++  'restricted': 4000000}
+?                ^
+
+
+======================================================================
+FAIL: test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='period', value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 89, in test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='evidence_grade', value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 89, in test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='evidence_grade', value=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 89, in test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='evidence_grade', value=4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 89, in test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='evidence_grade', value=5)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 89, in test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='triple', value=[1, 2])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 89, in test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='triple', value=[1, nan, 3])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 89, in test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='nature', value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 89, in test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) (key='basis', value='')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 89, in test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='curve')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 106, in test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 106, in test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='unknown')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 106, in test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='duplicate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 106, in test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) (change='source')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 106, in test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.042s
+
+FAILED (failures=30, errors=1)

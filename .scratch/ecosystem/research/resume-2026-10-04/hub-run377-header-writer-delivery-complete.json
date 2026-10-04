@@ -1,0 +1,88 @@
+{
+  "recorded_at": "2026-10-04T16:39:06.485352+00:00",
+  "status": "DELIVERED_BY_ORDINARY_REVIEWED_PR",
+  "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+  "pr": 155,
+  "url": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/155",
+  "source_head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "merged_main": "002f2a3c2e3849af6453d4e484a6efa3e4953fc7",
+  "tree": "6f0aab95463b73d0415552d213ea755f621c1cc1",
+  "parents": [
+    "48324860b8b9f7dc4762e9c9f841206881a28705",
+    "f10faa536aa441a7f64f42a0aceed6a3d7b8f205"
+  ],
+  "github_merge_signature_verified": true,
+  "github_merge_signature_reason": "valid",
+  "merged_at": "2026-10-04T16:37:29Z",
+  "merged_by": "app/pavc-other-hand",
+  "app_review_id": 5407189956,
+  "app_review_commit": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "body_sha256": "c31f7c58c958341acee2a2879947aa4cc91107378797585bb1f5a3e4befb2972",
+  "actual_ci_runs": [
+    {
+      "kind": "pr",
+      "run_id": 37216897669,
+      "log": "hub-run377-header-writer-pr-failed-jobs.log",
+      "sha256": "b06b7192d94beef814e620b8bfe9ea9713fa5dbf0284219f62404ac3251a5242",
+      "failed_test_names": [
+        "tests/test_invariant_suite.py::test_the_suite_is_green"
+      ],
+      "test_summary": [
+        "1 failed, 2908 passed, 24 skipped, 2 subtests passed in 200.51s (0:03:20)"
+      ],
+      "invariant_summary": [
+        "72 passed, 1 failed, 2 skipped (0 pending invariants, 2 skipped and not faked)"
+      ],
+      "invariant_failed_names": [
+        "flux_coverage_floor_is_still_reachable"
+      ]
+    },
+    {
+      "kind": "push",
+      "run_id": 37216893838,
+      "log": "hub-run377-header-writer-push-failed-jobs.log",
+      "sha256": "01497c26a3223257fac488bfd7b35b0c363166a19d6c7dd6bcb9a1e2a27c3a43",
+      "failed_test_names": [
+        "tests/test_invariant_suite.py::test_the_suite_is_green"
+      ],
+      "test_summary": [
+        "1 failed, 2908 passed, 24 skipped, 2 subtests passed in 204.60s (0:03:24)"
+      ],
+      "invariant_summary": [
+        "72 passed, 1 failed, 2 skipped (0 pending invariants, 2 skipped and not faked)"
+      ],
+      "invariant_failed_names": [
+        "flux_coverage_floor_is_still_reachable"
+      ]
+    }
+  ],
+  "owned_errors_cleared": true,
+  "all_other_status_checks_success": true,
+  "remaining_failure": "flux_coverage_floor_is_still_reachable",
+  "whole_hub_ci_green": false,
+  "floor_waived": false,
+  "branch_policy_override": false,
+  "admin_merge_or_check_bypass": false,
+  "review_rejection_bypassed": false,
+  "historical_rejection_preserved": true,
+  "normal_same_command_retry_after_trusted_exact_user_approval": true,
+  "prototype_published": false,
+  "receipts_sha256": {
+    "hub-run377-header-writer-exact-publication-approval.json": "34f28a05d6b11a952d1944167b47cf23580f05e6310388af5e6a344aa98318f6",
+    "hub-run377-header-writer-publication-stop.json": "2d6d8083a40cf95c213aeaa860a37960b77fd9e187f5eaa1f6a1cc1d0d6ff834",
+    "hub-run377-header-writer-approved-publication.json": "6fa78d4bf739499e6bab3ccecfb9f58e13e602dfae4c24a4d1c99a1f071a7027",
+    "hub-run377-header-writer-followup-candidate.json": "5965c0d732c65b66e899377f579792b94e40fe73ca6aa8e3f3a417622b7021c6",
+    "hub-run377-header-writer-followup-root-standards-review.json": "19970f71c3050d329e60dcf8795331345e3b6c04a5211b49ed3db28e0a5714e7",
+    "hub-run377-header-writer-followup-independent-spec-review.json": "308b93642a267d5e2b33bb6d6813d1b6894a83eae058a21a0b52fcfe9143946b",
+    "hub-run377-header-writer-followup-PR-body.md": "c31f7c58c958341acee2a2879947aa4cc91107378797585bb1f5a3e4befb2972",
+    "hub-run377-header-writer-public-pr-ci-final.json": "df274091558354cc31d31740408bbae5a7ce81a42ea0ce48cb089d614d02faf8",
+    "hub-run377-header-writer-ci-result.json": "1af05f736daba05c6d61e5a0eb45f620bd492291106bcaf84a45fd37e0ac4da2",
+    "hub-run377-header-writer-main-rules.json": "df719f85fc6cdacfb8c1bcaa4c1db6a348feecc6be608294f5406a02aebf374d",
+    "hub-run377-header-writer-other-hand-review-request.json": "822761bf91d8ff8e024919c2d8d63c4265a963d926798e098d5ba669ae2ebeea",
+    "hub-run377-header-writer-other-hand-review-response.json": "7ed5fdc6582fe60309f844df97404ff86058f09cd3f355468b76b09dea429921",
+    "hub-run377-header-writer-merged-pr.json": "7e76e9f06f68aecf7878048abcf2d97141b7e77ec65db477c241e6f8a22a23a5",
+    "hub-run377-header-writer-main-commit.json": "28dbd7f915028613494a3a0dfb925e3f5e698359b123cf869241253575929e93",
+    "hub-run377-header-writer-pr-failed-jobs.log": "b06b7192d94beef814e620b8bfe9ea9713fa5dbf0284219f62404ac3251a5242",
+    "hub-run377-header-writer-push-failed-jobs.log": "01497c26a3223257fac488bfd7b35b0c363166a19d6c7dd6bcb9a1e2a27c3a43"
+  }
+}

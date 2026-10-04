@@ -1,0 +1,28 @@
+{
+  "review_axis": "Standards",
+  "status": "HOLD_FOR_PRIMARY_PROVENANCE_CORRECTION",
+  "historical_candidate": "d06f0485203a8c59f92c8ab62cb54fd9068f00f0",
+  "tree": "ba81b551f8110146c3ffb05a6266dd9403f94412",
+  "parent": "5bc47331a536476f3580542be794908f5053f816",
+  "reported_at": "2026-10-04T15:01:44.985844+00:00",
+  "finding": "Seven of25 originally received gh api capture downloads and the received grade table normalized ESC to literal ^[. Prior preservation checks bind those received bytes; they do not establish equality with the exact Git483 capture blobs. The raw-at-commit wording must be corrected and exact binary Git sources retained.",
+  "unchanged_valid_checks": [
+    "977 owned data paths only; SSH G signature",
+    "nine published exact Git diffs, target trees/ancestry and independent reverse checks",
+    "genuine A/B aggregate and release joins",
+    "five append-only issue changes and honest machine actor",
+    "exporter default and relative-output finding closed",
+    "authored diffcheck exit0 with four preserved captured-output exceptions"
+  ],
+  "publication_approved": false,
+  "source_index_external_changes_by_reviewer": false,
+  "prior_inputs_sha256": {
+    "root-data-draft-independent-standards-checks.json": "3e946389ac4ccd74c5f2885c6e4a49190d964f6dfd0a6115ae32718d91e43d2a",
+    "root-data-draft-independent-standards-review.md": "0e0ae3ad9686a41dd7d4ed73119197c8105eb452673f7ed533fdfeeb56cb172e",
+    "hub-run377-capture-reads.json": "ea8eab9489e7dbcab7c65a465755fe937d9134fc1a3db4db693c9456633c8ba4",
+    "hub-run377-failure-classification.md": "c1837f9141992de1d47ad726b879d4a6bf27ee98c9bac24fc0fbb54c2fa92e0f",
+    "root-delivery-evidence-PR-body.md": "61b49b4458bbb484d488126ac34e1fb63fdc033fd74d8ba8c3c4ec0fc316f1fb",
+    "delivery-report.md": "f23db3acbacca3ef5e75487a3515d65a5fa321c101771d8e5b91a18f3f5ac8ee"
+  },
+  "next": "Rejoin exact binary Git capture hashes and grade table, review clarified statements, and bind fresh ordinary SSH publication head. Preserve received capture bytes and earlier audits as historical records."
+}

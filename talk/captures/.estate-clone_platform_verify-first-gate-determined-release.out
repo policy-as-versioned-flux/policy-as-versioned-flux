@@ -6,10 +6,14 @@ ok  gate -> engine cells -> commit evidence -> correct the array -> tag -> push,
 
 == 2. every declared bump agrees with the gate's own evidence ==
 ok  policy/v5.0.0: declared 'major' == evidence 'major', computed 'major', outcome passed
+ok  policy/v6.0.0: declared 'major' == evidence 'major', computed 'major', outcome passed
+ok  policy/v7.0.0: declared 'major' == evidence 'major', computed 'major', outcome passed
 
 == 3. the signature: only cut-release.yml, in Actions, can produce it ==
 == 4. the tag exists: it must resolve to the array-update commit, one ahead of the array ==
 ok  policy/v5.0.0 -> 5b88f1d0bb33274e3348db93645d972c893b3c2c, array names its parent 597f214bcdf10a77c957debc7e8a7842e1156fb8
+ok  policy/v6.0.0 -> 59ec7ce39bcd658c2454b23ce1cc26082e737fdd, array names its parent b18a0d8946f9dbeb5fbcf6bbe5233b9c919a7c8c
+ok  policy/v7.0.0 -> 703eff6aee959843c4160aa54fd03413f62858cc, array names its parent 393a40f707f2b23a3a174696a0c84a8473297ca9
 
 PASS: the release's number was determined by the gate before the tag -- the declared bump on
 the reviewed array element, the computed bump in the signed evidence and the outcome all

@@ -1,0 +1,34 @@
+test_admitted_mitigation_uses_its_own_triple_not_the_platform_table (test_own_response_model.AnnualResponses.test_admitted_mitigation_uses_its_own_triple_not_the_platform_table) ... ok
+test_currency_perspective_frequency_and_unit_ambiguity_refuse (test_own_response_model.AnnualResponses.test_currency_perspective_frequency_and_unit_ambiguity_refuse) ... ok
+test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments (test_own_response_model.AnnualResponses.test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments) ... ok
+test_grade_five_earns_no_credit_and_annual_cost_is_booked_once (test_own_response_model.AnnualResponses.test_grade_five_earns_no_credit_and_annual_cost_is_booked_once) ... ok
+test_grade_four_and_five_mitigation_never_change_the_admitted_money (test_own_response_model.AnnualResponses.test_grade_four_and_five_mitigation_never_change_the_admitted_money) ... ok
+test_known_zero_and_absent_mitigation_are_explicit (test_own_response_model.AnnualResponses.test_known_zero_and_absent_mitigation_are_explicit) ... ok
+test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total (test_own_response_model.AnnualResponses.test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total) ... ok
+test_nonfinite_derived_total_or_frequency_refuses (test_own_response_model.AnnualResponses.test_nonfinite_derived_total_or_frequency_refuses) ... 
+  test_nonfinite_derived_total_or_frequency_refuses (test_own_response_model.AnnualResponses.test_nonfinite_derived_total_or_frequency_refuses) (derived='annual total') ... FAIL
+  test_nonfinite_derived_total_or_frequency_refuses (test_own_response_model.AnnualResponses.test_nonfinite_derived_total_or_frequency_refuses) (derived='annual frequency') ... FAIL
+test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse (test_own_response_model.AnnualResponses.test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse) ... ok
+
+======================================================================
+FAIL: test_nonfinite_derived_total_or_frequency_refuses (test_own_response_model.AnnualResponses.test_nonfinite_derived_total_or_frequency_refuses) (derived='annual total')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 140, in test_nonfinite_derived_total_or_frequency_refuses
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+======================================================================
+FAIL: test_nonfinite_derived_total_or_frequency_refuses (test_own_response_model.AnnualResponses.test_nonfinite_derived_total_or_frequency_refuses) (derived='annual frequency')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/test_own_response_model.py", line 147, in test_nonfinite_derived_total_or_frequency_refuses
+    with self.assertRaises(model.MissingInstrument):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: MissingInstrument not raised
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.019s
+
+FAILED (failures=2)

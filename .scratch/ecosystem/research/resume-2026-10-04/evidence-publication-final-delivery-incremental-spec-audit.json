@@ -1,0 +1,203 @@
+{
+  "status": "PASS_FOR_BOUNDED_INCREMENTAL_SNAPSHOT",
+  "observed_from": "2026-10-04T16:42:37.002443+00:00",
+  "observed_until": "2026-10-04T16:42:37.332264+00:00",
+  "baseline": ".scratch/ecosystem/research/resume-2026-10-04/evidence-publication-final-spec-audit.json",
+  "baseline_sha256": "1b16fb30643a7495a8bc71287d675e4d2ad81c49db101ad310e3245c44175550",
+  "prior_incremental": ".scratch/ecosystem/research/resume-2026-10-04/evidence-publication-header-followup-incremental-spec-audit.json",
+  "prior_incremental_sha256": "6659a3f5d4cdd1b3e99b32df4e6a0cff74315012ea2c6789a33d1db07e50cd94",
+  "scope": [
+    ".scratch/ecosystem/research/resume-2026-10-04",
+    ".scratch/ecosystem/patches/resume-2026-10-04",
+    ".scratch/ecosystem/issues/156-the-incumbent-org-register.md",
+    ".scratch/ecosystem/issues/62-the-feed-parents-are-consumed-pinned-and-signed.md",
+    ".scratch/ecosystem/issues/77-every-pin-is-checked-for-content.md",
+    ".scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md",
+    ".scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md"
+  ],
+  "excluded_own_outputs": [
+    ".scratch/ecosystem/research/resume-2026-10-04/evidence-publication-final-delivery-incremental-spec-audit.json",
+    ".scratch/ecosystem/research/resume-2026-10-04/evidence-publication-final-delivery-incremental-spec-audit.md"
+  ],
+  "exclusion_reason": "Only this new audit output pair is excluded to avoid self-hash recursion; earlier audits and all prototype evidence are included when new or changed.",
+  "compared_files": 1351,
+  "scanned_added_or_changed_files": 21,
+  "scanned_bytes": 335575,
+  "strict_json_files": 13,
+  "strict_json_failures": [],
+  "filename_failures": [],
+  "symlinks_not_followed": [],
+  "high_confidence_credential_findings": [],
+  "credential_pattern_names": [
+    "aws-access-key-id",
+    "credential-bearing-url",
+    "github-token",
+    "google-api-key",
+    "literal-aws-secret",
+    "openai-api-key",
+    "private-key-material",
+    "slack-token"
+  ],
+  "long_literal_secret_field_pattern_included": true,
+  "second_read_changes": [],
+  "missing_since_cutoff": [],
+  "scanned_inventory": [
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/delivery-report.md",
+      "bytes": 10370,
+      "sha256": "4326e16c7ed843627184ae379ef8a48ee7919a4b926e5564fc070793c860155d",
+      "change_since_cutoff": "changed"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/evidence-publication-final-delivery-incremental-spec-audit.py",
+      "bytes": 9316,
+      "sha256": "690d046e9e6f3495c944dc4f6c01d8580305a717bfa3fcaa6b89119598e9625b",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/evidence-publication-header-followup-incremental-spec-audit.json",
+      "bytes": 9148,
+      "sha256": "6659a3f5d4cdd1b3e99b32df4e6a0cff74315012ea2c6789a33d1db07e50cd94",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/evidence-publication-header-followup-incremental-spec-audit.md",
+      "bytes": 708,
+      "sha256": "089623e93e58157906a66a0e350b88615492ae92ed5111ff844f46778a75a7fb",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-approved-publication.json",
+      "bytes": 855,
+      "sha256": "6fa78d4bf739499e6bab3ccecfb9f58e13e602dfae4c24a4d1c99a1f071a7027",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-ci-result.json",
+      "bytes": 1874,
+      "sha256": "1af05f736daba05c6d61e5a0eb45f620bd492291106bcaf84a45fd37e0ac4da2",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-delivery-complete.json",
+      "bytes": 4702,
+      "sha256": "2bba03394319ad3c9f9146f71f8dee56b021ee7707062ee8ba3e20dc181c9b27",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-exact-publication-approval.json",
+      "bytes": 811,
+      "sha256": "34f28a05d6b11a952d1944167b47cf23580f05e6310388af5e6a344aa98318f6",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-main-commit.json",
+      "bytes": 49182,
+      "sha256": "28dbd7f915028613494a3a0dfb925e3f5e698359b123cf869241253575929e93",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-main-rules.json",
+      "bytes": 844,
+      "sha256": "df719f85fc6cdacfb8c1bcaa4c1db6a348feecc6be608294f5406a02aebf374d",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-merged-pr.json",
+      "bytes": 6795,
+      "sha256": "7e76e9f06f68aecf7878048abcf2d97141b7e77ec65db477c241e6f8a22a23a5",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-other-hand-review-request.json",
+      "bytes": 1112,
+      "sha256": "822761bf91d8ff8e024919c2d8d63c4265a963d926798e098d5ba669ae2ebeea",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-other-hand-review-response.json",
+      "bytes": 2828,
+      "sha256": "7ed5fdc6582fe60309f844df97404ff86058f09cd3f355468b76b09dea429921",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-pr-failed-jobs.log",
+      "bytes": 102834,
+      "sha256": "b06b7192d94beef814e620b8bfe9ea9713fa5dbf0284219f62404ac3251a5242",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-public-pr-ci-current.json",
+      "bytes": 5396,
+      "sha256": "548ad58bc3379f39486b4bb2ec7b9eff69ea94d3588bd095a1ad76ac53c0a68e",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-public-pr-ci-final.json",
+      "bytes": 6616,
+      "sha256": "df274091558354cc31d31740408bbae5a7ce81a42ea0ce48cb089d614d02faf8",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-public-pr.json",
+      "bytes": 8109,
+      "sha256": "ece498e835368bf3fc5cee0fdfe03c905d2c9c9870f0e25358f39c94076cc300",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-push-failed-jobs.log",
+      "bytes": 102834,
+      "sha256": "01497c26a3223257fac488bfd7b35b0c363166a19d6c7dd6bcb9a1e2a27c3a43",
+      "change_since_cutoff": "added"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-prototype.md",
+      "bytes": 2123,
+      "sha256": "b4b4740aca3e9fb593fa4ae7c36cf53cc9828b76f40e8f6233ccc1f9c9fe4fc4",
+      "change_since_cutoff": "changed"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/root-delivery-evidence-PR-body.md",
+      "bytes": 2263,
+      "sha256": "cf7261c824334a833ffe821883de454fa0e52781e8753f50c3fa044f52d4e7e7",
+      "change_since_cutoff": "changed"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/run377-closure-gap-map.md",
+      "bytes": 6855,
+      "sha256": "8fa7419131dd547ae9d964fb23d95a37dce6e388e3ccfa6401104f69278e1462",
+      "change_since_cutoff": "changed"
+    }
+  ],
+  "inventory_sha256": "13718df480fff30a156c2cd6220b2ed97a5436dc0feec799d3abe93d5cd4dcd4",
+  "baseline_historical_received_capture_count": 25,
+  "baseline_recovered_raw_file_count": 26,
+  "actual_hub_source_head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "actual_merged_hub_main": "002f2a3c2e3849af6453d4e484a6efa3e4953fc7",
+  "completed_delivery_receipt": "hub-run377-header-writer-delivery-complete.json",
+  "historical_f10_stop_preserved": "hub-run377-header-writer-publication-stop.json",
+  "historical_primary_logs_modified_by_audit": false,
+  "external_mutations": false,
+  "unrelated_user_files_traversed": false,
+  "limits": "Local final incremental names, JSON and high-confidence credential audit. Completed source delivery is joined to its authentic saved receipt; no new runtime check, authentication claim, green whole-hub CI or live observation is inferred. Any later files require a separately bound audit.",
+  "frozen_final_documents": [
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/delivery-report.md",
+      "sha256": "4326e16c7ed843627184ae379ef8a48ee7919a4b926e5564fc070793c860155d"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/run377-closure-gap-map.md",
+      "sha256": "8fa7419131dd547ae9d964fb23d95a37dce6e388e3ccfa6401104f69278e1462"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/root-delivery-evidence-PR-body.md",
+      "sha256": "cf7261c824334a833ffe821883de454fa0e52781e8753f50c3fa044f52d4e7e7"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-prototype.md",
+      "sha256": "b4b4740aca3e9fb593fa4ae7c36cf53cc9828b76f40e8f6233ccc1f9c9fe4fc4"
+    }
+  ],
+  "actual_delivery_receipt_join": true,
+  "earlier_cutoff_and_incremental_audits_preserved": true
+}

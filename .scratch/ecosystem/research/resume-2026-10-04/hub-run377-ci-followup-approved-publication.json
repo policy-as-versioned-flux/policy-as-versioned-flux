@@ -1,0 +1,23 @@
+{
+  "recorded_at": "2026-10-04T15:46:45.537637+00:00",
+  "head": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "pr": 155,
+  "url": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/155",
+  "normal_push_and_body_update_exits": [
+    0,
+    0
+  ],
+  "same_command_after_trusted_exact_approval": true,
+  "trusted_reply": "Approve exact hub follow-up",
+  "standing_authorization": "user approves continuing the task while AFK",
+  "exact_saved_body_matches": true,
+  "body_sha256": "12c7b62d41fb5a9a02d14307a487fb67a2bbfe4c68ba490c4e2db83aed115ed0",
+  "actual_ci_runs": [
+    "37214243911",
+    "37214248030"
+  ],
+  "prior_rejection_preserved": "hub-run377-ci-followup-publication-stop.json",
+  "bypass_or_alternate_executor": false,
+  "app_review_or_merge_performed": false,
+  "raw_pr_receipt_sha256": "6669e4f97e17b398ca91cd5939c5367d56ae54580fd653aa1162b34e850e2299"
+}

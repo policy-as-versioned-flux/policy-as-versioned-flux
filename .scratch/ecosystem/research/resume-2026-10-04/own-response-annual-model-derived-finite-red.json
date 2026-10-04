@@ -1,0 +1,21 @@
+{
+  "recorded_at": "2026-10-04T15:02:17.137155+00:00",
+  "cwd": "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform",
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "compose",
+    "-p",
+    "test_own_response_model.py",
+    "-v"
+  ],
+  "exit_code": 1,
+  "source_sha256": "ac2c117260a4532b36c4888819f4c90d33f0f7bdbbae6eaec13835584df5267d",
+  "test_sha256": "2f1cc5eba67db40347bec70e9603470038e869f560f65ac0d33b7a0bda1cb982",
+  "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-derived-finite-red.log",
+  "log_sha256": "33b9a90ea0bd2ed939ff1eaa51427533ba2b65818e55a0eced0c65c5b45fe970",
+  "claim": "derived non-finite annual total and frequency must refuse; observed two failing subtests"
+}

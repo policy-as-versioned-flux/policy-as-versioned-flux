@@ -1,0 +1,13 @@
+{
+  "recorded_at": "2026-10-04T16:28:09.694766+00:00",
+  "trusted_exact_user_reply": "Approve exact fixture fix",
+  "authorization_delivered_by": "/root",
+  "authorized_repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+  "pr": 155,
+  "head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "body": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-followup-PR-body.md",
+  "body_sha256": "c31f7c58c958341acee2a2879947aa4cc91107378797585bb1f5a3e4befb2972",
+  "action_scope": "Retry the same normal push, update saved PR body, fresh ordinary CI and matching-head pavc-other-hand App review/merge; no admin, waiver, required-check bypass or alternate executor.",
+  "historical_stop_preserved": "hub-run377-header-writer-publication-stop.json",
+  "publication_performed": false
+}

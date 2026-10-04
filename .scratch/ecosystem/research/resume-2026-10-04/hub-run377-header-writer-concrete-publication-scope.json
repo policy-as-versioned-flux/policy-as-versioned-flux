@@ -1,0 +1,13 @@
+{
+  "recorded_at": "2026-10-04T16:10:20.715580+00:00",
+  "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+  "pr": 155,
+  "head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "body": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-followup-PR-body.md",
+  "body_sha256": "c31f7c58c958341acee2a2879947aa4cc91107378797585bb1f5a3e4befb2972",
+  "candidate_sha256": "5965c0d732c65b66e899377f579792b94e40fe73ca6aa8e3f3a417622b7021c6",
+  "standing_trusted_authorization": "you have my approval to continue without any further checks, i'm going AFK",
+  "controls": "ordinary CI, independent Standards+Spec, matching-head App review/merge; no admin, waiver, required-check bypass or alternative executor",
+  "exact7fa_prior_approval_and_receipts_preserved": true,
+  "new_source_publication_performed": false
+}

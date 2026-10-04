@@ -1,0 +1,23 @@
+{
+  "review_axis": "Standards",
+  "status": "PASS",
+  "findings": [],
+  "reviewed_at": "2026-10-04T16:07:07.510986+00:00",
+  "head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "tree": "6f0aab95463b73d0415552d213ea755f621c1cc1",
+  "parent": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "changed_paths": [
+    "tests/test_loophole_adr_0026.py"
+  ],
+  "source_sha256": {
+    "tests/test_loophole_adr_0026.py": "39ed98215e5e5b3c48f6dfaec85b08792ccb0d0595f65aa8cc350ed88f86ce72"
+  },
+  "candidate_sha256": "5965c0d732c65b66e899377f579792b94e40fe73ca6aa8e3f3a417622b7021c6",
+  "patch_sha256": "1f6fa32d4234d9b77601ebf057d439eb2de2cb4f2e9bfdf8a016694a500466a7",
+  "complete_patch_sha256": "4585787bd50f396aa99a442b247a4b61b30fc243e34ea0f3007d4e6c4e774e37",
+  "primary_checks_sha256": "79645b882c9a93c5ab96c9810300efaf194894a98d10654035ee10e96939d5ed",
+  "normal_SSH_signature_verified": true,
+  "clean_exact_source_tree": true,
+  "no_repeat_runtime_tests": true,
+  "limitations": "Private test fixture compatibility only; original authentic CI captures and floor remain preserved, fresh normal CI/merge separate."
+}

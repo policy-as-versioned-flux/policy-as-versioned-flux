@@ -1,0 +1,28 @@
+{
+  "status": "Delivered",
+  "delivered_source_only": true,
+  "receipts_sha256": {
+    "driftwood-delivery-order-maintenance-publication-complete.json": "e5a86facbcba7f6390e83cfc1d295d6ed652451af01df72bc9abba5e5ef9158b",
+    "platform-run377-maintenance-publication-complete.json": "7be806e02b0b01c34a58973d7cad40f026c7b69926e569df88b1808fb44c7b52",
+    "publication-final-published-source-export.json": "f45827bf9efb5ec460057ae7508e03af4dcc3c98f3114d77194de6534ca07a7a"
+  },
+  "driftwood": {
+    "PR": 57,
+    "reviewed_head": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+    "main": "1194561829ff60f89cd3889ab8cf06a45d5e9dd0",
+    "actual_CI": "shift-left and compose-check SUCCESS"
+  },
+  "platform": {
+    "PR": 51,
+    "reviewed_head": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+    "main": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb",
+    "actual_CI": "empty; no PR-triggered workflow",
+    "full_reviewed_native_checks_preserved": true
+  },
+  "normal_matching_head_App_merges": true,
+  "new_tags_or_releases": false,
+  "engine": "1.18.2",
+  "cloud_activation": false,
+  "new_live_baseline_claimed": false,
+  "remaining": "Genuine scheduled observations, webhook readiness, grade-aware cost instruments and other unchanged primary limitations remain separate; no future grade inferred"
+}

@@ -1,0 +1,24 @@
+{
+  "recorded_at": "2026-10-04T15:18:06.407778+00:00",
+  "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+  "public_source_head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "base": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "pr": 155,
+  "url": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/155",
+  "user_exact_approval_received": true,
+  "same_normal_push_retry_succeeded": true,
+  "previous_auto_review_rejection_preserved": "hub-run377-maintenance-publication-stop.json",
+  "alternate_executor_or_admin_bypass": false,
+  "matching_head_app_review_or_merge_performed": false,
+  "ci_status": "actual functional tests/typecheck show repairable failures plus unchanged floor; source merge held",
+  "source_followup_local": "6684f683bb6f9a9f7b83fed7e4b5f539ae7a3b11",
+  "remaining_test_alias_defect": "test_enact.py expects dependency metadata alias fx to equal repository directory, despite authentic feeds URL",
+  "unchanged_floor": "flux_coverage_floor_is_still_reachable",
+  "receipts": {
+    "hub-run377-maintenance-public-pr-ci-current.json": "e9110c3e816954546d46db01c36faa5928b0b037656f938d7a65011ba32147e3",
+    "hub-run377-maintenance-pr-tests-failure.log": "35af4be46a2c4ea9a8b0b1a89a783d41ec71eeb22fc3dc9855904713319a9239",
+    "hub-run377-maintenance-pr-invariants-failure.log": "4ac02c41f19e4140447337a975bbebb5571c947b46e75c18724735765ab08267",
+    "hub-run377-maintenance-push-typecheck-failure.log": "41c7747dfa2f4a2d666d7d2c5b67fd1664b9238f4f48395568b0146905e246f9",
+    "hub-run377-ci-typecheck-followup-candidate.json": "04772b0dfcaf01f68eb4685a9398e5217bc152f78095b390cd201a2f725ae226"
+  }
+}

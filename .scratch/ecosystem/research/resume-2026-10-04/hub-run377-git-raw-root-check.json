@@ -1,0 +1,16 @@
+{
+  "verdict": "PASS",
+  "source": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "capture_count": 25,
+  "grade_table_exact_git_blob": true,
+  "source_blobs_independently_joined": 26,
+  "original_downloads_preserved": true,
+  "download_normalization_only": "ESC byte to literal ^[ in7captures andgrade table",
+  "genuine_counts": {
+    "PASS": 88,
+    "FAIL": 25,
+    "SKIP": 22,
+    "EXCLUDED": 8
+  },
+  "provenance_receipt_sha256": "162d52aec048bafe4cdc7a690580dc8d2f248e6e255cb96bb1c45931a828b96b"
+}

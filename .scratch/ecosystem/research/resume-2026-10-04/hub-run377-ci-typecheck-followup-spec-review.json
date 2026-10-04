@@ -1,0 +1,46 @@
+{
+  "review_axis": "Spec",
+  "status": "PASS",
+  "findings": [],
+  "reviewed_at": "2026-10-04T15:18:09.138587+00:00",
+  "head": "6684f683bb6f9a9f7b83fed7e4b5f539ae7a3b11",
+  "tree": "0951b1ca6f64ca09d1538f062f19a49bc92cd20f",
+  "parent": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "normal_SSH_signature_independently_verified": true,
+  "clean_checkout": true,
+  "sole_changed_path": "tests/test_map_observation_ownership.py",
+  "source_sha256": {
+    "tests/test_map_observation_ownership.py": "f02e9ed2178f750671ffd07fbf39b41e89214bc0d0f9802344bf5f7f411cb8c6"
+  },
+  "patch_sha256": "8acc31d0abca0653f56a0af6e9e3a33dd45588fbb0085080f1b8f2fcad82b70c",
+  "candidate_packet_sha256": "04772b0dfcaf01f68eb4685a9398e5217bc152f78095b390cd201a2f725ae226",
+  "primary_checks_sha256": "fbb944161fae69ff44e4a2499b92f62a206f165d63a67536eb55e2b4c8320401",
+  "primary_log_hashes_verified": {
+    "typecheck": "3efc0e170174bf1eacbd391b4e67ae0597b59f89e8023c21d253c40c13dc02f0",
+    "ownership-test": "af1f91efa7f8ad8052b7bdfb32e55a0f8097d41ab3303b3ea3eeca3d15151e3f"
+  },
+  "primary_full_typecheck_source_count": 208,
+  "independent_ownership_regression": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest tests/test_map_observation_ownership.py -q -p no:cacheprovider",
+    "cwd": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+    "exit": 0,
+    "passed": 1
+  },
+  "unchanged_approved_repair_source_paths": [
+    "talk/verify-manifest.txt",
+    "tests/test_refusal_by_another_name.py",
+    "tests/test_verifier_snapshots.py",
+    "tests/test_workload_lane_entrypoint.py",
+    "verify/_snapshot.py",
+    "verify/e2e/step2_reprice.py",
+    "verify/engine-pairing/engine_pairing.py",
+    "verify/map-surface/map_surface.py",
+    "verify/refusal-by-another-name/refusal_scan.py",
+    "verify/refusal-by-another-name/register.yaml",
+    "verify/served-workloads/verify-served-workloads.sh"
+  ],
+  "all_other_parent_blobs_preserved": true,
+  "reviewed_source_or_index_changes": false,
+  "public_operations": false,
+  "limitations": "Narrow source review only. Remote CI, actual publication/merge and genuine scheduled evidence remain separate; unchanged90% floor is not waived."
+}

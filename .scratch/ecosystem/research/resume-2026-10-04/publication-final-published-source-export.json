@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "recorded_at": "2026-10-04T15:32:46.509043+00:00",
+  "scope": "New final-published nine public source bundle after actual DW/platform maintenance merges; previous complete cutoffs immutable",
+  "source_manifest": ".scratch/ecosystem/research/resume-2026-10-04/publication-final-published-source-manifest.json",
+  "source_manifest_sha256": "e9af59c924c18056a2650ef03f984fd705cd5d7f8ddca002744a658223db56a3",
+  "API_observations_sha256": "52b324b2d4cf2301ec61d2ce17a6eb2ff406c0859c9b739e0b258aad32baf565",
+  "export_manifest": ".scratch/ecosystem/patches/resume-2026-10-04/final-published/manifest.json",
+  "export_manifest_sha256": "aa4a437531bb28df76f8fdb2c70049f48081923b30d0281cbb4aed9f62a8098d",
+  "all_nine_exact_git_diff_and_tree_checks": true,
+  "all_nine_reverse_apply_checks": "PASS",
+  "patch_sha256": {
+    "platform": "3e8df1d17ba150f4c748c2f257f1c1c07146c830647d7c5f4fea79fc20e26234",
+    "feeds": "136e86ae9d8afe5a7f0863e10f50c2e0e5bf7eb3ce83e61d327147292f786795",
+    "app-ledger": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+    "app-storefront": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+    "app-api": "9a68368faad1c072ee0aab675f4dcd9c2e3335fa42b4704e986588bf777d4988",
+    "app-reports": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+    "driftwood": "4898d8bb8f13fb2863789db6d1305b024ed54e98087ac5a0384ef93ffda5fc2b",
+    "ludlow": "7c9ede9224b4e0945b6bbde0b4338916c0c8574cb17ba2bd3086947bab08caff",
+    "tuppence": "2600f3866e52138d2026ed113e44183f08f4ba2317f1642099cea2dd0b9dcb16"
+  },
+  "prior_complete_manifest_sha256_preserved": "03e976f02c69eff3779bcdb85e3abd1d55bfac66d363b0391fafd637b19d16f6",
+  "prior_source_manifest_sha256_preserved": "97a9cb1dab40dcf4453145b1c76714a6981f5ac87c0d6181f0f6364c3547c82d",
+  "all_original_worktree_heads_branches_statuses_preserved": true,
+  "insurer_hub_and_prototype_outside_nine": true,
+  "release_or_live_observation_claimed": false,
+  "exporter_argv": [
+    ".venv/bin/python",
+    ".scratch/ecosystem/patches/resume-2026-10-04/export_published_estate.py",
+    "--manifest",
+    ".scratch/ecosystem/research/resume-2026-10-04/publication-final-published-source-manifest.json",
+    "--output",
+    ".scratch/ecosystem/patches/resume-2026-10-04/final-published"
+  ],
+  "exporter_session": 73994,
+  "exporter_exit": 0
+}

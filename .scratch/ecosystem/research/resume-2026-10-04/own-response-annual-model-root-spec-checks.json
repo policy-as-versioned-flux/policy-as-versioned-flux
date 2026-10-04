@@ -1,0 +1,25 @@
+{
+  "recorded_at": "2026-10-04T15:24:44.767508+00:00",
+  "head": "c1bbb13a5124baa06247fe45845a425399908611",
+  "tree": "a69892493ae59f3e7e8658eb270526ef3d5bc25f",
+  "source_hashes_checked": 11,
+  "patch_hash_checked": true,
+  "checks": [
+    {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "compose",
+        "-p",
+        "test_own_response_model*.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-root-spec-tests.log",
+      "sha256": "63a58b181ca475528203d18ccff14086cc60f22119210531f877518ce05747fd"
+    }
+  ]
+}
