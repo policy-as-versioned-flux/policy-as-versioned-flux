@@ -1,0 +1,26 @@
+{
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "workflow": "release.yml",
+  "ref": "refs/tags/v4.0.1",
+  "inputs": {
+    "tag": "v4.0.1"
+  },
+  "head": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "dispatch_exit": 0,
+  "stdout": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37201994132\n",
+  "stderr": "",
+  "before_run_ids": [
+    32460372926,
+    35978940310,
+    36043564759,
+    37146414256,
+    37197387378
+  ],
+  "run": {
+    "conclusion": "",
+    "databaseId": 37201994132,
+    "headSha": "872d5c7f44801b496731b11cd40881f304f8a09a",
+    "status": "queued",
+    "url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37201994132"
+  }
+}

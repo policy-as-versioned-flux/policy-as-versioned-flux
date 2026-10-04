@@ -1,0 +1,32 @@
+{
+  "driftwood": {
+    "preliminary_native_graph": "PASS",
+    "target_tag": "v4.0.0",
+    "tag_object": "bff31936b9e34074a7ce078e873d3a0df31ecd35",
+    "target_commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+    "images": [
+      "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+      "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+      "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+    ],
+    "image_count": 3,
+    "primary_trim_equal": true,
+    "primary_metadata_preserved": true,
+    "inventory_bytes_preserved": true,
+    "exact_signed_candidate_review": "pending"
+  },
+  "ludlow": {
+    "preliminary_native_graph": "PASS",
+    "target_tag": "v4.0.0",
+    "tag_object": "36a1d2634beb4a2321414b020a6527bc714a0aba",
+    "target_commit": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae",
+    "images": [
+      "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+    ],
+    "image_count": 1,
+    "primary_trim_equal": true,
+    "primary_metadata_preserved": true,
+    "inventory_bytes_preserved": true,
+    "exact_signed_candidate_review": "pending"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "action": "Ordinary cut-release.yml main dispatch versionv4.0.1 followed by immutable-tag release.yml",
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "head": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "tag": "v4.0.1",
+  "workflow_dispatched": false,
+  "tag_created": false,
+  "external_mutation_executed": false,
+  "reason": "Automatic approval review: exact98d137 public-change approval does not cover this distinct immutable B release",
+  "fresh_Standards_and_Spec": "PASS on exact already-public872d5c7 main",
+  "normal_fresh_rerender_verify": "PASS, no source/output diff",
+  "normal_gate": "none, no policy additions or retirements",
+  "tag_unused_preflight": "PASS",
+  "no_workaround_attempted": true,
+  "active_sessions": [],
+  "required_next_step": "Trusted user approval to sign/publish immutablev4.0.1 from this concrete main; then same ordinary command"
+}

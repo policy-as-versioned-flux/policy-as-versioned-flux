@@ -1,0 +1,132 @@
+{
+  "verdict": "PASS",
+  "packet_sha256": "2414fb3a25350072eff1c76d88cb6edc089fc9c1ab21632034eac02e918ad82b",
+  "postcommit_packet_sha256": "7b8c1ea2d11a15c6376bbbdd1a947c38a50f710a7e7f55d039f474c7f991cfe4",
+  "findings": [],
+  "adopters": {
+    "ludlow": {
+      "verdict": "PASS",
+      "head": "b6aac1e5b0419a96ac675326adf5d2110d786c81",
+      "tree": "7e510770eb2d96b4bdfc594211d7e1050f13e17d",
+      "base": "035c9b991c5e2d69134737db7967437a62d6f288",
+      "changed_paths": [
+        "composed/HEADER.yaml",
+        "gitops/flux-system/gotk-sync.yaml",
+        "tests/test_apps_dependencies.py",
+        "tests/test_scenario_pricing.py",
+        "twin/scenario_pricing.py",
+        "twin/verify-twin-scenarios.sh"
+      ],
+      "source_sha256": {
+        "composed/HEADER.yaml": "94063db13f1ca8c999957a24f1c148489a1b1701424459df7a37adaa59c5f25a",
+        "gitops/flux-system/gotk-sync.yaml": "df7e7f67e44cb2a4f9421840ea44fcee00cab09c7bed3683cfb15c0e1dde14ea",
+        "tests/test_apps_dependencies.py": "0dfb7fa305da058e84db43adf41c482daa626b0be4a5e5152f3178d97d131644",
+        "tests/test_scenario_pricing.py": "52dfdc3a919f6d73357d7399ed5d7dd746956fa9636a21b04b7b9fa10ea1eaed",
+        "twin/scenario_pricing.py": "998fbef19c00154bceaf7bdfd5b4ce27703e5fba6fffbed2793a6f21bbe3f0de",
+        "twin/verify-twin-scenarios.sh": "d1d53e494f6241cb9ea76828dc8ff29c77e349118bcb1370748c80475f18f93e"
+      },
+      "authentic_clock_preserved": true,
+      "signed_clean": true,
+      "independent_tests": {
+        "test_apps_dependencies.py": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests",
+            "-p",
+            "test_apps_dependencies.py",
+            "-v"
+          ],
+          "exit": 0,
+          "log_sha256": "a07aad9ac8fb2debc10122ee16388fb7f5d700476f2183e37d3057815128b926"
+        },
+        "test_scenario_pricing.py": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests",
+            "-p",
+            "test_scenario_pricing.py",
+            "-v"
+          ],
+          "exit": 0,
+          "log_sha256": "7a8cb878b838d767245f34d55577b6175fe075cfbc5ad2a949e091488b562787"
+        }
+      },
+      "actual_native_declared_basis": "declared consequence basis: native valuation grade 3, loss mechanism grade 3, admitted by pricing threshold 3; no new observed incident or numeric standing-question forecast asserted",
+      "money_grades_primary_scans_A_B_pins_engine_cloud_preserved": true,
+      "postcommit_public_tests": 47,
+      "skips": 0,
+      "none_gate": "Same-pin early return plus independently byte-equal composed evidence; no add/retirement claimed",
+      "limit": "No live stamps, observed incidents or grade5 mitigation credit are supplied by this declaration checker."
+    },
+    "tuppence": {
+      "verdict": "PASS",
+      "head": "02c35b74a9044be9f02c580dd94103c85923a009",
+      "tree": "13d698baa99283a93601d90839a27e8844cbb55b",
+      "base": "7b3b0bd7aeb0895a0557a0cb8de6b17bdaba91f2",
+      "changed_paths": [
+        "composed/HEADER.yaml",
+        "gitops/flux-system/gotk-sync.yaml",
+        "tests/test_apps_dependencies.py",
+        "tests/test_scenario_pricing.py",
+        "twin/scenario_pricing.py",
+        "twin/verify-twin-scenarios.sh"
+      ],
+      "source_sha256": {
+        "composed/HEADER.yaml": "e38db1be881e9746cfce8946a93ac5ef927fd0217692a240f1aeafd6df817109",
+        "gitops/flux-system/gotk-sync.yaml": "f91e74a07a0f18c9c6eb90ff9be92ec3bacd79e854933cdcddd08d7fdcbe082e",
+        "tests/test_apps_dependencies.py": "0dfb7fa305da058e84db43adf41c482daa626b0be4a5e5152f3178d97d131644",
+        "tests/test_scenario_pricing.py": "52dfdc3a919f6d73357d7399ed5d7dd746956fa9636a21b04b7b9fa10ea1eaed",
+        "twin/scenario_pricing.py": "998fbef19c00154bceaf7bdfd5b4ce27703e5fba6fffbed2793a6f21bbe3f0de",
+        "twin/verify-twin-scenarios.sh": "72ff3d158466e48c02929742778c26b1e3836b8e8995b1cb686add60a0cde81c"
+      },
+      "authentic_clock_preserved": true,
+      "signed_clean": true,
+      "independent_tests": {
+        "test_apps_dependencies.py": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests",
+            "-p",
+            "test_apps_dependencies.py",
+            "-v"
+          ],
+          "exit": 0,
+          "log_sha256": "64cfbce8318553dba6e181355f0aee497ff3df020f9c64761613a017746c0fa6"
+        },
+        "test_scenario_pricing.py": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests",
+            "-p",
+            "test_scenario_pricing.py",
+            "-v"
+          ],
+          "exit": 0,
+          "log_sha256": "7a8cb878b838d767245f34d55577b6175fe075cfbc5ad2a949e091488b562787"
+        }
+      },
+      "actual_native_declared_basis": "declared consequence basis: native valuation grade 3, loss mechanism grade 3, admitted by pricing threshold 3; no new observed incident or numeric standing-question forecast asserted",
+      "money_grades_primary_scans_A_B_pins_engine_cloud_preserved": true,
+      "postcommit_public_tests": 47,
+      "skips": 0,
+      "none_gate": "Same-pin early return plus independently byte-equal composed evidence; no add/retirement claimed",
+      "limit": "No live stamps, observed incidents or grade5 mitigation credit are supplied by this declaration checker."
+    }
+  }
+}

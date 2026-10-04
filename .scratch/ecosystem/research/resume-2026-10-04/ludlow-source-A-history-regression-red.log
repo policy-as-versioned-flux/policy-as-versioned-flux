@@ -1,0 +1,27 @@
+FF
+======================================================================
+FAIL: test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history (test_platform_tools.WorkflowHistory.test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history) (job='shift-left')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow/tests/test_platform_tools.py", line 143, in test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history
+    self.assertEqual(own['with'].get('fetch-depth', 1), 0,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'inventory and since pricing require genuine adopter tags/history')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : inventory and since pricing require genuine adopter tags/history
+
+======================================================================
+FAIL: test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history (test_platform_tools.WorkflowHistory.test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history) (job='compose-check')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow/tests/test_platform_tools.py", line 143, in test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history
+    self.assertEqual(own['with'].get('fetch-depth', 1), 0,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'inventory and since pricing require genuine adopter tags/history')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : inventory and since pricing require genuine adopter tags/history
+
+----------------------------------------------------------------------
+Ran 1 test in 0.061s
+
+FAILED (failures=2)

@@ -1,0 +1,116 @@
+{
+  "recorded_at": "2026-10-04T15:24:35.753108+00:00",
+  "scope": "test-only copy of real gitops blobs from existing local commits/tags, not a clone or live observation",
+  "destination": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/.estate-clone",
+  "records": {
+    "platform": {
+      "source": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/platform",
+      "ref": "v5.0.0",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "copied_gitops_sha256": {}
+    },
+    "driftwood": {
+      "source": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+      "ref": "v4.0.0",
+      "commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+      "copied_gitops_sha256": {
+        "gitops/apps/api.yaml": "de16775c73ff1042ea1b71774b4b34c6a78bf5f3264cab2410f397eae2bb24ab",
+        "gitops/apps/kustomization.yaml": "16e17d4f83f8bcb35a967b28851c5f3ce5a366f96cc7d5e6a68d1e87b4a08cb8",
+        "gitops/apps/namespace.yaml": "72408a3599af949cde69527b098af1067250ea9e9cacb064f29f6cd66e4552cb",
+        "gitops/apps/nist-pin-configmap.yaml": "d8a1ad1cf2d0bcf10c10c921daa44e6dde5c09f03cf9565e6cb53fe8caf0e10a",
+        "gitops/apps/pod.yaml": "c5667a5ed86a2646ff1e5570f65c8aeed1c3d80295c49ae8380f92821aa92412",
+        "gitops/apps/storefront.yaml": "53e3993aabf6d5fe26362c17bf657ab1c4f863cf18cbf5391189c42c6879a8e9",
+        "gitops/apps/version-configmap.yaml": "7397b9a794e43b84f8eb7d31f3d50932a0f22ac7a87ca2a5e9c319670fdafdcf",
+        "gitops/composed/composed-set.yaml": "0ba77134b5d82e7df0bd8a571fc43ba532c910130e7dc670e9eac51b3ee8cd1e",
+        "gitops/composed/kustomization.yaml": "b7bee4cb0d385a187c27e2715e33b7b4f1ad473f0acf59abac11e706eb31ee13",
+        "gitops/engine/kyverno.yaml": "b9b4f35f4509e4b7c5988a08b405d7bae291e122fcdcb023e148482aeb879de1",
+        "gitops/flux-system/gotk-sync-feeds.yaml": "511633afa62f5e799cbbeb0c733b599ff564bfd74989d1e2f146c7f5b3b32dcb",
+        "gitops/flux-system/gotk-sync-fx.yaml": "065d2741dc76e9faa5ee46f745fc4e731d6ca9d7bd30dc09ffb24f15f3b32ff0",
+        "gitops/flux-system/gotk-sync-ico.yaml": "e061d0e7e06c995c436f681fe7b204c21ab61e1fda63bfe5c3119c78e6f2762e",
+        "gitops/flux-system/gotk-sync-insurer.yaml": "f25c795c0ab0e978bb958f1f2685946b6e79a90b61b5060f4ffc6683e73188ad",
+        "gitops/flux-system/gotk-sync-nist.yaml": "7cddab8bcca5ceca64651771bf41c82423d7cb009df106d5b4a5383e4ade27fa",
+        "gitops/flux-system/gotk-sync.yaml": "1ef771ce6175c4fae4af409ac7949f7505d2678f68a51734b8ce381bacf81ad7",
+        "gitops/platform/kustomization.yaml": "0b7910d2b2586a3732c8cd1369c59031eca41167f83587dd9286989ace4b344b",
+        "gitops/platform/platform-distribution.yaml": "face7a5b004c0ea5f01cccf151f4b7132518ee8c34a38760b4e91cbbfe1c3410",
+        "gitops/platform/platform-pin.yaml": "9b53256437a488eeddf3dcb82f96c2156b304b4bd3dc2234e15295cf3496c0ef"
+      }
+    },
+    "ludlow": {
+      "source": "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow",
+      "ref": "v4.0.1",
+      "commit": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+      "copied_gitops_sha256": {
+        "gitops/apps/kustomization.yaml": "035bb6ffdc9056708c4159399c6ca339be0597c93049182031393ab54c3ab6a4",
+        "gitops/apps/namespace.yaml": "ba2ae0c8c0692daf606a20a811747c5755f3d765fe15a4a4faf851a1b6d112fd",
+        "gitops/apps/nist-pin-configmap.yaml": "371a3da76d4b8e78533e06de9834965bc2e68d3667358731e560756943eef559",
+        "gitops/apps/reports.yaml": "786b21056b6a8462dc41c106d650ce1ef1e726ea73d37402c29c724bbafc8cc3",
+        "gitops/apps/risk-appetite-configmap.yaml": "20e880c684d017ab4090904e13292797025b150085dc9c42ef873b2617fd2ecd",
+        "gitops/apps/version-configmap.yaml": "21827f01eba296f94978a54d6856157dc90634afb109b3daf6bd9eb56e668286",
+        "gitops/composed/composed-set.yaml": "937d06c5fe0138d1d05f4fe396d6ac4aae8aaf76deecbae50fdcc55e6ff1d4c7",
+        "gitops/composed/kustomization.yaml": "b7bee4cb0d385a187c27e2715e33b7b4f1ad473f0acf59abac11e706eb31ee13",
+        "gitops/engine/kyverno.yaml": "abdcd1740f14d327626d54401c6a487dd96195bba993de3ef8ef0f401aed51a1",
+        "gitops/flux-system/gotk-sync-feeds.yaml": "4cc2cde6fd421dd60327cb8049699374f4b24ca656aabe59ed759ccc8e00451a",
+        "gitops/flux-system/gotk-sync-fx.yaml": "82523e77add5045687839845e8bca5493d7cbe3cd206c4f3a7bbd5a8bb18ddb5",
+        "gitops/flux-system/gotk-sync-ico.yaml": "0e9d4976e496f3b4a7351cc96c154b7f6aaa5f9fda95a5d45dd73165644b2d94",
+        "gitops/flux-system/gotk-sync-nist.yaml": "eb050e4415e5a09afdc94eafe2b119b50b15ad80adc50629d3335f47e4bdc9bd",
+        "gitops/flux-system/gotk-sync.yaml": "9540a61e570f648eae8c1594d9af1ea3408c1fefebe21dcda5f4c6a7a0f8319b",
+        "gitops/platform/kustomization.yaml": "0b7910d2b2586a3732c8cd1369c59031eca41167f83587dd9286989ace4b344b",
+        "gitops/platform/platform-distribution.yaml": "d61525aeeb08fa7066a1ead4ef746e870ab41e4c5a6210ef026ebbc52aa20095",
+        "gitops/platform/platform-pin.yaml": "999509ada87fb9dd7627c77cc100fa04b71dcea3f9e14767eb4c648b7782127b"
+      }
+    },
+    "feeds": {
+      "source": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/feeds",
+      "ref": "fx/v2.0.0",
+      "commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+      "copied_gitops_sha256": {}
+    },
+    "nist": {
+      "source": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/nist",
+      "ref": "HEAD",
+      "commit": "f83126f51423951cb50c4782e833d1cfcb02f06d",
+      "copied_gitops_sha256": {}
+    },
+    "ico": {
+      "source": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/ico",
+      "ref": "HEAD",
+      "commit": "abcb3a89ee52a9621fae6e3e0e18992cdcf76877",
+      "copied_gitops_sha256": {}
+    },
+    "insurer": {
+      "source": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/insurer",
+      "ref": "HEAD",
+      "commit": "d1c1844c34c3eafd03d63a743197ed58ec96a05b",
+      "copied_gitops_sha256": {
+        "gitops/platform/platform-pin.yaml": "ff6f56b657c4be755bde86c52f0314175e2a1574cd6a4f281e910a826e0f10a3"
+      }
+    },
+    "tuppence": {
+      "source": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/tuppence",
+      "ref": "v4.0.1",
+      "commit": "dbaa026f6510fe5c0042f33f29081f3840ea59c3",
+      "copied_gitops_sha256": {
+        "gitops/apps/kustomization.yaml": "6f4d781ac46013f72c94acc2f1198e191fcc5ce20b45974ca0a4d130853a0d3c",
+        "gitops/apps/ledger.yaml": "f35928e9422234c1ffe471e8c254f09ae7580ab23618649eb788970ad081ce70",
+        "gitops/apps/namespace.yaml": "d91594df18564ad196cd1489cde15735422d9b99e39765cacba82f9d5b3cc906",
+        "gitops/apps/nist-pin-configmap.yaml": "78ba1bfd7e101f7d41d591ee2ac07735fcc7f852b0daa543c3e70aafcfc2594e",
+        "gitops/apps/risk-appetite-configmap.yaml": "9e25efe642975ff23943eaea99fdb972964c86b48a37b3e33f372d445715e8d6",
+        "gitops/apps/version-configmap.yaml": "4d2844c7739d06ce3b89632d2c21ab05f6da360d868cb4ea1ab23978beb76301",
+        "gitops/cloud/claims.yaml": "340657fbf52678182e2456a4e0e2e3f3834c52ba39af23eb4c05fc18c2893d73",
+        "gitops/cloud/cloud-delivery.yaml": "dc5c6819af3153bf71ac76e227d8d39fc97cf6f657a1d5708a0e21febbcab7c7",
+        "gitops/cloud/kustomization.yaml": "10149623da1a7e1981312e195a47293c4c860d03c6068eb1159bac69e2dcd9b3",
+        "gitops/composed/composed-set.yaml": "ec4974e339c6d3c0b6656b90701f068c42f9193593344ce2ed5a787500b66c19",
+        "gitops/composed/kustomization.yaml": "b7bee4cb0d385a187c27e2715e33b7b4f1ad473f0acf59abac11e706eb31ee13",
+        "gitops/engine/kyverno.yaml": "98c5732422f811d75507441f4164f758f97bde2ee803ba70e0a488d597588f30",
+        "gitops/flux-system/gotk-sync-feeds.yaml": "5e9135c1720c83172d8cdc5b56ce97f501b7e66a4a4b6e1cde6be7253dc03ac1",
+        "gitops/flux-system/gotk-sync-fx.yaml": "065d2741dc76e9faa5ee46f745fc4e731d6ca9d7bd30dc09ffb24f15f3b32ff0",
+        "gitops/flux-system/gotk-sync-ico.yaml": "dc0a5434977c58ca01fcd44913ce56e918556744756eddffa6507a8f6266c009",
+        "gitops/flux-system/gotk-sync-nist.yaml": "f364d9193c535b49177e4fe34e4239efe0667c1c237cd7a05f81c3969d6a04ff",
+        "gitops/flux-system/gotk-sync.yaml": "fdd242a22ec42606e0583ad84cf5c3dce9008ce7c008063fb98f96f1ad4aeb15",
+        "gitops/platform/kustomization.yaml": "0b7910d2b2586a3732c8cd1369c59031eca41167f83587dd9286989ace4b344b",
+        "gitops/platform/platform-distribution.yaml": "d61525aeeb08fa7066a1ead4ef746e870ab41e4c5a6210ef026ebbc52aa20095",
+        "gitops/platform/platform-pin.yaml": "28eb0950598126175fbb6202b005ef88ec54068281ae3c04c7355cd6f807d9cd"
+      }
+    }
+  }
+}

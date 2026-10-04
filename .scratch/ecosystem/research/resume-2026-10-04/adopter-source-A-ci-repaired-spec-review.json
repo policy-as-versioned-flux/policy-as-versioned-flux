@@ -1,0 +1,71 @@
+{
+  "result": "PASS",
+  "scope": "Exact repaired source A commits; actual remote CI scope comes from root receipts; no live activation or tag publication claim",
+  "adopters": {
+    "driftwood": {
+      "result": "PASS",
+      "head": "de03c5bfc3bde938b30c538d6027508e7f14ee38",
+      "tree": "464b1b4ab6cade9b4252ad8977ff2eaa01fdb30f",
+      "normal_ssh_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0",
+      "clean": true,
+      "complete_changed_paths_verified": true,
+      "patch_sha256": "6e402ae1ff366e84338d0e603f13d2ab599f1c2f20bb6ea1751174257c8c37fc",
+      "narrow_delta": [
+        ".github/scripts/complete-feed-bump.sh",
+        ".github/scripts/refresh-twin-feed.py",
+        ".github/tests/test_complete_feed_bump.py",
+        ".github/workflows/shift-left.yml",
+        "composed/HEADER.yaml",
+        "tests/test_platform_tools.py"
+      ],
+      "narrow_file_sha256": {
+        ".github/scripts/complete-feed-bump.sh": "d3ef0752f90adcf218f5f6bcb7b64c468850515dba9513faa130e040c5add1fe",
+        ".github/scripts/refresh-twin-feed.py": "2d794c6c94d938eb8c285b2299151ef81ad581721718d6dfc457af34ece59163",
+        ".github/tests/test_complete_feed_bump.py": "5df5a9f9f52bf61e54e8e3690ed34296e4ec35e4b88061ca39540ef3ac3ebeed",
+        ".github/workflows/shift-left.yml": "60fa4936e2a3383ccd291c806c2d3b14dc32dad014a0e74a21164772afd63683",
+        "composed/HEADER.yaml": "ce528d9f2d1105cdfb551a401cf08b3af06f80a772f73c7cf03b998eadf4fd1d",
+        "tests/test_platform_tools.py": "e7890a90fcb3903b387402218145d9c7f353cea416ff6abbdd9dd69c2d82bc68"
+      },
+      "history_reading_jobs_full_and_no_shallow_fetch": true,
+      "immutable_primary_scan_and_price_inputs_preserved": true,
+      "postcommit_actual_layout_exit": 0,
+      "normal_institutional_gate": "major/admitted/no retirement"
+    },
+    "ludlow": {
+      "result": "PASS",
+      "head": "323a1b09dc9d7f4c243c66a3f53f12ea1a4cfeea",
+      "tree": "05b424c162450b3cd85e7117b0589303ac7ec73b",
+      "normal_ssh_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0",
+      "clean": true,
+      "complete_changed_paths_verified": true,
+      "patch_sha256": "cab77da6767f7d11b2e8ee35ea8611a24408d92ded76911c4c70bfc14d235de5",
+      "narrow_delta": [
+        ".github/workflows/shift-left.yml",
+        "composed/HEADER.yaml",
+        "tests/test_platform_tools.py"
+      ],
+      "narrow_file_sha256": {
+        ".github/workflows/shift-left.yml": "c26bdc46072dc4387895ebadcddc311b198738d441f5f989e6824dcb858b1667",
+        "composed/HEADER.yaml": "2cef435b90e2bb99c7126e32693bfe8652bd0dee8f9cafa7e1bde314c6b9bfb1",
+        "tests/test_platform_tools.py": "9a7ca6b9c197a013f8541af07f60056b658c3f5f4f8211117a88e761c20eaf56"
+      },
+      "history_reading_jobs_full_and_no_shallow_fetch": true,
+      "immutable_primary_scan_and_price_inputs_preserved": true,
+      "postcommit_actual_layout_exit": 0,
+      "normal_institutional_gate": "major/admitted/no retirement"
+    }
+  },
+  "driftwood_actual_pinned_current_major_completer_and_byte_verify": "PASS",
+  "genuine_old_v1_preserved": true,
+  "historical_shallow_and_unavailable_pin_negatives_preserved": true,
+  "evidence_sha256": {
+    "adopter-source-A-ci-repaired-candidates.json": "f305a131a3cfbe7e9d5cea34267c14912a10b381825d2a5478f11fceac9d8981",
+    "adopter-source-A-ci-repair-checks.json": "21d5b95ab8ed9f1d3af14e7037fd3ac0d42e4847eaa04f34c6772594e090476f",
+    "adopter-source-A-ci-repaired-postcommit-layout.json": "d7dd2a40445c81661a7fa2563bbd1c15219a190a571688c1c22ec58c4cc96dea",
+    "adopter-source-A-ci-repaired-grades.json": "1c9275dbc2686e514d8124a9b17b150eae8cfc1d8333d9870d6ed7ec1f14179c",
+    "driftwood-source-A-real-completer.json": "a6bfdba885e0732eae6d8714d3b3798227ac93dcc072242f04680f0289fc6b73",
+    "spec-history-boundary-probe.json": "03fa9fc8ec9bf08488645e57e208fa531b4f2e84e618dc5737a8e97e0a49642f"
+  },
+  "source_edits": false,
+  "external_mutations": false
+}

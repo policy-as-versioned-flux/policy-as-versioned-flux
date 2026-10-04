@@ -1,0 +1,198 @@
+{
+  "observed_from": "2026-10-04T14:36:37.806497+00:00",
+  "observed_at": "2026-10-04T14:36:47.273587+00:00",
+  "scope": "Nine exact published current main cutoffs, independently read from normal GitHub API and fetched origin/main; not pending source or a new live observation grade",
+  "repositories": {
+    "platform": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/platform",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "tree": "bba72befc0b76e339aa1f5536671a708b84a5878",
+      "remote": "https://github.com/policy-as-versioned-platform/platform",
+      "observed_at": "2026-10-04T14:36:38.996450+00:00",
+      "read_only_api": "repos/policy-as-versioned-platform/platform/commits/main",
+      "remote_main_matches_local_fetched_origin_main": true,
+      "github_commit_signature": "unsigned",
+      "github_commit_signature_valid": false,
+      "reviewed_published_source_commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "later_main_delta_paths": [],
+      "later_main_delta_scope": "none",
+      "preserved_worktree_head": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "preserved_worktree_branch": "refs/heads/main",
+      "preserved_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Exact published current main cutoff; preserved candidate worktree is not exported"
+    },
+    "feeds": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/feeds",
+      "commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+      "tree": "b88fb77f96cadf1a9639cae369ed529bd4e1731c",
+      "remote": "https://github.com/policy-as-versioned-feeds/feeds.git",
+      "observed_at": "2026-10-04T14:36:40.073875+00:00",
+      "read_only_api": "repos/policy-as-versioned-feeds/feeds/commits/main",
+      "remote_main_matches_local_fetched_origin_main": true,
+      "github_commit_signature": "valid",
+      "github_commit_signature_valid": true,
+      "reviewed_published_source_commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+      "later_main_delta_paths": [],
+      "later_main_delta_scope": "none",
+      "preserved_worktree_head": "d62f74e52ed992798a75cf3f4f138ec9c83db80a",
+      "preserved_worktree_branch": "refs/heads/resume/2026-10-04-dated-fx",
+      "preserved_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Exact published current main cutoff; preserved candidate worktree is not exported"
+    },
+    "app-ledger": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-ledger",
+      "commit": "d3255fa6fc0ccd25c84043f61b128b4d2e929ac0",
+      "tree": "e0f96aa9dc47e8fd7f8c624a9d478d0aaf87f6e4",
+      "remote": "https://github.com/policy-as-versioned-tuppence/ledger",
+      "observed_at": "2026-10-04T14:36:41.104130+00:00",
+      "read_only_api": "repos/policy-as-versioned-tuppence/ledger/commits/main",
+      "remote_main_matches_local_fetched_origin_main": true,
+      "github_commit_signature": "valid",
+      "github_commit_signature_valid": true,
+      "reviewed_published_source_commit": "d3255fa6fc0ccd25c84043f61b128b4d2e929ac0",
+      "later_main_delta_paths": [],
+      "later_main_delta_scope": "none",
+      "preserved_worktree_head": "a54f73dcb5bce9a5c9e33c272d3b21209a88649d",
+      "preserved_worktree_branch": "refs/heads/resume-2026-10-03-app-maintenance",
+      "preserved_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Exact published current main cutoff; preserved candidate worktree is not exported"
+    },
+    "app-storefront": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-storefront",
+      "commit": "deb25d3467c9b7c59a83b39bbb8023c790fbad31",
+      "tree": "43b3bba638bf5c8e446df56fc3d0d26979208551",
+      "remote": "https://github.com/policy-as-versioned-driftwood/storefront",
+      "observed_at": "2026-10-04T14:36:42.191072+00:00",
+      "read_only_api": "repos/policy-as-versioned-driftwood/storefront/commits/main",
+      "remote_main_matches_local_fetched_origin_main": true,
+      "github_commit_signature": "valid",
+      "github_commit_signature_valid": true,
+      "reviewed_published_source_commit": "deb25d3467c9b7c59a83b39bbb8023c790fbad31",
+      "later_main_delta_paths": [],
+      "later_main_delta_scope": "none",
+      "preserved_worktree_head": "3be69e2f1c686cac77bfd05cefe7cc2e61eb208d",
+      "preserved_worktree_branch": "refs/heads/resume-2026-10-03-app-maintenance",
+      "preserved_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Exact published current main cutoff; preserved candidate worktree is not exported"
+    },
+    "app-api": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-api",
+      "commit": "d9b5f4f922cb4ff4b30d75733d48975c86c6df61",
+      "tree": "1d166d6a6e9407a57db5e89887f2fee2183586a3",
+      "remote": "https://github.com/policy-as-versioned-driftwood/api",
+      "observed_at": "2026-10-04T14:36:43.232793+00:00",
+      "read_only_api": "repos/policy-as-versioned-driftwood/api/commits/main",
+      "remote_main_matches_local_fetched_origin_main": true,
+      "github_commit_signature": "valid",
+      "github_commit_signature_valid": true,
+      "reviewed_published_source_commit": "d9b5f4f922cb4ff4b30d75733d48975c86c6df61",
+      "later_main_delta_paths": [],
+      "later_main_delta_scope": "none",
+      "preserved_worktree_head": "1f7f49b7b1ce98f973f355d696920c038b8e020a",
+      "preserved_worktree_branch": "refs/heads/resume-2026-10-03-app-maintenance",
+      "preserved_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Exact published current main cutoff; preserved candidate worktree is not exported"
+    },
+    "app-reports": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-reports",
+      "commit": "f21bff06fac89401bf180ffc40dd46a37c36db51",
+      "tree": "922e5d6feaab6699550ea426652f38c482c9c7ff",
+      "remote": "https://github.com/policy-as-versioned-ludlow/reports",
+      "observed_at": "2026-10-04T14:36:44.403492+00:00",
+      "read_only_api": "repos/policy-as-versioned-ludlow/reports/commits/main",
+      "remote_main_matches_local_fetched_origin_main": true,
+      "github_commit_signature": "valid",
+      "github_commit_signature_valid": true,
+      "reviewed_published_source_commit": "f21bff06fac89401bf180ffc40dd46a37c36db51",
+      "later_main_delta_paths": [],
+      "later_main_delta_scope": "none",
+      "preserved_worktree_head": "286d81987a84b23b0b4f4537c4a5b2d050638773",
+      "preserved_worktree_branch": "refs/heads/resume-2026-10-03-app-maintenance",
+      "preserved_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Exact published current main cutoff; preserved candidate worktree is not exported"
+    },
+    "driftwood": {
+      "directory": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/driftwood",
+      "commit": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+      "tree": "895ed1d6af98b6a6275a0456053d14adbc4bb30f",
+      "remote": "https://github.com/policy-as-versioned-driftwood/driftwood.git",
+      "observed_at": "2026-10-04T14:36:45.455514+00:00",
+      "read_only_api": "repos/policy-as-versioned-driftwood/driftwood/commits/main",
+      "remote_main_matches_local_fetched_origin_main": true,
+      "github_commit_signature": "valid",
+      "github_commit_signature_valid": true,
+      "reviewed_published_source_commit": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+      "later_main_delta_paths": [],
+      "later_main_delta_scope": "none",
+      "preserved_worktree_head": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+      "preserved_worktree_branch": "refs/heads/maintenance-delivery-order-after-final-20261004",
+      "preserved_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Exact published current main cutoff; preserved candidate worktree is not exported"
+    },
+    "ludlow": {
+      "directory": "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow",
+      "commit": "e7243d917c323364c0fb74d312f921d0d1ec1356",
+      "tree": "7e510770eb2d96b4bdfc594211d7e1050f13e17d",
+      "remote": "https://github.com/policy-as-versioned-ludlow/ludlow",
+      "observed_at": "2026-10-04T14:36:46.378692+00:00",
+      "read_only_api": "repos/policy-as-versioned-ludlow/ludlow/commits/main",
+      "remote_main_matches_local_fetched_origin_main": true,
+      "github_commit_signature": "valid",
+      "github_commit_signature_valid": true,
+      "reviewed_published_source_commit": "e7243d917c323364c0fb74d312f921d0d1ec1356",
+      "later_main_delta_paths": [],
+      "later_main_delta_scope": "none",
+      "preserved_worktree_head": "b6aac1e5b0419a96ac675326adf5d2110d786c81",
+      "preserved_worktree_branch": "refs/heads/maintenance/2026-10-04-scenario-and-apps-order-clock",
+      "preserved_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Exact published current main cutoff; preserved candidate worktree is not exported"
+    },
+    "tuppence": {
+      "directory": "/private/tmp/pavf-tuppence-maintenance-20261004-estate/tuppence",
+      "commit": "011942de87ba827b5bc2949da0057d862b6b69f6",
+      "tree": "13d698baa99283a93601d90839a27e8844cbb55b",
+      "remote": "https://github.com/policy-as-versioned-tuppence/tuppence",
+      "observed_at": "2026-10-04T14:36:47.273285+00:00",
+      "read_only_api": "repos/policy-as-versioned-tuppence/tuppence/commits/main",
+      "remote_main_matches_local_fetched_origin_main": true,
+      "github_commit_signature": "valid",
+      "github_commit_signature_valid": true,
+      "reviewed_published_source_commit": "011942de87ba827b5bc2949da0057d862b6b69f6",
+      "later_main_delta_paths": [],
+      "later_main_delta_scope": "none",
+      "preserved_worktree_head": "02c35b74a9044be9f02c580dd94103c85923a009",
+      "preserved_worktree_branch": "refs/heads/maintenance/2026-10-04-scenario-and-apps-order-clock",
+      "preserved_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Exact published current main cutoff; preserved candidate worktree is not exported"
+    }
+  },
+  "earlier_source_manifest_hashes_preserved": {
+    ".scratch/ecosystem/research/resume-2026-10-04/publication-current-source-manifest.json": "745a9b07ab8c176784502736ce4551db9f1d3100c578d40cca07af62410b7710",
+    ".scratch/ecosystem/research/resume-2026-10-04/publication-foundation-current-source-manifest.json": "2ca4dc4839a8b7c2677e725888e7147909ec3562f423814cf68d597fa5feb0ca",
+    ".scratch/ecosystem/research/resume-2026-10-04/publication-foundation-refreshed-source-manifest.json": "2dfcb25c1f8f01c3c6e709aea275f2bcdd4801ff0a5a178a8b1e4dfe917f0b18"
+  },
+  "pending_excluded": {
+    "driftwood": {
+      "candidate": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+      "reason": "Reviewed maintenance source awaits exact public approval; published main remains separate"
+    },
+    "platform": {
+      "candidate": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+      "reason": "Reviewed maintenance source awaits exact public approval; genuine published main remains 703eff6"
+    },
+    "hub": {
+      "candidate": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+      "reason": "Hub verifier maintenance publication was rejected before execution; outside nine-repository source export"
+    },
+    "prototype": {
+      "reason": "Prepared prototype is outside approved delivered source and excluded"
+    }
+  },
+  "other_published_source_outside_nine_repository_bundle": {
+    "insurer": {
+      "commit": "5d1a7cde88230370074ed2a2ce4e94adf4eb8790",
+      "proof": "insurer-compatible-platform-pin-publication-complete.json"
+    }
+  },
+  "external_mutations": false
+}

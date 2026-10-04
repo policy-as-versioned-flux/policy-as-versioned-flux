@@ -1,0 +1,89 @@
+{
+  "scope": "Locally retained actual adopter tags only; source candidate commits are not releases",
+  "history": {
+    "driftwood": [
+      {
+        "tag": "v1.0.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v1.1.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v2.0.0",
+        "forward_intel": [
+          {
+            "path": "twin/forward-intel/v1/feed.json",
+            "version": "1.0.0",
+            "published_at": "2026-08-28T00:00:00Z"
+          }
+        ]
+      },
+      {
+        "tag": "v3.0.0",
+        "forward_intel": [
+          {
+            "path": "twin/forward-intel/v1/feed.json",
+            "version": "1.0.0",
+            "published_at": "2026-08-28T00:00:00Z"
+          }
+        ]
+      },
+      {
+        "tag": "v3.0.1",
+        "forward_intel": [
+          {
+            "path": "twin/forward-intel/v1/feed.json",
+            "version": "1.0.0",
+            "published_at": "2026-08-28T00:00:00Z"
+          }
+        ]
+      }
+    ],
+    "tuppence": [
+      {
+        "tag": "v1.0.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v1.1.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v2.0.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v3.0.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v3.0.1",
+        "forward_intel": []
+      }
+    ],
+    "ludlow": [
+      {
+        "tag": "v1.0.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v1.1.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v2.0.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v3.0.0",
+        "forward_intel": []
+      },
+      {
+        "tag": "v3.0.1",
+        "forward_intel": []
+      }
+    ]
+  }
+}

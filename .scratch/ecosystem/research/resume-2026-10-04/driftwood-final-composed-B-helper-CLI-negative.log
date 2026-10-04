@@ -1,0 +1,3 @@
+usage: adopter-gate.py [-h]
+                       {read-pin,verify-commit,compose,matrix-row,splice-body,wrap-section} ...
+adopter-gate.py: error: argument cmd: invalid choice: '/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/platform' (choose from 'read-pin', 'verify-commit', 'compose', 'matrix-row', 'splice-body', 'wrap-section')

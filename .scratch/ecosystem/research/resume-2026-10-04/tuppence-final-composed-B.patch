@@ -1,0 +1,54 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index c6838aa..f151547 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -621,7 +621,7 @@ ungoverned-namespaces:
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: 45b99ef8e72985b14cfc011fa115d6a5df35f30892e295a184e6e95048610937
++  after: 1acb6430e97697a50d878ef343bb3b97cce117a3ff2f0e593642d63150a38273
+   before:
+     header:
+       parents:
+diff --git a/gitops/composed/composed-set.yaml b/gitops/composed/composed-set.yaml
+index 8a6d25e..6573a3d 100644
+--- a/gitops/composed/composed-set.yaml
++++ b/gitops/composed/composed-set.yaml
+@@ -24,10 +24,10 @@
+ #     install platform's tree; it installs the artefact its own composition rendered from
+ #     platform's and nist's signed parents (composed/HEADER.yaml records those parent SHAs, and
+ #     fact 3 of the sample checks the live platform and nist pins against them).
+-#   * the tag is v4.0.0, the same genuine Source A release as the apps source in
+-#     gitops/flux-system/gotk-sync.yaml. Its composed tree carries policies 5.0.0, 6.0.0 and 7.0.0.
+-#     The coupled self-pin, inventory binding, array and verification gates move in one reviewed
+-#     change; renovate.json tracks publisher parents rather than these self-pins.
++#   * composed delivery uses the genuine v4.0.1 Composition B release, whose signed tree
++#     binds the apps source and native inventory to Source A v4.0.0. Its complete policy window
++#     is 5.0.0, 6.0.0 and 7.0.0. Apps and inventory stay bound to Source A; this reviewed pointer
++#     moves composed delivery to B. Renovate tracks publisher parents rather than self-pins.
+ #   * there is no `spec.verify` here. Flux's GitRepository.spec.verify speaks OpenPGP, and one
+ #     signature -- the gitsign tag -- is the only one this estate has (ADR-0023, D3). Verification
+ #     at the source boundary is the identity-pinned gitsign-verifying controller of ticket 41,
+@@ -73,9 +73,9 @@ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-tuppence/tuppence
+   ref:
+-    tag: v4.0.0
+-    commit: f575dc12de130c444d98a831de0ca21fd68b9c46
+-    # The resolved SHA of the genuine signed v4.0.0 Source A release (2026-10-04).
++    tag: v4.0.1
++    commit: dbaa026f6510fe5c0042f33f29081f3840ea59c3
++    # The resolved SHA of the genuine signed v4.0.1 Composition B release (2026-10-04).
+     # Belt-and-braces immutability, ADR-0001.
+ ---
+ apiVersion: fluxcd.controlplane.io/v1
+@@ -96,7 +96,7 @@ spec:
+         - { version: "5.0.0" }
+         - { version: "6.0.0" }
+         - { version: "7.0.0" }
+-        # The signed v4.0.0 tree carries all three versions, and its machinery admits exactly
++        # The signed v4.0.1 tree carries all three versions, and its machinery admits exactly
+         # this complete window. Current workload declarations claim 7.0.0; the deliberately
+         # stale claim in reset/workloads.yaml remains subject to the orphan cage.
+   resourcesTemplate: |

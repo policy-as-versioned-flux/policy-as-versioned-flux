@@ -1,0 +1,7 @@
+Spec PASS for exact SSH-signed `6684f683bb6f9a9f7b83fed7e4b5f539ae7a3b11`, tree `0951b1ca6f64ca09d1538f062f19a49bc92cd20f`, parent `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`. No Spec findings.
+
+The sole change adds `assert spec is not None and spec.loader is not None` before the observation-ownership regression imports its local verifier. It narrows the optional importlib values that actual CI rejected, and fails immediately if the regression cannot load its subject. Every regression assertion, runtime verifier, observation-ownership rule, snapshot closure, manifest entry, refusal rule, engine check and repricing path retains its exact parent blob.
+
+Independently verified the normal SSH signature, parent/tree, clean checkout, one-path diff, source/patch/check hashes and all eleven other approved repair source objects. The unchanged ownership regression independently passes (1 passed); the exact-source primary typecheck receipt reports no issues in 208 source files, and its log hash matches. No guard, test, threshold or claimed outcome is weakened.
+
+This review approves the narrow source correction within the existing repair. It does not establish remote CI completion, merge, publication, a scheduled observation or a coverage-floor pass. The historical 90% floor failure and run377 grades remain unchanged. No reviewed source/index or public operation was performed by this reviewer.

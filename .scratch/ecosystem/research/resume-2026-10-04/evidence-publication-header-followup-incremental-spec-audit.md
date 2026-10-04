@@ -1,0 +1,3 @@
+PASS_FOR_BOUNDED_INCREMENTAL_SNAPSHOT: 24 added or changed files (611592 bytes), 12 strict JSON files. Credentials: 0; filename issues: 0; parse errors: 0; second-read changes: 0. All eight original credential patterns and literal-secret checks ran. Prior audits and the two-file race closure remain unchanged. Only this output pair is excluded from its own hash inventory.
+
+The f10 source fix remains locally reviewed and unpublished after automatic approval review rejected its exact public payload. PR155 remains 7fa with the historical fixture and floor failures; this audit claims no green CI or source merge. Later final documents and publication receipts require a separately bound incremental audit.

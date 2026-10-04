@@ -1,0 +1,64 @@
+{
+  "platform_schema_tag": "v2.0.1",
+  "platform_schema_commit": "533dccb0a823001b396fd60ab08014bf75065a37",
+  "no_external_mutations": true,
+  "checks": {
+    "verify-feeds.sh": {
+      "exit": 0,
+      "final_line": "PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed; the bump ladder holds; publishes[] names only real paths; a twin scenario validates against the 2.0.0 forward-intel payload schema; fx prices a date it publishes and refuses one it does not; and the threat register publishes its own loss magnitudes with a dated basis on each and ships the converter that reads them."
+    },
+    "verify-market-and-news.sh": {
+      "exit": 0,
+      "final_line": "PASS: market-moves publishes a dated series from one mechanical rule over one venue with no probability-shaped field, and its own threshold is what opens a PR; news carries the five decided fields and admits nothing without a provenance URL; sub-threshold readings land on the observation branch carrying the reading; niobium is absent from the feed; no clock here invokes a model."
+    },
+    "fx-native-selfcheck": {
+      "exit": 0,
+      "stdout": "ok  1000 GBP -> 1336.70 USD at the 2026-08 HMRC rate 1.3367\nok  1336.70 USD -> 1000.00 GBP, the same month's rate both ways\nok  100 EUR -> 114.06 USD, crossed through the GBP base\nok  a same-currency amount needs no rate and no date\nok  2026-05-14 refuses (a month the feed does not publish): no fx rate published for 2026-05-14: the fx feed publishes 2025-12, 2026-08 (ADR-0020, a missing instrument refuses)\nok  2027-01-31 refuses (a month the feed has not reached): no fx rate published for 2027-01-31: the fx feed publishes 2025-12, 2026-08 (ADR-0020, a missing instrument refuses)\nok  an unquoted currency refuses: the fx feed for 2026-08 quotes no rate for XYZ (it quotes AED, ALL, AMD, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BHD, BIF, BMD, BND, BOB, BRL, BSD, BTN, BWP, BYN, BZD, CAD, CDF, CHF, CLP, CNY, COP, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, GBP, GEL, GHS, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KRW, KWD, KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MYR, MZN, NGN, NIO, NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SLE, SOS, SRD, SVC, SZL, THB, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, UYU, UZS, VES, VND, VUV, WST, XAF, XCD, XOF, XPF, YER, ZAR, ZMW, ZWG); ADR-0020, refusing\nok  converters/fx.py selfcheck: 7 cases\n",
+      "stderr": ""
+    },
+    "december-date-conversion": {
+      "exit": 0,
+      "stdout": "6456650921.834527\n",
+      "stderr": ""
+    },
+    "august-date-preserved": {
+      "exit": 0,
+      "stdout": "1336.7\n",
+      "stderr": ""
+    },
+    "original-to-december-normal-rule": {
+      "exit": 0,
+      "stdout": "major\n",
+      "stderr": ""
+    },
+    "december-offline-primary-replay": {
+      "exit": 0,
+      "stdout": "fx: upstream (https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_{year}-{month}.csv) vs published v2.0.0 under rule.yaml (a new monthly period, a currency added or withdrawn, or any published rate corrected) -> none\n{\"bump\": \"none\", \"feed\": \"fx\", \"observed_at\": \"2026-10-04T09:01:50+00:00\", \"payload_sha256\": \"3062828d54e4ad8576bc40c06d2f37949d51c95294e32444c2e8a65156d24e7c\", \"published_version\": \"2.0.0\"}\n",
+      "scope": "dry run against captured primary December payload; no observation lane write, no new upstream clock claim"
+    },
+    "missing-month-2025-11-30": {
+      "exit": 4,
+      "stderr": "MISSING INSTRUMENT: no fx rate published for 2025-11-30: the fx feed publishes 2025-12, 2026-08 (ADR-0020, a missing instrument refuses)\n",
+      "observed_honest_absence": true
+    },
+    "missing-month-2026-01-01": {
+      "exit": 4,
+      "stderr": "MISSING INSTRUMENT: no fx rate published for 2026-01-01: the fx feed publishes 2025-12, 2026-08 (ADR-0020, a missing instrument refuses)\n",
+      "observed_honest_absence": true
+    },
+    "primary-replay-2025-12": {
+      "complete_official_table_matches_envelope": true,
+      "raw_sha256": "48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26",
+      "unique_currency_count": 142
+    },
+    "primary-replay-2026-08": {
+      "complete_official_table_matches_envelope": true,
+      "raw_sha256": "8da9e83a830282c94cbcb31779cbeb93d7a2a739d1bb898cbec62182b7b29fad",
+      "unique_currency_count": 141
+    },
+    "frozen-major-preservation": {
+      "byte_exact_count": 12,
+      "PASS": true
+    }
+  }
+}

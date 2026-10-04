@@ -1,0 +1,9 @@
+test_composition_bytes_do_not_depend_on_checkout_prefix (test_platform_tools.RealCompilerLayout.test_composition_bytes_do_not_depend_on_checkout_prefix) ... ok
+test_runs_verified_compiler_without_running_implementation (test_platform_tools.ToolBoundary.test_runs_verified_compiler_without_running_implementation) ... ok
+test_composition_job_fetches_adopter_history_needed_to_price_since (test_platform_tools.WorkflowToolScope.test_composition_job_fetches_adopter_history_needed_to_price_since) ... ok
+test_every_tool_caller_provisions_inside_its_own_job (test_platform_tools.WorkflowToolScope.test_every_tool_caller_provisions_inside_its_own_job) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 22.287s
+
+OK

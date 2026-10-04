@@ -1,0 +1,26 @@
+test_composed_route_waiting_on_apps_is_a_cycle (test_apps_dependencies.AppAdmissionOrder.test_composed_route_waiting_on_apps_is_a_cycle) ... ok
+test_current_native_apps_wait_for_the_actual_composed_graph (test_apps_dependencies.AppAdmissionOrder.test_current_native_apps_wait_for_the_actual_composed_graph) ... FAIL
+test_missing_or_invented_route_is_rejected (test_apps_dependencies.AppAdmissionOrder.test_missing_or_invented_route_is_rejected) ... ok
+
+======================================================================
+FAIL: test_current_native_apps_wait_for_the_actual_composed_graph (test_apps_dependencies.AppAdmissionOrder.test_current_native_apps_wait_for_the_actual_composed_graph)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/driftwood/tests/test_apps_dependencies.py", line 54, in test_current_native_apps_wait_for_the_actual_composed_graph
+    assert_ordered(self, self.apps, self.generated)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/driftwood/tests/test_apps_dependencies.py", line 27, in assert_ordered
+    test.assertEqual(set(graph[key(apps)]), {key(obj) for obj in policies},
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'apps must wait for every composed policy route and machinery')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Items in the second set but not the first:
+('flux-system', 'composed-v7-0-0')
+('flux-system', 'composed-machinery')
+('flux-system', 'composed-v6-0-0')
+('flux-system', 'composed-v5-0-0') : apps must wait for every composed policy route and machinery
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.030s
+
+FAILED (failures=1)

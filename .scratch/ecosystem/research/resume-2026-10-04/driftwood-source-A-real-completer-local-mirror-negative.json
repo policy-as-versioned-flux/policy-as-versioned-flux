@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "bash",
+    ".github/scripts/complete-feed-bump.sh"
+  ],
+  "cwd": "/private/tmp/pavf-dw-real-completer-7zsp5quh/driftwood",
+  "local_sources": {
+    "https://github.com/policy-as-versioned-platform/platform": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/platform-tools",
+    "https://github.com/policy-as-versioned-nist/nist": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/nist",
+    "https://github.com/policy-as-versioned-ico/ico": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/ico",
+    "https://github.com/policy-as-versioned-feeds/feeds": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/feeds",
+    "https://github.com/policy-as-versioned-insurer/insurer": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/insurer",
+    "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/hub"
+  },
+  "exit": 1,
+  "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-source-A-real-completer.log",
+  "old_v1_before_sha256": "4668062dc40058aac100fd768353e220c8ce0276155c9b8c17f78c9a5c16edc2",
+  "old_v1_after_sha256": "4668062dc40058aac100fd768353e220c8ce0276155c9b8c17f78c9a5c16edc2",
+  "expected_v2_sha256": "5c7385f77834496dd17dbbbfeb13098f92df4e0759d9fd0721a8b5d88c070729",
+  "actual_v2_sha256": "5f1420798158fa17b8600092aa757d42809b4c14834f060ef7b4bf0c1ee18712"
+}

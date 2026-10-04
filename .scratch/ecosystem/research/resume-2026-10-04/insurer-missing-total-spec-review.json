@@ -1,0 +1,22 @@
+{
+  "verdict": "PASS",
+  "findings": [],
+  "head": "16b4857260f12458e5e0c797b2f99c60b1e03295",
+  "tree": "edad5232c2c12086406140142ae1635f1c59b444",
+  "base": "32ea73d5757ee4fc9d136ab9900ffed81d6c6eed",
+  "reviewed_at": "2026-10-04T13:15:14.934028+00:00",
+  "packet_sha256": "3517ec1bf6a2c42c1e11997080c99d4250e911a259a5a389fe0511ed34989546",
+  "source_sha256": {
+    "pricing/quote.py": "24464778f951666b911601c4ed54bdf0c9745465caf6a04e9df294e48045e659",
+    "pricing/test_quote_missing_total.py": "6f944b5872eac6bc330f4ae5125726d8cb5149ef667f2da925951719185da7b0",
+    "verify-insurer-quote.sh": "cc4e998624a5ddc64822e3ba4e75fa258a031be84163d8ff14c8a2f728e715b3"
+  },
+  "receipt_hashes_match": true,
+  "independent_four_tests_exit": 0,
+  "test_log_sha256": "c607aaa9eb9348c2535677e7d014f7a29f1b354e063c5baa88a63586e12e73d8",
+  "missing_total_is_typed_refusal": true,
+  "known_zero_and_existing_formula_retained": true,
+  "signed_LU_B_null_exposure_stays_unpriced": true,
+  "cloud_pin_contract_separate_unmodified": true,
+  "external_mutations": false
+}

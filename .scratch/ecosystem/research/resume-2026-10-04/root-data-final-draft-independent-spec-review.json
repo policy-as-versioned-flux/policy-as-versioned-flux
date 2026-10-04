@@ -1,0 +1,161 @@
+{
+  "review_axis": "Spec",
+  "status": "DRAFT_PASS_CORE_PENDING_FINAL_SIGNED_ROOT_AND_HUB_OUTCOME",
+  "observed_at": "2026-10-04T15:49:11.346967+00:00",
+  "baseline": "5bc47331a536476f3580542be794908f5053f816",
+  "historical_d06_candidate": "HOLD; not retroactively approved",
+  "final_nine_cutoff_at": "2026-10-04T15:27:37.834304+00:00",
+  "independent_published_bundle_joins": [
+    {
+      "repository": "platform",
+      "commit": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb",
+      "tree": "0a2b87aeacceecf5d5423b2e24df4b6e7db1f1b2",
+      "patch_sha256": "3e8df1d17ba150f4c748c2f257f1c1c07146c830647d7c5f4fea79fc20e26234",
+      "exact_git_diff_API_signature_and_bundle_join": true,
+      "recorded_reverse_apply": "PASS",
+      "prior_unchanged_proof_reused": false
+    },
+    {
+      "repository": "feeds",
+      "commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+      "tree": "b88fb77f96cadf1a9639cae369ed529bd4e1731c",
+      "patch_sha256": "136e86ae9d8afe5a7f0863e10f50c2e0e5bf7eb3ce83e61d327147292f786795",
+      "exact_git_diff_API_signature_and_bundle_join": true,
+      "recorded_reverse_apply": "PASS",
+      "prior_unchanged_proof_reused": true
+    },
+    {
+      "repository": "app-ledger",
+      "commit": "d3255fa6fc0ccd25c84043f61b128b4d2e929ac0",
+      "tree": "e0f96aa9dc47e8fd7f8c624a9d478d0aaf87f6e4",
+      "patch_sha256": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+      "exact_git_diff_API_signature_and_bundle_join": true,
+      "recorded_reverse_apply": "PASS",
+      "prior_unchanged_proof_reused": true
+    },
+    {
+      "repository": "app-storefront",
+      "commit": "deb25d3467c9b7c59a83b39bbb8023c790fbad31",
+      "tree": "43b3bba638bf5c8e446df56fc3d0d26979208551",
+      "patch_sha256": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+      "exact_git_diff_API_signature_and_bundle_join": true,
+      "recorded_reverse_apply": "PASS",
+      "prior_unchanged_proof_reused": true
+    },
+    {
+      "repository": "app-api",
+      "commit": "d9b5f4f922cb4ff4b30d75733d48975c86c6df61",
+      "tree": "1d166d6a6e9407a57db5e89887f2fee2183586a3",
+      "patch_sha256": "9a68368faad1c072ee0aab675f4dcd9c2e3335fa42b4704e986588bf777d4988",
+      "exact_git_diff_API_signature_and_bundle_join": true,
+      "recorded_reverse_apply": "PASS",
+      "prior_unchanged_proof_reused": true
+    },
+    {
+      "repository": "app-reports",
+      "commit": "f21bff06fac89401bf180ffc40dd46a37c36db51",
+      "tree": "922e5d6feaab6699550ea426652f38c482c9c7ff",
+      "patch_sha256": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+      "exact_git_diff_API_signature_and_bundle_join": true,
+      "recorded_reverse_apply": "PASS",
+      "prior_unchanged_proof_reused": true
+    },
+    {
+      "repository": "driftwood",
+      "commit": "1194561829ff60f89cd3889ab8cf06a45d5e9dd0",
+      "tree": "b2c8a4b5c3ab9f1cf3ef85e86e20776098cd0072",
+      "patch_sha256": "4898d8bb8f13fb2863789db6d1305b024ed54e98087ac5a0384ef93ffda5fc2b",
+      "exact_git_diff_API_signature_and_bundle_join": true,
+      "recorded_reverse_apply": "PASS",
+      "prior_unchanged_proof_reused": false
+    },
+    {
+      "repository": "ludlow",
+      "commit": "e7243d917c323364c0fb74d312f921d0d1ec1356",
+      "tree": "7e510770eb2d96b4bdfc594211d7e1050f13e17d",
+      "patch_sha256": "7c9ede9224b4e0945b6bbde0b4338916c0c8574cb17ba2bd3086947bab08caff",
+      "exact_git_diff_API_signature_and_bundle_join": true,
+      "recorded_reverse_apply": "PASS",
+      "prior_unchanged_proof_reused": true
+    },
+    {
+      "repository": "tuppence",
+      "commit": "011942de87ba827b5bc2949da0057d862b6b69f6",
+      "tree": "13d698baa99283a93601d90839a27e8844cbb55b",
+      "patch_sha256": "2600f3866e52138d2026ed113e44183f08f4ba2317f1642099cea2dd0b9dcb16",
+      "exact_git_diff_API_signature_and_bundle_join": true,
+      "recorded_reverse_apply": "PASS",
+      "prior_unchanged_proof_reused": true
+    }
+  ],
+  "new_maintenance_actual_merge_joins": [
+    {
+      "repository": "driftwood",
+      "source_candidate": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+      "main": "1194561829ff60f89cd3889ab8cf06a45d5e9dd0",
+      "tree": "b2c8a4b5c3ab9f1cf3ef85e86e20776098cd0072",
+      "actual_merge_and_App_matching_head_join": true,
+      "actual_CI": "2SUCCESS",
+      "new_release_or_live_claim": false
+    },
+    {
+      "repository": "platform",
+      "source_candidate": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+      "main": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb",
+      "tree": "0a2b87aeacceecf5d5423b2e24df4b6e7db1f1b2",
+      "actual_merge_and_App_matching_head_join": true,
+      "actual_CI": "empty rollup honestly recorded",
+      "new_release_or_live_claim": false
+    }
+  ],
+  "raw_provenance_finding": {
+    "original_d06_finding": "Seven received downloads and table render ESC as literal ^[; original raw-Git identity claim was too strong",
+    "closure_prepared": true,
+    "exact_git_objects": 26,
+    "original_downloads_preserved": true,
+    "genuine_counts": {
+      "PASS": 88,
+      "FAIL": 25,
+      "SKIP": 22,
+      "EXCLUDED": 8
+    },
+    "final_signed_inclusion_pending": true
+  },
+  "prototype": {
+    "head": "c1bbb13a5124baa06247fe45845a425399908611",
+    "tree": "a69892493ae59f3e7e8658eb270526ef3d5bc25f",
+    "source_contract_and_both_reviews_hash_join": true,
+    "prior_independent_public_tests_reused": 17,
+    "published_or_adopted": false,
+    "native_money_grades_or_cost_units_fabricated": false,
+    "outside_nine_bundle": true
+  },
+  "old_A_B_release_and_merged_source_proofs_reused_unchanged": true,
+  "all_five_issue_changes_remain_append_only": true,
+  "historical_90_percent_floor_not_waived": true,
+  "engines_1_18_2_cloud_false_and_unobserved_facts_preserved": true,
+  "inputs_sha256": {
+    "publication-final-published-source-manifest.json": "e9af59c924c18056a2650ef03f984fd705cd5d7f8ddca002744a658223db56a3",
+    "publication-final-published-source-api-observations.json": "52b324b2d4cf2301ec61d2ce17a6eb2ff406c0859c9b739e0b258aad32baf565",
+    "publication-final-published-source-export.json": "f45827bf9efb5ec460057ae7508e03af4dcc3c98f3114d77194de6534ca07a7a",
+    "driftwood-delivery-order-maintenance-publication-complete.json": "e5a86facbcba7f6390e83cfc1d295d6ed652451af01df72bc9abba5e5ef9158b",
+    "platform-run377-maintenance-publication-complete.json": "7be806e02b0b01c34a58973d7cad40f026c7b69926e569df88b1808fb44c7b52",
+    "hub-run377-git-raw-provenance.json": "162d52aec048bafe4cdc7a690580dc8d2f248e6e255cb96bb1c45931a828b96b",
+    "hub-run377-git-raw-root-check.json": "1c8de12cd20e3c9ca6d60159e077a2822b46de34a9311d4e2deb53bd86a262cf",
+    "own-response-annual-model-prototype-candidate.json": "3ddec82e46a9422a2e6fe2f4dd2a4fcc901e74b0b908d553410597176e303c7e",
+    "own-response-annual-model-prototype-independent-standards-review.json": "6269f0971c45468a3adbdf2ebe274f4fb86aa37e67eaa9b39e4c9c87f767819b",
+    "own-response-annual-model-root-spec-review.json": "67ba142f4c24ffb8cc3d9775f0d716037d3797d19b82b9c4d14167b466787a97",
+    "hub-run377-ci-combined-followup-spec-review.json": "b398dd2dfc64eb204882fc1c508292935345fe043ba6eff4143323876adf5d9e",
+    "delivery-report.md": "6de81deead11f2479f374b31fe3ac75bbd8b9886f6d838de15b53c6ebc8c14d9",
+    "root-delivery-evidence-PR-body.md": "13fd698723958b5c37c26f1ef459aac34aecdacafd801d0d66e59ac1aed3bcef"
+  },
+  "bundle_manifest_sha256": "aa4a437531bb28df76f8fdb2c70049f48081923b30d0281cbb4aed9f62a8098d",
+  "remaining_finalization": [
+    "Frozen current hub7fa publication/CI/merge outcome and honest report/PR-body wording",
+    "Exact normal signed superseding root commit/tree binding"
+  ],
+  "new_tests_run": 0,
+  "network_calls": 0,
+  "source_or_index_mutations": false,
+  "limitations": "Draft evidence joins only; final root commit and hub outcome not inferred. Original d06 remains historical HOLD. No scheduled regrade, new native grades, model adoption, engine/cloud activation or human review claimed."
+}

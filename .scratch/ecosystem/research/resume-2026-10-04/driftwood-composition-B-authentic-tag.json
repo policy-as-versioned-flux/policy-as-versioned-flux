@@ -1,0 +1,25 @@
+{
+  "institution": "driftwood",
+  "tag": "v4.0.1",
+  "tag_object": "1faa6914677d8da75ecf5fd4f03c7e338282c789",
+  "peeled_commit": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "cut_run": 37201470734,
+  "cut_conclusion": "success",
+  "signature_argv": [
+    "gitsign",
+    "verify-tag",
+    "v4.0.1",
+    "--certificate-identity=https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main",
+    "--certificate-oidc-issuer=https://token.actions.githubusercontent.com"
+  ],
+  "signature_exit": 0,
+  "git_signature": true,
+  "rekor_entry": true,
+  "certificate_claims": true,
+  "identity": "https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "tlog_index": "3077655413",
+  "immutable_release_publication_pending": true,
+  "final_composed_pointer_edits_may_begin": false,
+  "manual_tag_created": false
+}

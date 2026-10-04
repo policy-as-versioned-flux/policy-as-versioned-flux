@@ -1,0 +1,6 @@
+tests/test_map_observation_ownership.py:12: error: Argument 1 to "module_from_spec" has incompatible type "ModuleSpec | None"; expected "ModuleSpec"  [arg-type]
+tests/test_map_observation_ownership.py:13: error: Item "None" of "ModuleSpec | None" has no attribute "name"  [union-attr]
+tests/test_map_observation_ownership.py:14: error: Item "None" of "ModuleSpec | None" has no attribute "loader"  [union-attr]
+tests/test_map_observation_ownership.py:14: error: Item "None" of "Loader | Any | None" has no attribute "exec_module"  [union-attr]
+tests/test_sensor_admission.py:1288: note: By default the bodies of untyped functions are not checked, consider using --check-untyped-defs  [annotation-unchecked]
+Found 4 errors in 1 file (checked 208 source files)

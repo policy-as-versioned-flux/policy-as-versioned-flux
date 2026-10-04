@@ -1,0 +1,14 @@
+{
+  "scope": "Trusted user replies authorize exact reviewed public payloads, saved PR bodies and ordinary CI/matching-head App merges",
+  "user_response_driftwood_ludlow": "Approve both exact public changes",
+  "approved_atomic_heads": {
+    "policy-as-versioned-driftwood/driftwood": "98d13782173342bbdfbd14271e1626e3b11b0d73",
+    "policy-as-versioned-ludlow/ludlow": "6de0d00ce850ea820777f46fbea5c93a3238ea68"
+  },
+  "user_response_tuppence": "Approve exact Tuppence change",
+  "approved_final_pointer_head": {
+    "policy-as-versioned-tuppence/tuppence": "b2abe26c155beea87366bcdf9775faae991f0803"
+  },
+  "automatic_public_export_stops_resolved_for_these_exact_heads": true,
+  "no_authority_for_unrelated_public_payloads_inferred": true
+}

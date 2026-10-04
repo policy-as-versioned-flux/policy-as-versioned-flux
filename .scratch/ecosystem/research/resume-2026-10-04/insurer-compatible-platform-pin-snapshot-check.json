@@ -1,0 +1,496 @@
+{
+  "all_other_committed_bytes_preserved": {
+    ".github/rulesets/README.md": "4f2cc545277f325f821cb8134f23683aa6f044594a076755ca58ea82297253f9",
+    ".github/rulesets/observation-lane.json": "ce534e23fee73d85666a1f7e4f440f8030a31052e57275b430484a1b20f2368f",
+    ".github/workflows/cut-release.yml": "c49852d6f74b4128d50588c895f150f6ad95b352936790034242630756407f45",
+    ".github/workflows/fetch.yml": "b34f11e3b683aa7e8c2c56c05906c0aa0e7365617f73532c3c6f9c85ab4c2788",
+    ".github/workflows/release.yml": "345bb388d62e90841d5a07259405b3251a880167ad5dd0c93826c02676a09b0a",
+    ".gitignore": "2e214cdf20bfa8a01a40f596c6c9345fe9380d3efeaae2a86ccdd83d0c7901f0",
+    "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "README.md": "01771d86b070c72cdb4452fac849ba5f416d15aa69b35d41788819ff3cd84df9",
+    "pricing/quote.py": "24464778f951666b911601c4ed54bdf0c9745465caf6a04e9df294e48045e659",
+    "pricing/test_quote_missing_total.py": "6f944b5872eac6bc330f4ae5125726d8cb5149ef667f2da925951719185da7b0",
+    "quote/driftwood/bump.yaml": "0a60daf82653b0b284882a389483a9101e16c78531efbdae4cec405199b42345",
+    "quote/driftwood/rule.yaml": "7e1b1b2531bad6d7d603eedfa5b79dfb2595add6f4d97728345667ab61848674",
+    "quote/driftwood/v1/feed.json": "e1c39816a12a13cfe21ff137073ce33492e89abc044423372c85284dc3760329",
+    "quote/ludlow/bump.yaml": "01fb250f988465e5465b12a37a70cf5edb8daa5a2043cd19df54176deee04e2e",
+    "quote/ludlow/rule.yaml": "017d420e6cfb3e50b0ece80eabac0652b9631fa36f1cfcba274053144bc84846",
+    "quote/ludlow/v1/feed.json": "3d973e6663c477ad8697bbb4993b7e5b939eb8a1ec61b20871d465b399f4c418",
+    "quote/payload.schema.json": "a89d74adb4e96a924d37de8679af4ed8070dd6b0a91593d60b859c48cd6f1ccd",
+    "quote/tuppence/bump.yaml": "57041301d2e475c5cc19a661591a02d3098c63c4545aaa9a05bd007cc0089409",
+    "quote/tuppence/rule.yaml": "2478c4af50ae46da17c9badb1dc3fcea27da1c84337311f66bc432cc5540e1ae",
+    "quote/tuppence/v1/feed.json": "0818de3eb7f2e1a1eabfc19ba33d9818eedd98c2657bc9e23c35369110a319f2",
+    "renovate.json": "d3faf0af3cdd74fe6bead068e8095d7834a194df142c629398c9a06c55a34752",
+    "terms/driftwood.yaml": "c11a2089cbe7cedf5daa0a277960229ff1df1d725d0dbb030b825f99bcd818af",
+    "terms/ludlow.yaml": "10b27f6c7fc704c54aec8333485842218d6ba93ff9a9a6dc4b3730e46e837eb0",
+    "terms/tuppence.yaml": "0b6c70242396778d47ebb88b3b73de813665a0287b751e2db09039985537b1bb",
+    "verify-insurer-party.sh": "e2864aedecaa60fcee276417b0b99cda231aef4832a5e446db56e6da22aa07c8",
+    "verify-insurer-quote.sh": "cc4e998624a5ddc64822e3ba4e75fa258a031be84163d8ff14c8a2f728e715b3"
+  },
+  "base": "8d4a5ae684e4a58c8242bc8b6e50794473ef302b",
+  "compatible_published_tools_commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "implementation_record": {
+    "kind": "implementations",
+    "name": "cloud",
+    "path": "implementations/cloud",
+    "revoked": []
+  },
+  "pin_content_old_new_byte_equal": true,
+  "scope": "pure-consumer parent declaration; no cloud activation, quote render, release or live observation",
+  "snapshots": {
+    "driftwood": {
+      "HEADER_sha256": "16542693d41c95496be0fda086a1dad8422d9244cc87babfb684192b6c188479",
+      "actual_tag": "v2.0.0",
+      "commit": "c26d95cc7154a56df6b56f70904cd8fba3bfd404",
+      "measured_effect": "only platform priced_against version changes; numeric quote and signed terms identical",
+      "outcomes": {
+        "new": {
+          "kind": "priced",
+          "payload": {
+            "adopter": "driftwood",
+            "attachment": {
+              "amount": 40000.0,
+              "currency": "GBP"
+            },
+            "conditions": [
+              {
+                "consequence": "void",
+                "id": "ac-6",
+                "source": "nist",
+                "why": "Least privilege enforced on the governed namespace. This estate implements ac-6; cover is written on the assumption it stays implemented."
+              },
+              {
+                "consequence": "uplift",
+                "id": "cm-6",
+                "source": "nist",
+                "uplift": {
+                  "amount": 25000,
+                  "currency": "GBP"
+                },
+                "why": "Configuration settings enforced. A lapse is survivable but re-rates the account by the stated amount at the next re-quote."
+              }
+            ],
+            "currency": "GBP",
+            "exclusions": [
+              {
+                "control_ids": [
+                  "pl-2",
+                  "ra-3"
+                ],
+                "regime": "uk-gdpr",
+                "why": "Governance-of-record failures. The share of the uk-gdpr lower-tier exposure that ico's published control weights put on the system security plan (pl-2) and the risk assessment (ra-3) is retained by the insured: this cover attaches to breach consequence, not to the insured's own documentation of its programme."
+              }
+            ],
+            "formula": {
+              "excluded": 1072306.2451030707,
+              "id": "layer-rate-on-line",
+              "insured": 2632075.4928490305,
+              "layer": 2592075.4928490305,
+              "load": 0.25,
+              "rate": 0.035,
+              "version": "1.0.0"
+            },
+            "limit": {
+              "amount": 3000000,
+              "currency": "GBP"
+            },
+            "perspective": "insurer",
+            "premium": {
+              "amount": 113403.3,
+              "currency": "GBP",
+              "perspective": "driftwood"
+            },
+            "priced_against": [
+              {
+                "kind": "implementations",
+                "party": "platform",
+                "version": "5.0.0"
+              },
+              {
+                "exposure_sha256": "sha256:7f6b9c1efc06139d261d18d60fb660d0dc6500df8f48f73e581b0d007cb568ed",
+                "kind": "feed",
+                "name": "exposure",
+                "party": "driftwood",
+                "version": "v2.0.0"
+              }
+            ],
+            "valid_from": "2026-08-28",
+            "valid_until": "2027-08-28"
+          }
+        },
+        "old": {
+          "kind": "priced",
+          "payload": {
+            "adopter": "driftwood",
+            "attachment": {
+              "amount": 40000.0,
+              "currency": "GBP"
+            },
+            "conditions": [
+              {
+                "consequence": "void",
+                "id": "ac-6",
+                "source": "nist",
+                "why": "Least privilege enforced on the governed namespace. This estate implements ac-6; cover is written on the assumption it stays implemented."
+              },
+              {
+                "consequence": "uplift",
+                "id": "cm-6",
+                "source": "nist",
+                "uplift": {
+                  "amount": 25000,
+                  "currency": "GBP"
+                },
+                "why": "Configuration settings enforced. A lapse is survivable but re-rates the account by the stated amount at the next re-quote."
+              }
+            ],
+            "currency": "GBP",
+            "exclusions": [
+              {
+                "control_ids": [
+                  "pl-2",
+                  "ra-3"
+                ],
+                "regime": "uk-gdpr",
+                "why": "Governance-of-record failures. The share of the uk-gdpr lower-tier exposure that ico's published control weights put on the system security plan (pl-2) and the risk assessment (ra-3) is retained by the insured: this cover attaches to breach consequence, not to the insured's own documentation of its programme."
+              }
+            ],
+            "formula": {
+              "excluded": 1072306.2451030707,
+              "id": "layer-rate-on-line",
+              "insured": 2632075.4928490305,
+              "layer": 2592075.4928490305,
+              "load": 0.25,
+              "rate": 0.035,
+              "version": "1.0.0"
+            },
+            "limit": {
+              "amount": 3000000,
+              "currency": "GBP"
+            },
+            "perspective": "insurer",
+            "premium": {
+              "amount": 113403.3,
+              "currency": "GBP",
+              "perspective": "driftwood"
+            },
+            "priced_against": [
+              {
+                "kind": "implementations",
+                "party": "platform",
+                "version": "3.3.0"
+              },
+              {
+                "exposure_sha256": "sha256:7f6b9c1efc06139d261d18d60fb660d0dc6500df8f48f73e581b0d007cb568ed",
+                "kind": "feed",
+                "name": "exposure",
+                "party": "driftwood",
+                "version": "v2.0.0"
+              }
+            ],
+            "valid_from": "2026-08-28",
+            "valid_until": "2027-08-28"
+          }
+        }
+      },
+      "tag_object": "90144b731145469f13a9d9f0a39b2de2605b1255",
+      "terms_sha256": "c11a2089cbe7cedf5daa0a277960229ff1df1d725d0dbb030b825f99bcd818af"
+    },
+    "ludlow": {
+      "HEADER_sha256": "27298a7074fce8bb8d96f892fa6a7f9786f5dccee7a3624af7dc3312735cf076",
+      "actual_tag": "v2.0.0",
+      "commit": "ab89691912d40f376b5f0c87b0dcf41294423491",
+      "measured_effect": "only platform priced_against version changes; numeric quote and signed terms identical",
+      "outcomes": {
+        "new": {
+          "kind": "priced",
+          "payload": {
+            "adopter": "ludlow",
+            "attachment": {
+              "amount": 5000.0,
+              "currency": "GBP"
+            },
+            "conditions": [
+              {
+                "consequence": "void",
+                "id": "ac-6",
+                "source": "nist",
+                "why": "Least privilege enforced on the governed namespace."
+              },
+              {
+                "consequence": "uplift",
+                "id": "cm-6",
+                "source": "nist",
+                "uplift": {
+                  "amount": 10000,
+                  "currency": "GBP"
+                },
+                "why": "Configuration settings enforced; a lapse re-rates the account."
+              }
+            ],
+            "currency": "GBP",
+            "exclusions": [
+              {
+                "control_ids": [
+                  "pl-2",
+                  "ra-3",
+                  "ca-2"
+                ],
+                "regime": "uk-gdpr",
+                "why": "Governance-of-record failures: the shares ico's published weights put on the system security plan (pl-2), the risk assessment (ra-3) and the control assessment (ca-2) are retained by the insured."
+              }
+            ],
+            "formula": {
+              "excluded": 7231832.815811407,
+              "id": "layer-rate-on-line",
+              "insured": 2898744.569527032,
+              "layer": 2893744.569527032,
+              "load": 0.35,
+              "rate": 0.045,
+              "version": "1.0.0"
+            },
+            "limit": {
+              "amount": 4000000,
+              "currency": "GBP"
+            },
+            "perspective": "insurer",
+            "premium": {
+              "amount": 175794.98,
+              "currency": "GBP",
+              "perspective": "ludlow"
+            },
+            "priced_against": [
+              {
+                "kind": "implementations",
+                "party": "platform",
+                "version": "5.0.0"
+              },
+              {
+                "exposure_sha256": "sha256:aa708ea54434e0c2f5aaa043ef2c1bb3142b243cc91e7bda6f7447be864336fb",
+                "kind": "feed",
+                "name": "exposure",
+                "party": "ludlow",
+                "version": "v2.0.0"
+              }
+            ],
+            "valid_from": "2026-08-28",
+            "valid_until": "2027-08-28"
+          }
+        },
+        "old": {
+          "kind": "priced",
+          "payload": {
+            "adopter": "ludlow",
+            "attachment": {
+              "amount": 5000.0,
+              "currency": "GBP"
+            },
+            "conditions": [
+              {
+                "consequence": "void",
+                "id": "ac-6",
+                "source": "nist",
+                "why": "Least privilege enforced on the governed namespace."
+              },
+              {
+                "consequence": "uplift",
+                "id": "cm-6",
+                "source": "nist",
+                "uplift": {
+                  "amount": 10000,
+                  "currency": "GBP"
+                },
+                "why": "Configuration settings enforced; a lapse re-rates the account."
+              }
+            ],
+            "currency": "GBP",
+            "exclusions": [
+              {
+                "control_ids": [
+                  "pl-2",
+                  "ra-3",
+                  "ca-2"
+                ],
+                "regime": "uk-gdpr",
+                "why": "Governance-of-record failures: the shares ico's published weights put on the system security plan (pl-2), the risk assessment (ra-3) and the control assessment (ca-2) are retained by the insured."
+              }
+            ],
+            "formula": {
+              "excluded": 7231832.815811407,
+              "id": "layer-rate-on-line",
+              "insured": 2898744.569527032,
+              "layer": 2893744.569527032,
+              "load": 0.35,
+              "rate": 0.045,
+              "version": "1.0.0"
+            },
+            "limit": {
+              "amount": 4000000,
+              "currency": "GBP"
+            },
+            "perspective": "insurer",
+            "premium": {
+              "amount": 175794.98,
+              "currency": "GBP",
+              "perspective": "ludlow"
+            },
+            "priced_against": [
+              {
+                "kind": "implementations",
+                "party": "platform",
+                "version": "3.3.0"
+              },
+              {
+                "exposure_sha256": "sha256:aa708ea54434e0c2f5aaa043ef2c1bb3142b243cc91e7bda6f7447be864336fb",
+                "kind": "feed",
+                "name": "exposure",
+                "party": "ludlow",
+                "version": "v2.0.0"
+              }
+            ],
+            "valid_from": "2026-08-28",
+            "valid_until": "2027-08-28"
+          }
+        }
+      },
+      "tag_object": "7a5fb379636de4fa443b03763e2b8e043d121b69",
+      "terms_sha256": "10b27f6c7fc704c54aec8333485842218d6ba93ff9a9a6dc4b3730e46e837eb0"
+    },
+    "tuppence": {
+      "HEADER_sha256": "c2de1bdd66fa5762cf91fcfaae1e700cc423c1cee4f1f0daf26289e54f47a1ee",
+      "actual_tag": "v2.0.0",
+      "commit": "d5a4bfee9e01b658118140950693d757c08c59b9",
+      "measured_effect": "only platform priced_against version changes; numeric quote and signed terms identical",
+      "outcomes": {
+        "new": {
+          "kind": "priced",
+          "payload": {
+            "adopter": "tuppence",
+            "attachment": {
+              "amount": 15000.0,
+              "currency": "GBP"
+            },
+            "conditions": [
+              {
+                "consequence": "void",
+                "id": "ac-6",
+                "source": "nist",
+                "why": "Least privilege enforced on the governed namespace."
+              }
+            ],
+            "currency": "GBP",
+            "exclusions": [
+              {
+                "control_ids": [
+                  "pl-2"
+                ],
+                "regime": "uk-gdpr",
+                "why": "The share of the uk-gdpr lower-tier exposure ico's published weights put on the system security plan (pl-2) is retained by the insured."
+              }
+            ],
+            "formula": {
+              "excluded": 2711937.3059292776,
+              "id": "layer-rate-on-line",
+              "insured": 6791977.865925621,
+              "layer": 5000000.0,
+              "load": 0.3,
+              "rate": 0.03,
+              "version": "1.0.0"
+            },
+            "limit": {
+              "amount": 5000000,
+              "currency": "GBP"
+            },
+            "perspective": "insurer",
+            "premium": {
+              "amount": 195000.0,
+              "currency": "GBP",
+              "perspective": "tuppence"
+            },
+            "priced_against": [
+              {
+                "kind": "implementations",
+                "party": "platform",
+                "version": "5.0.0"
+              },
+              {
+                "exposure_sha256": "sha256:e33ddb2b1b78ef206dafa627cf66bee759d528c8c7829a58f704e44d3fd1b254",
+                "kind": "feed",
+                "name": "exposure",
+                "party": "tuppence",
+                "version": "v2.0.0"
+              }
+            ],
+            "valid_from": "2026-08-28",
+            "valid_until": "2027-08-28"
+          }
+        },
+        "old": {
+          "kind": "priced",
+          "payload": {
+            "adopter": "tuppence",
+            "attachment": {
+              "amount": 15000.0,
+              "currency": "GBP"
+            },
+            "conditions": [
+              {
+                "consequence": "void",
+                "id": "ac-6",
+                "source": "nist",
+                "why": "Least privilege enforced on the governed namespace."
+              }
+            ],
+            "currency": "GBP",
+            "exclusions": [
+              {
+                "control_ids": [
+                  "pl-2"
+                ],
+                "regime": "uk-gdpr",
+                "why": "The share of the uk-gdpr lower-tier exposure ico's published weights put on the system security plan (pl-2) is retained by the insured."
+              }
+            ],
+            "formula": {
+              "excluded": 2711937.3059292776,
+              "id": "layer-rate-on-line",
+              "insured": 6791977.865925621,
+              "layer": 5000000.0,
+              "load": 0.3,
+              "rate": 0.03,
+              "version": "1.0.0"
+            },
+            "limit": {
+              "amount": 5000000,
+              "currency": "GBP"
+            },
+            "perspective": "insurer",
+            "premium": {
+              "amount": 195000.0,
+              "currency": "GBP",
+              "perspective": "tuppence"
+            },
+            "priced_against": [
+              {
+                "kind": "implementations",
+                "party": "platform",
+                "version": "3.3.0"
+              },
+              {
+                "exposure_sha256": "sha256:e33ddb2b1b78ef206dafa627cf66bee759d528c8c7829a58f704e44d3fd1b254",
+                "kind": "feed",
+                "name": "exposure",
+                "party": "tuppence",
+                "version": "v2.0.0"
+              }
+            ],
+            "valid_from": "2026-08-28",
+            "valid_until": "2027-08-28"
+          }
+        }
+      },
+      "tag_object": "278780b78b83f8e1d0443075f7acaf0fe69b3c18",
+      "terms_sha256": "0b6c70242396778d47ebb88b3b73de813665a0287b751e2db09039985537b1bb"
+    }
+  }
+}

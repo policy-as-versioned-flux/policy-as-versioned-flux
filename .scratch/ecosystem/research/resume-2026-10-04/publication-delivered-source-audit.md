@@ -1,0 +1,3 @@
+PASS_FOR_BOUNDED_SNAPSHOT: 1167 files, 37181174 bytes, including the nine published-source patches and five owned ticket diffs. Credential findings: 0; credential filenames: 0; JSON parse failures: 0. Only names and hashes are recorded for possible matches. Historical primary negatives and every source worktree are preserved.
+
+The cutoff excludes pending DW8d, platform0547, hub4c4 and the prototype from the delivered-source bundle. Research records may describe those preparations explicitly. The root truth/twin workflow filters do not run on these DAY, patch, or ecosystem-ticket paths; this audit does not claim new green CI or a qualified live baseline. Future mapper records require a separately bound incremental audit.

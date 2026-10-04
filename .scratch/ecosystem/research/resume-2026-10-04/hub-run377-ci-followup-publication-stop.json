@@ -1,0 +1,25 @@
+{
+  "recorded_at": "2026-10-04T15:35:56.615934+00:00",
+  "action": "normal fast-forward source branch push for existing PR155",
+  "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+  "head": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "public_previous_head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "command": "git push https://github.com/policy-as-versioned-flux/policy-as-versioned-flux.git HEAD:refs/heads/repair/run377-hub-verifiers-20261004",
+  "cwd": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "automatic_approval_review": "rejected",
+  "reason": "This publishes a new two-file commit, not the exact user-approved 4c4 commit; the user did not authorize this changed public payload for the destination, so sensitive source-code egress must be denied. Do not bypass this rejection through a workaround or indirect execution.",
+  "executed": false,
+  "source_publication_or_pr_body_updated": false,
+  "matching_head_app_review_or_merge_performed": false,
+  "bypass_or_alternate_executor": false,
+  "current_block": "trusted exact changed-payload approval required before any normal retry",
+  "concrete_scope": "exact7fa source plus saved repaired PR body to this public repo, ordinary CI and App matching-head merge without admin/waiver",
+  "unchanged_floor_visible": true,
+  "prepared_receipt_sha256": {
+    "hub-run377-ci-combined-followup-candidate.json": "d6934e1f6f3c975e7fc542182c3f21083a7900c534407b17b25a3a52adceffab",
+    "hub-run377-ci-combined-followup-root-standards-review.json": "13649f43c758c2bc3adba273b1180a3213e53f6d96ede4382a24f7792ee8706b",
+    "hub-run377-ci-combined-followup-spec-review.json": "b398dd2dfc64eb204882fc1c508292935345fe043ba6eff4143323876adf5d9e",
+    "hub-run377-maintenance-ci-repaired-PR-body.md": "2892582a0e975c1e874fd314918b7bfa24986be4f98479d059b98b90c9f8aa20",
+    "hub-run377-ci-followup-public-preflight-main.json": "06c2a5a06872a1020aab67f8c720d5e3181718a24bea71be1dc2346d6830fc94"
+  }
+}

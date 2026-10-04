@@ -1,0 +1,83 @@
+{
+  "driftwood": {
+    "repository": "policy-as-versioned-driftwood/driftwood",
+    "reviewed_source_head": "eac40457ffb4b593dfbe17015c525db3f0914f5f",
+    "base": "17302ecd20041df61a52428e67246c330294d2a6",
+    "version_selection": {
+      "base_tag": "v3.0.1",
+      "ordinary_measured_bump": "major",
+      "next_semver": "v4.0.0",
+      "remote_unused_receipt": "adopter-source-A-remote-preflight.json"
+    },
+    "cut": {
+      "workflow": "cut-release.yml",
+      "ref": "main",
+      "inputs": {
+        "version": "v4.0.0",
+        "message": "Authenticated tools5 and supported policy5/6/7 source; corrected claim7 manifests and genuine dated twin instruments. SourceA; delivery self-pins follow in a reviewed change."
+      }
+    },
+    "release": {
+      "workflow": "release.yml",
+      "ref": "refs/tags/v4.0.0",
+      "inputs": {
+        "tag": "v4.0.0"
+      }
+    },
+    "barrier": "Exact-head reviews, normal PR+matching-head App review/merge, source reachability and unused-tag check before cut; authentic tag and immutable release receipt before delivery pin moves."
+  },
+  "tuppence": {
+    "repository": "policy-as-versioned-tuppence/tuppence",
+    "reviewed_source_head": "d1dbe766e09bb8112efa609836af0aa95cbe0ee4",
+    "base": "d8dead25e0e5e275172640b1a637562e45edb15d",
+    "version_selection": {
+      "base_tag": "v3.0.1",
+      "ordinary_measured_bump": "major",
+      "next_semver": "v4.0.0",
+      "remote_unused_receipt": "adopter-source-A-remote-preflight.json"
+    },
+    "cut": {
+      "workflow": "cut-release.yml",
+      "ref": "main",
+      "inputs": {
+        "version": "v4.0.0",
+        "message": "Authenticated tools5 and supported policy5/6/7 source; corrected claim7 manifests and genuine dated twin instruments. SourceA; delivery self-pins follow in a reviewed change."
+      }
+    },
+    "release": {
+      "workflow": "release.yml",
+      "ref": "refs/tags/v4.0.0",
+      "inputs": {
+        "tag": "v4.0.0"
+      }
+    },
+    "barrier": "Exact-head reviews, normal PR+matching-head App review/merge, source reachability and unused-tag check before cut; authentic tag and immutable release receipt before delivery pin moves."
+  },
+  "ludlow": {
+    "repository": "policy-as-versioned-ludlow/ludlow",
+    "reviewed_source_head": "926d6b38384fd9b532305c668313920ff943653a",
+    "base": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+    "version_selection": {
+      "base_tag": "v3.0.1",
+      "ordinary_measured_bump": "major",
+      "next_semver": "v4.0.0",
+      "remote_unused_receipt": "adopter-source-A-remote-preflight.json"
+    },
+    "cut": {
+      "workflow": "cut-release.yml",
+      "ref": "main",
+      "inputs": {
+        "version": "v4.0.0",
+        "message": "Authenticated tools5 and supported policy5/6/7 source; corrected claim7 manifests and genuine dated twin instruments. SourceA; delivery self-pins follow in a reviewed change."
+      }
+    },
+    "release": {
+      "workflow": "release.yml",
+      "ref": "refs/tags/v4.0.0",
+      "inputs": {
+        "tag": "v4.0.0"
+      }
+    },
+    "barrier": "Exact-head reviews, normal PR+matching-head App review/merge, source reachability and unused-tag check before cut; authentic tag and immutable release receipt before delivery pin moves."
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "recorded_at": "2026-10-04T11:59:25Z",
+  "scope": "Actual user-approved exact four-path public atomic delivery",
+  "head": "6de0d00ce850ea820777f46fbea5c93a3238ea68",
+  "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63",
+  "branch": "delivery-stage2-atomic-20261004",
+  "push": {"executed": true, "exit_code": 0},
+  "pull_request": {
+    "number": 52,
+    "url": "https://github.com/policy-as-versioned-ludlow/ludlow/pull/52",
+    "state": "OPEN",
+    "headRefOid": "6de0d00ce850ea820777f46fbea5c93a3238ea68",
+    "run_id": 37200561569,
+    "shift-left": "IN_PROGRESS",
+    "compose-check": "IN_PROGRESS"
+  },
+  "app_review_executed": false,
+  "merge_executed": false,
+  "composition_B_cut_executed": false,
+  "historical_hold_preserved": "ludlow-atomic-delivery-publication-hold.json",
+  "actual_user_approval": "ludlow-atomic-delivery-user-publication-approval.json"
+}

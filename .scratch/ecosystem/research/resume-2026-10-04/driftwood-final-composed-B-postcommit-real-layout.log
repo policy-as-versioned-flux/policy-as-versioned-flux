@@ -1,0 +1,8 @@
+test_composition_bytes_do_not_depend_on_checkout_prefix (test_platform_tools.RealCompilerLayout.test_composition_bytes_do_not_depend_on_checkout_prefix) ... ok
+test_runs_verified_compiler_without_running_implementation (test_platform_tools.ToolBoundary.test_runs_verified_compiler_without_running_implementation) ... ok
+test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history (test_platform_tools.WorkflowHistory.test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 23.297s
+
+OK

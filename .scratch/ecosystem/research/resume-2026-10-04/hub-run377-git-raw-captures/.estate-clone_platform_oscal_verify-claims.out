@@ -1,0 +1,12 @@
+[1;36m==>[0m 1. lint_claims.py's own asserts (the lint itself resolves correctly)
+Traceback (most recent call last):
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/oscal/lint_claims.py", line 226, in <module>
+    raise SystemExit(main(sys.argv))
+                     ^^^^^^^^^^^^^^
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/oscal/lint_claims.py", line 220, in main
+    selfcheck()
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/oscal/lint_claims.py", line 175, in selfcheck
+    assert dangling == KNOWN_DANGLING, f"dangling claims changed: {dangling}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: dangling claims changed: {('cm-6', 'policy-version-orphan-cage'), ('cm-6', 'governed-namespace-unclaimed-report'), ('ac-4', 'cage-netpol-bottom-rung')}
+FAIL: lint_claims.py --selfcheck

@@ -1,0 +1,165 @@
+{
+  "observed_at": "2026-10-04T10:16:45.040870+00:00",
+  "scope": "Read-only exact-source review joined to actual normal full-window gate and observed remote preflight; no publication",
+  "grade_file_sha256": "c546347dab4413c58e151a4b13ffd436793e64be0d68dce34de99c5b287cd169",
+  "preflight_file_sha256": "69e75f08f7e45f3fd8f00956830ef4ba95449feb86925684d1c695231d0efa14",
+  "adopters": {
+    "driftwood": {
+      "head": "eac40457ffb4b593dfbe17015c525db3f0914f5f",
+      "tree": "bd42b04976d0c74f08228fb0eb6115c0a81207b7",
+      "normal_gate_exit": 0,
+      "computed_bump": "major",
+      "acceptance_admitted": true,
+      "retired": [],
+      "observed_remote_main": "17302ecd20041df61a52428e67246c330294d2a6",
+      "observed_unused_release": "v4.0.0",
+      "workflows": {
+        "cut-release.yml": {
+          "sha256": "eb36fa3055715b17264334039bf7b9d8cb2f764ddb9444788d48858cb26f376b",
+          "workflow_dispatch_inputs": {
+            "version": {
+              "description": "semver tag to cut, e.g. v1.0.0",
+              "required": "true"
+            },
+            "message": {
+              "description": "annotated tag message -- what changed and why",
+              "required": "true"
+            }
+          },
+          "global_permissions": {
+            "contents": "write",
+            "id-token": "write"
+          },
+          "cut_release_identity": null,
+          "issuer": null,
+          "generic_feed_checkout": {
+            "repository": "policy-as-versioned-feeds/feeds",
+            "path": "feeds",
+            "fetch-depth": "0",
+            "ref": "${{ steps.pins.outputs.feeds_tag }}"
+          },
+          "verified_tools_composite_action": true
+        },
+        "release.yml": {
+          "sha256": "8d6b80d626fc275b7e579c6b5aefee907b5f7174b855af7ff50af3ab4e85ccfe",
+          "workflow_dispatch_inputs": {
+            "tag": {
+              "description": "tag to verify + publish (workflow_dispatch path only)",
+              "required": "true"
+            }
+          },
+          "global_permissions": {
+            "contents": "write"
+          },
+          "cut_release_identity": "^https://github\\.com/policy-as-versioned-driftwood/driftwood/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "issuer": "https://token.actions.githubusercontent.com"
+        }
+      }
+    },
+    "tuppence": {
+      "head": "d1dbe766e09bb8112efa609836af0aa95cbe0ee4",
+      "tree": "229bb619b07e1d2410573d81e8768791b15b2191",
+      "normal_gate_exit": 0,
+      "computed_bump": "major",
+      "acceptance_admitted": true,
+      "retired": [],
+      "observed_remote_main": "d8dead25e0e5e275172640b1a637562e45edb15d",
+      "observed_unused_release": "v4.0.0",
+      "workflows": {
+        "cut-release.yml": {
+          "sha256": "dc2ef2faa6077a62a6eefa9fa18cbc7b95fccbf1eca43553a06793f9fc0862b2",
+          "workflow_dispatch_inputs": {
+            "version": {
+              "description": "semver tag to cut, e.g. v1.0.0",
+              "required": "true"
+            },
+            "message": {
+              "description": "annotated tag message -- what changed and why",
+              "required": "true"
+            }
+          },
+          "global_permissions": {
+            "contents": "write",
+            "id-token": "write"
+          },
+          "cut_release_identity": null,
+          "issuer": null,
+          "generic_feed_checkout": {
+            "repository": "policy-as-versioned-feeds/feeds",
+            "path": "feeds",
+            "fetch-depth": "0",
+            "ref": "${{ steps.pins.outputs.feeds_tag }}"
+          },
+          "verified_tools_composite_action": true
+        },
+        "release.yml": {
+          "sha256": "c28acee73e79fe00fbe32b8b6b5689ee61466d7c320534e1f9416b8f15671114",
+          "workflow_dispatch_inputs": {
+            "tag": {
+              "description": "tag to verify + publish (workflow_dispatch path only)",
+              "required": "true"
+            }
+          },
+          "global_permissions": {
+            "contents": "write"
+          },
+          "cut_release_identity": "^https://github\\.com/policy-as-versioned-tuppence/tuppence/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "issuer": "https://token.actions.githubusercontent.com"
+        }
+      }
+    },
+    "ludlow": {
+      "head": "926d6b38384fd9b532305c668313920ff943653a",
+      "tree": "7c91c4e52346d9477a5bae17d2487463674141c9",
+      "normal_gate_exit": 0,
+      "computed_bump": "major",
+      "acceptance_admitted": true,
+      "retired": [],
+      "observed_remote_main": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+      "observed_unused_release": "v4.0.0",
+      "workflows": {
+        "cut-release.yml": {
+          "sha256": "b70f0a84d2d516d4bfc5835def599e850e215a6a17f5cb00b1c5e7bdd9886a6e",
+          "workflow_dispatch_inputs": {
+            "version": {
+              "description": "semver tag to cut, e.g. v1.0.0",
+              "required": "true"
+            },
+            "message": {
+              "description": "annotated tag message -- what changed and why",
+              "required": "true"
+            }
+          },
+          "global_permissions": {
+            "contents": "write",
+            "id-token": "write"
+          },
+          "cut_release_identity": null,
+          "issuer": null,
+          "generic_feed_checkout": {
+            "repository": "policy-as-versioned-feeds/feeds",
+            "path": "feeds",
+            "fetch-depth": "0",
+            "ref": "${{ steps.pins.outputs.feeds_tag }}"
+          },
+          "verified_tools_composite_action": true
+        },
+        "release.yml": {
+          "sha256": "dcc5cc6c1416017043dc83635ffc19bfb5ed8f692d87a4b290301d6fca5812bc",
+          "workflow_dispatch_inputs": {
+            "tag": {
+              "description": "tag to verify + publish (workflow_dispatch path only)",
+              "required": "true"
+            }
+          },
+          "global_permissions": {
+            "contents": "write"
+          },
+          "cut_release_identity": "^https://github\\.com/policy-as-versioned-ludlow/ludlow/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+          "issuer": "https://token.actions.githubusercontent.com"
+        }
+      }
+    }
+  },
+  "status": "PASS: exact signed source-A review, fresh normal major gates and observed unused v4 namespace agree"
+}

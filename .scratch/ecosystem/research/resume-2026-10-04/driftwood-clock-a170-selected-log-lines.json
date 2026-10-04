@@ -1,0 +1,13 @@
+[
+  "sample\tSet up job\t2026-10-04T12:23:59.8252402Z Version: 20260901.588",
+  "sample\tSet up job\t2026-10-04T12:23:59.8267336Z Version: 20260927.320.1",
+  "sample\tread the engine this repository declares (gitops/engine/kyverno.yaml, ticket 147)\t2026-10-04T12:24:05.0027702Z version=1.18.2",
+  "sample\tread the engine this repository declares (gitops/engine/kyverno.yaml, ticket 147)\t2026-10-04T12:24:05.0028623Z install_url=https://github.com/kyverno/kyverno/releases/download/v1.18.2/install.yaml",
+  "sample\tread the engine this repository declares (gitops/engine/kyverno.yaml, ticket 147)\t2026-10-04T12:24:05.0030634Z cli_url=https://github.com/kyverno/kyverno/releases/download/v1.18.2/kyverno-cli_v1.18.2_linux_x86_64.tar.gz",
+  "sample\tinstall the pinned tools (binary + checksum, no marketplace action)\t2026-10-04T12:24:05.0204159Z   KYVERNO_INSTALL_URL: https://github.com/kyverno/kyverno/releases/download/v1.18.2/install.yaml",
+  "sample\tinstall the pinned tools (binary + checksum, no marketplace action)\t2026-10-04T12:24:06.6609024Z kyverno.yaml: OK",
+  "sample\ttake the five-fact sample and append it to the observation log\t2026-10-04T12:27:18.3203265Z SKIP: drift/samples.jsonl carries uncommitted edits, so its newest line is a working-tree rehearsal and not a lane commit",
+  "sample\tsample every served workload and collect its OSCAL observations\t2026-10-04T12:27:25.9681885Z SKIP: drift/workload-samples.jsonl carries uncommitted edits, so its newest line is a working-tree rehearsal and not a lane commit",
+  "sample\tsample every served workload and collect its OSCAL observations\t2026-10-04T12:27:26.6164887Z OSCAL observation: 9 served policies mapped; 44 PolicyReports; observed: converted 44 PolicyReports at the lane's pinned platform tree",
+  "sample\tsample every served workload and collect its OSCAL observations\t2026-10-04T12:27:26.6954752Z SKIP: drift/oscal-samples.jsonl carries uncommitted edits, so its newest line is a working-tree rehearsal and not a lane commit"
+]

@@ -1,0 +1,3 @@
+E2E step 2 renovate pins and re-prices
+    driftwood pins ico/penalty-schema at v3; v4 is on disk
+FAIL: composition refused driftwood at v3 (refused): {"detail": "missing instrument: CVE inventory: apps source or pinned tree is unreadable: Command '['git', '-C', '/tmp/tmpw_8jhihk/driftwood', 'rev-parse', '--show-toplevel']' returned non-zero exit status 128.", "kind": "missing-instrument", "needs_composition": true, "subject": "driftwood"}

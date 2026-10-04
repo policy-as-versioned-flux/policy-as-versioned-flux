@@ -1,0 +1,111 @@
+diff --git a/.github/workflows/shift-left.yml b/.github/workflows/shift-left.yml
+index 48e773e0307394541c1cb484cc283d2e3508a5dd..d1e95e9e674ce63e123ff3140544f38566485fa5 100644
+--- a/.github/workflows/shift-left.yml
++++ b/.github/workflows/shift-left.yml
+@@ -92,9 +92,10 @@ jobs:
+         with:
+           path: ludlow
+           ref: ${{ github.event.pull_request.head.sha }}
++          fetch-depth: 0
+ 
+       - name: fetch this PR's base commit too (ticket cs-28 needs the OLD platform pin, not just the new one)
+-        run: git -C ludlow fetch --depth=1 origin ${{ github.event.pull_request.base.sha }}
++        run: git -C ludlow fetch origin ${{ github.event.pull_request.base.sha }}
+ 
+       - name: read the platform tag THIS PR proposes (from the PR head's own platform-pin.yaml -- bug #1 fix)
+         id: pin
+@@ -201,7 +202,7 @@ jobs:
+         run: |
+           set -euo pipefail
+           tag="$(python3 -c 'import sys; sys.path.insert(0, "ludlow/scripts"); import render_composed as rc; print(rc.pinned_tag())')"
+-          git -C ludlow fetch --quiet --depth=1 origin "refs/tags/${tag}:refs/tags/${tag}"
++          git -C ludlow fetch --quiet origin "refs/tags/${tag}:refs/tags/${tag}"
+           bash ludlow/verify-cage-probe.sh
+ 
+       - name: install pinned cosign (binary + checksum, no marketplace action)
+@@ -353,7 +354,7 @@ jobs:
+       contents: read
+     steps:
+       - uses: actions/checkout@v4
+-        with: { path: ludlow }
++        with: { path: ludlow, fetch-depth: 0 }
+ 
+       - name: Install pinned identity verifier
+         uses: ./ludlow/.github/actions/install-gitsign
+@@ -452,7 +453,7 @@ jobs:
+         # delivered by exactly one Kustomization that ResourceSet generates, the array must be the
+         # version directories that tag carries, and every machinery allow-list must be the array.
+         # The ResourceSet is read from this pull request's head, composed/ from the tag, which is
+-        # how the lane applies them. Tags are fetched because the checkout above is shallow.
++        # how the lane applies them. Refresh tags without truncating the complete checkout history.
+         run: |
+           set -euo pipefail
+           git -C ludlow fetch --quiet --tags origin
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index 0b591707717788931dd6f1ecc5f6ec576a0a7691..d44a94578e13bef6f63d73d66d820a68f10571e1 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -624,7 +624,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: 82091bb199079d0ed9a4c1819df9940fba61870de22331e8f796f95e09db1a4f
++  after: 2fa71b01e3673accce0ae551ac967431470920e08e41424e1d3413849bee77dc
+   before:
+     header:
+       parents:
+@@ -1260,10 +1260,15 @@ comparison-inputs:
+       proposed_tier: isolated
+       hole:
+         status: recorded
++    - kind: twin
++      source: twin
++      name: forward-intel
++      proposed_tier: isolated
++      hole: null
+     - kind: agent-cage
+       source: platform
+       name: twin-agent
+-      proposed_tier: null
++      proposed_tier: baseline
+       hole: null
+     - kind: switching
+       source: ico
+diff --git a/tests/test_platform_tools.py b/tests/test_platform_tools.py
+index 7ccabf3701b5bb08af989c4fadaa0ffacd4abde6..48aa4636aeae9e126b1c45a068531bf2e37afe75 100644
+--- a/tests/test_platform_tools.py
++++ b/tests/test_platform_tools.py
+@@ -130,6 +130,24 @@ class ToolBoundary(unittest.TestCase):
+             self.assertNotEqual(result.returncode, 0)
+ 
+ 
++class WorkflowHistory(unittest.TestCase):
++    def test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history(self):
++        import yaml
++        workflow = yaml.safe_load((ROOT / '.github/workflows/shift-left.yml').read_text())
++        for name in ('shift-left', 'compose-check'):
++            with self.subTest(job=name):
++                steps = workflow['jobs'][name]['steps']
++                own = next(step for step in steps if step.get('uses', '').startswith('actions/checkout@')
++                           and step.get('with', {}).get('path') == 'ludlow'
++                           and 'repository' not in step.get('with', {}))
++                self.assertEqual(own['with'].get('fetch-depth', 1), 0,
++                                 'inventory and since pricing require genuine adopter tags/history')
++                for step in steps:
++                    for line in step.get('run', '').splitlines():
++                        if 'git -C ludlow fetch' in line:
++                            self.assertNotIn('--depth', line, 'a later fetch must not truncate signed history')
++
++
+ @unittest.skipUnless(os.environ.get('PAVF_REAL_ESTATE'), 'set PAVF_REAL_ESTATE for signed real-compiler layout regression')
+ class RealCompilerLayout(unittest.TestCase):
+     def test_composition_bytes_do_not_depend_on_checkout_prefix(self):
+@@ -144,7 +162,7 @@ class RealCompilerLayout(unittest.TestCase):
+                            'compose', adopter_arg, '--estate-clone', os.path.relpath(estate, cwd),
+                            '--out', os.path.relpath(out, cwd)]
+                 result = subprocess.run(command, cwd=cwd, capture_output=True, text=True)
+-                self.assertEqual(result.returncode, 0, result.stderr)
++                self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+                 outputs.append({str(p.relative_to(out)): p.read_bytes() for p in out.rglob('*') if p.is_file()})
+             changed = [p for p in outputs[0] if outputs[0][p] != outputs[1].get(p)]
+             self.assertEqual(changed, [], 'layout changed generated bytes')

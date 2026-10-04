@@ -1,0 +1,57 @@
+{
+  "adopter": "ludlow",
+  "apps_and_composed_tag": "v4.0.0",
+  "artifacts": {
+    "ludlow-atomic-delivery-PR-body.md": "e140aa5a355dfe83d05e70843b483981ac7f0a9cbf5be8bf7cfe2b62a4a64cc2",
+    "ludlow-atomic-delivery-final-checks.json": "f77c6e84ea5bffe2ad05fadfdccec42010deeef7cd9696a85c584e88c3c48abc",
+    "ludlow-atomic-delivery-gate.md": "420a7b6f5f577590bea7f2fa4bc57805dbae7f13023361d88a990b3461fd1dbc",
+    "ludlow-atomic-delivery-implementation.md": "0f069898cc963d9be4bb9963f1ddfaf8f54fc1dd85e3bf38a7f7a1a68de1abe1",
+    "ludlow-atomic-delivery-local-preparation.json": "90a140da292551b5ce411481ff24c4da70e93217322dc4ae75d060121cc16e44",
+    "ludlow-atomic-delivery-sanity.json": "4e7dbba77c5d040e260ac581530c1f152779ed8aa1c1a275e70d9b97ed5a13fd",
+    "ludlow-atomic-delivery-source-signature.log": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907",
+    "ludlow-atomic-delivery-tag-verification.log": "3810fa641d5675cb748f37a05880158cac0de3b04d6f1e714c95329fa05fda43",
+    "ludlow-atomic-delivery.patch": "c5858a57d1475a5df9954ee096a610c4e9f0b8a3ebba06c9900b5849a0836496",
+    "ludlow-source-A-authentic-release.json": "d4956be951b3aa3eb278fd6a98162a224341966d9c1d59eba97e9388fe44b129"
+  },
+  "base": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae",
+  "branch": "delivery-stage2-atomic-20261004",
+  "changed_files": {
+    "composed/HEADER.yaml": {
+      "bytes": 21382,
+      "sha256": "a604912982d6491ec8f571693ed313ebba38144d5c0a68a373cdc82ebca4fbe1"
+    },
+    "gitops/composed/composed-set.yaml": {
+      "bytes": 8043,
+      "sha256": "937d06c5fe0138d1d05f4fe396d6ac4aae8aaf76deecbae50fdcc55e6ff1d4c7"
+    },
+    "gitops/flux-system/gotk-sync.yaml": {
+      "bytes": 2257,
+      "sha256": "9540a61e570f648eae8c1594d9af1ea3408c1fefebe21dcda5f4c6a7a0f8319b"
+    },
+    "inventory/PROVENANCE.json": {
+      "bytes": 3274,
+      "sha256": "951e7357d5d88b6a9a4d469bb8af6f628d48be569049fb5a943b736ea994f435"
+    }
+  },
+  "clean": true,
+  "composed_evidence_independently_byte_equal_to_source_A": true,
+  "computed_institutional_bump": "none",
+  "directory": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+  "future_source_B_tag_created": false,
+  "head": "6de0d00ce850ea820777f46fbea5c93a3238ea68",
+  "high_confidence_changed_source_secret_patterns_found": 0,
+  "normal_SSH_signature": "G",
+  "normal_gate_same_pin_early_return": true,
+  "parent": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae",
+  "postcommit_real_estate_public_tests": {
+    "exit": 0,
+    "skips": 0,
+    "tests": 37
+  },
+  "remote_mutations": false,
+  "requires_independent_review": true,
+  "scope": "Local atomic delivery implementation for independent root Standards and Spec review; no remote action or live activation",
+  "tag_commit": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae",
+  "tag_object": "36a1d2634beb4a2321414b020a6527bc714a0aba",
+  "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63"
+}

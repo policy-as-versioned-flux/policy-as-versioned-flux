@@ -1,0 +1,2 @@
+FAIL: emitter must declare exactly one literal semantic VERSION
+FAIL: 1 twin-sweep moved-path check(s) observed false

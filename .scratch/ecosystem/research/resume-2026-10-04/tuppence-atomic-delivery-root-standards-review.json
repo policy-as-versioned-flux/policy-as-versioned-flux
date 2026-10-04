@@ -1,0 +1,19 @@
+{
+  "scope": "Root independent Standards inspection of exact signed TU atomic-delivery commit; no live grade or B release claimed",
+  "head": "0dd1cf6987f04484a00141b2a962a3e69af200f8",
+  "base": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "ssh_signature": "G",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json"
+  ],
+  "primary_scan_fields_unchanged": true,
+  "inventory_and_engine_cloud_policy_evidence_unchanged": true,
+  "apps_provenance_matches_authentic_root_verified_release": true,
+  "hand_authored_diff_inspected": true,
+  "composer_reach_and_verification_receipts_inspected": true,
+  "hard_findings": [],
+  "publication_gate": "Independent Spec review and successful exact-head real-layout/remote CI required"
+}

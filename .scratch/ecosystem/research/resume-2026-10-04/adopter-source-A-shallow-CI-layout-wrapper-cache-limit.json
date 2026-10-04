@@ -1,0 +1,57 @@
+{
+  "scope": "Disposable local shallow-source versus full Git-history compose; no candidate edits/network",
+  "adopters": {
+    "driftwood": {
+      "shallow": {
+        "source_head": "eac40457ffb4b593dfbe17015c525db3f0914f5f",
+        "shallow": "true",
+        "tags": [],
+        "exit": 1,
+        "stdout": "",
+        "stderr": "REFUSED: platform tools: Error: error getting certificate root: initializing tuf: creating cached local store: open /Users/cns/.sigstore/root/tuf.db/LOCK: operation not permitted\n\n",
+        "rendered_files": 0
+      },
+      "full": {
+        "source_head": "eac40457ffb4b593dfbe17015c525db3f0914f5f",
+        "shallow": "false",
+        "tags": [
+          "v1.0.0",
+          "v1.1.0",
+          "v2.0.0",
+          "v3.0.0",
+          "v3.0.1"
+        ],
+        "exit": 1,
+        "stdout": "",
+        "stderr": "REFUSED: platform tools: Error: error getting certificate root: initializing tuf: creating cached local store: open /Users/cns/.sigstore/root/tuf.db/LOCK: operation not permitted\n\n",
+        "rendered_files": 0
+      }
+    },
+    "ludlow": {
+      "shallow": {
+        "source_head": "926d6b38384fd9b532305c668313920ff943653a",
+        "shallow": "true",
+        "tags": [],
+        "exit": 1,
+        "stdout": "",
+        "stderr": "REFUSED: platform tools: Error: error getting certificate root: initializing tuf: creating cached local store: open /Users/cns/.sigstore/root/tuf.db/LOCK: operation not permitted\n\n",
+        "rendered_files": 0
+      },
+      "full": {
+        "source_head": "926d6b38384fd9b532305c668313920ff943653a",
+        "shallow": "false",
+        "tags": [
+          "v1.0.0",
+          "v1.1.0",
+          "v2.0.0",
+          "v3.0.0",
+          "v3.0.1"
+        ],
+        "exit": 1,
+        "stdout": "",
+        "stderr": "REFUSED: platform tools: Error: error getting certificate root: initializing tuf: creating cached local store: open /Users/cns/.sigstore/root/tuf.db/LOCK: operation not permitted\n\n",
+        "rendered_files": 0
+      }
+    }
+  }
+}

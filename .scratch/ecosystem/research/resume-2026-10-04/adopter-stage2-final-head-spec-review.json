@@ -1,0 +1,105 @@
+{
+  "reviewed_at": "2026-10-04T10:18:50.285247+00:00",
+  "result": "PASS",
+  "scope": "Exact signed Source A commits only; source publication readiness, no tag publication or activation claim",
+  "adopters": {
+    "driftwood": {
+      "head": "eac40457ffb4b593dfbe17015c525db3f0914f5f",
+      "tree": "bd42b04976d0c74f08228fb0eb6115c0a81207b7",
+      "spec": "PASS",
+      "normal_gate_exit": 0,
+      "measured_bump": "major",
+      "accepted": true,
+      "retired": [],
+      "prospective_source_A_tag": "v4.0.0",
+      "critical_file_sha256": {
+        "verify-twin-overlay.sh": "7dafa7970e97dc7967838da6636c36139f9505070361eaeee54d8265f568bd07",
+        "twin/VENDORED.md": "2d0c2aa4c612706184f75dc454043f2d54e1d65ef9276f06b641505d8b8005c3",
+        "twin/PIN.yaml": "7bc8c412950f8ace3d657c132c136e61d12276c71369c3f99cf044300d0c8d30",
+        "twin/emit-forward-intel.py": "5868e4b2e908580ea978007bff62a976c9fa27ef68cb2f35536a939a451c738d",
+        "twin/forward-intel/payload.schema.json": "25af0b779905a5a92e0dfeeeae82decb59ab7b518b3287ba0577ec3a79a3aacc",
+        ".github/workflows/twin-sweep.yml": "372e83f2ee2c6ee1d0741907167c15ad715d480712032e3ba53da619d84b542b",
+        "gitops/flux-system/gotk-sync-fx.yaml": "065d2741dc76e9faa5ee46f745fc4e731d6ca9d7bd30dc09ffb24f15f3b32ff0"
+      }
+    },
+    "tuppence": {
+      "head": "d1dbe766e09bb8112efa609836af0aa95cbe0ee4",
+      "tree": "229bb619b07e1d2410573d81e8768791b15b2191",
+      "spec": "PASS",
+      "normal_gate_exit": 0,
+      "measured_bump": "major",
+      "accepted": true,
+      "retired": [],
+      "prospective_source_A_tag": "v4.0.0",
+      "critical_file_sha256": {
+        "verify-twin-overlay.sh": "48e0b96cbbe1015aef4edcb3f96af2652bbfe641e65102b5aac9d7268adda047",
+        "twin/VENDORED.md": "d926b6c8aa0ae59b95d7ae2faae3f8ab77120a0c92e16134db151dde1bf9723a",
+        "twin/PIN.yaml": "954c7ae260b559abec0636ad2a716844915505fc99c4e5f262f6ed775821b50d",
+        "twin/emit-forward-intel.py": "7f3172f9e566ba479f5af78b249bd1c26e74793308767c4757df787dd011d460",
+        "twin/forward-intel/payload.schema.json": "25af0b779905a5a92e0dfeeeae82decb59ab7b518b3287ba0577ec3a79a3aacc",
+        ".github/workflows/twin-sweep.yml": "48ba413d537ccf9a52f58e6cd205b5ce66d2e5472a54ce0b4a50fa1fa08ae192",
+        "gitops/flux-system/gotk-sync-fx.yaml": "065d2741dc76e9faa5ee46f745fc4e731d6ca9d7bd30dc09ffb24f15f3b32ff0"
+      }
+    },
+    "ludlow": {
+      "head": "926d6b38384fd9b532305c668313920ff943653a",
+      "tree": "7c91c4e52346d9477a5bae17d2487463674141c9",
+      "spec": "PASS",
+      "normal_gate_exit": 0,
+      "measured_bump": "major",
+      "accepted": true,
+      "retired": [],
+      "prospective_source_A_tag": "v4.0.0",
+      "critical_file_sha256": {
+        "verify-twin-overlay.sh": "2bd66bf850b493d798c5aea41370b5871b1aa11d7626fdab4c2a57d84b887ab2",
+        "twin/VENDORED.md": "8146a4b49a88dac5ff77d80f958d633c4209e9ee2b9f6bdef66958e05c5b29cd",
+        "twin/PIN.yaml": "954c7ae260b559abec0636ad2a716844915505fc99c4e5f262f6ed775821b50d",
+        "twin/emit-forward-intel.py": "95f6e2d5332c878c16662ada9abd540edc663f04b99f8294691cba50fcdc89df",
+        "twin/forward-intel/payload.schema.json": "25af0b779905a5a92e0dfeeeae82decb59ab7b518b3287ba0577ec3a79a3aacc",
+        ".github/workflows/twin-sweep.yml": "ec761804e7b4ae81fb4a034cb9b472e606c5219c286b067553433a4810f5549c",
+        "gitops/flux-system/gotk-sync-fx.yaml": "82523e77add5045687839845e8bca5493d7cbe3cd206c4f3a7bbd5a8bb18ddb5"
+      }
+    }
+  },
+  "engine": "1.18.2",
+  "workload_claim": "7.0.0",
+  "rendered_policy_window": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "apps_and_inventory_remain": "authentic apps3.0.1",
+  "composed_self_pin_remains": "authentic v3.0.0",
+  "sequence": [
+    "normal reviewed source A merge/cut/explicit tag-ref release verification",
+    "atomic appsA/provenanceA/composedA/full-window-array/signature-gates change plus exact rerender",
+    "measured composition B publication",
+    "composedB pin plus exact rerender; apps stay A"
+  ],
+  "nonclaims": [
+    "live scheduled grade",
+    "cloud activation",
+    "engine upgrade",
+    "Pod price or fabricated workload OSCAL binding",
+    "retirement",
+    "hub observation floor PASS"
+  ],
+  "historical_negatives_preserved": true,
+  "evidence_sha256": {
+    "adopter-stage2-final-spec-checks.json": "6b5a63f2fa61c46eb3c4ab60ca3b206e0bab1a9b36b6fd06277b00276e0a072f",
+    "adopter-stage2-final-producers.json": "d562646cb6f05b0345cd80d2c3f50681fc83f7ddeb2e0b6a1f933e3644e3884d",
+    "adopter-stage2-final-fx-signature.log": "27522b4b20efb9cddd3aa695a4957b918314e3b02807c5801813c0486c28d43f",
+    "adopter-stage2-final-checks.json": "fb85e93ce74e855a857e90529d49475176e5300b03f51e4c934d94441feec16a",
+    "adopter-stage2-final-compose.json": "1885e0be69f4ec0d6d1b3af6a4134b7b0a406be7f126e372ac208514d18ad37f",
+    "adopter-stage2-final-postcommit-byte-replay.json": "f4e6f557b6c3b20aa0c99b3eacda97b7ddfbf6d687beecf7f57602182ddf2844",
+    "adopter-stage2-final-policy7-corpus.json": "9c3f2b3da38f4ae6f1898f40b1996564b367ed645705c9231e72572937076079",
+    "adopter-stage2-final-source-A-grades.json": "c546347dab4413c58e151a4b13ffd436793e64be0d68dce34de99c5b287cd169",
+    "adopter-stage2-final-release-dispatch.json": "dbbe308758a602f1e2b1ace340fc3e32fecaa83c4893a891aa1973f92fc368e2",
+    "adopter-stage2-final-head-spec-review.md": "7e3cc5de3d9890d5a6199a7fb9a7824ce08c096a36c9f15b940cf4c688befb40",
+    "driftwood-stage2-final-source-A-pr-body.md": "1a85051ac6a65de8d7bc21ae26a66bafe59ed7c3d8df6b3119944f8145ad2051",
+    "tuppence-stage2-final-source-A-pr-body.md": "6df9064e76d6f562bc71b03e55b59df5981137cb062548bf59c58b0e9cf4e45e",
+    "ludlow-stage2-final-source-A-pr-body.md": "6dc5ed07ed5d5f615564f4b91aed52a608a09e6220a3b6e01830e25ce955a200"
+  },
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

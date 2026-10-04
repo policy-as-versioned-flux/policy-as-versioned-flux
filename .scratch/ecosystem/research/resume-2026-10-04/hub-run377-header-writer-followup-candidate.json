@@ -1,0 +1,55 @@
+{
+  "recorded_at": "2026-10-04T16:05:29.364803+00:00",
+  "repository": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux",
+  "checkout": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "branch": "repair/run377-hub-verifiers-20261004",
+  "head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "tree": "6f0aab95463b73d0415552d213ea755f621c1cc1",
+  "parent": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "original_main": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "signature": "G",
+  "status_porcelain": "",
+  "changed_paths": [
+    "tests/test_loophole_adr_0026.py"
+  ],
+  "complete_changed_paths": [
+    "talk/verify-manifest.txt",
+    "tests/test_enact.py",
+    "tests/test_loophole_adr_0026.py",
+    "tests/test_map_observation_ownership.py",
+    "tests/test_refusal_by_another_name.py",
+    "tests/test_verifier_snapshots.py",
+    "tests/test_workload_lane_entrypoint.py",
+    "verify/_snapshot.py",
+    "verify/e2e/step2_reprice.py",
+    "verify/engine-pairing/engine_pairing.py",
+    "verify/map-surface/map_surface.py",
+    "verify/refusal-by-another-name/refusal_scan.py",
+    "verify/refusal-by-another-name/register.yaml",
+    "verify/served-workloads/verify-served-workloads.sh"
+  ],
+  "source_sha256": {
+    "tests/test_loophole_adr_0026.py": "39ed98215e5e5b3c48f6dfaec85b08792ccb0d0595f65aa8cc350ed88f86ce72"
+  },
+  "patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-04/hub-run377-header-writer-followup.patch",
+  "patch_sha256": "1f6fa32d4234d9b77601ebf057d439eb2de2cb4f2e9bfdf8a016694a500466a7",
+  "complete_patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-04/hub-run377-maintenance-header-compatible-complete.patch",
+  "complete_patch_sha256": "4585787bd50f396aa99a442b247a4b61b30fc243e34ea0f3007d4e6c4e774e37",
+  "check_receipts": {
+    "hub-run377-header-writer-compatibility-red.json": "59b37e3c636322e5eece8fc517a8882b57efe3e1beb40d68ed1b6c48407bc582",
+    "hub-run377-header-writer-compatibility-checks.json": "79645b882c9a93c5ab96c9810300efaf194894a98d10654035ee10e96939d5ed"
+  },
+  "actual7fa_ci_log": "hub-run377-ci-followup-push-tests.log",
+  "actual7fa_ci_log_sha256": "4e1ff2d3979ef8f5946261b7c3366a38de78afcbac5d32d3853e99e3af69c883",
+  "claims": [
+    "fixture-only caller handles actual old703 write-only and publishedmainf0 auto-commit writer",
+    "stage header; diff0 means no extra commit, diff1 commits, other errors propagate",
+    "always checks HEAD exact rendered header bytes; tests preserve declared contents, history and idempotence",
+    "actual2case redFAIL -> greenPASS; full208mypyPASS",
+    "no empty fixture commits, missing-instrument or coverage guard waiver, real-price/source changes",
+    "ordinary full CI still required; historical8 fixture failures and floor preserved"
+  ],
+  "external_followup_publication": false,
+  "pr": 155,
+  "independent_review_required": true
+}

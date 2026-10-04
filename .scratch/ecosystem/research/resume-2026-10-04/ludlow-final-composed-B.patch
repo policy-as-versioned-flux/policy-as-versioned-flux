@@ -1,0 +1,41 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index feda986..bb9ccad 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -624,7 +624,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: e0f436a51b2094a650661fdf613f74847415186ea003f2d9ad912f3079081b6b
++  after: 6f2aa0087434f58546e5f0d478fc3b4e4ff32a598ea422cc78d141005d8b9052
+   before:
+     header:
+       parents:
+diff --git a/gitops/composed/composed-set.yaml b/gitops/composed/composed-set.yaml
+index ad51b3a..1bff4f6 100644
+--- a/gitops/composed/composed-set.yaml
++++ b/gitops/composed/composed-set.yaml
+@@ -24,8 +24,8 @@
+ #     install platform's tree; it installs the artefact its own composition rendered from
+ #     platform's and nist's signed parents (composed/HEADER.yaml records those parent SHAs, and
+ #     fact 3 of the sample checks the live platform and nist pins against them).
+-#   * apps and composed delivery use the same genuine v4.0.0 Source A release.
+-#     Its complete policy window and signature gates move with the inventory binding.
++#   * apps remain at genuine v4.0.0 Source A; composed serves signed v4.0.1 Composition B.
++#     Composition B renders from Source A's apps/inventory binding and carries policy 5/6/7.
+ #   * there is no `spec.verify` here. Flux's GitRepository.spec.verify speaks OpenPGP, and one
+ #     signature -- the gitsign tag -- is the only one this estate has (ADR-0023, D3). Verification
+ #     at the source boundary is the identity-pinned gitsign-verifying controller of ticket 41,
+@@ -71,9 +71,9 @@ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-ludlow/ludlow
+   ref:
+-    tag: v4.0.0
+-    commit: c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae
+-    # The resolved SHA of the genuine signed v4.0.0 Source A release.
++    tag: v4.0.1
++    commit: 3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289
++    # The resolved SHA of the genuine signed v4.0.1 Composition B release.
+     # Belt-and-braces immutability, ADR-0001.
+ ---
+ apiVersion: fluxcd.controlplane.io/v1

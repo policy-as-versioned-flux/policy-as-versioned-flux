@@ -1,0 +1,47 @@
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_the_dependency_pins_are_real_and_report_what_they_do_not_establish ____
+[gw0] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+proposal = Artefact(kind='enactment-proposal', mark='derived', command=['twin', 'propose'], pins={'model_repo': {'root': '', 'com...e-out and not an exception: all of it is derived, machine-signed and reproducible, and none of it changes the world.'})
+
+    def test_the_dependency_pins_are_real_and_report_what_they_do_not_establish(proposal: Artefact) -> None:
+        """Consumed by real separate repositories is a claim about files, so it is read from them."""
+        dependency = proposal.body["dependency"]
+        # NOT a frozen census of the estate any more (2026-08-29). This assertion has been re-pinned
+        # by hand at least three times -- insurer's platform pin, driftwood's composed source, then
+        # tuppence's and ludlow's -- and each re-pin was a test being dragged along behind a wider
+        # estate rather than a test catching anything. Widening the slice to a fourth adopter is the
+        # eco-system working; it is not a regression in `dependency_pins`, and a test that goes red on
+        # it teaches everyone to re-pin the number without reading why. What is asserted instead is
+        # what the docstring above actually claims -- that these are FILES, read, not described:
+        # every reported figure is re-derived from the pins themselves, every name resolves to a real
+        # directory or a composed source belonging to one, and the floors say the estate did not
+        # quietly empty out.
+        pins = dependency["pins"]
+        consumed = [p for p in pins if p["cross_repository"]]
+        assert dependency["cross_repository_pins"] == len(consumed) >= 8
+        assert dependency["self_sync_pins"] == len(pins) - len(consumed) >= 3
+        assert set(dependency["consumer_repositories"]) == {p["consumer"] for p in consumed}
+        assert set(dependency["dependencies"]) == {p["dependency"] for p in consumed}
+        # The three adopters and the insurer consume policy they did not write; that is the claim.
+        assert {"driftwood", "tuppence", "ludlow", "insurer"} <= set(dependency["consumer_repositories"])
+        estate = {p.name for p in enact.ESTATE_DIR.iterdir() if p.is_dir()}
+        for name in dependency["consumer_repositories"]:
+            assert name in estate, f"{name} is reported as a consumer and is not a repository"
+        for pin in consumed:
+            # A Flux source's name is a local alias: `fx` consumes the feeds repository,
+            # and `<adopter>-composed` consumes that adopter's own rendered set (ticket 40).
+            # Its actual URL must still resolve to a repository this estate contains.
+            repository = Path(urlsplit(pin["url"]).path.rstrip("/")).name.removesuffix(".git")
+>           assert repository in estate, (pin["dependency"], pin["url"])
+E           AssertionError: ('fx', 'https://github.com/policy-as-versioned-feeds/nonexistent-feed-repository')
+E           assert 'nonexistent-feed-repository' in {'driftwood', 'feeds', 'ico', 'insurer', 'ludlow', 'nist', ...}
+
+tests/test_enact.py:885: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_enact.py::test_the_dependency_pins_are_real_and_report_what_they_do_not_establish
+1 failed in 2.84s

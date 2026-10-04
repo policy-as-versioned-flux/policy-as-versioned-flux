@@ -1,0 +1,33 @@
+{
+  "axis": "Standards",
+  "verdict": "PASS",
+  "head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "tree": "555196f32a7fe029354f0314af83636e79643360",
+  "base": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "changed_paths": [
+    "talk/verify-manifest.txt",
+    "tests/test_map_observation_ownership.py",
+    "tests/test_refusal_by_another_name.py",
+    "tests/test_verifier_snapshots.py",
+    "tests/test_workload_lane_entrypoint.py",
+    "verify/_snapshot.py",
+    "verify/e2e/step2_reprice.py",
+    "verify/engine-pairing/engine_pairing.py",
+    "verify/map-surface/map_surface.py",
+    "verify/refusal-by-another-name/refusal_scan.py",
+    "verify/refusal-by-another-name/register.yaml",
+    "verify/served-workloads/verify-served-workloads.sh"
+  ],
+  "source_and_primary_artifact_hashes_checked": true,
+  "normal_signature": "G",
+  "clean": true,
+  "review_sha256": "7624e22e7f8aa1f5aebf85e9dcd93c6786f27f63eea87f584ab044164abe4652",
+  "hash_audit": "hub-and-insurer-root-standards-hash-audit.json",
+  "substantive_findings": [],
+  "independent_tests": {
+    "passed": 62,
+    "subtests": 2,
+    "log": "hub-run377-root-standards-focused.log",
+    "sha256": "abd8b14ce7fcf961a0f439440812392ac3c2c3300c9f2c31c1659fa11a0b8468"
+  }
+}

@@ -1,0 +1,6 @@
+tlog index: 3077401757
+gitsign: Signature made using certificate ID 0x8646829e5c31eba4d1242008877af2cde5b4b758 | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true

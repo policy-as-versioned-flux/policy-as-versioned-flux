@@ -1,0 +1,128 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index d97900e..c6838aa 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -621,7 +621,7 @@ ungoverned-namespaces:
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: 65b663036064ca9c76d339b133615a3055e76b074a84d1726ddf3e6752bf3846
++  after: 45b99ef8e72985b14cfc011fa115d6a5df35f30892e295a184e6e95048610937
+   before:
+     header:
+       parents:
+@@ -1247,8 +1247,7 @@ comparison-inputs:
+       source: feeds
+       name: cve
+       proposed_tier: isolated
+-      hole:
+-        status: closed
++      hole: null
+     - kind: twin
+       source: twin
+       name: forward-intel
+diff --git a/gitops/composed/composed-set.yaml b/gitops/composed/composed-set.yaml
+index 08f1caa..8a6d25e 100644
+--- a/gitops/composed/composed-set.yaml
++++ b/gitops/composed/composed-set.yaml
+@@ -24,10 +24,10 @@
+ #     install platform's tree; it installs the artefact its own composition rendered from
+ #     platform's and nist's signed parents (composed/HEADER.yaml records those parent SHAs, and
+ #     fact 3 of the sample checks the live platform and nist pins against them).
+-#   * the tag is v3.0.0, not the v1.0.0 in gitops/flux-system/gotk-sync.yaml. v1.0.0 predates
+-#     composed/ and does not carry the tree this reconciles. A self-pin bump is a reviewed PR that
+-#     moves tag and commit together (renovate.json's customManagers track nist and platform, not
+-#     the self-pin).
++#   * the tag is v4.0.0, the same genuine Source A release as the apps source in
++#     gitops/flux-system/gotk-sync.yaml. Its composed tree carries policies 5.0.0, 6.0.0 and 7.0.0.
++#     The coupled self-pin, inventory binding, array and verification gates move in one reviewed
++#     change; renovate.json tracks publisher parents rather than these self-pins.
+ #   * there is no `spec.verify` here. Flux's GitRepository.spec.verify speaks OpenPGP, and one
+ #     signature -- the gitsign tag -- is the only one this estate has (ADR-0023, D3). Verification
+ #     at the source boundary is the identity-pinned gitsign-verifying controller of ticket 41,
+@@ -66,17 +66,17 @@ metadata:
+     # verified with somebody else's identity is observed false rather than merely 'verified'.
+     policy-as-versioned.dev/gitsign-identity-regexp: ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+     policy-as-versioned.dev/gitsign-issuer: https://token.actions.githubusercontent.com
+-    policy-as-versioned.dev/gitsign-gates: flux-system/composed-v5-0-0,flux-system/composed-machinery
++    policy-as-versioned.dev/gitsign-gates: flux-system/composed-v5-0-0,flux-system/composed-v6-0-0,flux-system/composed-v7-0-0,flux-system/composed-machinery
+   labels:
+     policy-as-versioned.dev/composed-for: tuppence
+ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-tuppence/tuppence
+   ref:
+-    tag: v3.0.0
+-    commit: 3d64a4d65d5eb5d81deedc10a0826c8b02d0ad39
+-    # The resolved SHA tuppence's own v3.0.0 tag points to (`git rev-parse 'v3.0.0^{}'`,
+-    # 2026-09-24). Belt-and-braces immutability, ADR-0001.
++    tag: v4.0.0
++    commit: f575dc12de130c444d98a831de0ca21fd68b9c46
++    # The resolved SHA of the genuine signed v4.0.0 Source A release (2026-10-04).
++    # Belt-and-braces immutability, ADR-0001.
+ ---
+ apiVersion: fluxcd.controlplane.io/v1
+ kind: ResourceSet
+@@ -94,11 +94,11 @@ spec:
+         # directories the pinned tag carries and every machinery allow-list at that tag. Move it
+         # in the same pull request that moves the tag.
+         - { version: "5.0.0" }
+-        # v3.0.0 carries composed/policies/v5.0.0 only, and every machinery allow-list at that
+-        # tag admits ['5.0.0'] only. It was composed under platform v4.0.0, which retires policy
+-        # 4.0.0 (owner-instructed 2026-09-24). Every in-currency workload tuppence declares
+-        # claims 5.0.0 (Phase B, 2026-09-24). teller-stale in reset/workloads.yaml claims 1.0.0
+-        # on purpose; the orphan cage takes it.
++        - { version: "6.0.0" }
++        - { version: "7.0.0" }
++        # The signed v4.0.0 tree carries all three versions, and its machinery admits exactly
++        # this complete window. Current workload declarations claim 7.0.0; the deliberately
++        # stale claim in reset/workloads.yaml remains subject to the orphan cage.
+   resourcesTemplate: |
+     << range $v := (index (inputs) "versions") >>
+     ---
+diff --git a/gitops/flux-system/gotk-sync.yaml b/gitops/flux-system/gotk-sync.yaml
+index 5eca982..9e3a4f2 100644
+--- a/gitops/flux-system/gotk-sync.yaml
++++ b/gitops/flux-system/gotk-sync.yaml
+@@ -18,10 +18,10 @@ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-tuppence/tuppence
+   ref:
+-    tag: v3.0.1
+-    commit: d8dead25e0e5e275172640b1a637562e45edb15d
++    tag: v4.0.0
++    commit: f575dc12de130c444d98a831de0ca21fd68b9c46
+     # commit pinned at release (belt-and-braces immutability, ADR-0001) --
+-    # the resolved SHA tuppence's own signed v3.0.1 apps release points to. Not covered by the
++    # the resolved SHA tuppence's own signed v4.0.0 apps release points to. Not covered by the
+     # Renovate customManagers in renovate.json (those track nist and platform
+     # only); a self-pin bump is a reviewed PR that moves both fields together.
+ ---
+diff --git a/inventory/PROVENANCE.json b/inventory/PROVENANCE.json
+index 837781d..cdaa294 100644
+--- a/inventory/PROVENANCE.json
++++ b/inventory/PROVENANCE.json
+@@ -1,6 +1,6 @@
+ {
+   "apps_source": {
+-    "commit": "d8dead25e0e5e275172640b1a637562e45edb15d",
++    "commit": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+     "path": "gitops/apps",
+     "repository": "https://github.com/policy-as-versioned-tuppence/tuppence",
+     "signature": {
+@@ -9,11 +9,11 @@
+       "identity": "https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main",
+       "issuer": "https://token.actions.githubusercontent.com",
+       "rekor": true,
+-      "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511590",
+-      "tlog_index": "3075511590"
++      "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3077499916",
++      "tlog_index": "3077499916"
+     },
+-    "tag": "v3.0.1",
+-    "tag_object": "bc6ee99a1cda20e9fe0365feb25c3086aad7f5a5"
++    "tag": "v4.0.0",
++    "tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e"
+   },
+   "binding": "The complete exact tagged apps graph and primary reports reproduce images.json; no release or cluster activation is asserted.",
+   "cached_database_unchanged": true,

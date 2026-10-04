@@ -1,0 +1,1148 @@
+cut	Set up job	﻿2026-10-04T12:15:23.5708617Z Current runner version: '2.337.0'
+cut	Set up job	2026-10-04T12:15:23.5725314Z ##[group]Runner Image Provisioner
+cut	Set up job	2026-10-04T12:15:23.5726074Z Hosted Compute Agent
+cut	Set up job	2026-10-04T12:15:23.5726475Z Version: 20260901.588
+cut	Set up job	2026-10-04T12:15:23.5726882Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+cut	Set up job	2026-10-04T12:15:23.5727333Z Build Date: 2026-09-01T19:56:44Z
+cut	Set up job	2026-10-04T12:15:23.5727769Z Worker ID: {906afe4b-628e-4aa6-867a-61615e17e8ac}
+cut	Set up job	2026-10-04T12:15:23.5728180Z Azure Region: centralus
+cut	Set up job	2026-10-04T12:15:23.5728614Z ##[endgroup]
+cut	Set up job	2026-10-04T12:15:23.5729361Z ##[group]Operating System
+cut	Set up job	2026-10-04T12:15:23.5729750Z Ubuntu
+cut	Set up job	2026-10-04T12:15:23.5730074Z 24.04.5
+cut	Set up job	2026-10-04T12:15:23.5730381Z LTS
+cut	Set up job	2026-10-04T12:15:23.5730723Z ##[endgroup]
+cut	Set up job	2026-10-04T12:15:23.5731084Z ##[group]Runner Image
+cut	Set up job	2026-10-04T12:15:23.5731433Z Image: ubuntu-24.04
+cut	Set up job	2026-10-04T12:15:23.5731847Z Version: 20260927.320.1
+cut	Set up job	2026-10-04T12:15:23.5732442Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+cut	Set up job	2026-10-04T12:15:23.5733473Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+cut	Set up job	2026-10-04T12:15:23.5734174Z ##[endgroup]
+cut	Set up job	2026-10-04T12:15:23.5734819Z ##[group]GITHUB_TOKEN Permissions
+cut	Set up job	2026-10-04T12:15:23.5736169Z Contents: write
+cut	Set up job	2026-10-04T12:15:23.5736562Z Metadata: read
+cut	Set up job	2026-10-04T12:15:23.5736896Z ##[endgroup]
+cut	Set up job	2026-10-04T12:15:23.5738182Z Secret source: Actions
+cut	Set up job	2026-10-04T12:15:23.5738709Z Cache mode: write
+cut	Set up job	2026-10-04T12:15:23.5739209Z Prepare workflow directory
+cut	Set up job	2026-10-04T12:15:23.5944277Z Prepare all required actions
+cut	Set up job	2026-10-04T12:15:23.5975143Z Getting action download info
+cut	Set up job	2026-10-04T12:15:23.8401144Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+cut	Set up job	2026-10-04T12:15:24.0438560Z Complete job name: cut
+cut	Run actions/checkout@v4	﻿2026-10-04T12:15:24.1936889Z ##[group]Run actions/checkout@v4
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1937316Z with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1937543Z   path: driftwood
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1937779Z   fetch-depth: 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1938061Z   repository: policy-as-versioned-driftwood/driftwood
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1940113Z   token: ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1940342Z   ssh-strict: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1940575Z   ssh-user: git
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1940811Z   persist-credentials: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1941101Z   clean: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1941341Z   sparse-checkout-cone-mode: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1941617Z   fetch-tags: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1941856Z   show-progress: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1942094Z   lfs: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1942319Z   submodules: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1942558Z   set-safe-directory: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1942830Z   allow-unsafe-pr-checkout: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.1943174Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2606874Z Syncing repository: policy-as-versioned-driftwood/driftwood
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2608012Z ##[group]Getting Git version info
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2608493Z Working directory is '/home/runner/work/driftwood/driftwood/driftwood'
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2609091Z [command]/usr/bin/git version
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2632103Z git version 2.55.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2650446Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2655976Z Temporarily overriding HOME='/home/runner/work/_temp/d99ab03d-f42c-4993-a73e-3e79eeff233f' before making global git config changes
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2657425Z Adding repository directory to the temporary git global config as a safe directory
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2658715Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/driftwood
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2703643Z ##[group]Initializing the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2710979Z [command]/usr/bin/git init /home/runner/work/driftwood/driftwood/driftwood
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2829637Z hint: Using 'master' as the name for the initial branch. This default branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2830768Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2832031Z hint: to use in all of your new repositories, which will suppress this warning,
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2832717Z hint: call:
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2837053Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2838533Z hint: 	git config --global init.defaultBranch <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2907238Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2907797Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2908376Z hint: 'development'. The just-created branch can be renamed via this command:
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2908837Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2909113Z hint: 	git branch -m <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2909411Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2909760Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2910363Z Initialized empty Git repository in /home/runner/work/driftwood/driftwood/driftwood/.git/
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2912077Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-driftwood/driftwood
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2913620Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2914438Z ##[group]Disabling automatic garbage collection
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2915028Z [command]/usr/bin/git config --local gc.auto 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2939990Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2940671Z ##[group]Setting up auth
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2945543Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.2977366Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.3302734Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.3335013Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.3515755Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.3544571Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.3722710Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.3755646Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.3756308Z ##[group]Fetching the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:24.3761855Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2208026Z From https://github.com/policy-as-versioned-driftwood/driftwood
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2209885Z  * [new branch]      adopt-v3.0.0-composed   -> origin/adopt-v3.0.0-composed
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2211348Z  * [new branch]      bootstrap-apps-inventory -> origin/bootstrap-apps-inventory
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2212863Z  * [new branch]      delivery-stage2-20261004 -> origin/delivery-stage2-20261004
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2214790Z  * [new branch]      delivery-stage2-atomic-20261004 -> origin/delivery-stage2-atomic-20261004
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2216575Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2218510Z  * [new branch]      ecosystem/thin-slice    -> origin/ecosystem/thin-slice
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2220461Z  * [new branch]      fix-scheduled-tools-20260910 -> origin/fix-scheduled-tools-20260910
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2222550Z  * [new branch]      implement-platform-tools-20260910 -> origin/implement-platform-tools-20260910
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2224848Z  * [new branch]      implement-ticket-86-20260910 -> origin/implement-ticket-86-20260910
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2226714Z  * [new branch]      main                    -> origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2227993Z  * [new branch]      phaseb-policy-5.0.0     -> origin/phaseb-policy-5.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2229418Z  * [new branch]      platform-v4.0.0-retire-4 -> origin/platform-v4.0.0-retire-4
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2231156Z  * [new branch]      policy-composition/tickets-09-16-wip -> origin/policy-composition/tickets-09-16-wip
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2233383Z  * [new branch]      renovate/feeds-threat-register-3.x -> origin/renovate/feeds-threat-register-3.x
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2236974Z  * [new branch]      renovate/https-github.com-policy-as-versioned-feeds-feeds-3.x -> origin/renovate/https-github.com-policy-as-versioned-feeds-feeds-3.x
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2240360Z  * [new branch]      renovate/https-github.com-policy-as-versioned-ico-ico-4.x -> origin/renovate/https-github.com-policy-as-versioned-ico-ico-4.x
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2243258Z  * [new branch]      repair/every-composing-job-fetches-its-parents -> origin/repair/every-composing-job-fetches-its-parents
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2245722Z  * [new branch]      repair/signals-follow-the-pin -> origin/repair/signals-follow-the-pin
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2247378Z  * [new branch]      rollout-platform-v3.3.0 -> origin/rollout-platform-v3.3.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2250138Z  * [new branch]      ticket-101-the-gates-verify-a-real-signature -> origin/ticket-101-the-gates-verify-a-real-signature
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2253270Z  * [new branch]      ticket-105-pinned-trust-roots -> origin/ticket-105-pinned-trust-roots
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2256925Z  * [new branch]      ticket-107-the-sampler-waits-for-what-exists -> origin/ticket-107-the-sampler-waits-for-what-exists
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2259983Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2262569Z  * [new branch]      ticket-131-sibling-cut-release -> origin/ticket-131-sibling-cut-release
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2265191Z  * [new branch]      ticket-132-gate-reads-acceptance -> origin/ticket-132-gate-reads-acceptance
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2267625Z  * [new branch]      ticket-140-fact4-omitted-zero -> origin/ticket-140-fact4-omitted-zero
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2269711Z  * [new branch]      ticket-143a-twin-sweep-split -> origin/ticket-143a-twin-sweep-split
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2271599Z  * [new branch]      ticket-147-declared-engine -> origin/ticket-147-declared-engine
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2274178Z  * [new branch]      ticket-161-reference-workload -> origin/ticket-161-reference-workload
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2277087Z  * [new branch]      ticket-33-lift-ledger-storefront-and-reports -> origin/ticket-33-lift-ledger-storefront-and-reports
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2279909Z  * [new branch]      ticket-34-followup-2026-09-08 -> origin/ticket-34-followup-2026-09-08
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2282887Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2286300Z  * [new branch]      ticket-51-the-supply-constraint-actor-path -> origin/ticket-51-the-supply-constraint-actor-path
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2289167Z  * [new branch]      ticket-60-grade-the-lane-sample -> origin/ticket-60-grade-the-lane-sample
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2291490Z  * [new branch]      ticket-60-sampler-waits -> origin/ticket-60-sampler-waits
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2293253Z  * [new branch]      ticket-61-allowed-commands -> origin/ticket-61-allowed-commands
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2295220Z  * [new branch]      ticket-61-one-renovate  -> origin/ticket-61-one-renovate
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2297168Z  * [new branch]      ticket-61-renovate-completes-step-2 -> origin/ticket-61-renovate-completes-step-2
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2298967Z  * [new branch]      ticket-62-and-77        -> origin/ticket-62-and-77
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2300612Z  * [new branch]      ticket-64-the-twin-is-three-adopters -> origin/ticket-64-the-twin-is-three-adopters
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2302806Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2305119Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2307277Z  * [new branch]      ticket-86-the-cage-enters-the-citable-number -> origin/ticket-86-the-cage-enters-the-citable-number
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2309146Z  * [new branch]      truth-surface-reconcile -> origin/truth-surface-reconcile
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2310360Z  * [new tag]         v1.0.0                  -> v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2311496Z  * [new tag]         v1.1.0                  -> v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2312470Z  * [new tag]         v2.0.0                  -> v2.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2313423Z  * [new tag]         v3.0.0                  -> v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2314496Z  * [new tag]         v3.0.1                  -> v3.0.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2315435Z  * [new tag]         v4.0.0                  -> v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2317743Z [command]/usr/bin/git branch --list --remote origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2318695Z   origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2320250Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2321253Z 872d5c7f44801b496731b11cd40881f304f8a09a
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2323249Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2324432Z ##[group]Determining the checkout info
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2325612Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2326297Z [command]/usr/bin/git sparse-checkout disable
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2374808Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.2472582Z ##[group]Checking out the ref
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.3770403Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.3771619Z Switched to a new branch 'main'
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.3780293Z branch 'main' set up to track 'origin/main'.
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.3785774Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.3915026Z [command]/usr/bin/git log -1 --format=%H
+cut	Run actions/checkout@v4	2026-10-04T12:15:25.3935342Z 872d5c7f44801b496731b11cd40881f304f8a09a
+cut	Install pinned identity verifier	﻿2026-10-04T12:15:25.4152327Z Prepare all required actions
+cut	Install pinned identity verifier	2026-10-04T12:15:25.4205588Z ##[group]Run ./driftwood/.github/actions/install-gitsign
+cut	Install pinned identity verifier	2026-10-04T12:15:25.4206387Z ##[endgroup]
+cut	Install pinned identity verifier	2026-10-04T12:15:25.4245842Z ##[start-action display=Run bash "$GITHUB_ACTION_PATH/install.sh" "$GITSIGN_VERSION" "$GITSIGN_SHA256";id=__self.__run]
+cut	Install pinned identity verifier	2026-10-04T12:15:25.4284427Z ##[group]Run bash "$GITHUB_ACTION_PATH/install.sh" "$GITSIGN_VERSION" "$GITSIGN_SHA256"
+cut	Install pinned identity verifier	2026-10-04T12:15:25.4285856Z ^[[36;1mbash "$GITHUB_ACTION_PATH/install.sh" "$GITSIGN_VERSION" "$GITSIGN_SHA256"^[[0m
+cut	Install pinned identity verifier	2026-10-04T12:15:25.5371958Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+cut	Install pinned identity verifier	2026-10-04T12:15:25.5372811Z env:
+cut	Install pinned identity verifier	2026-10-04T12:15:25.5373323Z   GITSIGN_VERSION: 0.17.1
+cut	Install pinned identity verifier	2026-10-04T12:15:25.5374424Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	Install pinned identity verifier	2026-10-04T12:15:25.5375384Z ##[endgroup]
+cut	Install pinned identity verifier	2026-10-04T12:15:26.4664956Z /home/runner/work/_temp/gitsign-download.qzAIgF/gitsign: OK
+cut	Install pinned identity verifier	2026-10-04T12:15:26.5222731Z ##[end-action id=__self.__run;outcome=success;conclusion=success;duration_ms=1097]
+cut	Independently pinned compiler tools	﻿2026-10-04T12:15:26.5266203Z Prepare all required actions
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.5266555Z Getting action download info
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6762040Z ##[group]Run ./driftwood/.github/actions/platform-tools
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6762254Z with:
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6762397Z   adopter-dir: driftwood
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6762545Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6767528Z ##[start-action display=Run set -euo pipefail;id=__self_2.pin]
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6779828Z ##[group]Run set -euo pipefail
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6780041Z ^[[36;1mset -euo pipefail^[[0m
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6780208Z ^[[36;1mpip install --quiet pyyaml^[[0m
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6780421Z ^[[36;1mpython3 "$ADOPTER_DIR/.github/scripts/read-pins.py" \^[[0m
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6780825Z ^[[36;1m  "$ADOPTER_DIR/.github/platform-tools-pin.yaml" tools >> "$GITHUB_OUTPUT"^[[0m
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6834180Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6834424Z env:
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6834561Z   ADOPTER_DIR: driftwood
+cut	Independently pinned compiler tools	2026-10-04T12:15:26.6834713Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6630758Z ##[end-action id=__self_2.pin;outcome=success;conclusion=success;duration_ms=3986]
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6634503Z ##[start-action display=Run actions/checkout@v4;id=__self_2.__actions_checkout]
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6670742Z ##[group]Run actions/checkout@v4
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6670891Z with:
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6671042Z   repository: policy-as-versioned-platform/platform
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6671358Z   path: platform-tools
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6671485Z   ref: v5.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6671603Z   fetch-depth: 0
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6672812Z   token: ***
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6672923Z   ssh-strict: true
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6673031Z   ssh-user: git
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6673170Z   persist-credentials: true
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6673328Z   clean: true
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6673445Z   sparse-checkout-cone-mode: true
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6673584Z   fetch-tags: false
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6673695Z   show-progress: true
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6673806Z   lfs: false
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6673908Z   submodules: false
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6674033Z   set-safe-directory: true
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6674307Z   allow-unsafe-pr-checkout: false
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.6674456Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7189129Z Syncing repository: policy-as-versioned-platform/platform
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7189897Z ##[group]Getting Git version info
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7190303Z Working directory is '/home/runner/work/driftwood/driftwood/platform-tools'
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7207615Z [command]/usr/bin/git version
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7236712Z git version 2.55.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7249121Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7256380Z Temporarily overriding HOME='/home/runner/work/_temp/46f277f7-9974-4898-ad3c-70d4c059f86d' before making global git config changes
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7257308Z Adding repository directory to the temporary git global config as a safe directory
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7260037Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/platform-tools
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7285033Z ##[group]Initializing the repository
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7288029Z [command]/usr/bin/git init /home/runner/work/driftwood/driftwood/platform-tools
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7324343Z hint: Using 'master' as the name for the initial branch. This default branch name
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7325014Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7327111Z hint: to use in all of your new repositories, which will suppress this warning,
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7327558Z hint: call:
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7327717Z hint:
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7327914Z hint: 	git config --global init.defaultBranch <name>
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7328182Z hint:
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7328413Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7328805Z hint: 'development'. The just-created branch can be renamed via this command:
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7329120Z hint:
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7329287Z hint: 	git branch -m <name>
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7329479Z hint:
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7329740Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7330460Z Initialized empty Git repository in /home/runner/work/driftwood/driftwood/platform-tools/.git/
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7332870Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-platform/platform
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7361497Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7361828Z ##[group]Disabling automatic garbage collection
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7364263Z [command]/usr/bin/git config --local gc.auto 0
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7387315Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7387525Z ##[group]Setting up auth
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7392445Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7416168Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7607919Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7638116Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7816944Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.7843678Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.8008288Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.8040229Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.8040471Z ##[group]Fetching the repository
+cut	Independently pinned compiler tools	2026-10-04T12:15:30.8046472Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6988317Z From https://github.com/policy-as-versioned-platform/platform
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6988844Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6989202Z  * [new branch]      ecosystem/thin-slice    -> origin/ecosystem/thin-slice
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6989695Z  * [new branch]      fix-2026-09-09-absence-count-is-derived -> origin/fix-2026-09-09-absence-count-is-derived
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6990243Z  * [new branch]      fix-transition-replay-20260910 -> origin/fix-transition-replay-20260910
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6990782Z  * [new branch]      implement-engine-fixtures-20260910 -> origin/implement-engine-fixtures-20260910
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6991357Z  * [new branch]      implement-floor-change-evidence-20260910 -> origin/implement-floor-change-evidence-20260910
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6991932Z  * [new branch]      main                    -> origin/main
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6992287Z  * [new branch]      observations            -> origin/observations
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6992928Z  * [new branch]      policy-composition/tickets-09-16-wip -> origin/policy-composition/tickets-09-16-wip
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6993519Z  * [new branch]      release/2.0.x           -> origin/release/2.0.x
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6993865Z  * [new branch]      renovate/configure      -> origin/renovate/configure
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6994471Z  * [new branch]      repair-2026-09-04-gate-regressions -> origin/repair-2026-09-04-gate-regressions
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6994976Z  * [new branch]      repair/array-commit-for-4-0-0 -> origin/repair/array-commit-for-4-0-0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6995455Z  * [new branch]      repair/evidence-reaches-main -> origin/repair/evidence-reaches-main
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6995919Z  * [new branch]      resume/2026-10-03-security6 -> origin/resume/2026-10-03-security6
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6996398Z  * [new branch]      resume/2026-10-04-compatibility7 -> origin/resume/2026-10-04-compatibility7
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6996827Z  * [new branch]      retire-policy-4-0-0     -> origin/retire-policy-4-0-0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6997454Z  * [new branch]      ticket-106-composition-selfcheck-fixture-namespace -> origin/ticket-106-composition-selfcheck-fixture-namespace
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6998391Z  * [new branch]      ticket-110-offline-supersede -> origin/ticket-110-offline-supersede
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6998988Z  * [new branch]      ticket-110-selfcheck-derives-supersede -> origin/ticket-110-selfcheck-derives-supersede
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.6999682Z  * [new branch]      ticket-111-the-cage-delivers-its-classes -> origin/ticket-111-the-cage-delivers-its-classes
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7000310Z  * [new branch]      ticket-113-infra-is-a-role-not-a-rung -> origin/ticket-113-infra-is-a-role-not-a-rung
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7000933Z  * [new branch]      ticket-119-unlabelled-namespace-is-priced -> origin/ticket-119-unlabelled-namespace-is-priced
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7001650Z  * [new branch]      ticket-121-implementing-a-control-moves-the-price -> origin/ticket-121-implementing-a-control-moves-the-price
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7002312Z  * [new branch]      ticket-122-ramp-survives-rename -> origin/ticket-122-ramp-survives-rename
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7003056Z  * [new branch]      ticket-123-a-withdrawal-is-the-regulators -> origin/ticket-123-a-withdrawal-is-the-regulators
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7003650Z  * [new branch]      ticket-124-price-the-removal -> origin/ticket-124-price-the-removal
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7004421Z  * [new branch]      ticket-126-a-withdrawn-control-is-not-selectable -> origin/ticket-126-a-withdrawn-control-is-not-selectable
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7005215Z  * [new branch]      ticket-128-behind-a-major-unreadable -> origin/ticket-128-behind-a-major-unreadable
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7005781Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7006373Z  * [new branch]      ticket-134-observation-is-not-source -> origin/ticket-134-observation-is-not-source
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7006895Z  * [new branch]      ticket-136-vendor-by-feed-name -> origin/ticket-136-vendor-by-feed-name
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7007424Z  * [new branch]      ticket-137-parent-tree-per-feed-edge -> origin/ticket-137-parent-tree-per-feed-edge
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7007920Z  * [new branch]      ticket-138-as-of-docstring -> origin/ticket-138-as-of-docstring
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7008367Z  * [new branch]      ticket-139-since-after-as-of -> origin/ticket-139-since-after-as-of
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7008902Z  * [new branch]      ticket-141-party-declares-pricing-threshold -> origin/ticket-141-party-declares-pricing-threshold
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7009457Z  * [new branch]      ticket-145-agent-cage-price -> origin/ticket-145-agent-cage-price
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7009863Z  * [new branch]      ticket-146-engine-cells -> origin/ticket-146-engine-cells
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7010299Z  * [new branch]      ticket-148-unsupported-pairing -> origin/ticket-148-unsupported-pairing
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7010917Z  * [new branch]      ticket-34-followup-2026-09-08 -> origin/ticket-34-followup-2026-09-08
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7011458Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7011900Z  * [new branch]      ticket-45-switching-cost-computed-in-composition -> origin/ticket-45-switching-cost-computed-in-composition
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7012270Z  * [new branch]      ticket-55-instrument-faults -> origin/ticket-55-instrument-faults
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7012529Z  * [new branch]      ticket-62-and-77        -> origin/ticket-62-and-77
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7012833Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7013162Z  * [new branch]      ticket-79-the-pound-inputs -> origin/ticket-79-the-pound-inputs
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7013488Z  * [new branch]      ticket-80-three-forks-not-a-config-base -> origin/ticket-80-three-forks-not-a-config-base
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7013865Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7014474Z  * [new branch]      ticket-89-deny-is-not-a-rung -> origin/ticket-89-deny-is-not-a-rung
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7014819Z  * [new branch]      ticket-91-the-currency-controller-is-owned -> origin/ticket-91-the-currency-controller-is-owned
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7015184Z  * [new branch]      ticket-98-refusal-by-another-name -> origin/ticket-98-refusal-by-another-name
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7015500Z  * [new branch]      truth-surface-computed-semver -> origin/truth-surface-computed-semver
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7015783Z  * [new branch]      truth-surface-live-tails -> origin/truth-surface-live-tails
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7016009Z  * [new tag]         policy/v2.0.0           -> policy/v2.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7016199Z  * [new tag]         policy/v2.0.1           -> policy/v2.0.1
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7016386Z  * [new tag]         policy/v3.0.0           -> policy/v3.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7016565Z  * [new tag]         policy/v4.0.0           -> policy/v4.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7016744Z  * [new tag]         policy/v5.0.0           -> policy/v5.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7016927Z  * [new tag]         policy/v6.0.0           -> policy/v6.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7017105Z  * [new tag]         policy/v7.0.0           -> policy/v7.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7017278Z  * [new tag]         v0.1.0                  -> v0.1.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7017440Z  * [new tag]         v0.1.1                  -> v0.1.1
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7017687Z  * [new tag]         v1.0.0                  -> v1.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7017847Z  * [new tag]         v1.1.0                  -> v1.1.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7018023Z  * [new tag]         v1.1.1                  -> v1.1.1
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7018262Z  * [new tag]         v2.0.0                  -> v2.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7018438Z  * [new tag]         v2.0.1                  -> v2.0.1
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7018595Z  * [new tag]         v3.0.0                  -> v3.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7018776Z  * [new tag]         v3.1.0                  -> v3.1.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7018933Z  * [new tag]         v3.2.0                  -> v3.2.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7019092Z  * [new tag]         v3.3.0                  -> v3.3.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7019250Z  * [new tag]         v3.4.0                  -> v3.4.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7019408Z  * [new tag]         v3.4.1                  -> v3.4.1
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7019568Z  * [new tag]         v4.0.0                  -> v4.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7019734Z  * [new tag]         v5.0.0                  -> v5.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7020615Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7020939Z ##[group]Determining the checkout info
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7021224Z [command]/usr/bin/git branch --list --remote origin/v5.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7046897Z [command]/usr/bin/git tag --list v5.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7071384Z v5.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7073949Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7077054Z [command]/usr/bin/git sparse-checkout disable
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7106945Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7130978Z ##[group]Checking out the ref
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7133341Z [command]/usr/bin/git checkout --progress --force refs/tags/v5.0.0
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7450885Z Note: switching to 'refs/tags/v5.0.0'.
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7451147Z 
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7453114Z You are in 'detached HEAD' state. You can look around, make experimental
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7453506Z changes and commit them, and you can discard any commits you make in this
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7453904Z state without impacting any branches by switching back to a branch.
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7454240Z 
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7454461Z If you want to create a new branch to retain commits you create, you may
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7454881Z do so (now or later) by using -c with the switch command. Example:
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7455120Z 
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7455457Z   git switch -c <new-branch-name>
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7455601Z 
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7455682Z Or undo this operation with:
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7455812Z 
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7455881Z   git switch -
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7456147Z 
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7456316Z Turn off this advice by setting config variable advice.detachedHead to false
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7456566Z 
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7456921Z HEAD is now at 703eff6 cs-27: point versions.yaml commit field(s) at the evidence commit 393a40f707f2b23a3a174696a0c84a8473297ca9 (policy/v7.0.0)
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7458847Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7488377Z [command]/usr/bin/git log -1 --format=%H
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7509061Z 703eff6aee959843c4160aa54fd03413f62858cc
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7587190Z ##[end-action id=__self_2.__actions_checkout;outcome=success;conclusion=success;duration_ms=1095]
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7590535Z ##[start-action display=Verify tool release before execution;id=__self_2.__run]
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7601213Z ##[group]Run python3 "$ADOPTER_DIR/.github/scripts/platform-tools.py" \
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7601478Z ^[[36;1mpython3 "$ADOPTER_DIR/.github/scripts/platform-tools.py" \^[[0m
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7601718Z ^[[36;1m  --adopter-dir "$ADOPTER_DIR" --tools-dir platform-tools check^[[0m
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7653208Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7653385Z env:
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7653496Z   ADOPTER_DIR: driftwood
+cut	Independently pinned compiler tools	2026-10-04T12:15:31.7653621Z ##[endgroup]
+cut	Independently pinned compiler tools	2026-10-04T12:15:32.7256729Z OK: platform tools v5.0.0 at 703eff6aee959843c4160aa54fd03413f62858cc, release identity verified
+cut	Independently pinned compiler tools	2026-10-04T12:15:32.7319053Z ##[end-action id=__self_2.__run;outcome=success;conclusion=success;duration_ms=972]
+cut	read driftwood's own pinned platform and nist tags	﻿2026-10-04T12:15:32.7345946Z ##[group]Run set -euo pipefail
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7346223Z ^[[36;1mset -euo pipefail^[[0m
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7346442Z ^[[36;1mpip install --quiet pyyaml^[[0m
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7346724Z ^[[36;1mpython3 driftwood/.github/scripts/read-pins.py \^[[0m
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7347077Z ^[[36;1m  driftwood/gitops/platform/platform-pin.yaml platform \^[[0m
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7347469Z ^[[36;1m  driftwood/gitops/flux-system/gotk-sync-nist.yaml nist \^[[0m
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7347823Z ^[[36;1m  driftwood/gitops/flux-system/gotk-sync-ico.yaml ico \^[[0m
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7348191Z ^[[36;1m  driftwood/gitops/flux-system/gotk-sync-feeds.yaml feeds \^[[0m
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7348579Z ^[[36;1m  driftwood/gitops/flux-system/gotk-sync-insurer.yaml insurer \^[[0m
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7348903Z ^[[36;1m  >> "$GITHUB_OUTPUT"^[[0m
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7400553Z shell: /usr/bin/bash -e {0}
+cut	read driftwood's own pinned platform and nist tags	2026-10-04T12:15:32.7400695Z ##[endgroup]
+cut	Run actions/checkout@v4	﻿2026-10-04T12:15:33.6611857Z ##[group]Run actions/checkout@v4
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6612027Z with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6612163Z   repository: policy-as-versioned-platform/platform
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6612328Z   path: platform
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6612436Z   ref: v5.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6612542Z   fetch-depth: 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6613737Z   token: ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6613840Z   ssh-strict: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6613946Z   ssh-user: git
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6614231Z   persist-credentials: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6614360Z   clean: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6614478Z   sparse-checkout-cone-mode: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6614615Z   fetch-tags: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6614724Z   show-progress: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6614836Z   lfs: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6614961Z   submodules: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6615074Z   set-safe-directory: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6615206Z   allow-unsafe-pr-checkout: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.6615340Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7137898Z Syncing repository: policy-as-versioned-platform/platform
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7141750Z ##[group]Getting Git version info
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7142100Z Working directory is '/home/runner/work/driftwood/driftwood/platform'
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7164191Z [command]/usr/bin/git version
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7194496Z git version 2.55.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7205520Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7213785Z Temporarily overriding HOME='/home/runner/work/_temp/ad332eed-5319-47b8-a370-4f9b2bef32b6' before making global git config changes
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7214613Z Adding repository directory to the temporary git global config as a safe directory
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7216722Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/platform
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7242196Z ##[group]Initializing the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7244897Z [command]/usr/bin/git init /home/runner/work/driftwood/driftwood/platform
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7277387Z hint: Using 'master' as the name for the initial branch. This default branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7277972Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7278614Z hint: to use in all of your new repositories, which will suppress this warning,
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7279099Z hint: call:
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7279400Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7279737Z hint: 	git config --global init.defaultBranch <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7280204Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7280576Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7281622Z hint: 'development'. The just-created branch can be renamed via this command:
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7282736Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7283038Z hint: 	git branch -m <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7283370Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7283766Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7284511Z Initialized empty Git repository in /home/runner/work/driftwood/driftwood/platform/.git/
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7286089Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-platform/platform
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7312781Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7313268Z ##[group]Disabling automatic garbage collection
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7315189Z [command]/usr/bin/git config --local gc.auto 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7338756Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7339108Z ##[group]Setting up auth
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7343136Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7367524Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7567469Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7595205Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7811987Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.7841016Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.8010456Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.8042537Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.8042952Z ##[group]Fetching the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:33.8049212Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5028618Z From https://github.com/policy-as-versioned-platform/platform
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5029176Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5029654Z  * [new branch]      ecosystem/thin-slice    -> origin/ecosystem/thin-slice
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5030181Z  * [new branch]      fix-2026-09-09-absence-count-is-derived -> origin/fix-2026-09-09-absence-count-is-derived
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5030756Z  * [new branch]      fix-transition-replay-20260910 -> origin/fix-transition-replay-20260910
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5031333Z  * [new branch]      implement-engine-fixtures-20260910 -> origin/implement-engine-fixtures-20260910
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5031936Z  * [new branch]      implement-floor-change-evidence-20260910 -> origin/implement-floor-change-evidence-20260910
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5032423Z  * [new branch]      main                    -> origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5032737Z  * [new branch]      observations            -> origin/observations
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5033180Z  * [new branch]      policy-composition/tickets-09-16-wip -> origin/policy-composition/tickets-09-16-wip
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5033614Z  * [new branch]      release/2.0.x           -> origin/release/2.0.x
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5033954Z  * [new branch]      renovate/configure      -> origin/renovate/configure
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5034581Z  * [new branch]      repair-2026-09-04-gate-regressions -> origin/repair-2026-09-04-gate-regressions
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5035100Z  * [new branch]      repair/array-commit-for-4-0-0 -> origin/repair/array-commit-for-4-0-0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5035595Z  * [new branch]      repair/evidence-reaches-main -> origin/repair/evidence-reaches-main
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5036063Z  * [new branch]      resume/2026-10-03-security6 -> origin/resume/2026-10-03-security6
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5036569Z  * [new branch]      resume/2026-10-04-compatibility7 -> origin/resume/2026-10-04-compatibility7
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5037039Z  * [new branch]      retire-policy-4-0-0     -> origin/retire-policy-4-0-0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5037682Z  * [new branch]      ticket-106-composition-selfcheck-fixture-namespace -> origin/ticket-106-composition-selfcheck-fixture-namespace
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5038320Z  * [new branch]      ticket-110-offline-supersede -> origin/ticket-110-offline-supersede
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5039178Z  * [new branch]      ticket-110-selfcheck-derives-supersede -> origin/ticket-110-selfcheck-derives-supersede
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5039882Z  * [new branch]      ticket-111-the-cage-delivers-its-classes -> origin/ticket-111-the-cage-delivers-its-classes
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5040588Z  * [new branch]      ticket-113-infra-is-a-role-not-a-rung -> origin/ticket-113-infra-is-a-role-not-a-rung
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5041258Z  * [new branch]      ticket-119-unlabelled-namespace-is-priced -> origin/ticket-119-unlabelled-namespace-is-priced
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5042020Z  * [new branch]      ticket-121-implementing-a-control-moves-the-price -> origin/ticket-121-implementing-a-control-moves-the-price
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5042712Z  * [new branch]      ticket-122-ramp-survives-rename -> origin/ticket-122-ramp-survives-rename
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5043350Z  * [new branch]      ticket-123-a-withdrawal-is-the-regulators -> origin/ticket-123-a-withdrawal-is-the-regulators
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5044011Z  * [new branch]      ticket-124-price-the-removal -> origin/ticket-124-price-the-removal
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5045070Z  * [new branch]      ticket-126-a-withdrawn-control-is-not-selectable -> origin/ticket-126-a-withdrawn-control-is-not-selectable
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5045819Z  * [new branch]      ticket-128-behind-a-major-unreadable -> origin/ticket-128-behind-a-major-unreadable
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5046431Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5047009Z  * [new branch]      ticket-134-observation-is-not-source -> origin/ticket-134-observation-is-not-source
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5047523Z  * [new branch]      ticket-136-vendor-by-feed-name -> origin/ticket-136-vendor-by-feed-name
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5048064Z  * [new branch]      ticket-137-parent-tree-per-feed-edge -> origin/ticket-137-parent-tree-per-feed-edge
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5048572Z  * [new branch]      ticket-138-as-of-docstring -> origin/ticket-138-as-of-docstring
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5049045Z  * [new branch]      ticket-139-since-after-as-of -> origin/ticket-139-since-after-as-of
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5049638Z  * [new branch]      ticket-141-party-declares-pricing-threshold -> origin/ticket-141-party-declares-pricing-threshold
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5050224Z  * [new branch]      ticket-145-agent-cage-price -> origin/ticket-145-agent-cage-price
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5050668Z  * [new branch]      ticket-146-engine-cells -> origin/ticket-146-engine-cells
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5051133Z  * [new branch]      ticket-148-unsupported-pairing -> origin/ticket-148-unsupported-pairing
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5051626Z  * [new branch]      ticket-34-followup-2026-09-08 -> origin/ticket-34-followup-2026-09-08
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5061757Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5062334Z  * [new branch]      ticket-45-switching-cost-computed-in-composition -> origin/ticket-45-switching-cost-computed-in-composition
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5062754Z  * [new branch]      ticket-55-instrument-faults -> origin/ticket-55-instrument-faults
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5063034Z  * [new branch]      ticket-62-and-77        -> origin/ticket-62-and-77
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5063366Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5063721Z  * [new branch]      ticket-79-the-pound-inputs -> origin/ticket-79-the-pound-inputs
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5064381Z  * [new branch]      ticket-80-three-forks-not-a-config-base -> origin/ticket-80-three-forks-not-a-config-base
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5064787Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5065153Z  * [new branch]      ticket-89-deny-is-not-a-rung -> origin/ticket-89-deny-is-not-a-rung
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5065532Z  * [new branch]      ticket-91-the-currency-controller-is-owned -> origin/ticket-91-the-currency-controller-is-owned
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5066094Z  * [new branch]      ticket-98-refusal-by-another-name -> origin/ticket-98-refusal-by-another-name
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5066432Z  * [new branch]      truth-surface-computed-semver -> origin/truth-surface-computed-semver
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5066734Z  * [new branch]      truth-surface-live-tails -> origin/truth-surface-live-tails
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5066983Z  * [new tag]         policy/v2.0.0           -> policy/v2.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5067188Z  * [new tag]         policy/v2.0.1           -> policy/v2.0.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5067382Z  * [new tag]         policy/v3.0.0           -> policy/v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5067571Z  * [new tag]         policy/v4.0.0           -> policy/v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5067764Z  * [new tag]         policy/v5.0.0           -> policy/v5.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5067954Z  * [new tag]         policy/v6.0.0           -> policy/v6.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5068146Z  * [new tag]         policy/v7.0.0           -> policy/v7.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5068337Z  * [new tag]         v0.1.0                  -> v0.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5068600Z  * [new tag]         v0.1.1                  -> v0.1.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5068773Z  * [new tag]         v1.0.0                  -> v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5068943Z  * [new tag]         v1.1.0                  -> v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5069114Z  * [new tag]         v1.1.1                  -> v1.1.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5069290Z  * [new tag]         v2.0.0                  -> v2.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5069458Z  * [new tag]         v2.0.1                  -> v2.0.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5069629Z  * [new tag]         v3.0.0                  -> v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5069795Z  * [new tag]         v3.1.0                  -> v3.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5069961Z  * [new tag]         v3.2.0                  -> v3.2.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5070130Z  * [new tag]         v3.3.0                  -> v3.3.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5070300Z  * [new tag]         v3.4.0                  -> v3.4.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5070475Z  * [new tag]         v3.4.1                  -> v3.4.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5070648Z  * [new tag]         v4.0.0                  -> v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5070815Z  * [new tag]         v5.0.0                  -> v5.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5071667Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5071883Z ##[group]Determining the checkout info
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5072073Z [command]/usr/bin/git branch --list --remote origin/v5.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5081828Z [command]/usr/bin/git tag --list v5.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5114650Z v5.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5117971Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5120710Z [command]/usr/bin/git sparse-checkout disable
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5154481Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5179124Z ##[group]Checking out the ref
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5181422Z [command]/usr/bin/git checkout --progress --force refs/tags/v5.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5515035Z Note: switching to 'refs/tags/v5.0.0'.
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5515453Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5515637Z You are in 'detached HEAD' state. You can look around, make experimental
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5516062Z changes and commit them, and you can discard any commits you make in this
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5516461Z state without impacting any branches by switching back to a branch.
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5516699Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5516853Z If you want to create a new branch to retain commits you create, you may
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5517218Z do so (now or later) by using -c with the switch command. Example:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5517433Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5517526Z   git switch -c <new-branch-name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5517671Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5517757Z Or undo this operation with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5517888Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5517962Z   git switch -
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5518060Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5518235Z Turn off this advice by setting config variable advice.detachedHead to false
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5518487Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5518844Z HEAD is now at 703eff6 cs-27: point versions.yaml commit field(s) at the evidence commit 393a40f707f2b23a3a174696a0c84a8473297ca9 (policy/v7.0.0)
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5523286Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5552311Z [command]/usr/bin/git log -1 --format=%H
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5573726Z 703eff6aee959843c4160aa54fd03413f62858cc
+cut	Run actions/checkout@v4	﻿2026-10-04T12:15:34.5694844Z ##[group]Run actions/checkout@v4
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5694998Z with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5695126Z   repository: policy-as-versioned-nist/nist
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5695281Z   path: nist
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5695389Z   ref: v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5695496Z   fetch-depth: 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5696719Z   token: ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5696827Z   ssh-strict: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5696940Z   ssh-user: git
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5697058Z   persist-credentials: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5697186Z   clean: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5697306Z   sparse-checkout-cone-mode: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5697447Z   fetch-tags: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5697561Z   show-progress: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5697679Z   lfs: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5697791Z   submodules: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5697907Z   set-safe-directory: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5698045Z   allow-unsafe-pr-checkout: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.5698183Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6211015Z Syncing repository: policy-as-versioned-nist/nist
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6215348Z ##[group]Getting Git version info
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6215964Z Working directory is '/home/runner/work/driftwood/driftwood/nist'
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6238162Z [command]/usr/bin/git version
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6268403Z git version 2.55.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6281365Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6290023Z Temporarily overriding HOME='/home/runner/work/_temp/16090d7d-6c1d-48fa-a6c0-9804d5db9eb4' before making global git config changes
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6290665Z Adding repository directory to the temporary git global config as a safe directory
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6293179Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/nist
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6321037Z ##[group]Initializing the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6324209Z [command]/usr/bin/git init /home/runner/work/driftwood/driftwood/nist
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6363269Z hint: Using 'master' as the name for the initial branch. This default branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6371222Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6371703Z hint: to use in all of your new repositories, which will suppress this warning,
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6372028Z hint: call:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6372187Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6372403Z hint: 	git config --global init.defaultBranch <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6372657Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6372907Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6373322Z hint: 'development'. The just-created branch can be renamed via this command:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6373638Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6373804Z hint: 	git branch -m <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6373995Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6374382Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6374717Z Initialized empty Git repository in /home/runner/work/driftwood/driftwood/nist/.git/
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6375253Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-nist/nist
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6402589Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6402930Z ##[group]Disabling automatic garbage collection
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6405943Z [command]/usr/bin/git config --local gc.auto 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6457222Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6457530Z ##[group]Setting up auth
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6462745Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6487622Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6678386Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6711132Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6896255Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.6924520Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.7102367Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.7139950Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.7140329Z ##[group]Fetching the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:34.7149009Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2402717Z From https://github.com/policy-as-versioned-nist/nist
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2403067Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2403330Z  * [new branch]      ecosystem/thin-slice -> origin/ecosystem/thin-slice
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2403553Z  * [new branch]      main                 -> origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2403761Z  * [new branch]      observations         -> origin/observations
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2404174Z  * [new branch]      policy-composition/tickets-09-16-wip -> origin/policy-composition/tickets-09-16-wip
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2404468Z  * [new branch]      renovate/configure   -> origin/renovate/configure
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2404798Z  * [new branch]      ticket-103-release-gate-computes-the-bump -> origin/ticket-103-release-gate-computes-the-bump
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2405110Z  * [new branch]      ticket-56-and-85     -> origin/ticket-56-and-85
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2405410Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2405840Z  * [new tag]         v1.0.0               -> v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2406009Z  * [new tag]         v1.1.0               -> v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2413225Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2413493Z ##[group]Determining the checkout info
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2413703Z [command]/usr/bin/git branch --list --remote origin/v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2442343Z [command]/usr/bin/git tag --list v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2495995Z v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2498653Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2501209Z [command]/usr/bin/git sparse-checkout disable
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2531993Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2555421Z ##[group]Checking out the ref
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2557532Z [command]/usr/bin/git checkout --progress --force refs/tags/v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2672274Z Note: switching to 'refs/tags/v1.1.0'.
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2672471Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2672635Z You are in 'detached HEAD' state. You can look around, make experimental
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2673040Z changes and commit them, and you can discard any commits you make in this
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2673426Z state without impacting any branches by switching back to a branch.
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2673647Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2673798Z If you want to create a new branch to retain commits you create, you may
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2674284Z do so (now or later) by using -c with the switch command. Example:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2674492Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2674578Z   git switch -c <new-branch-name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2674720Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2674802Z Or undo this operation with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2674930Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2674999Z   git switch -
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2675098Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2675264Z Turn off this advice by setting config variable advice.detachedHead to false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2675518Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2675792Z HEAD is now at 33a05df Merge pull request #2 from policy-as-versioned-nist/policy-composition/tickets-09-16-wip
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2677977Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2705903Z [command]/usr/bin/git log -1 --format=%H
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2726286Z 33a05df1f5241bca6ffbc1c69a70075cdb7a5819
+cut	Run actions/checkout@v4	﻿2026-10-04T12:15:35.2848584Z ##[group]Run actions/checkout@v4
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2848724Z with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2848844Z   repository: policy-as-versioned-ico/ico
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2848990Z   path: ico
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2849092Z   fetch-depth: 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2849196Z   ref: v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2850338Z   token: ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2850439Z   ssh-strict: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2850545Z   ssh-user: git
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2850656Z   persist-credentials: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2850777Z   clean: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2850890Z   sparse-checkout-cone-mode: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2851023Z   fetch-tags: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2851135Z   show-progress: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2851246Z   lfs: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2851346Z   submodules: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2851457Z   set-safe-directory: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2851597Z   allow-unsafe-pr-checkout: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.2851731Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3341459Z Syncing repository: policy-as-versioned-ico/ico
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3345989Z ##[group]Getting Git version info
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3346349Z Working directory is '/home/runner/work/driftwood/driftwood/ico'
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3370206Z [command]/usr/bin/git version
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3400562Z git version 2.55.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3412652Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3420861Z Temporarily overriding HOME='/home/runner/work/_temp/f62eca97-993f-4f44-ade4-0b0178e15713' before making global git config changes
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3421343Z Adding repository directory to the temporary git global config as a safe directory
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3423777Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/ico
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3449303Z ##[group]Initializing the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3452118Z [command]/usr/bin/git init /home/runner/work/driftwood/driftwood/ico
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3488672Z hint: Using 'master' as the name for the initial branch. This default branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3491399Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3491916Z hint: to use in all of your new repositories, which will suppress this warning,
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3492225Z hint: call:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3492436Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3492681Z hint: 	git config --global init.defaultBranch <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3492999Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3493375Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3493869Z hint: 'development'. The just-created branch can be renamed via this command:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3494825Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3494984Z hint: 	git branch -m <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3495165Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3495413Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3495799Z Initialized empty Git repository in /home/runner/work/driftwood/driftwood/ico/.git/
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3503510Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-ico/ico
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3528240Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3528620Z ##[group]Disabling automatic garbage collection
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3531140Z [command]/usr/bin/git config --local gc.auto 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3554217Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3554532Z ##[group]Setting up auth
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3559559Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3585548Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3804781Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.3842410Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.4020637Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.4049483Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.4215837Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.4248525Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.4248945Z ##[group]Fetching the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.4254643Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8623382Z From https://github.com/policy-as-versioned-ico/ico
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8623858Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8624511Z  * [new branch]      ecosystem/thin-slice    -> origin/ecosystem/thin-slice
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8624835Z  * [new branch]      main                    -> origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8625182Z  * [new branch]      observations            -> origin/observations
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8625544Z  * [new branch]      renovate/configure      -> origin/renovate/configure
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8625907Z  * [new branch]      reset-bump-after-v4.0.0 -> origin/reset-bump-after-v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8626410Z  * [new branch]      ticket-103-release-gate-computes-the-bump -> origin/ticket-103-release-gate-computes-the-bump
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8626907Z  * [new branch]      ticket-62-and-77        -> origin/ticket-62-and-77
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8627356Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8627841Z  * [new branch]      ticket-79-the-pound-inputs -> origin/ticket-79-the-pound-inputs
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8628184Z  * [new tag]         v1.0.0                  -> v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8628431Z  * [new tag]         v3.0.0                  -> v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8628680Z  * [new tag]         v4.0.0                  -> v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8630146Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8630522Z ##[group]Determining the checkout info
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8636139Z [command]/usr/bin/git branch --list --remote origin/v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8666648Z [command]/usr/bin/git tag --list v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8691792Z v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8694231Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8697543Z [command]/usr/bin/git sparse-checkout disable
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8728633Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8753242Z ##[group]Checking out the ref
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8755949Z [command]/usr/bin/git checkout --progress --force refs/tags/v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8797027Z Note: switching to 'refs/tags/v3.0.0'.
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8797189Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8797456Z You are in 'detached HEAD' state. You can look around, make experimental
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8797831Z changes and commit them, and you can discard any commits you make in this
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8798190Z state without impacting any branches by switching back to a branch.
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8798338Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8798437Z If you want to create a new branch to retain commits you create, you may
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8798671Z do so (now or later) by using -c with the switch command. Example:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8798801Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8798860Z   git switch -c <new-branch-name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8798950Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8799006Z Or undo this operation with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8799090Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8799189Z   git switch -
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8799303Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8799432Z Turn off this advice by setting config variable advice.detachedHead to false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8799640Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8799829Z HEAD is now at 9d09222 Merge pull request #2 from policy-as-versioned-ico/ecosystem/thin-slice
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8802456Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8831065Z [command]/usr/bin/git log -1 --format=%H
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.8851411Z 9d09222117dde1257e5b43401caa43342f47bae3
+cut	Run actions/checkout@v4	﻿2026-10-04T12:15:35.9011685Z ##[group]Run actions/checkout@v4
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9011831Z with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9011958Z   repository: policy-as-versioned-feeds/feeds
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9012111Z   path: feeds
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9012212Z   fetch-depth: 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9012325Z   ref: threat-register/v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9013479Z   token: ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9013582Z   ssh-strict: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9013687Z   ssh-user: git
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9013833Z   persist-credentials: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9013956Z   clean: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9014242Z   sparse-checkout-cone-mode: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9014377Z   fetch-tags: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9014487Z   show-progress: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9014597Z   lfs: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9014695Z   submodules: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9014811Z   set-safe-directory: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9014941Z   allow-unsafe-pr-checkout: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9015072Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9504463Z Syncing repository: policy-as-versioned-feeds/feeds
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9508069Z ##[group]Getting Git version info
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9521636Z Working directory is '/home/runner/work/driftwood/driftwood/feeds'
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9531925Z [command]/usr/bin/git version
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9561797Z git version 2.55.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9574169Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9594884Z Temporarily overriding HOME='/home/runner/work/_temp/8c26362a-7d62-4344-a538-ed27b888df36' before making global git config changes
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9595751Z Adding repository directory to the temporary git global config as a safe directory
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9596466Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/feeds
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9611342Z ##[group]Initializing the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9614245Z [command]/usr/bin/git init /home/runner/work/driftwood/driftwood/feeds
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9648334Z hint: Using 'master' as the name for the initial branch. This default branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9648952Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9649461Z hint: to use in all of your new repositories, which will suppress this warning,
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9649767Z hint: call:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9649918Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9650119Z hint: 	git config --global init.defaultBranch <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9650361Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9650591Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9650980Z hint: 'development'. The just-created branch can be renamed via this command:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9651279Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9651437Z hint: 	git branch -m <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9651624Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9651875Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9652282Z Initialized empty Git repository in /home/runner/work/driftwood/driftwood/feeds/.git/
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9658670Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-feeds/feeds
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9739487Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9739820Z ##[group]Disabling automatic garbage collection
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9743024Z [command]/usr/bin/git config --local gc.auto 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9766107Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9766477Z ##[group]Setting up auth
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9771072Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9796648Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:35.9992485Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.0023704Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.0199661Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.0226291Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.0390065Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.0421307Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.0421689Z ##[group]Fetching the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.0427774Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6198979Z From https://github.com/policy-as-versioned-feeds/feeds
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6199345Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6199616Z  * [new branch]      fetch/cve-2.0.1        -> origin/fetch/cve-2.0.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6199850Z  * [new branch]      fetch/eol-2.0.1        -> origin/fetch/eol-2.0.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6200102Z  * [new branch]      fetch/fx-1.1.0         -> origin/fetch/fx-1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6200320Z  * [new branch]      fetch/fx-3.0.0         -> origin/fetch/fx-3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6200583Z  * [new branch]      fetch/threat-register-2.0.1 -> origin/fetch/threat-register-2.0.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6201069Z  * [new branch]      fetch/threat-register-3.0.1 -> origin/fetch/threat-register-3.0.1
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6201514Z  * [new branch]      fix-skill-gate-drop-github-markers -> origin/fix-skill-gate-drop-github-markers
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6201803Z  * [new branch]      main                   -> origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6202018Z  * [new branch]      observations           -> origin/observations
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6202536Z  * [new branch]      reset-bump-after-threat-register-v3.0.0 -> origin/reset-bump-after-threat-register-v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6203162Z  * [new branch]      resume/2026-10-03-primary-cve-fx-threat-feeds -> origin/resume/2026-10-03-primary-cve-fx-threat-feeds
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6203733Z  * [new branch]      resume/2026-10-04-dated-fx -> origin/resume/2026-10-04-dated-fx
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6204165Z  * [new branch]      ticket-145-agent-cage-price -> origin/ticket-145-agent-cage-price
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6204434Z  * [new branch]      ticket-56-and-85       -> origin/ticket-56-and-85
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6204663Z  * [new branch]      ticket-62-and-77       -> origin/ticket-62-and-77
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6204987Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6205345Z  * [new branch]      ticket-79-the-pound-inputs -> origin/ticket-79-the-pound-inputs
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6205695Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6205992Z  * [new tag]         cve/v3.0.0             -> cve/v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6206194Z  * [new tag]         fx/v1.1.0              -> fx/v1.1.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6206390Z  * [new tag]         fx/v2.0.0              -> fx/v2.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6206590Z  * [new tag]         threat-register/v1.0.0 -> threat-register/v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6206812Z  * [new tag]         threat-register/v2.0.0 -> threat-register/v2.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6207053Z  * [new tag]         threat-register/v3.0.0 -> threat-register/v3.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6207279Z  * [new tag]         threat-register/v4.0.0 -> threat-register/v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6207901Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6208134Z ##[group]Determining the checkout info
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6210714Z [command]/usr/bin/git branch --list --remote origin/threat-register/v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6243649Z [command]/usr/bin/git tag --list threat-register/v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6267025Z threat-register/v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6269769Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6272711Z [command]/usr/bin/git sparse-checkout disable
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6362839Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6387614Z ##[group]Checking out the ref
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6390715Z [command]/usr/bin/git checkout --progress --force refs/tags/threat-register/v4.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6474015Z Note: switching to 'refs/tags/threat-register/v4.0.0'.
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6474404Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6474585Z You are in 'detached HEAD' state. You can look around, make experimental
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6475001Z changes and commit them, and you can discard any commits you make in this
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6475412Z state without impacting any branches by switching back to a branch.
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6475653Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6475810Z If you want to create a new branch to retain commits you create, you may
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6476207Z do so (now or later) by using -c with the switch command. Example:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6476430Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6476526Z   git switch -c <new-branch-name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6476675Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6476774Z Or undo this operation with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6476910Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6476986Z   git switch -
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6477092Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6477270Z Turn off this advice by setting config variable advice.detachedHead to false
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6477537Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6477854Z HEAD is now at 974e735 Merge pull request #10 from policy-as-versioned-feeds/resume/2026-10-03-primary-cve-fx-threat-feeds
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6480168Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6509935Z [command]/usr/bin/git log -1 --format=%H
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6530951Z 974e73514e0d8d4cad2e6906acf51d1cc27028b3
+cut	Run actions/checkout@v4	﻿2026-10-04T12:15:36.6671525Z ##[group]Run actions/checkout@v4
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6671770Z with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6671996Z   repository: policy-as-versioned-insurer/insurer
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6672282Z   path: insurer
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6672457Z   fetch-depth: 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6672631Z   ref: v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6674938Z   token: ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6675120Z   ssh-strict: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6675294Z   ssh-user: git
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6675481Z   persist-credentials: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6675687Z   clean: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6675882Z   sparse-checkout-cone-mode: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6676109Z   fetch-tags: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6676294Z   show-progress: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6676499Z   lfs: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6676661Z   submodules: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6676843Z   set-safe-directory: true
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6677066Z   allow-unsafe-pr-checkout: false
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.6677282Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7207504Z Syncing repository: policy-as-versioned-insurer/insurer
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7212185Z ##[group]Getting Git version info
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7212584Z Working directory is '/home/runner/work/driftwood/driftwood/insurer'
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7234553Z [command]/usr/bin/git version
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7266111Z git version 2.55.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7277512Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7285587Z Temporarily overriding HOME='/home/runner/work/_temp/6d5fdb2e-e478-4600-9aa3-558c3066ccf7' before making global git config changes
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7286297Z Adding repository directory to the temporary git global config as a safe directory
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7288822Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/insurer
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7314612Z ##[group]Initializing the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7318161Z [command]/usr/bin/git init /home/runner/work/driftwood/driftwood/insurer
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7354752Z hint: Using 'master' as the name for the initial branch. This default branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7355310Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7355832Z hint: to use in all of your new repositories, which will suppress this warning,
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7356432Z hint: call:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7361917Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7362710Z hint: 	git config --global init.defaultBranch <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7362984Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7364872Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7365359Z hint: 'development'. The just-created branch can be renamed via this command:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7365731Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7365909Z hint: 	git branch -m <name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7366146Z hint:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7366436Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7366969Z Initialized empty Git repository in /home/runner/work/driftwood/driftwood/insurer/.git/
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7368083Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-insurer/insurer
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7393323Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7393709Z ##[group]Disabling automatic garbage collection
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7396338Z [command]/usr/bin/git config --local gc.auto 0
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7420969Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7421320Z ##[group]Setting up auth
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7425965Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7450228Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7656074Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7687072Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7872591Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.7901185Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.8075073Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.8107723Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.8108056Z ##[group]Fetching the repository
+cut	Run actions/checkout@v4	2026-10-04T12:15:36.8113922Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2358138Z From https://github.com/policy-as-versioned-insurer/insurer
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2358625Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2359182Z  * [new branch]      implement-release-verifier-pin-20260910 -> origin/implement-release-verifier-pin-20260910
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2359708Z  * [new branch]      main                    -> origin/main
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2360063Z  * [new branch]      observations            -> origin/observations
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2360474Z  * [new branch]      requote/driftwood-20260925 -> origin/requote/driftwood-20260925
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2360890Z  * [new branch]      requote/driftwood-20260926 -> origin/requote/driftwood-20260926
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2361463Z  * [new branch]      requote/driftwood-20260927 -> origin/requote/driftwood-20260927
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2361916Z  * [new branch]      requote/driftwood-20260928 -> origin/requote/driftwood-20260928
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2362364Z  * [new branch]      requote/driftwood-20260929 -> origin/requote/driftwood-20260929
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2362815Z  * [new branch]      requote/driftwood-20260930 -> origin/requote/driftwood-20260930
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2363286Z  * [new branch]      requote/driftwood-20261001 -> origin/requote/driftwood-20261001
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2363774Z  * [new branch]      requote/driftwood-20261002 -> origin/requote/driftwood-20261002
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2364391Z  * [new branch]      requote/driftwood-20261003 -> origin/requote/driftwood-20261003
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2365111Z  * [new branch]      requote/driftwood-20261004 -> origin/requote/driftwood-20261004
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2365552Z  * [new branch]      requote/ludlow-20260925 -> origin/requote/ludlow-20260925
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2365988Z  * [new branch]      requote/ludlow-20260926 -> origin/requote/ludlow-20260926
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2366399Z  * [new branch]      requote/ludlow-20260927 -> origin/requote/ludlow-20260927
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2366800Z  * [new branch]      requote/ludlow-20260928 -> origin/requote/ludlow-20260928
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2367224Z  * [new branch]      requote/ludlow-20260929 -> origin/requote/ludlow-20260929
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2367647Z  * [new branch]      requote/ludlow-20260930 -> origin/requote/ludlow-20260930
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2368061Z  * [new branch]      requote/ludlow-20261001 -> origin/requote/ludlow-20261001
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2368501Z  * [new branch]      requote/ludlow-20261002 -> origin/requote/ludlow-20261002
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2368963Z  * [new branch]      requote/ludlow-20261003 -> origin/requote/ludlow-20261003
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2369387Z  * [new branch]      requote/ludlow-20261004 -> origin/requote/ludlow-20261004
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2369858Z  * [new branch]      requote/tuppence-20260925 -> origin/requote/tuppence-20260925
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2370299Z  * [new branch]      requote/tuppence-20260926 -> origin/requote/tuppence-20260926
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2370740Z  * [new branch]      requote/tuppence-20260927 -> origin/requote/tuppence-20260927
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2371179Z  * [new branch]      requote/tuppence-20260928 -> origin/requote/tuppence-20260928
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2371628Z  * [new branch]      requote/tuppence-20260929 -> origin/requote/tuppence-20260929
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2372042Z  * [new branch]      requote/tuppence-20260930 -> origin/requote/tuppence-20260930
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2372909Z  * [new branch]      requote/tuppence-20261001 -> origin/requote/tuppence-20261001
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2373382Z  * [new branch]      requote/tuppence-20261002 -> origin/requote/tuppence-20261002
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2373884Z  * [new branch]      requote/tuppence-20261003 -> origin/requote/tuppence-20261003
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2374455Z  * [new branch]      requote/tuppence-20261004 -> origin/requote/tuppence-20261004
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2374852Z  * [new branch]      ticket-56-and-85        -> origin/ticket-56-and-85
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2375199Z  * [new branch]      ticket-62-and-77        -> origin/ticket-62-and-77
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2375676Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2376193Z  * [new branch]      ticket-79-the-pound-inputs -> origin/ticket-79-the-pound-inputs
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2376541Z  * [new tag]         v1.0.0                  -> v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2377246Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2377555Z ##[group]Determining the checkout info
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2377835Z [command]/usr/bin/git branch --list --remote origin/v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2406336Z [command]/usr/bin/git tag --list v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2435688Z v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2438614Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2441389Z [command]/usr/bin/git sparse-checkout disable
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2528659Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2553303Z ##[group]Checking out the ref
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2555813Z [command]/usr/bin/git checkout --progress --force refs/tags/v1.0.0
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2596172Z Note: switching to 'refs/tags/v1.0.0'.
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2596365Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2596549Z You are in 'detached HEAD' state. You can look around, make experimental
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2596963Z changes and commit them, and you can discard any commits you make in this
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2597368Z state without impacting any branches by switching back to a branch.
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2597615Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2597774Z If you want to create a new branch to retain commits you create, you may
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2598360Z do so (now or later) by using -c with the switch command. Example:
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2598576Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2598671Z   git switch -c <new-branch-name>
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2598820Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2598909Z Or undo this operation with:
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2599048Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2599121Z   git switch -
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2599226Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2599404Z Turn off this advice by setting config variable advice.detachedHead to false
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2599668Z 
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2600058Z HEAD is now at 632db22 register workflows, second attempt (ecosystem ticket 57): touch each workflow file so the indexer sees them; comment-only change
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2602556Z ##[endgroup]
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2632492Z [command]/usr/bin/git log -1 --format=%H
+cut	Run actions/checkout@v4	2026-10-04T12:15:37.2653912Z 632db22c92003b048795cea1f5d5bf6e08dcf386
+cut	every parent is at the {tag, commit} pair this repository pins	﻿2026-10-04T12:15:37.2768410Z ##[group]Run set -euo pipefail
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.2768595Z ^[[36;1mset -euo pipefail^[[0m
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.2768803Z ^[[36;1mpython3 driftwood/.github/scripts/verify-pinned-checkouts.py \^[[0m
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.2769066Z ^[[36;1m  driftwood/gitops/platform/platform-pin.yaml platform \^[[0m
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.2769306Z ^[[36;1m  driftwood/gitops/flux-system/gotk-sync-nist.yaml nist \^[[0m
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.2769539Z ^[[36;1m  driftwood/gitops/flux-system/gotk-sync-ico.yaml ico \^[[0m
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.2769772Z ^[[36;1m  driftwood/gitops/flux-system/gotk-sync-feeds.yaml feeds \^[[0m
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.2770016Z ^[[36;1m  driftwood/gitops/flux-system/gotk-sync-insurer.yaml insurer^[[0m
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.2822479Z shell: /usr/bin/bash -e {0}
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.2822622Z ##[endgroup]
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.3273421Z ok  platform is v5.0.0 (703eff6ae) per driftwood/gitops/platform/platform-pin.yaml
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.3273811Z ok  nist is v1.1.0 (33a05df1f) per driftwood/gitops/flux-system/gotk-sync-nist.yaml
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.3274260Z ok  ico is v3.0.0 (9d0922211) per driftwood/gitops/flux-system/gotk-sync-ico.yaml
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.3274577Z ok  feeds is threat-register/v4.0.0 (974e73514) per driftwood/gitops/flux-system/gotk-sync-feeds.yaml
+cut	every parent is at the {tag, commit} pair this repository pins	2026-10-04T12:15:37.3274909Z ok  insurer is v1.0.0 (632db22c9) per driftwood/gitops/flux-system/gotk-sync-insurer.yaml
+cut	ticket 18 -- re-render the composed artefact from the recorded parent SHAs, byte-for-byte, before any tag is cut	﻿2026-10-04T12:15:37.3330307Z ##[group]Run set -euo pipefail
+cut	ticket 18 -- re-render the composed artefact from the recorded parent SHAs, byte-for-byte, before any tag is cut	2026-10-04T12:15:37.3330481Z ^[[36;1mset -euo pipefail^[[0m
+cut	ticket 18 -- re-render the composed artefact from the recorded parent SHAs, byte-for-byte, before any tag is cut	2026-10-04T12:15:37.3330824Z ^[[36;1mpython3 driftwood/.github/scripts/platform-tools.py --adopter-dir driftwood --tools-dir platform-tools verify driftwood --estate-clone .^[[0m
+cut	ticket 18 -- re-render the composed artefact from the recorded parent SHAs, byte-for-byte, before any tag is cut	2026-10-04T12:15:37.3376662Z shell: /usr/bin/bash -e {0}
+cut	ticket 18 -- re-render the composed artefact from the recorded parent SHAs, byte-for-byte, before any tag is cut	2026-10-04T12:15:37.3376804Z ##[endgroup]
+cut	ticket 18 -- re-render the composed artefact from the recorded parent SHAs, byte-for-byte, before any tag is cut	2026-10-04T12:15:39.9420546Z OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs
+cut	reject a tag that already exists (no force-move, ever)	﻿2026-10-04T12:15:39.9620712Z ##[group]Run set -euo pipefail
+cut	reject a tag that already exists (no force-move, ever)	2026-10-04T12:15:39.9620919Z ^[[36;1mset -euo pipefail^[[0m
+cut	reject a tag that already exists (no force-move, ever)	2026-10-04T12:15:39.9621099Z ^[[36;1mif git rev-parse "refs/tags/v4.0.1" >/dev/null 2>&1; then^[[0m
+cut	reject a tag that already exists (no force-move, ever)	2026-10-04T12:15:39.9621385Z ^[[36;1m  echo "FAIL: v4.0.1 already exists -- tags are immutable here, cut a new version" >&2^[[0m
+cut	reject a tag that already exists (no force-move, ever)	2026-10-04T12:15:39.9621637Z ^[[36;1m  exit 1^[[0m
+cut	reject a tag that already exists (no force-move, ever)	2026-10-04T12:15:39.9621749Z ^[[36;1mfi^[[0m
+cut	reject a tag that already exists (no force-move, ever)	2026-10-04T12:15:39.9674557Z shell: /usr/bin/bash -e {0}
+cut	reject a tag that already exists (no force-move, ever)	2026-10-04T12:15:39.9674704Z ##[endgroup]
+cut	create the signed annotated tag (ambient Actions identity, no interactive login)	﻿2026-10-04T12:15:39.9771508Z ##[group]Run set -euo pipefail
+cut	create the signed annotated tag (ambient Actions identity, no interactive login)	2026-10-04T12:15:39.9771695Z ^[[36;1mset -euo pipefail^[[0m
+cut	create the signed annotated tag (ambient Actions identity, no interactive login)	2026-10-04T12:15:39.9771876Z ^[[36;1mgit -c gpg.format=x509 -c gpg.x509.program=gitsign \^[[0m
+cut	create the signed annotated tag (ambient Actions identity, no interactive login)	2026-10-04T12:15:39.9772111Z ^[[36;1m  -c user.name="policy-as-versioned release bot" \^[[0m
+cut	create the signed annotated tag (ambient Actions identity, no interactive login)	2026-10-04T12:15:39.9772350Z ^[[36;1m  -c user.email="releases@${GITHUB_REPOSITORY_OWNER}.invalid" \^[[0m
+cut	create the signed annotated tag (ambient Actions identity, no interactive login)	2026-10-04T12:15:39.9772760Z ^[[36;1m  tag -s "v4.0.1" -m "Bind the signed composed HEADER to genuine claim7 apps Source A; retain policies5/6/7, measured inventory and engine declarations"^[[0m
+cut	create the signed annotated tag (ambient Actions identity, no interactive login)	2026-10-04T12:15:39.9819699Z shell: /usr/bin/bash -e {0}
+cut	create the signed annotated tag (ambient Actions identity, no interactive login)	2026-10-04T12:15:39.9819845Z ##[endgroup]
+cut	push the tag (git push only -- never the git-data REST API)	﻿2026-10-04T12:15:40.7479816Z ##[group]Run git push origin "v4.0.1"
+cut	push the tag (git push only -- never the git-data REST API)	2026-10-04T12:15:40.7480147Z ^[[36;1mgit push origin "v4.0.1"^[[0m
+cut	push the tag (git push only -- never the git-data REST API)	2026-10-04T12:15:40.7532023Z shell: /usr/bin/bash -e {0}
+cut	push the tag (git push only -- never the git-data REST API)	2026-10-04T12:15:40.7532170Z ##[endgroup]
+cut	push the tag (git push only -- never the git-data REST API)	2026-10-04T12:15:42.1454562Z To https://github.com/policy-as-versioned-driftwood/driftwood
+cut	push the tag (git push only -- never the git-data REST API)	2026-10-04T12:15:42.1454821Z  * [new tag]         v4.0.1 -> v4.0.1
+cut	Post Run actions/checkout@v4	﻿2026-10-04T12:15:42.1542723Z Post job cleanup.
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2089032Z [command]/usr/bin/git version
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2121352Z git version 2.55.0
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2144559Z Temporarily overriding HOME='/home/runner/work/_temp/1de807c7-0f26-44de-a62b-47c37e6e3aff' before making global git config changes
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2145240Z Adding repository directory to the temporary git global config as a safe directory
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2147502Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/insurer
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2177012Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2202455Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2397896Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2432301Z http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2433111Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2459541Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2662474Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.2692631Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Post Run actions/checkout@v4	﻿2026-10-04T12:15:42.2981485Z Post job cleanup.
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3521872Z [command]/usr/bin/git version
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3553660Z git version 2.55.0
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3577763Z Temporarily overriding HOME='/home/runner/work/_temp/937166e6-1506-4619-a844-59836ddde5e7' before making global git config changes
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3578446Z Adding repository directory to the temporary git global config as a safe directory
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3581109Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/feeds
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3611735Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3637964Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3832304Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3851300Z http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3865588Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.3890247Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.4081927Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.4112978Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Post Run actions/checkout@v4	﻿2026-10-04T12:15:42.4406931Z Post job cleanup.
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.4925655Z [command]/usr/bin/git version
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.4957657Z git version 2.55.0
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.4979367Z Temporarily overriding HOME='/home/runner/work/_temp/3afa608f-9a65-4ce7-bfbc-d1e94eb9d48d' before making global git config changes
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.4980300Z Adding repository directory to the temporary git global config as a safe directory
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.4983208Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/ico
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.5012547Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.5044857Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.5238837Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.5261233Z http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.5271043Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.5301256Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.5499078Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.5533453Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Post Run actions/checkout@v4	﻿2026-10-04T12:15:42.5848885Z Post job cleanup.
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6375963Z [command]/usr/bin/git version
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6408287Z git version 2.55.0
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6430203Z Temporarily overriding HOME='/home/runner/work/_temp/5bdc72f1-c1ca-409a-a3ee-acf72d9f3399' before making global git config changes
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6430921Z Adding repository directory to the temporary git global config as a safe directory
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6433213Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/nist
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6463376Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6489593Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6703601Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6734639Z http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6735983Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6786322Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.6977127Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.7006446Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Post Run actions/checkout@v4	﻿2026-10-04T12:15:42.7306538Z Post job cleanup.
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.7841483Z [command]/usr/bin/git version
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.7872828Z git version 2.55.0
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.7896952Z Temporarily overriding HOME='/home/runner/work/_temp/17697615-942f-47ff-9e16-e46b0b280fa2' before making global git config changes
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.7897632Z Adding repository directory to the temporary git global config as a safe directory
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.7900675Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/platform
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.7931793Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.7957670Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.8174893Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.8204534Z http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.8214752Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.8259207Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.8547763Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:42.8579415Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Post Independently pinned compiler tools	﻿2026-10-04T12:15:42.8874484Z Post job cleanup.
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.8876909Z ##[start-action display=Run actions/checkout@v4;id=__14f15f27-6fbf-4696-b7af-eef9a32ff11e.__actions_checkout]
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.8915498Z Post job cleanup.
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9450279Z [command]/usr/bin/git version
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9481723Z git version 2.55.0
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9504856Z Temporarily overriding HOME='/home/runner/work/_temp/a4682f75-2bc2-42ce-a409-dd9b3c4803dc' before making global git config changes
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9505740Z Adding repository directory to the temporary git global config as a safe directory
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9508625Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/platform-tools
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9539813Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9566022Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9769011Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9789575Z http.https://github.com/.extraheader
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9805571Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:42.9834773Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:43.0061824Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:43.0091873Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Post Independently pinned compiler tools	2026-10-04T12:15:43.0349933Z ##[end-action id=__14f15f27-6fbf-4696-b7af-eef9a32ff11e.__actions_checkout;outcome=success;conclusion=success;duration_ms=147]
+cut	Post Run actions/checkout@v4	﻿2026-10-04T12:15:43.0389100Z Post job cleanup.
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1025010Z [command]/usr/bin/git version
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1084840Z git version 2.55.0
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1094760Z Temporarily overriding HOME='/home/runner/work/_temp/cd33f62b-23c3-4ab5-a04b-d0b8a38226c1' before making global git config changes
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1096516Z Adding repository directory to the temporary git global config as a safe directory
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1099642Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood/driftwood
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1136531Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1167737Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1374529Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1392689Z http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1434873Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1464309Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1654950Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	Post Run actions/checkout@v4	2026-10-04T12:15:43.1684211Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	Complete job	﻿2026-10-04T12:15:43.1967024Z Cleaning up orphan processes
+cut	Complete job	2026-10-04T12:15:43.2160887Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

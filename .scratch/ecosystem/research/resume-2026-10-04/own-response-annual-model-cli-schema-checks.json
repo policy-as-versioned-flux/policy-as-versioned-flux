@@ -1,0 +1,70 @@
+{
+  "scope": "Isolated unreleased prototype CLI/schema/public adapter tests only",
+  "prototype_parent": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "published_frozen_source": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "observed_at": "2026-10-04T15:12:35.877671+00:00",
+  "public_adapter_test_execution": {
+    "session_id": 50300,
+    "exit": 0,
+    "tests": 8,
+    "seconds": 1.565,
+    "skips": 0
+  },
+  "mypy_CLI_exit": 0,
+  "actual_supplied_adopter_inputs": [
+    {
+      "party": "ludlow",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/own_response_model_cli.py",
+        "--feed",
+        "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/twin/forward-intel/v1/feed.json",
+        "--evidence",
+        "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/composed/evidence.json",
+        "--threshold",
+        "3"
+      ],
+      "exit": 3,
+      "result": {
+        "outcome": "missing-instrument",
+        "reason": "response_model: expected exactly ['cost_period', 'loss_period', 'responses', 'version']"
+      },
+      "feed_sha256": "16adebe89e4b689e13cb432e21f5b4861df4c4067102e02409c00772589c8dc2",
+      "evidence_sha256": "cad733b339b67684ddb37dfeebfedd7eac62bf2327835ca5dfbac5c83e80c7b1",
+      "stderr_empty": true
+    },
+    {
+      "party": "tuppence",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform/compose/own_response_model_cli.py",
+        "--feed",
+        "/private/tmp/pavf-tuppence-maintenance-20261004-estate/tuppence/twin/forward-intel/v1/feed.json",
+        "--evidence",
+        "/private/tmp/pavf-tuppence-maintenance-20261004-estate/tuppence/composed/evidence.json",
+        "--threshold",
+        "3"
+      ],
+      "exit": 3,
+      "result": {
+        "outcome": "missing-instrument",
+        "reason": "response_model: expected exactly ['cost_period', 'loss_period', 'responses', 'version']"
+      },
+      "feed_sha256": "bc7e7948829fb7056522ecef071a498984ca7b4ba4cd7207a425d425b1aaf76f",
+      "evidence_sha256": "dcc5038096572ae73e57e93c17f5474dfedb07d6d4f36019fe7c1fd45767a54e",
+      "stderr_empty": true
+    }
+  ],
+  "owned_source_sha256": {
+    "compose/own_response_model_cli.py": "1149727763ed460f97b6ce89109911370b6a9829dbc5d2deda2588d68c5d1002",
+    "compose/test_own_response_model_cli.py": "f8172a78c3805a540645c4d4223502f37000babeb710945214441f885adad0ed",
+    "feeds/forward-intel.v3.payload.schema.json": "172a248f7d780dbee32be482ad72e6e5e8da4f6e078ce9e4fed3003d5c8e5917"
+  },
+  "canonical_payload_schema_byte_preserved": "08c5bcec9af6f03a2fad39a3fefa4d63312354e047a7965f987d325f3f833cf2",
+  "production_tracked_diff_from_prototype_parent_empty": true,
+  "frozen_policy_and_calibration_tables_byte_preserved": true,
+  "no_authentication_or_live_adoption_claim": true,
+  "annual_unit_limit": "Existing composed evidence accepted only at horizon1; no multi-year amount relabelled annual",
+  "budget_variant": "Absent; graded measurement or published estimate required",
+  "root_data_publication_scope": "Excluded by own-response-annual-model prefix; prototype source outside repository"
+}

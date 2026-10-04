@@ -1,0 +1,13 @@
+Add primary dated December 2025 FX snapshot
+
+Normalize HMRC's complete monthly CSV into the existing FX envelope/schema
+for the actual December 2025 valuation date. The unchanged publisher rule
+measures major: VES is absent, BGN and VED are present. The ordinary next
+version is 2.0.0. Preserve authentic August 1.1 and all older major bytes.
+
+Retain both primary monthly CSVs, parser/provenance hashes, and an explicit
+dated December offline replay. Keep the default August replay unchanged.
+Native publisher gates, date lookups and neighboring-month refusals pass.
+Actual signed consumption waits the ordinary reviewed release workflow.
+
+Prepared-by: Codex agent; no human was present during preparation.

@@ -1,0 +1,50 @@
+{
+  "review_axis": "Spec",
+  "status": "PASS",
+  "findings": [],
+  "reviewed_at": "2026-10-04T15:32:10.446257+00:00",
+  "head": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "tree": "4042ec2099f70807d916f4b72f74938bb8167806",
+  "parent": "6684f683bb6f9a9f7b83fed7e4b5f539ae7a3b11",
+  "reviewed_public_base": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "candidate_packet_sha256": "d6934e1f6f3c975e7fc542182c3f21083a7900c534407b17b25a3a52adceffab",
+  "normal_SSH_signature_independently_verified": true,
+  "clean_checkout": true,
+  "sole_followup_changed_paths": [
+    "tests/test_enact.py",
+    "tests/test_map_observation_ownership.py"
+  ],
+  "source_sha256": {
+    "tests/test_enact.py": "cae329b9ab23ce7b916326bdeea3d89b7eeaa1861ed56e8a5b7539bbba5b232e",
+    "tests/test_map_observation_ownership.py": "f02e9ed2178f750671ffd07fbf39b41e89214bc0d0f9802344bf5f7f411cb8c6"
+  },
+  "followup_patch_sha256": "3643c2c38a06cc565ae80b1d612475e75afbc63a39b2d97bfe1dfdd736628658",
+  "complete_patch_sha256": "f9186cac576dc117db0acfef2356fd980dbc4bb3eaa9dc073b6e61cb9108b593",
+  "exact_followup_and_complete_git_diff_joined": true,
+  "all_other_reviewed_parent_blobs_unchanged": true,
+  "all_primary_CI_receipt_and_red_green_negative_log_hashes_verified": true,
+  "genuine_copied_gitops_input_blobs": 57,
+  "independent_validation": {
+    "two_targeted_pytest_tests": {
+      "exit": 0,
+      "passed": 2,
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest tests/test_enact.py::test_the_dependency_pins_are_real_and_report_what_they_do_not_establish tests/test_map_observation_ownership.py -q -p no:cacheprovider"
+    },
+    "actual_pin_and_in_memory_unknown_URL_assertions": {
+      "genuine_fx_alias": "PASS",
+      "unknown_repository_URL": "REFUSED",
+      "source_or_fixture_bytes_modified": false
+    },
+    "primary_full_mypy": {
+      "exit": 0,
+      "source_files": 208
+    }
+  },
+  "census_tag_commit_and_floor_guards_preserved": true,
+  "historical_coverage_floor_waived": false,
+  "overall_remote_CI_green_claimed": false,
+  "followup_publication_or_merge_claimed": false,
+  "reviewer_source_fixture_or_index_mutations": false,
+  "public_operations": false,
+  "limitations": "Narrow two-test-path CI repair review only; actual remote CI, matching-head publication/merge and scheduled observations remain separate. Original root d06 data candidate remains provenance HOLD."
+}

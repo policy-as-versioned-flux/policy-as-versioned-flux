@@ -1,0 +1,284 @@
+release	Set up job	﻿2026-10-04T12:24:37.2011656Z Current runner version: '2.337.0'
+release	Set up job	2026-10-04T12:24:37.2045703Z ##[group]Runner Image Provisioner
+release	Set up job	2026-10-04T12:24:37.2046858Z Hosted Compute Agent
+release	Set up job	2026-10-04T12:24:37.2047621Z Version: 20260901.588
+release	Set up job	2026-10-04T12:24:37.2048448Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+release	Set up job	2026-10-04T12:24:37.2049620Z Build Date: 2026-09-01T19:56:44Z
+release	Set up job	2026-10-04T12:24:37.2050601Z Worker ID: {028c01a1-755e-4a3d-a0cf-a50dffddccde}
+release	Set up job	2026-10-04T12:24:37.2051574Z Azure Region: northcentralus
+release	Set up job	2026-10-04T12:24:37.2052456Z ##[endgroup]
+release	Set up job	2026-10-04T12:24:37.2054532Z ##[group]Operating System
+release	Set up job	2026-10-04T12:24:37.2055353Z Ubuntu
+release	Set up job	2026-10-04T12:24:37.2056073Z 24.04.5
+release	Set up job	2026-10-04T12:24:37.2056717Z LTS
+release	Set up job	2026-10-04T12:24:37.2057377Z ##[endgroup]
+release	Set up job	2026-10-04T12:24:37.2058095Z ##[group]Runner Image
+release	Set up job	2026-10-04T12:24:37.2059055Z Image: ubuntu-24.04
+release	Set up job	2026-10-04T12:24:37.2059847Z Version: 20260927.320.1
+release	Set up job	2026-10-04T12:24:37.2061227Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+release	Set up job	2026-10-04T12:24:37.2063360Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+release	Set up job	2026-10-04T12:24:37.2064789Z ##[endgroup]
+release	Set up job	2026-10-04T12:24:37.2066308Z ##[group]GITHUB_TOKEN Permissions
+release	Set up job	2026-10-04T12:24:37.2069391Z Contents: write
+release	Set up job	2026-10-04T12:24:37.2070688Z Metadata: read
+release	Set up job	2026-10-04T12:24:37.2071475Z ##[endgroup]
+release	Set up job	2026-10-04T12:24:37.2074715Z Secret source: Actions
+release	Set up job	2026-10-04T12:24:37.2075952Z Cache mode: write
+release	Set up job	2026-10-04T12:24:37.2077311Z Prepare workflow directory
+release	Set up job	2026-10-04T12:24:37.2694407Z Prepare all required actions
+release	Set up job	2026-10-04T12:24:37.2763000Z Getting action download info
+release	Set up job	2026-10-04T12:24:37.5219119Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+release	Set up job	2026-10-04T12:24:37.7063354Z Complete job name: release
+release	Run actions/checkout@v4	﻿2026-10-04T12:24:37.7680705Z ##[group]Run actions/checkout@v4
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7681640Z with:
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7682137Z   fetch-depth: 0
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7682696Z   fetch-tags: true
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7683329Z   repository: policy-as-versioned-driftwood/driftwood
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7687396Z   token: ***
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7687928Z   ssh-strict: true
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7688424Z   ssh-user: git
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7689072Z   persist-credentials: true
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7689700Z   clean: true
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7690235Z   sparse-checkout-cone-mode: true
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7690840Z   show-progress: true
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7691352Z   lfs: false
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7691813Z   submodules: false
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7692349Z   set-safe-directory: true
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7693091Z   allow-unsafe-pr-checkout: false
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7693862Z env:
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7694332Z   TAG: v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7694824Z   GITSIGN_VERSION: 0.17.1
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7695630Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7696536Z   KUSTOMIZE_VERSION: 5.8.1
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7697352Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7699069Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7700536Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	Run actions/checkout@v4	2026-10-04T12:24:37.7701265Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8668145Z Syncing repository: policy-as-versioned-driftwood/driftwood
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8670568Z ##[group]Getting Git version info
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8671402Z Working directory is '/home/runner/work/driftwood/driftwood'
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8672444Z [command]/usr/bin/git version
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8762129Z git version 2.55.0
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8788338Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8797289Z Temporarily overriding HOME='/home/runner/work/_temp/45c719d7-2a25-4592-a727-f00ebe2fc0e8' before making global git config changes
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8799837Z Adding repository directory to the temporary git global config as a safe directory
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8810095Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8865096Z Deleting the contents of '/home/runner/work/driftwood/driftwood'
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8871126Z ##[group]Initializing the repository
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8875518Z [command]/usr/bin/git init /home/runner/work/driftwood/driftwood
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8977478Z hint: Using 'master' as the name for the initial branch. This default branch name
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8979108Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8980174Z hint: to use in all of your new repositories, which will suppress this warning,
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8980960Z hint: call:
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8981439Z hint:
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8982037Z hint: 	git config --global init.defaultBranch <name>
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8982768Z hint:
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8983373Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8984351Z hint: 'development'. The just-created branch can be renamed via this command:
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8985136Z hint:
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8985681Z hint: 	git branch -m <name>
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8986204Z hint:
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8986849Z hint: Disable this message with "git config set advice.defaultBranchName false"
+release	Run actions/checkout@v4	2026-10-04T12:24:37.8991892Z Initialized empty Git repository in /home/runner/work/driftwood/driftwood/.git/
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9001748Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-driftwood/driftwood
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9057123Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9058885Z ##[group]Disabling automatic garbage collection
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9060526Z [command]/usr/bin/git config --local gc.auto 0
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9093606Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9095545Z ##[group]Setting up auth
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9101029Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9129098Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9477688Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9511513Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9705553Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9734214Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9916926Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9954223Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9955299Z ##[group]Fetching the repository
+release	Run actions/checkout@v4	2026-10-04T12:24:37.9962872Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5967497Z From https://github.com/policy-as-versioned-driftwood/driftwood
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5969479Z  * [new branch]      adopt-v3.0.0-composed   -> origin/adopt-v3.0.0-composed
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5970940Z  * [new branch]      bootstrap-apps-inventory -> origin/bootstrap-apps-inventory
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5972594Z  * [new branch]      delivery-stage2-20261004 -> origin/delivery-stage2-20261004
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5974539Z  * [new branch]      delivery-stage2-atomic-20261004 -> origin/delivery-stage2-atomic-20261004
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5976772Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5979017Z  * [new branch]      ecosystem/thin-slice    -> origin/ecosystem/thin-slice
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5980824Z  * [new branch]      fix-scheduled-tools-20260910 -> origin/fix-scheduled-tools-20260910
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5983517Z  * [new branch]      implement-platform-tools-20260910 -> origin/implement-platform-tools-20260910
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5985632Z  * [new branch]      implement-ticket-86-20260910 -> origin/implement-ticket-86-20260910
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5987083Z  * [new branch]      main                    -> origin/main
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5988474Z  * [new branch]      phaseb-policy-5.0.0     -> origin/phaseb-policy-5.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5990461Z  * [new branch]      platform-v4.0.0-retire-4 -> origin/platform-v4.0.0-retire-4
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5991972Z  * [new branch]      policy-composition/tickets-09-16-wip -> origin/policy-composition/tickets-09-16-wip
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5993763Z  * [new branch]      renovate/https-github.com-policy-as-versioned-ico-ico-4.x -> origin/renovate/https-github.com-policy-as-versioned-ico-ico-4.x
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5995674Z  * [new branch]      repair/every-composing-job-fetches-its-parents -> origin/repair/every-composing-job-fetches-its-parents
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5997791Z  * [new branch]      repair/signals-follow-the-pin -> origin/repair/signals-follow-the-pin
+release	Run actions/checkout@v4	2026-10-04T12:24:38.5999657Z  * [new branch]      rollout-platform-v3.3.0 -> origin/rollout-platform-v3.3.0
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6001088Z  * [new branch]      ticket-101-the-gates-verify-a-real-signature -> origin/ticket-101-the-gates-verify-a-real-signature
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6002544Z  * [new branch]      ticket-105-pinned-trust-roots -> origin/ticket-105-pinned-trust-roots
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6004131Z  * [new branch]      ticket-107-the-sampler-waits-for-what-exists -> origin/ticket-107-the-sampler-waits-for-what-exists
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6005869Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6007273Z  * [new branch]      ticket-131-sibling-cut-release -> origin/ticket-131-sibling-cut-release
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6008997Z  * [new branch]      ticket-132-gate-reads-acceptance -> origin/ticket-132-gate-reads-acceptance
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6010361Z  * [new branch]      ticket-140-fact4-omitted-zero -> origin/ticket-140-fact4-omitted-zero
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6011573Z  * [new branch]      ticket-143a-twin-sweep-split -> origin/ticket-143a-twin-sweep-split
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6013127Z  * [new branch]      ticket-147-declared-engine -> origin/ticket-147-declared-engine
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6015136Z  * [new branch]      ticket-161-reference-workload -> origin/ticket-161-reference-workload
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6017713Z  * [new branch]      ticket-33-lift-ledger-storefront-and-reports -> origin/ticket-33-lift-ledger-storefront-and-reports
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6020780Z  * [new branch]      ticket-34-followup-2026-09-08 -> origin/ticket-34-followup-2026-09-08
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6023269Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6026370Z  * [new branch]      ticket-51-the-supply-constraint-actor-path -> origin/ticket-51-the-supply-constraint-actor-path
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6028570Z  * [new branch]      ticket-60-grade-the-lane-sample -> origin/ticket-60-grade-the-lane-sample
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6030462Z  * [new branch]      ticket-60-sampler-waits -> origin/ticket-60-sampler-waits
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6032364Z  * [new branch]      ticket-61-allowed-commands -> origin/ticket-61-allowed-commands
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6033492Z  * [new branch]      ticket-61-one-renovate  -> origin/ticket-61-one-renovate
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6034764Z  * [new branch]      ticket-61-renovate-completes-step-2 -> origin/ticket-61-renovate-completes-step-2
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6035977Z  * [new branch]      ticket-62-and-77        -> origin/ticket-62-and-77
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6037551Z  * [new branch]      ticket-64-the-twin-is-three-adopters -> origin/ticket-64-the-twin-is-three-adopters
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6040096Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6047752Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6050571Z  * [new branch]      ticket-86-the-cage-enters-the-citable-number -> origin/ticket-86-the-cage-enters-the-citable-number
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6052279Z  * [new branch]      truth-surface-reconcile -> origin/truth-surface-reconcile
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6053214Z  * [new tag]         v1.0.0                  -> v1.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6054002Z  * [new tag]         v1.1.0                  -> v1.1.0
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6054784Z  * [new tag]         v2.0.0                  -> v2.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6055523Z  * [new tag]         v3.0.0                  -> v3.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6056299Z  * [new tag]         v3.0.1                  -> v3.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6057048Z  * [new tag]         v4.0.0                  -> v4.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6057837Z  * [new tag]         v4.0.1                  -> v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6059860Z [command]/usr/bin/git tag --list v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6060665Z v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6061919Z [command]/usr/bin/git rev-parse refs/tags/v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6068228Z 1faa6914677d8da75ecf5fd4f03c7e338282c789
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6074874Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +872d5c7f44801b496731b11cd40881f304f8a09a:refs/tags/v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6133570Z From https://github.com/policy-as-versioned-driftwood/driftwood
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6134781Z  t [tag update]      872d5c7f44801b496731b11cd40881f304f8a09a -> v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6137400Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6138593Z ##[group]Determining the checkout info
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6140263Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6142436Z [command]/usr/bin/git sparse-checkout disable
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6189244Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6218639Z ##[group]Checking out the ref
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6222813Z [command]/usr/bin/git checkout --progress --force refs/tags/v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6420833Z Note: switching to 'refs/tags/v4.0.1'.
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6421635Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6422383Z You are in 'detached HEAD' state. You can look around, make experimental
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6423529Z changes and commit them, and you can discard any commits you make in this
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6424607Z state without impacting any branches by switching back to a branch.
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6425231Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6425747Z If you want to create a new branch to retain commits you create, you may
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6426840Z do so (now or later) by using -c with the switch command. Example:
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6427379Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6427677Z   git switch -c <new-branch-name>
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6428060Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6428355Z Or undo this operation with:
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6429525Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6429793Z   git switch -
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6430133Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6430578Z Turn off this advice by setting config variable advice.detachedHead to false
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6431260Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6431979Z HEAD is now at 872d5c7 Merge pull request #55 from policy-as-versioned-driftwood/delivery-stage2-atomic-20261004
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6434658Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6468240Z [command]/usr/bin/git log -1 --format=%H
+release	Run actions/checkout@v4	2026-10-04T12:24:38.6490699Z 872d5c7f44801b496731b11cd40881f304f8a09a
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	﻿2026-10-04T12:24:38.6697248Z ##[group]Run set -euo pipefail
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6698212Z ^[[36;1mset -euo pipefail^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6699897Z ^[[36;1mcurl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6701394Z ^[[36;1mecho "${GITSIGN_SHA256}  gitsign" | sha256sum -c -^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6702314Z ^[[36;1mchmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6703107Z ^[[36;1m^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6704601Z ^[[36;1mcurl -sSL -o kustomize.tar.gz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6706523Z ^[[36;1mecho "${KUSTOMIZE_SHA256}  kustomize.tar.gz" | sha256sum -c -^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6707745Z ^[[36;1mtar xzf kustomize.tar.gz kustomize && chmod +x kustomize && sudo mv kustomize /usr/local/bin/kustomize^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6912246Z shell: /usr/bin/bash -e {0}
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6913255Z env:
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6913773Z   TAG: v4.0.1
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6914390Z   GITSIGN_VERSION: 0.17.1
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6915255Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6916552Z   KUSTOMIZE_VERSION: 5.8.1
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6917548Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6919498Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6921243Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:38.6922046Z ##[endgroup]
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:39.1474715Z gitsign: OK
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:39.2897321Z kustomize.tar.gz: OK
+release	gitops tree builds cleanly (release gate)	﻿2026-10-04T12:24:39.4759769Z ##[group]Run set -euo pipefail
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4761401Z ^[[36;1mset -euo pipefail^[[0m
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4763093Z ^[[36;1mkustomize build gitops/apps > /dev/null^[[0m
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4765052Z ^[[36;1mkustomize build gitops/platform > /dev/null^[[0m
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4810840Z shell: /usr/bin/bash -e {0}
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4812314Z env:
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4813436Z   TAG: v4.0.1
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4814579Z   GITSIGN_VERSION: 0.17.1
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4816959Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4819457Z   KUSTOMIZE_VERSION: 5.8.1
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4821465Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4825900Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4830158Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:39.4832125Z ##[endgroup]
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	﻿2026-10-04T12:24:39.5164429Z ##[group]Run set -euo pipefail
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5165731Z ^[[36;1mset -euo pipefail^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5167387Z ^[[36;1m# actions/checkout's second fetch flattens the annotated tag object^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5169879Z ^[[36;1m# gitsign needs -- re-fetch the real tag ref before verifying it.^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5171969Z ^[[36;1mgit fetch origin "+refs/tags/${TAG}:refs/tags/${TAG}" --force^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5173704Z ^[[36;1mgitsign verify-tag "${TAG}" \^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5175408Z ^[[36;1m  --certificate-identity-regexp="${EXPECTED_IDENTITY_REGEXP}" \^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5177355Z ^[[36;1m  --certificate-oidc-issuer="${EXPECTED_ISSUER}"^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5222213Z shell: /usr/bin/bash -e {0}
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5223479Z env:
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5224377Z   TAG: v4.0.1
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5225412Z   GITSIGN_VERSION: 0.17.1
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5227140Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5229208Z   KUSTOMIZE_VERSION: 5.8.1
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5231122Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5234934Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5238530Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5240339Z   GITSIGN_REKOR_MODE: offline
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.5241527Z ##[endgroup]
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.7463647Z From https://github.com/policy-as-versioned-driftwood/driftwood
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:39.7466044Z  t [tag update]      v4.0.1     -> v4.0.1
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:40.5035487Z tlog index: 3077655413
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:40.5037098Z gitsign: Signature made using certificate ID 0xd9ff0a4350882e02e2f78f20970ce19ab1eccab1 | CN=sigstore-intermediate,O=sigstore.dev
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:40.5038317Z gitsign: Good signature from [https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:40.5039650Z Validated Git signature: true
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:40.5040012Z Validated Rekor entry: true
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:40.5040418Z Validated Certificate claims: true
+release	publish GitHub Release recording the resolved SHA	﻿2026-10-04T12:24:40.5114260Z ##[group]Run set -euo pipefail
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5114674Z ^[[36;1mset -euo pipefail^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5115046Z ^[[36;1mresolved=$(git rev-parse "${TAG}^{commit}")^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5115417Z ^[[36;1m{^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5116356Z ^[[36;1m  git tag -l --format='%(contents)' "${TAG}" | sed '/^-----BEGIN SIGNED MESSAGE-----$/,$d'^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5116904Z ^[[36;1m  echo "---"^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5117524Z ^[[36;1m  echo "Verified gitsign signature (identity regexp: ${EXPECTED_IDENTITY_REGEXP}, issuer: ${EXPECTED_ISSUER}). Resolved commit: ${resolved}."^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5118197Z ^[[36;1m} > release-notes.md^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5118536Z ^[[36;1mgh release create "${TAG}" \^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5119101Z ^[[36;1m  --title "${TAG}" \^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5119449Z ^[[36;1m  --notes-file release-notes.md^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5163227Z shell: /usr/bin/bash -e {0}
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5163640Z env:
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5164432Z   TAG: v4.0.1
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5164741Z   GITSIGN_VERSION: 0.17.1
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5165309Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5165795Z   KUSTOMIZE_VERSION: 5.8.1
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5166300Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5167230Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5168101Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5171179Z   GH_TOKEN: ***
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:40.5171512Z ##[endgroup]
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:42.0168157Z https://github.com/policy-as-versioned-driftwood/driftwood/releases/tag/v4.0.1
+release	Post Run actions/checkout@v4	﻿2026-10-04T12:24:42.0302204Z Post job cleanup.
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1086790Z [command]/usr/bin/git version
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1123257Z git version 2.55.0
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1157546Z Temporarily overriding HOME='/home/runner/work/_temp/42dccd59-0096-4ec8-b781-8549681dde3f' before making global git config changes
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1159777Z Adding repository directory to the temporary git global config as a safe directory
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1165211Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/driftwood/driftwood
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1204056Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1235018Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1435653Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1457523Z http.https://github.com/.extraheader
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1470569Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1504461Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1711828Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+release	Post Run actions/checkout@v4	2026-10-04T12:24:42.1745324Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+release	Complete job	﻿2026-10-04T12:24:42.2093376Z Cleaning up orphan processes
+release	Complete job	2026-10-04T12:24:42.2331115Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

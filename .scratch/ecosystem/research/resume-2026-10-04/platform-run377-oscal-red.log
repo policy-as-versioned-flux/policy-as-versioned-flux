@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/oscal/lint_claims.py", line 226, in <module>
+    raise SystemExit(main(sys.argv))
+                     ~~~~^^^^^^^^^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/oscal/lint_claims.py", line 220, in main
+    selfcheck()
+    ~~~~~~~~~^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/oscal/lint_claims.py", line 175, in selfcheck
+    assert dangling == KNOWN_DANGLING, f"dangling claims changed: {dangling}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: dangling claims changed: {('cm-6', 'governed-namespace-unclaimed-report'), ('cm-6', 'policy-version-orphan-cage'), ('ac-4', 'cage-netpol-bottom-rung')}

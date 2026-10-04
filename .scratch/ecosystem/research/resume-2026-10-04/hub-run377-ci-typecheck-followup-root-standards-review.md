@@ -1,0 +1,3 @@
+Standards: PASS at `6684f683bb6f9a9f7b83fed7e4b5f539ae7a3b11` / `0951b1ca6f64ca09d1538f062f19a49bc92cd20f`.
+
+The sole added assertion narrows the optional importlib spec and loader before module loading; it follows Python's explicit optional-value handling and preserves the actual ownership test. Independently inspected exact one-line diff and signature/tree/source checks, and ran the ownership regression:1PASS. The author's full208-source mypy proof fixes the four genuine CI type errors. No runtime, manifest, source dependency, coverage floor or skip rule is changed. This historical narrow review does not assert later remote CI or merge success.

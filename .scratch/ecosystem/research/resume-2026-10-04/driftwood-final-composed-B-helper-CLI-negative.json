@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    ".github/scripts/adopter-gate.py",
+    "--platform-dir",
+    "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/platform",
+    "--new-pin-yaml",
+    "gitops/platform/platform-pin.yaml",
+    "--old-pin-yaml",
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-old-platform-pin.yaml",
+    "--identity-regexp",
+    "^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+    "--issuer",
+    "https://token.actions.githubusercontent.com",
+    "--adopter-dir",
+    "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+    "--base-ref",
+    "872d5c7f44801b496731b11cd40881f304f8a09a",
+    "--head-ref",
+    "226a319f475fb34a16745d836197807331efa3d9",
+    "--out",
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-gate.json"
+  ],
+  "exit": 2,
+  "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-gate.log",
+  "log_sha256": "09592aa0438fbc9946302fd274924ab8db3974b4f2fe5cdc7d18431f6d3caaef"
+}

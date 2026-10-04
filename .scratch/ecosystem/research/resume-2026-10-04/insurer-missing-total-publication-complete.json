@@ -1,0 +1,18 @@
+{
+  "PR": "https://github.com/policy-as-versioned-insurer/insurer/pull/7",
+  "head": "16b4857260f12458e5e0c797b2f99c60b1e03295",
+  "main": "8d4a5ae684e4a58c8242bc8b6e50794473ef302b",
+  "tree": "edad5232c2c12086406140142ae1635f1c59b444",
+  "GitHub_merge_signature_verified": true,
+  "ordinary_matching_head_App_merge": true,
+  "actual_configured_PR_Actions_rollup": [],
+  "no_PR_workflow_configured": true,
+  "no_clock_or_quote_release_claim": true,
+  "receipts_sha256": {
+    "insurer-missing-total-actual-merge.json": "5b646fa8e7b541de1bd9dded5caf08a78a3d3161a4769f281bcf7f5230de3d64",
+    "insurer-missing-total-main-commit-verification.json": "40153a4c7040eadd745edfabed6efefe9e4a97506c9601f75450d6d4ba8e404e",
+    "insurer-missing-total-root-standards-review.json": "7dba648da79ecce8a5327e34e75627e0301e16479edace83a22e1c7a18c695cf",
+    "insurer-missing-total-spec-review.json": "117c2ad90ef59362900580253c1c4e211fafb3472d8abc005ad21056063af0da",
+    "insurer-missing-total-PR-body.md": "d5272f4ba89b9ee58b68df5b9ba4df6cf05ebdaa640bf8c674994ce16a43870d"
+  }
+}

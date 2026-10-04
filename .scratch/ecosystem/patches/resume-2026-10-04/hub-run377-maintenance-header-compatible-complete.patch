@@ -1,0 +1,666 @@
+diff --git a/talk/verify-manifest.txt b/talk/verify-manifest.txt
+index 07dae39e..91628f0e 100644
+--- a/talk/verify-manifest.txt
++++ b/talk/verify-manifest.txt
+@@ -216,3 +216,6 @@ verify/cloud-plane/verify-cloud-plane.sh | estate-observation | waits: cloud pla
+ verify/incumbent-org/verify-incumbent-org.sh | estate-observation | waits: no INCUMBENT_FACTS file from the credentialled clocks job|incumbent forge observations are older than the 48h freshness bound|anonymous OCI manifest observation missing|served incumbent images
+ verify/served-workloads/verify-served-workloads.sh | estate-observation | waits: no scheduled workload sample has landed|no scheduled OSCAL observation has landed|no committed workload registration has reached origin/main|no PolicyReport existed on the lane cluster before teardown   # ticket 155: each adopter grades its own signed scheduled app and OSCAL observations; runner capacity and allocation are recorded; a failed observation without an actual cage risk is a fall, never a declared wait
+ verify/oscal-lane/verify-oscal-lane.sh | estate-observation | waits: no scheduled OSCAL observation has landed|no PolicyReport existed on the lane cluster before teardown   # ticket 155: PolicyReports converted by the lane pinned platform tree; every failed not-satisfied observation must join an actual priced cage risk; missing joins and unmapped failures are falls
++verify/cve-inventory/verify-cve-inventory.sh | estate-observation | -   # ticket 153: grades each adopter's immutable served apps graph against its primary image inventory; fixture controls do not replace the observed graph
++verify/engine-pairing/verify-engine-pairing.sh | estate-observation | -   # ticket 148: reads served engine declarations and published policy support, then compares the served composer's output; planted engine controls are explicitly labelled
++verify/twin-cage/verify-twin-cage.sh | estate-observation | -   # ticket 142: reads the adopters' served workflows and priced cage decisions; a local capability LIMIT remains a failed observation, not a declared skip
+diff --git a/tests/test_enact.py b/tests/test_enact.py
+index f0eca5d1..2c65dea7 100644
+--- a/tests/test_enact.py
++++ b/tests/test_enact.py
+@@ -7,6 +7,7 @@ import io
+ import json
+ import re
+ from pathlib import Path
++from urllib.parse import urlsplit
+ 
+ import pytest
+ 
+@@ -876,9 +877,12 @@ def test_the_dependency_pins_are_real_and_report_what_they_do_not_establish(prop
+     estate = {p.name for p in enact.ESTATE_DIR.iterdir() if p.is_dir()}
+     for name in dependency["consumer_repositories"]:
+         assert name in estate, f"{name} is reported as a consumer and is not a repository"
+-    for name in dependency["dependencies"]:
+-        # `<adopter>-composed` is that adopter's own rendered set consumed as a source (ticket 40).
+-        assert name in estate or name.rsplit("-", 1)[0] in estate, name
++    for pin in consumed:
++        # A Flux source's name is a local alias: `fx` consumes the feeds repository,
++        # and `<adopter>-composed` consumes that adopter's own rendered set (ticket 40).
++        # Its actual URL must still resolve to a repository this estate contains.
++        repository = Path(urlsplit(pin["url"]).path.rstrip("/")).name.removesuffix(".git")
++        assert repository in estate, (pin["dependency"], pin["url"])
+     # A repository syncing itself consumes nobody's policy, so it never reaches this list.
+     assert not [p for p in consumed if p["consumer"] == p["dependency"]]
+     assert all(pin["tag"] for pin in dependency["pins"])
+diff --git a/tests/test_loophole_adr_0026.py b/tests/test_loophole_adr_0026.py
+index f8cd8615..049b7772 100644
+--- a/tests/test_loophole_adr_0026.py
++++ b/tests/test_loophole_adr_0026.py
+@@ -49,6 +49,7 @@ candidates point at one place, the earliest by (round, key) is credited and the
+ 
+ from __future__ import annotations
+ 
++import ast
+ import re
+ import importlib.util
+ import json
+@@ -239,7 +240,50 @@ def _record_header(comp: ModuleType, work: Path, rendered: dict[str, str]) -> No
+     comp._commit_header(work, rendered)
+     if (work / ".git").exists():
+         _git(work, "add", "--", "composed/HEADER.yaml")
+-        _git(work, "commit", "-q", "-m", "fixture comparison header")
++        staged = subprocess.run(["git", "-C", str(work), "diff", "--cached", "--quiet"],
++                                capture_output=True)
++        if staged.returncode not in (0, 1):
++            staged.check_returncode()
++        if staged.returncode == 1:
++            _git(work, "commit", "-q", "-m", "fixture comparison header")
++        committed = subprocess.run(["git", "-C", str(work), "show", "HEAD:composed/HEADER.yaml"],
++                                   check=True, capture_output=True).stdout
++        assert committed == rendered["composed/HEADER.yaml"].encode("utf-8")
++
++
++@pytest.mark.parametrize("writer_ref", ["v5.0.0", "HEAD"], ids=["published-write-only", "current-auto-commit"])
++def test_record_header_preserves_real_writer_history(tmp_path, monkeypatch, writer_ref):
++    """The genuine old/new fixture writers both record exactly one comparison point."""
++    source = subprocess.run(["git", "-C", str(PLATFORM), "show", f"{writer_ref}:compose/composition.py"],
++                            check=True, capture_output=True, text=True).stdout
++    function = next(node for node in ast.parse(source).body
++                    if isinstance(node, ast.FunctionDef) and node.name == "_commit_header")
++    comp = ModuleType("actual_fixture_header_writer")
++    comp.__dict__["Path"] = Path
++    exec(compile(ast.Module(body=[function], type_ignores=[]), "actual_fixture_header_writer", "exec"),
++         comp.__dict__)
++    monkeypatch.syspath_prepend(str(PLATFORM / "compose"))
++    monkeypatch.delitem(sys.modules, "fixture_inventory", raising=False)
++    work = tmp_path / "declared-fixture"
++    work.mkdir()
++    (work / "fixture.txt").write_text("Declared test state, not evidence\n")
++    _git(work, "init", "-q")
++    _git(work, "add", "-A")
++    _git(work, "commit", "-qm", "fixture source")
++    (work / "fixture.txt").write_text("Declared next comparison state, not evidence\n")
++    _git(work, "add", "fixture.txt")
++    rendered = {"composed/HEADER.yaml": "fixture: explicit comparison state\n"}
++    _record_header(comp, work, rendered)
++    def read(*args):
++        return subprocess.run(["git", "-C", str(work), *args], check=True,
++                              capture_output=True, text=True).stdout
++    assert read("show", "HEAD:composed/HEADER.yaml") == rendered["composed/HEADER.yaml"]
++    assert read("show", "HEAD:fixture.txt") == (work / "fixture.txt").read_text()
++    assert read("rev-list", "--count", "HEAD").strip() == "2"
++    before = read("rev-parse", "HEAD")
++    _record_header(comp, work, rendered)
++    assert read("rev-parse", "HEAD") == before
++    assert read("status", "--porcelain") == ""
+ 
+ 
+ def _edit_party(work: Path, edit: Any) -> None:
+diff --git a/tests/test_map_observation_ownership.py b/tests/test_map_observation_ownership.py
+new file mode 100644
+index 00000000..2a73111c
+--- /dev/null
++++ b/tests/test_map_observation_ownership.py
+@@ -0,0 +1,65 @@
++"""A declared lane alone cannot establish ownership of a scheduled ledger."""
++import importlib.util
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++
++ROOT = Path(__file__).resolve().parents[1]
++spec = importlib.util.spec_from_file_location("map_observation_ownership", ROOT / "verify/map-surface/map_surface.py")
++assert spec is not None and spec.loader is not None
++surface = importlib.util.module_from_spec(spec)
++sys.modules[spec.name] = surface
++spec.loader.exec_module(surface)
++
++
++class MapObservationOwnership(unittest.TestCase):
++    def test_real_writer_defaults_own_unlanded_ledgers_but_declarations_do_not(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            repo = Path(tmp)
++
++            def git(*args):
++                return subprocess.check_output([
++                    "git", "-C", str(repo), "-c", "commit.gpgsign=false",
++                    "-c", "core.hooksPath=/dev/null", "-c", "user.name=Ownership fixture",
++                    "-c", "user.email=fixture@example.invalid", *args], text=True).strip()
++
++            git("init", "-q")
++            workflows = repo / ".github/workflows"
++            workflows.mkdir(parents=True)
++            workflow = workflows / "sample.yml"
++            workflow.write_text('env:\n  OBSERVATION_LANE: "drift/workload-samples.jsonl drift/oscal-samples.jsonl"\n'
++                                'jobs:\n  sample:\n    steps:\n      - run: |\n'
++                                '          python3 drift/served_apps.py sample\n'
++                                '          python3 drift/oscal_lane.py collect\n')
++            drift = repo / "drift"
++            drift.mkdir()
++            for name, ledger in (("served_apps.py", "workload-samples.jsonl"),
++                                 ("oscal_lane.py", "oscal-samples.jsonl")):
++                (drift / name).write_text('from pathlib import Path\nHERE = Path(__file__).resolve().parent\n'
++                                         f'LOG = HERE / "{ledger}"\n')
++            (drift / 'oscal_lane.py').write_text(
++                'from pathlib import Path\nROOT = Path(__file__).resolve().parents[1]\n'
++                'HERE = ROOT / "drift"\nLOG = HERE / "oscal-samples.jsonl"\n')
++            git("add", ".")
++            git("commit", "-qm", "Owned default writers fixture")
++            git("update-ref", "refs/remotes/origin/main", "HEAD")
++            self.assertEqual(surface.owned_lane_paths(repo),
++                             {"drift/workload-samples.jsonl", "drift/oscal-samples.jsonl"})
++            # The default is not used when the scheduled caller redirects the output.
++            workflow.write_text(workflow.read_text().replace(' sample\n', ' sample --out other.jsonl\n'))
++            git("commit", "-qam", "Redirected writer fixture")
++            git("update-ref", "refs/remotes/origin/main", "HEAD")
++            self.assertEqual(surface.owned_lane_paths(repo), {"drift/oscal-samples.jsonl"})
++            # A working-copy change and a lane declaration cannot widen observed ownership.
++            (drift / "oscal_lane.py").write_text('LOG = "drift/workload-samples.jsonl"\n')
++            self.assertEqual(surface.owned_lane_paths(repo), {"drift/oscal-samples.jsonl"})
++            git("commit", "-qam", "Missing directory-bound default fixture")
++            git("update-ref", "refs/remotes/origin/main", "HEAD")
++            self.assertEqual(surface.owned_lane_paths(repo), set())
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tests/test_refusal_by_another_name.py b/tests/test_refusal_by_another_name.py
+index 25cfd530..be77fbf4 100644
+--- a/tests/test_refusal_by_another_name.py
++++ b/tests/test_refusal_by_another_name.py
+@@ -236,6 +236,22 @@ def test_the_complete_trio_is_clean() -> None:
+     assert rs.priority_trio(rs.mutation(cage())) == ()
+ 
+ 
++def test_prepared_cloud_inputs_are_authoring_but_a_delivered_unknown_cr_is_not_exempt() -> None:
++    source = rs.classify("platform/implementations/cloud/policies/cloud-cage-rds.yaml", {}, {})
++    assert source.surface == "authoring" and not source.graded
++    assert rs.classify("driftwood/implementations/cloud/policies/unknown.yaml", {}, {}).surface == "other"
++    delivered = rs.classify("tuppence/composed/cloud/cloud-cage-rds.yaml", {}, {})
++    assert delivered.surface == "served-machinery" and delivered.graded
++    doc = hold()
++    doc["spec"]["matchConstraints"]["resourceRules"][0].update(
++        apiGroups=["rds.aws.m.upbound.io"], resources=["instances"])
++    mutation = rs.mutation(doc, path="tuppence/composed/cloud/cloud-cage-rds.yaml",
++                           surface=delivered.surface)
++    verdict = rs.grade([mutation], {}, {})
++    assert verdict.code == 3
++    assert any("only the pod's mutability is tabulated" in line for line in verdict.lines)
++
++
+ def test_a_mutation_that_names_no_priority_class_owes_no_trio() -> None:
+     assert rs.priority_trio(rs.mutation(hold())) == ()
+ 
+diff --git a/tests/test_verifier_snapshots.py b/tests/test_verifier_snapshots.py
+new file mode 100644
+index 00000000..56b45f9c
+--- /dev/null
++++ b/tests/test_verifier_snapshots.py
+@@ -0,0 +1,108 @@
++"""Temporary adopter probes retain immutable apps objects and dated Git history."""
++import importlib.util
++from pathlib import Path
++import subprocess
++import tempfile
++import unittest
++from unittest.mock import patch
++
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def load(name, path):
++    spec = importlib.util.spec_from_file_location(name, ROOT / path)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++def git(repo, *args):
++    # These are disposable authored fixtures, never delivery commits.
++    return subprocess.check_output([
++        "git", "-C", str(repo), "-c", "commit.gpgsign=false",
++        "-c", "tag.gpgsign=false", "-c", "core.hooksPath=/dev/null",
++        "-c", "user.name=Snapshot fixture", "-c", "user.email=fixture@example.invalid",
++        *args], stderr=subprocess.PIPE, text=True).strip()
++
++
++class VerifierSnapshots(unittest.TestCase):
++    def test_mixed_policy_window_still_has_unsupported_pairings(self):
++        engine = load("partial_support_engine", "verify/engine-pairing/engine_pairing.py")
++        table = ["1.18.2", "1.19.1"]
++        self.assertEqual(engine.unsupported_pairing_engines(table, {
++            "5.0.0": ["1.18.2"], "6.0.0": ["1.18.2"],
++            "7.0.0": ["1.18.2", "1.19.1"]}), ["1.19.1"])
++        self.assertEqual(engine.unsupported_pairing_engines(table, {
++            "7.0.0": ["1.18.2", "1.19.1"]}), [])
++        self.assertEqual(engine.unsupported_pairing_engines(table, {}), [])
++
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.tmp.cleanup)
++        self.root = Path(self.tmp.name)
++        self.repo = self.root / "estate" / "fixture"
++        self.repo.mkdir(parents=True)
++        git(self.repo, "init", "-q")
++        (self.repo / "apps.yaml").write_text("served digest\n")
++        git(self.repo, "add", ".")
++        git(self.repo, "commit", "-qm", "Served apps fixture")
++        self.served = git(self.repo, "rev-parse", "HEAD")
++        git(self.repo, "tag", "apps/v1.0.0")
++        git(self.repo, "update-ref", "refs/remotes/origin/main", self.served)
++        git(self.repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
++        git(self.repo, "checkout", "-qb", "candidate-source")
++        (self.repo / "apps.yaml").write_text("proposed digest\n")
++        git(self.repo, "commit", "-qam", "Proposed source fixture")
++        self.head = git(self.repo, "rev-parse", "HEAD")
++        # The observed clock is reachable only through a remote-tracking ref,
++        # newer than the local candidate branch. It must survive the local clone.
++        git(self.repo, "checkout", "--detach", self.served)
++        (self.repo / "clock.fixture").write_text("Authored fixture, not a live observation\n")
++        git(self.repo, "add", ".")
++        git(self.repo, "commit", "-qm", "Remote-only clock object fixture")
++        self.remote_main = git(self.repo, "rev-parse", "HEAD")
++        git(self.repo, "update-ref", "refs/remotes/origin/main", self.remote_main)
++        git(self.repo, "checkout", "candidate-source")
++        (self.repo / "apps.yaml").write_text("uncommitted bytes must stay out\n")
++
++    def assert_snapshot(self, directory):
++        self.assertEqual(git(directory, "rev-parse", "--show-toplevel"), str(directory.resolve()))
++        self.assertEqual(git(directory, "rev-parse", "HEAD"), self.head)
++        self.assertEqual(git(directory, "rev-parse", "apps/v1.0.0^{commit}"), self.served)
++        self.assertEqual(git(directory, "show", "apps/v1.0.0:apps.yaml"), "served digest")
++        self.assertEqual(git(directory, "rev-parse", "refs/remotes/origin/main"), self.remote_main)
++        self.assertEqual(git(directory, "show", "origin/main:clock.fixture"),
++                         "Authored fixture, not a live observation")
++        self.assertEqual(git(directory, "for-each-ref", "--format=%(refname)", "refs/remotes/origin/"),
++                         git(self.repo, "for-each-ref", "--format=%(refname)", "refs/remotes/origin/"))
++        self.assertEqual(git(directory, "symbolic-ref", "refs/remotes/origin/HEAD"),
++                         "refs/remotes/origin/main")
++        self.assertEqual((directory / "apps.yaml").read_text(), "proposed digest\n")
++
++    def test_engine_adopter_probe_preserves_its_real_object_context(self):
++        engine = load("snapshot_engine", "verify/engine-pairing/engine_pairing.py")
++        estate = engine.Estate.__new__(engine.Estate)
++        estate.root, estate.work = self.repo.parent, self.root / "work"
++        copied = estate.adopter_copy("fixture", "forward")
++        self.assert_snapshot(copied)
++        self.assertEqual((self.repo / "apps.yaml").read_text(), "uncommitted bytes must stay out\n")
++
++    def test_reprice_probe_preserves_context_before_calling_the_composer(self):
++        reprice = load("snapshot_reprice", "verify/e2e/step2_reprice.py")
++
++        class BoundaryReached(Exception):
++            pass
++
++        def composer(directory, _out, _label):
++            self.assert_snapshot(Path(directory))
++            raise BoundaryReached
++
++        with patch.object(reprice, "ESTATE", str(self.repo.parent)), \
++             patch.object(reprice, "compose", composer), \
++             self.assertRaises(BoundaryReached):
++            reprice.try_bump("fixture", {"name": "threat-register", "party": "fixture"}, "v1", "v2")
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tests/test_workload_lane_entrypoint.py b/tests/test_workload_lane_entrypoint.py
+new file mode 100644
+index 00000000..a8ed4fa8
+--- /dev/null
++++ b/tests/test_workload_lane_entrypoint.py
+@@ -0,0 +1,53 @@
++"""The clock checkout has Python on PATH, without the hub's local virtualenv."""
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import tempfile
++import unittest
++
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++class WorkloadLaneEntrypoint(unittest.TestCase):
++    def test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv(self):
++        for lane, instrument in (("served-workloads", "served_apps.py"),
++                                 ("oscal-lane", "oscal_lane.py")):
++            with self.subTest(lane=lane), tempfile.TemporaryDirectory() as tmp:
++                hub = Path(tmp)
++                for name in ("served-workloads", "oscal-lane"):
++                    target = hub / "verify" / name
++                    target.mkdir(parents=True)
++                    shutil.copy(ROOT / "verify" / name / ("verify-" + name + ".sh"), target)
++                for party in ("driftwood", "tuppence", "ludlow"):
++                    drift = hub / ".estate-clone" / party / "drift"
++                    drift.mkdir(parents=True)
++                    (drift / instrument).write_text(
++                        "from pathlib import Path\nimport sys\n"
++                        "with (Path(__file__).parent / 'calls').open('a') as f:\n"
++                        "    f.write(sys.argv[1] + '\\n')\n")
++                env = dict(os.environ)
++                env.pop("PYTHON", None)
++                env["PATH"] = str(Path(sys.executable).parent) + os.pathsep + env["PATH"]
++                result = subprocess.run(["bash", str(hub / "verify" / lane /
++                                        ("verify-" + lane + ".sh"))], env=env,
++                                        capture_output=True, text=True)
++                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++                for party in ("driftwood", "tuppence", "ludlow"):
++                    self.assertEqual((hub / ".estate-clone" / party / "drift" /
++                                      "calls").read_text(), "selfcheck\ngrade\n")
++
++    def test_explicit_unavailable_interpreter_still_refuses(self):
++        env = {**os.environ, "PYTHON": "/no-such-workload-interpreter"}
++        result = subprocess.run(["bash", str(ROOT / "verify/served-workloads/"
++                                            "verify-served-workloads.sh")], env=env,
++                                capture_output=True, text=True)
++        self.assertEqual(result.returncode, 3)
++        self.assertIn("SKIP: no hub interpreter", result.stdout)
++        self.assertNotIn("==>", result.stdout)
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/verify/_snapshot.py b/verify/_snapshot.py
+new file mode 100644
+index 00000000..8805958d
+--- /dev/null
++++ b/verify/_snapshot.py
+@@ -0,0 +1,50 @@
++"""Committed local adopter copies for probes that need immutable Git objects."""
++from pathlib import Path
++import subprocess
++
++
++def committed_repository(repo: Path, dest: Path) -> None:
++    """Clone HEAD and its tag/history context without copying working-tree edits.
++
++    The source is a local checkout. Preserve its observed origin/main ref rather
++    than letting clone label the source's current probe branch as origin/main.
++    All mutations occur in the disposable destination.
++    """
++    repo = repo.resolve()
++
++    def source(*args: str) -> str:
++        return subprocess.check_output(["git", "-C", str(repo), *args],
++                                       text=True).strip()
++
++    if source("rev-parse", "--show-toplevel") != str(repo):
++        raise ValueError("probe source must be its own Git repository")
++    commit = source("rev-parse", "HEAD")
++    dest.parent.mkdir(parents=True, exist_ok=True)
++    subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", "--no-checkout",
++                    str(repo), str(dest)], check=True)
++    refs = source("for-each-ref", "--format=%(refname) %(objectname) %(symref)",
++                  "refs/remotes/origin/")
++    rows = [row.split() for row in refs.splitlines()]
++    for sha in {commit, *(row[1] for row in rows)}:
++        present = subprocess.run(["git", "-C", str(dest), "cat-file", "-e", sha],
++                                 capture_output=True)
++        if present.returncode:
++            # The immutable source object is fetched locally, never from the forge.
++            subprocess.run(["git", "-C", str(dest), "fetch", "--quiet", "--no-tags",
++                            str(repo), sha], check=True)
++        subprocess.run(["git", "-C", str(dest), "cat-file", "-e", sha], check=True)
++    # A clone invents origin/<source local branch>. Only the source checkout's
++    # actual observed remote refs may answer dated-history questions in a probe.
++    existing = subprocess.check_output([
++        "git", "-C", str(dest), "for-each-ref", "--format=%(refname)",
++        "refs/remotes/origin/"], text=True).splitlines()
++    for ref in existing:
++        subprocess.run(["git", "-C", str(dest), "update-ref", "--no-deref", "-d", ref], check=True)
++    for row in rows:
++        ref, sha = row[:2]
++        if len(row) == 3:
++            subprocess.run(["git", "-C", str(dest), "symbolic-ref", ref, row[2]], check=True)
++        else:
++            subprocess.run(["git", "-C", str(dest), "update-ref", "--no-deref", ref, sha], check=True)
++    subprocess.run(["git", "-C", str(dest), "checkout", "--quiet", "--detach", commit],
++                   check=True)
+diff --git a/verify/e2e/step2_reprice.py b/verify/e2e/step2_reprice.py
+index d05ea644..450d8abb 100755
+--- a/verify/e2e/step2_reprice.py
++++ b/verify/e2e/step2_reprice.py
+@@ -3,8 +3,8 @@
+ adopter's own party.yaml — the one edit a merged Renovate PR makes — changes that adopter's
+ prices[].
+ 
+-Never touches a real repo: the adopter's committed tree is copied into a temp directory (minus
+-.git), composed once to install a header to compare against, the pin is edited from the pinned
++Never touches a real repo: the adopter's committed tree and immutable Git objects are cloned
++into a temp directory, composed once to install a header to compare against, the pin is edited from the pinned
+ version to the next version present locally, and it is composed again. The two prices[]
+ documents are diffed. The copy is thrown away; nothing is restored because nothing real moved.
+ 
+@@ -16,8 +16,8 @@ from __future__ import annotations
+ import glob
+ import json
+ import os
++from pathlib import Path
+ import re
+-import shutil
+ import subprocess
+ import sys
+ import tempfile
+@@ -27,6 +27,7 @@ import yaml
+ HERE = os.path.dirname(os.path.abspath(__file__))
+ sys.path.insert(0, os.path.dirname(HERE))
+ from _estate import ESTATE  # noqa: E402
++from _snapshot import committed_repository  # noqa: E402
+ 
+ # The gate never passes this. It exists so this step can be smoke-tested against a scratch
+ # estate (a fixture with the not-yet-published files planted) without touching a real unit.
+@@ -149,11 +150,10 @@ def try_bump(adopter, edge, pinned, newer):
+     name = edge["name"]
+     print(f"    {adopter} pins {edge['party']}/{name} at {pinned}; {newer} is on disk")
+     with tempfile.TemporaryDirectory() as tmp:
+-        # The whole committed tree, minus git and scratch: the party artefact's own check()
+-        # reads workflows and pin files, not just party.yaml.
++        # The committed tree plus real tag/history objects: immutable apps inventory
++        # and dated source facts must resolve exactly as they do in the adopter repo.
+         work = os.path.join(tmp, adopter)
+-        shutil.copytree(os.path.join(ESTATE, adopter), work,
+-                        ignore=shutil.ignore_patterns(".git", ".work", "__pycache__"))
++        committed_repository(Path(ESTATE) / adopter, Path(work))
+ 
+         before = compose(work, work, f"{adopter} at {pinned}")["prices"]
+ 
+diff --git a/verify/engine-pairing/engine_pairing.py b/verify/engine-pairing/engine_pairing.py
+index 519b4fb7..61639c20 100644
+--- a/verify/engine-pairing/engine_pairing.py
++++ b/verify/engine-pairing/engine_pairing.py
+@@ -68,13 +68,14 @@ import sys
+ import tarfile
+ import tempfile
+ from pathlib import Path
+-from typing import Any, Callable
++from typing import Any, Callable, Iterable
+ 
+ import yaml
+ 
+ HERE = Path(__file__).resolve().parent
+ sys.path.insert(0, str(HERE.parent))
+ from _estate import ESTATE as DEFAULT_ESTATE  # noqa: E402
++from _snapshot import committed_repository  # noqa: E402
+ 
+ LINES: list[str] = []
+ ENGINE_FILE = "gitops/engine/kyverno.yaml"
+@@ -321,7 +322,7 @@ class Estate:
+ 
+     def adopter_copy(self, name: str, label: str) -> Path:
+         dest = self.work / "adopters" / label / name
+-        _export(self.root / name, dest)
++        committed_repository(self.root / name, dest)
+         return dest
+ 
+ 
+@@ -365,6 +366,11 @@ def _baseline_source(party: dict) -> str:
+                  if e.get("kind") == "controls" and e.get("party") != party.get("party")), "")
+ 
+ 
++def unsupported_pairing_engines(table: Iterable[str], support: dict[str, list[str] | None]) -> list[str]:
++    """A real engine may support one carried line and be unsupported by another."""
++    return sorted(v for v in table if any(v not in (listed or []) for listed in support.values()))
++
++
+ def planted_and_forward(estate: Estate) -> None:
+     served = estate.scratch("served")
+     where = f"platform {estate.commit}'s composer and tree"
+@@ -404,7 +410,7 @@ def planted_and_forward(estate: Estate) -> None:
+     lines_v = sorted(v for v in bodies if v != MACHINERY)
+     support = _support_at(estate.platform, None, lines_v)
+     # 2. an engine the composed line does not list: a row of the engine table, never invented.
+-    unlisted = sorted(v for v in estate.rows if all(v not in (support[l] or []) for l in lines_v))
++    unlisted = unsupported_pairing_engines(estate.rows, {line: support[line] for line in lines_v})
+     if not unlisted:
+         out("SKIP", "planted: every row of the engine table is listed by every composed line, so no "
+                     "unsupported engine can be planted from the table")
+diff --git a/verify/map-surface/map_surface.py b/verify/map-surface/map_surface.py
+index f0a80841..b0bfe3d2 100644
+--- a/verify/map-surface/map_surface.py
++++ b/verify/map-surface/map_surface.py
+@@ -78,6 +78,7 @@ no skip pattern because there is none to declare.
+ """
+ from __future__ import annotations
+ 
++import ast
+ import importlib.util
+ import re
+ import subprocess
+@@ -539,7 +540,8 @@ LANE_ENV = re.compile(r"^\s*OBSERVATION_LANE:\s*\"([^\"]*)\"\s*$", re.M)
+ UNITS = ("driftwood", "feeds", "ico", "insurer", "ludlow", "nist", "platform", "tuppence")
+ 
+ # What each repository owns in the lane, read from the repository rather than asserted.
+-LANE_PATHS = ("talk/truth.log", "drift/samples.jsonl", "talk/captures", "observations")
++LANE_PATHS = ("talk/truth.log", "drift/samples.jsonl", "drift/workload-samples.jsonl",
++              "drift/oscal-samples.jsonl", "talk/captures", "observations")
+ 
+ # THE REF THIS GRADES (review F3, 2026-09-06). What GitHub serves is `origin/main`, not whatever
+ # happens to be checked out in `.estate-clone/<unit>`. Reading the working copy made the verdict
+@@ -601,7 +603,7 @@ def _workflow_texts(unit_root: Path) -> dict[str, str]:
+ 
+ def checkout_behind(unit_root: Path) -> list[str]:
+     """Workflow files whose checkout copy declares a different lane from the served copy."""
+-    differs = []
++    differs: list[str] = []
+     local = unit_root / ".github" / "workflows"
+     if not local.is_dir():
+         return differs
+@@ -635,6 +637,40 @@ def refresh_served_ref(unit_root: Path) -> str | None:
+     return None
+ 
+ 
++def _default_instrument_lane(unit_root: Path, texts: list[str], path: str) -> bool:
++    """Read an owned writer's directory-bound default, without executing its code.
++
++    A lane declaration does not own a path. The served workflow must actually
++    invoke the instrument's writing command without redirecting its default.
++    """
++    writers = {"drift/workload-samples.jsonl": ("served_apps.py", "sample"),
++               "drift/oscal-samples.jsonl": ("oscal_lane.py", "collect")}
++    if path not in writers:
++        return False
++    module, command = writers[path]
++    caller = re.compile(r"\s*python3?\s+drift/" + re.escape(module) + r"\s+" + command + r"(?:\s|$)")
++    if not any(caller.match(line) and "--out" not in line
++               for text in texts for line in text.splitlines()):
++        return False
++    source = _git(unit_root, "show", f"{SERVED_REF}:drift/{module}")
++    if source is None:
++        return False
++    try:
++        assignments = {node.targets[0].id: ast.dump(node.value)
++                       for node in ast.parse(source).body
++                       if isinstance(node, ast.Assign) and len(node.targets) == 1
++                       and isinstance(node.targets[0], ast.Name)}
++    except SyntaxError:
++        return False
++    here = ast.dump(ast.parse("Path(__file__).resolve().parent", mode="eval").body)
++    root = ast.dump(ast.parse("Path(__file__).resolve().parents[1]", mode="eval").body)
++    root_drift = ast.dump(ast.parse("ROOT / 'drift'", mode="eval").body)
++    log = ast.dump(ast.parse("HERE / " + repr(Path(path).name), mode="eval").body)
++    own_directory = (assignments.get("HERE") == here or
++                     (assignments.get("ROOT") == root and assignments.get("HERE") == root_drift))
++    return own_directory and assignments.get("LOG") == log
++
++
+ def owned_lane_paths(unit_root: Path) -> set[str]:
+     """The lane paths this repository owns. Read from git, never from the working copy alone:
+ 
+@@ -643,6 +679,8 @@ def owned_lane_paths(unit_root: Path) -> set[str]:
+       * the repository's own workflow shell writes it, outside the OBSERVATION_LANE declaration
+         and outside the cage's loop over it. driftwood owns `observations` this way and by no
+         other: its twin-sweep appends `observations/twin-sweep.jsonl` on main.
++      * the served workflow calls its own observation instrument's writing command,
++        whose literal default ledger is relative to that instrument's own directory.
+     """
+     owned: set[str] = set()
+     texts = list(_workflow_texts(unit_root).values())
+@@ -656,6 +694,9 @@ def owned_lane_paths(unit_root: Path) -> set[str]:
+         if path in ref_roots:
+             owned.add(path)
+             continue
++        if _default_instrument_lane(unit_root, texts, path):
++            owned.add(path)
++            continue
+         for text in texts:
+             for line in text.splitlines():
+                 if "OBSERVATION_LANE" in line or path not in line:
+diff --git a/verify/refusal-by-another-name/refusal_scan.py b/verify/refusal-by-another-name/refusal_scan.py
+index d9f051e7..928f6424 100755
+--- a/verify/refusal-by-another-name/refusal_scan.py
++++ b/verify/refusal-by-another-name/refusal_scan.py
+@@ -704,6 +704,11 @@ def classify(path: str, declared: dict[str, set[str]], cut: dict[str, set[str]])
+       * `vselfcheck/` -- a fixture directory for the renderers' own asserts.
+     """
+     unit = path.split("/", 1)[0]
++    if path.startswith("platform/implementations/cloud/policies/"):
++        return Surface("authoring", False,
++                       "the cloud package's authoring inputs: package.yaml names these members "
++                       "and render.py emits claim-bound copies into the adopter's composed/cloud; "
++                       "the source path itself is not a reconciled tree")
+     if "/graded/policies/" in "/" + path:
+         return Surface("authoring", False,
+                        "the authoring tree: no Kustomization anywhere applies graded/policies/, "
+diff --git a/verify/refusal-by-another-name/register.yaml b/verify/refusal-by-another-name/register.yaml
+index 5e0466df..1c0670c1 100644
+--- a/verify/refusal-by-another-name/register.yaml
++++ b/verify/refusal-by-another-name/register.yaml
+@@ -42,6 +42,12 @@ accepted:
+     # refusal_scan.py graded it "named but not found", which is this row's own staleness guard.
+     policies:
+       - cage-tier-5-0-0
++      # 2026-10-04: the genuine source-A 4.0.0 releases also serve policy 6 and 7.
++      # The scan re-derived the same exact thirteen UPDATE field hazards for
++      # every named body. The existing recreate decision and per-policy field
++      # join remain binding; this admits no additional field or wildcard name.
++      - cage-tier-6-0-0
++      - cage-tier-7-0-0
+     operation: UPDATE
+     fields:
+       - spec.containers[*].name
+diff --git a/verify/served-workloads/verify-served-workloads.sh b/verify/served-workloads/verify-served-workloads.sh
+index df77821d..006bb70b 100755
+--- a/verify/served-workloads/verify-served-workloads.sh
++++ b/verify/served-workloads/verify-served-workloads.sh
+@@ -4,6 +4,9 @@ set -uo pipefail
+ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ ROOT="$(cd "${HERE}/../.." && pwd)"
+ PY="${PYTHON:-${ROOT}/.venv/bin/python}"
++if [ -z "${PYTHON:-}" ] && [ ! -x "$PY" ]; then
++  PY="$(command -v python3 || true)"
++fi
+ [ -x "$PY" ] || { echo 'SKIP: no hub interpreter for the workload lane'; exit 3; }
+ INSTRUMENT="${1:-served_apps.py}"
+ case "$INSTRUMENT" in served_apps.py|oscal_lane.py) ;; *) echo "FAIL: unknown lane instrument $INSTRUMENT"; exit 1 ;; esac

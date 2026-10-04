@@ -1,0 +1,18 @@
+PASS: the overlay carries 6 standing scenarios (the six of decision ticket 11 answer item 4)
+PASS: every scenario declares a question, a proposition, a date, components, a world model and an affected-parties register
+PASS: 4 scenario(s) name a committed class (bus-factor-key-person, eol-date-passes, penalty-published, supply-shock); 2 name none, by decision
+PASS: the four classed subjects are present: a tier-one supplier failing (supply-shock), an EOL date passing, a penalty published, a key-person event
+PASS: class 'eol-date-passes' lands in all three places: enum=True library=True overlay=True
+PASS: class 'penalty-published' lands in all three places: enum=True library=True overlay=True
+PASS: penalty-published-2026.yaml prices no fine: no currency symbol and no figure anywhere in it (the estate prices the fine, the twin prices what the publication does)
+FAIL: penalty-published-2026.yaml says which half of the seam it carries: the consequence is declared and its note says in its own words that it is not priced; the note claims neither a price nor the absence of one, so a reader cannot tell the post-penalty value-chain shock is unpriced
+PASS: the supply-shock headline lives in this overlay as clearing-house-supply-shock-2026, not in a news feed
+PASS: every scenario's proposition and world model exist in the vendored world layer
+PASS: every scenario's proposition carries a prior belief in the reference map
+PASS: the overlay with its six scenarios still loads and re-renders the feed byte-identically
+PASS: every one of the 6 pins on party.yaml resolves to exactly one dated signal
+PASS: every signal is dated and names a scenario that exists, and every scenario is either bound by a pin or declared unbound with a reason
+PASS: the lookup carries no price: binding a pin to a signal is not pricing it
+PASS: each of the 1 priced valuation(s) names a fact resolvable in party.yaml and re-derives from it
+TOTAL: 15 pass, 1 fail, 0 could-not-look
+FAIL: 1 standing-scenario check(s) observed false

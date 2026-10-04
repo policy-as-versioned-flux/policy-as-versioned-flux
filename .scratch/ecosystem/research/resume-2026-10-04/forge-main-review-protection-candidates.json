@@ -1,0 +1,51 @@
+{
+  "scope": "Preserve five actual main rulesets and add their existing release PR review requirement",
+  "candidates": [
+    {
+      "name": "driftwood",
+      "repository": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_id": 23993301,
+      "request": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/forge-driftwood-main-review-protection-request.json",
+      "sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "adds_only": "Existing release-branch pull_request rule with one approving review",
+      "bypass_actors": []
+    },
+    {
+      "name": "ludlow",
+      "repository": "policy-as-versioned-ludlow/ludlow",
+      "ruleset_id": 23993310,
+      "request": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/forge-ludlow-main-review-protection-request.json",
+      "sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "adds_only": "Existing release-branch pull_request rule with one approving review",
+      "bypass_actors": []
+    },
+    {
+      "name": "tuppence",
+      "repository": "policy-as-versioned-tuppence/tuppence",
+      "ruleset_id": 23993306,
+      "request": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/forge-tuppence-main-review-protection-request.json",
+      "sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "adds_only": "Existing release-branch pull_request rule with one approving review",
+      "bypass_actors": []
+    },
+    {
+      "name": "platform",
+      "repository": "policy-as-versioned-platform/platform",
+      "ruleset_id": 23993294,
+      "request": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/forge-platform-main-review-protection-request.json",
+      "sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "adds_only": "Existing release-branch pull_request rule with one approving review",
+      "bypass_actors": []
+    },
+    {
+      "name": "hub",
+      "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_id": 23950610,
+      "request": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/forge-hub-main-review-protection-request.json",
+      "sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "adds_only": "Existing release-branch pull_request rule with one approving review",
+      "bypass_actors": []
+    }
+  ],
+  "public_mutations": false
+}

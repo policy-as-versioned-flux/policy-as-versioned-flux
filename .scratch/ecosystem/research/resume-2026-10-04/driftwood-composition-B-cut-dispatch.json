@@ -1,0 +1,40 @@
+{
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "workflow": "cut-release.yml",
+  "ref": "main",
+  "version": "v4.0.1",
+  "head": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "dispatch_argv": [
+    "gh",
+    "workflow",
+    "run",
+    "cut-release.yml",
+    "--repo",
+    "policy-as-versioned-driftwood/driftwood",
+    "--ref",
+    "main",
+    "-f",
+    "version=v4.0.1",
+    "-f",
+    "message=Bind the signed composed HEADER to genuine claim7 apps Source A; retain policies5/6/7, measured inventory and engine declarations"
+  ],
+  "manual_tag_created": false,
+  "before_run_ids": [
+    32460211114,
+    32875965641,
+    32876110865,
+    35975270740,
+    35978861821,
+    36043487377,
+    37146159741,
+    37197118689
+  ],
+  "run": {
+    "conclusion": "",
+    "createdAt": "2026-10-04T12:15:19Z",
+    "databaseId": 37201470734,
+    "headSha": "872d5c7f44801b496731b11cd40881f304f8a09a",
+    "status": "in_progress",
+    "url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37201470734"
+  }
+}

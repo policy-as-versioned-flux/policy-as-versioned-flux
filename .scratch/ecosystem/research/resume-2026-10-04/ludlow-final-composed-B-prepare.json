@@ -1,0 +1,20 @@
+{
+  "base": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "branch": "delivery-stage2-composed-B-20261004",
+  "apps_stays": {
+    "tag": "v4.0.0",
+    "commit": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae"
+  },
+  "composed_target": {
+    "tag": "v4.0.1",
+    "commit": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+    "tag_object": "efffeee3b39cc59dd5ecc1ac0536845e712d4c6f"
+  },
+  "parsed_change_only_composed_ref": true,
+  "gates_array_and_engine_cloud_unchanged": true,
+  "source_edits": [
+    "gitops/composed/composed-set.yaml"
+  ],
+  "remote_mutations": false,
+  "authentic_release": "ludlow-composition-B-authentic-release.json"
+}

@@ -1,0 +1,24 @@
+{
+  "PR": "https://github.com/policy-as-versioned-insurer/insurer/pull/8",
+  "head": "ed17499668f368c55261729c760904662ab7e242",
+  "main": "5d1a7cde88230370074ed2a2ce4e94adf4eb8790",
+  "tree": "2a6c5ad76dbc710505ffbc48a0f269b644ea522d",
+  "GitHub_merge_signature_verified": true,
+  "ordinary_matching_head_App_merge": true,
+  "actual_configured_PR_Actions_rollup": [],
+  "no_PR_workflow_configured": true,
+  "historical_quotes_terms_and_deployment_preserved": true,
+  "no_quote_render_release_clock_dispatch_or_cloud_activation": true,
+  "source_reviews": {
+    "Standards": "insurer-compatible-platform-pin-root-standards-review.json",
+    "Spec": "insurer-compatible-platform-pin-spec-review.json"
+  },
+  "receipts_sha256": {
+    "insurer-compatible-platform-pin-actual-merge.json": "88c1c0c174a3ec797a88dd0a2d3006cb7a47d247d775665ab877ed79abe26ac5",
+    "insurer-compatible-platform-pin-main-commit-verification.json": "8a363751fdf1861ee1424c31668b062955f4e0c3fcfd6586ad5d925fa81bb837",
+    "insurer-compatible-platform-pin-root-standards-review.json": "2c56fa86d6e2a851c46709cdc8e1a6832be2eca4e41f79ef065664a638ba3cc3",
+    "insurer-compatible-platform-pin-spec-review.json": "640d7fa171946928b4d41b2fcff5d76f842848439ba5d4f1821bbd656de1d492",
+    "insurer-compatible-platform-pin-PR-body.md": "053019c0f18a099ff991a2c84168a36b75bf844b81a426070e0df0a995531519",
+    "insurer-compatible-platform-pin-postcommit-snapshot-check.json": "f380d228642ce02c3d8247d3ac13145c23db65134f84a2e8727479246bf31d55"
+  }
+}

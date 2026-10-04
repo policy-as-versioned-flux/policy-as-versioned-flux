@@ -1,0 +1,2 @@
+OK: every control claim resolves to a shipped policy and a catalogued control id
+selfcheck ok: 0 known dangling claim(s), all other claims resolve, unknown-id fixture fails as required

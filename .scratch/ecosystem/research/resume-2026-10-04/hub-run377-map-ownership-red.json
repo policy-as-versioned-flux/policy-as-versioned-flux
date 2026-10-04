@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_map_observation_ownership.py",
+    "-v"
+  ],
+  "exit": 1,
+  "log_sha256": "1deed4869783dca564e0db334df1284a96aca0e18f424fa43b5d652c39b8dff3"
+}

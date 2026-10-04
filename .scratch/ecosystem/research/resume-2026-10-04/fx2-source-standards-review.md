@@ -1,0 +1,11 @@
+# FX2 source Standards review — 2026-10-04
+
+PASS for exact clean SSH-signed source d62f74e52ed992798a75cf3f4f138ec9c83db80a, tree b88fb77f96cadf1a9639cae369ed529bd4e1731c, based at authentic974e73514e0d8d4cad2e6906acf51d1cc27028b3. [Independent source manifest and checks](fx2-source-standards-review.json) bind all seven changed paths. No source/index edits or external actions by reviewer.
+
+All existing tracked bytes are unchanged except fx/bump.yaml minor→major. Every12 prior-major envelope, default August offline payload, parser, converter, rule, schema, catalogue and workflow is preserved. December is added at fx/v2/feed.json, declaring2.0.0 under the existing FX catalogue/schema path; no duplicate discovery record or payload-shape change is needed.
+
+Independent calls to the actual unchanged fetch/fx.py parser reproduce both complete captured official CSV tables, with matching raw and canonical payload hashes. December supplies USD1.3126 per GBP1 for2025-12; August remains USD1.3367 for2026-08. Each parser call rejects the other month. Explicit December replay matches the envelope; default replay remains byte-exact August. Existing live-fetch code still chooses current UTC month unless an explicit reviewed historical period is supplied. Candidate provenance and README distinguish captured preparation/offline replay from genuine signed release or a new live observation.
+
+The unchanged normal bump engine computes major and next_version yields2.0.0: VES is removed, BGN/VED added. No currency is silently renamed and no rate extrapolated. Native publisher gates and dated/missing-month converter checks pass in the saved exact candidate proof. No high-confidence credential/private-key match in candidate blobs.
+
+No concrete hard finding or consequential smell. Local fx/v2.0.0 tag namespace is unused; root must check real remote absence before normal main cut. Cut inputs are feed=fx, version=2.0.0; release verification must dispatch at immutable ref fx/v2.0.0 with tag=fx/v2.0.0, binding genuine signer identity/issuer and peeled source commit. Consumer FX pins and corrected hub producer replay wait for that authentic receipt. Source preparation itself is not a signed rate or live activation.

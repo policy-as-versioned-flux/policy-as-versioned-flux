@@ -1,0 +1,90 @@
+{
+  "source_checks": "PASS",
+  "normal_receipt_review": "pending",
+  "institution": "ludlow",
+  "head": "b84006a176e6c783bbb45fc2463c46be6ba73071",
+  "tree": "3cd9ee3f18b4cd5c189e747a540b143988aee073",
+  "candidate_parent": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "base_B": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "source_A": {
+    "observed_at": "2026-10-04T11:05:19.149922+00:00",
+    "institution": "ludlow",
+    "tag": "v4.0.0",
+    "tag_object": "36a1d2634beb4a2321414b020a6527bc714a0aba",
+    "peeled_commit": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae",
+    "reviewed_source": "323a1b09dc9d7f4c243c66a3f53f12ea1a4cfeea",
+    "cut_run": 37197121326,
+    "release_run": 37197418730,
+    "github_release": "https://github.com/policy-as-versioned-ludlow/ludlow/releases/tag/v4.0.0",
+    "published_at": "2026-10-04T11:03:36Z",
+    "draft": false,
+    "prerelease": false,
+    "git_signature": true,
+    "rekor_entry": true,
+    "certificate_claims": true,
+    "tlog_index": "3077567855",
+    "delivery_edits_may_begin": true,
+    "live_delivery_claimed": false
+  },
+  "source_B": {
+    "artifact_sha256": {
+      "ludlow-composition-B-cut-run.json": "cd35d678ef9874437860cf33320abc98e39206bd140ddbe8eb01f6e898ada363",
+      "ludlow-composition-B-cut.log": "45636181868390d8e74dd48fe386828dad78dc410e289de535f329ec2fd679fe",
+      "ludlow-composition-B-github-release.json": "35fc1a2744db4a6f874a1af9561af674fc8c90fad3472883198f82680020ef11",
+      "ludlow-composition-B-release-run.json": "48c52c9e1bae1bf8ca903bd324498023ed9c34035fbc68fe95435c41c8b8caa0",
+      "ludlow-composition-B-release.log": "e6b63f3a72b50ee620340abc838aec02645d94eee61d1f4e1c71a9c73d52e07d",
+      "ludlow-composition-B-tag-object.txt": "1aa6d5434f3cd358037627498d440418c272f8dc1b7f96a6c4a0268b2c17d5a1",
+      "ludlow-composition-B-tag-verification.log": "b96d1be91d43762f6151423c6fe1d6c7ad0e67e9ae074d21b51cf0127a3480da"
+    },
+    "commit": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+    "cut_conclusion": "success",
+    "cut_run": 37201479463,
+    "explicit_user_approval": "ludlow-composition-B-explicit-release-approval.json",
+    "fresh_Spec": "ludlow-composition-B-spec-review.json",
+    "fresh_Standards": "ludlow-composition-B-root-standards-review.json",
+    "immutable_release_ref_and_input": "v4.0.1",
+    "published_at": "2026-10-04T12:24:16Z",
+    "release_conclusion": "success",
+    "release_run": 37201969669,
+    "release_url": "https://github.com/policy-as-versioned-ludlow/ludlow/releases/tag/v4.0.1",
+    "scope": "Authentic approved Composition B signed release, no live observation claimed",
+    "signature": {
+      "Git": true,
+      "Rekor": true,
+      "certificate": true,
+      "exact_identity": "https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "rekor_mode": "offline",
+      "tlog_index": 3077655513
+    },
+    "tag": "v4.0.1",
+    "tag_object": "efffeee3b39cc59dd5ecc1ac0536845e712d4c6f",
+    "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63"
+  },
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "changed_file_sha256": {
+    "composed/HEADER.yaml": "4baf530cf4b3d4b6e64ef64b9679d5743af45fad7da6b4332fddcd27ba360433",
+    "gitops/composed/composed-set.yaml": "9b8a60bf24a0bccfe2e58852bb8a9ec615d0d4449e0c190bbd675d73e0b179df"
+  },
+  "normal_SSH_signature": "G",
+  "clean": true,
+  "HEADER_only_delta": "comparison-inputs.after",
+  "comparison_after": "6f2aa0087434f58546e5f0d478fc3b4e4ff32a598ea422cc78d141005d8b9052",
+  "apps_and_primary_provenance_A_preserved": true,
+  "primary_trim_equal": true,
+  "served_images": [
+    "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+  ],
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "four_gitsign_gates_preserved": true,
+  "engine": "1.18.2",
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

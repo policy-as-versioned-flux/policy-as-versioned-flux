@@ -1,0 +1,14 @@
+diff --git a/renovate.json b/renovate.json
+index 7190a60b6422152e768da3a34747a17d956739be..44619ef552be9ebada7756c20f599a09a8702c73 100644
+--- a/renovate.json
++++ b/renovate.json
+@@ -1,3 +1,8 @@
+ {
+-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
++  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
++  "extends": [
++    "config:recommended"
++  ],
++  "dependencyDashboard": true,
++  "automerge": false
+ }

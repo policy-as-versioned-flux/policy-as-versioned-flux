@@ -1,0 +1,24 @@
+{
+  "scope": "Separate local maintenance; actual generated policy dependency graph",
+  "base": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "directory": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/driftwood",
+  "exit": 0,
+  "test_count": 3,
+  "subtest_count": 2,
+  "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-app-order-green.log",
+  "log_sha256": "739bcef7ab4f24ac872703c664cbd7e262ab5682efdc18dedbb5ff3b20fbd997",
+  "red_log_sha256": "a2bc67d50ad7d7f701ff33d7cc2da967f75fbb793a2dc09e72b080896ae10383",
+  "dependency_names": [
+    "composed-v5-0-0",
+    "composed-v6-0-0",
+    "composed-v7-0-0",
+    "composed-machinery"
+  ],
+  "webhook_readiness_claimed": false,
+  "fixture_guards": [
+    "missing edge",
+    "unknown name",
+    "cycle"
+  ],
+  "source_unserved": true
+}

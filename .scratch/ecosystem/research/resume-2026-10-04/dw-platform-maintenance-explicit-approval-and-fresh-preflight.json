@@ -1,0 +1,29 @@
+{
+  "reported_at": "2026-10-04T15:14:50.866855+00:00",
+  "authorization_origin": "Root relayed actual trusted user exact payload approvals for these two reviewed commits, saved bodies, public destinations and ordinary CI/App matching-head merges on2026-10-04; no authority expansion",
+  "automatic_review_rejections_preserved": true,
+  "fresh_readonly_preflight": [
+    {
+      "head": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+      "destination": "policy-as-versioned-driftwood/driftwood",
+      "actual_main": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+      "base": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+      "later_main_changes": [],
+      "public_admin": true,
+      "unchanged_body_sha256": "bb45dde56c85dedc6a608ff1df26ad15154ad837942f80dc90f890524f274a77",
+      "ordinary_publication_helper": "driftwood-delivery-order-maintenance-publish.py"
+    },
+    {
+      "head": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+      "destination": "policy-as-versioned-platform/platform",
+      "actual_main": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "base": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "later_main_changes": [],
+      "public_admin": true,
+      "unchanged_body_sha256": "2feff6a485f82bd99d16df539bfe6e8d753fe8f1f190217a5e4f22ae5d6f9c57",
+      "ordinary_publication_helper": "platform-run377-maintenance-publish.py"
+    }
+  ],
+  "source_worktrees_preserved": true,
+  "external_mutations": false
+}

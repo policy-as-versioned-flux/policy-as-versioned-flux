@@ -1,0 +1,50 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent Spec review of fresh Composition B on actual published Driftwood main; genuine B publication readiness only",
+  "head": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "packet_sha256": "f1986ecef9a79cec5bcf6a1fb10b2ac744b7a6a1942fa457c589d94ff5905192",
+  "valid_GitHub_merge_signature_receipt": true,
+  "main_receipt_sha256": "dd492a1a9639d847db78d9f892c723402e65944dacf0cc21ed5cca12c58164bb",
+  "fresh_authentic_compose_verify_reach_exits": [
+    0,
+    0,
+    0
+  ],
+  "all_committed_render_files_independently_matched": 54,
+  "source_output_diff": [],
+  "source_clean": true,
+  "source_A": {
+    "tag": "v4.0.0",
+    "tag_object": "bff31936b9e34074a7ce078e873d3a0df31ecd35",
+    "commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67"
+  },
+  "apps_and_primary_inventory_A_preserved": true,
+  "native_graph_primary_trim": "PASS",
+  "served_images": [
+    "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+    "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+    "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+  ],
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "four_gitsign_gates_preserved": true,
+  "comparison_after": "40282e7a51941ab5c974ee362d75d6124d05f776f2ea16348949e1e64c9584cf",
+  "institutional_gate": {
+    "composed_bump": "none",
+    "declared_bump": "none",
+    "added": [],
+    "retired": [],
+    "reasons": [],
+    "weaker_than_declared": false
+  },
+  "engine": "1.18.2",
+  "cloud_or_observed_claims_added": false,
+  "prospective_B_tag": "v4.0.1",
+  "findings": [],
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

@@ -1,0 +1,9 @@
+{
+  "directory": "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform",
+  "estate": "/private/tmp/pavf-own-response-model-20261004-cc77gdoi",
+  "base": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "source": "/private/tmp/pavf-run377-platform-estate-20261004/platform",
+  "scope": "Separate reversible local grade-aware own-response annual model prototype; no published source/table/feed changes",
+  "remote_mutations": false,
+  "parent_reviewed_hub_payload_changed": false
+}

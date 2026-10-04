@@ -1,0 +1,3 @@
+Move composed delivery to the genuine signed and published v4.0.1 Composition B release, whose tree binds apps and the native inventory to v4.0.0 Source A. Apps and inventory retain their genuine A source, and policies 5.0.0, 6.0.0 and 7.0.0 retain all four signature gates.
+
+Only the composed source reference and its explanatory comments change, with a fresh derived HEADER comparison fingerprint. All remaining source bytes are preserved. Signed v5.0.0 tools re-render and verify byte-for-byte; reach against authentic v4.0.1, the exact-head institutional none gate, and three enabled real-estate public layout tests pass. Engine 1.18.2 and the existing cloud declaration are preserved. Live reconciliation is established by the scheduled observer.

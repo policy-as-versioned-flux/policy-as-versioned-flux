@@ -1,0 +1,27 @@
+{
+  "scope": "Bounded Spec/runtime diagnosis only; no source, grade, price, or primary observation change",
+  "source_sha256": {
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/docs/adr/0021-the-twin-emits-a-scenario-the-estate-selects-the-tier.md": "04a865900f4ebff1277fe1e4a058df72b46dfbc91460aa3cd967d638aa8e6524",
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/docs/adr/0032-an-adopter-may-price-on-published-evidence-and-a-synthetic-record-never-raises-a-grade.md": "4c4d1da0574c06c00d155636d89087a731e639b4c88bd2c71387e9974793a67e",
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/issues/08-the-pound-seam.md": "469afda54c2ae1b4654ae3576cf4e671d8ce5c455f9e80fb4eccfbf83f6327e5",
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/verify/pound-seam/pound_seam.py": "e88f015ab9ba62b2384fd692b2d2f5ad4a68789aaa6670500381b7e96874c47d",
+    "/private/tmp/pavf-ludlow-maintenance-20261004-estate/platform/compose/composition.py": "35008c0d75ef00d8b0907703182244f19ba60fd4b3c4d58dc474ce5b5c58bd5c",
+    "/private/tmp/pavf-ludlow-maintenance-20261004-estate/platform/graded/cage.py": "d5cb7a0e689ab18fd8baeb79ce8fa4ff80d35cc03df129f6127a132c67286630",
+    "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/twin/emit-forward-intel.py": "95f6e2d5332c878c16662ada9abd540edc663f04b99f8294691cba50fcdc89df",
+    "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/twin/orgs/ludlow/responses/run-the-claims-adjudication-at-isolated.yaml": "917b0fbab9b04d4d307a656ae6ac7059efcfff175eae45c8a5c2bbd0e8adc8ce",
+    "/private/tmp/pavf-tuppence-maintenance-20261004-estate/tuppence/twin/emit-forward-intel.py": "7f3172f9e566ba479f5af78b249bd1c26e74793308767c4757df787dd011d460",
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_pound-seam_verify-pound-seam.out": "c9989b7d4e767327778f154d5ee6f897b2da12353bb49a631ede2ccb152f2f22"
+  },
+  "actual_failure": "Published LU/TU own curves admit no grade5 mitigation under threshold3 and are cheapest at baseline. Composer annual residuals use ungraded platform calibration reductions; that table is cheapest at isolated on this shock. Guard deliberately reports real disagreement.",
+  "contract": "ADR0021 requires a versioned own selection package and named curve; issue08 v1 uses first caged residual under tolerance. ADR0032 forbids grade4/5 pricing and synthetic evidence upgrades. Existing residual_basis discloses the alternative platform table, but disclosure alone does not satisfy the agreement guard.",
+  "feasible_code_repair": {
+    "implementation": "Introduce an explicit versioned grade-aware own-response annual-residual mapping for the twin line, consuming the signed response reduction/cost declarations (and explicit currency/time basis), gated by the party threshold and weakest input grade. Validate published curve/hash against those inputs; own selection package consumes real mapped residuals, with all downstream cage/agent gap and cost evidence re-derived.",
+    "guard": "Keep existing platform-table comparison red for unchanged historical/table-based entries; make the new mapper prove exact own-input consistency and reject tampered, absent, or unit-ambiguous inputs. No signature or primary observation synthesized.",
+    "release": "Measuring changed residuals/cages/amounts requires normal versioning, adopter rerender, institutional comparison, genuine release and atomic provenance/pins; cannot be labelled no-op maintenance.",
+    "limit": "Published net_cost_of_risk alone cannot yield both residual loss and separate annual control cost. Multiplying its total by LEF incorrectly annualizes the annual control cost. No inferred reductions, guessed cost periods, zero price substitution, or grade reassignment."
+  },
+  "evidence_alternative": "Existing table agreement can instead be supported by real eligible grade2/3 mitigation evidence, published through the adopter normal record/regrade path; unavailable measurements cannot be manufactured.",
+  "known_model_unit_seam": "Emitter calls the whole curve per-shock while imported response cost basis says GBP/year. A correct mapper must make the cost period explicit; do not silently treat total curve money as annual residual.",
+  "repair_authorized_or_implemented": false,
+  "historical_run377_capture_unchanged": true
+}

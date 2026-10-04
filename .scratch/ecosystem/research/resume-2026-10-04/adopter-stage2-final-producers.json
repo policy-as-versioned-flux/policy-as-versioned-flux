@@ -1,0 +1,148 @@
+{
+  "scope": "local real source replay; no live run, source release or activation claimed",
+  "hub_commit": "5bc47331a536476f3580542be794908f5053f816",
+  "published_hub_main": "14ec4902bcbd4be58ac43e0ab47d0ea1f4c8250d",
+  "hub_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0\n",
+  "generic_feeds_head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+  "FX_tag": "fx/v2.0.0",
+  "FX_tag_object": "f6edadce94b98a01479a517a1babda92ce8b2243",
+  "FX_commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+  "FX_signature_log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-final-fx-signature.log",
+  "adopters": {
+    "driftwood": {
+      "emit_exit": 0,
+      "check_exit": 0,
+      "byte_exact": true,
+      "generated": [
+        {
+          "path": "twin/forward-intel/v1/feed.json",
+          "sha256": "4668062dc40058aac100fd768353e220c8ce0276155c9b8c17f78c9a5c16edc2"
+        },
+        {
+          "path": "twin/forward-intel/v2/feed.json",
+          "sha256": "5c7385f77834496dd17dbbbfeb13098f92df4e0759d9fd0721a8b5d88c070729"
+        }
+      ],
+      "published_at": "2026-10-03T00:00:00Z",
+      "valuation": {
+        "amount": 3200000.0000000005,
+        "currency": "GBP",
+        "native_amount": 3200000.0000000005,
+        "native_currency": "GBP",
+        "party_fact": "size.turnover",
+        "fx": null
+      },
+      "rests_on_grade": 3,
+      "borrowed_frequency": {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "threat-register",
+        "version": "4"
+      },
+      "read_only_observer": null,
+      "immutable_driftwood_v1_preserved": true
+    },
+    "tuppence": {
+      "emit_exit": 0,
+      "check_exit": 0,
+      "byte_exact": true,
+      "generated": [
+        {
+          "path": "twin/forward-intel/v1/feed.json",
+          "sha256": "bc7e7948829fb7056522ecef071a498984ca7b4ba4cd7207a425d425b1aaf76f"
+        }
+      ],
+      "published_at": "2026-10-04T00:00:00Z",
+      "valuation": {
+        "amount": 113974999.99999999,
+        "currency": "GBP",
+        "native_amount": 113974999.99999999,
+        "native_currency": "GBP",
+        "party_fact": "size.turnover",
+        "fx": null
+      },
+      "rests_on_grade": 3,
+      "borrowed_frequency": {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "threat-register",
+        "version": "4"
+      },
+      "read_only_observer": {
+        "adopter_ref": "c70edb11086527c439b9adbc094eca6140136ae0",
+        "detail": "ok  twin/forward-intel/v1/feed.json is byte-identical to a fresh render of the overlay",
+        "emitter_exit": 0,
+        "feed": "forward-intel",
+        "hub_ref": "5bc47331a536476f3580542be794908f5053f816",
+        "moved": false,
+        "org": "tuppence",
+        "run": "local-source-rehearsal",
+        "status": "unchanged",
+        "swept_at": "2026-10-04T09:36:01Z",
+        "twin_pin": {
+          "hub_commit": "5bc47331a536476f3580542be794908f5053f816",
+          "tag_cut": false,
+          "twin_tag": "twin/v0.1.0",
+          "twin_version": "0.1.0"
+        }
+      },
+      "immutable_driftwood_v1_preserved": true
+    },
+    "ludlow": {
+      "emit_exit": 0,
+      "check_exit": 0,
+      "byte_exact": true,
+      "generated": [
+        {
+          "path": "twin/forward-intel/v1/feed.json",
+          "sha256": "16adebe89e4b689e13cb432e21f5b4861df4c4067102e02409c00772589c8dc2"
+        }
+      ],
+      "published_at": "2026-10-04T00:00:00Z",
+      "valuation": {
+        "amount": 6456650921.834527,
+        "currency": "GBP",
+        "native_amount": 8475000000.0,
+        "native_currency": "USD",
+        "party_fact": "size.turnover",
+        "fx": {
+          "published_by": "feeds",
+          "version": "2.0.0",
+          "period": "2025-12",
+          "valuation_date": "2025-12-31",
+          "source": "HMRC monthly exchange rates",
+          "from_rate": 1.3126,
+          "to_rate": 1.0
+        }
+      },
+      "rests_on_grade": 3,
+      "borrowed_frequency": {
+        "party": "feeds",
+        "kind": "feed",
+        "name": "threat-register",
+        "version": "4"
+      },
+      "read_only_observer": {
+        "adopter_ref": "4f81da7eca50ae9adadcb905813cf06f17a5d9a1",
+        "detail": "ok  twin/forward-intel/v1/feed.json is byte-identical to a fresh render of the overlay",
+        "emitter_exit": 0,
+        "feed": "forward-intel",
+        "hub_ref": "5bc47331a536476f3580542be794908f5053f816",
+        "moved": false,
+        "org": "ludlow",
+        "run": "local-source-rehearsal",
+        "status": "unchanged",
+        "swept_at": "2026-10-04T09:36:10Z",
+        "twin_pin": {
+          "hub_commit": "5bc47331a536476f3580542be794908f5053f816",
+          "tag_cut": false,
+          "twin_tag": "twin/v0.1.0",
+          "twin_version": "0.1.0"
+        }
+      },
+      "immutable_driftwood_v1_preserved": true
+    }
+  },
+  "Ludlow_generic_HEAD974_with_real_FX2_objects_byte_replay": true,
+  "clean_hub_tracked_tree_unchanged": true
+}

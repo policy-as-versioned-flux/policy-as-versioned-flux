@@ -1,0 +1,10 @@
+{
+  "primary_ref": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "primary_clock_run": 377,
+  "raw_FAIL_captures_retained": 25,
+  "all_original_sha256s_equal": true,
+  "primary_table_sha256": "6d5cc2fab865644049cf2c6a5059c9be7f05a9f581cc2979261d09297dec65bf",
+  "no_primary_edits_or_regrade": true,
+  "acknowledgement_current_format_helper": true,
+  "source_bindings_are_local_until_actual_merge_receipts": true
+}

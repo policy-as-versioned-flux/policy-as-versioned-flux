@@ -1,0 +1,80 @@
+{
+  "base": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "branch": "delivery-stage2-composed-B-20261004",
+  "checks": {
+    "gate": {
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow/.github/scripts/adopter_gate.py",
+        "--platform-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/platform",
+        "--ludlow-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+        "--old-ref",
+        "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+        "--new-ref",
+        "b84006a176e6c783bbb45fc2463c46be6ba73071",
+        "--composed-base-ref",
+        "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+        "--composed-head-ref",
+        "b84006a176e6c783bbb45fc2463c46be6ba73071",
+        "--identity-regexp",
+        "^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+        "--issuer",
+        "https://token.actions.githubusercontent.com",
+        "--out-comment",
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-final-composed-B-gate.md"
+      ],
+      "composed": "none",
+      "composed_evidence_independently_byte_equal": true,
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "declared": "none",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-final-composed-B-gate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "markdown_sha256": "420a7b6f5f577590bea7f2fa4bc57805dbae7f13023361d88a990b3461fd1dbc",
+      "same_pin_early_return": true
+    },
+    "postcommit_real_estate_public_tests": {
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-final-composed-B-postcommit_real_estate_public_tests.log",
+      "log_sha256": "8a988fc0ecd21b4850d15395dfb43543c4008c64c6bf358f7262e92a9cf9187d",
+      "skips": 0,
+      "test_count": 37
+    },
+    "reach": {
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow/scripts/render_composed.py",
+        "reach",
+        "--ref",
+        "v4.0.1"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-final-composed-B-reach.log",
+      "log_sha256": "6f3c2637b29fb47c1c5c8ba0c1e02463bbedf5f3d6dc9aabb259e168c98350b3"
+    }
+  },
+  "head": "b84006a176e6c783bbb45fc2463c46be6ba73071",
+  "normal_SSH_signature": "G",
+  "remote_mutations": false,
+  "source_clean": true,
+  "source_still_clean": true,
+  "tree": "3cd9ee3f18b4cd5c189e747a540b143988aee073"
+}

@@ -1,0 +1,19 @@
+{
+  "runtime": {
+    "served-workloads": {
+      "exit": 3,
+      "no_hub_interpreter": false,
+      "output": "SKIP: driftwood has no served_apps.py; ticket 155's instrument has not reached this checkout\nSKIP: tuppence has no served_apps.py; ticket 155's instrument has not reached this checkout\nSKIP: ludlow has no served_apps.py; ticket 155's instrument has not reached this checkout"
+    },
+    "oscal-lane": {
+      "exit": 3,
+      "no_hub_interpreter": false,
+      "output": "SKIP: driftwood has no oscal_lane.py; ticket 155's instrument has not reached this checkout\nSKIP: tuppence has no oscal_lane.py; ticket 155's instrument has not reached this checkout\nSKIP: ludlow has no oscal_lane.py; ticket 155's instrument has not reached this checkout"
+    }
+  },
+  "missing_manifest_rows": [],
+  "genuine_CVE_PASS_output_counted_as_fail": 0,
+  "genuine_CVE_PASS_output_counted_as_pass": 1,
+  "manifest_explanation": [],
+  "live_or_scheduled_observation_claimed": false
+}

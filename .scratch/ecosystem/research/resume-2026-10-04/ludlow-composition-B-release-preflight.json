@@ -1,0 +1,90 @@
+{
+  "actual_main_matches_fresh_reviewed_B": true,
+  "dispatch_executed": false,
+  "head": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "normal_future_commands_after_actual_explicit_approval": [
+    [
+      "gh",
+      "workflow",
+      "run",
+      "cut-release.yml",
+      "--repo",
+      "policy-as-versioned-ludlow/ludlow",
+      "--ref",
+      "main",
+      "-f",
+      "version=v4.0.1",
+      "-f",
+      "message=Fresh Composition B serves authentic v4.0.0 apps and policy 5/6/7; policy bump none; engine 1.18.2 and cloud inactive."
+    ],
+    [
+      "gh",
+      "workflow",
+      "run",
+      "release.yml",
+      "--repo",
+      "policy-as-versioned-ludlow/ludlow",
+      "--ref",
+      "v4.0.1",
+      "-f",
+      "tag=v4.0.1"
+    ]
+  ],
+  "read_at": "2026-10-04T12:11:54.649202+00:00",
+  "read_only": true,
+  "reads": {
+    "main": {
+      "argv": [
+        "gh",
+        "api",
+        "repos/policy-as-versioned-ludlow/ludlow/git/ref/heads/main"
+      ],
+      "exit": 0,
+      "response": {
+        "node_id": "REF_kwDOT-3Ona9yZWZzL2hlYWRzL21haW4",
+        "object": {
+          "sha": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+          "type": "commit",
+          "url": "https://api.github.com/repos/policy-as-versioned-ludlow/ludlow/git/commits/3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289"
+        },
+        "ref": "refs/heads/main",
+        "url": "https://api.github.com/repos/policy-as-versioned-ludlow/ludlow/git/refs/heads/main"
+      },
+      "stderr": ""
+    },
+    "release": {
+      "argv": [
+        "gh",
+        "api",
+        "repos/policy-as-versioned-ludlow/ludlow/releases/tags/v4.0.1"
+      ],
+      "exit": 1,
+      "response": {
+        "documentation_url": "https://docs.github.com/rest/releases/releases#get-a-release-by-tag-name",
+        "message": "Not Found",
+        "status": "404"
+      },
+      "stderr": "gh: Not Found (HTTP 404)"
+    },
+    "tag": {
+      "argv": [
+        "gh",
+        "api",
+        "repos/policy-as-versioned-ludlow/ludlow/git/ref/tags/v4.0.1"
+      ],
+      "exit": 1,
+      "response": {
+        "documentation_url": "https://docs.github.com/rest/git/refs#get-a-reference",
+        "message": "Not Found",
+        "status": "404"
+      },
+      "stderr": "gh: Not Found (HTTP 404)"
+    }
+  },
+  "tag": "v4.0.1",
+  "tag_and_release_namespace_unused_at_read": true,
+  "workflows": {
+    ".github/workflows/cut-release.yml": "b70f0a84d2d516d4bfc5835def599e850e215a6a17f5cb00b1c5e7bdd9886a6e",
+    ".github/workflows/release.yml": "dcc5cc6c1416017043dc83635ffc19bfb5ed8f692d87a4b290301d6fca5812bc"
+  }
+}

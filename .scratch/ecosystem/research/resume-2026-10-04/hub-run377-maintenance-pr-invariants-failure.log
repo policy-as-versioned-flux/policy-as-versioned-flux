@@ -1,0 +1,722 @@
+﻿2026-10-04T15:07:41.8594477Z Current runner version: '2.337.0'
+2026-10-04T15:07:41.8620298Z ##[group]Runner Image Provisioner
+2026-10-04T15:07:41.8621122Z Hosted Compute Agent
+2026-10-04T15:07:41.8621766Z Version: 20260901.588
+2026-10-04T15:07:41.8622448Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-04T15:07:41.8623175Z Build Date: 2026-09-01T19:56:44Z
+2026-10-04T15:07:41.8623974Z Worker ID: {6ff91eb5-afc3-4311-8962-5f32814c13eb}
+2026-10-04T15:07:41.8624685Z Azure Region: eastus2
+2026-10-04T15:07:41.8625303Z ##[endgroup]
+2026-10-04T15:07:41.8626999Z ##[group]Operating System
+2026-10-04T15:07:41.8627741Z Ubuntu
+2026-10-04T15:07:41.8628276Z 24.04.5
+2026-10-04T15:07:41.8628773Z LTS
+2026-10-04T15:07:41.8629391Z ##[endgroup]
+2026-10-04T15:07:41.8629971Z ##[group]Runner Image
+2026-10-04T15:07:41.8630647Z Image: ubuntu-24.04
+2026-10-04T15:07:41.8631226Z Version: 20260927.320.1
+2026-10-04T15:07:41.8632538Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-04T15:07:41.8634130Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+2026-10-04T15:07:41.8635176Z ##[endgroup]
+2026-10-04T15:07:41.8636251Z ##[group]GITHUB_TOKEN Permissions
+2026-10-04T15:07:41.8638575Z Contents: read
+2026-10-04T15:07:41.8639233Z Metadata: read
+2026-10-04T15:07:41.8639784Z ##[endgroup]
+2026-10-04T15:07:41.8641854Z Secret source: Actions
+2026-10-04T15:07:41.8642887Z Cache mode: write
+2026-10-04T15:07:41.8643594Z Prepare workflow directory
+2026-10-04T15:07:41.8972908Z Prepare all required actions
+2026-10-04T15:07:41.9020895Z Getting action download info
+2026-10-04T15:07:42.0832653Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-04T15:07:42.2053410Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-04T15:07:42.4105734Z Complete job name: invariants
+2026-10-04T15:07:42.4885160Z ##[group]Run actions/checkout@v4
+2026-10-04T15:07:42.4886072Z with:
+2026-10-04T15:07:42.4886504Z   fetch-depth: 0
+2026-10-04T15:07:42.4887261Z   persist-credentials: false
+2026-10-04T15:07:42.4887945Z   repository: policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:42.4891835Z   token: ***
+2026-10-04T15:07:42.4892279Z   ssh-strict: true
+2026-10-04T15:07:42.4892717Z   ssh-user: git
+2026-10-04T15:07:42.4893140Z   clean: true
+2026-10-04T15:07:42.4893587Z   sparse-checkout-cone-mode: true
+2026-10-04T15:07:42.4894113Z   fetch-tags: false
+2026-10-04T15:07:42.4894557Z   show-progress: true
+2026-10-04T15:07:42.4895011Z   lfs: false
+2026-10-04T15:07:42.4895423Z   submodules: false
+2026-10-04T15:07:42.4895884Z   set-safe-directory: true
+2026-10-04T15:07:42.4896391Z   allow-unsafe-pr-checkout: false
+2026-10-04T15:07:42.4897408Z ##[endgroup]
+2026-10-04T15:07:42.5897160Z Syncing repository: policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:42.5899702Z ##[group]Getting Git version info
+2026-10-04T15:07:42.5900807Z Working directory is '/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux'
+2026-10-04T15:07:42.5902382Z [command]/usr/bin/git version
+2026-10-04T15:07:42.5983184Z git version 2.55.0
+2026-10-04T15:07:42.6005824Z ##[endgroup]
+2026-10-04T15:07:42.6021326Z Temporarily overriding HOME='/home/runner/work/_temp/477a2434-203e-413e-b756-840cb9edc327' before making global git config changes
+2026-10-04T15:07:42.6023697Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-04T15:07:42.6026571Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:42.6077952Z Deleting the contents of '/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux'
+2026-10-04T15:07:42.6087423Z ##[group]Initializing the repository
+2026-10-04T15:07:42.6088947Z [command]/usr/bin/git init /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:42.6201955Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-04T15:07:42.6204334Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-04T15:07:42.6206463Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-04T15:07:42.6208259Z hint: call:
+2026-10-04T15:07:42.6209237Z hint:
+2026-10-04T15:07:42.6210346Z hint: 	git config --global init.defaultBranch <name>
+2026-10-04T15:07:42.6211631Z hint:
+2026-10-04T15:07:42.6212880Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-04T15:07:42.6214685Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-04T15:07:42.6216191Z hint:
+2026-10-04T15:07:42.6217292Z hint: 	git branch -m <name>
+2026-10-04T15:07:42.6218372Z hint:
+2026-10-04T15:07:42.6219661Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-04T15:07:42.6221938Z Initialized empty Git repository in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.git/
+2026-10-04T15:07:42.6226219Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:42.6264313Z ##[endgroup]
+2026-10-04T15:07:42.6265659Z ##[group]Disabling automatic garbage collection
+2026-10-04T15:07:42.6269360Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-04T15:07:42.6311436Z ##[endgroup]
+2026-10-04T15:07:42.6312791Z ##[group]Setting up auth
+2026-10-04T15:07:42.6319225Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-04T15:07:42.6360099Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-04T15:07:42.6722884Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-04T15:07:42.6763954Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-04T15:07:42.6997477Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-04T15:07:42.7034942Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-04T15:07:42.7261095Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-04T15:07:42.7302272Z ##[endgroup]
+2026-10-04T15:07:42.7303715Z ##[group]Fetching the repository
+2026-10-04T15:07:42.7314704Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +55d6fee61ff75f94193d05eedd0782dc3a553b2c:refs/remotes/pull/155/merge
+2026-10-04T15:07:48.2025501Z From https://github.com/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:07:48.2037706Z  * [new branch]      chart-125-seam1-signature-flake          -> origin/chart-125-seam1-signature-flake
+2026-10-04T15:07:48.2040337Z  * [new branch]      chart-127-128-129                        -> origin/chart-127-128-129
+2026-10-04T15:07:48.2042524Z  * [new branch]      chart-130-root-machinery                 -> origin/chart-130-root-machinery
+2026-10-04T15:07:48.2044573Z  * [new branch]      chart-131-132-133                        -> origin/chart-131-132-133
+2026-10-04T15:07:48.2047015Z  * [new branch]      chart-134-identity-lane                  -> origin/chart-134-identity-lane
+2026-10-04T15:07:48.2049021Z  * [new branch]      chart-135-136                            -> origin/chart-135-136
+2026-10-04T15:07:48.2051050Z  * [new branch]      chart-138-as-of                          -> origin/chart-138-as-of
+2026-10-04T15:07:48.2054280Z  * [new branch]      chart-2026-09-05-a-branch-run-records-nothing -> origin/chart-2026-09-05-a-branch-run-records-nothing
+2026-10-04T15:07:48.2057923Z  * [new branch]      chart-2026-09-05-refusal-by-another-name -> origin/chart-2026-09-05-refusal-by-another-name
+2026-10-04T15:07:48.2061883Z  * [new branch]      chart-2026-09-05-the-adopter-gate-grades-the-change -> origin/chart-2026-09-05-the-adopter-gate-grades-the-change
+2026-10-04T15:07:48.2065747Z  * [new branch]      chart-2026-09-10-the-map-line-and-the-moving-count -> origin/chart-2026-09-10-the-map-line-and-the-moving-count
+2026-10-04T15:07:48.2069909Z  * [new branch]      chart-2026-09-21-the-cage-names-what-it-does-not-deliver -> origin/chart-2026-09-21-the-cage-names-what-it-does-not-deliver
+2026-10-04T15:07:48.2073364Z  * [new branch]      ci-2026-09-04-the-hub-tests-itself       -> origin/ci-2026-09-04-the-hub-tests-itself
+2026-10-04T15:07:48.2075989Z  * [new branch]      close-111-86-chart-140                   -> origin/close-111-86-chart-140
+2026-10-04T15:07:48.2078728Z  * [new branch]      close-113-phase-b                        -> origin/close-113-phase-b
+2026-10-04T15:07:48.2080920Z  * [new branch]      close-133-134-137                        -> origin/close-133-134-137
+2026-10-04T15:07:48.2082998Z  * [new branch]      close-140                                -> origin/close-140
+2026-10-04T15:07:48.2085353Z  * [new branch]      cs-06-cross-party-composition            -> origin/cs-06-cross-party-composition
+2026-10-04T15:07:48.2088496Z  * [new branch]      fix-2026-09-05-refresh-keeps-work        -> origin/fix-2026-09-05-refresh-keeps-work
+2026-10-04T15:07:48.2091222Z  * [new branch]      fix-2026-09-05-tickets-96-97-crossref    -> origin/fix-2026-09-05-tickets-96-97-crossref
+2026-10-04T15:07:48.2094006Z  * [new branch]      fix-2026-09-06-served-only-comment       -> origin/fix-2026-09-06-served-only-comment
+2026-10-04T15:07:48.2097769Z  * [new branch]      fix-local-gates-drop-github-markers      -> origin/fix-local-gates-drop-github-markers
+2026-10-04T15:07:48.2100838Z  * [new branch]      fix-phase-b-stale-records                -> origin/fix-phase-b-stale-records
+2026-10-04T15:07:48.2103230Z  * [new branch]      fix-verify-before-tag-test               -> origin/fix-verify-before-tag-test
+2026-10-04T15:07:48.2105606Z  * [new branch]      implement-2026-09-10-next                -> origin/implement-2026-09-10-next
+2026-10-04T15:07:48.2108138Z  * [new branch]      implement-2026-09-10-remaining           -> origin/implement-2026-09-10-remaining
+2026-10-04T15:07:48.2110616Z  * [new branch]      implement-2026-09-10-rollout             -> origin/implement-2026-09-10-rollout
+2026-10-04T15:07:48.2113184Z  * [new branch]      implement-observation-reader-20260910    -> origin/implement-observation-reader-20260910
+2026-10-04T15:07:48.2116158Z  * [new branch]      implement-release-clock-record-20260910  -> origin/implement-release-clock-record-20260910
+2026-10-04T15:07:48.2118855Z  * [new branch]      main                                     -> origin/main
+2026-10-04T15:07:48.2120954Z  * [new branch]      record-2026-09-04-the-62-77-landing      -> origin/record-2026-09-04-the-62-77-landing
+2026-10-04T15:07:48.2123728Z  * [new branch]      record-2026-09-04-the-app-and-workflows  -> origin/record-2026-09-04-the-app-and-workflows
+2026-10-04T15:07:48.2126390Z  * [new branch]      record-2026-09-06-stale-blockers         -> origin/record-2026-09-06-stale-blockers
+2026-10-04T15:07:48.2129667Z  * [new branch]      record-2026-09-09-a-cancelled-branch-run -> origin/record-2026-09-09-a-cancelled-branch-run
+2026-10-04T15:07:48.2132292Z  * [new branch]      record-2026-09-09-run-197-fall           -> origin/record-2026-09-09-run-197-fall
+2026-10-04T15:07:48.2135313Z  * [new branch]      record-2026-09-10-the-cuts-and-what-they-cost -> origin/record-2026-09-10-the-cuts-and-what-they-cost
+2026-10-04T15:07:48.2138660Z  * [new branch]      record-2026-09-10-ticket-107-the-lane-answered -> origin/record-2026-09-10-ticket-107-the-lane-answered
+2026-10-04T15:07:48.2141321Z  * [new branch]      record-fixes-2026-09-23                  -> origin/record-fixes-2026-09-23
+2026-10-04T15:07:48.2143665Z  * [new branch]      record-run-277-supersede-echo            -> origin/record-run-277-supersede-echo
+2026-10-04T15:07:48.2146951Z  * [new branch]      record-run-290-priced-holes              -> origin/record-run-290-priced-holes
+2026-10-04T15:07:48.2149107Z  * [new branch]      record-run-339                           -> origin/record-run-339
+2026-10-04T15:07:48.2151246Z  * [new branch]      redo-rescue-as-cherry-picks              -> origin/redo-rescue-as-cherry-picks
+2026-10-04T15:07:48.2153773Z  * [new branch]      repair-2026-09-04-gate-regressions       -> origin/repair-2026-09-04-gate-regressions
+2026-10-04T15:07:48.2156532Z  * [new branch]      repair/run377-hub-verifiers-20261004     -> origin/repair/run377-hub-verifiers-20261004
+2026-10-04T15:07:48.2159091Z  * [new branch]      rescue-run-101                           -> origin/rescue-run-101
+2026-10-04T15:07:48.2161018Z  * [new branch]      rescue-runs-76-84-88                     -> origin/rescue-runs-76-84-88
+2026-10-04T15:07:48.2162395Z  * [new branch]      resume/2026-10-04-claude-handoff         -> origin/resume/2026-10-04-claude-handoff
+2026-10-04T15:07:48.2164022Z  * [new branch]      resume/2026-10-04-valuation-date         -> origin/resume/2026-10-04-valuation-date
+2026-10-04T15:07:48.2166031Z  * [new branch]      ticket-100-a-branch-run-says-what-it-can-record -> origin/ticket-100-a-branch-run-says-what-it-can-record
+2026-10-04T15:07:48.2168171Z  * [new branch]      ticket-101-the-gates-verify-a-real-signature -> origin/ticket-101-the-gates-verify-a-real-signature
+2026-10-04T15:07:48.2170025Z  * [new branch]      ticket-102-the-cited-tree-names-who-added-the-check -> origin/ticket-102-the-cited-tree-names-who-added-the-check
+2026-10-04T15:07:48.2172031Z  * [new branch]      ticket-103-release-gate-computes-the-bump -> origin/ticket-103-release-gate-computes-the-bump
+2026-10-04T15:07:48.2173548Z  * [new branch]      ticket-105-pinned-trust-roots            -> origin/ticket-105-pinned-trust-roots
+2026-10-04T15:07:48.2175503Z  * [new branch]      ticket-106-composition-selfcheck-fixture-namespace -> origin/ticket-106-composition-selfcheck-fixture-namespace
+2026-10-04T15:07:48.2177743Z  * [new branch]      ticket-107-the-sampler-waits-for-what-exists -> origin/ticket-107-the-sampler-waits-for-what-exists
+2026-10-04T15:07:48.2179341Z  * [new branch]      ticket-108-the-recording-commit          -> origin/ticket-108-the-recording-commit
+2026-10-04T15:07:48.2180709Z  * [new branch]      ticket-110-rollout-measured              -> origin/ticket-110-rollout-measured
+2026-10-04T15:07:48.2182183Z  * [new branch]      ticket-111-the-cage-delivers-its-classes -> origin/ticket-111-the-cage-delivers-its-classes
+2026-10-04T15:07:48.2183769Z  * [new branch]      ticket-112-threshold-states-corpus       -> origin/ticket-112-threshold-states-corpus
+2026-10-04T15:07:48.2185316Z  * [new branch]      ticket-113-infra-is-a-role-not-a-rung    -> origin/ticket-113-infra-is-a-role-not-a-rung
+2026-10-04T15:07:48.2187070Z  * [new branch]      ticket-113-release-gate-one-line         -> origin/ticket-113-release-gate-one-line
+2026-10-04T15:07:48.2188645Z  * [new branch]      ticket-114-unobserved-party-not-green    -> origin/ticket-114-unobserved-party-not-green
+2026-10-04T15:07:48.2190175Z  * [new branch]      ticket-115-loophole-procedure            -> origin/ticket-115-loophole-procedure
+2026-10-04T15:07:48.2192212Z  * [new branch]      ticket-116-twelve-loophole-candidates    -> origin/ticket-116-twelve-loophole-candidates
+2026-10-04T15:07:48.2194291Z  * [new branch]      ticket-117-two-tickets-share-the-number-111 -> origin/ticket-117-two-tickets-share-the-number-111
+2026-10-04T15:07:48.2196251Z  * [new branch]      ticket-118-luck-may-not-promote          -> origin/ticket-118-luck-may-not-promote
+2026-10-04T15:07:48.2198471Z  * [new branch]      ticket-119-unlabelled-namespace-is-priced -> origin/ticket-119-unlabelled-namespace-is-priced
+2026-10-04T15:07:48.2200444Z  * [new branch]      ticket-120-adr-0026-candidates           -> origin/ticket-120-adr-0026-candidates
+2026-10-04T15:07:48.2202555Z  * [new branch]      ticket-121-implementing-a-control-moves-the-price -> origin/ticket-121-implementing-a-control-moves-the-price
+2026-10-04T15:07:48.2204893Z  * [new branch]      ticket-122-ramp-survives-rename          -> origin/ticket-122-ramp-survives-rename
+2026-10-04T15:07:48.2206836Z  * [new branch]      ticket-123-a-withdrawal-is-the-regulators -> origin/ticket-123-a-withdrawal-is-the-regulators
+2026-10-04T15:07:48.2208836Z  * [new branch]      ticket-124-price-the-removal             -> origin/ticket-124-price-the-removal
+2026-10-04T15:07:48.2210388Z  * [new branch]      ticket-125-signature-leak                -> origin/ticket-125-signature-leak
+2026-10-04T15:07:48.2212372Z  * [new branch]      ticket-126-a-withdrawn-control-is-not-selectable -> origin/ticket-126-a-withdrawn-control-is-not-selectable
+2026-10-04T15:07:48.2214624Z  * [new branch]      ticket-127-pound-seam-switching-price    -> origin/ticket-127-pound-seam-switching-price
+2026-10-04T15:07:48.2216797Z  * [new branch]      ticket-128-behind-a-major-unreadable     -> origin/ticket-128-behind-a-major-unreadable
+2026-10-04T15:07:48.2218748Z  * [new branch]      ticket-129-major-acceptance-record       -> origin/ticket-129-major-acceptance-record
+2026-10-04T15:07:48.2220928Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+2026-10-04T15:07:48.2223035Z  * [new branch]      ticket-130-the-composed-set-moves        -> origin/ticket-130-the-composed-set-moves
+2026-10-04T15:07:48.2224876Z  * [new branch]      ticket-131-sibling-cut-release           -> origin/ticket-131-sibling-cut-release
+2026-10-04T15:07:48.2227218Z  * [new branch]      ticket-132-adopter-gate-reads-acceptance -> origin/ticket-132-adopter-gate-reads-acceptance
+2026-10-04T15:07:48.2229484Z  * [new branch]      ticket-134-clock-observation-comparison  -> origin/ticket-134-clock-observation-comparison
+2026-10-04T15:07:48.2231766Z  * [new branch]      ticket-135-lifted-app-verdict            -> origin/ticket-135-lifted-app-verdict
+2026-10-04T15:07:48.2233711Z  * [new branch]      ticket-136-selfcheck-driftwood           -> origin/ticket-136-selfcheck-driftwood
+2026-10-04T15:07:48.2235758Z  * [new branch]      ticket-137-parent-tree-per-feed-edge     -> origin/ticket-137-parent-tree-per-feed-edge
+2026-10-04T15:07:48.2237875Z  * [new branch]      ticket-138-grader-as-of                  -> origin/ticket-138-grader-as-of
+2026-10-04T15:07:48.2239767Z  * [new branch]      ticket-139-ungoverned-namespace-born     -> origin/ticket-139-ungoverned-namespace-born
+2026-10-04T15:07:48.2241825Z  * [new branch]      ticket-140-fact4-defaulted-false         -> origin/ticket-140-fact4-defaulted-false
+2026-10-04T15:07:48.2243957Z  * [new branch]      ticket-141-declared-pricing-threshold    -> origin/ticket-141-declared-pricing-threshold
+2026-10-04T15:07:48.2246265Z  * [new branch]      ticket-142a-schedule-blind-spots-and-clock-cage -> origin/ticket-142a-schedule-blind-spots-and-clock-cage
+2026-10-04T15:07:48.2248678Z  * [new branch]      ticket-143a-twin-sweep-split             -> origin/ticket-143a-twin-sweep-split
+2026-10-04T15:07:48.2250411Z  * [new branch]      ticket-145-agent-cage-price              -> origin/ticket-145-agent-cage-price
+2026-10-04T15:07:48.2252191Z  * [new branch]      ticket-146-engine-cells                  -> origin/ticket-146-engine-cells
+2026-10-04T15:07:48.2253772Z  * [new branch]      ticket-146-resolved                      -> origin/ticket-146-resolved
+2026-10-04T15:07:48.2255183Z  * [new branch]      ticket-146-tags-read-only                -> origin/ticket-146-tags-read-only
+2026-10-04T15:07:48.2256943Z  * [new branch]      ticket-147-declared-engine               -> origin/ticket-147-declared-engine
+2026-10-04T15:07:48.2258489Z  * [new branch]      ticket-148-unsupported-pairing           -> origin/ticket-148-unsupported-pairing
+2026-10-04T15:07:48.2260091Z  * [new branch]      ticket-152-grill                         -> origin/ticket-152-grill
+2026-10-04T15:07:48.2261423Z  * [new branch]      ticket-161-engine-pin                    -> origin/ticket-161-engine-pin
+2026-10-04T15:07:48.2263062Z  * [new branch]      ticket-161-reference-workload            -> origin/ticket-161-reference-workload
+2026-10-04T15:07:48.2264964Z  * [new branch]      ticket-17-twin-follow-ups-from-the-aug-05-itemisation -> origin/ticket-17-twin-follow-ups-from-the-aug-05-itemisation
+2026-10-04T15:07:48.2266917Z  * [new branch]      ticket-30-grill                          -> origin/ticket-30-grill
+2026-10-04T15:07:48.2268386Z  * [new branch]      ticket-31-sensor-admission               -> origin/ticket-31-sensor-admission
+2026-10-04T15:07:48.2270092Z  * [new branch]      ticket-33-lift-ledger-storefront-and-reports -> origin/ticket-33-lift-ledger-storefront-and-reports
+2026-10-04T15:07:48.2271803Z  * [new branch]      ticket-34-followup-2026-09-08            -> origin/ticket-34-followup-2026-09-08
+2026-10-04T15:07:48.2273490Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+2026-10-04T15:07:48.2275087Z  * [new branch]      ticket-35-grill                          -> origin/ticket-35-grill
+2026-10-04T15:07:48.2276376Z  * [new branch]      ticket-35-review-fixes                   -> origin/ticket-35-review-fixes
+2026-10-04T15:07:48.2278117Z  * [new branch]      ticket-38-priced-holes-in-composition    -> origin/ticket-38-priced-holes-in-composition
+2026-10-04T15:07:48.2279840Z  * [new branch]      ticket-39-supersede-adr-0013-0017-0018   -> origin/ticket-39-supersede-adr-0013-0017-0018
+2026-10-04T15:07:48.2282085Z  * [new branch]      ticket-44-eco-system-misuse-catalogue-graded-by-the-gate -> origin/ticket-44-eco-system-misuse-catalogue-graded-by-the-gate
+2026-10-04T15:07:48.2284322Z  * [new branch]      ticket-45-switching-cost-computed-in-composition -> origin/ticket-45-switching-cost-computed-in-composition
+2026-10-04T15:07:48.2286454Z  * [new branch]      ticket-48-the-demos-remaining-beats      -> origin/ticket-48-the-demos-remaining-beats
+2026-10-04T15:07:48.2288535Z  * [new branch]      ticket-51-the-supply-constraint-actor-path -> origin/ticket-51-the-supply-constraint-actor-path
+2026-10-04T15:07:48.2290607Z  * [new branch]      ticket-53-the-release-pushes-tags-but-not-the-branch -> origin/ticket-53-the-release-pushes-tags-but-not-the-branch
+2026-10-04T15:07:48.2293049Z  * [new branch]      ticket-55-every-red-on-the-clock-is-real-explained-and-finishable -> origin/ticket-55-every-red-on-the-clock-is-real-explained-and-finishable
+2026-10-04T15:07:48.2295214Z  * [new branch]      ticket-56-and-85-the-clocks-are-graded   -> origin/ticket-56-and-85-the-clocks-are-graded
+2026-10-04T15:07:48.2297517Z  * [new branch]      ticket-57-feeds-and-insurer-become-runnable-workflows-registered -> origin/ticket-57-feeds-and-insurer-become-runnable-workflows-registered
+2026-10-04T15:07:48.2299824Z  * [new branch]      ticket-59-a-fall-blocks-and-status-is-derived -> origin/ticket-59-a-fall-blocks-and-status-is-derived
+2026-10-04T15:07:48.2301725Z  * [new branch]      ticket-62-and-77-pins-are-checked-for-content -> origin/ticket-62-and-77-pins-are-checked-for-content
+2026-10-04T15:07:48.2303742Z  * [new branch]      ticket-63-the-unlabelled-default-flips-to-isolated -> origin/ticket-63-the-unlabelled-default-flips-to-isolated
+2026-10-04T15:07:48.2305662Z  * [new branch]      ticket-64-the-twin-is-three-adopters     -> origin/ticket-64-the-twin-is-three-adopters
+2026-10-04T15:07:48.2307839Z  * [new branch]      ticket-65-enact-guard-closes-the-git-dir-family -> origin/ticket-65-enact-guard-closes-the-git-dir-family
+2026-10-04T15:07:48.2310389Z  * [new branch]      ticket-66-the-deck-check-grades-the-run-its-own-truth-line-names -> origin/ticket-66-the-deck-check-grades-the-run-its-own-truth-line-names
+2026-10-04T15:07:48.2312574Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+2026-10-04T15:07:48.2314358Z  * [new branch]      ticket-69-an-untagged-pin-is-a-priced-hole -> origin/ticket-69-an-untagged-pin-is-a-priced-hole
+2026-10-04T15:07:48.2316615Z  * [new branch]      ticket-70-the-observation-lane-is-detectively-enforced-and-honest -> origin/ticket-70-the-observation-lane-is-detectively-enforced-and-honest
+2026-10-04T15:07:48.2388283Z  * [new branch]      ticket-71-grill                          -> origin/ticket-71-grill
+2026-10-04T15:07:48.2390680Z  * [new branch]      ticket-71-upstream-status                -> origin/ticket-71-upstream-status
+2026-10-04T15:07:48.2394142Z  * [new branch]      ticket-72-a-feed-bump-re-renders-the-twin-s-derived-artefacts -> origin/ticket-72-a-feed-bump-re-renders-the-twin-s-derived-artefacts
+2026-10-04T15:07:48.2398125Z  * [new branch]      ticket-73-verifier-trust-instant         -> origin/ticket-73-verifier-trust-instant
+2026-10-04T15:07:48.2401259Z  * [new branch]      ticket-76-every-green-rests-on-an-observation -> origin/ticket-76-every-green-rests-on-an-observation
+2026-10-04T15:07:48.2404612Z  * [new branch]      ticket-78-the-proposer-can-only-tighten  -> origin/ticket-78-the-proposer-can-only-tighten
+2026-10-04T15:07:48.2406412Z  * [new branch]      ticket-79-the-pound-inputs               -> origin/ticket-79-the-pound-inputs
+2026-10-04T15:07:48.2408124Z  * [new branch]      ticket-80-follow-up                      -> origin/ticket-80-follow-up
+2026-10-04T15:07:48.2409595Z  * [new branch]      ticket-80-the-record-matches-the-code    -> origin/ticket-80-the-record-matches-the-code
+2026-10-04T15:07:48.2411177Z  * [new branch]      ticket-81-record-round-3-landed          -> origin/ticket-81-record-round-3-landed
+2026-10-04T15:07:48.2412957Z  * [new branch]      ticket-81-round-3-of-the-sampler-wait-order-lands -> origin/ticket-81-round-3-of-the-sampler-wait-order-lands
+2026-10-04T15:07:48.2414935Z  * [new branch]      ticket-82-licence-attribution-and-disclaimers -> origin/ticket-82-licence-attribution-and-disclaimers
+2026-10-04T15:07:48.2417306Z  * [new branch]      ticket-83-the-truth-line-says-what-it-measured -> origin/ticket-83-the-truth-line-says-what-it-measured
+2026-10-04T15:07:48.2419171Z  * [new branch]      ticket-84-being-behind-costs-something   -> origin/ticket-84-being-behind-costs-something
+2026-10-04T15:07:48.2420975Z  * [new branch]      ticket-86-the-cage-enters-the-citable-number -> origin/ticket-86-the-cage-enters-the-citable-number
+2026-10-04T15:07:48.2422773Z  * [new branch]      ticket-87-the-forge-enforces-the-review  -> origin/ticket-87-the-forge-enforces-the-review
+2026-10-04T15:07:48.2424345Z  * [new branch]      ticket-89-deny-is-not-a-rung             -> origin/ticket-89-deny-is-not-a-rung
+2026-10-04T15:07:48.2425956Z  * [new branch]      ticket-91-the-currency-controller-is-owned -> origin/ticket-91-the-currency-controller-is-owned
+2026-10-04T15:07:48.2428020Z  * [new branch]      ticket-92-follow-up-trailers-and-hooks   -> origin/ticket-92-follow-up-trailers-and-hooks
+2026-10-04T15:07:48.2429574Z  * [new branch]      ticket-92-the-local-clock                -> origin/ticket-92-the-local-clock
+2026-10-04T15:07:48.2431026Z  * [new branch]      ticket-92-the-local-clock-round-4        -> origin/ticket-92-the-local-clock-round-4
+2026-10-04T15:07:48.2432700Z  * [new branch]      ticket-92-tidy-trailer-space-and-102-answer -> origin/ticket-92-tidy-trailer-space-and-102-answer
+2026-10-04T15:07:48.2434466Z  * [new branch]      ticket-93-the-twin-derives-a-probability -> origin/ticket-93-the-twin-derives-a-probability
+2026-10-04T15:07:48.2436192Z  * [new branch]      ticket-96-the-citable-line-says-the-mode -> origin/ticket-96-the-citable-line-says-the-mode
+2026-10-04T15:07:48.2438259Z  * [new branch]      ticket-98-a-refusal-by-another-name-is-graded -> origin/ticket-98-a-refusal-by-another-name-is-graded
+2026-10-04T15:07:48.2440108Z  * [new branch]      ticket-99-the-adopter-gate-grades-the-change -> origin/ticket-99-the-adopter-gate-grades-the-change
+2026-10-04T15:07:48.2441717Z  * [new branch]      tidy-2026-09-08-tickets-33-45            -> origin/tidy-2026-09-08-tickets-33-45
+2026-10-04T15:07:48.2443173Z  * [new branch]      wayfinder-laya-loophole-20260921         -> origin/wayfinder-laya-loophole-20260921
+2026-10-04T15:07:48.2444697Z  * [new ref]         55d6fee61ff75f94193d05eedd0782dc3a553b2c -> pull/155/merge
+2026-10-04T15:07:48.2447002Z ##[endgroup]
+2026-10-04T15:07:48.2447843Z ##[group]Determining the checkout info
+2026-10-04T15:07:48.2448737Z ##[endgroup]
+2026-10-04T15:07:48.2449349Z [command]/usr/bin/git sparse-checkout disable
+2026-10-04T15:07:48.2450842Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-04T15:07:48.2452588Z ##[group]Checking out the ref
+2026-10-04T15:07:48.2453415Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/155/merge
+2026-10-04T15:07:49.6683159Z Updating files:  71% (2533/3554)
+2026-10-04T15:07:49.6703682Z Updating files:  72% (2559/3554)
+2026-10-04T15:07:49.8094735Z Updating files:  73% (2595/3554)
+2026-10-04T15:07:49.8393867Z Updating files:  74% (2630/3554)
+2026-10-04T15:07:50.0026927Z Updating files:  75% (2666/3554)
+2026-10-04T15:07:50.0133980Z Updating files:  76% (2702/3554)
+2026-10-04T15:07:50.0154894Z Updating files:  77% (2737/3554)
+2026-10-04T15:07:50.0179990Z Updating files:  78% (2773/3554)
+2026-10-04T15:07:50.0213462Z Updating files:  79% (2808/3554)
+2026-10-04T15:07:50.0260891Z Updating files:  80% (2844/3554)
+2026-10-04T15:07:50.0291166Z Updating files:  81% (2879/3554)
+2026-10-04T15:07:50.0326874Z Updating files:  82% (2915/3554)
+2026-10-04T15:07:50.0349222Z Updating files:  83% (2950/3554)
+2026-10-04T15:07:50.0374459Z Updating files:  84% (2986/3554)
+2026-10-04T15:07:50.0393987Z Updating files:  85% (3021/3554)
+2026-10-04T15:07:50.0416854Z Updating files:  86% (3057/3554)
+2026-10-04T15:07:50.0438704Z Updating files:  87% (3092/3554)
+2026-10-04T15:07:50.0481154Z Updating files:  88% (3128/3554)
+2026-10-04T15:07:50.0516405Z Updating files:  89% (3164/3554)
+2026-10-04T15:07:50.0553542Z Updating files:  90% (3199/3554)
+2026-10-04T15:07:50.0587688Z Updating files:  91% (3235/3554)
+2026-10-04T15:07:50.0625482Z Updating files:  92% (3270/3554)
+2026-10-04T15:07:50.0655765Z Updating files:  93% (3306/3554)
+2026-10-04T15:07:50.0711628Z Updating files:  94% (3341/3554)
+2026-10-04T15:07:50.0749638Z Updating files:  95% (3377/3554)
+2026-10-04T15:07:50.0793310Z Updating files:  96% (3412/3554)
+2026-10-04T15:07:50.0827628Z Updating files:  97% (3448/3554)
+2026-10-04T15:07:50.0874161Z Updating files:  98% (3483/3554)
+2026-10-04T15:07:50.0916846Z Updating files:  99% (3519/3554)
+2026-10-04T15:07:50.0917800Z Updating files: 100% (3554/3554)
+2026-10-04T15:07:50.0918442Z Updating files: 100% (3554/3554), done.
+2026-10-04T15:07:50.0960436Z Note: switching to 'refs/remotes/pull/155/merge'.
+2026-10-04T15:07:50.0960829Z 
+2026-10-04T15:07:50.0961080Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-04T15:07:50.0961663Z changes and commit them, and you can discard any commits you make in this
+2026-10-04T15:07:50.0962418Z state without impacting any branches by switching back to a branch.
+2026-10-04T15:07:50.0962925Z 
+2026-10-04T15:07:50.0963270Z If you want to create a new branch to retain commits you create, you may
+2026-10-04T15:07:50.0964069Z do so (now or later) by using -c with the switch command. Example:
+2026-10-04T15:07:50.0964527Z 
+2026-10-04T15:07:50.0964713Z   git switch -c <new-branch-name>
+2026-10-04T15:07:50.0965014Z 
+2026-10-04T15:07:50.0965191Z Or undo this operation with:
+2026-10-04T15:07:50.0965463Z 
+2026-10-04T15:07:50.0965615Z   git switch -
+2026-10-04T15:07:50.0965825Z 
+2026-10-04T15:07:50.0966190Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-04T15:07:50.0966962Z 
+2026-10-04T15:07:50.0967567Z HEAD is now at 55d6fee Merge 4c4b53c7163b0da7e11e9d0574057bcbc24e298d into 48324860b8b9f7dc4762e9c9f841206881a28705
+2026-10-04T15:07:50.1039320Z ##[endgroup]
+2026-10-04T15:07:50.1088905Z [command]/usr/bin/git log -1 --format=%H
+2026-10-04T15:07:50.1119138Z 55d6fee61ff75f94193d05eedd0782dc3a553b2c
+2026-10-04T15:07:50.1129308Z ##[group]Removing auth
+2026-10-04T15:07:50.1133062Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-04T15:07:50.1167369Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-04T15:07:50.1397632Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-04T15:07:50.1426997Z http.https://github.com/.extraheader
+2026-10-04T15:07:50.1435260Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-04T15:07:50.1476892Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-04T15:07:50.1703879Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-04T15:07:50.1767220Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-04T15:07:50.1986184Z ##[endgroup]
+2026-10-04T15:07:50.2242792Z ##[group]Run actions/setup-python@v5
+2026-10-04T15:07:50.2243116Z with:
+2026-10-04T15:07:50.2243325Z   python-version: 3.12
+2026-10-04T15:07:50.2243567Z   check-latest: false
+2026-10-04T15:07:50.2245873Z   token: ***
+2026-10-04T15:07:50.2246092Z   update-environment: true
+2026-10-04T15:07:50.2246338Z   allow-prereleases: false
+2026-10-04T15:07:50.2246578Z   freethreaded: false
+2026-10-04T15:07:50.2247252Z ##[endgroup]
+2026-10-04T15:07:50.3553400Z ##[group]Installed versions
+2026-10-04T15:07:50.3966587Z (node:2397) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-04T15:07:50.3968675Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-04T15:07:50.3969491Z Successfully set up CPython (3.12.14)
+2026-10-04T15:07:50.3970343Z ##[endgroup]
+2026-10-04T15:07:50.4160781Z ##[group]Run pip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'
+2026-10-04T15:07:50.4161676Z [36;1mpip install 'pyyaml==6.0.3' 'pytest==9.0.0' 'pytest-xdist==3.8.0' 'mypy==1.14.1' 'types-PyYAML==6.0.12.20250516'[0m
+2026-10-04T15:07:50.4500413Z shell: /usr/bin/bash -e {0}
+2026-10-04T15:07:50.4500712Z env:
+2026-10-04T15:07:50.4501009Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:50.4501495Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-04T15:07:50.4501957Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:50.4502362Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:50.4502775Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:50.4503209Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-04T15:07:50.4503556Z ##[endgroup]
+2026-10-04T15:07:53.1458049Z Collecting pyyaml==6.0.3
+2026-10-04T15:07:53.2098943Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-10-04T15:07:53.2404788Z Collecting pytest==9.0.0
+2026-10-04T15:07:53.2492090Z   Downloading pytest-9.0.0-py3-none-any.whl.metadata (7.6 kB)
+2026-10-04T15:07:53.2701702Z Collecting pytest-xdist==3.8.0
+2026-10-04T15:07:53.2778981Z   Downloading pytest_xdist-3.8.0-py3-none-any.whl.metadata (3.0 kB)
+2026-10-04T15:07:53.4087822Z Collecting mypy==1.14.1
+2026-10-04T15:07:53.4249879Z   Downloading mypy-1.14.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl.metadata (2.1 kB)
+2026-10-04T15:07:53.4443281Z Collecting types-PyYAML==6.0.12.20250516
+2026-10-04T15:07:53.4535617Z   Downloading types_pyyaml-6.0.12.20250516-py3-none-any.whl.metadata (1.8 kB)
+2026-10-04T15:07:53.4683131Z Collecting iniconfig>=1.0.1 (from pytest==9.0.0)
+2026-10-04T15:07:53.4758495Z   Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-04T15:07:53.4942238Z Collecting packaging>=22 (from pytest==9.0.0)
+2026-10-04T15:07:53.5028365Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-04T15:07:53.5180615Z Collecting pluggy<2,>=1.5 (from pytest==9.0.0)
+2026-10-04T15:07:53.5255280Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+2026-10-04T15:07:53.5466615Z Collecting pygments>=2.7.2 (from pytest==9.0.0)
+2026-10-04T15:07:53.5538227Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-04T15:07:53.5689583Z Collecting execnet>=2.1 (from pytest-xdist==3.8.0)
+2026-10-04T15:07:53.5767441Z   Downloading execnet-2.1.2-py3-none-any.whl.metadata (2.9 kB)
+2026-10-04T15:07:53.5976884Z Collecting typing_extensions>=4.6.0 (from mypy==1.14.1)
+2026-10-04T15:07:53.6054222Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+2026-10-04T15:07:53.6187485Z Collecting mypy_extensions>=1.0.0 (from mypy==1.14.1)
+2026-10-04T15:07:53.6258875Z   Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+2026-10-04T15:07:53.6383247Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-10-04T15:07:53.6711395Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 38.2 MB/s  0:00:00
+2026-10-04T15:07:53.6793942Z Downloading pytest-9.0.0-py3-none-any.whl (373 kB)
+2026-10-04T15:07:53.6940975Z Downloading pytest_xdist-3.8.0-py3-none-any.whl (46 kB)
+2026-10-04T15:07:53.7096082Z Downloading mypy-1.14.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl (12.9 MB)
+2026-10-04T15:07:53.8287403Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.9/12.9 MB 109.8 MB/s  0:00:00
+2026-10-04T15:07:53.8370846Z Downloading types_pyyaml-6.0.12.20250516-py3-none-any.whl (20 kB)
+2026-10-04T15:07:53.8469101Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+2026-10-04T15:07:53.8563834Z Downloading execnet-2.1.2-py3-none-any.whl (40 kB)
+2026-10-04T15:07:53.8654624Z Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+2026-10-04T15:07:53.8763701Z Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+2026-10-04T15:07:53.8853636Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-04T15:07:53.8946281Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-10-04T15:07:53.9014999Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 236.4 MB/s  0:00:00
+2026-10-04T15:07:53.9086805Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-10-04T15:07:54.0877892Z Installing collected packages: typing_extensions, types-PyYAML, pyyaml, pygments, pluggy, packaging, mypy_extensions, iniconfig, execnet, pytest, mypy, pytest-xdist
+2026-10-04T15:07:56.6544753Z 
+2026-10-04T15:07:56.6561252Z Successfully installed execnet-2.1.2 iniconfig-2.3.0 mypy-1.14.1 mypy_extensions-1.1.0 packaging-26.3 pluggy-1.6.0 pygments-2.21.0 pytest-9.0.0 pytest-xdist-3.8.0 pyyaml-6.0.3 types-PyYAML-6.0.12.20250516 typing_extensions-4.16.0
+2026-10-04T15:07:56.7103392Z ##[group]Run bash clone-estate.sh
+2026-10-04T15:07:56.7103748Z [36;1mbash clone-estate.sh[0m
+2026-10-04T15:07:56.7169725Z shell: /usr/bin/bash -e {0}
+2026-10-04T15:07:56.7169986Z env:
+2026-10-04T15:07:56.7170247Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:56.7170682Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-04T15:07:56.7171128Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:56.7171510Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:56.7171884Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:56.7172265Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-04T15:07:56.7172598Z ##[endgroup]
+2026-10-04T15:07:56.7310190Z ==> cloning policy-as-versioned-platform/platform
+2026-10-04T15:07:57.1910948Z ==> cloning policy-as-versioned-driftwood/driftwood
+2026-10-04T15:07:57.5574783Z ==> cloning policy-as-versioned-tuppence/tuppence
+2026-10-04T15:07:57.8648996Z ==> cloning policy-as-versioned-ludlow/ludlow
+2026-10-04T15:07:58.1419289Z ==> cloning policy-as-versioned-nist/nist
+2026-10-04T15:07:58.3737225Z ==> cloning policy-as-versioned-ico/ico
+2026-10-04T15:07:58.5910531Z ==> cloning policy-as-versioned-feeds/feeds
+2026-10-04T15:07:58.8387932Z ==> cloning policy-as-versioned-insurer/insurer
+2026-10-04T15:07:59.0605131Z OK: 8 units in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone
+2026-10-04T15:07:59.7704390Z OK: four independent application repositories in /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-apps
+2026-10-04T15:07:59.7745522Z ##[group]Run ./bin/twin verify
+2026-10-04T15:07:59.7745822Z [36;1m./bin/twin verify[0m
+2026-10-04T15:07:59.7810283Z shell: /usr/bin/bash -e {0}
+2026-10-04T15:07:59.7810532Z env:
+2026-10-04T15:07:59.7810799Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:59.7811250Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-10-04T15:07:59.7811690Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:59.7812080Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:59.7812486Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-10-04T15:07:59.7812870Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-10-04T15:07:59.7813201Z   TWIN_CHECK_TIMEOUT: 600
+2026-10-04T15:07:59.7813423Z ##[endgroup]
+2026-10-04T15:08:14.7112337Z ==> twin invariant suite (tool 0.1.0)
+2026-10-04T15:08:14.7113792Z ==> netflix: would-the-twin-have-flagged-it rewound to 2011-08-01 — scoring-eligible under as-consumed
+2026-10-04T15:08:14.7114940Z forecast-bundle -> /tmp/twin-verify-s3yufb6l/netflix-engine-guard/threat.json
+2026-10-04T15:08:14.7116131Z   attestation  threat.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:14.7117399Z   sha256       de508f4550148b82262bbf9f89886d53796e70137281a34f0f86d4e8b3b57776
+2026-10-04T15:08:14.7118082Z   depth        full
+2026-10-04T15:08:14.7118626Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:14.7119441Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:14.7120219Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:14.7121122Z ==> netflix as at 2011-08-01: commit 3d1fb95e715d, committed 2011-07-26T21:00:00Z
+2026-10-04T15:08:14.7121806Z   3 components, 2 edges, 0 causal
+2026-10-04T15:08:14.7122451Z   a model state, not a filtered view: everything downstream reads it unchanged
+2026-10-04T15:08:14.7123387Z rewound-model -> /tmp/twin-verify-s3yufb6l/netflix-engine-guard/rewind.json
+2026-10-04T15:08:14.7124573Z   attestation  rewind.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:14.7125632Z   sha256       b204e47519ce3b432a45dee96ccae520affc274e4f23a78a59de6535ae3a4b38
+2026-10-04T15:08:14.7126313Z   depth        full
+2026-10-04T15:08:14.7127070Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:14.7127838Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:14.7128636Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:14.7129577Z ==> gameplay sweep across 1 repo(s), 1 org(s): 1 opportunity candidate(s) pulled, 3 signal(s) pushed
+2026-10-04T15:08:14.7130622Z opportunity-sweep -> /tmp/twin-verify-s3yufb6l/netflix-engine-guard/sweep.json
+2026-10-04T15:08:14.7131829Z   attestation  sweep.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:14.7132812Z   sha256       1104a8e18f44087395c05ac7989131633b5cd14495a9cdae13fd1b78c439fcfc
+2026-10-04T15:08:14.7133510Z   depth        full
+2026-10-04T15:08:14.7160587Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:14.7161425Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:14.7162263Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:14.7163234Z ==> netflix: 3 option(s) considered for 'the-operator', 2 priced, 1 removed before pricing
+2026-10-04T15:08:14.7165162Z   removed  rank-domestic-members-by-cancellation-risk forbidden — no-individual-level-output (universal tier), no figure
+2026-10-04T15:08:14.7167009Z   priced   hold-the-bundled-price-for-one-quarter 30000000.0/45000000.0/70000000.0 mean 46666666.6667, sampled p50 46287011.5481
+2026-10-04T15:08:14.7168967Z   priced   ship-one-bill-and-one-sign-in-across-the-two-plans 10000000.0/15000000.0/22000000.0 mean 15333333.3333, sampled p50 15142499.58
+2026-10-04T15:08:14.7170359Z   a constraint is not a very large price: a removed option carries no number at all
+2026-10-04T15:08:14.7171404Z priced-option-set -> /tmp/twin-verify-s3yufb6l/netflix-engine-guard/options-head.json
+2026-10-04T15:08:14.7172847Z   attestation  options-head.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:14.7173950Z   sha256       7b359d9cfe0573089d0863a582b7c384f220be3a96527bb58a0f7fb98a3e85d6
+2026-10-04T15:08:14.7174674Z   depth        full
+2026-10-04T15:08:14.7175240Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+2026-10-04T15:08:14.7176058Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:14.7177067Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:14.7177865Z ==> netflix: a shock at 'dvd-by-mail', priced under 1 perspective(s)
+2026-10-04T15:08:14.7178495Z   the-operator
+2026-10-04T15:08:14.7179091Z     price    streaming-service        23,800,000 / 47,600,000 / 95,200,000  grade 1
+2026-10-04T15:08:14.7180055Z     option   hold-the-bundled-price-for-one-quarter cost 46,666,667, credit 19,040,000
+2026-10-04T15:08:14.7181545Z     option   ship-one-bill-and-one-sign-in-across-the-two-plans cost 15,333,333, the-mitigation-claim-is-graded-outside-the-pricing-threshold
+2026-10-04T15:08:14.7183172Z   prices, costs and credits in one unit, in the order they were authored. Nothing marks one option best and nothing recommends one
+2026-10-04T15:08:14.7184409Z priced-impact -> /tmp/twin-verify-s3yufb6l/netflix-engine-guard/price.json
+2026-10-04T15:08:14.7185622Z   attestation  price.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:14.7186905Z   sha256       f45c9cb3ecc9aa4211799fa0e30745bdfa8a2ef973b4e21ab2ae3cb6f004a564
+2026-10-04T15:08:14.7187634Z   depth        full
+2026-10-04T15:08:14.7188182Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+2026-10-04T15:08:14.7189008Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+2026-10-04T15:08:14.7189822Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:14.7190596Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:14.7191486Z ==> netflix/the-operator: a shock at 'dvd-by-mail', 2 response(s) across 3 account(s)
+2026-10-04T15:08:14.7193320Z   hold-the-bundled-price-for-one-quarter range=57,120,000  (the-damage-was-mostly-the-rebrand=35,480,000, the-shock-crossed-to-the-streaming-side=-21,640,000, the-shock-stayed-on-the-dvd-side=25,960,000)
+2026-10-04T15:08:14.7195951Z   ship-one-bill-and-one-sign-in-across-the-two-plans range=0  (the-damage-was-mostly-the-rebrand=15,000,000, the-shock-crossed-to-the-streaming-side=15,000,000, the-shock-stayed-on-the-dvd-side=15,000,000)
+2026-10-04T15:08:14.7199414Z   agreement  unanimous=False  the named accounts disagree about which response is cheapest — reported here rather than smoothed into the default below, because a credible disagreement about the mechanism is the most decision-relevant fact on the page
+2026-10-04T15:08:14.7203716Z   default    hold-the-bundled-price-for-one-quarter — the option whose mean net cost of risk across the named accounts is lowest — a default point for a reader who wants one, computed rather than declared, and not a recommendation. No account is privileged, so the mean rather than any one account's own figure is what breaks the tie; naming or dropping a rival account can move it
+2026-10-04T15:08:14.7206974Z trade-off-curve -> /tmp/twin-verify-s3yufb6l/netflix-engine-guard/curve.json
+2026-10-04T15:08:14.7208214Z   attestation  curve.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:14.7209243Z   sha256       05a68f85989616026b4ac38a96b0b15858499b45227ea4cd3001bdb9436e943a
+2026-10-04T15:08:14.7209941Z   depth        full
+2026-10-04T15:08:14.7210736Z     causal-layer       full     5/5 of decision ticket 08  unchecked: -
+2026-10-04T15:08:14.7211585Z     currency-regimes   full     6/6 of decision ticket 09  unchecked: -
+2026-10-04T15:08:14.7212395Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:14.7213169Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:14.7214085Z ==> netflix: proposes hold-the-bundled-price-for-one-quarter via the 'record' channel
+2026-10-04T15:08:14.7216362Z   means      the verification substrate — a lever that is not code, carrying a versioned signed record that it was enacted without being enforced by policy. Most levers are this one, and the £ engine's cross-domain comparison depends on it
+2026-10-04T15:08:14.7218531Z   disposed   a human, out of band — this tool has no path to it
+2026-10-04T15:08:14.7219236Z   layer      structural absence   twin/enact.py
+2026-10-04T15:08:14.7220012Z     holds      no merge code path exists; the module's public surface is an allow-list
+2026-10-04T15:08:14.7221814Z     fails when the twin is composed with a shell tool, an MCP GitHub server or a subagent with `gh` — the absence still holds and the guarantee is gone, with no diff to twin/ at all
+2026-10-04T15:08:14.7223353Z   layer      tool-call boundary   twin/enact_guard.py, registered as a PreToolUse hook
+2026-10-04T15:08:14.7224355Z     holds      a disposing tool call is refused before it runs, including a subagent's own
+2026-10-04T15:08:14.7226183Z     fails when the registration is deleted, or the twin is driven by a runner that does not honour hooks — a policy check is a call site, and a forgotten call site fails open in silence
+2026-10-04T15:08:14.7228769Z   dependency 20 cross-repository pin(s) (3 self-sync, counted separately): driftwood-composed, feeds, fx, ico, insurer, ludlow-composed, nist, platform, tuppence-composed consumed by driftwood, insurer, ludlow, tuppence
+2026-10-04T15:08:14.7231425Z     limit      0 of 23 pins name a tag and no commit, so the pin is only as immutable as the tag. Every commit line in this estate is a commented-out placeholder; until one is filled in, 'pinned' means 'pinned to a movable name'.
+2026-10-04T15:08:14.7233801Z     limit      3 of 23 pins are a repository syncing itself rather than consuming anybody's policy, and are counted separately: only the 20 cross-repository pins evidence a dependency at all.
+2026-10-04T15:08:14.7237381Z     limit      the signature is the sources' own declaration, checked by nothing here: no tag is verified, no Rekor entry is looked up, and estate/verify/provenance/verify-provenance.sh records that this repository's own commits are not keyless-signed either. 'Signed' is therefore a property of the design, not an observation, and the word does no work until something verifies it.
+2026-10-04T15:08:23.3019630Z     limit      the consumer repositories are separate by URL and not yet by existence: estate/README.md describes a monorepo-style working tree whose top-level directories become their own GitHub repositories *at split*, and each up.sh rewrites the pinned URL to an in-cluster git server for the offline demo. The pins name real separate repositories; whether those repositories are live is a question this code does not ask.
+2026-10-04T15:08:23.3022339Z     limit      read from committed sources, not from a running cluster: this evidences what the repositories declare they consume, never that a control is in force right now. Whether continuous proof of force is required at all is build ticket 65's question and is still open.
+2026-10-04T15:08:23.3024509Z     limit      these pins are read from this tool's own repository (.estate-clone), not from any repository 'netflix' owns. The dependency block above evidences what THIS estate consumes; it names no pin, tag or repository belonging to the subject the proposal is about, and 'netflix' is not assumed to have an estate under Flux at all.
+2026-10-04T15:08:23.3027727Z   narrowed   Policy-as-code is AN enactment arm, not THE definition of governance. Responses are priced by the FAIR factor they modify and most levers are not code, so if versioned policy were the shape of governance the cross-domain comparison the £ engine exists for could not exist.
+2026-10-04T15:08:23.3029115Z enactment-proposal -> /tmp/twin-verify-s3yufb6l/netflix-engine-guard/proposal.json
+2026-10-04T15:08:23.3029876Z   attestation  proposal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:23.3030524Z   sha256       102afa73298a28c288a220d444814ccf5af3b3eb37484cc616fa582929866e40
+2026-10-04T15:08:23.3030920Z   depth        full
+2026-10-04T15:08:23.3031231Z     enactment          full     5/5 of decision ticket 18  unchecked: -
+2026-10-04T15:08:23.3031699Z ==> netflix: substrate fidelity at 2011-10-24, detection scored at 2011-10-24
+2026-10-04T15:08:23.3032109Z   signal_to_noise      0.121  within [0.05, 0.25]
+2026-10-04T15:08:23.3032432Z   plant_difficulty     0.275  within [0.05, 0.5]
+2026-10-04T15:08:23.3032756Z   plant_difficulty_spread 0.600  within [0.05, 1.0]
+2026-10-04T15:08:23.3033079Z   spine_consistency    1.000  within [1.0, 1.0]
+2026-10-04T15:08:23.3033386Z   reporting_asymmetry  0.667  within [0.6, 0.95]
+2026-10-04T15:08:23.3033685Z   mundanity            0.879  within [0.7, 1.0]
+2026-10-04T15:08:23.3033988Z   contamination        0.000  within [0.0, 0.0]
+2026-10-04T15:08:23.3034634Z   free-running         28 line(s) against 5 anchored — the diff-against-the-spine attack has somewhere to hide a plant
+2026-10-04T15:08:23.3035162Z   hit rate             25%, mean score 0.250
+2026-10-04T15:08:23.3035878Z     events           missed  horizon 2011-09-30  not detected: no detection at events[3] ('an unusual incident review opens after hours, examining access to the member billing export')
+2026-10-04T15:08:23.3037776Z     communications   missed  horizon 2011-10-24  not detected: no detection at communications[3] ('a press query is withdrawn abruptly, days after an earlier complaint thread was escalated')
+2026-10-04T15:08:23.3038956Z     hr               timely  horizon 2011-11-15  detected at 2011-10-24, on or before the actionability horizon 2011-11-15 — still actionable
+2026-10-04T15:08:23.3039972Z     telemetry        missed  horizon 2011-09-20  not detected: no detection at telemetry[3] ('an overnight export of the member table runs outside the scheduled batch, with no ticket raised')
+2026-10-04T15:08:23.3041770Z   limitation:  planter and detector are the same model family and share model priors (decision ticket 12 Q2): a synthetic result is never evidence the twin anticipates the world, only evidence that the detection machinery works. The detector may find a plant because it thinks like the planter, not because the signal was findable by an independently-minded reader.
+2026-10-04T15:08:23.3043268Z substrate-report -> /tmp/twin-verify-s3yufb6l/netflix-engine-guard/substrate.json
+2026-10-04T15:08:23.3043947Z   attestation  substrate.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:23.3044536Z   sha256       186420ffbed97daf866204328e573c3f9a601155f3a1ec474627fac73d1b1729
+2026-10-04T15:08:23.3044925Z   depth        full
+2026-10-04T15:08:23.3045253Z     synthetic-substrate full     7/7 of decision ticket 12  unchecked: -
+2026-10-04T15:08:23.3045715Z ==> sweep across 1 repo(s): 2 execution(s), 4 forecast(s), 0 failure(s)
+2026-10-04T15:08:23.3046165Z sweep -> /tmp/twin-verify-s3yufb6l/intel-forecast-guard/sweep.json
+2026-10-04T15:08:23.3046613Z   attestation  sweep.json.att.json (agent-signed (origin only))
+2026-10-04T15:08:23.3047878Z   sha256       9dfe5ec7212febd0999f0534de08030f5cb5f86f46215135978f241e63cd9573
+2026-10-04T15:08:23.3048499Z   depth        full
+2026-10-04T15:08:23.3048805Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:23.3049243Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:23.3049679Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:23.3050526Z ==> intel: does-the-14a-bet-land-a-named-customer under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:08:23.3051200Z forecast-bundle -> /tmp/twin-verify-s3yufb6l/intel-forecast-guard/run.json
+2026-10-04T15:08:23.3051671Z   attestation  run.json.att.json (agent-signed (origin only))
+2026-10-04T15:08:23.3052156Z   sha256       3c891bc1da4eef0c1ccc0a6031a1a699297752a8e67b71fc420a342224df6740
+2026-10-04T15:08:23.3052537Z   depth        full
+2026-10-04T15:08:23.3052827Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:23.3053249Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:23.3053676Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:23.3054253Z ==> netflix: dvd-decline-2011 rewound to 2026-01-01 — scoring-eligible under as-consumed
+2026-10-04T15:08:23.3054775Z forecast-bundle -> /tmp/twin-verify-s3yufb6l/guard-backtest.json
+2026-10-04T15:08:23.3055414Z   attestation  guard-backtest.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:23.3056018Z   sha256       5d7231a5720c7c1a8b3ade68f94a1e564cd470b4c9246da46d8ec0bf2ed20de8
+2026-10-04T15:08:23.3056394Z   depth        full
+2026-10-04T15:08:23.3056910Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:23.3057367Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:23.3057812Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:23.3058418Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:08:23.3058952Z forecast-bundle -> /tmp/twin-verify-s3yufb6l/guard-run.json
+2026-10-04T15:08:23.3059571Z   attestation  guard-run.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:23.3060158Z   sha256       bd21812ad2bafa8bad618651731ab65f3c7b13df22b3340f45347ec7fd58001d
+2026-10-04T15:08:23.3060544Z   depth        full
+2026-10-04T15:08:23.3060835Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:23.3061242Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:23.3061655Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:23.3062303Z ==> royal-mail: would-the-twin-have-flagged-it rewound to 2018-06-01 — scoring-eligible under as-consumed
+2026-10-04T15:08:23.3062901Z forecast-bundle -> /tmp/twin-verify-s3yufb6l/beat/forecast-bundle.json
+2026-10-04T15:08:23.3063553Z   attestation  forecast-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:23.3064170Z   sha256       a03e55a0e10a54e13e3f6b716863d811cc42d09876d5d765bd429ecab8e73af8
+2026-10-04T15:08:23.3064549Z   depth        full
+2026-10-04T15:08:23.3064828Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:23.3065239Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:23.3065662Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:23.3066324Z ==> carillion: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:08:23.3067858Z forecast-bundle -> /tmp/twin-verify-s3yufb6l/beat/carillion-bundle.json
+2026-10-04T15:08:23.3068540Z   attestation  carillion-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:23.3069143Z   sha256       74725f047f6294fb56d800313ed2db8548597e6dbeedf2baaa54f9513afedd62
+2026-10-04T15:08:23.3069720Z   depth        full
+2026-10-04T15:08:23.3070022Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:23.3070462Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:23.3070886Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:23.3071393Z ==> carillion-collapse-resolved: observed=True, resolved 2018-01-15, contamination low
+2026-10-04T15:08:23.3072188Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+2026-10-04T15:08:23.3072788Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+2026-10-04T15:08:23.3073280Z     market-consensus-2016        p=0.05   brier=0.9025   log-loss=2.9957   [as-consumed]
+2026-10-04T15:08:23.3073790Z score-card -> /tmp/twin-verify-s3yufb6l/beat/carillion-card.json
+2026-10-04T15:08:23.3074425Z   attestation  carillion-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:23.3075030Z   sha256       d8f40a7156283f60cb87d15da97533d82433bd3b4d9753921475801fbc2a0938
+2026-10-04T15:08:23.3075409Z   depth        full
+2026-10-04T15:08:23.3075745Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:23.3076168Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:23.3076577Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+2026-10-04T15:08:23.3077664Z ==> enron: would-the-twin-have-flagged-it under as-consumed — scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:08:23.3078281Z forecast-bundle -> /tmp/twin-verify-s3yufb6l/beat/enron-bundle.json
+2026-10-04T15:08:23.3078916Z   attestation  enron-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:23.3079505Z   sha256       4e375f00c56348baa430db99564f0af08f244c64e896a9f3ab7898ac0c69600d
+2026-10-04T15:08:23.3079885Z   depth        full
+2026-10-04T15:08:23.3080175Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:23.3080599Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:23.3081015Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:47.8545456Z ==> enron-bankruptcy-resolved: observed=True, resolved 2001-12-02, contamination control
+2026-10-04T15:08:47.8547130Z   contamination discount: not measured — no --discount-enron/--discount-obscure basis given
+2026-10-04T15:08:47.8548259Z   rules brier, log_loss (lower-is-better) — 1 scored, 0 unscoreable
+2026-10-04T15:08:47.8548897Z     market-consensus-2001        p=0.03   brier=0.9409   log-loss=3.5066   [as-consumed]
+2026-10-04T15:08:47.8549528Z score-card -> /tmp/twin-verify-s3yufb6l/beat/enron-card.json
+2026-10-04T15:08:47.8550336Z   attestation  enron-card.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:47.8551114Z   sha256       ac0d90d27d6f1d64e9cb2e39893bfb416562c40178c59d42b25a677f1c28d808
+2026-10-04T15:08:47.8551636Z   depth        full
+2026-10-04T15:08:47.8552019Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:47.8552594Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:47.8553161Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+2026-10-04T15:08:47.8553981Z ==> netflix: dvd-decline-2011 under with-hindsight — not scoring-eligible, 0 fact(s) withheld by date
+2026-10-04T15:08:47.8554869Z   ingestion history unavailable: every fact in the repository today was visible to this execution
+2026-10-04T15:08:47.8555660Z forecast-bundle -> /tmp/twin-verify-s3yufb6l/beat/with-hindsight-bundle.json
+2026-10-04T15:08:47.8556611Z   attestation  with-hindsight-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:47.8557685Z   sha256       082a734b44847c068b1fc4900ed56f6b78e53f41d706471faac16afb6804c4f9
+2026-10-04T15:08:47.8558184Z   depth        full
+2026-10-04T15:08:47.8558842Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:47.8559390Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:47.8559951Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:47.8560747Z ==> netflix: dvd-decline-2011 under as-consumed — scoring-eligible, 1 fact(s) withheld by date
+2026-10-04T15:08:47.8563392Z   withheld dvd-decline-2011-resolved          outcomes, dated 2012-12-31
+2026-10-04T15:08:47.8565156Z   ingestion history unavailable: the ingestion-history filter did not run: this repository has no commit at or before the execution time, so `as-consumed` here rests on fact dates alone. A fact ingested late but dated early is not detectable from this repository.
+2026-10-04T15:08:47.8567182Z forecast-bundle -> /tmp/twin-verify-s3yufb6l/beat/as-consumed-bundle.json
+2026-10-04T15:08:47.8568194Z   attestation  as-consumed-bundle.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:47.8568872Z   sha256       c90b827b7e1705fceb8ac1b6822fb54d36c9b2d86f97fa301de96b9aab80447b
+2026-10-04T15:08:47.8569271Z   depth        full
+2026-10-04T15:08:47.8569570Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:47.8570001Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:47.8570461Z     scenario-engine    full     7/7 of decision ticket 13  unchecked: -
+2026-10-04T15:08:47.8570932Z bound-signal -> /tmp/twin-substrate-guard-cion4h51/bound-signal.json
+2026-10-04T15:08:47.8571582Z   attestation  bound-signal.json.att.json (unsigned — no signing key present (set TWIN_SIGNING_KEY))
+2026-10-04T15:08:47.8572175Z   sha256       deecec484590202429548d21ee4596781bf6ee01002dec48b700f892cb211083
+2026-10-04T15:08:47.8572554Z   depth        full
+2026-10-04T15:08:47.8572842Z     domain-model       full     7/7 of decision ticket 07  unchecked: -
+2026-10-04T15:08:47.8573269Z     provenance         full     4/4 of decision ticket 14  unchecked: -
+2026-10-04T15:08:47.8573675Z     sense-move         full     8/8 of decision ticket 11  unchecked: -
+2026-10-04T15:08:47.8574177Z   1  PASS  manifest_names_every_invariant                16 invariants, manifest and constitution agree
+2026-10-04T15:08:47.8574736Z   2  PASS  live_invariants_have_checks                   16 live, 0 pending
+2026-10-04T15:08:47.8575320Z   3  PASS  no_invariant_pending_past_its_ticket          every pending invariant names an open activating ticket
+2026-10-04T15:08:47.8575993Z   4  PASS  invariant_bodies_match_manifest_hashes        16 live test bodies match their pinned hashes
+2026-10-04T15:08:47.8576934Z   5  PASS  hash_changes_are_authorised                   no unauthorised hash changes against the previous version (0923c960eb6e)
+2026-10-04T15:08:47.8577684Z   6  PASS  worksheet_matches_the_pocket_org              82 hand-computed lines match, 0 pending on open tickets
+2026-10-04T15:08:47.8578720Z   7  PASS  position_deltas_have_no_privileged_default    3 positions, each dispensable, none privileged; scores stay put when any one is dropped
+2026-10-04T15:08:47.8579986Z   8  PASS  credibility_blend_falls_back_to_the_world_prior_alone  payment-fraud-loss (n=0) blends to exactly its prior; identity-store-incident-cost (n=3) moves off it — z=0.932038834951
+2026-10-04T15:08:47.8581300Z   9  PASS  a_var_shaped_summary_hides_what_tvar_surfaces  identical VaR (100000.00) at alpha=0.8434 for xi=0.1 and xi=0.7; TVaR diverges (188888.89 vs 366666.67); xi>=1 refuses at the shape boundary and xi=0.99 still computes
+2026-10-04T15:08:47.8582793Z  10  PASS  a_constraint_removal_with_no_computed_attractiveness_is_rejected  attractiveness computed as mode=5.0 (not stated); log_removal accepts no raw float; an unlogged removal is rejected and the same removal logged clean verifies
+2026-10-04T15:08:47.8584389Z  11  PASS  misuse_catalogues_load_and_every_row_names_a_mechanism  3 catalogues, 30 rows, one loader; 12 eco-system rows carrying ticket 19's four ids, each anchored by path or by the ticket building its price; a row with its mechanism blanked is refused
+2026-10-04T15:08:47.8586969Z  12  PASS  a_challenge_to_a_constituent_survives_an_unrelated_resolution  resolve() reproduces its challenge's own claim_path; a hand-built resolution naming a different one is refused; an unrelated resolution on the same artefact leaves the original challenge reported open, not silently closed
+2026-10-04T15:08:47.8589090Z  13  PASS  disparate_impact_audit_channel_is_sealed_and_role_gated  a finding naming a protected characteristic is refused; a response from any role but 'disparate-impact-respondent' is refused (checked against three registered roles); the defined respondent, structurally checked, succeeds
+2026-10-04T15:08:47.8591211Z  14  PASS  skill_eval_harness_is_agnostic_and_thresholds_are_guarded  6 real skill names absent from every harness function; the fixture skill passes, a degraded one fails, one right on a wrong basis fails and a short corpus is not measurable; no threshold or stated minimum lowered without a citation against the previous version (98caf04a10a9)
+2026-10-04T15:08:47.8592991Z  15  PASS  honest_build_inventory_matches_files_and_owning_tickets  18 capabilities classified (10 code, 3 inherited, 5 skill); 5 skill(s) each resolve to a real decision ticket under .scratch/twin/issues/
+2026-10-04T15:08:47.8594023Z  16  PASS  skill_score_log_is_append_only                13 line(s) against the previous version (9f4443e7b087) unchanged; 7 new
+2026-10-04T15:08:47.8595271Z  17  PASS  signal_classify_is_grade_5_by_construction    no grade-shaped parameter exists on classify(); every call returns evidence_grade 5; the real 23-item labelled corpus clears its threshold (outcome not-measurable) and a degraded classifier fails its threshold
+2026-10-04T15:08:47.8597866Z  18  PASS  evolution_judge_output_is_graded_by_construction_and_never_silent  no grade-shaped parameter exists on judge() or override(); judge() always emits grade 5, override() always emits grade 4 and refuses an unregistered role, override() cannot run without an inferred claim first, pushback() is never silent on agreement or disagreement; the real 4-item labelled corpus clears its threshold (outcome not-measurable) and a degraded judge fails its threshold
+2026-10-04T15:08:47.8600421Z  19  PASS  causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory  over-grading every item to grade 1 passes the claim metric and fails the grade metric at 0.0; propose() never returns an empty alternatives field; shared_ancestors() finds the real shared dependency on both co-flagship edges
+2026-10-04T15:08:47.8602750Z  20  PASS  gameplay_lens_is_grade_5_and_reports_no_recommendation  no grade-shaped parameter exists on propose(); every opportunity carries evidence_grade 5; the real 3-item labelled corpus clears its threshold (outcome not-measurable) and a skill that proposes nothing fails its threshold; the sweep reports 1 opportunity candidate(s) beside 10 signal(s), and no action-shaped field found in it
+2026-10-04T15:08:47.8605353Z  21  PASS  substrate_generator_is_mundane_by_default_and_records_measurability_winning  regenerating from the identical recipe reproduces byte-for-byte; a plant-per-channel batch still clears mundane_fraction >= 0.7; the resolution names measurability winning; the real 3-item labelled corpus clears its threshold (outcome not-measurable) and a silent generator fails its threshold
+2026-10-04T15:08:47.8607716Z  22  PASS  ingest_runs_unattended_with_provenance_and_measured_throughput  ingest_run's own source calls no confirmation/review/approval step; 60 of 60 declared item(s) classified at grade 5, each carrying full provenance, measured at 34083.4 items/sec
+2026-10-04T15:08:47.8609446Z  23  PASS  unbound_pool_retains_a_decayed_signal_rather_than_dropping_it  a signal 9497 days old stays in the pool report (decayed: true, decayed_on 2002-02-17) rather than being dropped, and is excluded from the observable live pool_size/age_distribution rather than double-counted
+2026-10-04T15:08:47.8611275Z  24  PASS  retrospective_sweep_rescues_a_decayed_signal_when_a_model_change_binds_it  a signal 945 days old (decayed before rescue: true) stays still_unbound with no matching component, and rebinds the moment a model change adds one
+2026-10-04T15:08:47.8613578Z  25  PASS  substrate_reconciles_with_the_spine_and_the_diff_attack_finds_no_plants  a batch missing the 8-fact real Carillion spine fails reconcile(); once anchored it reconciles at every one of the spine's own dated checkpoints; a malformed checkpoint fails through regimes.RegimeError, not a parallel parser; the diff attack leaves the plant beside 24 non-plant decoy(s), while an over-anchored control exposes it as the sole residual
+2026-10-04T15:08:47.8616438Z  26  PASS  substrate_fidelity_is_measured_and_tuning_closes_a_real_gap  evaluate_fidelity() returns exactly the 7 declared dimensions; a balanced 50/50 mix genuinely misses reporting_asymmetry; tune() converges in 2 iteration(s) to a batch passing every band, with reporting_asymmetry=0.6206896551724138 skewing negative; a degraded batch fails 3 dimension(s) at once (plant_difficulty, plant_difficulty_spread, reporting_asymmetry)
+2026-10-04T15:08:47.8619657Z  27  PASS  planter_detector_scorer_are_structurally_separated_and_late_detection_scores_near_zero  twin/detector.py imports nothing naming 'planter'; detect() returns identical output with and without a decoy ground-truth key present; a plant detected before its actionability horizon scores 1.0, the identical plant detected after it scores 0.05 with the horizon named in the reason, and a missed plant scores 0.0; every result carries the shared-prior limitation verbatim
+2026-10-04T15:08:47.8622559Z  28  PASS  netflix_substrate_is_free_running_and_every_plant_carries_a_horizon  the committed Netflix recipe restates none of the spine's 6 facts; all 4 plants carry a declared horizon and reason, and a horizons file drifted from the recipe is refused; every fidelity dimension is inside its band at 2011-10-24; the report reproduces byte-for-byte and scores every plant, misses included, at a hit rate of 0.25
+2026-10-04T15:08:47.8627504Z  29  PASS  netflix_runs_both_paths_and_the_curve_keeps_the_disagreement  `twin backtest` and `twin rewind` independently resolved 2011-08-01 to the same commit; 3 rival forecasts (3 distinct) and 1 opportunity pulled from it, with `twin options` refusing the perspective and 0 causal edges at that commit; 'hold-the-bundled-price-for-one-quarter' priced with credit and 'ship-one-bill-and-one-sign-in-across-the-two-plans' refused with a reason, its own net cost of risk unmoved across every account; the accounts disagree (the-damage-was-mostly-the-rebrand->ship-one-bill-and-one-sign-in-across-the-two-plans, the-shock-crossed-to-the-streaming-side->hold-the-bundled-price-for-one-quarter, the-shock-stayed-on-the-dvd-side->ship-one-bill-and-one-sign-in-across-the-two-plans) and dropping any one leaves the rest untouched; enactment proposed on the lever through `record`; 1/8 emitted artefacts claim synthetic-substrate and all carry the limitation
+2026-10-04T15:08:47.8632286Z  30  PASS  intel_forecast_is_pinned_signed_and_names_its_own_unscoreability  `twin sweep` and a standalone `twin run` agree byte-for-byte on 'does-the-14a-bet-land-a-named-customer' (2 distinct forecasts); both artefacts are pinned and agent-signed; the emitted body names its own unscoreability, resolution window and checking procedure; the intel overlay carries zero outcomes and `twin score` refuses against it
+2026-10-04T15:08:47.8634902Z  31  PASS  benchmark_selection_is_mechanical_and_quarantine_catches_a_planted_breach  select_questions() reproduces byte-identically against the committed rule; the selected 18-question set spans all 6 declared confidence bins; a clean provenance audit reports no breach; a quarantined id planted in a nested field of an old and a since-elapsed record is caught at both
+2026-10-04T15:08:47.8638145Z  32  PASS  forecast_book_is_blind_by_construction_and_observe_only  an emission at or after its resolution window is refused (checked at the boundary and past it); a blind emission records observe_only/position_placed correctly and is_blind() agrees with its own recorded body; the module's public surface is exactly emit, is_blind, score_resolution, none position-shaped; score_resolution() calls scoring.score() and reproduces its output bit for bit; both the emission and the resolution score carry a claim_scope naming what the gate does not evidence
+2026-10-04T15:08:47.8641056Z  33  PASS  carillion_answer_key_is_dated_and_adversarial  8 dated signal(s), each citing a live https source and none citing the post-collapse HC 769; the answer key itself does; commit history spans 2016-11-01..2018-05-17 monotonically; the world layer names no tenant
+2026-10-04T15:08:47.8642621Z  34  PASS  further_answer_keys_are_dated_and_evidenced   nmc: 5 signal(s), contamination=low; wirecard: 6 signal(s), contamination=high; enron: 4 signal(s), contamination=control; royal-mail: 6 signal(s), contamination=low
+2026-10-04T15:08:47.8644660Z  35  PASS  measure_discount_is_computed_not_hardcoded    measure_discount([{'brier': 0.9025, 'log_loss': 2.99573227355}, {'brier': 0.81, 'log_loss': 2.30258509299}], [{'brier': 0.36, 'log_loss': 0.916290731874}, {'brier': 0.16, 'log_loss': 0.510825623766}])=-0.59625 != measure_discount([{'brier': 0.36, 'log_loss': 0.916290731874}, {'brier': 0.16, 'log_loss': 0.510825623766}], [{'brier': 0.9025, 'log_loss': 2.99573227355}, {'brier': 0.81, 'log_loss': 2.30258509299}])=0.59625
+2026-10-04T15:08:47.8646956Z  36  PASS  hindsight_resistance_cases_score_a_memorising_system_worse  az: memorising brier=0.7225 > honest brier=0.04; sanofi: memorising brier=0.7225 > honest brier=0.0625; discount without hindsight=-0.0384, with hindsight=0.316425
+2026-10-04T15:08:47.8648738Z  37  PASS  backtest_is_a_pure_composition                cmd_backtest's source calls exactly rewind( and verbs.run(, references no propagation, intervention or scoring machinery; an explicit rewind+run and run() alone compute the identical forecast at the same time, differing only in which command produced it
+2026-10-04T15:08:47.8650744Z  38  PASS  a_scored_forecast_is_never_silently_dropped   the partition holds on both a scoring card (1 emitted, 1 scored) and an all-unscoreable one (3 named, 0 scored); every scored forecast's own figure reaches stdout; the worst is brier 0.9025 and is printed first, worse than a coin flip and still the headline
+2026-10-04T15:08:47.8652669Z  39  PASS  causal_accounts_have_no_privileged_default    3 accounts, each dispensable, none privileged; dropping any one leaves the rest's own figures unmoved; a named account and overlay.graph() reach the same components; a planted author/date field on a causal-account is refused
+2026-10-04T15:08:47.8654650Z  40  PASS  trade_off_curve_reports_disagreement_never_a_scalar  expand-the-delivery-network's net cost of risk ranges 4,080,000 across 2 accounts ({'netflix-base-case': 39000000.0, 'rival-cdn-headwind': 43080000.0}), reported per account rather than averaged; no action-shaped field found; the default names its own basis
+2026-10-04T15:08:47.8656446Z  41  PASS  unanchored_severity_parameters_are_marked_not_assumed  subject 'data-breach-loss': 3 anchored (mu, sigma, threshold), 2 unanchored (beta, xi); a planted anchored-with-no-method or unanchored-with-no-reason is refused
+2026-10-04T15:08:47.8657876Z  42  PASS  graded_edge_fixture_holds_its_contract        4 graded causal edges, one degenerate and flagged; a stripped one is refused
+2026-10-04T15:08:47.8658823Z  43  PASS  drift_window_was_declared_before_it_was_measured  window 2026-08-07..2026-11-06 committed 2026-08-07, 2 declared falsifier(s), 108 sample(s), none earlier
+2026-10-04T15:08:47.8659725Z  44  PASS  drift_window_is_actually_being_sampled        108 sample(s) in an open window, newest 2026-10-04, 32 day(s) left
+2026-10-04T15:08:47.8662563Z  45  FAIL  flux_coverage_floor_is_still_reachable        the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sample(s), only 32 days, 8:51:32.753983 of window left to take them in, a ceiling of 35.7%. The continuous-state branch closes `unmeasured`, so build ticket 65's primary falsifier is unanswerable and the residual branch cannot be concluded either. Chris Nesbitt-Smith owns the probe; window.yaml's `operation.crontab` is the line that was never installed. **This guard staying red is the finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached
+2026-10-04T15:08:47.8665433Z  46  PASS  forced_campaign_pre_registered_and_walled_off  4 trial(s) declared, committed 2026-08-14, 464 forced sample(s), none earlier, none leaked into the organic log, no marker contamination
+2026-10-04T15:08:47.8666590Z  47  PASS  flux_verdict_is_pre_registered_and_derived    3 branches, floor 90%, amendment drafted; state=pending, residual=pending, action=unmeasured, verdict=none yet
+2026-10-04T15:08:47.8669368Z  48  PASS  enactment_is_propose_only_at_both_layers      layer 1 exposes exactly dependency_pins, propose; layer 2 refuses 5 disposition shape(s) and admits 3 proposing one(s), routed by a matcher that admits a tool name revealing nothing about merging; the proposal is derived and refuses a human signature; 20 cross-repository pin(s) across 4 consumers (3 self-sync, counted apart), 6 limit(s) stated. This check FORCED `operations` to test the capability; the estate is running at `development`, which admits every merge and every enactment push
+2026-10-04T15:08:47.8672517Z  49  PASS  enforcement_is_a_spectrum_and_never_prices_a_rung  4 rungs, 2 of them changing the outcome; a priced rung and a priced enforcement block are both refused; the same control is one Option at 'observe' and at 'block'; posture-as-identity admitted for 1 control and excluded by name for 3, of 5 named cases; 1 unrecorded move(s) caught in git history; the posture is authored and unsigned reads as unsigned
+2026-10-04T15:08:47.8675969Z  50  PASS  enactment_is_sensed_and_corroboration_sets_the_grade  6 channels, none pricing alone (5 independent of the subject); a table that prices alone, one carrying a privileging field and a people-observing channel with no admission ladder are all refused; three self-declared claims across two of the subject's own channels stay at 1 independent channel and grade 4; the reconciler is interchangeable with 4 other machine channel(s); the fixture's corroborated response grades 2 from a strongest-alone of 3 and prices, its self-declared one grades 4 and does not; a claim naming its own grade is refused; both signal kinds sense to bound-signal
+2026-10-04T15:08:47.8678710Z  51  PASS  scheduled_emission_ignores_signal_presence    2 scenario(s) across 1 repo(s) emitted 6 forecast(s) on both of two consecutive, unconditional sweeps
+2026-10-04T15:08:47.8679823Z  52  PASS  an_intervention_never_reaches_upstream        do(streaming-experience) severs 1 edge(s) and updates nothing upstream; observe() updates 1; the downstream halves are identical
+2026-10-04T15:08:47.8680965Z  53  SKIP  cross_architecture_determinism                requires the CI matrix (set TWIN_CI_ARCH_MATRIX=1); the same-machine leg is asserted by identical_pins_identical_bytes
+2026-10-04T15:08:47.8682916Z  54  PASS  substrate_regeneration_is_not_deterministic_so_it_is_authored  the pure seeded generator reproduces from an identical recipe; the stand-in live-model generator does not; an authored substrate batch accepts a human signature and a derived reference to it still refuses one; a substrate-referencing sense artefact reproduces from its pins with the substrate bytes never written anywhere twin can read them
+2026-10-04T15:08:47.8685328Z  55  PASS  twin_self_reference_is_cut_not_recursed       a component carrying a planted models_graph/nested_twin/twin_of field is refused at load; propagating the twin's own fixture from either side of its self-referential cycle reaches the other component exactly once and the return leg is cut, disclosed, not silent
+2026-10-04T15:08:47.8688110Z  56  PASS  ethics_gate_ladder_stops_early_and_fast_improvement_is_never_an_automatic_finding  the ladder stops at its first failing rung without touching the rest; a fully-passing walk carries a justification on every rung; flag_fast_improvement() carries no action/verdict-shaped field or phrase; adjudication refuses an unflagged input and an unregistered role; the real 5-item labelled corpus clears its threshold (outcome not-measurable) and a skill that admits everything fails its threshold
+2026-10-04T15:08:47.8690462Z  57  SKIP  does_not_do_register_is_generated_never_typed  every loaded capability is already `full`; there is nothing left to check off
+2026-10-04T15:08:47.8691722Z  58  PASS  the_demo_sequence_earns_credibility_before_it_spends_it  royal-mail, intel, netflix in that order; £ absent from the first two beats; propose precedes both price and trade-off in the third
+2026-10-04T15:08:47.8693776Z  59  PASS  mitigation_credit_is_gated_on_corroborated_enactment_not_just_claimed_evidence  an identical claim credits against a corroborated option and refuses as NOT_ENACTED (never CLAIM_TOO_WEAK) against an uncorroborated one; the live price artefact credits retrain-the-on-call-rota against its own fixture's corroborated enactment and refuses it the moment that corroboration is stripped from the same fixture
+2026-10-04T15:08:47.8695724Z  60  PASS  store_rebuildable_from_git                    index dropped and rebuilt from git alone, identically (df33e237a9f2); 8 aggregate field names have no authored or stored form
+2026-10-04T15:08:47.8697220Z  61  PASS  identical_pins_identical_bytes                12 artefacts identical across runs, processes, hash seeds and the committed goldens; a score card reproduces from its pins and a hand-edited one does not
+2026-10-04T15:08:47.8698264Z  62  PASS  every_artefact_marked                         all emitted artefacts marked; an unmarked artefact refuses to serialise
+2026-10-04T15:08:47.8699008Z  63  PASS  every_capability_depth_graded                 6 capabilities graded by computed checklist; typed grades refused
+2026-10-04T15:08:47.8699912Z  64  PASS  world_never_references_overlay                clean fixture is clean; planted violation caught (world/components/tenant-leak.yaml: names a tenant ('netflix'))
+2026-10-04T15:08:47.8700982Z  65  PASS  no_collapse_mechanism                         3 forecasts emitted, no collapse affordance anywhere; 3 combined propagation figures, each beside every path it combines
+2026-10-04T15:08:47.8702126Z  66  PASS  no_recommended_action_field                   no recommendation field in any artefact; every declared one is refused at emission; 7 map positions carry numbers and no inherited action band
+2026-10-04T15:08:47.8703427Z  67  PASS  derived_never_human_signed                    derived artefacts refuse human signatures and a planted one is detected on read; authored artefacts require one; the two signature types never substitute
+2026-10-04T15:08:47.8704453Z  68  PASS  only_as_consumed_scores                       3 as-consumed scores; as-knowable and with-hindsight refused explicitly
+2026-10-04T15:08:47.8705187Z  69  PASS  no_special_category_slot                      36 Article 9 categories with no representation, at any depth
+2026-10-04T15:08:47.8707224Z  70  PASS  grade_5_only_path_never_prices                grades [1, 2] price and 5 never does; 1 admitted on fully-graded paths and brand-goodwill unpriced at grade 5; every perspective registers it without a figure in both the exposure and the priced impact, and the schema refuses one; mitigation credit is gated on the same rule; the blast body is closed with no price slot; the threshold is pinned in the artefact and moving it moves the digest
+2026-10-04T15:08:47.8709489Z  71  PASS  ruin_class_absent_not_priced                  2 options removed before pricing at both tiers, carrying no figure; neither a zero nor an absurd cost brings one back; 1 priced, and the ruin-class one still survives the perspective that declares no such boundary
+2026-10-04T15:08:47.8711105Z  72  PASS  prefilter_precedes_pricing                    pricing is a method on the pre-filter's product and no free pricing function exists; a hand-built Admitted set is refused; 3 options considered, 2 removed on published constraints and 1 priced
+2026-10-04T15:08:47.8712653Z  73  PASS  as_consumed_admits_no_post_T_fact             regime has no default and no schema slot; as-consumed admits 1 of 4 facts and still forecasts; a post-T fact bound to the subject refuses the run
+2026-10-04T15:08:47.8714742Z  74  PASS  price_levels_never_probabilities              as_probability refuses every level handed to it, by construction, with no warning path; 2 price-move signals classified against the real fixture graph with no probability-shaped field anywhere in the artefact and the bias evidence cited; a quarantined question id is excluded before classification runs, and build ticket 57's own audit confirms the result clean
+2026-10-04T15:08:47.8717192Z  75  PASS  standing_library_covers_committed_classes     the standing library covers all 11 committed classes: ai-model-access, bus-factor-key-person, climate-event, eol-date-passes, insider-coercion, m-and-a, memory-cost, penalty-published, quantum-hndl, sanctions, supply-shock
+2026-10-04T15:08:47.8718221Z 
+2026-10-04T15:08:47.8718455Z RESULT: 72 passed, 1 failed, 2 skipped (0 pending invariants, 2 skipped and not faked)
+2026-10-04T15:08:47.8721176Z   FAIL flux_coverage_floor_is_still_reachable: the pre-registered coverage floor of 90% can no longer be reached: 3/1966 sample(s), only 32 days, 8:51:32.753983 of window left to take them in, a ceiling of 35.7%. The continuous-state branch closes `unmeasured`, so build ticket 65's primary falsifier is unanswerable and the residual branch cannot be concluded either. Chris Nesbitt-Smith owns the probe; window.yaml's `operation.crontab` is the line that was never installed. **This guard staying red is the finding, not a defect in it** — see build ticket 70's finding 1. It goes green only if the floor is actually reached
+2026-10-04T15:08:47.8748791Z ##[error]Process completed with exit code 1.
+2026-10-04T15:08:47.8898304Z Post job cleanup.
+2026-10-04T15:08:47.9754125Z [command]/usr/bin/git version
+2026-10-04T15:08:47.9796605Z git version 2.55.0
+2026-10-04T15:08:47.9835234Z Temporarily overriding HOME='/home/runner/work/_temp/adaae23b-5c4d-4745-8e33-8cbaea7bf347' before making global git config changes
+2026-10-04T15:08:47.9836538Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-04T15:08:47.9841329Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux
+2026-10-04T15:08:47.9880211Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-04T15:08:47.9920628Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-04T15:08:48.0188637Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-04T15:08:48.0240929Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-04T15:08:48.0520634Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-04T15:08:48.0558629Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-04T15:08:48.0970990Z Cleaning up orphan processes
+2026-10-04T15:08:48.1241710Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

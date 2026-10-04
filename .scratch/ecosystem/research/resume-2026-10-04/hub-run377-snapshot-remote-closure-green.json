@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_verifier_snapshots.py",
+    "-v"
+  ],
+  "exit": 0,
+  "log_sha256": "0132dfa91604fdf05f3ba2ae9741eeacc9de7ea86ad2d1cfeb99df2fdfb77492",
+  "exact_source_ref_set": true,
+  "symbolic_origin_HEAD_main_restored": true,
+  "remote_only_future_clock_object_resolves": true
+}

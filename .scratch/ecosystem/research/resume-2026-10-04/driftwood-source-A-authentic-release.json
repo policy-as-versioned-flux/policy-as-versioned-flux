@@ -1,0 +1,20 @@
+{
+  "observed_at": "2026-10-04T11:05:18.661777+00:00",
+  "institution": "driftwood",
+  "tag": "v4.0.0",
+  "tag_object": "bff31936b9e34074a7ce078e873d3a0df31ecd35",
+  "peeled_commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "reviewed_source": "de03c5bfc3bde938b30c538d6027508e7f14ee38",
+  "cut_run": 37197118689,
+  "release_run": 37197387378,
+  "github_release": "https://github.com/policy-as-versioned-driftwood/driftwood/releases/tag/v4.0.0",
+  "published_at": "2026-10-04T11:03:05Z",
+  "draft": false,
+  "prerelease": false,
+  "git_signature": true,
+  "rekor_entry": true,
+  "certificate_claims": true,
+  "tlog_index": "3077567350",
+  "delivery_edits_may_begin": true,
+  "live_delivery_claimed": false
+}

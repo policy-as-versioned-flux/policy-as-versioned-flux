@@ -1,0 +1,46 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent Spec review of fresh Composition B on actual published Tuppence main; publication readiness only",
+  "head": "dbaa026f6510fe5c0042f33f29081f3840ea59c3",
+  "tree": "f8ad854469bfe76f591c72746d76334e7d1fa290",
+  "packet_sha256": "70c4082ee1b9d23b930ab8393b9478b2a179d5c5c09abe3941e7cf4508a4f8a9",
+  "source_A": {
+    "tag": "v4.0.0",
+    "tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e",
+    "commit": "f575dc12de130c444d98a831de0ca21fd68b9c46"
+  },
+  "fresh_normal_compose_exit": 0,
+  "fresh_normal_verify_exit": 0,
+  "independently_matched_committed_render_files": 51,
+  "fresh_compose_log_sha256": "2e1a453814df873079538d7cb178c46912e381bd5a3c788bb6b6f57ccfb13a46",
+  "fresh_verify_log_sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd",
+  "clean_source": true,
+  "source_output_diff": [],
+  "comparison_after": "45b99ef8e72985b14cfc011fa115d6a5df35f30892e295a184e6e95048610937",
+  "inventory_sha256": "b100844ba2f1b5e776eec6415e677704045fa01d3d0f860f74adacf4b472df18",
+  "actual_primary_report_hashes_match": true,
+  "apps_and_composed_refs_exact_A": true,
+  "rendered_policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "all_four_gitsign_gates_preserved": true,
+  "institutional_gate": {
+    "exit": 0,
+    "declared": "none",
+    "composed": "none",
+    "added": [],
+    "retired": []
+  },
+  "GitHub_merge_signature_receipt_verified": true,
+  "source_A_reach_exit": 0,
+  "engine": "1.18.2",
+  "no_new_cloud_or_live_observation_claim": true,
+  "prospective_B_tag": "v4.0.1",
+  "B_tag_created_by_this_review": false,
+  "historical_cut_rejection_preserved": "tuppence-composition-B-cut-auto-review-rejection.json",
+  "findings": [],
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

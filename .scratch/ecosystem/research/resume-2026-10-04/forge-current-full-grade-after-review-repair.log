@@ -1,0 +1,19 @@
+pin: driftwood propose-tier.yml ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/propose-tier\.yml@refs/heads/main$ (first read in .github/workflows/propose-tier.yml)
+pin: driftwood cut-release.yml ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+pin: hub cut-release.yml ^https://github\.com/policy-as-versioned-flux/policy-as-versioned-flux/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/twin-sweep.yml)
+PASS: driftwood: 3 active ruleset(s) on policy-as-versioned-driftwood/driftwood; 6 pinned branch(es) reviewed; 7 tag(s) held; bypass lists read and empty
+SKIP: feeds: the gate's checkout carries no readable clone of policy-as-versioned-feeds/feeds, so the pins it serves were not read
+PASS: feeds: 3 active ruleset(s) on policy-as-versioned-feeds/feeds; 0 pinned branch(es) reviewed; 7 tag(s) held; bypass lists read and empty
+PASS: hub: 3 active ruleset(s) on policy-as-versioned-flux/policy-as-versioned-flux; 6 pinned branch(es) reviewed; 0 tag(s) held; bypass lists read and empty
+SKIP: ico: the gate's checkout carries no readable clone of policy-as-versioned-ico/ico, so the pins it serves were not read
+PASS: ico: 3 active ruleset(s) on policy-as-versioned-ico/ico; 0 pinned branch(es) reviewed; 3 tag(s) held; bypass lists read and empty
+SKIP: insurer: the gate's checkout carries no readable clone of policy-as-versioned-insurer/insurer, so the pins it serves were not read
+PASS: insurer: 3 active ruleset(s) on policy-as-versioned-insurer/insurer; 0 pinned branch(es) reviewed; 1 tag(s) held; bypass lists read and empty
+SKIP: ludlow: the gate's checkout carries no readable clone of policy-as-versioned-ludlow/ludlow, so the pins it serves were not read
+PASS: ludlow: 3 active ruleset(s) on policy-as-versioned-ludlow/ludlow; 0 pinned branch(es) reviewed; 7 tag(s) held; bypass lists read and empty
+SKIP: nist: the gate's checkout carries no readable clone of policy-as-versioned-nist/nist, so the pins it serves were not read
+PASS: nist: 3 active ruleset(s) on policy-as-versioned-nist/nist; 0 pinned branch(es) reviewed; 2 tag(s) held; bypass lists read and empty
+SKIP: platform: the gate's checkout carries no readable clone of policy-as-versioned-platform/platform, so the pins it serves were not read
+PASS: platform: 3 active ruleset(s) on policy-as-versioned-platform/platform; 0 pinned branch(es) reviewed; 22 tag(s) held; bypass lists read and empty
+SKIP: tuppence: the gate's checkout carries no readable clone of policy-as-versioned-tuppence/tuppence, so the pins it serves were not read
+PASS: tuppence: 3 active ruleset(s) on policy-as-versioned-tuppence/tuppence; 0 pinned branch(es) reviewed; 7 tag(s) held; bypass lists read and empty

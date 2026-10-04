@@ -1,0 +1,11 @@
+{
+  "base": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "branch": "delivery-stage2-atomic-20261004",
+  "paths": [
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "remote_actions": false,
+  "source_A_branch_preserved": true
+}

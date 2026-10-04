@@ -1,0 +1,33 @@
+{
+  "result": "PASS",
+  "scope": "Independent read-only Standards review of the actual final B-pointer committed bytes and exact-head proof; no live adoption assertion",
+  "head": "b2abe26c155beea87366bcdf9775faae991f0803",
+  "tree": "5dcedc2fbc951c25251ee56b9c13bcf844ab044e",
+  "base": "dbaa026f6510fe5c0042f33f29081f3840ea59c3",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "packet_sha256": "32aa2fbf928e86606641ff340ac26310cfcbb5b9093d3d4889ea6132078647e3",
+  "normal_SSH_signature": "G",
+  "source_clean": true,
+  "all_other_tracked_entries_unchanged": 217,
+  "HEADER_only_delta": "comparison-inputs.after",
+  "prior_fingerprint": "45b99ef8e72985b14cfc011fa115d6a5df35f30892e295a184e6e95048610937",
+  "new_fingerprint": "1acb6430e97697a50d878ef343bb3b97cce117a3ff2f0e593642d63150a38273",
+  "authentic_B_tag_object": "9d0fbbbbf1d1ab8ef2d7da5c553f2b86bee22a5c",
+  "authentic_B_commit": "dbaa026f6510fe5c0042f33f29081f3840ea59c3",
+  "root_normal_crypto_measurement_joined_to_exact_local_tag": true,
+  "tlog_index": "3077582720",
+  "apps_and_native_inventory_remain_A": true,
+  "B_signed_tree_and_final_policy_tree_equal": true,
+  "engine_and_cloud_declarations_unchanged": true,
+  "array_and_all_signature_gates": "5/6/7 +machinery",
+  "recorded_authentic_compose_verify_reach": "PASS",
+  "exact_postcommit_real_layout": "4PASS, no skips",
+  "institutional_gate": "none/none, no added or retired versions",
+  "hard_findings": [],
+  "source_edits": false,
+  "external_actions": false,
+  "active_sessions": []
+}

@@ -1,0 +1,18 @@
+{
+  "candidate": "98d13782173342bbdfbd14271e1626e3b11b0d73",
+  "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "base": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "local_preparation": "complete",
+  "genuine_source_A_verified": true,
+  "primary_inventory_and_policy_bytes_preserved": true,
+  "authenticated_compose_verify_reach": "PASS",
+  "precommit_tests": "25 public +17 workflow PASS, no skips",
+  "normal_exact_head_gate": "none/none, added=[], retired=[], exit0",
+  "postcommit_layout": "PASS, no skips",
+  "source_clean": true,
+  "external_mutations": false,
+  "active_sessions": [],
+  "historical_approval_review_failure": "Preserved separately; identical normal approved command now passed",
+  "candidate_packet": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-candidate.json",
+  "body": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-PR-body.md"
+}

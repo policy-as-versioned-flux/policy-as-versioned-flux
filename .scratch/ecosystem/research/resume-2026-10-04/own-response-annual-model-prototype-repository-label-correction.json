@@ -1,0 +1,14 @@
+{
+  "recorded_at": "2026-10-04T15:26:46.680597+00:00",
+  "scope": "candidate metadata repository label only; signed11-file source/head/tree and primary checks unchanged",
+  "field": "repository",
+  "old": "https://github.com/policy-as-versioned-flux/platform",
+  "new": "https://github.com/policy-as-versioned-platform/platform",
+  "original_packet": ".scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-prototype-candidate-initial-repository-label.json",
+  "original_packet_sha256": "1dcb27f2d824ead824aeb1eb9b8df64373619fe83460f5177b7dc01dca990bac",
+  "current_packet": ".scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-prototype-candidate.json",
+  "current_packet_sha256": "3ddec82e46a9422a2e6fe2f4dd2a4fcc901e74b0b908d553410597176e303c7e",
+  "source_head": "c1bbb13a5124baa06247fe45845a425399908611",
+  "source_tree": "a69892493ae59f3e7e8658eb270526ef3d5bc25f",
+  "external_publication": false
+}

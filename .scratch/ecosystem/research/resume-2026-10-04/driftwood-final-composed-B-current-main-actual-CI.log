@@ -1,0 +1,12 @@
+Refreshing checks status every 10 seconds. Press Ctrl+C to quit.
+
+compose-check	pending	0	https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37205282527/job/111445081785	
+shift-left	pending	0	https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37205282527/job/111445081963	
+Refreshing checks status every 10 seconds. Press Ctrl+C to quit.
+
+compose-check	pending	0	https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37205282527/job/111445081785	
+shift-left	pass	36s	https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37205282527/job/111445081963	
+compose-check	pass	44s	https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37205282527/job/111445081785	
+shift-left	pass	36s	https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37205282527/job/111445081963	
+compose-check	pass	44s	https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37205282527/job/111445081785	
+shift-left	pass	36s	https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37205282527/job/111445081963	

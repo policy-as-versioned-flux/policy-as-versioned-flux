@@ -1,0 +1,23 @@
+Ticket 62 — .scratch/ecosystem/issues/62-the-feed-parents-are-consumed-pinned-and-signed.md
+
+## Regression acknowledgement, 2026-10-04
+
+**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/feed-contract/verify-feed-contract.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: insurer declared a platform implementations pin whose authentic tree lacks its claimed cloud path; Standards owns the exact compatible-parent correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed insurer source `ed17499668f368c55261729c760904662ab7e242`, reviewed against the genuine tools5 tag and commit `703eff6aee959843c4160aa54fd03413f62858cc`; its normal public PR 8 was last captured open, so no completed merge or fresh clock grade is claimed.
+
+Ticket 77 — .scratch/ecosystem/issues/77-every-pin-is-checked-for-content.md
+
+## Regression acknowledgement, 2026-10-04
+
+**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/feed-contract/verify-feed-contract.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: insurer declared a platform implementations pin whose authentic tree lacks its claimed cloud path; Standards owns the exact compatible-parent correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed insurer source `ed17499668f368c55261729c760904662ab7e242`, reviewed against the genuine tools5 tag and commit `703eff6aee959843c4160aa54fd03413f62858cc`; its normal public PR 8 was last captured open, so no completed merge or fresh clock grade is claimed.
+
+Ticket 83 — .scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md
+
+## Regression acknowledgement, 2026-10-04
+
+**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/truth-line/verify-truth-line.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: three discovered checks lacked manifest rows; Spec owns the exact source classification/entrypoint correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed hub source `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`, with exact manifest/entrypoint repairs and independent review; publication and its next actual collector grade remain separate.
+
+Ticket 96 — .scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md
+
+## Regression acknowledgement, 2026-10-04
+
+**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/truth-line/verify-truth-line.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: three discovered checks lacked manifest rows; Spec owns the exact source classification/entrypoint correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed hub source `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`, with exact manifest/entrypoint repairs and independent review; publication and its next actual collector grade remain separate.

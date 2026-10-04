@@ -1,0 +1,20 @@
+{
+  "recorded_at": "2026-10-04T16:01:29.014955+00:00",
+  "cwd": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_loophole_adr_0026.py::test_record_header_preserves_real_writer_history",
+    "-q"
+  ],
+  "exit_code": 1,
+  "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-compatibility-red.log",
+  "log_sha256": "e060a849b502fb7c80f61d67294139efeb4ce26857c77262cf1bab87a0a1fe64",
+  "platform_refs": {
+    "v5.0.0": "703eff6aee959843c4160aa54fd03413f62858cc",
+    "HEAD": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb"
+  },
+  "source_sha256": "431829ab35f6f8669111c831b1d87e8bf7ea4199cb2413dea9bdaa138a95be81",
+  "expectation": "before fix actual auto-commit writer duplicates gitcommit; repeated old write-only also rejects clean state"
+}

@@ -1,0 +1,49 @@
+F.E.E.
+======================================================================
+ERROR: test_known_zero_is_priced_and_false_absence_fails (test_scenario_pricing.ConsequenceDeclaration.test_known_zero_is_priced_and_false_absence_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/tests/test_scenario_pricing.py", line 75, in test_known_zero_is_priced_and_false_absence_fails
+    self.assertIn("valuation grade 3", self.check())
+                                       ~~~~~~~~~~^^
+  File "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/tests/test_scenario_pricing.py", line 24, in check
+    return pricing.validate_consequence(scenario or self.scenario,
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        self.perspectives if perspectives is None else perspectives,
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        self.edges if edges is None else edges, threshold)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/twin/scenario_pricing.py", line 13, in validate_consequence
+    raise InvalidDeclaration("the note does not declare an unpriced consequence")
+scenario_pricing.InvalidDeclaration: the note does not declare an unpriced consequence
+
+======================================================================
+ERROR: test_priced_basis_is_admitted_without_regrading_mitigation_or_observation (test_scenario_pricing.ConsequenceDeclaration.test_priced_basis_is_admitted_without_regrading_mitigation_or_observation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/tests/test_scenario_pricing.py", line 30, in test_priced_basis_is_admitted_without_regrading_mitigation_or_observation
+    result = self.check()
+  File "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/tests/test_scenario_pricing.py", line 24, in check
+    return pricing.validate_consequence(scenario or self.scenario,
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        self.perspectives if perspectives is None else perspectives,
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        self.edges if edges is None else edges, threshold)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/twin/scenario_pricing.py", line 13, in validate_consequence
+    raise InvalidDeclaration("the note does not declare an unpriced consequence")
+scenario_pricing.InvalidDeclaration: the note does not declare an unpriced consequence
+
+======================================================================
+FAIL: test_ambiguous_or_unrelated_absence_does_not_supply_consequence_declaration (test_scenario_pricing.ConsequenceDeclaration.test_ambiguous_or_unrelated_absence_does_not_supply_consequence_declaration) (note='The fine is not priced; mitigation remains unpriced.')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow/tests/test_scenario_pricing.py", line 46, in test_ambiguous_or_unrelated_absence_does_not_supply_consequence_declaration
+    with self.subTest(note=note), self.assertRaises(pricing.InvalidDeclaration):
+                                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDeclaration not raised
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+FAILED (failures=1, errors=2)

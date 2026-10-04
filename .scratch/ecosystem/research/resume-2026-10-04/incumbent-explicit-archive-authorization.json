@@ -1,0 +1,10 @@
+{
+  "trusted_user_answer": "Approve these three archives",
+  "targets": [
+    "policy-as-versioned-flux/readiness-collector",
+    "policy-as-versioned-flux/pr-gate-action",
+    "policy-as-versioned-flux/renovate-config"
+  ],
+  "order": "readiness first; anonymous OCI preservation check; then other two",
+  "scope": "Specific authorization after automatic review rejection; no other archives authorized by this answer."
+}

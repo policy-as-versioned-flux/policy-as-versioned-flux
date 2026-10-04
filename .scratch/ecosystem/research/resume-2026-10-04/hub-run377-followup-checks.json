@@ -1,0 +1,73 @@
+{
+  "head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "checks": {
+    "signature": {
+      "argv": [
+        "git",
+        "verify-commit",
+        "4c4b53c7163b0da7e11e9d0574057bcbc24e298d"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-signature.log",
+      "sha256": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907"
+    },
+    "mypy": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "mypy",
+        "--explicit-package-bases",
+        "--follow-imports=silent",
+        "--ignore-missing-imports",
+        "verify/_snapshot.py",
+        "verify/map-surface/map_surface.py",
+        "verify/engine-pairing/engine_pairing.py",
+        "verify/e2e/step2_reprice.py"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-mypy.log",
+      "sha256": "71144743c83babea384888a735db0c4daba3d4d7b7942b6839984bd5c21b52bb"
+    },
+    "focused": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_workload_lane_entrypoint.py",
+        "tests/test_verifier_snapshots.py",
+        "tests/test_map_observation_ownership.py",
+        "tests/test_truth_manifest.py",
+        "tests/test_map_surface.py",
+        "tests/test_refusal_by_another_name.py"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-focused.log",
+      "sha256": "ebbced0fe1aa3b278598a88178352d68ab8e518636f0ec16e3ba4e59edb0831f"
+    },
+    "engine": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/engine-pairing/engine_pairing.py",
+        "check"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-engine.log",
+      "sha256": "a54548f109f397fde1305656a74cab9e4dcc30d668c4cf2b415ebda6b57843cd"
+    },
+    "e2e": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/e2e/step2_reprice.py",
+        "--estate",
+        "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/.estate-clone"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-e2e.log",
+      "sha256": "81f2d2d92f251967ca1155828295f50998b3df097524ee7506bfa9243d801aca"
+    }
+  },
+  "external_mutations": false,
+  "scheduled_run_regraded": false,
+  "clean": true
+}

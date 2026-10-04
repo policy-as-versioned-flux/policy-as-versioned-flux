@@ -1,0 +1,7 @@
+Spec PASS for signed head f10faa536aa441a7f64f42a0aceed6a3d7b8f205, tree6f0aab95463b73d0415552d213ea755f621c1cc1, parent7fa013805f1e8bdd58e5a0390997c38211c5e087. No actionable finding.
+
+The single-file followup fixes the actual ADR0026 fixture caller: after the genuine writer runs, a staged diff of0 creates no duplicate commit,1 commits the changed fixture, and unexpected Git statuses propagate. Every Git-backed call then checks HEAD’s exact rendered HEADER bytes. Non-Git fixture behavior is preserved. The new tests execute AST-extracted functions from authentic tools5/703 and published platform mainf0 against real Git history, preserve declared staged state, and require exactly one comparison point plus idempotence.
+
+Independent read-only binding confirms normal SSH/G signature, clean exact HEAD/tree/parent, source and narrow/full binary patches, all14 combined paths, and the saved PR body. Recorded genuine old/new compatibility changed2FAIL to2PASS; all208-source mypy passed. Logs and platform refs join the exact source receipt. These meaningful author checks are reused without another runtime suite.
+
+The preceding actual7fa CI log remains intact:2898PASS,24SKIP and9FAIL, including eight duplicate fixture-commit failures and the unchanged90% floor invariant. This review supports ordinary publication of the repaired source, followed by actual CI and matching-head App review. It does not claim fresh CI, waive the floor, alter production pricing/guards, or substitute for scheduled observations.

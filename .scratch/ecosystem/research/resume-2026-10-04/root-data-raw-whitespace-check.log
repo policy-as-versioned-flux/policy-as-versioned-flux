@@ -1,0 +1,32 @@
+.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-gate.md:4: new blank line at EOF.
+.scratch/ecosystem/research/resume-2026-10-04/driftwood-composition-B-published-main-gate.md:4: new blank line at EOF.
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_demo_verify-demo.out:5: trailing whitespace.
++    line 279: This is the step where the price becomes a constraint on a running workload, and it is the step whose green I 
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:13: trailing whitespace.
++.estate-clone/feeds/verify-market-and-news.sh	PASS	PASS: market-moves publishes a dated series from one mechanical rule over one venue with no probability-shaped field, and its own threshold is what opens a PR; 
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:16: trailing whitespace.
++.estate-clone/ico/schema/verify.sh	EXCLUDED	
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:18: trailing whitespace.
++.estate-clone/ico/verify-penalty-feed.sh	PASS	PASS: ico penalty schema signed+versioned, fair.py consumes it unmodified, a schema bump moves the £, a second obligation source raises it, the four published 
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:30: trailing whitespace.
++.estate-clone/platform/access/verify-access.sh	EXCLUDED	
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:40: trailing whitespace.
++.estate-clone/platform/computed-semver/verify-pairing.sh	PASS	selfcheck ok: parses YAML, never a text diff -- a comment-only change is no movement; pairing uses (identity, name-with-version-stripped), proven by two family 
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:53: trailing whitespace.
++.estate-clone/platform/eud/verify-eud.sh	EXCLUDED	
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:56: trailing whitespace.
++.estate-clone/platform/feeds/verify.sh	EXCLUDED	
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:59: trailing whitespace.
++.estate-clone/platform/identity/verify-federation.sh	EXCLUDED	
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:60: trailing whitespace.
++.estate-clone/platform/identity/verify-identity.sh	EXCLUDED	
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:66: trailing whitespace.
++.estate-clone/platform/posture/verify-posture-projection.sh	EXCLUDED	
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:78: trailing whitespace.
++.estate-clone/tuppence/reset/verify-reach-secrets.sh	EXCLUDED	
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:110: trailing whitespace.
++verify/fold-agreement/verify-fold-agreement.sh	PASS	PASS: on 6 planted movements of a composed window (accepted, arrival, misaddressed, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, 
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:115: trailing whitespace.
++verify/map-surface/verify-map-surface.sh	FAIL	FAIL: the record and the surface disagree -- 1 of this script's legs observed false; the ' == ' tally above says how many findings of which kind, and every one 
+.scratch/ecosystem/research/resume-2026-10-04/hub-run377-grades.tsv:122: trailing whitespace.
++verify/priced-holes/verify-priced-holes.sh	PASS	PASS: no hole, widening, removal or ungoverned namespace refuses; each is a priced delta keyed (source, id), the ungoverned share ramps from a signed since and 

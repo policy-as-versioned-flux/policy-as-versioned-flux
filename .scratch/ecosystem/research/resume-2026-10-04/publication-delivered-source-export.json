@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "source_manifest": ".scratch/ecosystem/research/resume-2026-10-04/publication-delivered-source-manifest.json",
+  "source_manifest_sha256": "97a9cb1dab40dcf4453145b1c76714a6981f5ac87c0d6181f0f6364c3547c82d",
+  "complete_manifest": ".scratch/ecosystem/patches/resume-2026-10-04/complete/manifest.json",
+  "complete_manifest_sha256": "03e976f02c69eff3779bcdb85e3abd1d55bfac66d363b0391fafd637b19d16f6",
+  "nine_repository_patch_hashes": {
+    "platform": "cfc745a8c95af92e64a54c5c566cdd12e901d1fdaf46c553b7718eb1af29c9be",
+    "feeds": "136e86ae9d8afe5a7f0863e10f50c2e0e5bf7eb3ce83e61d327147292f786795",
+    "app-ledger": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+    "app-storefront": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+    "app-api": "9a68368faad1c072ee0aab675f4dcd9c2e3335fa42b4704e986588bf777d4988",
+    "app-reports": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+    "driftwood": "e158385f7400744dc4246cc3becb253105572160f4d59a723a3a75978474d848",
+    "ludlow": "7c9ede9224b4e0945b6bbde0b4338916c0c8574cb17ba2bd3086947bab08caff",
+    "tuppence": "2600f3866e52138d2026ed113e44183f08f4ba2317f1642099cea2dd0b9dcb16"
+  },
+  "all_reverse_apply_checks": "PASS",
+  "all_genuine_published_commits_match_fresh_remote_main": true,
+  "earlier_source_manifests_preserved": true,
+  "oct3_complete_manifest_sha256_preserved": "28a36c140e9ed9afbe58816cc280bedae5bbffea841aeaaebf9ffc45538c3260",
+  "candidate_worktrees_preserved": true,
+  "pending_source_excluded": {
+    "driftwood": {
+      "candidate": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+      "reason": "Reviewed maintenance source awaits exact public approval; published main remains separate"
+    },
+    "platform": {
+      "candidate": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+      "reason": "Reviewed maintenance source awaits exact public approval; genuine published main remains 703eff6"
+    },
+    "hub": {
+      "candidate": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+      "reason": "Hub verifier maintenance publication was rejected before execution; outside nine-repository source export"
+    },
+    "prototype": {
+      "reason": "Prepared prototype is outside approved delivered source and excluded"
+    }
+  },
+  "external_mutations": false,
+  "limitation": "Actual published source cutoff, not fresh live PolicyReport baseline or whole-hub green CI; exact public root data publication remains separate."
+}

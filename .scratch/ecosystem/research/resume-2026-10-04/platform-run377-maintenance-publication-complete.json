@@ -1,0 +1,28 @@
+{
+  "source_candidate": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "source_tree": "0a2b87aeacceecf5d5423b2e24df4b6e7db1f1b2",
+  "actual_published_main": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb",
+  "actual_published_tree_equals_reviewed_tree": true,
+  "normal_matching_head_App_review": {
+    "id": 5406856517,
+    "actor": "pavc-other-hand[bot]",
+    "commit": "0547a5fa7babe34227be5085ff63b1cf196d8cae"
+  },
+  "actual_main_signature_verified": true,
+  "PR": "https://github.com/policy-as-versioned-platform/platform/pull/51",
+  "merged_at": "2026-10-04T15:22:58Z",
+  "actual_CI": "Empty rollup: no pull-request workflow declared; no green CI invented",
+  "source_validation": "Exact reviewed source checks remain bound by identical merged tree; no new postmerge full test run claimed",
+  "initial_auto_review_rejection_preserved": true,
+  "exact_trusted_user_approval_record": "dw-platform-maintenance-explicit-approval-and-fresh-preflight.json",
+  "protection_or_signing_overrides": false,
+  "release_created": false,
+  "engine_or_cloud_activation": false,
+  "new_live_baseline_claimed": false,
+  "artifacts_sha256": {
+    "platform-run377-maintenance-candidate.json": "4a54983579aadfa98b01a50eec58e61b03946b26fcf67eb8371d57ee1e826238",
+    "platform-run377-maintenance-actual-merge.json": "6ce338b3dda665b76ca75f704e39d253fd0680113cd8ae6d366d7185a1f939d8",
+    "platform-run377-maintenance-App-review.json": "23b8fc384b09a5b467f7438e98e3f3327d2208f4151b487902129ff15e8abffc",
+    "platform-run377-maintenance-actual-CI-current.json": "12a71b564fa927a1eb4a8bd3d7875abba3269f8e6b93b1e2c9ddd9decbc919d1"
+  }
+}

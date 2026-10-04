@@ -1,0 +1,55 @@
+{
+  "actor": "Codex integrator acting under owner-delegated implementation scope",
+  "authorized_by": "Root explicitly instructed these four append-only owned ticket acknowledgements; no human quote manufactured",
+  "date": "2026-10-04",
+  "primary_grades_edited": false,
+  "Answer_sections_preserved": true,
+  "source_only_root_commit_pending": true,
+  "insurer_authentic_delivery_receipt_sha256": "e8dd98db5aa3bfe989837e0480bbf245f7d1b193b8fab22db6586362cdf5d7d2",
+  "records": [
+    {
+      "ticket": 62,
+      "path": ".scratch/ecosystem/issues/62-the-feed-parents-are-consumed-pinned-and-signed.md",
+      "check": "verify/feed-contract/verify-feed-contract.sh",
+      "before_sha256": "198dc8f2827309f4cab3cdae682245ab963174ce96b95e3eb8147024f4b34b6b",
+      "after_sha256": "2e08e59655bc358cb8031addcc2d46a9e991554cafe64f57871fb26ef654b695",
+      "exact_prior_bytes_prefix_preserved": true,
+      "Answer_unchanged": true,
+      "unchanged_textual_helper_accepts": true,
+      "applied_append": "## Regression acknowledgement, 2026-10-04\n\n**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/feed-contract/verify-feed-contract.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: insurer declared a platform implementations pin whose authentic tree lacks its claimed cloud path; Standards owns the exact compatible-parent correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed insurer source `ed17499668f368c55261729c760904662ab7e242`, reviewed against the genuine tools5 tag and commit `703eff6aee959843c4160aa54fd03413f62858cc`; its normal matching-head App-reviewed public PR 8 is genuinely merged at `5d1a7cde88230370074ed2a2ce4e94adf4eb8790`. No future scheduled fetch, quote release or fresh clock grade is claimed.\n"
+    },
+    {
+      "ticket": 77,
+      "path": ".scratch/ecosystem/issues/77-every-pin-is-checked-for-content.md",
+      "check": "verify/feed-contract/verify-feed-contract.sh",
+      "before_sha256": "9e4eb50204ce0a63d24636e07f24bf28e03a3773cd06ffec20aa4fd7177c5440",
+      "after_sha256": "32c540fb00ead2739edd156f0ce5be8784248d8e08d17c321bd0bf992447006c",
+      "exact_prior_bytes_prefix_preserved": true,
+      "Answer_unchanged": true,
+      "unchanged_textual_helper_accepts": true,
+      "applied_append": "## Regression acknowledgement, 2026-10-04\n\n**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/feed-contract/verify-feed-contract.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: insurer declared a platform implementations pin whose authentic tree lacks its claimed cloud path; Standards owns the exact compatible-parent correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed insurer source `ed17499668f368c55261729c760904662ab7e242`, reviewed against the genuine tools5 tag and commit `703eff6aee959843c4160aa54fd03413f62858cc`; its normal matching-head App-reviewed public PR 8 is genuinely merged at `5d1a7cde88230370074ed2a2ce4e94adf4eb8790`. No future scheduled fetch, quote release or fresh clock grade is claimed.\n"
+    },
+    {
+      "ticket": 83,
+      "path": ".scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md",
+      "check": "verify/truth-line/verify-truth-line.sh",
+      "before_sha256": "fcf022257110e750df0f92e817d713fa945e26fa5ac2405604a904aa4b2d67ec",
+      "after_sha256": "8b4adb269294740ef2a3ac0bd6c35f0e6aefc5ee42de23ca7f2b5d50635ea49b",
+      "exact_prior_bytes_prefix_preserved": true,
+      "Answer_unchanged": true,
+      "unchanged_textual_helper_accepts": true,
+      "applied_append": "## Regression acknowledgement, 2026-10-04\n\n**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/truth-line/verify-truth-line.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: three discovered checks lacked manifest rows; Spec owns the exact source classification/entrypoint correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed hub source `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`, with exact manifest/entrypoint repairs and independent review; publication and its next actual collector grade remain separate.\n"
+    },
+    {
+      "ticket": 96,
+      "path": ".scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md",
+      "check": "verify/truth-line/verify-truth-line.sh",
+      "before_sha256": "b427ef01b0ad70934c777b90570456096955dc31d940c27368007891417ea0ed",
+      "after_sha256": "50ca08899b1bacd6781d0156eb378b975d828b774d43bdc2647874d21c914096",
+      "exact_prior_bytes_prefix_preserved": true,
+      "Answer_unchanged": true,
+      "unchanged_textual_helper_accepts": true,
+      "applied_append": "## Regression acknowledgement, 2026-10-04\n\n**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/truth-line/verify-truth-line.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: three discovered checks lacked manifest rows; Spec owns the exact source classification/entrypoint correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed hub source `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`, with exact manifest/entrypoint repairs and independent review; publication and its next actual collector grade remain separate.\n"
+    }
+  ]
+}

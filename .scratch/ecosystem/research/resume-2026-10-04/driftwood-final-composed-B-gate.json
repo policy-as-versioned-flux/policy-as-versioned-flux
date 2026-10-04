@@ -1,0 +1,11 @@
+{
+  "result": {
+    "composed_bump": "none",
+    "declared_bump": "none",
+    "added": [],
+    "retired": [],
+    "reasons": [],
+    "weaker_than_declared": false
+  },
+  "evidence": {}
+}

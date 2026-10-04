@@ -1,0 +1,168 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index 0ef6a28e952b1dcc5eacaef32a060411516ea50a..4841275b472802ec225f0444a66c538ab10454f0 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -624,7 +624,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: e9dcdf11ebbbd9a9d851b2b0c6bb1adb03a3a2f23e32bb814a8871d7a9f56e87
++  after: b50aace4fbe93f5fa7a1a2ef8c840f97c5b0d9025240d177630474b395cd88c5
+   before:
+     header:
+       parents:
+diff --git a/gitops/flux-system/gotk-sync.yaml b/gitops/flux-system/gotk-sync.yaml
+index 0e822fa82bc48373abf4b373a437c6199fbe314f..75f0a279155e1b430c582cc19b5852d344c246af 100644
+--- a/gitops/flux-system/gotk-sync.yaml
++++ b/gitops/flux-system/gotk-sync.yaml
+@@ -34,6 +34,14 @@ spec:
+   interval: 5m
+   retryInterval: 1m
+   timeout: 3m
++  # A cold cluster must install the complete composed window before native
++  # workloads are admitted. Ready is Flux's delivery boundary; the scheduled
++  # lane still observes actual webhook mutation and keeps missing stamps honest.
++  dependsOn:
++    - name: composed-v5-0-0
++    - name: composed-v6-0-0
++    - name: composed-v7-0-0
++    - name: composed-machinery
+   sourceRef:
+     kind: GitRepository
+     name: driftwood
+diff --git a/tests/test_apps_dependencies.py b/tests/test_apps_dependencies.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..a1319ed8b2e84900496b8eb905048346e62ab583
+--- /dev/null
++++ b/tests/test_apps_dependencies.py
+@@ -0,0 +1,76 @@
++"""Native app admission follows the actual signed composed delivery graph."""
++import copy
++from pathlib import Path
++import sys
++import unittest
++
++import yaml
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT / 'scripts'))
++import render_composed
++
++
++def assert_ordered(test, apps, generated):
++    """Require every generated policy route before apps, with no unknown edge or cycle."""
++    policies = [obj for obj in generated if obj.get('kind') == 'Kustomization']
++    key = lambda obj: (obj['metadata'].get('namespace', ''), obj['metadata']['name'])
++    nodes = {key(obj): obj for obj in [apps, *policies]}
++    test.assertEqual(len(nodes), len(policies) + 1, 'duplicate Kustomization name')
++    graph = {}
++    for node, obj in nodes.items():
++        dependencies = [(dep.get('namespace', node[0]), dep['name'])
++                        for dep in obj['spec'].get('dependsOn', [])]
++        test.assertEqual(len(dependencies), len(set(dependencies)), 'duplicate dependency')
++        test.assertTrue(set(dependencies) <= nodes.keys(), 'dependency names no generated route')
++        graph[node] = dependencies
++    test.assertEqual(set(graph[key(apps)]), {key(obj) for obj in policies},
++                     'apps must wait for every composed policy route and machinery')
++    visited, active = set(), set()
++
++    def visit(node):
++        test.assertNotIn(node, active, 'Flux dependency cycle')
++        if node in visited:
++            return
++        active.add(node)
++        for dependency in graph[node]:
++            visit(dependency)
++        active.remove(node)
++        visited.add(node)
++
++    for node in graph:
++        visit(node)
++
++
++class AppAdmissionOrder(unittest.TestCase):
++    def setUp(self):
++        self.apps = next(obj for obj in yaml.safe_load_all(
++            (ROOT / 'gitops/flux-system/gotk-sync.yaml').read_text())
++            if obj and obj.get('kind') == 'Kustomization')
++        # Expand the repository's actual ResourceSet template and declared array.
++        self.generated = render_composed.expand(repo=str(ROOT))
++
++    def test_current_native_apps_wait_for_the_actual_composed_graph(self):
++        assert_ordered(self, self.apps, self.generated)
++
++    def test_missing_or_invented_route_is_rejected(self):
++        for change in ('missing', 'invented'):
++            with self.subTest(change=change):
++                apps = copy.deepcopy(self.apps)
++                if change == 'missing':
++                    apps['spec']['dependsOn'] = apps['spec'].get('dependsOn', [])[:-1]
++                else:
++                    apps['spec']['dependsOn'] = [{'name': 'no-such-composed-route'}]
++                with self.assertRaises(AssertionError):
++                    assert_ordered(self, apps, self.generated)
++
++    def test_composed_route_waiting_on_apps_is_a_cycle(self):
++        apps = copy.deepcopy(self.apps)
++        apps['spec']['dependsOn'] = [
++            {'name': obj['metadata']['name']}
++            for obj in self.generated if obj.get('kind') == 'Kustomization']
++        generated = copy.deepcopy(self.generated)
++        route = next(obj for obj in generated if obj.get('kind') == 'Kustomization')
++        route['spec']['dependsOn'] = [{'name': apps['metadata']['name']}]
++        with self.assertRaisesRegex(AssertionError, 'cycle'):
++            assert_ordered(self, apps, generated)
+diff --git a/twin/verify-twin-sweep-moved.sh b/twin/verify-twin-sweep-moved.sh
+index 15ac9a79d011a71a6e1dd2dae171c53213678c56..7becdd76529656818bda1a092a6b128295953b1f 100755
+--- a/twin/verify-twin-sweep-moved.sh
++++ b/twin/verify-twin-sweep-moved.sh
+@@ -44,7 +44,7 @@ WORKFLOW="$REPO/.github/workflows/twin-sweep.yml"
+ 
+ log="$(mktemp)"; trap 'rm -f "$log"' EXIT
+ HUB="$HUB" REPO="$REPO" PY="$PY" WORKFLOW="$WORKFLOW" "$PY" - >"$log" 2>&1 <<'PY'
+-import json, os, re, shutil, stat, subprocess, sys, tempfile
++import ast, json, os, re, shutil, stat, subprocess, sys, tempfile
+ from pathlib import Path
+ 
+ HUB, REPO, PY, WORKFLOW = (Path(os.environ[k]) for k in ("HUB", "REPO", "PY", "WORKFLOW"))
+@@ -68,6 +68,22 @@ if step is None or not step.get("run"):
+     sys.exit(1)
+ script = str(step["run"])
+ 
++# Mutate the current publisher declaration, just as the actual emitter selects
++# its output. Retained major directories are immutable history, not the feed
++# checked by this clock. Read the literal without importing/executing the emitter.
++tree = ast.parse((REPO / "twin" / "emit-forward-intel.py").read_text())
++declarations = [node for node in tree.body if isinstance(node, ast.Assign)
++                and any(isinstance(target, ast.Name) and target.id == "VERSION" for target in node.targets)]
++if (len(declarations) != 1 or not isinstance(declarations[0].value, ast.Constant)
++        or not isinstance(declarations[0].value.value, str)
++        or not re.fullmatch(r"[1-9][0-9]*\.[0-9]+\.[0-9]+", declarations[0].value.value)):
++    out("FAIL", "emitter must declare exactly one literal semantic VERSION")
++    sys.exit(1)
++current_feed = Path("twin") / "forward-intel" / ("v" + declarations[0].value.value.split(".")[0]) / "feed.json"
++if not (REPO / current_feed).is_file():
++    out("FAIL", "current declared emitter feed is absent: %s" % current_feed)
++    sys.exit(1)
++
+ # Planted under the hub, not /tmp, because the emitter finds the twin package by walking up;
+ # directly under the hub rather than .estate-clone/ so no estate-wide glob sees it.
+ plant_root = Path(tempfile.mkdtemp(prefix=".plant-", dir=str(HUB)))
+@@ -112,10 +128,16 @@ try:
+ 
+     cases = [
+         ("a fresh copy", lambda p: None, "moved=false"),
+-        ("a stale feed", lambda p: (p / "twin" / "forward-intel" / "v1" / "feed.json").open("a").write("\n"),
++        ("a stale feed", lambda p: (p / current_feed).open("a").write("\n"),
+          "moved=true"),
+         ("a stale signal lookup", stale_lookup, "moved=true"),
+     ]
++    for old_feed in sorted((REPO / "twin" / "forward-intel").glob("v*/feed.json")):
++        relative = old_feed.relative_to(REPO)
++        if relative != current_feed:
++            cases.append(("a stale retained %s feed" % old_feed.parent.name,
++                          lambda p, relative=relative: (p / relative).open("a").write("\n"),
++                          "moved=false"))
+     for label, mutate, want in cases:
+         rc, outputs, said = run_step(label, mutate)
+         ok = rc == 0 and want in outputs and any(o.startswith("swept_at=") for o in outputs)

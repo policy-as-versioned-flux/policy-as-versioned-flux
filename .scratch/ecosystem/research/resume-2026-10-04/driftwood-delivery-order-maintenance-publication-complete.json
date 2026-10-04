@@ -1,0 +1,28 @@
+{
+  "source_candidate": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+  "source_tree": "b2c8a4b5c3ab9f1cf3ef85e86e20776098cd0072",
+  "actual_published_main": "1194561829ff60f89cd3889ab8cf06a45d5e9dd0",
+  "actual_published_tree_equals_reviewed_tree": true,
+  "normal_matching_head_App_review": {
+    "id": 5406849127,
+    "actor": "pavc-other-hand[bot]",
+    "commit": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a"
+  },
+  "actual_main_signature_verified": true,
+  "PR": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/57",
+  "merged_at": "2026-10-04T15:21:14Z",
+  "actual_CI": "both shift-left and compose-check SUCCESS",
+  "source_validation": "Exact reviewed source checks remain bound by identical merged tree; no new postmerge full test run claimed",
+  "initial_auto_review_rejection_preserved": true,
+  "exact_trusted_user_approval_record": "dw-platform-maintenance-explicit-approval-and-fresh-preflight.json",
+  "protection_or_signing_overrides": false,
+  "release_created": false,
+  "engine_or_cloud_activation": false,
+  "new_live_baseline_claimed": false,
+  "artifacts_sha256": {
+    "driftwood-delivery-order-maintenance-candidate.json": "e0d5d3616bdc4da2de213cafd2c329cccbfc6d698ed312baecc99079e7536c68",
+    "driftwood-delivery-order-maintenance-actual-merge.json": "e23490f93667f73cd8413afc9b064cf12d6bff655bd1889cb1261169905cdcc9",
+    "driftwood-delivery-order-maintenance-App-review.json": "b1148d4a05b1990d6791260ae5755f7db5c2fa2813e82408cd91155b224c7e6f",
+    "driftwood-delivery-order-maintenance-actual-CI-current.json": "2eeb2160bd93b4fd28de22e3b8ef9cff00998a9441e857665b27c75ce202c76c"
+  }
+}

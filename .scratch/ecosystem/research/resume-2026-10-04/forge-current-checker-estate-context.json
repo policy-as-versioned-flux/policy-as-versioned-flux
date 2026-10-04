@@ -1,0 +1,70 @@
+{
+  "scope": "Disposable committed-source clones for unchanged HTTPS-only forge collector; no original remotes or source bytes changed",
+  "estate": "/private/tmp/pavf-forge-current-20261004",
+  "sources": [
+    {
+      "unit": "driftwood",
+      "original": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+      "snapshot": "/private/tmp/pavf-forge-current-20261004/driftwood",
+      "commit": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+      "source_worktree_preserved": true,
+      "canonical_https_remote_matches_estate_contract": true
+    },
+    {
+      "unit": "ludlow",
+      "original": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "snapshot": "/private/tmp/pavf-forge-current-20261004/ludlow",
+      "commit": "b84006a176e6c783bbb45fc2463c46be6ba73071",
+      "source_worktree_preserved": true,
+      "canonical_https_remote_matches_estate_contract": true
+    },
+    {
+      "unit": "tuppence",
+      "original": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/tuppence",
+      "snapshot": "/private/tmp/pavf-forge-current-20261004/tuppence",
+      "commit": "b2abe26c155beea87366bcdf9775faae991f0803",
+      "source_worktree_preserved": true,
+      "canonical_https_remote_matches_estate_contract": true
+    },
+    {
+      "unit": "platform",
+      "original": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/platform",
+      "snapshot": "/private/tmp/pavf-forge-current-20261004/platform",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "source_worktree_preserved": true,
+      "canonical_https_remote_matches_estate_contract": true
+    },
+    {
+      "unit": "feeds",
+      "original": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/feeds",
+      "snapshot": "/private/tmp/pavf-forge-current-20261004/feeds",
+      "commit": "d62f74e52ed992798a75cf3f4f138ec9c83db80a",
+      "source_worktree_preserved": true,
+      "canonical_https_remote_matches_estate_contract": true
+    },
+    {
+      "unit": "ico",
+      "original": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/ico",
+      "snapshot": "/private/tmp/pavf-forge-current-20261004/ico",
+      "commit": "9d09222117dde1257e5b43401caa43342f47bae3",
+      "source_worktree_preserved": true,
+      "canonical_https_remote_matches_estate_contract": true
+    },
+    {
+      "unit": "nist",
+      "original": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/nist",
+      "snapshot": "/private/tmp/pavf-forge-current-20261004/nist",
+      "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+      "source_worktree_preserved": true,
+      "canonical_https_remote_matches_estate_contract": true
+    },
+    {
+      "unit": "insurer",
+      "original": "/private/tmp/pavf-insurer-maintenance-20261004",
+      "snapshot": "/private/tmp/pavf-forge-current-20261004/insurer",
+      "commit": "8d4a5ae684e4a58c8242bc8b6e50794473ef302b",
+      "source_worktree_preserved": true,
+      "canonical_https_remote_matches_estate_contract": true
+    }
+  ]
+}

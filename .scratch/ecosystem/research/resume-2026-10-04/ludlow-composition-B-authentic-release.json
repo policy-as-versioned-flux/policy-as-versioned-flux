@@ -1,0 +1,35 @@
+{
+  "artifact_sha256": {
+    "ludlow-composition-B-cut-run.json": "cd35d678ef9874437860cf33320abc98e39206bd140ddbe8eb01f6e898ada363",
+    "ludlow-composition-B-cut.log": "45636181868390d8e74dd48fe386828dad78dc410e289de535f329ec2fd679fe",
+    "ludlow-composition-B-github-release.json": "35fc1a2744db4a6f874a1af9561af674fc8c90fad3472883198f82680020ef11",
+    "ludlow-composition-B-release-run.json": "48c52c9e1bae1bf8ca903bd324498023ed9c34035fbc68fe95435c41c8b8caa0",
+    "ludlow-composition-B-release.log": "e6b63f3a72b50ee620340abc838aec02645d94eee61d1f4e1c71a9c73d52e07d",
+    "ludlow-composition-B-tag-object.txt": "1aa6d5434f3cd358037627498d440418c272f8dc1b7f96a6c4a0268b2c17d5a1",
+    "ludlow-composition-B-tag-verification.log": "b96d1be91d43762f6151423c6fe1d6c7ad0e67e9ae074d21b51cf0127a3480da"
+  },
+  "commit": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "cut_conclusion": "success",
+  "cut_run": 37201479463,
+  "explicit_user_approval": "ludlow-composition-B-explicit-release-approval.json",
+  "fresh_Spec": "ludlow-composition-B-spec-review.json",
+  "fresh_Standards": "ludlow-composition-B-root-standards-review.json",
+  "immutable_release_ref_and_input": "v4.0.1",
+  "published_at": "2026-10-04T12:24:16Z",
+  "release_conclusion": "success",
+  "release_run": 37201969669,
+  "release_url": "https://github.com/policy-as-versioned-ludlow/ludlow/releases/tag/v4.0.1",
+  "scope": "Authentic approved Composition B signed release, no live observation claimed",
+  "signature": {
+    "Git": true,
+    "Rekor": true,
+    "certificate": true,
+    "exact_identity": "https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "rekor_mode": "offline",
+    "tlog_index": 3077655513
+  },
+  "tag": "v4.0.1",
+  "tag_object": "efffeee3b39cc59dd5ecc1ac0536845e712d4c6f",
+  "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63"
+}

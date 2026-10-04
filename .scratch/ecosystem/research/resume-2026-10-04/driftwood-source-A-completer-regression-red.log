@@ -1,0 +1,121 @@
+F
+======================================================================
+FAIL: test_exact_hub_pin_refreshes_current_major_before_composition (test_complete_feed_bump.FeedCompletion.test_exact_hub_pin_refreshes_current_major_before_composition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood/.github/tests/test_complete_feed_bump.py", line 75, in test_exact_hub_pin_refreshes_current_major_before_composition
+    self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Note: switching to 'fc7d0ce6618617a6306eadef14ab2aa0e8daf7ee'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Note: switching to 'fc7d0ce6618617a6306eadef14ab2aa0e8daf7ee'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Note: switching to 'fc7d0ce6618617a6306eadef14ab2aa0e8daf7ee'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Note: switching to 'fc7d0ce6618617a6306eadef14ab2aa0e8daf7ee'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Note: switching to 'fc7d0ce6618617a6306eadef14ab2aa0e8daf7ee'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Note: switching to 'fc7d0ce6618617a6306eadef14ab2aa0e8daf7ee'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Traceback (most recent call last):
+  File "/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmpru8v5bpq/adopter/.github/scripts/platform-tools.py", line 2, in <module>
+    assert Path('twin/signals.yaml').read_text() == 'version: 4\n', 'signals stale before compose'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: signals stale before compose
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.546s
+
+FAILED (failures=1)

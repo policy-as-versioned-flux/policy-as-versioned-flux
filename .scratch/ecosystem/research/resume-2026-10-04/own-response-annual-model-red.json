@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "compose",
+    "-p",
+    "test_own_response_model.py",
+    "-v"
+  ],
+  "exit": 1,
+  "log_sha256": "47b5e72a0cf517af3614987e55186222f18ed2a90ae36593aff3b7f4f7d0bce4",
+  "adapter": "Existing real platform cage.caged_residual and TIERS, called behind prototype interface; no frozen table edits",
+  "scope": "Authored contract fixtures plus genuine immutable LU/TU absence negatives, no live evidence"
+}

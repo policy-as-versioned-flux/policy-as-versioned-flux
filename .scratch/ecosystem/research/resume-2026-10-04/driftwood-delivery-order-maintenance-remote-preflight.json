@@ -1,0 +1,19 @@
+{
+  "destination": "policy-as-versioned-driftwood/driftwood",
+  "public": true,
+  "admin": true,
+  "head": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+  "tree": "b2c8a4b5c3ab9f1cf3ef85e86e20776098cd0072",
+  "main": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+  "base_to_current_main": [],
+  "reviewed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "tests/test_apps_dependencies.py",
+    "twin/verify-twin-sweep-moved.sh"
+  ],
+  "body": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-PR-body.md",
+  "body_sha256": "bb45dde56c85dedc6a608ff1df26ad15154ad837942f80dc90f890524f274a77",
+  "source_clean": true,
+  "remote_mutations": false
+}

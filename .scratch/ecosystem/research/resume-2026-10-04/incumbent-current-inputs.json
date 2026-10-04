@@ -1,0 +1,10 @@
+{
+  "scope": "Read-only public-forge and anonymous OCI facts over genuinely served apps3.0.1 source pins; no archive act or release mutation.",
+  "estate": "/private/tmp/pavf-incumbent-current-uu181wal",
+  "apps_tags": "v3.0.1",
+  "inputs": {
+    "driftwood": "/private/tmp/pavf-apps-bootstrap-lnuADR/driftwood-estate/driftwood",
+    "tuppence": "/private/tmp/pavf-apps-bootstrap-lnuADR/tuppence-estate/tuppence",
+    "ludlow": "/private/tmp/pavf-apps-bootstrap-lnuADR/ludlow-estate/ludlow"
+  }
+}

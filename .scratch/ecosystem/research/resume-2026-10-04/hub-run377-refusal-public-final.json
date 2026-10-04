@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "bash",
+    "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/refusal-by-another-name/verify-refusal-by-another-name.sh"
+  ],
+  "exit": 1,
+  "log_sha256": "ef0041b056a2b7bf4ec563f486c1ac48ec51f652c3eda4d50d9c93f26449a637",
+  "actual_scheduled_run_regraded": false
+}

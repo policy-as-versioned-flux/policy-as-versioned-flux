@@ -1,0 +1,8 @@
+{
+  "image": "ghcr.io/policy-as-versioned-flux/readiness-collector:v1.0.0",
+  "pullable": true,
+  "status": 200,
+  "digest": "sha256:8c5d78146351822a31935cf5e7cfc54bb855d7a1300bdb56ff0311b9d84786cd",
+  "observed_at": "2026-10-04T09:36:44.521875+00:00",
+  "repository_archived": true
+}

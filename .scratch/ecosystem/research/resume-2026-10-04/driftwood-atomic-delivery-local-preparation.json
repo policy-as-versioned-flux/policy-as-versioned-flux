@@ -1,0 +1,73 @@
+{
+  "source_A_tag": "v4.0.0",
+  "source_A_tag_object": "bff31936b9e34074a7ce078e873d3a0df31ecd35",
+  "source_A_commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "signature_argv": [
+    "gitsign",
+    "verify-tag",
+    "v4.0.0",
+    "--certificate-identity=https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main",
+    "--certificate-oidc-issuer=https://token.actions.githubusercontent.com"
+  ],
+  "gitsign_exit": 0,
+  "tlog_index": "3077567350",
+  "inventory_sha256": "3673e27a8447f33a48430ec6b586ffd7732a352363b7cc533c5df23af428ecca",
+  "inventory_bytes_unchanged": true,
+  "primary_trim_equal": true,
+  "served_images": [
+    "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+    "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+    "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+  ],
+  "target_policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "checks": {
+    "compose": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood/.github/scripts/platform-tools.py",
+        "--adopter-dir",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+        "--tools-dir",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/platform-tools",
+        "compose",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+        "--estate-clone",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate"
+      ],
+      "exit": 0,
+      "log": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-compose.log"
+    },
+    "verify": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood/.github/scripts/platform-tools.py",
+        "--adopter-dir",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+        "--tools-dir",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/platform-tools",
+        "verify",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+        "--estate-clone",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate"
+      ],
+      "exit": 0,
+      "log": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-verify.log"
+    },
+    "reach": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood/scripts/render_composed.py",
+        "reach",
+        "--ref",
+        "v4.0.0"
+      ],
+      "exit": 0,
+      "log": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-reach.log"
+    }
+  },
+  "external_mutations": false
+}

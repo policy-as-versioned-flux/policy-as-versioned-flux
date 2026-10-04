@@ -1,0 +1,48 @@
+{
+  "candidate_head": "2dd89404f699a4af70e6a44451793347a4af11ef",
+  "candidate_base": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "current_main": "2e04b9803a57cd0d61afa3ef2deeca74f749d969",
+  "subsequent_clock_paths": [
+    "observations/twin-sweep.jsonl"
+  ],
+  "identity_rule": "tools5 comparison_history.identity excludes declared non-YAML observation lanes (ticket134)",
+  "source_candidate_unchanged": true,
+  "checks": {
+    "compose": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        ".github/scripts/platform-tools.py",
+        "--adopter-dir",
+        ".",
+        "--tools-dir",
+        "../platform-tools",
+        "compose",
+        ".",
+        "--estate-clone",
+        ".."
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-current-main-clock-merge-compose.log",
+      "sha256": "b8427d5b88e6d2789a51bc7013d852ef776e4c1f81fce305eb1835872c16da5a"
+    },
+    "verify": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        ".github/scripts/platform-tools.py",
+        "--adopter-dir",
+        ".",
+        "--tools-dir",
+        "../platform-tools",
+        "verify",
+        ".",
+        "--estate-clone",
+        ".."
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-current-main-clock-merge-verify.log",
+      "sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    }
+  },
+  "fixture_object_closure": "Import genuine remote-only current main object before local merge; no fabricated ref/tag.",
+  "normal_merge_layout_replay_complete": true
+}

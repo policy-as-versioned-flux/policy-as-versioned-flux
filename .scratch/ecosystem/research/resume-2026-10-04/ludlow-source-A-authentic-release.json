@@ -1,0 +1,20 @@
+{
+  "observed_at": "2026-10-04T11:05:19.149922+00:00",
+  "institution": "ludlow",
+  "tag": "v4.0.0",
+  "tag_object": "36a1d2634beb4a2321414b020a6527bc714a0aba",
+  "peeled_commit": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae",
+  "reviewed_source": "323a1b09dc9d7f4c243c66a3f53f12ea1a4cfeea",
+  "cut_run": 37197121326,
+  "release_run": 37197418730,
+  "github_release": "https://github.com/policy-as-versioned-ludlow/ludlow/releases/tag/v4.0.0",
+  "published_at": "2026-10-04T11:03:36Z",
+  "draft": false,
+  "prerelease": false,
+  "git_signature": true,
+  "rekor_entry": true,
+  "certificate_claims": true,
+  "tlog_index": "3077567855",
+  "delivery_edits_may_begin": true,
+  "live_delivery_claimed": false
+}

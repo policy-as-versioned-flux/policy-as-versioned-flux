@@ -1,0 +1,18 @@
+{
+  "trusted_user_response": "Approve both exact public changes",
+  "approval_relay": "Root received actual async user response for exact DW98d137 and LU6de0d00 public repos/fourpaths/saved PRbodies and normalCI/Appmerge",
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "head": "98d13782173342bbdfbd14271e1626e3b11b0d73",
+  "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json"
+  ],
+  "patch_sha256": "4ca835224921db446e1b9b3d462128a3cfc860bb1e1dc77dabc26c57516f8821",
+  "body_sha256": "78a7d3d8aee924e91c445a0c11a9f5c183010ac16fed63ca9e2bfed52c626882",
+  "approved_action": "Same normal branchpush and PRcreate, actualCI, matching-head other-hand Appreview and merge",
+  "authority_expansion": false,
+  "subsequent_B_cut_requires_fresh_exact_reviews": true
+}

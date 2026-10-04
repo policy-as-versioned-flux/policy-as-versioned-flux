@@ -1,0 +1,26 @@
+{
+  "destination": "policy-as-versioned-platform/platform",
+  "public": true,
+  "admin": true,
+  "head": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "tree": "0a2b87aeacceecf5d5423b2e24df4b6e7db1f1b2",
+  "main": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "base_to_current_main": [],
+  "reviewed_paths": [
+    "compose/composition.py",
+    "compose/fixture_inventory.py",
+    "compose/test_comparison_history.py",
+    "compose/test_floor_change.py",
+    "compose/test_portable_observations.py",
+    "compose/test_real_adopter_fixture.py",
+    "feeds/verify-feeds.sh",
+    "oscal/lint_claims.py",
+    "oscal/test_lint_claims.py"
+  ],
+  "body": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/platform-run377-maintenance-PR-body.md",
+  "body_sha256": "2feff6a485f82bd99d16df539bfe6e8d753fe8f1f190217a5e4f22ae5d6f9c57",
+  "negative_high_confidence_secret_scan": true,
+  "source_bytes": 653904,
+  "source_clean": true,
+  "remote_mutations": false
+}

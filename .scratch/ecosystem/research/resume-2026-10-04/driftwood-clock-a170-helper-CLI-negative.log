@@ -1,0 +1,28 @@
+Error: unknown flag: --certificate-identity
+Usage:
+  gitsign [flags]
+  gitsign [command]
+
+Available Commands:
+  attest      add attestations to Git objects
+  completion  Generate the autocompletion script for the specified shell
+  help        Help about any command
+  initialize  Initializes Sigstore root to retrieve trusted certificate and key targets for verification.
+  show        Show source predicate information
+  verify      Verify a commit
+  verify-tag  Verify a tag
+  version     print Gitsign version
+
+Flags:
+  -a, --armor               create ascii armored output
+  -b, --detach-sign         make a detached signature
+  -h, --help                help for gitsign
+      --include-certs int   -3 is the same as -2, but omits issuer when cert has Authority Information Access extension. -2 includes all certs except root. -1 includes all certs. 0 includes no certs. 1 includes leaf cert. >1 includes n from the leaf. Default -2. (default -2)
+  -u, --local-user string   use USER-ID to sign
+  -s, --sign                make a signature
+      --status-fd int       write special status strings to the file descriptor n. (default -1)
+  -v, --verify              verify a signature
+      --version             print Gitsign version
+
+Use "gitsign [command] --help" for more information about a command.
+

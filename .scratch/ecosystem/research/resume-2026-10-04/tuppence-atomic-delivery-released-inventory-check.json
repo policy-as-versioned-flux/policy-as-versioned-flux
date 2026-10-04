@@ -1,0 +1,27 @@
+{
+  "apps_commit": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "apps_tag": "v4.0.0",
+  "apps_tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e",
+  "inventory_bytes_unchanged": true,
+  "inventory_module_sha256": "2cb807ab1edb765773b0288cb24bb88fa63a0db75965525a9af6c60568271cfb",
+  "inventory_sha256": "b100844ba2f1b5e776eec6415e677704045fa01d3d0f860f74adacf4b472df18",
+  "old_and_released_graph_images_equal": true,
+  "primary_trim_rows": [
+    {
+      "image": "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5",
+      "normalized_row_equal": true,
+      "raw_report": ".scratch/ecosystem/research/resume-2026-10-03/adopter-stage2-trivy-raw/ledger.json",
+      "raw_report_sha256": "e34bb1e33c0676a9599d69921e7b4bbb890660d9e5f1e9f864e0ef1e0f790190",
+      "vulnerability_rows": 9
+    }
+  ],
+  "receipt_sha256": "f1696e1c4b856948c76bf43c7cbe0ed549c743105c2a8b6bad29cd773738b0d7",
+  "scope": "Existing primary scans replayed against authentic released apps; no fresh scan or activation asserted",
+  "served_images": [
+    "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5"
+  ],
+  "signature_log_sha256": "d48ed98e05272ca1ad0ff1509f95280551c23be6a5539ce80afb4387c8531ec4",
+  "tlog_index": "3077499916",
+  "tools_commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "validate_passed": true
+}

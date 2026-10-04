@@ -1,0 +1,26 @@
+compose-check	Compiler boundary and real checkout-layout regression	﻿2026-10-04T10:17:47.5983328Z ##[group]Run set -euo pipefail
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.5983732Z ^[[36;1mset -euo pipefail^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.5984143Z ^[[36;1mpython3 -m unittest discover -s ludlow/tests -p test_platform_tools.py^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.5984908Z ^[[36;1m# Ticket 131: workflow-shape tests live under .github/ so they stay^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.5985389Z ^[[36;1m# outside the comparison identity that composed/ records.^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.5986031Z ^[[36;1mpython3 -m unittest discover -s ludlow/.github/tests -p 'test_*.py'^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.6049402Z shell: /usr/bin/bash -e {0}
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.6049660Z env:
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.6050359Z   ADOPTER_GATE_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.6051252Z   ADOPTER_GATE_ISSUER: https://token.actions.githubusercontent.com
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.6051685Z   PAVF_REAL_ESTATE: /home/runner/work/ludlow/ludlow
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.6051985Z ##[endgroup]
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5882050Z F.
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5882560Z ======================================================================
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5883929Z FAIL: test_composition_bytes_do_not_depend_on_checkout_prefix (test_platform_tools.RealCompilerLayout.test_composition_bytes_do_not_depend_on_checkout_prefix)
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5885337Z ----------------------------------------------------------------------
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5885915Z Traceback (most recent call last):
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5886660Z   File "/home/runner/work/ludlow/ludlow/ludlow/tests/test_platform_tools.py", line 147, in test_composition_bytes_do_not_depend_on_checkout_prefix
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5887483Z     self.assertEqual(result.returncode, 0, result.stderr)
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5887860Z AssertionError: 1 != 0 : 
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5888424Z 
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5888614Z ----------------------------------------------------------------------
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5889011Z Ran 2 tests in 2.920s
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5889167Z 
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5889277Z FAILED (failures=1)
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:50.5984292Z ##[error]Process completed with exit code 1.

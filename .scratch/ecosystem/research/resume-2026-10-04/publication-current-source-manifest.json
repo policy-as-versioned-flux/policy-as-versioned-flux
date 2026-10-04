@@ -1,0 +1,66 @@
+{
+  "observed_at": "2026-10-04T12:13:39.795Z",
+  "repositories": {
+    "platform": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/platform",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "tree": "bba72befc0b76e339aa1f5536671a708b84a5878",
+      "remote": "https://github.com/policy-as-versioned-platform/platform",
+      "scope": "Fresh normal remote main read; worktree preserved; release trust receipts remain separate"
+    },
+    "feeds": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/feeds",
+      "commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+      "tree": "b88fb77f96cadf1a9639cae369ed529bd4e1731c",
+      "remote": "https://github.com/policy-as-versioned-feeds/feeds.git",
+      "scope": "Fresh normal remote main read; worktree preserved; release trust receipts remain separate"
+    },
+    "app-ledger": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-ledger",
+      "commit": "d3255fa6fc0ccd25c84043f61b128b4d2e929ac0",
+      "tree": "e0f96aa9dc47e8fd7f8c624a9d478d0aaf87f6e4",
+      "remote": "https://github.com/policy-as-versioned-tuppence/ledger",
+      "scope": "Fresh normal remote main read; worktree preserved; release trust receipts remain separate"
+    },
+    "app-storefront": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-storefront",
+      "commit": "deb25d3467c9b7c59a83b39bbb8023c790fbad31",
+      "tree": "43b3bba638bf5c8e446df56fc3d0d26979208551",
+      "remote": "https://github.com/policy-as-versioned-driftwood/storefront",
+      "scope": "Fresh normal remote main read; worktree preserved; release trust receipts remain separate"
+    },
+    "app-api": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-api",
+      "commit": "d9b5f4f922cb4ff4b30d75733d48975c86c6df61",
+      "tree": "1d166d6a6e9407a57db5e89887f2fee2183586a3",
+      "remote": "https://github.com/policy-as-versioned-driftwood/api",
+      "scope": "Fresh normal remote main read; worktree preserved; release trust receipts remain separate"
+    },
+    "app-reports": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-reports",
+      "commit": "f21bff06fac89401bf180ffc40dd46a37c36db51",
+      "tree": "922e5d6feaab6699550ea426652f38c482c9c7ff",
+      "remote": "https://github.com/policy-as-versioned-ludlow/reports",
+      "scope": "Fresh normal remote main read; worktree preserved; release trust receipts remain separate"
+    },
+    "driftwood": {
+      "directory": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+      "commit": "872d5c7f44801b496731b11cd40881f304f8a09a",
+      "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+      "scope": "Actual published main at current snapshot; future final pointers are excluded"
+    },
+    "tuppence": {
+      "directory": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/tuppence",
+      "commit": "55bf5aa14d80f6cee4c524394d08b244b1461846",
+      "tree": "5dcedc2fbc951c25251ee56b9c13bcf844ab044e",
+      "scope": "Actual published main at current snapshot; future final pointers are excluded"
+    },
+    "ludlow": {
+      "directory": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "commit": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+      "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63",
+      "scope": "Actual published main at current snapshot; future final pointers are excluded"
+    }
+  },
+  "scope": "Current exact published nine-repository snapshot; DW/LU B cuts and final pointers remain pending"
+}

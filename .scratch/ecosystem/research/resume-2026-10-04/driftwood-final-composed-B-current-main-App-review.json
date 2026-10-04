@@ -1,0 +1,40 @@
+{
+  "id": 5406404447,
+  "node_id": "PRR_kwDOT-3Nm88AAAABQj8vXw",
+  "user": {
+    "login": "pavc-other-hand[bot]",
+    "id": 324560547,
+    "node_id": "BOT_kgDOE1hmow",
+    "avatar_url": "https://avatars.githubusercontent.com/u/304952089?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D",
+    "html_url": "https://github.com/apps/pavc-other-hand",
+    "followers_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/received_events",
+    "type": "Bot",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "body": "Reviewed exact head 2dd89404f699a4af70e6a44451793347a4af11ef. Independent Standards and Spec pass, actual shift-left and compose-check CI succeed, and the ordinary merge with the later genuine observation clock re-renders and verifies byte-for-byte under authentic tools5. Only composed delivery points to genuine signed/published B4.0.1, with its derived comparison fingerprint; Apps and primary inventory remain genuine SourceA4, the complete5/6/7 window and all four signature gates remain. The three real-layout tests and exact-head none gate pass. Approving the ordinary reviewed merge.\n",
+  "state": "APPROVED",
+  "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/56#pullrequestreview-5406404447",
+  "pull_request_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/pulls/56",
+  "author_association": "CONTRIBUTOR",
+  "_links": {
+    "html": {
+      "href": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/56#pullrequestreview-5406404447"
+    },
+    "pull_request": {
+      "href": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/pulls/56"
+    }
+  },
+  "submitted_at": "2026-10-04T13:24:51Z",
+  "commit_id": "2dd89404f699a4af70e6a44451793347a4af11ef"
+}

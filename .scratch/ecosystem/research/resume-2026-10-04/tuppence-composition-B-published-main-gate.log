@@ -1,0 +1,5 @@
+ok  platform checked out at v5.0.0, resolved commit matches the pinned commit field (703eff6aee959843c4160aa54fd03413f62858cc)
+declared (platform tag v5.0.0 -> v5.0.0): none
+composed (this institution, over what this pull request moves -- added [], retired []; window at the head is ['5.0.0', '6.0.0', '7.0.0']): none
+this pull request adds and retires no policy version, so it composes 'none' -- whether a major already stands in the window is reported continuously by the hub's verify-unreviewed-major-in-window.sh, not by this gate (eco-system ticket 99)
+PASS: composed bump 'none' does not exceed major; v5.0.0 may be adopted

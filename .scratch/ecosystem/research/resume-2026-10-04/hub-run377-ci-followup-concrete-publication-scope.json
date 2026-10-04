@@ -1,0 +1,22 @@
+{
+  "recorded_at": "2026-10-04T15:38:32.870491+00:00",
+  "head": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "tree": "4042ec2099f70807d916f4b72f74938bb8167806",
+  "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+  "pr": 155,
+  "body": ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-ci-followup-PR-body.md",
+  "body_sha256": "12c7b62d41fb5a9a02d14307a487fb67a2bbfe4c68ba490c4e2db83aed115ed0",
+  "complete_source_paths": 13,
+  "followup_test_only_paths": [
+    "tests/test_enact.py",
+    "tests/test_map_observation_ownership.py"
+  ],
+  "candidate": "hub-run377-ci-combined-followup-candidate.json",
+  "candidate_sha256": "d6934e1f6f3c975e7fc542182c3f21083a7900c534407b17b25a3a52adceffab",
+  "publication_stop": "hub-run377-ci-followup-publication-stop.json",
+  "stop_sha256": "650578b531a852b0427ef64f87d0c19325c22a360801ddb018de3c069a48471b",
+  "source_not_pushed": true,
+  "original4c4_body_preserved": true,
+  "current_prepared_body_replaces": "hub-run377-maintenance-ci-repaired-PR-body.md",
+  "ordinary_matching_app_merge_no_admin_or_waiver": true
+}

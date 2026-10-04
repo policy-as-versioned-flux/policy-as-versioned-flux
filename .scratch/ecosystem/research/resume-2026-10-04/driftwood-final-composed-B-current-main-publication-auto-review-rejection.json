@@ -1,0 +1,15 @@
+{
+  "action": "Normal git push of exact reviewed branch and ordinary public PR with saved body",
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "head": "2dd89404f699a4af70e6a44451793347a4af11ef",
+  "tree": "510b579cfc616e822cef0a59955acd5b3a1f921b",
+  "base": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "changed_paths": ["composed/HEADER.yaml", "gitops/composed/composed-set.yaml"],
+  "body": "driftwood-final-composed-B-current-main-PR-body.md",
+  "automatic_review_rejected": true,
+  "reason": "This pushes and opens a public PR for a distinct Driftwood final-pointer commit that the user's trusted approvals did not explicitly authorize; the prior approval covered the separate atomic commit and B release, not this new public payload.",
+  "external_action_executed": false,
+  "active_session": false,
+  "retry_hold": "Await actual trusted approval for this exact final-pointer public payload; no workaround or indirect execution.",
+  "unaffected_work": "Read-only genuine clock evidence audit and separate local moved-selfcheck maintenance"
+}

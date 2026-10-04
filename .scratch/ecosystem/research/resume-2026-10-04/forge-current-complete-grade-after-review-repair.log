@@ -1,0 +1,23 @@
+pin: driftwood propose-tier.yml ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/propose-tier\.yml@refs/heads/main$ (first read in .github/workflows/propose-tier.yml)
+pin: driftwood cut-release.yml ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+pin: feeds cut-release.yml ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in gitops/flux-system/gotk-sync-feeds.yaml)
+pin: hub truth.yml ^https://github\.com/policy-as-versioned-flux/policy-as-versioned-flux/\.github/workflows/truth\.yml@refs/heads/main$ (first read in implementations/cloud/trigger.py)
+pin: hub cut-release.yml ^https://github\.com/policy-as-versioned-flux/policy-as-versioned-flux/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/twin-sweep.yml)
+pin: ico cut-release.yml ^https://github\.com/policy-as-versioned-ico/ico/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in gitops/flux-system/gotk-sync-ico.yaml)
+pin: insurer cut-release.yml ^https://github\.com/policy-as-versioned-insurer/insurer/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in gitops/flux-system/gotk-sync-insurer.yaml)
+pin: ludlow propose-tier.yml ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/propose-tier\.yml@refs/heads/main$ (first read in .github/workflows/propose-tier.yml)
+pin: ludlow cut-release.yml ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+pin: nist cut-release.yml ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in gitops/flux-system/gotk-sync-nist.yaml)
+pin: platform cloud-release.yml ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cloud-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/cloud-release.yml)
+pin: platform cut-release.yml ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+pin: tuppence propose-tier.yml ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/propose-tier\.yml@refs/heads/main$ (first read in .github/workflows/propose-tier.yml)
+pin: tuppence cut-release.yml ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+PASS: driftwood: 3 active ruleset(s) on policy-as-versioned-driftwood/driftwood; 6 pinned branch(es) reviewed; 7 tag(s) held; bypass lists read and empty
+PASS: feeds: 3 active ruleset(s) on policy-as-versioned-feeds/feeds; 6 pinned branch(es) reviewed; 7 tag(s) held; bypass lists read and empty
+PASS: hub: 3 active ruleset(s) on policy-as-versioned-flux/policy-as-versioned-flux; 6 pinned branch(es) reviewed; 0 tag(s) held; bypass lists read and empty
+PASS: ico: 3 active ruleset(s) on policy-as-versioned-ico/ico; 6 pinned branch(es) reviewed; 3 tag(s) held; bypass lists read and empty
+PASS: insurer: 3 active ruleset(s) on policy-as-versioned-insurer/insurer; 6 pinned branch(es) reviewed; 1 tag(s) held; bypass lists read and empty
+PASS: ludlow: 3 active ruleset(s) on policy-as-versioned-ludlow/ludlow; 6 pinned branch(es) reviewed; 7 tag(s) held; bypass lists read and empty
+PASS: nist: 3 active ruleset(s) on policy-as-versioned-nist/nist; 6 pinned branch(es) reviewed; 2 tag(s) held; bypass lists read and empty
+PASS: platform: 3 active ruleset(s) on policy-as-versioned-platform/platform; 6 pinned branch(es) reviewed; 22 tag(s) held; bypass lists read and empty
+PASS: tuppence: 3 active ruleset(s) on policy-as-versioned-tuppence/tuppence; 6 pinned branch(es) reviewed; 7 tag(s) held; bypass lists read and empty

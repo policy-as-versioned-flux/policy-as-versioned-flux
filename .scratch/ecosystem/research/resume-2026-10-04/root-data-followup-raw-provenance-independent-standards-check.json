@@ -1,0 +1,32 @@
+{
+  "axis": "Standards",
+  "status": "RAW_PROVENANCE_FINDING_CLOSED; fresh signed-root binding pending",
+  "observed_at": "2026-10-04T15:36:13.092055+00:00",
+  "historical_candidate_on_hold": "d06f0485203a8c59f92c8ab62cb54fd9068f00f0",
+  "source_primary_commit": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "independent_exact_Git_blob_joins": 26,
+  "raw_failure_captures": 25,
+  "raw_grade_table": true,
+  "received_download_byte_identical": 18,
+  "received_download_ESC_only_rendering": 7,
+  "both_representations_preserved": true,
+  "original_downloads_and_previous_audits_not_rewritten": true,
+  "classified_outcomes_preserved": {
+    "PASS": 88,
+    "FAIL": 25,
+    "SKIP": 22,
+    "EXCLUDED": 8
+  },
+  "no_plaintext_capture_dump": true,
+  "fresh_approved_source_joins": "DW119456 and platformf0e7 exact reviewed merges; separate final-published bundle; previous cutoff preserved",
+  "source_index_external_changes_by_reviewer": false,
+  "inputs_sha256": {
+    "hub-run377-git-raw-provenance.json": "162d52aec048bafe4cdc7a690580dc8d2f248e6e255cb96bb1c45931a828b96b",
+    "hub-run377-git-raw-root-check.json": "1c8de12cd20e3c9ca6d60159e077a2822b46de34a9311d4e2deb53bd86a262cf",
+    "hub-run377-failure-classification.md": "ccc7eda0f180ec356fd1e04590429aba0a084db4e5ed24af90a1ea9d5071828e",
+    "delivery-report.md": "9a3fb67f25999c5b5d55f07c8d36065c269006eedaa01091af90a1627bb7a900",
+    "publication-final-published-source-manifest.json": "e9af59c924c18056a2650ef03f984fd705cd5d7f8ddca002744a658223db56a3",
+    "publication-final-published-source-export.json": "f45827bf9efb5ec460057ae7508e03af4dcc3c98f3114d77194de6534ca07a7a",
+    "dw-platform-maintenance-delivery-aggregate.json": "a5b0923e7f6562d9aac46969087e68b2d92d91a406690665de3ca57a48db49de"
+  }
+}

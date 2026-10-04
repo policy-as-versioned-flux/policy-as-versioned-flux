@@ -1,0 +1,19 @@
+test_real_writer_defaults_own_unlanded_ledgers_but_declarations_do_not (test_map_observation_ownership.MapObservationOwnership.test_real_writer_defaults_own_unlanded_ledgers_but_declarations_do_not) ... FAIL
+
+======================================================================
+FAIL: test_real_writer_defaults_own_unlanded_ledgers_but_declarations_do_not (test_map_observation_ownership.MapObservationOwnership.test_real_writer_defaults_own_unlanded_ledgers_but_declarations_do_not)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_map_observation_ownership.py", line 45, in test_real_writer_defaults_own_unlanded_ledgers_but_declarations_do_not
+    self.assertEqual(surface.owned_lane_paths(repo),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     {"drift/workload-samples.jsonl", "drift/oscal-samples.jsonl"})
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Items in the second set but not the first:
+'drift/workload-samples.jsonl'
+'drift/oscal-samples.jsonl'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.192s
+
+FAILED (failures=1)

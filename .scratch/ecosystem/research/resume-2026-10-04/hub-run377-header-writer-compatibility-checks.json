@@ -1,0 +1,47 @@
+{
+  "recorded_at": "2026-10-04T16:03:32.557907+00:00",
+  "cwd": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "checks": [
+    {
+      "name": "compatibility-green",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_loophole_adr_0026.py::test_record_header_preserves_real_writer_history",
+        "-q"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-compatibility-green.log",
+      "log_sha256": "ee99eca3e77b7a0b1df2a0aeba5826f14fc922a5ea06d9d266650c93d6d4093f"
+    },
+    {
+      "name": "full-typecheck",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "mypy",
+        "twin",
+        "tests",
+        "conftest.py",
+        "--ignore-missing-imports",
+        "--warn-unused-ignores"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-header-writer-full-typecheck.log",
+      "log_sha256": "3efc0e170174bf1eacbd391b4e67ae0597b59f89e8023c21d253c40c13dc02f0"
+    }
+  ],
+  "platform_refs": {
+    "v5.0.0": "703eff6aee959843c4160aa54fd03413f62858cc",
+    "HEAD": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb"
+  },
+  "source_sha256": "39ed98215e5e5b3c48f6dfaec85b08792ccb0d0595f65aa8cc350ed88f86ce72",
+  "claims": [
+    "actual old/new fixture writer functions from genuine Git objects",
+    "HEAD exact rendered header plus staged declared fixture contents preserved",
+    "exactly one history point; identical repeat adds no empty commit",
+    "unexpected git status errors propagated; floor/inventory/control guards unchanged"
+  ],
+  "whole_hub_rerun": false
+}

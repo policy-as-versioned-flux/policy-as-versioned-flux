@@ -1,0 +1,6 @@
+tlog index: 3077655413
+gitsign: Signature made using certificate ID 0xd9ff0a4350882e02e2f78f20970ce19ab1eccab1 | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true

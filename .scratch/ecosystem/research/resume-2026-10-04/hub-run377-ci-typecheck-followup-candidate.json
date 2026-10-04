@@ -1,0 +1,27 @@
+{
+  "recorded_at": "2026-10-04T15:12:54.079066+00:00",
+  "repository": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux",
+  "checkout": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "branch": "repair/run377-hub-verifiers-20261004",
+  "head": "6684f683bb6f9a9f7b83fed7e4b5f539ae7a3b11",
+  "tree": "0951b1ca6f64ca09d1538f062f19a49bc92cd20f",
+  "parent": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "signature": "G",
+  "status_porcelain": "",
+  "changed_paths": [
+    "tests/test_map_observation_ownership.py"
+  ],
+  "source_sha256": {
+    "tests/test_map_observation_ownership.py": "f02e9ed2178f750671ffd07fbf39b41e89214bc0d0f9802344bf5f7f411cb8c6"
+  },
+  "patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-04/hub-run377-ci-typecheck-followup.patch",
+  "patch_sha256": "8acc31d0abca0653f56a0af6e9e3a33dd45588fbb0085080f1b8f2fcad82b70c",
+  "checks": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-ci-followup-checks.json",
+  "checks_sha256": "fbb944161fae69ff44e4a2499b92f62a206f165d63a67536eb55e2b4c8320401",
+  "claim": "one explicit optional importlib spec/loader assertion; full208-source mypy and actual test pass; no guard/runtime logic changes",
+  "external_publication": false,
+  "review_required": true,
+  "historical_exact_source_pr": 155,
+  "unchanged_actual_invariant_failure": "flux_coverage_floor_is_still_reachable",
+  "remaining_remote_jobs": "actual4c4 fullpytest/truth may still be running; no claim of CI green"
+}

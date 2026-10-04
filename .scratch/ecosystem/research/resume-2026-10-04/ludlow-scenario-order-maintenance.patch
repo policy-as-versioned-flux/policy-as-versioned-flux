@@ -1,0 +1,309 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index bb9ccad..d96a8e6 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -624,7 +624,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: 6f2aa0087434f58546e5f0d478fc3b4e4ff32a598ea422cc78d141005d8b9052
++  after: e2c5f248f40369f256154a1b2a216e078c9bd091c101a80a753eb0152fb170f4
+   before:
+     header:
+       parents:
+diff --git a/gitops/flux-system/gotk-sync.yaml b/gitops/flux-system/gotk-sync.yaml
+index 4fd7de0..d5d628d 100644
+--- a/gitops/flux-system/gotk-sync.yaml
++++ b/gitops/flux-system/gotk-sync.yaml
+@@ -44,6 +44,14 @@ spec:
+   # from the gitops/ directory itself, so gitops/ IS that repo's root -- and up.sh applies its own
+   # inline Kustomization with ./apps for exactly that reason, so this line does not touch the
+   # touring demo.
++  # Apps wait for every signed composed route to report Flux Ready.
++  # Ready establishes reconciliation order; actual webhook mutation remains
++  # a separate cluster observation, not a guarantee from this dependency.
++  dependsOn:
++    - name: composed-v5-0-0
++    - name: composed-v6-0-0
++    - name: composed-v7-0-0
++    - name: composed-machinery
+   path: ./gitops/apps
+   prune: true   # prune-on-retire: remove what git no longer declares
+   wait: true    # health-gate the reconcile
+diff --git a/tests/test_apps_dependencies.py b/tests/test_apps_dependencies.py
+new file mode 100644
+index 0000000..ec483d1
+--- /dev/null
++++ b/tests/test_apps_dependencies.py
+@@ -0,0 +1,83 @@
++"""Native app admission follows the actual signed composed delivery graph."""
++import copy
++from pathlib import Path
++import sys
++import unittest
++
++import yaml
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT / 'scripts'))
++import render_composed
++
++
++def assert_ordered(test, apps, generated):
++    """Require every generated policy route before apps, with no unknown edge or cycle."""
++    policies = [obj for obj in generated if obj.get('kind') == 'Kustomization']
++    key = lambda obj: (obj['metadata'].get('namespace', ''), obj['metadata']['name'])
++    nodes = {key(obj): obj for obj in [apps, *policies]}
++    test.assertEqual(len(nodes), len(policies) + 1, 'duplicate Kustomization name')
++    graph = {}
++    for node, obj in nodes.items():
++        dependencies = [(dep.get('namespace', node[0]), dep['name'])
++                        for dep in obj['spec'].get('dependsOn', [])]
++        test.assertEqual(len(dependencies), len(set(dependencies)), 'duplicate dependency')
++        test.assertTrue(set(dependencies) <= nodes.keys(), 'dependency names no generated route')
++        graph[node] = dependencies
++    test.assertEqual(set(graph[key(apps)]), {key(obj) for obj in policies},
++                     'apps must wait for every composed policy route and machinery')
++    visited, active = set(), set()
++
++    def visit(node):
++        test.assertNotIn(node, active, 'Flux dependency cycle')
++        if node in visited:
++            return
++        active.add(node)
++        for dependency in graph[node]:
++            visit(dependency)
++        active.remove(node)
++        visited.add(node)
++
++    for node in graph:
++        visit(node)
++
++
++class AppAdmissionOrder(unittest.TestCase):
++    def setUp(self):
++        self.apps = next(obj for obj in yaml.safe_load_all(
++            (ROOT / 'gitops/flux-system/gotk-sync.yaml').read_text())
++            if obj and obj.get('kind') == 'Kustomization')
++        # Expand the repository's actual ResourceSet template and declared array.
++        self.generated = render_composed.expand(repo=str(ROOT))
++
++    def test_current_native_apps_wait_for_the_actual_composed_graph(self):
++        assert_ordered(self, self.apps, self.generated)
++
++    def test_missing_or_invented_route_is_rejected(self):
++        for change in ('missing', 'invented'):
++            with self.subTest(change=change):
++                apps = copy.deepcopy(self.apps)
++                if change == 'missing':
++                    apps['spec']['dependsOn'] = apps['spec'].get('dependsOn', [])[:-1]
++                else:
++                    apps['spec']['dependsOn'] = [{'name': 'no-such-composed-route'}]
++                with self.assertRaises(AssertionError):
++                    assert_ordered(self, apps, self.generated)
++
++    def test_composed_route_waiting_on_apps_is_a_cycle(self):
++        apps = copy.deepcopy(self.apps)
++        apps['spec']['dependsOn'] = [
++            {'name': obj['metadata']['name']}
++            for obj in self.generated if obj.get('kind') == 'Kustomization']
++        generated = copy.deepcopy(self.generated)
++        route = next(obj for obj in generated if obj.get('kind') == 'Kustomization')
++        route['spec']['dependsOn'] = [{'name': apps['metadata']['name']}]
++        with self.assertRaisesRegex(AssertionError, 'cycle'):
++            assert_ordered(self, apps, generated)
++
++    def test_duplicate_route_is_rejected(self):
++        apps = copy.deepcopy(self.apps)
++        apps["spec"]["dependsOn"] = [{"name": obj["metadata"]["name"]} for obj in self.generated if obj.get("kind") == "Kustomization"]
++        apps["spec"]["dependsOn"].append(copy.deepcopy(apps["spec"]["dependsOn"][0]))
++        with self.assertRaisesRegex(AssertionError, "duplicate dependency"):
++            assert_ordered(self, apps, self.generated)
+diff --git a/tests/test_scenario_pricing.py b/tests/test_scenario_pricing.py
+new file mode 100644
+index 0000000..a23f2a3
+--- /dev/null
++++ b/tests/test_scenario_pricing.py
+@@ -0,0 +1,82 @@
++"""Public consequence declaration contract, independent of monetary fine screening."""
++import copy
++import importlib.util
++from pathlib import Path
++import unittest
++
++ROOT = Path(__file__).resolve().parents[1]
++spec = importlib.util.spec_from_file_location("scenario_pricing", ROOT / "twin/scenario_pricing.py")
++pricing = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(pricing)
++
++
++class ConsequenceDeclaration(unittest.TestCase):
++    def setUp(self):
++        self.scenario = {"components": ["record", "fees"],
++                         "note": "This scenario prices the consequence on the value chain and never the fine. "
++                                 "Grade-5 mitigation remains unpriced; no new incident is observed."}
++        self.perspectives = [{"cash_flow": ["fees"], "values": {
++            "fees": {"amount": 100, "evidence_grade": 3},
++            "standing": {"evidence_grade": 5}}}]
++        self.edges = [{"type": "influences", "from": "record", "to": "fees", "evidence_grade": 3}]
++
++    def check(self, scenario=None, perspectives=None, edges=None, threshold=3):
++        return pricing.validate_consequence(scenario or self.scenario,
++                                            self.perspectives if perspectives is None else perspectives,
++                                            self.edges if edges is None else edges, threshold)
++
++    def test_priced_basis_is_admitted_without_regrading_mitigation_or_observation(self):
++        before = copy.deepcopy((self.scenario, self.perspectives, self.edges))
++        result = self.check()
++        self.assertIn("valuation grade 3", result)
++        self.assertIn("mechanism grade 3", result)
++        self.assertIn("declared", result)
++        self.assertEqual(before, (self.scenario, self.perspectives, self.edges))
++
++    def test_explicit_unpriced_consequence_with_missing_native_amount(self):
++        self.scenario["note"] = "The consequence is not yet priced. The fine belongs to the estate."
++        del self.perspectives[0]["values"]["fees"]["amount"]
++        self.perspectives[0]["values"]["fees"]["evidence_grade"] = 5
++        self.assertIn("unpriced", self.check())
++
++    def test_ambiguous_or_unrelated_absence_does_not_supply_consequence_declaration(self):
++        for note in ("The fine is not priced; mitigation remains unpriced.",
++                     "The consequence might eventually have a price.",
++                     "This scenario prices the consequence. The consequence remains unpriced."):
++            with self.subTest(note=note), self.assertRaises(pricing.InvalidDeclaration):
++                self.check({**self.scenario, "note": note})
++
++    def test_priced_claim_requires_real_admitted_native_and_mechanism_grades(self):
++        for target, field, value in (("valuation", "evidence_grade", 5),
++                                     ("valuation", "evidence_grade", 6),
++                                     ("valuation", "amount", None),
++                                     ("valuation", "amount", float("nan")),
++                                     ("valuation", "amount", True),
++                                     ("edge", "evidence_grade", 5),
++                                     ("edge", "evidence_grade", None)):
++            with self.subTest(target=target, field=field, value=value):
++                perspectives, edges = copy.deepcopy(self.perspectives), copy.deepcopy(self.edges)
++                record = perspectives[0]["values"]["fees"] if target == "valuation" else edges[0]
++                record[field] = value
++                with self.assertRaises(pricing.InvalidDeclaration):
++                    self.check(perspectives=perspectives, edges=edges)
++        for threshold in (None, 2, 5, True):
++            with self.subTest(threshold=threshold), self.assertRaises(pricing.InvalidDeclaration):
++                self.check(threshold=threshold)
++
++    def test_no_cash_flow_or_no_unique_causal_edge_cannot_back_priced_claim(self):
++        for perspectives, edges in (([], self.edges), (self.perspectives, []),
++                                   (self.perspectives, self.edges + self.edges)):
++            with self.subTest(perspectives=perspectives, edges=edges), self.assertRaises(pricing.InvalidDeclaration):
++                self.check(perspectives=perspectives, edges=edges)
++
++    def test_known_zero_is_priced_and_false_absence_fails(self):
++        self.perspectives[0]["values"]["fees"]["amount"] = 0
++        self.assertIn("valuation grade 3", self.check())
++        self.scenario["note"] = "The consequence is not priced."
++        with self.assertRaises(pricing.InvalidDeclaration):
++            self.check()
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/twin/scenario_pricing.py b/twin/scenario_pricing.py
+new file mode 100644
+index 0000000..cf494ad
+--- /dev/null
++++ b/twin/scenario_pricing.py
+@@ -0,0 +1,61 @@
++"""Check a standing question's declared consequence basis; never price or observe it."""
++import math
++import re
++
++
++class InvalidDeclaration(ValueError):
++    pass
++
++
++def _grade(record):
++    grade = record.get("evidence_grade")
++    if type(grade) is not int or grade not in range(1, 6):
++        raise InvalidDeclaration("the declared basis has no valid evidence grade")
++    return grade
++
++
++def validate_consequence(scenario, perspectives, edges, threshold):
++    """Check explicit priced/unpriced prose against this question's native cash-flow basis.
++
++    Existing producer and party-fact checks still validate the actual numeric forecast.
++    This check neither constructs a penalty forecast nor records a new observed incident.
++    """
++    text = " ".join(str(scenario.get("note", "")).lower().split())
++    priced = re.search(r"\bprices the consequence\b", text) is not None
++    unpriced = re.search(r"\bconsequence (?:is|remains) (?:not yet priced|not priced|unpriced)\b", text) is not None
++    if priced == unpriced:
++        raise InvalidDeclaration("declare exactly one priced or unpriced consequence; fine or mitigation prose cannot supply it")
++    if type(threshold) is not int or threshold not in (2, 3):
++        raise InvalidDeclaration("no valid declared pricing threshold")
++
++    components = set(scenario.get("components") or [])
++    admitted = []
++    for perspective in perspectives:
++        for value_id in perspective.get("cash_flow") or []:
++            if value_id not in components:
++                continue
++            value = (perspective.get("values") or {}).get(value_id) or {}
++            valuation_grade = _grade(value)
++            amount = value.get("amount")
++            if amount is None:
++                continue  # honest absence, never zero
++            if isinstance(amount, bool) or not isinstance(amount, (int, float)) or not math.isfinite(amount):
++                raise InvalidDeclaration("the native cash-flow amount is not a finite number")
++            relevant = [edge for edge in edges if edge.get("type") == "influences"
++                        and edge.get("to") == value_id and edge.get("from") in components]
++            if len(relevant) != 1:
++                continue  # no unique mechanism behind a priced declaration
++            mechanism_grade = _grade(relevant[0])
++            if max(valuation_grade, mechanism_grade) <= threshold:
++                admitted.append((valuation_grade, mechanism_grade))
++
++    if priced and not admitted:
++        raise InvalidDeclaration("the priced consequence has no native cash flow and unique mechanism admitted by the declared threshold")
++    if unpriced and admitted:
++        raise InvalidDeclaration("the unpriced declaration conflicts with its admitted native cash-flow basis")
++    if unpriced:
++        return "declared unpriced consequence; no admitted native cash-flow basis"
++    valuation_grade = max(v for v, _ in admitted)
++    mechanism_grade = max(m for _, m in admitted)
++    return (f"declared consequence basis: native valuation grade {valuation_grade}, loss mechanism grade {mechanism_grade}, "
++            f"admitted by pricing threshold {threshold}; no new observed incident or numeric standing-question forecast asserted")
+diff --git a/twin/verify-twin-scenarios.sh b/twin/verify-twin-scenarios.sh
+index a1f888a..5dcbb65 100755
+--- a/twin/verify-twin-scenarios.sh
++++ b/twin/verify-twin-scenarios.sh
+@@ -131,13 +131,21 @@ else:
+     # on the absent half only would pass a scenario that priced NOTHING identically to one that
+     # priced the value-chain shock. So the artefact has to say in its own words which half it
+     # carries.
+-    consequence = str(docs[penalty.stem].get("note", "")) + str(docs[penalty.stem].get("question", ""))
+-    said = "not yet priced" in consequence.lower() or "not priced" in consequence.lower()
+-    out("PASS" if said else "FAIL",
+-        "%s says which half of the seam it carries: the consequence is declared and its note says "
+-        "in its own words that it is not priced" % penalty.name
+-        + ("" if said else "; the note claims neither a price nor the absence of one, so a reader "
+-                          "cannot tell the post-penalty value-chain shock is unpriced"))
++    sys.path.insert(0, str(HERE))
++    from scenario_pricing import InvalidDeclaration, validate_consequence
++    party_basis = yaml.safe_load((HERE.parent / "party.yaml").read_text()) or {}
++    org_dir = HERE / "orgs" / ORG
++    perspectives = [yaml.safe_load(p.read_text()) or {}
++                    for p in sorted((org_dir / "perspectives").glob("*.yaml"))]
++    edges = [yaml.safe_load(p.read_text()) or {}
++             for p in sorted((org_dir / "edges").glob("*.yaml"))]
++    try:
++        basis = validate_consequence(docs[penalty.stem], perspectives, edges,
++                                     (party_basis.get("appetite") or {}).get("pricing_threshold"))
++    except InvalidDeclaration as exc:
++        out("FAIL", "%s consequence declaration: %s" % (penalty.name, exc))
++    else:
++        out("PASS", "%s: %s" % (penalty.name, basis))
+ 
+ # 5. the supply-shock headline is a scenario here and never a news-feed entry (amendment C13).
+ shock = [n for n, d in docs.items() if str(d.get("class")) == "supply-shock"]

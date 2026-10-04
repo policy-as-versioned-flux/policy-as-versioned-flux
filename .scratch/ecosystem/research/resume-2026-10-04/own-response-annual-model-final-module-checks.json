@@ -1,0 +1,42 @@
+{
+  "recorded_at": "2026-10-04T15:02:48.578153+00:00",
+  "cwd": "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform",
+  "checks": [
+    {
+      "name": "green",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "compose",
+        "-p",
+        "test_own_response_model.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-final-green.log",
+      "log_sha256": "58559960fa4eb2220625fccbebcdb1481903a0d6ccac131ac584551006de6c0b"
+    },
+    {
+      "name": "mypy",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "mypy",
+        "compose/own_response_model.py",
+        "compose/own_response_model_cli.py"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-final-mypy.log",
+      "log_sha256": "f9b031e5c45aa702cd4fef028d465551cb20a2c4698e0913c7b00766b20ac4d8"
+    }
+  ],
+  "source_sha256": {
+    "compose/own_response_model.py": "c7f79cb8b7c12ab9fb4d50770bdb6f9ae1dad78aa6b390202964eafe438d7355",
+    "compose/test_own_response_model.py": "2f1cc5eba67db40347bec70e9603470038e869f560f65ac0d33b7a0bda1cb982",
+    "compose/own_response_model_cli.py": "4fd08339cf71448e48401d30278f23c9dbc64376c458a836715ba68cd1352525"
+  },
+  "claim": "nine module tests including derived overflow negatives and mypy of both module and CLI"
+}

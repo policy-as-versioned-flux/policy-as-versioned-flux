@@ -1,0 +1,42 @@
+OK compose(): the real driftwood composes against its real pinned parents; platform's two formerly-dangling claims are fixed, zero refusals
+OK document: carries outcome, parents[], members[], refusals[], restatements[], cages[], holes[], ungoverned[], prices[], deltas[], limits[]
+OK prices[]: computed on the real driftwood's very first composition too, with no prior signed artefact to compare a bump against -- old and new both price at this run's own pin, an honest 'no move'
+OK prices[]: every entry names its perspective, currency, source and kind, and restates its own amount per customer against driftwood's OWN signed size (240000 customers)
+OK agent-cage: a real-declaration fixture pinned to threat-register@v2 carries ONE twin-agent cage line, unpriced by name: v2 publishes no `scheduled-agent-misuses-write-credential` row -- proposing no rung
+OK agent-cage: with the register pin moved to a major 4 carrying the row, driftwood's twin-agent cage prices at 0.0000 GBP a year (gap 0.00 over 1.0 day(s), frequency [8.4186e-05, 8.4186e-05, 0.00029465]), restricted and quarantine carry baseline's residual, isolated 0; driftwood's own selection policy 1.1.0 picks 'baseline'; the Namespace fold gives 'isolated' with the line and without it
+OK agent-cage: the reach is read off the served tree -- a sweep without contents: write leaves the token paths could-not-look and the pick falls closed to 'isolated'; a pull-request gate without the recompose step, with its drift test commented out, or with the exit after it turned to zero, leaves the proposal path could-not-look and the pick falls to 'quarantine'
+OK prices[]: the insurer's signed quote books as one `premium` cost line under driftwood's own perspective (113403.30 GBP), and the insurer's layer arithmetic stays under its own
+OK prices[]: a quote insuring another party, or booking its premium on another party's sheet, refuses as a missing instrument and prices nothing
+OK exposure: driftwood's composed artefact signs its total priced exposure (None GBP; None means an unpriced line), its appetite as the attachment and the 4 breakdown by regime name and control id; the premium it buys is a cost and is not counted in it
+OK (N3) a total that excludes an untiered line gives NO VERDICT against the aggregate: 10,000.00 tiered + 50,000,000.00 untiered against a 40,000.00 band returns 7000.00 with breaches_band=None and a could-not-look naming `huge`, not the False it used to return
+OK (F3) an appetite declared in USD against a GBP exposure is CONVERTED through the signed FX feed (40,000.00 USD = 29924.44 GBP at 2026-08-15, breaches_band=True), and with no rate for the date there is no verdict at all: breaches_band=None and a named could-not-look, never a comparison of two currencies. (F8) a book whose every line is untiered still returns a section, naming all 3 of them.
+OK (e) driftwood's exposure.total of None GBP says what it is ('an ordinal, auditable comparison under one perspective; not an expected annual loss'), and the aggregate of its 3 selected-tier residuals is 49965.36 GBP against a tolerance of 40000.00 GBP: breaches_band=None (not tiered, so not in the total: cve)
+OK pin signature: the real driftwood's quote pin resolves to the insurer's signed tag v1.0.0 on the checkout, and carries no hole
+OK pin signature: only a checkout that can show the publisher's tag namespace may say `untagged` -- no tag at all, a lightweight tag and a flattened annotated tag all read `unobserved`; an annotated tag with no signature block is untagged
+OK untagged pin: a quote pinned at a version no tag on the insurer's checkout signs composes (no refusal) with a hole of its own premium (113403.30 GBP) under driftwood's perspective, printed as a new-untagged-pin delta
+OK untagged pin: identical composition preserves the opening delta for replay
+OK unobserved pin: a parent tree with no git metadata, and a checkout carrying no tag at all, both read `unobserved` -- they keep a recorded hole and open none, a could-not-look and never a signature
+OK unobserved pin: a real signed tag flattened onto its commit by a second fetch reads `unobserved` and books NO hole -- a fabricated hole is worse than a missed one, and the fetch is the workflow's to fix (ticket 69)
+OK closed pin: composing against the insurer's real signed tag closes the hole, prints one closed-untagged-pin delta, and the next composition retains the closure transition so its handbook replays
+OK untagged pin: every object the engine applies is byte-identical across untagged, recorded and unobserved -- signature state lives in the evidence, never the enforced render -- and the handbook, which nothing applies, names the hole as untagged-pin `insurer/quote-driftwood@v2` with its premium while open and explicitly records its closure
+OK prices[]: the one summing helper refuses a list that crosses a perspective or a currency -- no number in this estate is a lie by addition
+OK prices[]: driftwood's own forward-intel feed prices as one source:twin entry -- perspective driftwood, GBP, tail bounded-pert, curve sha256:b324e, policy version 1.1.0, rests on grade 3 (as the served payload states it, or null where the payload predates the field)
+OK prices[]: an adopter with no forward-intel feed simply has no twin entry -- a missing twin feed is never a refusal (ticket 25)
+OK prices[]: an ico pin at v3 carries the published control weights as a per-hole breakdown -- 4 holes, weights sum to 1.0, and the entry amount IS the sum of the hole amounts (a hole partitions the regime, it never adds to it)
+OK prices[]: implementing the weighted control pl-2 takes its 536153.12 line off the regime entry, 1787177.08 -> 1251023.95; the partition still sums to 1787177.08 (eco-system ticket 121)
+OK prices[]: an adopter with no signed appetite refuses as a missing instrument (ADR-0020), naming the artefact that declares none -- and prices nothing
+OK prices[]: driftwood's own overlay.floor clamps the selection UP -- the threat-register price that picks baseline unclamped is held at the declared quarantine floor, tighten-only (ADR-0022)
+OK limits[]: the two-publisher-conflict limit prints open at driftwood's one pinned implementations publisher
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/composition.py", line 9485, in <module>
+    sys.exit(main(sys.argv))
+             ~~~~^^^^^^^^^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/composition.py", line 6040, in main
+    selfcheck()
+    ~~~~~~~~~^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/composition.py", line 7272, in selfcheck
+    assert declared_kinds == {"controls", "implementations", "penalty-schema", "threat-register",
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                              "quote-driftwood"}
+                              ^^^^^^^^^^^^^^^^^^
+AssertionError

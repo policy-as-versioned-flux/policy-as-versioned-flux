@@ -1,0 +1,8 @@
+selfcheck ok
+/tmp/tmp.sH6xkglhmH/deck.md: 524 lines from 141 captures on disk
+ok  the deck builds: 524 lines from 141 captures
+  review, not a lint failure: the word gate appears on 1 lines; every use outside the 5 phrases CONTEXT.md refuses is a human review item:
+    line 279: This is the step where the price becomes a constraint on a running workload, and it is the step whose green I 
+    bad  aside priced-cage: the capture's own last line says SKIP and the run's grade table (talk/captures/_grades.tsv) says FAIL
+  checked 7 beats and 4 asides in /tmp/tmp.sH6xkglhmH/deck.md
+FAIL: the built deck does not survive its own checks

@@ -1,0 +1,5 @@
+Standards HOLD for historical candidate `d06f0485203a8c59f92c8ab62cb54fd9068f00f0`. No final publication approval.
+
+The draft’s25-capture checks establish unchanged originally received download bytes. Spec subsequently found seven downloads and the received grade table represented ESC bytes as literal `^[`, so those checks do not establish byte equality with Git483 primary blobs. Claims that all received captures were raw-at-commit are too strong. The root is preserving both representations, adding the exact binary Git capture set/grade table and clarifying provenance before an ordinary signed follow-up.
+
+The independent977-path scope/signature checks, exact nine published exports, authentic A/B receipt joins, append-only tickets, corrected exporter-default proof and authored diffcheck remain valid within their stated scope. All earlier artifacts remain historical; this addendum does not rewrite a grade or alter source/index. A fresh exact-source binding is required after the primary provenance correction.

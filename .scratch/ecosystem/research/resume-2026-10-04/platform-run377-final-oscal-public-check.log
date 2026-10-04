@@ -1,0 +1,6 @@
+[1;36m==>[0m 1. lint_claims.py's own asserts (the lint itself resolves correctly)
+OK: every control claim resolves to a shipped policy and a catalogued control id
+selfcheck ok: 0 known dangling claim(s), all other claims resolve, unknown-id fixture fails as required
+[1;36m==>[0m 2. the real check against component-definition.json
+OK: every control claim resolves to a shipped policy and a catalogued control id
+[1;36m==>[0m PASS: every control claim resolves

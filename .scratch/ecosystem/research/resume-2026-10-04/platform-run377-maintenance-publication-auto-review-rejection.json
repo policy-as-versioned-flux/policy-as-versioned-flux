@@ -1,0 +1,31 @@
+{
+  "action": "Normal branch push and public PR for exact platform nine-path fixture/lint maintenance payload",
+  "destination": "policy-as-versioned-platform/platform",
+  "head": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "tree": "0a2b87aeacceecf5d5423b2e24df4b6e7db1f1b2",
+  "branch": "maintenance/run377-fixture-and-oscal-20261004",
+  "command": "ulimit -n 4096\n.venv/bin/python .scratch/ecosystem/research/resume-2026-10-04/platform-run377-maintenance-publish.py",
+  "normal_runner": "exec_command require_escalated, login:false, tty:true",
+  "reviewed_changed_paths": [
+    "compose/composition.py",
+    "compose/fixture_inventory.py",
+    "compose/test_comparison_history.py",
+    "compose/test_floor_change.py",
+    "compose/test_portable_observations.py",
+    "compose/test_real_adopter_fixture.py",
+    "feeds/verify-feeds.sh",
+    "oscal/lint_claims.py",
+    "oscal/test_lint_claims.py"
+  ],
+  "body": "platform-run377-maintenance-PR-body.md",
+  "body_sha256": "2feff6a485f82bd99d16df539bfe6e8d753fe8f1f190217a5e4f22ae5d6f9c57",
+  "preflight": "platform-run377-maintenance-remote-preflight.json",
+  "independent_Standards": "platform-run377-maintenance-independent-standards-review.json",
+  "independent_Spec": "platform-run377-maintenance-spec-review.json",
+  "reason": "This action pushes the new nine-file platform maintenance payload to a public repository and opens a PR, but the trusted user approvals cover different exact changes and do not authorize this public data export.",
+  "command_executed": false,
+  "public_mutation": false,
+  "workaround_attempted": false,
+  "release_required": false,
+  "required": "Actual trusted user approval of this exact public maintenance payload before retrying the same normal command"
+}

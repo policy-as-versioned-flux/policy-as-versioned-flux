@@ -1,0 +1,62 @@
+{
+  "created_at": "2026-10-04T14:13:39.155805+00:00",
+  "directory": "/private/tmp/pavf-run377-platform-estate-20261004/platform",
+  "base": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "head": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "tree": "0a2b87aeacceecf5d5423b2e24df4b6e7db1f1b2",
+  "branch": "maintenance/run377-fixture-and-oscal-20261004",
+  "normal_SSH_signature": "G",
+  "clean": true,
+  "changed_paths": [
+    "compose/composition.py",
+    "compose/fixture_inventory.py",
+    "compose/test_comparison_history.py",
+    "compose/test_floor_change.py",
+    "compose/test_portable_observations.py",
+    "compose/test_real_adopter_fixture.py",
+    "feeds/verify-feeds.sh",
+    "oscal/lint_claims.py",
+    "oscal/test_lint_claims.py"
+  ],
+  "source_sha256": {
+    "compose/composition.py": "89a930859fccab955753a3654d8775f409e60d6c5a984e37083c34853a218005",
+    "compose/fixture_inventory.py": "8eb7ee43d70856284a4e8193ac19bd63a3f1ef2252d1e3d90fe8bba9733ddae6",
+    "compose/test_comparison_history.py": "2b2bf3ae29234a9af6179b6b815731d7429c32c0fe65fb770bafcb84f292a1b7",
+    "compose/test_floor_change.py": "bfbbc97fa4d322110d6096a0f6c7eeafbdf03ef1a1b838f0b2d4839a91ec63fb",
+    "compose/test_portable_observations.py": "e1cd47d88a54cb49ff85c42cfb0957e5fa28598a9f2b2ca7b30e322e08a416c1",
+    "compose/test_real_adopter_fixture.py": "6a0c46d97ba4c777e6a55f6ca0f78966170c5c393a4934e8db4233acbd143a38",
+    "feeds/verify-feeds.sh": "5ff06da806ae002c5fa24283fea2077e5218abf025211a71138f52046ffba3e3",
+    "oscal/lint_claims.py": "6b794941db0b42bac907ff76e040dd71a60fa262a76ca4c7eacc735ae2480007",
+    "oscal/test_lint_claims.py": "8e1f49a1c0772cfa3f059ee258d1e9a0b3a992e9d3a7a568ffd216cb536d3a11"
+  },
+  "artifacts_sha256": {
+    "platform-run377-composition-selfcheck-repaired-eleventh.log": "f36db1fff3a0938a706eea150fdbb3339ee9ea3cfa51976018e497e8e66728af",
+    "platform-run377-final-compose-suite.log": "3c04dc8d0c3df368621d3e71827433cd48acbd7499dbe0ce61e14629dbc840f7",
+    "platform-run377-final-oscal-suite.log": "108d29490c549d45cb9432dd9ae1f09733913b98b32caf2bd5df768c242ceaef",
+    "platform-run377-final-inventory-cve-guards.log": "2d366a7000ebc0434f2e9693b324aab96ce018928a8b8662da7094a2ca75ad87",
+    "platform-run377-final-feed-public-check.log": "ca5a8be8b91d4e8d0b444ce313b887933a358fafb625378af18ce258b615f2c7",
+    "platform-run377-final-oscal-public-check.log": "8f6a95b55a30a97d657d3c3fbb81282d48c216a8d128772b8dc9fdd7feee8e51",
+    "platform-run377-final-signature.log": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907"
+  },
+  "patch": "platform-run377-maintenance.patch",
+  "patch_sha256": "0a2afd383ecd0682ad0f7ca231492ce739e274ffcf3ef56a7bee5e40af7ee1d4",
+  "reverse_apply_check": true,
+  "checks": {
+    "native_assembled_composition_selfcheck": 0,
+    "compose_103_tests": 0,
+    "oscal_2_tests": 0,
+    "inventory_and_CVE_13_tests": 0,
+    "public_feed_check": 0,
+    "public_oscal_check": 0,
+    "git_diff_check": 0
+  },
+  "only_changed_composition_functions": [
+    "_adopter_copy",
+    "_commit_header",
+    "selfcheck"
+  ],
+  "all_other_publisher_bytes_preserved": true,
+  "primary_native_scan_grade_price_clock_and_frozen_policy_bytes_changed": false,
+  "historical_failed_fixture_iterations_preserved": true,
+  "external_mutations": false
+}

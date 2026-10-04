@@ -1,0 +1,26 @@
+diff --git a/README.md b/README.md
+index 13bd57706328c2f873096ec28d1fe8f65d622ac2..dea89156e4d7d76f8f81666f9ad19eb562a95ca4 100644
+--- a/README.md
++++ b/README.md
+@@ -12,3 +12,7 @@ very different dependency hygiene, both visible on the estate dashboard.
+ 
+ Push a `vX.Y.Z` tag; `.github/workflows/release.yml` builds and publishes
+ `ghcr.io/policy-as-versioned-flux/api:vX.Y.Z` and prints the digest in the run summary.
++
++## Correction, 2026-10-03 (eco-system ticket 154)
++
++The historical description "good citizen" describes policy declarations, not vulnerability health. The 2026-09-25 scan found eight HIGH CVEs in Go 1.26.5 and an end-of-support Alpine 3.20.10 base. New inventory records grade the served image digest; the label does not assert a clean scan.
+diff --git a/renovate.json b/renovate.json
+index 7190a60b6422152e768da3a34747a17d956739be..44619ef552be9ebada7756c20f599a09a8702c73 100644
+--- a/renovate.json
++++ b/renovate.json
+@@ -1,3 +1,8 @@
+ {
+-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
++  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
++  "extends": [
++    "config:recommended"
++  ],
++  "dependencyDashboard": true,
++  "automerge": false
+ }

@@ -1,0 +1,8 @@
+ok  formula 1.0.0: exclusion partitions the regime, the attachment is retained, the premium is layer * rate * (1 + load)
+ok  the layer clamps at the limit
+ok  the implied loss ratio is 20.0000 = layer/premium = 1/(rate x (1+load)); a band it sits outside reds, and a zero layer is a named absence
+ok  an exposure inside the retention is a zero layer, not a negative one
+ok  an exclusion with no control ids excludes the whole regime line
+ok  every missing instrument refuses and none of them invents a premium
+ok  exposure_sha256 is stable over a round trip
+ok  the bump rule: a premium move inside numeric_tolerance is an observation, one outside it and any non-numeric change are a release a human merges

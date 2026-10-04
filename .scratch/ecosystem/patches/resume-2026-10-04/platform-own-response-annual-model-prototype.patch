@@ -1,0 +1,1595 @@
+diff --git a/compose/OWN-RESPONSE-MODEL.md b/compose/OWN-RESPONSE-MODEL.md
+new file mode 100644
+index 0000000..74779ad
+--- /dev/null
++++ b/compose/OWN-RESPONSE-MODEL.md
+@@ -0,0 +1,116 @@
++# Own-response annual model prototype
++
++This implements response model `1.0.0` behind `annual_responses(payload,
++annual_loss, threshold)` and a proposed forward-intel payload `3.0.0` schema.
++It is an isolated, unpublished prototype. Existing payloads, producers,
++selection packages and policy5/6/7 calibration tables retain their original
++bytes and behaviour. No native LU/TU declaration is added by this work.
++
++The module takes caller-authenticated instruments and returns a complete money
++mapping or raises `MissingInstrument`. It performs no IO, signature verification,
++currency conversion, loss simulation, tier selection or policy activation. The
++CLI joins supplied files and reports their hashes; that consistency check is not
++authentication.
++
++## Monetary interface
++
++`annual_loss` explicitly declares `amount`, `currency`, `period: year`,
++`perspective`, `rests_on_grade` and a frequency triple with `horizon_years`.
++The caller has already annualised gross loss exactly once. The input amount is
++never multiplied by frequency again. The explicit threshold is2 or3; missing,
++invalid or nonadmitted money grades refuse. The annual loss cannot claim a
++better grade than its source payload.
++
++The payload supplies a per-event `lm` triple and a `response_model` containing
++exactly one row for baseline, restricted, quarantine and isolated. Every row
++names a declared relative source path and its SHA256. Its mitigation is either
++explicitly null or an ordered reduction triple, evidence grade and nonempty
++basis. Grades4/5 receive no credit and remain listed as excluded claims. A
++missing or invalid mitigation grade is an invalid instrument, not an exclusion.
++
++Every row must also contain a separate ordered control-cost triple, matching
++currency, `period: year`, its own evidence grade, nature and basis. A measurement
++requires grade1/2; a published estimate requires grade3. The cost must be
++admitted at the declared threshold. Missing cost, units, grade or basis refuses
++the whole mapping; no partial selectable total or zero default is emitted. An
++explicit admitted zero is retained. A prospective contractual budget needs its
++own reviewed authority/effective-date contract and is not included here.
++
++The chosen point estimate is explicitly the declared mode. For each account:
++
++```
++admitted reduction = mitigation mode, if admitted; otherwise 0
++annual residual = already-annual gross loss * (1 - admitted reduction)
++annual total = annual residual + annual control-cost mode
++```
++
++All monetary and derived frequency results must remain finite and nonnegative.
++The output keeps residual risk, annual control cost and annual total separate,
++reports the weakest included monetary grade, names excluded mitigation, and
++states that authentication remains the caller's responsibility. It never
++recovers either mitigation or cost by inverting a combined net-cost curve.
++
++## Versioned payload and adapter
++
++`feeds/forward-intel.v3.payload.schema.json` is a separate proposed major, not a
++change to the canonical current schema. Its curve contains four decomposed
++`residual_loss_per_event` and `annual_control_cost` rows. The module checks those
++values against the declared instruments at the supplied threshold. The schema
++retains the scenario fields and optional owned valuation metadata. The current
++mapper supports bounded `lm` triples; a schema-valid heavy-tail severity object
++is a named missing instrument for this prototype, not a priced response.
++
++The executable adapter is:
++
++```
++python compose/own_response_model_cli.py \
++  --feed supplied-forward-intel.json \
++  --evidence supplied-composed-evidence.json --threshold 3
++```
++
++It requires one composed twin/forward-intel price with the supplied feed version,
++perspective, currency, grade, frequency, horizon and canonical curve hash. Current
++composition evidence has no explicit annual amount period for horizons other
++than1; this adapter refuses those cases. The deep module may receive a separately
++proven annual amount for another positive frequency horizon. Success emits JSON
++`priced-prototype`; refusal emits JSON `missing-instrument` and exits3. Neither
++result claims live observation, source authenticity or enforcement adoption.
++
++## Genuine absence and future adoption
++
++The fixture corpus copies LU/TU feed and response bytes from their genuine
++`v4.0.0` tags, with original tag-object and commit receipts in `PROVENANCE.json`.
++Their legacy curves contain only `net_cost_of_risk`. Their native control costs
++have no explicit evidence grade or annual unit instrument, and mitigation is
++grade5. The actual adapter therefore refuses them. Fixture-only positive cases
++declare their own grade3 annual costs; those declarations are not assigned to a
++real adopter.
++
++A future producer must publish genuinely authored graded cost instruments and
++the decomposed payload under its normal measured-major/release process. A
++consumer must authenticate that source and supply annual gross loss, then select
++a tier using these separate annual responses under a separately reviewed model
++adoption. Existing curve hashes cannot substitute for response semantics or
++source authentication. No producer, caller or published selection package is
++moved by this prototype.
++
++## Checks
++
++The module and CLI use the standard library. Tests require PyYAML and the full
++Draft7 `jsonschema` validator already used by repository fixture checks; this
++does not widen the production stdlib schema subset. The public interface tests
++cover own admitted mitigation, grade4/5 no-credit,
++annual control cost booked once, missing/malformed/nonadmitted money, curve and
++source tampering, account closure, currencies/units/thresholds, explicit zero,
++genuine old-feed refusal, and derived numeric overflow. Run:
++
++```
++python -m unittest discover -s compose -p test_own_response_model.py -v
++python -m unittest discover -s compose -p test_own_response_model_cli.py -v
++python -m mypy compose/own_response_model.py compose/own_response_model_cli.py
++```
++
++The initial real calibration mapping failed the new contract tests. The finite
++overflow regression also failed before its guard. The red and green logs are
++retained separately in the Oct4 research packet; none changes a historical
++clock grade or claims a native price is now available.
+diff --git a/compose/fixtures/own-response-model/PROVENANCE.json b/compose/fixtures/own-response-model/PROVENANCE.json
+new file mode 100644
+index 0000000..fe324e6
+--- /dev/null
++++ b/compose/fixtures/own-response-model/PROVENANCE.json
+@@ -0,0 +1,18 @@
++{
++  "ludlow": {
++    "source_repository": "https://github.com/policy-as-versioned-ludlow/ludlow",
++    "tag": "v4.0.0",
++    "tag_object": "36a1d2634beb4a2321414b020a6527bc714a0aba",
++    "commit": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae",
++    "feed_sha256": "16adebe89e4b689e13cb432e21f5b4861df4c4067102e02409c00772589c8dc2",
++    "scope": "Byte-exact historical public input for absence regression; no fixture cost grade or annual period assigned to the real adopter."
++  },
++  "tuppence": {
++    "source_repository": "https://github.com/policy-as-versioned-tuppence/tuppence",
++    "tag": "v4.0.0",
++    "tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e",
++    "commit": "f575dc12de130c444d98a831de0ca21fd68b9c46",
++    "feed_sha256": "bc7e7948829fb7056522ecef071a498984ca7b4ba4cd7207a425d425b1aaf76f",
++    "scope": "Byte-exact historical public input for absence regression; no fixture cost grade or annual period assigned to the real adopter."
++  }
++}
+diff --git a/compose/fixtures/own-response-model/ludlow-v1-feed.json b/compose/fixtures/own-response-model/ludlow-v1-feed.json
+new file mode 100644
+index 0000000..fd83062
+--- /dev/null
++++ b/compose/fixtures/own-response-model/ludlow-v1-feed.json
+@@ -0,0 +1,81 @@
++{
++  "kind": "feed",
++  "name": "forward-intel",
++  "version": "1.0.0",
++  "published_by": "ludlow",
++  "published_at": "2026-10-04T00:00:00Z",
++  "payload_schema": "twin/forward-intel/payload.schema.json",
++  "payload": {
++    "perspective": "ludlow",
++    "valuation": {
++      "amount": 6456650921.834527,
++      "currency": "GBP",
++      "native_amount": 8475000000.0,
++      "native_currency": "USD",
++      "party_fact": "size.turnover",
++      "fx": {
++        "published_by": "feeds",
++        "version": "2.0.0",
++        "period": "2025-12",
++        "valuation_date": "2025-12-31",
++        "source": "HMRC monthly exchange rates",
++        "from_rate": 1.3126,
++        "to_rate": 1.0
++      }
++    },
++    "rests_on_grade": 3,
++    "shock": "An exfiltration of the member record store suppresses plan administration fees over the following year.\nTHE TRIPLE IS AN ANCHOR, NOT A MEASUREMENT, and it is graded 3 for exactly that reason. This institution has no incident of its own to measure, so the three numbers are arithmetic on the most thoroughly litigated plan-administrator breach on the public record, nested from the narrowest settled track to the widest:\n\n  min  0.00019 =  16,000,000 / 84,194,000,000   (the regulator's own settlement alone)\n  mode 0.00076 =  64,200,000 / 84,194,000,000   (regulator + the multistate settlement)\n  max  0.00213 = 179,200,000 / 84,194,000,000   (both, plus the class-action settlement)\n\n16,000,000 USD is the federal civil-rights regulator (HHS OCR) settlement with Anthem, Inc.; 48,200,000 USD the multistate attorneys-general settlement; 115,000,000 USD the class-action settlement, all on the same 2015 breach of the records of 78.8 million individuals, the regulated record category this plan holds. 84,194,000,000 USD is total operating revenue for the fiscal year ended 2016-12-31 in that company's own SEC Form 10-K. Sources are recorded in the hub's .scratch/ecosystem/research/94-studied-firms.md. Numerator and denominator are USD from the same record, so the ratio is dimensionless and carries no FX claim -- which matters, because this party reports in GBP.\nWhat it is NOT: a settlement is not a suppression of administration fees, and that company is not this one. Grade 3 on the published ladder is \"an established mechanism from published work, not observed here\", which is precisely the claim being made. The institution's party artefact declares pricing_threshold: 3, so this unchanged grade is admissible at that declared threshold. Pricing the native USD cash flow in GBP still requires the matching signed FX instrument for the filing date; a missing rate refuses without converting this anchor into an observation. A grade-1 or grade-2 replacement would require this institution's own dated incident record, and a regrade event must record who moved it and why (twin/evidence.py).",
++    "horizon": 1,
++    "lef": null,
++    "lm": [
++      1226763.68,
++      4907054.7,
++      13752666.46
++    ],
++    "currency": "GBP",
++    "curve": [
++      {
++        "account": "baseline",
++        "net_cost_of_risk": 4907554.7
++      },
++      {
++        "account": "restricted",
++        "net_cost_of_risk": 4909054.7
++      },
++      {
++        "account": "quarantine",
++        "net_cost_of_risk": 4913054.7
++      },
++      {
++        "account": "isolated",
++        "net_cost_of_risk": 4922054.7
++      }
++    ],
++    "register": [],
++    "claim_scope": {
++      "included": [
++        "hipaa"
++      ],
++      "excluded": [
++        "uk-gdpr",
++        "pci-dss"
++      ],
++      "note": "The shock is an exfiltration of the member health record store, scoped to the one regime this plan is supervised under. UK data protection and the card schemes are carved out: this party administers a US health plan and no publisher in its inherits[] prices either, so a number here would have no instrument behind it."
++    },
++    "derived_from": [
++      {
++        "party": "feeds",
++        "kind": "feed",
++        "name": "threat-register",
++        "version": "4"
++      },
++      {
++        "party": "ludlow",
++        "kind": "feed",
++        "name": "forward-intel",
++        "version": "1.0.0",
++        "ref": "0600a42f3ea39998abc770ccbfd233ea1fce53a5"
++      }
++    ]
++  }
++}
+diff --git a/compose/fixtures/own-response-model/ludlow-v4-response-sources.json b/compose/fixtures/own-response-model/ludlow-v4-response-sources.json
+new file mode 100644
+index 0000000..99a7f6f
+--- /dev/null
++++ b/compose/fixtures/own-response-model/ludlow-v4-response-sources.json
+@@ -0,0 +1,18 @@
++{
++  "twin/orgs/ludlow/responses/run-the-claims-adjudication-at-baseline.yaml": {
++    "sha256": "953b0f3ebd5511016d4a1036bd26b908cc601f6219b24264990a22174df1301e",
++    "yaml": "id: run-the-claims-adjudication-at-baseline\nname: Run claims adjudication at cage tier 'baseline'\naddresses: claims-adjudication\ncost: { min: 500, mode: 500, max: 500 }\nmitigates:\n  component: member-record-store\n  reduction: { min: 0.30, mode: 0.30, max: 0.30 }\n  evidence_grade: 5\n  basis: >-\n    The publisher's own figure, adopted rather than restated: platform's graded/cage.py TIERS\n    table at TABLE_VERSION 1.0.0, in the release this repository pins (platform v2.0.1), gives\n    'baseline' reduce 0.30 and cost 500 GBP per year. Both triples are DEGENERATE -- min, mode and max\n    are the same number -- because the publisher publishes one figure per rung and no range, and\n    widening it here would be this institution inventing a spread the source does not carry.\n    Grade 5, not 3: platform's own comment beside that table says the numbers are calibration\n    knobs \"evidenced by nothing but this comment\", so nothing observed them, nothing published\n    evidence for them and nobody calibrated them. This institution has no incident record of its\n    own to replace them with. Grade 5 is outside the pricing threshold, so this claim earns no\n    pound credit; it is here so the rung is visible and priceable the day a measurement exists.\nnote: >-\n  One rung of the cage ladder as an option this overlay can price. It is an option, never a\n  recommendation: the ladder is ordered and nothing here ranks one rung above another. The rung\n  names come from ../../ladder.yaml, which records which platform release published them.\n"
++  },
++  "twin/orgs/ludlow/responses/run-the-claims-adjudication-at-isolated.yaml": {
++    "sha256": "917b0fbab9b04d4d307a656ae6ac7059efcfff175eae45c8a5c2bbd0e8adc8ce",
++    "yaml": "id: run-the-claims-adjudication-at-isolated\nname: Run claims adjudication at cage tier 'isolated'\naddresses: claims-adjudication\ncost: { min: 15000, mode: 15000, max: 15000 }\nmitigates:\n  component: member-record-store\n  reduction: { min: 0.98, mode: 0.98, max: 0.98 }\n  evidence_grade: 5\n  basis: >-\n    The publisher's own figure, adopted rather than restated: platform's graded/cage.py TIERS\n    table at TABLE_VERSION 1.0.0, in the release this repository pins (platform v2.0.1), gives\n    'isolated' reduce 0.98 and cost 15000 GBP per year. Both triples are DEGENERATE -- min, mode and max\n    are the same number -- because the publisher publishes one figure per rung and no range, and\n    widening it here would be this institution inventing a spread the source does not carry.\n    Grade 5, not 3: platform's own comment beside that table says the numbers are calibration\n    knobs \"evidenced by nothing but this comment\", so nothing observed them, nothing published\n    evidence for them and nobody calibrated them. This institution has no incident record of its\n    own to replace them with. Grade 5 is outside the pricing threshold, so this claim earns no\n    pound credit; it is here so the rung is visible and priceable the day a measurement exists.\nnote: >-\n  One rung of the cage ladder as an option this overlay can price. It is an option, never a\n  recommendation: the ladder is ordered and nothing here ranks one rung above another. The rung\n  names come from ../../ladder.yaml, which records which platform release published them.\n"
++  },
++  "twin/orgs/ludlow/responses/run-the-claims-adjudication-at-quarantine.yaml": {
++    "sha256": "213c408b2d31138c3b08683c02621779aca304d19c55a95d9a34661fc387695d",
++    "yaml": "id: run-the-claims-adjudication-at-quarantine\nname: Run claims adjudication at cage tier 'quarantine'\naddresses: claims-adjudication\ncost: { min: 6000, mode: 6000, max: 6000 }\nmitigates:\n  component: member-record-store\n  reduction: { min: 0.92, mode: 0.92, max: 0.92 }\n  evidence_grade: 5\n  basis: >-\n    The publisher's own figure, adopted rather than restated: platform's graded/cage.py TIERS\n    table at TABLE_VERSION 1.0.0, in the release this repository pins (platform v2.0.1), gives\n    'quarantine' reduce 0.92 and cost 6000 GBP per year. Both triples are DEGENERATE -- min, mode and max\n    are the same number -- because the publisher publishes one figure per rung and no range, and\n    widening it here would be this institution inventing a spread the source does not carry.\n    Grade 5, not 3: platform's own comment beside that table says the numbers are calibration\n    knobs \"evidenced by nothing but this comment\", so nothing observed them, nothing published\n    evidence for them and nobody calibrated them. This institution has no incident record of its\n    own to replace them with. Grade 5 is outside the pricing threshold, so this claim earns no\n    pound credit; it is here so the rung is visible and priceable the day a measurement exists.\nnote: >-\n  One rung of the cage ladder as an option this overlay can price. It is an option, never a\n  recommendation: the ladder is ordered and nothing here ranks one rung above another. The rung\n  names come from ../../ladder.yaml, which records which platform release published them.\n"
++  },
++  "twin/orgs/ludlow/responses/run-the-claims-adjudication-at-restricted.yaml": {
++    "sha256": "ce04c04f89689a249b21d65172eef67c3242f13d22c7712e9ac64d91b6f01613",
++    "yaml": "id: run-the-claims-adjudication-at-restricted\nname: Run claims adjudication at cage tier 'restricted'\naddresses: claims-adjudication\ncost: { min: 2000, mode: 2000, max: 2000 }\nmitigates:\n  component: member-record-store\n  reduction: { min: 0.70, mode: 0.70, max: 0.70 }\n  evidence_grade: 5\n  basis: >-\n    The publisher's own figure, adopted rather than restated: platform's graded/cage.py TIERS\n    table at TABLE_VERSION 1.0.0, in the release this repository pins (platform v2.0.1), gives\n    'restricted' reduce 0.70 and cost 2000 GBP per year. Both triples are DEGENERATE -- min, mode and max\n    are the same number -- because the publisher publishes one figure per rung and no range, and\n    widening it here would be this institution inventing a spread the source does not carry.\n    Grade 5, not 3: platform's own comment beside that table says the numbers are calibration\n    knobs \"evidenced by nothing but this comment\", so nothing observed them, nothing published\n    evidence for them and nobody calibrated them. This institution has no incident record of its\n    own to replace them with. Grade 5 is outside the pricing threshold, so this claim earns no\n    pound credit; it is here so the rung is visible and priceable the day a measurement exists.\nnote: >-\n  One rung of the cage ladder as an option this overlay can price. It is an option, never a\n  recommendation: the ladder is ordered and nothing here ranks one rung above another. The rung\n  names come from ../../ladder.yaml, which records which platform release published them.\n"
++  }
++}
+diff --git a/compose/fixtures/own-response-model/tuppence-v1-feed.json b/compose/fixtures/own-response-model/tuppence-v1-feed.json
+new file mode 100644
+index 0000000..e49181c
+--- /dev/null
++++ b/compose/fixtures/own-response-model/tuppence-v1-feed.json
+@@ -0,0 +1,73 @@
++{
++  "kind": "feed",
++  "name": "forward-intel",
++  "version": "1.0.0",
++  "published_by": "tuppence",
++  "published_at": "2026-10-04T00:00:00Z",
++  "payload_schema": "twin/forward-intel/payload.schema.json",
++  "payload": {
++    "perspective": "tuppence",
++    "valuation": {
++      "amount": 113974999.99999999,
++      "currency": "GBP",
++      "native_amount": 113974999.99999999,
++      "native_currency": "GBP",
++      "party_fact": "size.turnover",
++      "fx": null
++    },
++    "rests_on_grade": 3,
++    "shock": "An exfiltration of the account and transaction record store suppresses fee income for a quarter.\nTHE TRIPLE IS AN ANCHOR, NOT A MEASUREMENT, and it is graded 3 for exactly that reason. This institution has no incident of its own to measure, so the three numbers are arithmetic on a comparable UK challenger bank's own published regulatory record, nested from the narrowest reading to the widest:\n\n  min  0.0640 = 28,959,426 / 452,800,000\n  mode 0.0698 = 28,959,426 / 414,814,000\n  max  0.0987 = 40,959,426 / 414,814,000\n\n28,959,426 GBP is the financial penalty in the FCA's Final Notice against Starling Bank Limited of 2024-09-27 (reference 730166), and 40,959,426 GBP is the same notice's figure before the 30% stage-one settlement discount. 452,800,000 GBP is the revenue the same notice states at 2.1 for 2023; 414,814,000 GBP is Total Income for the year ended 2023-03-31 in that bank's own audited Annual Report 2023, a different metric on a different reporting convention. Sources and the discrepancy are recorded in the hub's .scratch/ecosystem/research/94-studied-firms.md.\nWhat it is NOT: a conduct penalty is not a suppression of fee income, and that firm is not this one. Grade 3 on the published ladder is \"an established mechanism from published work, not observed here\", which is precisely the claim being made. The institution's party artefact declares pricing_threshold: 3, so this unchanged grade is admissible at that declared threshold. The cash flow remains derived from its recorded native GBP filing fact; no comparable penalty becomes this institution's incident or a measurement of suppressed fee income. A grade-1 or grade-2 replacement would require this institution's own dated incident record, and a regrade event must record who moved it and why (twin/evidence.py).",
++    "horizon": 1,
++    "lef": null,
++    "lm": [
++      7294400.0,
++      7955455.0,
++      11249332.5
++    ],
++    "currency": "GBP",
++    "curve": [
++      {
++        "account": "baseline",
++        "net_cost_of_risk": 7955955.0
++      },
++      {
++        "account": "restricted",
++        "net_cost_of_risk": 7957455.0
++      },
++      {
++        "account": "quarantine",
++        "net_cost_of_risk": 7961455.0
++      },
++      {
++        "account": "isolated",
++        "net_cost_of_risk": 7970455.0
++      }
++    ],
++    "register": [],
++    "claim_scope": {
++      "included": [
++        "uk-gdpr",
++        "fca-principle-3"
++      ],
++      "excluded": [
++        "pci-dss"
++      ],
++      "note": "The shock is an exfiltration of the account and transaction record store, scoped to the two regimes this party is supervised under that a subscribed publisher prices or publishes a schema for. Card-scheme penalties are carved out: no publisher in this party's inherits[] prices pci-dss, so a number here would have no instrument behind it."
++    },
++    "derived_from": [
++      {
++        "party": "feeds",
++        "kind": "feed",
++        "name": "threat-register",
++        "version": "4"
++      },
++      {
++        "party": "tuppence",
++        "kind": "feed",
++        "name": "forward-intel",
++        "version": "1.0.0",
++        "ref": "2249f02d0a2a093628b0cf943261c80eea058aa0"
++      }
++    ]
++  }
++}
+diff --git a/compose/fixtures/own-response-model/tuppence-v4-response-sources.json b/compose/fixtures/own-response-model/tuppence-v4-response-sources.json
+new file mode 100644
+index 0000000..1f88b3c
+--- /dev/null
++++ b/compose/fixtures/own-response-model/tuppence-v4-response-sources.json
+@@ -0,0 +1,18 @@
++{
++  "twin/orgs/tuppence/responses/run-the-payments-api-at-baseline.yaml": {
++    "sha256": "664ce7b5f37f77509e67ba5b9808308ceb46acd42cbbada9cad417e3a96b5301",
++    "yaml": "id: run-the-payments-api-at-baseline\nname: Run the payments API at cage tier 'baseline'\naddresses: payments-api\ncost: { min: 500, mode: 500, max: 500 }\nmitigates:\n  component: customer-account-records\n  reduction: { min: 0.30, mode: 0.30, max: 0.30 }\n  evidence_grade: 5\n  basis: >-\n    The publisher's own figure, adopted rather than restated: platform's graded/cage.py TIERS\n    table at TABLE_VERSION 1.0.0, in the release this repository pins (platform v2.0.1), gives\n    'baseline' reduce 0.30 and cost 500 GBP per year. Both triples are DEGENERATE -- min, mode and max\n    are the same number -- because the publisher publishes one figure per rung and no range, and\n    widening it here would be this institution inventing a spread the source does not carry.\n    Grade 5, not 3: platform's own comment beside that table says the numbers are calibration\n    knobs \"evidenced by nothing but this comment\", so nothing observed them, nothing published\n    evidence for them and nobody calibrated them. This institution has no incident record of its\n    own to replace them with. Grade 5 is outside the pricing threshold, so this claim earns no\n    pound credit; it is here so the rung is visible and priceable the day a measurement exists.\nnote: >-\n  One rung of the cage ladder as an option this overlay can price. It is an option, never a\n  recommendation: the ladder is ordered and nothing here ranks one rung above another. The rung\n  names come from ../../ladder.yaml, which records which platform release published them.\n"
++  },
++  "twin/orgs/tuppence/responses/run-the-payments-api-at-isolated.yaml": {
++    "sha256": "63c007638e4e62a94622f5360be8f0ee4b8da31c6de9987e60e2e2854edf2678",
++    "yaml": "id: run-the-payments-api-at-isolated\nname: Run the payments API at cage tier 'isolated'\naddresses: payments-api\ncost: { min: 15000, mode: 15000, max: 15000 }\nmitigates:\n  component: customer-account-records\n  reduction: { min: 0.98, mode: 0.98, max: 0.98 }\n  evidence_grade: 5\n  basis: >-\n    The publisher's own figure, adopted rather than restated: platform's graded/cage.py TIERS\n    table at TABLE_VERSION 1.0.0, in the release this repository pins (platform v2.0.1), gives\n    'isolated' reduce 0.98 and cost 15000 GBP per year. Both triples are DEGENERATE -- min, mode and max\n    are the same number -- because the publisher publishes one figure per rung and no range, and\n    widening it here would be this institution inventing a spread the source does not carry.\n    Grade 5, not 3: platform's own comment beside that table says the numbers are calibration\n    knobs \"evidenced by nothing but this comment\", so nothing observed them, nothing published\n    evidence for them and nobody calibrated them. This institution has no incident record of its\n    own to replace them with. Grade 5 is outside the pricing threshold, so this claim earns no\n    pound credit; it is here so the rung is visible and priceable the day a measurement exists.\nnote: >-\n  One rung of the cage ladder as an option this overlay can price. It is an option, never a\n  recommendation: the ladder is ordered and nothing here ranks one rung above another. The rung\n  names come from ../../ladder.yaml, which records which platform release published them.\n"
++  },
++  "twin/orgs/tuppence/responses/run-the-payments-api-at-quarantine.yaml": {
++    "sha256": "13bb2fa2a7d3fd0f3c47190a9828aded128b6df0180fb6e3efa94d7114b68497",
++    "yaml": "id: run-the-payments-api-at-quarantine\nname: Run the payments API at cage tier 'quarantine'\naddresses: payments-api\ncost: { min: 6000, mode: 6000, max: 6000 }\nmitigates:\n  component: customer-account-records\n  reduction: { min: 0.92, mode: 0.92, max: 0.92 }\n  evidence_grade: 5\n  basis: >-\n    The publisher's own figure, adopted rather than restated: platform's graded/cage.py TIERS\n    table at TABLE_VERSION 1.0.0, in the release this repository pins (platform v2.0.1), gives\n    'quarantine' reduce 0.92 and cost 6000 GBP per year. Both triples are DEGENERATE -- min, mode and max\n    are the same number -- because the publisher publishes one figure per rung and no range, and\n    widening it here would be this institution inventing a spread the source does not carry.\n    Grade 5, not 3: platform's own comment beside that table says the numbers are calibration\n    knobs \"evidenced by nothing but this comment\", so nothing observed them, nothing published\n    evidence for them and nobody calibrated them. This institution has no incident record of its\n    own to replace them with. Grade 5 is outside the pricing threshold, so this claim earns no\n    pound credit; it is here so the rung is visible and priceable the day a measurement exists.\nnote: >-\n  One rung of the cage ladder as an option this overlay can price. It is an option, never a\n  recommendation: the ladder is ordered and nothing here ranks one rung above another. The rung\n  names come from ../../ladder.yaml, which records which platform release published them.\n"
++  },
++  "twin/orgs/tuppence/responses/run-the-payments-api-at-restricted.yaml": {
++    "sha256": "c395e30a7f48a955762ccb3ee2b43819ecd6ea65b206439a4bed7a889b2a48aa",
++    "yaml": "id: run-the-payments-api-at-restricted\nname: Run the payments API at cage tier 'restricted'\naddresses: payments-api\ncost: { min: 2000, mode: 2000, max: 2000 }\nmitigates:\n  component: customer-account-records\n  reduction: { min: 0.70, mode: 0.70, max: 0.70 }\n  evidence_grade: 5\n  basis: >-\n    The publisher's own figure, adopted rather than restated: platform's graded/cage.py TIERS\n    table at TABLE_VERSION 1.0.0, in the release this repository pins (platform v2.0.1), gives\n    'restricted' reduce 0.70 and cost 2000 GBP per year. Both triples are DEGENERATE -- min, mode and max\n    are the same number -- because the publisher publishes one figure per rung and no range, and\n    widening it here would be this institution inventing a spread the source does not carry.\n    Grade 5, not 3: platform's own comment beside that table says the numbers are calibration\n    knobs \"evidenced by nothing but this comment\", so nothing observed them, nothing published\n    evidence for them and nobody calibrated them. This institution has no incident record of its\n    own to replace them with. Grade 5 is outside the pricing threshold, so this claim earns no\n    pound credit; it is here so the rung is visible and priceable the day a measurement exists.\nnote: >-\n  One rung of the cage ladder as an option this overlay can price. It is an option, never a\n  recommendation: the ladder is ordered and nothing here ranks one rung above another. The rung\n  names come from ../../ladder.yaml, which records which platform release published them.\n"
++  }
++}
+diff --git a/compose/own_response_model.py b/compose/own_response_model.py
+new file mode 100644
+index 0000000..d64d1e6
+--- /dev/null
++++ b/compose/own_response_model.py
+@@ -0,0 +1,174 @@
++"""Strict own-response annual model: authenticated inputs, no IO or tier selection.
++
++The caller authenticates feed/source hashes and annualises gross loss once. This
++module checks the separate instruments and decomposed curve, admits mitigation
++by the signed threshold and books annual control cost once. Legacy combined net
++cost never supplies a reduction, cost period or grade.
++"""
++from __future__ import annotations
++import math
++from pathlib import PurePosixPath
++import re
++from typing import Any
++
++VERSION = '1.0.0'
++ACCOUNTS = ('baseline', 'restricted', 'quarantine', 'isolated')
++
++
++class MissingInstrument(ValueError):
++    """No complete defensible money mapping; no zero or partial total emitted."""
++
++
++def _mapping(value: Any, keys: set[str], where: str) -> dict:
++    if not isinstance(value, dict) or set(value) != keys:
++        raise MissingInstrument(f'{where}: expected exactly {sorted(keys)}')
++    return value
++
++
++def _number(value: Any, where: str) -> float:
++    if isinstance(value, bool) or not isinstance(value, (int, float)):
++        raise MissingInstrument(f'{where}: expected finite nonnegative number')
++    try:
++        number = float(value)
++    except OverflowError:
++        raise MissingInstrument(f'{where}: expected finite nonnegative number') from None
++    if not math.isfinite(number) or number < 0:
++        raise MissingInstrument(f'{where}: expected finite nonnegative number')
++    return number
++
++
++def _triple(value: Any, where: str, *, fraction: bool = False) -> list[float]:
++    if not isinstance(value, list) or len(value) != 3:
++        raise MissingInstrument(f'{where}: expected min/mode/max triple')
++    points = [_number(point, where) for point in value]
++    if points != sorted(points) or (fraction and points[-1] > 1):
++        raise MissingInstrument(f'{where}: unordered or out-of-range triple')
++    return points
++
++
++def _grade(value: Any, where: str) -> int:
++    if type(value) is not int or value not in range(1, 6):
++        raise MissingInstrument(f'{where}: explicit evidence grade1 through5 required')
++    return value
++
++
++def _basis(value: Any, where: str) -> str:
++    if not isinstance(value, str) or not value.strip():
++        raise MissingInstrument(f'{where}: explicit nonempty basis required')
++    return value
++
++
++def _accounts(rows: Any, where: str) -> dict[str, dict]:
++    if not isinstance(rows, list):
++        raise MissingInstrument(f'{where}: all named accounts required')
++    found: dict[str, dict] = {}
++    for row in rows:
++        if not isinstance(row, dict) or row.get('account') not in ACCOUNTS:
++            raise MissingInstrument(f'{where}: unknown or absent account')
++        account = row['account']
++        if account in found:
++            raise MissingInstrument(f'{where}: duplicate account {account}')
++        found[account] = row
++    if set(found) != set(ACCOUNTS):
++        raise MissingInstrument(f'{where}: missing accounts {sorted(set(ACCOUNTS) - set(found))}')
++    return found
++
++
++def annual_responses(payload: dict, annual_loss: dict, threshold: int) -> dict:
++    """Map already annualised gross loss using explicit response-model1.0.0.
++
++    Reduction/cost point estimates use declared modes; triples are never inverted
++    from a net total. Grade4/5 mitigation earns no credit and is labelled excluded.
++    Invalid, absent or nonadmitted annual cost refuses the complete mapping. The
++    caller authenticates inputs and annualises once; this module selects no tier.
++    """
++    if type(threshold) is not int or threshold not in (2, 3):
++        raise MissingInstrument('party pricing threshold must explicitly be2 or3')
++    if not isinstance(payload, dict):
++        raise MissingInstrument('payload must be a mapping')
++    model = _mapping(payload.get('response_model'),
++                     {'version', 'loss_period', 'cost_period', 'responses'}, 'response_model')
++    if model['version'] != VERSION or model['loss_period'] != 'event' or model['cost_period'] != 'year':
++        raise MissingInstrument('response_model: unsupported version or ambiguous loss/control-cost units')
++    loss = _mapping(annual_loss, {'amount', 'currency', 'period', 'perspective', 'rests_on_grade', 'frequency'},
++                    'annualised gross loss')
++    currency = payload.get('currency')
++    if not isinstance(currency, str) or not re.fullmatch('[A-Z]{3}', currency):
++        raise MissingInstrument('payload currency must be explicit ISO4217')
++    perspective = _basis(payload.get('perspective'), 'payload perspective')
++    if loss['currency'] != currency or loss['perspective'] != perspective or loss['period'] != 'year':
++        raise MissingInstrument('annual gross loss must share perspective/currency and explicit year units')
++    amount = _number(loss['amount'], 'annualised gross loss amount')
++    money_grade = _grade(loss['rests_on_grade'], 'annualised gross loss grade')
++    payload_grade = _grade(payload.get('rests_on_grade'), 'payload weakest grade')
++    if money_grade < payload_grade or max(money_grade, payload_grade) > threshold:
++        raise MissingInstrument('gross loss/payload is not admitted at declared pricing threshold')
++    frequency = _mapping(loss['frequency'], {'triple', 'horizon_years'}, 'annualisation frequency')
++    lef = _triple(frequency['triple'], 'annualisation frequency')
++    horizon = _number(frequency['horizon_years'], 'annualisation horizon_years')
++    if horizon <= 0 or horizon != _number(payload.get('horizon'), 'payload horizon'):
++        raise MissingInstrument('annualisation horizon_years must be positive and match payload horizon')
++    annual_frequency = _triple([point / horizon for point in lef], 'derived annual frequency')
++    magnitude = _triple(payload.get('lm'), 'per-event loss magnitude')[1]
++    responses = _accounts(model['responses'], 'response_model')
++    curve = _accounts(payload.get('curve'), 'published decomposed curve')
++    residuals: dict[str, float] = {}
++    costs: dict[str, float] = {}
++    totals: dict[str, float] = {}
++    excluded: list[dict] = []
++    sources: dict[str, dict] = {}
++    grades = [money_grade, payload_grade]
++    for account in ACCOUNTS:
++        row = _mapping(responses[account], {'account', 'mitigation', 'control_cost', 'source'}, account)
++        source = _mapping(row['source'], {'path', 'sha256'}, f'{account} source')
++        path, digest = source['path'], source['sha256']
++        if (not isinstance(path, str) or '\\' in path or PurePosixPath(path).is_absolute()
++                or '..' in PurePosixPath(path).parts or not path or path == '.'):
++            raise MissingInstrument(f'{account}: source must be a relative declared POSIX path')
++        if not isinstance(digest, str) or not re.fullmatch('[a-f0-9]{64}', digest):
++            raise MissingInstrument(f'{account}: source must name exact SHA256')
++        sources[account] = dict(source)
++        reduction = 0.0  # no claim/no admitted credit; never a default zero money price
++        if row['mitigation'] is not None:
++            mitigation = _mapping(row['mitigation'], {'triple', 'evidence_grade', 'basis'}, f'{account} mitigation')
++            points = _triple(mitigation['triple'], f'{account} reduction', fraction=True)
++            grade = _grade(mitigation['evidence_grade'], f'{account} mitigation grade')
++            _basis(mitigation['basis'], f'{account} mitigation basis')
++            if grade <= threshold:
++                reduction = points[1]
++                grades.append(grade)
++            else:
++                excluded.append({'account': account, 'evidence_grade': grade,
++                                 'reason': f'not admitted at pricing threshold {threshold}; no mitigation credit'})
++        cost = _mapping(row['control_cost'], {'triple', 'currency', 'period', 'evidence_grade', 'nature', 'basis'},
++                        f'{account} annual control cost')
++        points = _triple(cost['triple'], f'{account} annual control cost')
++        grade = _grade(cost['evidence_grade'], f'{account} annual control cost grade')
++        if grade > threshold:
++            raise MissingInstrument(f'{account}: cost grade{grade} not admitted; no monetary total')
++        if cost['currency'] != currency or cost['period'] != 'year':
++            raise MissingInstrument(f'{account}: control cost needs matching currency and explicit year period')
++        if (cost['nature'] not in ('measurement', 'published-estimate')
++                or (cost['nature'] == 'measurement' and grade > 2)
++                or (cost['nature'] == 'published-estimate' and grade != 3)):
++            raise MissingInstrument(f'{account}: cost nature/grade identifies no admitted monetary instrument')
++        _basis(cost['basis'], f'{account} annual cost basis')
++        grades.append(grade)
++        point = _mapping(curve[account], {'account', 'residual_loss_per_event', 'annual_control_cost'},
++                         f'{account} decomposed curve')
++        if (not math.isclose(_number(point['residual_loss_per_event'], account), magnitude * (1 - reduction),
++                             rel_tol=1e-12, abs_tol=1e-6)
++                or not math.isclose(_number(point['annual_control_cost'], account), points[1],
++                                    rel_tol=1e-12, abs_tol=1e-6)):
++            raise MissingInstrument(f'{account}: decomposed curve differs from admitted response instruments')
++        residuals[account] = _number(amount * (1 - reduction), f'{account} derived annual residual')
++        costs[account] = points[1]
++        totals[account] = _number(residuals[account] + costs[account], f'{account} derived annual total')
++    return {'residuals': residuals, 'annual_control_costs': costs, 'annual_total_costs': totals,
++            'rests_on_grade': max(grades), 'excluded_mitigations': excluded,
++            'provenance': {'model_version': VERSION, 'point_estimate': 'declared-mode',
++                           'loss_period': 'year', 'control_cost_period': 'year',
++                           'perspective': perspective, 'currency': currency,
++                           'frequency_per_year': annual_frequency,
++                           'annualisation': 'already upstream; no frequency multiplication here',
++                           'source': sources, 'authentication': 'caller verifies signed feed and input hashes'}}
+diff --git a/compose/own_response_model_cli.py b/compose/own_response_model_cli.py
+new file mode 100644
+index 0000000..741dd3b
+--- /dev/null
++++ b/compose/own_response_model_cli.py
+@@ -0,0 +1,119 @@
++"""Read-only prototype adapter for explicitly graded own-response instruments.
++
++The supplied composition already annualised the loss. This adapter never runs an
++adopter, verifies a signature, writes a source, or selects an enforcement tier.
++"""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++import math
++from pathlib import Path
++from typing import Any
++
++from own_response_model import MissingInstrument, annual_responses
++
++
++def _object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
++    result: dict[str, Any] = {}
++    for key, value in pairs:
++        if key in result:
++            raise MissingInstrument(f"duplicate JSON field {key!r}")
++        result[key] = value
++    return result
++
++
++def _constant(value: str) -> None:
++    raise MissingInstrument(f"non-finite JSON number {value!r}")
++
++
++def _read(path: Path) -> tuple[dict[str, Any], str]:
++    try:
++        content = path.read_bytes()
++        value = json.loads(content, object_pairs_hook=_object, parse_constant=_constant)
++    except (OSError, UnicodeDecodeError, ValueError) as error:
++        raise MissingInstrument(f"cannot read JSON instrument {path}: {error}") from None
++    if not isinstance(value, dict):
++        raise MissingInstrument(f"JSON instrument {path} must be an object")
++    return value, hashlib.sha256(content).hexdigest()
++
++
++def _annual_loss(feed: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any]:
++    if feed.get("kind") != "feed" or feed.get("name") != "forward-intel":
++        raise MissingInstrument("feed must be a forward-intel envelope")
++    payload = feed.get("payload")
++    if not isinstance(payload, dict):
++        raise MissingInstrument("forward-intel envelope has no payload object")
++    if evidence.get("outcome") != "composed":
++        raise MissingInstrument("annual loss requires a composed evidence outcome")
++    prices = evidence.get("prices")
++    if not isinstance(prices, list):
++        raise MissingInstrument("composition has no prices array")
++    rows = [row for row in prices if isinstance(row, dict)
++            and row.get("source") == "twin" and row.get("kind") == "twin"
++            and row.get("name") == "forward-intel"]
++    if len(rows) != 1:
++        raise MissingInstrument("composition must contain exactly one forward-intel twin price")
++    row = rows[0]
++    version = feed.get("version")
++    if not isinstance(version, str) or not version or row.get("feed_version") != version:
++        raise MissingInstrument("annual loss does not name the supplied feed version")
++    curve = payload.get("curve")
++    if not isinstance(curve, list):
++        raise MissingInstrument("forward-intel payload has no curve array")
++    try:
++        encoded = json.dumps(curve, sort_keys=True, separators=(",", ":"),
++                             ensure_ascii=False, allow_nan=False).encode("utf-8")
++    except ValueError:
++        raise MissingInstrument("forward-intel curve contains a non-finite number") from None
++    curve_hash = "sha256:" + hashlib.sha256(encoded).hexdigest()
++    if row.get("curve_hash") != curve_hash:
++        raise MissingInstrument("annual loss curve hash does not match the supplied feed")
++    horizon = payload.get("horizon")
++    try:
++        valid_horizon = (not isinstance(horizon, bool) and isinstance(horizon, (int, float))
++                         and math.isfinite(horizon) and horizon > 0)
++    except OverflowError:
++        valid_horizon = False
++    if (not valid_horizon or isinstance(row.get("horizon"), bool)
++            or row.get("horizon") != horizon):
++        raise MissingInstrument("annual loss horizon does not match the supplied feed")
++    if horizon != 1:
++        raise MissingInstrument("existing composition supplies no explicit annual amount period "
++                                "for a horizon other than one year")
++    if payload.get("lef") is not None and payload["lef"] != row.get("lef"):
++        raise MissingInstrument("annual loss frequency does not match the supplied explicit feed")
++    return {"amount": row.get("amount"), "currency": row.get("currency"),
++            "period": "year", "perspective": row.get("perspective"),
++            "rests_on_grade": row.get("rests_on_grade"),
++            "frequency": {"triple": row.get("lef"), "horizon_years": horizon}}
++
++
++def main() -> int:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--feed", type=Path, required=True, help="Supplied forward-intel envelope")
++    parser.add_argument("--evidence", type=Path, required=True, help="Supplied composed evidence.json")
++    parser.add_argument("--threshold", type=int, choices=(2, 3), required=True,
++                        help="The consuming party's explicit declared threshold")
++    args = parser.parse_args()
++    try:
++        feed, feed_hash = _read(args.feed)
++        evidence, evidence_hash = _read(args.evidence)
++        annual_loss = _annual_loss(feed, evidence)
++        result = annual_responses(feed["payload"], annual_loss, args.threshold)
++        output = {"outcome": "priced-prototype", "model": result,
++                  "input_provenance": {"feed_sha256": feed_hash,
++                                       "evidence_sha256": evidence_hash,
++                                       "declared_threshold": args.threshold,
++                                       "source_authentication": "not checked by this prototype",
++                                       "annual_loss": annual_loss}}
++        print(json.dumps(output, sort_keys=True, allow_nan=False))
++    except MissingInstrument as error:
++        print(json.dumps({"outcome": "missing-instrument", "reason": str(error)}, sort_keys=True))
++        return 3
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/compose/test_own_response_model.py b/compose/test_own_response_model.py
+new file mode 100644
+index 0000000..c15f540
+--- /dev/null
++++ b/compose/test_own_response_model.py
+@@ -0,0 +1,152 @@
++"""A strict new model contract; old genuine feeds do not pretend to provide it."""
++import copy
++import json
++from pathlib import Path
++import unittest
++
++import yaml
++
++import own_response_model as model
++
++LADDER = ('baseline', 'restricted', 'quarantine', 'isolated')
++FIXTURES = Path(__file__).with_name('fixtures') / 'own-response-model'
++
++
++def declared_fixture():
++    """Authored cost grades/units, never adopted as real LU/TU evidence."""
++    rows = []
++    curve = []
++    for account, reduction, cost in zip(LADDER, (0.30, 0.70, 0.92, 0.98), (500, 2000, 6000, 15000)):
++        rows.append({'account': account,
++                     'mitigation': {'triple': [reduction] * 3, 'evidence_grade': 5,
++                                    'basis': 'Declared fixture calibration claim; not observed'},
++                     'control_cost': {'triple': [cost] * 3, 'currency': 'GBP', 'period': 'year',
++                                      'evidence_grade': 3, 'nature': 'published-estimate',
++                                      'basis': 'Explicitly authored public-contract fixture; no real adopter grade'},
++                     'source': {'path': 'declared-fixture/' + account + '.yaml', 'sha256': 'a' * 64}})
++        curve.append({'account': account, 'residual_loss_per_event': 1000000,
++                      'annual_control_cost': cost})
++    return {'perspective': 'declared-fixture', 'currency': 'GBP', 'lm': [1000000] * 3, 'horizon': 1,
++            'rests_on_grade': 3, 'curve': curve,
++            'response_model': {'version': '1.0.0', 'loss_period': 'event',
++                               'cost_period': 'year', 'responses': rows}}
++
++
++class AnnualResponses(unittest.TestCase):
++    def setUp(self):
++        self.payload = declared_fixture()
++        self.loss = {'amount': 4000000, 'currency': 'GBP', 'period': 'year',
++                     'perspective': 'declared-fixture', 'rests_on_grade': 3,
++                     'frequency': {'triple': [4, 4, 4], 'horizon_years': 1}}
++
++    def run_model(self, payload=None, loss=None, threshold=3):
++        return model.annual_responses(payload or self.payload, loss or self.loss, threshold)
++
++    def test_grade_five_earns_no_credit_and_annual_cost_is_booked_once(self):
++        r = self.run_model()
++        self.assertEqual(r['residuals'], dict.fromkeys(LADDER, 4000000))
++        self.assertEqual(r['annual_control_costs']['isolated'], 15000)
++        self.assertEqual(r['annual_total_costs']['isolated'], 4015000)
++        self.assertEqual(r['rests_on_grade'], 3)
++        self.assertEqual(len(r['excluded_mitigations']), 4)
++
++    def test_admitted_mitigation_uses_its_own_triple_not_the_platform_table(self):
++        for row, curve in zip(self.payload['response_model']['responses'], self.payload['curve']):
++            row['mitigation'].update(triple=[0.05, 0.10, 0.15], evidence_grade=3)
++            curve['residual_loss_per_event'] = 900000
++        r = self.run_model()
++        self.assertEqual(r['residuals']['baseline'], 3600000)
++        self.assertEqual(r['annual_total_costs']['baseline'], 3600500)
++
++    def test_grade_four_and_five_mitigation_never_change_the_admitted_money(self):
++        for grade in (4, 5):
++            with self.subTest(grade=grade):
++                for row in self.payload['response_model']['responses']:
++                    row['mitigation']['evidence_grade'] = grade
++                self.assertEqual(self.run_model()['residuals'], dict.fromkeys(LADDER, 4000000))
++
++    def test_genuine_ludlow_tuppence_old_payloads_lack_annual_cost_instruments(self):
++        for org in ('ludlow', 'tuppence'):
++            with self.subTest(org=org):
++                feed = json.loads((FIXTURES / (org + '-v1-feed.json')).read_text())
++                self.assertNotIn('response_model', feed['payload'])
++                sources = json.loads((FIXTURES / (org + '-v4-response-sources.json')).read_text())
++                for source in sources.values():
++                    response = yaml.safe_load(source['yaml'])
++                    self.assertNotIn('evidence_grade', response['cost'])
++                    self.assertNotIn('period', response['cost'])
++                    self.assertEqual(response['mitigates']['evidence_grade'], 5)
++                with self.assertRaises(model.MissingInstrument):
++                    self.run_model(feed['payload'])
++
++    def test_missing_invalid_or_nonadmitted_cost_never_becomes_zero_or_partial_total(self):
++        for key, value in (('period', None), ('evidence_grade', None), ('evidence_grade', True),
++                           ('evidence_grade', 4), ('evidence_grade', 5), ('triple', [1, 2]),
++                           ('triple', [1, float('nan'), 3]), ('nature', None), ('basis', '')):
++            with self.subTest(key=key, value=value):
++                payload = copy.deepcopy(self.payload)
++                payload['response_model']['responses'][0]['control_cost'][key] = value
++                with self.assertRaises(model.MissingInstrument):
++                    self.run_model(payload)
++
++    def test_tampered_curve_or_missing_unknown_duplicate_accounts_refuse(self):
++        for change in ('curve', 'missing', 'unknown', 'duplicate', 'source'):
++            with self.subTest(change=change):
++                payload = copy.deepcopy(self.payload)
++                if change == 'curve':
++                    payload['curve'][0]['residual_loss_per_event'] -= 1
++                elif change == 'missing':
++                    payload['response_model']['responses'].pop()
++                elif change == 'unknown':
++                    payload['response_model']['responses'][0]['account'] = 'no-such-rung'
++                elif change == 'duplicate':
++                    payload['response_model']['responses'].append(payload['response_model']['responses'][0])
++                else:
++                    payload['response_model']['responses'][0]['source']['path'] = '../undeclared.yaml'
++                with self.assertRaises(model.MissingInstrument):
++                    self.run_model(payload)
++
++    def test_currency_perspective_frequency_and_unit_ambiguity_refuse(self):
++        for key, value in (('currency', 'USD'), ('perspective', 'somebody-else'), ('period', 'event'),
++                           ('frequency', {'triple': [4, 4, 4]}), ('rests_on_grade', 5), ('amount', True)):
++            with self.subTest(key=key):
++                loss = copy.deepcopy(self.loss)
++                loss[key] = value
++                with self.assertRaises(model.MissingInstrument):
++                    self.run_model(loss=loss)
++        for threshold in (None, 4, 5, True):
++            with self.subTest(threshold=threshold), self.assertRaises(model.MissingInstrument):
++                self.run_model(threshold=threshold)
++
++    def test_known_zero_and_absent_mitigation_are_explicit(self):
++        self.loss['amount'] = 0
++        self.payload['lm'] = [0, 0, 0]
++        for curve in self.payload['curve']:
++            curve['residual_loss_per_event'] = 0
++        for row in self.payload['response_model']['responses']:
++            row['mitigation'] = None
++        self.assertEqual(self.run_model()['residuals'], dict.fromkeys(LADDER, 0))
++        for row, curve in zip(self.payload['response_model']['responses'], self.payload['curve']):
++            row['control_cost']['triple'] = [0, 0, 0]
++            curve['annual_control_cost'] = 0
++        self.assertEqual(self.run_model()['annual_total_costs'], dict.fromkeys(LADDER, 0))
++
++    def test_nonfinite_derived_total_or_frequency_refuses(self):
++        with self.subTest(derived='annual total'):
++            self.loss['amount'] = 1e308
++            for row, curve in zip(self.payload['response_model']['responses'], self.payload['curve']):
++                row['control_cost']['triple'] = [1e308] * 3
++                curve['annual_control_cost'] = 1e308
++            with self.assertRaises(model.MissingInstrument):
++                self.run_model()
++        with self.subTest(derived='annual frequency'):
++            self.payload = declared_fixture()
++            self.loss['amount'] = 4000000
++            self.payload['horizon'] = 1e-308
++            self.loss['frequency']['horizon_years'] = 1e-308
++            with self.assertRaises(model.MissingInstrument):
++                self.run_model()
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/compose/test_own_response_model_cli.py b/compose/test_own_response_model_cli.py
+new file mode 100644
+index 0000000..4ff0ae7
+--- /dev/null
++++ b/compose/test_own_response_model_cli.py
+@@ -0,0 +1,172 @@
++"""Public prototype adapter checks; authored fixtures never become adopter evidence."""
++from __future__ import annotations
++
++import copy
++import hashlib
++import json
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++import jsonschema
++
++from test_own_response_model import declared_fixture
++
++HERE = Path(__file__).resolve().parent
++CLI = HERE / "own_response_model_cli.py"
++SCHEMA = HERE.parent / "feeds/forward-intel.v3.payload.schema.json"
++FIXTURES = HERE / "fixtures/own-response-model"
++
++
++def curve_hash(curve: list) -> str:
++    return "sha256:" + hashlib.sha256(json.dumps(
++        curve, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
++
++
++def fixture():
++    payload = declared_fixture()
++    payload.update(shock="Authored prototype fixture; not a world observation", horizon=1,
++                   lef=[4, 4, 4], register=[], claim_scope={"included": [], "excluded": []},
++                   derived_from=[{"party": "declared-fixture", "kind": "feed",
++                                  "name": "authored-frequency", "version": "1.0.0"}])
++    feed = {"kind": "feed", "name": "forward-intel", "version": "3.0.0",
++            "published_by": "declared-fixture", "published_at": "2026-10-04T00:00:00Z",
++            "payload_schema": "declared-prototype", "payload": payload}
++    row = {"source": "twin", "kind": "twin", "name": "forward-intel",
++           "feed_version": feed["version"], "amount": 4000000,
++           "currency": "GBP", "perspective": "declared-fixture", "rests_on_grade": 3,
++           "horizon": 1, "lef": [4, 4, 4], "curve_hash": curve_hash(payload["curve"])}
++    return feed, {"outcome": "composed", "prices": [row]}
++
++
++class OwnResponseCLI(unittest.TestCase):
++    def invoke(self, feed, evidence, *, threshold=3, raw_feed=None):
++        with tempfile.TemporaryDirectory(prefix="own-response-cli-fixture-") as temporary:
++            directory = Path(temporary)
++            feed_path, evidence_path = directory / "feed.json", directory / "evidence.json"
++            feed_path.write_text(raw_feed if raw_feed is not None else json.dumps(feed))
++            evidence_path.write_text(json.dumps(evidence))
++            before = (feed_path.read_bytes(), evidence_path.read_bytes())
++            result = subprocess.run([sys.executable, str(CLI), "--feed", str(feed_path),
++                                     "--evidence", str(evidence_path), "--threshold", str(threshold)],
++                                    capture_output=True, text=True, check=False)
++            self.assertEqual(before, (feed_path.read_bytes(), evidence_path.read_bytes()))
++            self.assertEqual(result.stderr, "", result.stderr)
++            return result.returncode, json.loads(result.stdout), before
++
++    def refused(self, feed, evidence, **kwargs):
++        code, result, _ = self.invoke(feed, evidence, **kwargs)
++        self.assertEqual(code, 3, result)
++        self.assertEqual(result["outcome"], "missing-instrument")
++        self.assertNotIn("model", result)
++        return result["reason"]
++
++    def test_declared_annual_cost_booked_once_with_readonly_provenance(self):
++        feed, evidence = fixture()
++        code, result, inputs = self.invoke(feed, evidence)
++        self.assertEqual(code, 0)
++        self.assertEqual(result["model"]["residuals"]["baseline"], 4000000)
++        self.assertEqual(result["model"]["annual_total_costs"]["baseline"], 4000500)
++        self.assertEqual(result["model"]["rests_on_grade"], 3)
++        self.assertEqual(len(result["model"]["excluded_mitigations"]), 4)
++        provenance = result["input_provenance"]
++        self.assertEqual(provenance["feed_sha256"], hashlib.sha256(inputs[0]).hexdigest())
++        self.assertEqual(provenance["evidence_sha256"], hashlib.sha256(inputs[1]).hexdigest())
++        self.assertEqual(provenance["annual_loss"]["period"], "year")
++        self.assertEqual(provenance["source_authentication"], "not checked by this prototype")
++
++    def test_genuine_legacy_feeds_have_no_model_and_remain_missing_instrument(self):
++        for org in ("ludlow", "tuppence"):
++            with self.subTest(org=org):
++                feed = json.loads((FIXTURES / (org + "-v1-feed.json")).read_text())
++                row = fixture()[1]["prices"][0]
++                row.update(feed_version=feed["version"], perspective=feed["payload"]["perspective"],
++                           currency=feed["payload"]["currency"], horizon=feed["payload"]["horizon"],
++                           curve_hash=curve_hash(feed["payload"]["curve"]))
++                reason = self.refused(feed, {"outcome": "composed", "prices": [row]})
++                self.assertIn("response_model", reason)
++
++    def test_unique_price_version_curve_and_frequency_join(self):
++        for mutation in ("missing", "duplicate", "version", "curve", "horizon", "frequency"):
++            with self.subTest(mutation=mutation):
++                feed, evidence = fixture()
++                row = evidence["prices"][0]
++                if mutation == "missing": evidence["prices"] = []
++                elif mutation == "duplicate": evidence["prices"].append(copy.deepcopy(row))
++                elif mutation == "version": row["feed_version"] = "2.0.0"
++                elif mutation == "curve": row["curve_hash"] = "sha256:" + "0" * 64
++                elif mutation == "horizon": row["horizon"] = 2
++                else: row["lef"] = [3, 3, 3]
++                self.refused(feed, evidence)
++
++    def test_multiyear_and_unrepresentable_horizons_refuse_without_traceback(self):
++        for horizon in (2, True, 10 ** 400):
++            with self.subTest(horizon_type=type(horizon).__name__):
++                feed, evidence = fixture()
++                feed["payload"]["horizon"] = evidence["prices"][0]["horizon"] = horizon
++                self.refused(feed, evidence)
++
++    def test_money_holes_remain_typed_and_no_partial_total(self):
++        for mutation in ("cost-grade", "cost-period", "cost-nature", "currency", "perspective",
++                         "amount-bool", "loss-grade", "threshold"):
++            with self.subTest(mutation=mutation):
++                feed, evidence = fixture()
++                cost = feed["payload"]["response_model"]["responses"][0]["control_cost"]
++                row = evidence["prices"][0]
++                if mutation == "cost-grade": cost.pop("evidence_grade")
++                elif mutation == "cost-period": cost["period"] = "event"
++                elif mutation == "cost-nature": cost["nature"] = "authorised-budget"
++                elif mutation == "currency": row["currency"] = "USD"
++                elif mutation == "perspective": row["perspective"] = "another-party"
++                elif mutation == "amount-bool": row["amount"] = True
++                elif mutation == "loss-grade": row["rests_on_grade"] = 5
++                self.refused(feed, evidence, threshold=2 if mutation == "threshold" else 3)
++
++    def test_nonfinite_and_duplicate_json_refuse(self):
++        feed, evidence = fixture()
++        self.assertIn("duplicate", self.refused(feed, evidence, raw_feed='{"kind":"feed","kind":"feed"}'))
++        for value in ("NaN", "Infinity", "1e999"):
++            with self.subTest(value=value):
++                raw = json.dumps(feed).replace('"residual_loss_per_event": 1000000',
++                                               '"residual_loss_per_event": ' + value, 1)
++                self.refused(feed, evidence, raw_feed=raw)
++
++
++class OwnResponseSchema(unittest.TestCase):
++    def setUp(self):
++        self.schema = json.loads(SCHEMA.read_text())
++        jsonschema.Draft7Validator.check_schema(self.schema)
++        self.validator = jsonschema.Draft7Validator(self.schema)
++
++    def test_explicit_declared_contract_validates(self):
++        self.validator.validate(fixture()[0]["payload"])
++
++    def test_closed_fields_and_money_period_grade_nature_are_required(self):
++        for mutation in ("missing-model", "model-extra", "cost-extra", "grade5", "grade-bool",
++                         "period", "nature", "measurement-grade3", "estimate-grade2", "missing-account",
++                         "duplicate-account", "source-parent", "source-absolute", "source-dot"):
++            with self.subTest(mutation=mutation):
++                payload = fixture()[0]["payload"]
++                model = payload["response_model"]
++                cost = model["responses"][0]["control_cost"]
++                if mutation == "missing-model": payload.pop("response_model")
++                elif mutation == "model-extra": model["guess"] = 0
++                elif mutation == "cost-extra": cost["budget"] = True
++                elif mutation == "grade5": cost["evidence_grade"] = 5
++                elif mutation == "grade-bool": cost["evidence_grade"] = True
++                elif mutation == "period": cost.pop("period")
++                elif mutation == "nature": cost["nature"] = "authorised-budget"
++                elif mutation == "measurement-grade3": cost["nature"] = "measurement"
++                elif mutation == "estimate-grade2": cost["evidence_grade"] = 2
++                elif mutation == "missing-account": model["responses"].pop()
++                elif mutation == "duplicate-account": model["responses"][1]["account"] = "baseline"
++                elif mutation == "source-parent": model["responses"][0]["source"]["path"] = "../cost.yaml"
++                elif mutation == "source-absolute": model["responses"][0]["source"]["path"] = "/cost.yaml"
++                else: model["responses"][0]["source"]["path"] = "cost/./source.yaml"
++                self.assertTrue(list(self.validator.iter_errors(payload)), mutation)
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/feeds/forward-intel.v3.payload.schema.json b/feeds/forward-intel.v3.payload.schema.json
+new file mode 100644
+index 0000000..2cd4299
+--- /dev/null
++++ b/feeds/forward-intel.v3.payload.schema.json
+@@ -0,0 +1,588 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "$id": "https://policy-as-versioned.dev/schema/feeds/forward-intel.v3.prototype.json",
++  "title": "PROTOTYPE forward-intel payload v3: own graded response model",
++  "$comment": "PROTOTYPE VERSION 3.0.0, not released or adopted. Explicit event residual loss and separately annual control cost. No ungraded budget variant. Immutable v2 source is unchanged.",
++  "description": "Prototype scenario contract: the estate annualises lm once; the own-response mapper applies admitted mitigation and adds an explicitly graded annual control cost once. A curve decomposes per-event residual loss and annual control cost; it never recommends or selects a tier. These are supplied declarations, not new measurements or signature verification.",
++  "type": "object",
++  "required": [
++    "perspective",
++    "shock",
++    "horizon",
++    "lef",
++    "lm",
++    "currency",
++    "curve",
++    "register",
++    "claim_scope",
++    "derived_from",
++    "rests_on_grade",
++    "response_model"
++  ],
++  "additionalProperties": false,
++  "properties": {
++    "perspective": {
++      "type": "string",
++      "minLength": 1,
++      "description": "The party whose balance sheet this scenario is on, as on its party.yaml. Every amount below is that party's money and nothing else: no sum crosses perspectives (ADR-0021, hard rule 7)."
++    },
++    "shock": {
++      "type": "string",
++      "minLength": 1,
++      "description": "What happens, in one line of plain English. The thing being priced, not its remedy."
++    },
++    "horizon": {
++      "type": "number",
++      "exclusiveMinimum": 0,
++      "description": "Years the frequency triple is expressed over. 1 unless stated otherwise; it is stated here rather than assumed by the reader (ticket 08)."
++    },
++    "lef": {
++      "type": [
++        "array",
++        "null"
++      ],
++      "minItems": 3,
++      "maxItems": 3,
++      "items": {
++        "type": "number",
++        "minimum": 0
++      },
++      "description": "Loss event frequency over `horizon` as a (min, mode, max) triple, or null. Null means the twin has no frequency and the subscribed pricing feed supplies it -- which is the normal case, because the twin prices one shock and has no clock (ADR-0021)."
++    },
++    "lm": {
++      "type": [
++        "array",
++        "object"
++      ],
++      "minItems": 3,
++      "maxItems": 3,
++      "items": {
++        "type": "number",
++        "minimum": 0
++      },
++      "required": [
++        "model",
++        "mu",
++        "sigma",
++        "u",
++        "xi",
++        "beta"
++      ],
++      "additionalProperties": false,
++      "properties": {
++        "model": {
++          "enum": [
++            "lognormal-gpd"
++          ],
++          "description": "The only severity spec fair.py dispatches to twin/severity.py for. Anything else is a new model and a new major."
++        },
++        "mu": {
++          "type": "number",
++          "description": "Lognormal body: mean of ln(loss)."
++        },
++        "sigma": {
++          "type": "number",
++          "exclusiveMinimum": 0,
++          "description": "Lognormal body: sd of ln(loss)."
++        },
++        "u": {
++          "type": "number",
++          "exclusiveMinimum": 0,
++          "description": "Threshold where the body hands over to the tail, in `currency`."
++        },
++        "xi": {
++          "type": "number",
++          "minimum": 0,
++          "description": "GPD shape, heavy or exponential tail only. Above 0 the tail is a power law and the mean is finite only for xi < 1. Bounded below at 0 because platform/fair/severity.py accepts xi >= 0: a payload this schema passes must be one the pricer can price."
++        },
++        "beta": {
++          "type": "number",
++          "exclusiveMinimum": 0,
++          "description": "GPD scale, in `currency`."
++        }
++      },
++      "description": "Loss magnitude, in `currency`, one of two shapes: a (min, mode, max) triple, which fair.py prices with its bounded beta-PERT and reports as tail `bounded-pert`; or a lognormal-GPD severity spec, which fair.py dispatches to twin/severity.py and reports under its own tail name. Expressed as one node rather than a oneOf on purpose: draft-07 applies `items` only to arrays and `required`/`properties` only to objects, so the union validates under a full validator and under the estate's stdlib subset checker alike."
++    },
++    "currency": {
++      "type": "string",
++      "pattern": "^[A-Z]{3}$",
++      "description": "ISO 4217 for scenario lm and both explicit curve amounts. The mapper requires the already annualised loss and annual costs in this currency; it supplies no FX rate."
++    },
++    "curve": {
++      "type": "array",
++      "minItems": 4,
++      "maxItems": 4,
++      "items": {
++        "type": "object",
++        "required": [
++          "account",
++          "residual_loss_per_event",
++          "annual_control_cost"
++        ],
++        "additionalProperties": false,
++        "properties": {
++          "account": {
++            "enum": [
++              "baseline",
++              "restricted",
++              "quarantine",
++              "isolated"
++            ]
++          },
++          "residual_loss_per_event": {
++            "type": "number",
++            "minimum": 0
++          },
++          "annual_control_cost": {
++            "type": "number",
++            "minimum": 0
++          }
++        }
++      },
++      "allOf": [
++        {
++          "contains": {
++            "type": "object",
++            "required": [
++              "account"
++            ],
++            "properties": {
++              "account": {
++                "const": "baseline"
++              }
++            }
++          }
++        },
++        {
++          "contains": {
++            "type": "object",
++            "required": [
++              "account"
++            ],
++            "properties": {
++              "account": {
++                "const": "restricted"
++              }
++            }
++          }
++        },
++        {
++          "contains": {
++            "type": "object",
++            "required": [
++              "account"
++            ],
++            "properties": {
++              "account": {
++                "const": "quarantine"
++              }
++            }
++          }
++        },
++        {
++          "contains": {
++            "type": "object",
++            "required": [
++              "account"
++            ],
++            "properties": {
++              "account": {
++                "const": "isolated"
++              }
++            }
++          }
++        }
++      ],
++      "description": "Exactly four named accounts. Loss is per event; control cost is per year. Runtime verifies these stated amounts against the explicit graded response model without recovering either value from a combined total."
++    },
++    "register": {
++      "type": "array",
++      "description": "C10. Entries the scenario names but does not price. Each takes the tier selected for the priced hits in the same scenario and perspective -- strictest on the ladder if nothing in the scenario priced. No new knob, and nothing runs looser than the hit it hangs off (ticket 15 answer 4). An empty register is a real answer.",
++      "items": {
++        "type": "object",
++        "required": [
++          "source",
++          "id",
++          "tier"
++        ],
++        "additionalProperties": false,
++        "properties": {
++          "source": {
++            "type": "string",
++            "minLength": 1,
++            "description": "The publisher of the id's namespace, e.g. 'nist', or the party for a bespoke control."
++          },
++          "id": {
++            "type": "string",
++            "minLength": 1,
++            "description": "The control id inside that namespace, e.g. 'sc-28'. Keyed (source, id): a bare id is not a key."
++          },
++          "tier": {
++            "enum": [
++              "baseline",
++              "restricted",
++              "quarantine",
++              "isolated",
++              "infra"
++            ],
++            "description": "The tier this unpriced entry takes, copied from the tier the scenario's priced hits selected. `infra` is only ever a platform-role party's."
++          },
++          "note": {
++            "type": "string",
++            "minLength": 1,
++            "description": "Why it is unpriced, in one line."
++          }
++        }
++      }
++    },
++    "claim_scope": {
++      "type": "object",
++      "description": "C10. What an insurance claim off this scenario would and would not cover, so the insurer prices exclusions from the same artefact the estate prices risk from (ticket 36: exclusions key on regime names and control ids). The twin writes scope; only an override prices.",
++      "required": [
++        "included",
++        "excluded"
++      ],
++      "additionalProperties": false,
++      "properties": {
++        "included": {
++          "type": "array",
++          "items": {
++            "type": "string",
++            "minLength": 1
++          },
++          "description": "Regime names ('uk-gdpr') or control keys ('nist:sc-28') this scenario's loss is claimable under."
++        },
++        "excluded": {
++          "type": "array",
++          "items": {
++            "type": "string",
++            "minLength": 1
++          },
++          "description": "The same keying, for what is carved out. An empty list is a claim of no exclusions and is read as one."
++        },
++        "note": {
++          "type": "string",
++          "minLength": 1
++        }
++      }
++    },
++    "derived_from": {
++      "type": "array",
++      "minItems": 1,
++      "description": "C10. Every pinned input this scenario was derived from, in the same shape as `inherits[]` on a party artefact, so provenance reads the same way on both sides of the seam. At least one: a scenario derived from nothing pinned is not evidence.",
++      "items": {
++        "type": "object",
++        "required": [
++          "party",
++          "kind",
++          "version"
++        ],
++        "additionalProperties": false,
++        "properties": {
++          "party": {
++            "type": "string",
++            "minLength": 1
++          },
++          "kind": {
++            "enum": [
++              "controls",
++              "implementations",
++              "feed"
++            ],
++            "description": "The closed parent kind, as on inherits[]."
++          },
++          "name": {
++            "type": "string",
++            "minLength": 1,
++            "description": "The feed's name. Required in practice when kind is feed; meaningless otherwise."
++          },
++          "version": {
++            "type": "string",
++            "minLength": 1,
++            "description": "The pinned version, no leading v."
++          },
++          "ref": {
++            "type": "string",
++            "minLength": 1,
++            "description": "The exact commit or tag read, where the version alone does not identify it (the twin's own overlay ref, say)."
++          }
++        }
++      }
++    },
++    "rests_on_grade": {
++      "type": "integer",
++      "enum": [
++        1,
++        2,
++        3
++      ]
++    },
++    "valuation": {
++      "type": "object",
++      "required": [
++        "amount",
++        "currency",
++        "native_amount",
++        "native_currency",
++        "party_fact",
++        "fx"
++      ],
++      "properties": {
++        "amount": {
++          "type": "number"
++        },
++        "currency": {
++          "type": "string"
++        },
++        "native_amount": {
++          "type": "number"
++        },
++        "native_currency": {
++          "type": "string"
++        },
++        "party_fact": {
++          "type": "string"
++        },
++        "fx": {
++          "type": [
++            "object",
++            "null"
++          ]
++        }
++      },
++      "additionalProperties": false
++    },
++    "response_model": {
++      "type": "object",
++      "required": [
++        "version",
++        "loss_period",
++        "cost_period",
++        "responses"
++      ],
++      "additionalProperties": false,
++      "properties": {
++        "version": {
++          "const": "1.0.0"
++        },
++        "loss_period": {
++          "const": "event"
++        },
++        "cost_period": {
++          "const": "year"
++        },
++        "responses": {
++          "type": "array",
++          "minItems": 4,
++          "maxItems": 4,
++          "items": {
++            "type": "object",
++            "required": [
++              "account",
++              "mitigation",
++              "control_cost",
++              "source"
++            ],
++            "additionalProperties": false,
++            "properties": {
++              "account": {
++                "enum": [
++                  "baseline",
++                  "restricted",
++                  "quarantine",
++                  "isolated"
++                ]
++              },
++              "mitigation": {
++                "type": [
++                  "object",
++                  "null"
++                ],
++                "required": [
++                  "triple",
++                  "evidence_grade",
++                  "basis"
++                ],
++                "additionalProperties": false,
++                "properties": {
++                  "triple": {
++                    "type": "array",
++                    "minItems": 3,
++                    "maxItems": 3,
++                    "items": {
++                      "type": "number",
++                      "minimum": 0,
++                      "maximum": 1
++                    }
++                  },
++                  "evidence_grade": {
++                    "type": "integer",
++                    "enum": [
++                      1,
++                      2,
++                      3,
++                      4,
++                      5
++                    ]
++                  },
++                  "basis": {
++                    "type": "string",
++                    "minLength": 1
++                  }
++                }
++              },
++              "control_cost": {
++                "type": "object",
++                "required": [
++                  "triple",
++                  "currency",
++                  "period",
++                  "evidence_grade",
++                  "nature",
++                  "basis"
++                ],
++                "additionalProperties": false,
++                "properties": {
++                  "triple": {
++                    "type": "array",
++                    "minItems": 3,
++                    "maxItems": 3,
++                    "items": {
++                      "type": "number",
++                      "minimum": 0
++                    }
++                  },
++                  "currency": {
++                    "type": "string",
++                    "pattern": "^[A-Z]{3}$"
++                  },
++                  "period": {
++                    "const": "year"
++                  },
++                  "evidence_grade": {
++                    "type": "integer",
++                    "enum": [
++                      1,
++                      2,
++                      3
++                    ]
++                  },
++                  "nature": {
++                    "enum": [
++                      "measurement",
++                      "published-estimate"
++                    ]
++                  },
++                  "basis": {
++                    "type": "string",
++                    "minLength": 1
++                  }
++                },
++                "allOf": [
++                  {
++                    "if": {
++                      "properties": {
++                        "nature": {
++                          "const": "measurement"
++                        }
++                      }
++                    },
++                    "then": {
++                      "properties": {
++                        "evidence_grade": {
++                          "enum": [
++                            1,
++                            2
++                          ]
++                        }
++                      }
++                    },
++                    "else": {
++                      "properties": {
++                        "evidence_grade": {
++                          "const": 3
++                        }
++                      }
++                    }
++                  }
++                ]
++              },
++              "source": {
++                "type": "object",
++                "required": [
++                  "path",
++                  "sha256"
++                ],
++                "additionalProperties": false,
++                "properties": {
++                  "path": {
++                    "type": "string",
++                    "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*(?:^|/)\\.(?:/|$))(?!.*\\\\)[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$"
++                  },
++                  "sha256": {
++                    "type": "string",
++                    "pattern": "^[0-9a-f]{64}$"
++                  }
++                }
++              }
++            }
++          },
++          "allOf": [
++            {
++              "contains": {
++                "type": "object",
++                "required": [
++                  "account"
++                ],
++                "properties": {
++                  "account": {
++                    "const": "baseline"
++                  }
++                }
++              }
++            },
++            {
++              "contains": {
++                "type": "object",
++                "required": [
++                  "account"
++                ],
++                "properties": {
++                  "account": {
++                    "const": "restricted"
++                  }
++                }
++              }
++            },
++            {
++              "contains": {
++                "type": "object",
++                "required": [
++                  "account"
++                ],
++                "properties": {
++                  "account": {
++                    "const": "quarantine"
++                  }
++                }
++              }
++            },
++            {
++              "contains": {
++                "type": "object",
++                "required": [
++                  "account"
++                ],
++                "properties": {
++                  "account": {
++                    "const": "isolated"
++                  }
++                }
++              }
++            }
++          ]
++        }
++      }
++    }
++  }
++}

@@ -1,0 +1,97 @@
+{
+  "recorded_at": "2026-10-04T15:14:52.810340+00:00",
+  "status": "implemented-unpublished-prototype-awaiting-independent-review",
+  "repository": "https://github.com/policy-as-versioned-flux/platform",
+  "checkout": "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform",
+  "branch": "prototype/own-response-annual-model-20261004",
+  "head": "c1bbb13a5124baa06247fe45845a425399908611",
+  "tree": "a69892493ae59f3e7e8658eb270526ef3d5bc25f",
+  "base": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "signature": "G",
+  "status_porcelain": "",
+  "changed_paths": [
+    "compose/OWN-RESPONSE-MODEL.md",
+    "compose/fixtures/own-response-model/PROVENANCE.json",
+    "compose/fixtures/own-response-model/ludlow-v1-feed.json",
+    "compose/fixtures/own-response-model/ludlow-v4-response-sources.json",
+    "compose/fixtures/own-response-model/tuppence-v1-feed.json",
+    "compose/fixtures/own-response-model/tuppence-v4-response-sources.json",
+    "compose/own_response_model.py",
+    "compose/own_response_model_cli.py",
+    "compose/test_own_response_model.py",
+    "compose/test_own_response_model_cli.py",
+    "feeds/forward-intel.v3.payload.schema.json"
+  ],
+  "source_sha256": {
+    "compose/OWN-RESPONSE-MODEL.md": "47f17983c4c41e9ff2c1ab59f3802ab56652c0801c4898247e31c926910afe38",
+    "compose/fixtures/own-response-model/PROVENANCE.json": "d73a47963193e7ef7e2c919a334e23acbe849d5c2630a38278b2cc9e583dc662",
+    "compose/fixtures/own-response-model/ludlow-v1-feed.json": "16adebe89e4b689e13cb432e21f5b4861df4c4067102e02409c00772589c8dc2",
+    "compose/fixtures/own-response-model/ludlow-v4-response-sources.json": "6352906b4d76824e1da70a0ed027d7b18d387d04e23184139860288dcd107a0e",
+    "compose/fixtures/own-response-model/tuppence-v1-feed.json": "bc7e7948829fb7056522ecef071a498984ca7b4ba4cd7207a425d425b1aaf76f",
+    "compose/fixtures/own-response-model/tuppence-v4-response-sources.json": "914bd0877f033d1e126ce303210b4572e691d4c4ecb4548a79334ea33a6082f7",
+    "compose/own_response_model.py": "c7f79cb8b7c12ab9fb4d50770bdb6f9ae1dad78aa6b390202964eafe438d7355",
+    "compose/own_response_model_cli.py": "1149727763ed460f97b6ce89109911370b6a9829dbc5d2deda2588d68c5d1002",
+    "compose/test_own_response_model.py": "2f1cc5eba67db40347bec70e9603470038e869f560f65ac0d33b7a0bda1cb982",
+    "compose/test_own_response_model_cli.py": "f8172a78c3805a540645c4d4223502f37000babeb710945214441f885adad0ed",
+    "feeds/forward-intel.v3.payload.schema.json": "172a248f7d780dbee32be482ad72e6e5e8da4f6e078ce9e4fed3003d5c8e5917"
+  },
+  "patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/patches/resume-2026-10-04/platform-own-response-annual-model-prototype.patch",
+  "patch_sha256": "f73fb4f9650b168197271291d137d228a24cbdba85508d2e14bb891166809ff2",
+  "checks": [
+    {
+      "name": "postcommit-public-tests",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "compose",
+        "-p",
+        "test_own_response_model*.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-postcommit-public-tests.log",
+      "log_sha256": "45c3f16543b9b20dfa25ee97bb2f07970b31245ef9baff7923c8a60e944cd3cb"
+    },
+    {
+      "name": "postcommit-mypy",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "mypy",
+        "compose/own_response_model.py",
+        "compose/own_response_model_cli.py"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-postcommit-mypy.log",
+      "log_sha256": "f9b031e5c45aa702cd4fef028d465551cb20a2c4698e0913c7b00766b20ac4d8"
+    }
+  ],
+  "linked_receipts": {
+    "own-response-annual-model-red.json": "7fa50ddcaae452e4ae055ee632d34d2cef2478fa2e4aa364a0eb09ce6b95ffac",
+    "own-response-annual-model-derived-finite-red.json": "2ad4619b691b3d352d401c4d31542b3a76639b9a29cbd3d73d348d90712c843c",
+    "own-response-annual-model-final-module-checks.json": "6a9d84e5c060073e9a4db9ecf28948633cdaa1131c5e377ed50119e94240bb6d",
+    "own-response-annual-model-cli-schema-checks.json": "ce9e388e8d91211e877164ce3140eb8d4388fdab73ac093d40c055f19523976f",
+    "own-response-annual-model-joined-checks.json": "cbf20fb8910c02588e8576713df9dde4644907f74d8d1252b49da6080ee89735"
+  },
+  "contract": {
+    "model_version": "1.0.0",
+    "proposed_payload_major": "3.0.0",
+    "selection_or_enforcement": false,
+    "signature_verification": "caller responsibility; CLI only consistency + hashes",
+    "annualisation": "already annual gross loss, never annualises cost or inverted net curve",
+    "cost_instrument": "explicit admitted grade + measurement/published-estimate nature + year period + currency + basis",
+    "genuine_ludlow_tuppence_result": "typed missing-instrument exit3, no declared native cost instrument added",
+    "frozen_policy_5_6_7_or_old_feed_edits": false,
+    "published_native_inputs_or_versions": false
+  },
+  "native_missing_inputs": [
+    "Separately authored control-cost evidence grade, nature, annual period and provenance on each response",
+    "New decomposed response-model payload under genuine normal publisher version and signature",
+    "Reviewed consuming selection integration using authenticated input and separately annual gross loss"
+  ],
+  "external_mutations": false,
+  "self_review": "implementation receipts only; independent review required"
+}

@@ -1,0 +1,32 @@
+E
+======================================================================
+ERROR: test_committed_apps_objects_travel_without_dirty_bytes_or_prior_comparison (test_real_adopter_fixture.RealAdopterFixture.test_committed_apps_objects_travel_without_dirty_bytes_or_prior_comparison)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/wargamer/inventory.py", line 39, in git
+    return subprocess.run(['git', '-C', str(repository), *args], check=True,
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          capture_output=True, text=True, timeout=30).stdout.strip()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['git', '-C', '/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmpkrdqjw6z/copies/adopter', 'rev-parse', '--show-toplevel']' returned non-zero exit status 128.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_real_adopter_fixture.py", line 31, in test_committed_apps_objects_travel_without_dirty_bytes_or_prior_comparison
+    self.assertEqual(reader.served_images(copied),['example.invalid/declared-fixture@sha256:'+'a'*64])
+                     ~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/wargamer/inventory.py", line 43, in served_images
+    if git('rev-parse', '--show-toplevel') != str(repository):
+       ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/wargamer/inventory.py", line 42, in git
+    raise InstrumentFault('apps source or pinned tree is unreadable: ' + str(exc)) from exc
+fixture_inventory_reader.InstrumentFault: apps source or pinned tree is unreadable: Command '['git', '-C', '/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmpkrdqjw6z/copies/adopter', 'rev-parse', '--show-toplevel']' returned non-zero exit status 128.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.272s
+
+FAILED (errors=1)

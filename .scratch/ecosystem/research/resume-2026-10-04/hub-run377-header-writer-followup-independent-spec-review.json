@@ -1,0 +1,62 @@
+{
+  "review_axis": "Spec",
+  "status": "PASS_NO_ACTIONABLE_FINDING",
+  "observed_at": "2026-10-04T16:14:19.715681+00:00",
+  "head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "tree": "6f0aab95463b73d0415552d213ea755f621c1cc1",
+  "parent": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "normal_ssh_signature": "G",
+  "verify_commit_exit": 0,
+  "clean_exact_source": true,
+  "changed_paths": [
+    "tests/test_loophole_adr_0026.py"
+  ],
+  "complete_changed_paths": [
+    "talk/verify-manifest.txt",
+    "tests/test_enact.py",
+    "tests/test_loophole_adr_0026.py",
+    "tests/test_map_observation_ownership.py",
+    "tests/test_refusal_by_another_name.py",
+    "tests/test_verifier_snapshots.py",
+    "tests/test_workload_lane_entrypoint.py",
+    "verify/_snapshot.py",
+    "verify/e2e/step2_reprice.py",
+    "verify/engine-pairing/engine_pairing.py",
+    "verify/map-surface/map_surface.py",
+    "verify/refusal-by-another-name/refusal_scan.py",
+    "verify/refusal-by-another-name/register.yaml",
+    "verify/served-workloads/verify-served-workloads.sh"
+  ],
+  "packet_sha256": "5965c0d732c65b66e899377f579792b94e40fe73ca6aa8e3f3a417622b7021c6",
+  "source_sha256": {
+    "tests/test_loophole_adr_0026.py": "39ed98215e5e5b3c48f6dfaec85b08792ccb0d0595f65aa8cc350ed88f86ce72"
+  },
+  "patch_sha256": "1f6fa32d4234d9b77601ebf057d439eb2de2cb4f2e9bfdf8a016694a500466a7",
+  "complete_patch_sha256": "4585787bd50f396aa99a442b247a4b61b30fc243e34ea0f3007d4e6c4e774e37",
+  "pr_body_sha256": "c31f7c58c958341acee2a2879947aa4cc91107378797585bb1f5a3e4befb2972",
+  "check_receipts_sha256": {
+    "hub-run377-header-writer-compatibility-red.json": "59b37e3c636322e5eece8fc517a8882b57efe3e1beb40d68ed1b6c48407bc582",
+    "hub-run377-header-writer-compatibility-checks.json": "79645b882c9a93c5ab96c9810300efaf194894a98d10654035ee10e96939d5ed"
+  },
+  "authentic_platform_refs": {
+    "v5.0.0": "703eff6aee959843c4160aa54fd03413f62858cc",
+    "HEAD": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb"
+  },
+  "author_red_green": "2FAIL -> 2PASS; real Git old/new writer history + exact rendered bytes + idempotence",
+  "full_typecheck": "208 source files PASS",
+  "historical_ci_log_sha256": "4e1ff2d3979ef8f5946261b7c3366a38de78afcbac5d32d3853e99e3af69c883",
+  "historical_ci_failure_preserved": true,
+  "spec_inspection": [
+    "staged0/1/other-error handling",
+    "HEAD exact rendered header assertion",
+    "declared staged state retained",
+    "one genuine comparison commit and identical-repeat no-op",
+    "both authentic fixture writer implementations exercised"
+  ],
+  "new_runtime_tests": 0,
+  "network_calls": 0,
+  "source_or_index_mutations": false,
+  "production_price_grade_guard_floor_changes": false,
+  "ordinary_fresh_CI_still_required": true,
+  "report_sha256": "5536114bd7c4abaa3dde5a08355a2016ecb5369b0a8f918dae056eab4cf6a295"
+}

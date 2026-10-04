@@ -1,0 +1,102 @@
+{
+  "observed_at": "2026-10-04T09:29:30.886837+00:00",
+  "scope": "Preparatory local object-closure observation; source worktrees are still being edited, no exact new adopter head approval",
+  "platform": {
+    "head": "703eff6aee959843c4160aa54fd03413f62858cc",
+    "tools_tag_commit": "703eff6aee959843c4160aa54fd03413f62858cc"
+  },
+  "adopters": {
+    "driftwood": {
+      "source_head": "aa923631de95276615e4985e67ee41971efacf25",
+      "generic_pin": {
+        "tag": "threat-register/v4.0.0",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "fx_pin": {
+        "tag": "fx/v1.1.0",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "feeds_head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "generic_checkout_guard": null,
+      "fx_tag_commit": {
+        "code": 0,
+        "stdout": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+        "stderr": ""
+      },
+      "fx_read": {
+        "code": 0,
+        "sha256": "eb5732c627eb362149ad479ffa56c183a4712777c3d7e07d308b622d2917a5a2",
+        "stderr": "",
+        "hash_basis": "exact Git blob bytes including trailing newline"
+      },
+      "fx_path_at_generic_commit": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "threat4_preserved_at_fx_commit": true,
+      "current_workflow_sha256": "372e83f2ee2c6ee1d0741907167c15ad715d480712032e3ba53da619d84b542b"
+    },
+    "tuppence": {
+      "source_head": "c70edb11086527c439b9adbc094eca6140136ae0",
+      "generic_pin": {
+        "tag": "threat-register/v4.0.0",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "fx_pin": {
+        "tag": "fx/v1.1.0",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "feeds_head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "generic_checkout_guard": null,
+      "fx_tag_commit": {
+        "code": 0,
+        "stdout": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+        "stderr": ""
+      },
+      "fx_read": {
+        "code": 0,
+        "sha256": "eb5732c627eb362149ad479ffa56c183a4712777c3d7e07d308b622d2917a5a2",
+        "stderr": "",
+        "hash_basis": "exact Git blob bytes including trailing newline"
+      },
+      "fx_path_at_generic_commit": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "threat4_preserved_at_fx_commit": true,
+      "current_workflow_sha256": "48ba413d537ccf9a52f58e6cd205b5ce66d2e5472a54ce0b4a50fa1fa08ae192"
+    },
+    "ludlow": {
+      "source_head": "4f81da7eca50ae9adadcb905813cf06f17a5d9a1",
+      "generic_pin": {
+        "tag": "threat-register/v4.0.0",
+        "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "fx_pin": {
+        "tag": "fx/v2.0.0",
+        "commit": "8c84a66951ce89834f33e008380b2c47f054b7c0"
+      },
+      "feeds_head": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "generic_checkout_guard": null,
+      "fx_tag_commit": {
+        "code": 128,
+        "stdout": "fx/v2.0.0^{commit}",
+        "stderr": "fatal: ambiguous argument 'fx/v2.0.0^{commit}': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'"
+      },
+      "fx_read": {
+        "code": 128,
+        "sha256": null,
+        "stderr": "fatal: path 'fx/v2/feed.json' does not exist in '8c84a66951ce89834f33e008380b2c47f054b7c0'"
+      },
+      "fx_path_at_generic_commit": {
+        "code": 128,
+        "stdout": "",
+        "stderr": "fatal: path 'fx/v2/feed.json' does not exist in '974e73514e0d8d4cad2e6906acf51d1cc27028b3'"
+      },
+      "threat4_preserved_at_fx_commit": false,
+      "current_workflow_sha256": "ec761804e7b4ae81fb4a034cb9b472e606c5219c286b067553433a4810f5549c"
+    }
+  }
+}

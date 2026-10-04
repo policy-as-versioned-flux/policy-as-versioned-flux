@@ -1,0 +1,12 @@
+{
+  "all_staged_diff_check_exit": 2,
+  "authored_paths_diff_check_exit": 0,
+  "captured_output_bytes_preserved": {
+    "driftwood-atomic-delivery-gate.md": "0c7296db4676b2350aaed5e8dfaa0a09d12f77a6a799d021607a02b2992b174f",
+    "driftwood-composition-B-published-main-gate.md": "0c7296db4676b2350aaed5e8dfaa0a09d12f77a6a799d021607a02b2992b174f",
+    "hub-run377-captures/verify_demo_verify-demo.out": "bb1a1327c4299afca95df959c07290ec7d4f23fe7af91ff564a68e135794a36f",
+    "hub-run377-grades.tsv": "6d5cc2fab865644049cf2c6a5059c9be7f05a9f581cc2979261d09297dec65bf"
+  },
+  "reason": "These four files are genuine captured output, including tab-separated empty final fields and producer-generated Markdown. Their bytes and historical primary hashes remain unchanged; no format cleanup substitutes for the signed capture.",
+  "unrelated_user_files_in_index": false
+}

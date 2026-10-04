@@ -1,0 +1,30 @@
+{
+  "recorded_at": "2026-10-04T16:19:38.942694+00:00",
+  "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+  "pr": 155,
+  "head": "f10faa536aa441a7f64f42a0aceed6a3d7b8f205",
+  "tree": "6f0aab95463b73d0415552d213ea755f621c1cc1",
+  "public_previous_head": "7fa013805f1e8bdd58e5a0390997c38211c5e087",
+  "action": "normal fast-forward source branch push for existing PR155",
+  "command": "git push https://github.com/policy-as-versioned-flux/policy-as-versioned-flux.git HEAD:refs/heads/repair/run377-hub-verifiers-20261004",
+  "cwd": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "automatic_approval_review": "rejected",
+  "reason": "This publishes a new f10 commit containing an additional changed public payload; approval explicitly named 7fa, while the broad AFK continuation instruction does not clearly authorize this exact new source egress. Do not bypass this rejection through a workaround or indirect execution.",
+  "executed": false,
+  "source_publication_or_pr_body_updated": false,
+  "matching_head_app_review_or_merge_performed": false,
+  "bypass_or_alternate_executor": false,
+  "standing_trusted_authorization": "you have my approval to continue without any further checks, i'm going AFK",
+  "current_block": "Automatic approval review requires exact changed-payload authorization for f10 before any normal retry.",
+  "concrete_scope": "Exact f10 source plus saved c31f PR body to this public repository; ordinary CI and matching-head App review/merge without admin, waiver or required-check bypass.",
+  "body_sha256": "c31f7c58c958341acee2a2879947aa4cc91107378797585bb1f5a3e4befb2972",
+  "unchanged_floor_visible": true,
+  "actual_previous_ci_preserved": "7fa actual CI: eight header fixture failures plus unchanged floor; no f10 CI exists yet.",
+  "prepared_receipt_sha256": {
+    "hub-run377-header-writer-followup-candidate.json": "5965c0d732c65b66e899377f579792b94e40fe73ca6aa8e3f3a417622b7021c6",
+    "hub-run377-header-writer-followup-root-standards-review.json": "19970f71c3050d329e60dcf8795331345e3b6c04a5211b49ed3db28e0a5714e7",
+    "hub-run377-header-writer-followup-independent-spec-review.json": "308b93642a267d5e2b33bb6d6813d1b6894a83eae058a21a0b52fcfe9143946b",
+    "hub-run377-header-writer-followup-PR-body.md": "c31f7c58c958341acee2a2879947aa4cc91107378797585bb1f5a3e4befb2972",
+    "hub-run377-header-writer-concrete-publication-scope.json": "e30aa53b14cc31b9247ed6c42c24152170733b162d225b21432bc49cbcbb8c88"
+  }
+}

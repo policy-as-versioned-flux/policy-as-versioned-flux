@@ -1,0 +1,42 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index c264176..0ef6a28 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -624,7 +624,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: 40282e7a51941ab5c974ee362d75d6124d05f776f2ea16348949e1e64c9584cf
++  after: e9dcdf11ebbbd9a9d851b2b0c6bb1adb03a3a2f23e32bb814a8871d7a9f56e87
+   before:
+     header:
+       parents:
+diff --git a/gitops/composed/composed-set.yaml b/gitops/composed/composed-set.yaml
+index c04da68..989ff53 100644
+--- a/gitops/composed/composed-set.yaml
++++ b/gitops/composed/composed-set.yaml
+@@ -24,8 +24,9 @@
+ #     install platform's tree; it installs the artefact its own composition rendered from
+ #     platform's and nist's signed parents (composed/HEADER.yaml records those parent SHAs, and
+ #     fact 3 of the sample checks the live platform and nist pins against them).
+-#   * apps and composed delivery use the same genuine v4.0.0 Source A release.
+-#     Its complete policy window and signature gates move with the inventory binding.
++#   * composed delivery uses genuine v4.0.1 Composition B, whose signed tree binds
++#     apps and native inventory to Source A v4.0.0. Its complete window is5.0.0,6.0.0,7.0.0.
++#     Apps and inventory remain A; this reviewed pointer moves only composed delivery to B.
+ #   * there is no `spec.verify` here. Flux's GitRepository.spec.verify speaks OpenPGP, and one
+ #     signature -- the gitsign tag -- is the only one this estate has (ADR-0023, D3). Verification
+ #     at the source boundary is the identity-pinned gitsign-verifying controller of ticket 41,
+@@ -69,9 +70,9 @@ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-driftwood/driftwood
+   ref:
+-    tag: v4.0.0
+-    commit: 1cd446f62a531c0aeee7e50c0a59a11ac5d00d67
+-    # The resolved SHA of the genuine signed v4.0.0 Source A release.
++    tag: v4.0.1
++    commit: 872d5c7f44801b496731b11cd40881f304f8a09a
++    # The resolved SHA of the genuine signed v4.0.1 Composition B release.
+     # Belt-and-braces immutability, ADR-0001.
+ ---
+ apiVersion: fluxcd.controlplane.io/v1

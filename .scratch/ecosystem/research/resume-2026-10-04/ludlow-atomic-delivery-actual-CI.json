@@ -1,0 +1,12 @@
+{
+  "pull_request": "https://github.com/policy-as-versioned-ludlow/ludlow/pull/52",
+  "head": "6de0d00ce850ea820777f46fbea5c93a3238ea68",
+  "mergeStateStatus": "CLEAN",
+  "run_id": 37200561569,
+  "checks": [
+    {"name": "shift-left", "status": "COMPLETED", "conclusion": "SUCCESS", "completedAt": "2026-10-04T11:59:56Z"},
+    {"name": "compose-check", "status": "COMPLETED", "conclusion": "SUCCESS", "completedAt": "2026-10-04T12:00:05Z"}
+  ],
+  "independent_standards": "ludlow-atomic-delivery-root-standards-review.json",
+  "independent_spec": "ludlow-atomic-delivery-spec-review.json"
+}

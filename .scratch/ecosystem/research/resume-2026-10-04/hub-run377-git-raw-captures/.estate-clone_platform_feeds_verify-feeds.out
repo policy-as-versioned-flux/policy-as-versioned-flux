@@ -1,0 +1,20 @@
+
+== 1. every feed signature + version verifies offline (v1, v2 x3 feeds) ==
+Signature Verified Successfully
+ok  threat-register/v1 signature verified, feed_version matches
+Signature Verified Successfully
+ok  threat-register/v2 signature verified, feed_version matches
+Signature Verified Successfully
+ok  cve/v1 signature verified, feed_version matches
+Signature Verified Successfully
+ok  cve/v2 signature verified, feed_version matches
+Signature Verified Successfully
+ok  eol/v1 signature verified, feed_version matches
+Signature Verified Successfully
+ok  eol/v2 signature verified, feed_version matches
+
+== 2. a tampered feed fails signature verification ==
+ok  tampered feed correctly rejected
+
+== 3. fair.py consumes all three feeds as pinned deps (unmodified fair.py) ==
+missing instrument: cve subscription has no committed image inventory

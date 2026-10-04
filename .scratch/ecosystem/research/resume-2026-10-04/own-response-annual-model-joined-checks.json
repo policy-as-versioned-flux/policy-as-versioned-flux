@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-10-04T15:13:35.265203+00:00",
+  "cwd": "/private/tmp/pavf-own-response-model-20261004-cc77gdoi/platform",
+  "base": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "checks": [
+    {
+      "name": "joined-tests",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "compose",
+        "-p",
+        "test_own_response_model*.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-final-joined-tests.log",
+      "log_sha256": "3407f844007c474370fae52ee8e8136a454906d5ceb4ce353fe4b9f986a8ae0e"
+    },
+    {
+      "name": "mypy",
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "mypy",
+        "compose/own_response_model.py",
+        "compose/own_response_model_cli.py"
+      ],
+      "exit_code": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/own-response-annual-model-final-mypy.log",
+      "log_sha256": "f9b031e5c45aa702cd4fef028d465551cb20a2c4698e0913c7b00766b20ac4d8"
+    }
+  ],
+  "claim": "joined17 public prototype tests and mypy of module+adapter; genuine old inputs still refuse"
+}

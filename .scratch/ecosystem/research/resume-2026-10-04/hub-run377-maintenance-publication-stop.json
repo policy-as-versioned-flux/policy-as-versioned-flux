@@ -1,0 +1,14 @@
+{
+  "head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "destination": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux.git",
+  "ref": "refs/heads/repair/run377-hub-verifiers-20261004",
+  "command": "git push https://github.com/policy-as-versioned-flux/policy-as-versioned-flux.git HEAD:refs/heads/repair/run377-hub-verifiers-20261004",
+  "executed": false,
+  "automatic_approval": "REJECTED",
+  "reason": "This publishes source code to a public repository/branch, but the trusted user approvals do not authorize this exact hub payload and destination; sensitive-code egress therefore lacks required specific authorization.",
+  "instruction": "Do not bypass this rejection through a workaround or indirect execution.",
+  "bypassed": false,
+  "retried": false,
+  "recorded_at": "2026-10-04T14:07:52.568441+00:00",
+  "pending": "Specific trusted user authorization for exact hub payload and public destination; root notified."
+}

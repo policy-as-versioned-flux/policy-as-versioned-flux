@@ -1,0 +1,6 @@
+PASS: selfcheck: gitops/engine/kyverno.yaml reads, and each of 9 planted declarations is refused
+........
+----------------------------------------------------------------------
+Ran 8 tests in 0.065s
+
+OK

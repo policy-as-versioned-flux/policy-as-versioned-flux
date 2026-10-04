@@ -1,0 +1,5 @@
+Standards: PASS at `7fa013805f1e8bdd58e5a0390997c38211c5e087`, tree `4042ec2099f70807d916f4b72f74938bb8167806`, compared with public approved `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`. No findings.
+
+The two-path test-only follow-up explicitly narrows the optional importlib specification/loader and resolves real Flux source aliases through the already recorded URL. Existing consumer census, self/cross-pin floors, tag, actual commit and limit assertions are retained. The URL check still requires an estate repository; the supplied unknown-URL negative fixture refuses. Standard-library `urlsplit` and path handling fit the existing Python code.
+
+Independently verified the normal SSH signature, clean exact tree, both source hashes, full and narrow binary patches, all original failed CI captures and bound red/green receipts. Independently ran the dependency-pin and ownership regressions on genuine copied gitops blobs:2PASS. The full208-source mypy proof is bound to the same files. No production logic, coverage floor, native grade, runtime manifest, test skip or release changes. Remote checks and merge remain separate.

@@ -1,0 +1,6 @@
+tlog index: 3077582720
+gitsign: Signature made using certificate ID 0x9764fcb3785b946875bf39a4ecfd37f46efe8a96 | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true

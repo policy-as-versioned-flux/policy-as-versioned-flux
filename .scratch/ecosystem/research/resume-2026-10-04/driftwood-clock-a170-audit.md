@@ -1,0 +1,17 @@
+The genuine scheduled Driftwood drift run [37201959785](https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37201959785) appended commit a1707bb7d13447edaeba85f26c3240cd8884a415 from run source 872d5c7f44801b496731b11cd40881f304f8a09a. Its API event and certificate trigger are both `schedule`. Normal gitsign verification against the exact drift-sample main workflow, Actions issuer and source SHA passes Git/Rekor/certificate claims (tlog 3077679841). GitHub's separate account-mapping verification says `no_user`; the cryptographic proof is retained independently.
+
+The primary log reads the declared Kyverno 1.18.2 install URL and checksum and records `kyverno.yaml: OK`. The install digest is 3dcd43eaf11f0719084217148cd0c82a8fa49faa9b1a783ea5bea2cf84041bda. The raw run log digest is 31494c6a10ab90ecb06ebcc866cd7b79c72e3461b559a022355500bcae7b1b58.
+
+`drift/samples.jsonl` lines 106–108 record all seven facts true at genuine Source A v4.0.0/1cd446f62a531c0aeee7e50c0a59a11ac5d00d67. They show policy 7 on the isolated probe, source verification, applied revision, 34 declared-equal objects and Flux inventory, plus bracketed two-target reach refusal. The equality and finite-network ceilings remain explicit. The unchanged five-facts grader, on a clean genuine source with its documented x509 verifier and current registration history, returns PASS 0.
+
+The native workload row records checkout-svc, storefront and api Running at their real digest-pinned images with claim 7. Each has `observed:null`: the API server has not recorded its cage stamps. The unchanged served-workload grader returns SKIP 3. The Namespace declares governed=true and isolated; direct cage-tier 7 selectors match the real claims, while party restatements/cages are empty. No intentional unbound/exempt workload is declared. Apps have no composed dependency; API container start 12:25:15 predates composed-v7 Kustomization creation around 12:25:17 and Ready 12:25:21. A later probe is stamped and caged. This supports a cold-cluster admission ordering/synchronize gap. Raw Pod creation and webhook-ready timestamps are absent, so the timing cause is not proven individually for every Pod.
+
+The OSCAL row records 44 PolicyReports converted by the pinned platform into 493 observations, 12 served policies with 9 mapped, 0 read/validation errors and 3 unmapped machinery policies. It retains converted observations rather than raw PolicyReport objects. Require-nonroot 7 has 4 pass / 40 skip results; cage-tier 7 has 4 fail / 40 skip. Seven not-satisfied observations lack a cage risk, so the unchanged OSCAL grader returns FAIL 1. These remain primary limitations, with exact row, result-count and grader receipts retained.
+
+The file digests at a170 are:
+
+- `drift/samples.jsonl`: 29e3514b0abb5614fdd0d284c3435cc0008100ca6c8f12c08d3d14dda7fac9db
+- `drift/oscal-samples.jsonl`: 11280327038b11f091c213f291ef43e44a2fa9f95e64476db6587c9a734bd45b
+- `drift/workload-samples.jsonl`: 1894729561f4faabc45f4f6f7c7b1b747c28c2535fbf046f1b6354ed601721fe
+
+This supplies Driftwood's scheduled declared 1.18.2 converted-report capture. Ticket 150 chose Ludlow, whose own scheduled baseline is still required. This local audit creates no citable modern hub step4 grade and grants no engine move or cloud activation. The separate maintenance proposes complete Flux composed dependencies for native admission and retains actual webhook mutation as the observer's question.

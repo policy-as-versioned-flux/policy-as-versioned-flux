@@ -1,0 +1,25 @@
+{
+  "action": "Normal branch push and public PR for exact Driftwood four-path maintenance payload",
+  "destination": "policy-as-versioned-driftwood/driftwood",
+  "head": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+  "tree": "b2c8a4b5c3ab9f1cf3ef85e86e20776098cd0072",
+  "branch": "maintenance-delivery-order-after-final-20261004",
+  "command": "ulimit -n 4096\n.venv/bin/python .scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-publish.py",
+  "normal_runner": "exec_command require_escalated, login:false, tty:true",
+  "reviewed_changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "tests/test_apps_dependencies.py",
+    "twin/verify-twin-sweep-moved.sh"
+  ],
+  "body": "driftwood-delivery-order-maintenance-PR-body.md",
+  "body_sha256": "bb45dde56c85dedc6a608ff1df26ad15154ad837942f80dc90f890524f274a77",
+  "preflight": "driftwood-delivery-order-maintenance-remote-preflight.json",
+  "independent_Standards": "driftwood-delivery-order-maintenance-independent-review.json",
+  "independent_Spec": "driftwood-delivery-order-maintenance-spec-review.json",
+  "reason": "This pushes a new four-file maintenance commit and its contents to a public repository, which is external data egress; the trusted user approvals cover different exact commits and do not authorize this maintenance payload.",
+  "command_executed": false,
+  "public_mutation": false,
+  "workaround_attempted": false,
+  "required": "Actual trusted user approval of this exact public maintenance payload before retrying the same normal command"
+}

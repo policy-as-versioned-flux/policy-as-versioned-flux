@@ -1,0 +1,26 @@
+{
+  "driftwood": {
+    "before": "aa923631de95276615e4985e67ee41971efacf25",
+    "head": "eac40457ffb4b593dfbe17015c525db3f0914f5f",
+    "tree": "bd42b04976d0c74f08228fb0eb6115c0a81207b7",
+    "changes": " M composed/HANDBOOK.md\n M composed/HEADER.yaml\n M composed/evidence.json\n M twin/PIN.yaml\n M twin/VENDORED.md\n M twin/forward-intel/v2/feed.json\n M verify-twin-overlay.sh\n",
+    "normal_ssh_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0\n",
+    "clean": true
+  },
+  "tuppence": {
+    "before": "c70edb11086527c439b9adbc094eca6140136ae0",
+    "head": "d1dbe766e09bb8112efa609836af0aa95cbe0ee4",
+    "tree": "229bb619b07e1d2410573d81e8768791b15b2191",
+    "changes": " M composed/HANDBOOK.md\n M composed/HEADER.yaml\n M composed/evidence.json\n M tests/test_twin_clock.py\n M twin/PIN.yaml\n M twin/VENDORED.md\n M twin/emit-forward-intel.py\n M twin/forward-intel/v1/feed.json\n M twin/orgs/tuppence/components/payment-fee-income.yaml\n M twin/orgs/tuppence/edges/customer-records-loss-cuts-payment-fee-income.yaml\n M twin/orgs/tuppence/scenarios/penalty-published-2026.yaml\n M verify-twin-overlay.sh\n",
+    "normal_ssh_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0\n",
+    "clean": true
+  },
+  "ludlow": {
+    "before": "4f81da7eca50ae9adadcb905813cf06f17a5d9a1",
+    "head": "926d6b38384fd9b532305c668313920ff943653a",
+    "tree": "7c91c4e52346d9477a5bae17d2487463674141c9",
+    "changes": " M .github/workflows/twin-sweep.yml\n M composed/HANDBOOK.md\n M composed/HEADER.yaml\n M composed/evidence.json\n M composed/feeds/feeds/eol/v2/PROVENANCE.json\n M composed/floor-change.json\n M gitops/flux-system/gotk-sync-fx.yaml\n M tests/test_twin_clock.py\n M twin/PIN.yaml\n M twin/VENDORED.md\n M twin/emit-forward-intel.py\n M twin/orgs/ludlow/components/plan-administration-fees.yaml\n M twin/orgs/ludlow/edges/member-records-loss-cuts-plan-administration-fees.yaml\n M twin/orgs/ludlow/scenarios/penalty-published-2026.yaml\n M verify-twin-overlay.sh\n?? twin/forward-intel/v1/\n",
+    "normal_ssh_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0\n",
+    "clean": true
+  }
+}

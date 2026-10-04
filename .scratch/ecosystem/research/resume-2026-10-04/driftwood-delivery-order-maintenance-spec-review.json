@@ -1,0 +1,29 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent Spec review, exact local source; no publication or live activation approval inferred",
+  "head": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+  "tree": "b2c8a4b5c3ab9f1cf3ef85e86e20776098cd0072",
+  "base": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+  "reviewed_at": "2026-10-04T13:51:11.558731+00:00",
+  "packet_sha256": "e0d5d3616bdc4da2de213cafd2c329cccbfc6d698ed312baecc99079e7536c68",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "tests/test_apps_dependencies.py",
+    "twin/verify-twin-sweep-moved.sh"
+  ],
+  "source_clean": true,
+  "normal_signature_valid": true,
+  "all_bound_file_log_patch_hashes_valid": true,
+  "independent_graph_tests": {
+    "tests": 3,
+    "exit": 0
+  },
+  "findings": [],
+  "retained_limits": [
+    "Flux Ready orders delivery; actual webhook mutation remains separately observed",
+    "Moved path offline: four passes; live firing remains SKIP3",
+    "Engine 1.18.2, cloud disabled, immutable A/B pins and native scan/valuation bytes preserved by four-path diff"
+  ],
+  "source_interpretation": "Apps depend on actual generated policy5/6/7 plus machinery routes. Tests expand the real ResourceSet and reject missing/invented routes and cycles. Moved checker reads unique literal emitter VERSION and exercises current major while proving retained major drift is ignored. Only generated HEADER after fingerprint changes."
+}

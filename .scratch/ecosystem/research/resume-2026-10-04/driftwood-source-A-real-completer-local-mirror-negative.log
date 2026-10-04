@@ -1,0 +1,115 @@
+ok  /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.Ys06qA9hCN/platform is v5.0.0 (703eff6ae) per gitops/platform/platform-pin.yaml
+ok  /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.Ys06qA9hCN/nist is v1.1.0 (33a05df1f) per gitops/flux-system/gotk-sync-nist.yaml
+ok  /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.Ys06qA9hCN/ico is v3.0.0 (9d0922211) per gitops/flux-system/gotk-sync-ico.yaml
+ok  /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.Ys06qA9hCN/feeds is threat-register/v4.0.0 (974e73514) per gitops/flux-system/gotk-sync-feeds.yaml
+ok  /var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.Ys06qA9hCN/insurer is v1.0.0 (632db22c9) per gitops/flux-system/gotk-sync-insurer.yaml
+ok  twin/signals.yaml: every pin on party.yaml resolves to its row at the pinned version
+warning: refs/tags/v5.0.0 6ab1d49cf4ded25b4939ba16f8e8e741a5c2b8f0 is not a commit!
+Note: switching to '703eff6aee959843c4160aa54fd03413f62858cc'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+warning: refs/tags/v5.0.0 6ab1d49cf4ded25b4939ba16f8e8e741a5c2b8f0 is not a commit!
+Note: switching to '703eff6aee959843c4160aa54fd03413f62858cc'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+warning: refs/tags/v1.1.0 bcfe38813332ca8bea31b9e490c31e004cb92cd4 is not a commit!
+Note: switching to '33a05df1f5241bca6ffbc1c69a70075cdb7a5819'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+warning: refs/tags/v3.0.0 7966e10731399727c024391029aa0bae21c54921 is not a commit!
+Note: switching to '9d09222117dde1257e5b43401caa43342f47bae3'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+warning: refs/tags/threat-register/v4.0.0 57cfe4af7aa85301e27dc720f0227834bfd0574f is not a commit!
+Note: switching to '974e73514e0d8d4cad2e6906acf51d1cc27028b3'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+warning: refs/tags/v1.0.0 d45005c2f4d6ec5832c33f43161f401d5501c885 is not a commit!
+Note: switching to '632db22c92003b048795cea1f5d5bf6e08dcf386'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+REFUSED: twin feed refresh: Command '['git', '-C', '/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp.Ys06qA9hCN/hub', 'merge-base', '--is-ancestor', '5bc47331a536476f3580542be794908f5053f816', 'origin/main']' returned non-zero exit status 1.

@@ -1,0 +1,30 @@
+{
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "url": "https://github.com/policy-as-versioned-driftwood/driftwood",
+  "private": false,
+  "visibility": "public",
+  "archived": false,
+  "permissions": {
+    "admin": true,
+    "maintain": true,
+    "push": true,
+    "triage": true,
+    "pull": true
+  },
+  "remote_main": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "candidate_head": "2dd89404f699a4af70e6a44451793347a4af11ef",
+  "candidate_tree": "510b579cfc616e822cef0a59955acd5b3a1f921b",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "file_sha256": {
+    "composed/HEADER.yaml": "1f6302dbb257e2ecc4f8c7c02d5768577632abd719739ad78d883dce6273d815",
+    "gitops/composed/composed-set.yaml": "289ef0ced35464aa74442df9dae5e09991bba8ba4d6eefe2a243e87e4632aa14"
+  },
+  "patch_sha256": "804d0269af9d914b271725eaf9777778480fbe7c22c89f820781fb5cb068e9b0",
+  "PR_body_sha256": "9527e4fb3e06fd61d538501a1ff3ab3308988fbddf0b6bf047c16b63735891b5",
+  "scope": "Exactly reviewed composed pointer + derived HEADER comparison.after; every other byte including new clock observations preserved",
+  "external_mutations_performed": false,
+  "publication_hold": "Fresh exact root Standards and Spec review"
+}

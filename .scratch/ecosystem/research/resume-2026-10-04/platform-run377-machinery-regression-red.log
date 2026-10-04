@@ -1,0 +1,24 @@
+FE
+======================================================================
+ERROR: test_removed_optional_machinery_is_not_remembered_as_shipped (test_lint_claims.MachineryClaims.test_removed_optional_machinery_is_not_remembered_as_shipped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/oscal/test_lint_claims.py", line 26, in test_removed_optional_machinery_is_not_remembered_as_shipped
+    names=lint.shipped_policy_names(platform_root=root)
+TypeError: shipped_policy_names() got an unexpected keyword argument 'platform_root'
+
+======================================================================
+FAIL: test_new_machinery_claims_resolve_and_an_unshipped_claim_still_fails (test_lint_claims.MachineryClaims.test_new_machinery_claims_resolve_and_an_unshipped_claim_still_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/oscal/test_lint_claims.py", line 16, in test_new_machinery_claims_resolve_and_an_unshipped_claim_still_fails
+    self.assertTrue({'policy-version-orphan-cage','governed-namespace-unclaimed-report',
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'cage-netpol-bottom-rung'} <= names)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.109s
+
+FAILED (failures=1, errors=1)

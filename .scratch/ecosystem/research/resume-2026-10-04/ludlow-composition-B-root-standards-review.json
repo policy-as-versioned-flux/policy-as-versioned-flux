@@ -1,0 +1,15 @@
+{
+  "scope": "Root independent Standards review of fresh genuine render on exact actual published main before Composition B cut",
+  "head": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63",
+  "packet_sha256": "13902752d3ea6d6a760e8b4f59d45eacd8a97ea6ae713a8f2c52d3330f9a395f",
+  "actual_merge_signature_verified": true,
+  "reviewed_atomic_tree_equals_actual_main": true,
+  "fresh_compose_verify_reach_and_exact_none_gate_receipts_hash_joined": true,
+  "rendered_files_independently_bound_to_committed_bytes": 55,
+  "source_clean": true,
+  "source_A_release_still_genuine": true,
+  "hard_findings": [],
+  "result": "PASS",
+  "cut_requires": "Independent fresh Spec PASS and ordinary immutable signed cut/release workflow"
+}

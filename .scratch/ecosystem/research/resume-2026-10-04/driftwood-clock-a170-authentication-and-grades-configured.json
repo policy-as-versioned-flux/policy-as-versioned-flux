@@ -1,0 +1,101 @@
+{
+  "scope": "Actual signed scheduled source and unmodified local graders; no citable truth run created",
+  "source": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "checks": {
+    "source-signature": {
+      "argv": [
+        "gitsign",
+        "verify",
+        "a1707bb7d13447edaeba85f26c3240cd8884a415",
+        "--certificate-identity=https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/drift-sample.yml@refs/heads/main",
+        "--certificate-oidc-issuer=https://token.actions.githubusercontent.com",
+        "--certificate-github-workflow-trigger=schedule",
+        "--certificate-github-workflow-sha=872d5c7f44801b496731b11cd40881f304f8a09a"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-source-signature.log",
+      "sha256": "fc568ce78c2a7664c0190afef8f30a9b9108cc3acceae0d9f76a85869d07e27f"
+    },
+    "five-facts-grade": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "drift/five-facts.py",
+        "grade"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-five-facts-grade.log",
+      "sha256": "fa3aa94db9392ade80220a1b40715f2e88890de7640bb3140ecd0a350f1aa96d"
+    },
+    "served-workloads-grade": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "drift/served_apps.py",
+        "grade"
+      ],
+      "exit": 3,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-served-workloads-grade.log",
+      "sha256": "d697e5074e3d17181be1f35c45f5f1bda6805b12e601a540c00e7246ffdfbdb2"
+    },
+    "oscal-grade": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "drift/oscal_lane.py",
+        "grade"
+      ],
+      "exit": 1,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-oscal-grade.log",
+      "sha256": "63465d20daffa28b7080caca500c55cb7e82c19818d67e334b8ad08f5d884324"
+    }
+  },
+  "unconfigured_local_grader_results": {
+    "source-signature": {
+      "argv": [
+        "gitsign",
+        "verify",
+        "a1707bb7d13447edaeba85f26c3240cd8884a415",
+        "--certificate-identity=https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/drift-sample.yml@refs/heads/main",
+        "--certificate-oidc-issuer=https://token.actions.githubusercontent.com",
+        "--certificate-github-workflow-trigger=schedule",
+        "--certificate-github-workflow-sha=872d5c7f44801b496731b11cd40881f304f8a09a"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-source-signature.log",
+      "sha256": "fc568ce78c2a7664c0190afef8f30a9b9108cc3acceae0d9f76a85869d07e27f"
+    },
+    "five-facts-grade": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "drift/five-facts.py",
+        "grade"
+      ],
+      "exit": 3,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-unconfigured-five-facts-grade.log",
+      "sha256": "6ce7bebc905d3d31586ec48eec6f80c6ff19dd4ff0d4598154ce9df757193880"
+    },
+    "served-workloads-grade": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "drift/served_apps.py",
+        "grade"
+      ],
+      "exit": 3,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-unconfigured-served-workloads-grade.log",
+      "sha256": "5c46a7d7c7cfc64864fb3f5620f5f3374a226057ec3011e8cd091c41ab72b8cb"
+    },
+    "oscal-grade": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "drift/oscal_lane.py",
+        "grade"
+      ],
+      "exit": 3,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-unconfigured-oscal-grade.log",
+      "sha256": "6ce7bebc905d3d31586ec48eec6f80c6ff19dd4ff0d4598154ce9df757193880"
+    }
+  },
+  "normal_local_verifier_setup": "Documented gpg.x509.program=gitsign + gpg.format=x509; genuine fetched origin/main, no signature skip.",
+  "actual_origin_main": "2e04b9803a57cd0d61afa3ef2deeca74f749d969",
+  "subsequent_clock_only_paths": [
+    "observations/twin-sweep.jsonl"
+  ]
+}

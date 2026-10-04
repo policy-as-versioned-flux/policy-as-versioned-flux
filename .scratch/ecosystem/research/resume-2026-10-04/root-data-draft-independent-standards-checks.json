@@ -1,0 +1,159 @@
+{
+  "review_axis": "Standards",
+  "status": "DRAFT_PASS_CORE; final incremental audit and signed root binding pending",
+  "baseline": "5bc47331a536476f3580542be794908f5053f816",
+  "observed_at": "2026-10-04T14:47:33.769457+00:00",
+  "independent_export_checks": [
+    {
+      "repository": "platform",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "tree": "bba72befc0b76e339aa1f5536671a708b84a5878",
+      "patch_sha256": "cfc745a8c95af92e64a54c5c566cdd12e901d1fdaf46c553b7718eb1af29c9be",
+      "exact_git_diff": true,
+      "independent_reverse_apply": true,
+      "source_status_preserved": true
+    },
+    {
+      "repository": "feeds",
+      "commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+      "tree": "b88fb77f96cadf1a9639cae369ed529bd4e1731c",
+      "patch_sha256": "136e86ae9d8afe5a7f0863e10f50c2e0e5bf7eb3ce83e61d327147292f786795",
+      "exact_git_diff": true,
+      "independent_reverse_apply": true,
+      "source_status_preserved": true
+    },
+    {
+      "repository": "app-ledger",
+      "commit": "d3255fa6fc0ccd25c84043f61b128b4d2e929ac0",
+      "tree": "e0f96aa9dc47e8fd7f8c624a9d478d0aaf87f6e4",
+      "patch_sha256": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+      "exact_git_diff": true,
+      "independent_reverse_apply": true,
+      "source_status_preserved": true
+    },
+    {
+      "repository": "app-storefront",
+      "commit": "deb25d3467c9b7c59a83b39bbb8023c790fbad31",
+      "tree": "43b3bba638bf5c8e446df56fc3d0d26979208551",
+      "patch_sha256": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+      "exact_git_diff": true,
+      "independent_reverse_apply": true,
+      "source_status_preserved": true
+    },
+    {
+      "repository": "app-api",
+      "commit": "d9b5f4f922cb4ff4b30d75733d48975c86c6df61",
+      "tree": "1d166d6a6e9407a57db5e89887f2fee2183586a3",
+      "patch_sha256": "9a68368faad1c072ee0aab675f4dcd9c2e3335fa42b4704e986588bf777d4988",
+      "exact_git_diff": true,
+      "independent_reverse_apply": true,
+      "source_status_preserved": true
+    },
+    {
+      "repository": "app-reports",
+      "commit": "f21bff06fac89401bf180ffc40dd46a37c36db51",
+      "tree": "922e5d6feaab6699550ea426652f38c482c9c7ff",
+      "patch_sha256": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+      "exact_git_diff": true,
+      "independent_reverse_apply": true,
+      "source_status_preserved": true
+    },
+    {
+      "repository": "driftwood",
+      "commit": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+      "tree": "895ed1d6af98b6a6275a0456053d14adbc4bb30f",
+      "patch_sha256": "e158385f7400744dc4246cc3becb253105572160f4d59a723a3a75978474d848",
+      "exact_git_diff": true,
+      "independent_reverse_apply": true,
+      "source_status_preserved": true
+    },
+    {
+      "repository": "ludlow",
+      "commit": "e7243d917c323364c0fb74d312f921d0d1ec1356",
+      "tree": "7e510770eb2d96b4bdfc594211d7e1050f13e17d",
+      "patch_sha256": "7c9ede9224b4e0945b6bbde0b4338916c0c8574cb17ba2bd3086947bab08caff",
+      "exact_git_diff": true,
+      "independent_reverse_apply": true,
+      "source_status_preserved": true
+    },
+    {
+      "repository": "tuppence",
+      "commit": "011942de87ba827b5bc2949da0057d862b6b69f6",
+      "tree": "13d698baa99283a93601d90839a27e8844cbb55b",
+      "patch_sha256": "2600f3866e52138d2026ed113e44183f08f4ba2317f1642099cea2dd0b9dcb16",
+      "exact_git_diff": true,
+      "independent_reverse_apply": true,
+      "source_status_preserved": true
+    }
+  ],
+  "five_owned_ticket_checks": [
+    {
+      "path": ".scratch/ecosystem/issues/62-the-feed-parents-are-consumed-pinned-and-signed.md",
+      "original_bytes_preserved": true,
+      "sha256": "2e08e59655bc358cb8031addcc2d46a9e991554cafe64f57871fb26ef654b695"
+    },
+    {
+      "path": ".scratch/ecosystem/issues/77-every-pin-is-checked-for-content.md",
+      "original_bytes_preserved": true,
+      "sha256": "32c540fb00ead2739edd156f0ce5be8784248d8e08d17c321bd0bf992447006c"
+    },
+    {
+      "path": ".scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md",
+      "original_bytes_preserved": true,
+      "sha256": "8b4adb269294740ef2a3ac0bd6c35f0e6aefc5ee42de23ca7f2b5d50635ea49b"
+    },
+    {
+      "path": ".scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md",
+      "original_bytes_preserved": true,
+      "sha256": "50ca08899b1bacd6781d0156eb378b975d828b774d43bdc2647874d21c914096"
+    }
+  ],
+  "primary_negative_captures_unchanged": 25,
+  "prior_bounded_audit_files": 1167,
+  "prior_audit_changed_inputs": [
+    ".scratch/ecosystem/patches/resume-2026-10-04/export_published_estate.py"
+  ],
+  "finding": "CLOSED: default retained input and relative output independently hash-bound to actual nine-check exit0 proof",
+  "scope_excludes_user_skill_media_paths": true,
+  "no_source_index_external_changes": true,
+  "inputs_sha256": {
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/platform.patch": "cfc745a8c95af92e64a54c5c566cdd12e901d1fdaf46c553b7718eb1af29c9be",
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/feeds.patch": "136e86ae9d8afe5a7f0863e10f50c2e0e5bf7eb3ce83e61d327147292f786795",
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/app-ledger.patch": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/app-storefront.patch": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/app-api.patch": "9a68368faad1c072ee0aab675f4dcd9c2e3335fa42b4704e986588bf777d4988",
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/app-reports.patch": "f1fa456c12ddc7249ec012071ee9ff1663ac973ff6917e0aa0c2f967a04dcb7d",
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/driftwood.patch": "e158385f7400744dc4246cc3becb253105572160f4d59a723a3a75978474d848",
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/ludlow.patch": "7c9ede9224b4e0945b6bbde0b4338916c0c8574cb17ba2bd3086947bab08caff",
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/tuppence.patch": "2600f3866e52138d2026ed113e44183f08f4ba2317f1642099cea2dd0b9dcb16",
+    ".scratch/ecosystem/research/resume-2026-10-04/driftwood-final-delivery-complete.json": "7b2be8b1eec67c7b49ab89b8bcf99f05186abea164c6083a479bb92d38d176dc",
+    ".scratch/ecosystem/research/resume-2026-10-04/ludlow-delivery-complete.json": "61e004efa2a9d4d5990cfde21f08378dda5839d35d78046b4a47830249e0ebaa",
+    ".scratch/ecosystem/research/resume-2026-10-04/tuppence-final-delivery-complete.json": "f49b64939aa994e568ff527c7c108fd09fffae01fdb94d4166c4e37c994df864",
+    ".scratch/ecosystem/research/resume-2026-10-04/driftwood-source-A-authentic-release.json": "b5a7cc277ac2531365251ff00fc198c4445d605a3e16be4177419d6f6a6e499f",
+    ".scratch/ecosystem/research/resume-2026-10-04/driftwood-composition-B-authentic-release.json": "d926705e6746ae0619b7933d64799f0c662103305979f2d85e80211a33fe4f12",
+    ".scratch/ecosystem/research/resume-2026-10-04/tuppence-source-A-authentic-release.json": "f1696e1c4b856948c76bf43c7cbe0ed549c743105c2a8b6bad29cd773738b0d7",
+    ".scratch/ecosystem/research/resume-2026-10-04/tuppence-composition-B-authentic-release.json": "dec6d1c2fbd6d013fc65c4ebfc0de8bca9971007e5e9405662b9bfa109e5b936",
+    ".scratch/ecosystem/research/resume-2026-10-04/ludlow-source-A-authentic-release.json": "d4956be951b3aa3eb278fd6a98162a224341966d9c1d59eba97e9388fe44b129",
+    ".scratch/ecosystem/research/resume-2026-10-04/ludlow-composition-B-authentic-release.json": "1dd5a24faa29317926d7581ec109d0b47af6fa698252610def8f5e2364d2f1ca",
+    ".scratch/ecosystem/issues/62-the-feed-parents-are-consumed-pinned-and-signed.md": "2e08e59655bc358cb8031addcc2d46a9e991554cafe64f57871fb26ef654b695",
+    ".scratch/ecosystem/issues/77-every-pin-is-checked-for-content.md": "32c540fb00ead2739edd156f0ce5be8784248d8e08d17c321bd0bf992447006c",
+    ".scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md": "8b4adb269294740ef2a3ac0bd6c35f0e6aefc5ee42de23ca7f2b5d50635ea49b",
+    ".scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md": "50ca08899b1bacd6781d0156eb378b975d828b774d43bdc2647874d21c914096",
+    ".scratch/ecosystem/issues/156-the-incumbent-org-register.md": "451c648d1ef45d5d5822393f55853d095015f76d4926057d38bb76a8e438aeab",
+    ".scratch/ecosystem/research/resume-2026-10-04/publication-delivered-source-manifest.json": "97a9cb1dab40dcf4453145b1c76714a6981f5ac87c0d6181f0f6364c3547c82d",
+    ".scratch/ecosystem/research/resume-2026-10-04/publication-delivered-source-export.json": "a6bbba758155f675d6b9260506b02fa0fed44b33684051757e15f6ab068249a3",
+    ".scratch/ecosystem/research/resume-2026-10-04/publication-delivered-source-audit.json": "14b3d7d59b4ded1ceb07e26bc0170c192c3cea58e62f512e4c21550208140562",
+    ".scratch/ecosystem/research/resume-2026-10-04/adopter-final-delivery-aggregate.json": "261dbf998fc23b594fad0408017e0c6760edc57a348babd0a5b97f76b1fffa68",
+    ".scratch/ecosystem/research/resume-2026-10-04/delivery-report.md": "f23db3acbacca3ef5e75487a3515d65a5fa321c101771d8e5b91a18f3f5ac8ee",
+    ".scratch/ecosystem/research/resume-2026-10-04/root-delivery-evidence-PR-body.md": "61b49b4458bbb484d488126ac34e1fb63fdc033fd74d8ba8c3c4ec0fc316f1fb",
+    ".scratch/ecosystem/research/resume-2026-10-04/run377-derived-status-applied-acknowledgements.json": "0272b97f620ad38bb2411c12fbc90a97513204176feb10294bb74decd5b9c8bf",
+    ".scratch/ecosystem/research/resume-2026-10-04/incumbent-unconditional-archives-complete.json": "855bcaf541b44ba8554c920a7fa98d83e0b3ddbb7e3ae8058f98c12f957602fe",
+    ".scratch/ecosystem/research/resume-2026-10-04/forge-main-review-protection-updates-complete.json": "b084144f15614cf8aadbea3f40ca465c12ecf939e2b3d373c1eada3cb802f939",
+    ".scratch/ecosystem/research/resume-2026-10-04/hub-run377-capture-reads.json": "ea8eab9489e7dbcab7c65a465755fe937d9134fc1a3db4db693c9456633c8ba4",
+    ".scratch/ecosystem/patches/resume-2026-10-04/complete/manifest.json": "03e976f02c69eff3779bcdb85e3abd1d55bfac66d363b0391fafd637b19d16f6",
+    ".scratch/ecosystem/patches/resume-2026-10-04/export_published_estate.py": "48fc02d8e2c074b01b4783b9a8923a9e46e8c3898a7033be3c2cf537a9f8b355",
+    ".scratch/ecosystem/research/resume-2026-10-04/published-export-default-path-finding-closure.json": "e9e5b9b83cb1225254ab3c53053f3aef445ee2868c34d276b28dab6f77ec1201",
+    ".scratch/ecosystem/research/resume-2026-10-04/published-export-default-input-and-relative-output.log": "85d84fcfe33640333cd4a484a48439b145a4d303aab6e356e7eadbdb3f12068c"
+  },
+  "draft_findings": []
+}

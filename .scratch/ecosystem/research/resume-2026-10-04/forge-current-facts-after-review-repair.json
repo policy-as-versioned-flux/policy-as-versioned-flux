@@ -1,0 +1,2770 @@
+{
+ "collector": "verify/forge-review/forge_review.py collect",
+ "repos": {
+  "driftwood": {
+   "branch_rules": {
+    "main": [
+     {
+      "ruleset_id": 23993301,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993301,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993301,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/0.0.x": [
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/1.0.x": [
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/10.20.x": [
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/2.0.x": [
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/99.99.x": [
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993303,
+      "ruleset_source": "policy-as-versioned-driftwood/driftwood",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ]
+   },
+   "branches": [
+    "adopt-v3.0.0-composed",
+    "bootstrap-apps-inventory",
+    "delivery-stage2-20261004",
+    "delivery-stage2-atomic-20261004",
+    "delivery-stage2-composed-B-current-main-20261004",
+    "ecosystem/build-2026-09-03",
+    "ecosystem/thin-slice",
+    "fix-scheduled-tools-20260910",
+    "implement-platform-tools-20260910",
+    "implement-ticket-86-20260910",
+    "main",
+    "phaseb-policy-5.0.0",
+    "platform-v4.0.0-retire-4",
+    "policy-composition/tickets-09-16-wip",
+    "renovate/https-github.com-policy-as-versioned-ico-ico-4.x",
+    "repair/every-composing-job-fetches-its-parents",
+    "repair/signals-follow-the-pin",
+    "rollout-platform-v3.3.0",
+    "ticket-33-lift-ledger-storefront-and-reports",
+    "ticket-34-followup-2026-09-08",
+    "ticket-34-handbook-as-a-compose-time-render",
+    "ticket-51-the-supply-constraint-actor-path",
+    "ticket-60-grade-the-lane-sample",
+    "ticket-60-sampler-waits",
+    "ticket-61-allowed-commands",
+    "ticket-61-one-renovate",
+    "ticket-61-renovate-completes-step-2",
+    "ticket-62-and-77",
+    "ticket-64-the-twin-is-three-adopters",
+    "ticket-67-the-record-matches-the-surface",
+    "ticket-84-being-behind-costs-something",
+    "ticket-86-the-cage-enters-the-citable-number",
+    "ticket-101-the-gates-verify-a-real-signature",
+    "ticket-105-pinned-trust-roots",
+    "ticket-107-the-sampler-waits-for-what-exists",
+    "ticket-130-the-composed-root-is-delivered",
+    "ticket-131-sibling-cut-release",
+    "ticket-132-gate-reads-acceptance",
+    "ticket-140-fact4-omitted-zero",
+    "ticket-143a-twin-sweep-split",
+    "ticket-147-declared-engine",
+    "ticket-161-reference-workload",
+    "truth-surface-reconcile"
+   ],
+   "default_branch": "main",
+   "remote": "policy-as-versioned-driftwood/driftwood",
+   "rulesets": [
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-driftwood/driftwood/rules/23993301"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/rulesets/23993301"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~DEFAULT_BRANCH"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:17.866+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993301,
+     "name": "main-keeps-its-history",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c2bzgFuG9U",
+     "rules": [
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-driftwood/driftwood",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-10-04T14:26:57.908+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-driftwood/driftwood/rules/23993303"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/rulesets/23993303"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "refs/heads/release/**"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:18.526+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993303,
+     "name": "release-branches-are-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c2bzgFuG9c",
+     "rules": [
+      {
+       "type": "creation"
+      },
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-driftwood/driftwood",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:18.614+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-driftwood/driftwood/rules/23993304"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/rulesets/23993304"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~ALL"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:19.284+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993304,
+     "name": "release-tags-hold",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c2bzgFuG9g",
+     "rules": [
+      {
+       "type": "update"
+      },
+      {
+       "type": "deletion"
+      }
+     ],
+     "source": "policy-as-versioned-driftwood/driftwood",
+     "source_type": "Repository",
+     "target": "tag",
+     "updated_at": "2026-09-25T12:04:19.319+01:00"
+    }
+   ],
+   "tags": [
+    "v4.0.1",
+    "v4.0.0",
+    "v3.0.1",
+    "v3.0.0",
+    "v2.0.0",
+    "v1.1.0",
+    "v1.0.0"
+   ]
+  },
+  "feeds": {
+   "branch_rules": {
+    "main": [
+     {
+      "ruleset_id": 23993323,
+      "ruleset_source": "policy-as-versioned-feeds/feeds",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993323,
+      "ruleset_source": "policy-as-versioned-feeds/feeds",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993323,
+      "ruleset_source": "policy-as-versioned-feeds/feeds",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ]
+   },
+   "branches": [
+    "ecosystem/build-2026-09-03",
+    "fetch/cve-2.0.1",
+    "fetch/eol-2.0.1",
+    "fetch/fx-1.1.0",
+    "fetch/fx-3.0.0",
+    "fetch/threat-register-2.0.1",
+    "fetch/threat-register-3.0.1",
+    "fix-skill-gate-drop-github-markers",
+    "main",
+    "observations",
+    "reset-bump-after-threat-register-v3.0.0",
+    "resume/2026-10-03-primary-cve-fx-threat-feeds",
+    "resume/2026-10-04-dated-fx",
+    "ticket-56-and-85",
+    "ticket-62-and-77",
+    "ticket-67-the-record-matches-the-surface",
+    "ticket-79-the-pound-inputs",
+    "ticket-84-being-behind-costs-something",
+    "ticket-145-agent-cage-price"
+   ],
+   "default_branch": "main",
+   "remote": "policy-as-versioned-feeds/feeds",
+   "rulesets": [
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-feeds/feeds/rules/23993323"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-feeds/feeds/rulesets/23993323"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~DEFAULT_BRANCH"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:28.115+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993323,
+     "name": "main-is-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5QaiaWzgFuG-s",
+     "rules": [
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-feeds/feeds",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:28.162+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-feeds/feeds/rules/23993324"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-feeds/feeds/rulesets/23993324"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "refs/heads/release/**"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:28.893+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993324,
+     "name": "release-branches-are-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5QaiaWzgFuG-w",
+     "rules": [
+      {
+       "type": "creation"
+      },
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-feeds/feeds",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:28.926+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-feeds/feeds/rules/23993327"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-feeds/feeds/rulesets/23993327"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~ALL"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:29.647+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993327,
+     "name": "release-tags-hold",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5QaiaWzgFuG-8",
+     "rules": [
+      {
+       "type": "update"
+      },
+      {
+       "type": "deletion"
+      }
+     ],
+     "source": "policy-as-versioned-feeds/feeds",
+     "source_type": "Repository",
+     "target": "tag",
+     "updated_at": "2026-09-25T12:04:29.704+01:00"
+    }
+   ],
+   "tags": [
+    "threat-register/v4.0.0",
+    "threat-register/v3.0.0",
+    "threat-register/v2.0.0",
+    "threat-register/v1.0.0",
+    "fx/v2.0.0",
+    "fx/v1.1.0",
+    "cve/v3.0.0"
+   ]
+  },
+  "hub": {
+   "branch_rules": {
+    "main": [
+     {
+      "ruleset_id": 23950610,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23950610,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23950610,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/0.0.x": [
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/1.0.x": [
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/10.20.x": [
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/2.0.x": [
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ],
+    "release/99.99.x": [
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "creation"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23950611,
+      "ruleset_source": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ]
+   },
+   "branches": [
+    "chart-125-seam1-signature-flake",
+    "chart-127-128-129",
+    "chart-130-root-machinery",
+    "chart-131-132-133",
+    "chart-134-identity-lane",
+    "chart-135-136",
+    "chart-138-as-of",
+    "chart-2026-09-05-a-branch-run-records-nothing",
+    "chart-2026-09-05-refusal-by-another-name",
+    "chart-2026-09-05-the-adopter-gate-grades-the-change",
+    "chart-2026-09-10-the-map-line-and-the-moving-count",
+    "chart-2026-09-21-the-cage-names-what-it-does-not-deliver",
+    "ci-2026-09-04-the-hub-tests-itself",
+    "close-111-86-chart-140",
+    "close-113-phase-b",
+    "close-133-134-137",
+    "close-140",
+    "cs-06-cross-party-composition",
+    "fix-2026-09-05-refresh-keeps-work",
+    "fix-2026-09-05-tickets-96-97-crossref",
+    "fix-2026-09-06-served-only-comment",
+    "fix-local-gates-drop-github-markers",
+    "fix-phase-b-stale-records",
+    "fix-verify-before-tag-test",
+    "implement-2026-09-10-next",
+    "implement-2026-09-10-remaining",
+    "implement-2026-09-10-rollout",
+    "implement-observation-reader-20260910",
+    "implement-release-clock-record-20260910",
+    "main",
+    "record-2026-09-04-the-62-77-landing",
+    "record-2026-09-04-the-app-and-workflows",
+    "record-2026-09-06-stale-blockers",
+    "record-2026-09-09-a-cancelled-branch-run",
+    "record-2026-09-09-run-197-fall",
+    "record-2026-09-10-the-cuts-and-what-they-cost",
+    "record-2026-09-10-ticket-107-the-lane-answered",
+    "record-fixes-2026-09-23",
+    "record-run-277-supersede-echo",
+    "record-run-290-priced-holes",
+    "record-run-339",
+    "redo-rescue-as-cherry-picks",
+    "repair-2026-09-04-gate-regressions",
+    "rescue-run-101",
+    "rescue-runs-76-84-88",
+    "resume/2026-10-04-claude-handoff",
+    "resume/2026-10-04-valuation-date",
+    "ticket-17-twin-follow-ups-from-the-aug-05-itemisation",
+    "ticket-30-grill",
+    "ticket-31-sensor-admission",
+    "ticket-33-lift-ledger-storefront-and-reports",
+    "ticket-34-followup-2026-09-08",
+    "ticket-34-handbook-as-a-compose-time-render",
+    "ticket-35-grill",
+    "ticket-35-review-fixes",
+    "ticket-38-priced-holes-in-composition",
+    "ticket-39-supersede-adr-0013-0017-0018",
+    "ticket-44-eco-system-misuse-catalogue-graded-by-the-gate",
+    "ticket-45-switching-cost-computed-in-composition",
+    "ticket-48-the-demos-remaining-beats",
+    "ticket-51-the-supply-constraint-actor-path",
+    "ticket-53-the-release-pushes-tags-but-not-the-branch",
+    "ticket-55-every-red-on-the-clock-is-real-explained-and-finishable",
+    "ticket-56-and-85-the-clocks-are-graded",
+    "ticket-57-feeds-and-insurer-become-runnable-workflows-registered",
+    "ticket-59-a-fall-blocks-and-status-is-derived",
+    "ticket-62-and-77-pins-are-checked-for-content",
+    "ticket-63-the-unlabelled-default-flips-to-isolated",
+    "ticket-64-the-twin-is-three-adopters",
+    "ticket-65-enact-guard-closes-the-git-dir-family",
+    "ticket-66-the-deck-check-grades-the-run-its-own-truth-line-names",
+    "ticket-67-the-record-matches-the-surface",
+    "ticket-69-an-untagged-pin-is-a-priced-hole",
+    "ticket-70-the-observation-lane-is-detectively-enforced-and-honest",
+    "ticket-71-grill",
+    "ticket-71-upstream-status",
+    "ticket-72-a-feed-bump-re-renders-the-twin-s-derived-artefacts",
+    "ticket-73-verifier-trust-instant",
+    "ticket-76-every-green-rests-on-an-observation",
+    "ticket-78-the-proposer-can-only-tighten",
+    "ticket-79-the-pound-inputs",
+    "ticket-80-follow-up",
+    "ticket-80-the-record-matches-the-code",
+    "ticket-81-record-round-3-landed",
+    "ticket-81-round-3-of-the-sampler-wait-order-lands",
+    "ticket-82-licence-attribution-and-disclaimers",
+    "ticket-83-the-truth-line-says-what-it-measured",
+    "ticket-84-being-behind-costs-something",
+    "ticket-86-the-cage-enters-the-citable-number",
+    "ticket-87-the-forge-enforces-the-review",
+    "ticket-89-deny-is-not-a-rung",
+    "ticket-91-the-currency-controller-is-owned",
+    "ticket-92-follow-up-trailers-and-hooks",
+    "ticket-92-the-local-clock",
+    "ticket-92-the-local-clock-round-4",
+    "ticket-92-tidy-trailer-space-and-102-answer",
+    "ticket-93-the-twin-derives-a-probability",
+    "ticket-96-the-citable-line-says-the-mode",
+    "ticket-98-a-refusal-by-another-name-is-graded",
+    "ticket-99-the-adopter-gate-grades-the-change",
+    "ticket-100-a-branch-run-says-what-it-can-record",
+    "ticket-101-the-gates-verify-a-real-signature",
+    "ticket-102-the-cited-tree-names-who-added-the-check",
+    "ticket-103-release-gate-computes-the-bump",
+    "ticket-105-pinned-trust-roots",
+    "ticket-106-composition-selfcheck-fixture-namespace",
+    "ticket-107-the-sampler-waits-for-what-exists",
+    "ticket-108-the-recording-commit",
+    "ticket-110-rollout-measured",
+    "ticket-111-the-cage-delivers-its-classes",
+    "ticket-112-threshold-states-corpus",
+    "ticket-113-infra-is-a-role-not-a-rung",
+    "ticket-113-release-gate-one-line",
+    "ticket-114-unobserved-party-not-green",
+    "ticket-115-loophole-procedure",
+    "ticket-116-twelve-loophole-candidates",
+    "ticket-117-two-tickets-share-the-number-111",
+    "ticket-118-luck-may-not-promote",
+    "ticket-119-unlabelled-namespace-is-priced",
+    "ticket-120-adr-0026-candidates",
+    "ticket-121-implementing-a-control-moves-the-price",
+    "ticket-122-ramp-survives-rename",
+    "ticket-123-a-withdrawal-is-the-regulators",
+    "ticket-124-price-the-removal",
+    "ticket-125-signature-leak",
+    "ticket-126-a-withdrawn-control-is-not-selectable",
+    "ticket-127-pound-seam-switching-price",
+    "ticket-128-behind-a-major-unreadable",
+    "ticket-129-major-acceptance-record",
+    "ticket-130-the-composed-root-is-delivered",
+    "ticket-130-the-composed-set-moves",
+    "ticket-131-sibling-cut-release",
+    "ticket-132-adopter-gate-reads-acceptance",
+    "ticket-134-clock-observation-comparison",
+    "ticket-135-lifted-app-verdict",
+    "ticket-136-selfcheck-driftwood",
+    "ticket-137-parent-tree-per-feed-edge",
+    "ticket-138-grader-as-of",
+    "ticket-139-ungoverned-namespace-born",
+    "ticket-140-fact4-defaulted-false",
+    "ticket-141-declared-pricing-threshold",
+    "ticket-142a-schedule-blind-spots-and-clock-cage",
+    "ticket-143a-twin-sweep-split",
+    "ticket-145-agent-cage-price",
+    "ticket-146-engine-cells",
+    "ticket-146-resolved",
+    "ticket-146-tags-read-only",
+    "ticket-147-declared-engine",
+    "ticket-148-unsupported-pairing",
+    "ticket-152-grill",
+    "ticket-161-engine-pin",
+    "ticket-161-reference-workload",
+    "tidy-2026-09-08-tickets-33-45",
+    "wayfinder-laya-loophole-20260921"
+   ],
+   "default_branch": "main",
+   "remote": "policy-as-versioned-flux/policy-as-versioned-flux",
+   "rulesets": [
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/rules/23950610"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-flux/policy-as-versioned-flux/rulesets/23950610"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~DEFAULT_BRANCH"
+       ]
+      }
+     },
+     "created_at": "2026-09-24T17:51:01.036+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23950610,
+     "name": "main-keeps-its-history",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5NhXw_zgFtdRI",
+     "rules": [
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-flux/policy-as-versioned-flux",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-10-04T14:26:23.004+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/rules/23950611"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-flux/policy-as-versioned-flux/rulesets/23950611"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "refs/heads/release/**"
+       ]
+      }
+     },
+     "created_at": "2026-09-24T17:51:01.612+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23950611,
+     "name": "release-branches-are-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5NhXw_zgFtdRM",
+     "rules": [
+      {
+       "type": "creation"
+      },
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-flux/policy-as-versioned-flux",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-24T17:51:01.654+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/rules/23950612"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-flux/policy-as-versioned-flux/rulesets/23950612"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~ALL"
+       ]
+      }
+     },
+     "created_at": "2026-09-24T17:51:02.679+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23950612,
+     "name": "release-tags-hold",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5NhXw_zgFtdRQ",
+     "rules": [
+      {
+       "type": "update"
+      },
+      {
+       "type": "deletion"
+      }
+     ],
+     "source": "policy-as-versioned-flux/policy-as-versioned-flux",
+     "source_type": "Repository",
+     "target": "tag",
+     "updated_at": "2026-09-24T17:51:02.726+01:00"
+    }
+   ],
+   "tags": []
+  },
+  "ico": {
+   "branch_rules": {
+    "main": [
+     {
+      "ruleset_id": 23993320,
+      "ruleset_source": "policy-as-versioned-ico/ico",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993320,
+      "ruleset_source": "policy-as-versioned-ico/ico",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993320,
+      "ruleset_source": "policy-as-versioned-ico/ico",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ]
+   },
+   "branches": [
+    "ecosystem/build-2026-09-03",
+    "ecosystem/thin-slice",
+    "main",
+    "observations",
+    "renovate/configure",
+    "reset-bump-after-v4.0.0",
+    "ticket-62-and-77",
+    "ticket-67-the-record-matches-the-surface",
+    "ticket-79-the-pound-inputs",
+    "ticket-103-release-gate-computes-the-bump"
+   ],
+   "default_branch": "main",
+   "remote": "policy-as-versioned-ico/ico",
+   "rulesets": [
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-ico/ico/rules/23993320"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-ico/ico/rulesets/23993320"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~DEFAULT_BRANCH"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:26.452+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993320,
+     "name": "main-is-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c8fzgFuG-g",
+     "rules": [
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-ico/ico",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:26.483+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-ico/ico/rules/23993321"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-ico/ico/rulesets/23993321"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "refs/heads/release/**"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:27.004+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993321,
+     "name": "release-branches-are-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c8fzgFuG-k",
+     "rules": [
+      {
+       "type": "creation"
+      },
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-ico/ico",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:27.038+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-ico/ico/rules/23993322"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-ico/ico/rulesets/23993322"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~ALL"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:27.563+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993322,
+     "name": "release-tags-hold",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c8fzgFuG-o",
+     "rules": [
+      {
+       "type": "update"
+      },
+      {
+       "type": "deletion"
+      }
+     ],
+     "source": "policy-as-versioned-ico/ico",
+     "source_type": "Repository",
+     "target": "tag",
+     "updated_at": "2026-09-25T12:04:27.580+01:00"
+    }
+   ],
+   "tags": [
+    "v4.0.0",
+    "v3.0.0",
+    "v1.0.0"
+   ]
+  },
+  "insurer": {
+   "branch_rules": {
+    "main": [
+     {
+      "ruleset_id": 23993329,
+      "ruleset_source": "policy-as-versioned-insurer/insurer",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993329,
+      "ruleset_source": "policy-as-versioned-insurer/insurer",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993329,
+      "ruleset_source": "policy-as-versioned-insurer/insurer",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ]
+   },
+   "branches": [
+    "ecosystem/build-2026-09-03",
+    "implement-release-verifier-pin-20260910",
+    "main",
+    "maintenance/2026-10-04-missing-exposure-total",
+    "observations",
+    "requote/driftwood-20260925",
+    "requote/driftwood-20260926",
+    "requote/driftwood-20260927",
+    "requote/driftwood-20260928",
+    "requote/driftwood-20260929",
+    "requote/driftwood-20260930",
+    "requote/driftwood-20261001",
+    "requote/driftwood-20261002",
+    "requote/driftwood-20261003",
+    "requote/driftwood-20261004",
+    "requote/ludlow-20260925",
+    "requote/ludlow-20260926",
+    "requote/ludlow-20260927",
+    "requote/ludlow-20260928",
+    "requote/ludlow-20260929",
+    "requote/ludlow-20260930",
+    "requote/ludlow-20261001",
+    "requote/ludlow-20261002",
+    "requote/ludlow-20261003",
+    "requote/ludlow-20261004",
+    "requote/tuppence-20260925",
+    "requote/tuppence-20260926",
+    "requote/tuppence-20260927",
+    "requote/tuppence-20260928",
+    "requote/tuppence-20260929",
+    "requote/tuppence-20260930",
+    "requote/tuppence-20261001",
+    "requote/tuppence-20261002",
+    "requote/tuppence-20261003",
+    "requote/tuppence-20261004",
+    "ticket-56-and-85",
+    "ticket-62-and-77",
+    "ticket-67-the-record-matches-the-surface",
+    "ticket-79-the-pound-inputs"
+   ],
+   "default_branch": "main",
+   "remote": "policy-as-versioned-insurer/insurer",
+   "rulesets": [
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-insurer/insurer/rules/23993329"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-insurer/insurer/rulesets/23993329"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~DEFAULT_BRANCH"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:30.516+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993329,
+     "name": "main-is-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5QaiazzgFuG_E",
+     "rules": [
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-insurer/insurer",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:30.576+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-insurer/insurer/rules/23993330"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-insurer/insurer/rulesets/23993330"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "refs/heads/release/**"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:31.232+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993330,
+     "name": "release-branches-are-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5QaiazzgFuG_I",
+     "rules": [
+      {
+       "type": "creation"
+      },
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-insurer/insurer",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:31.270+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-insurer/insurer/rules/23993331"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-insurer/insurer/rulesets/23993331"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~ALL"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:31.991+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993331,
+     "name": "release-tags-hold",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5QaiazzgFuG_M",
+     "rules": [
+      {
+       "type": "update"
+      },
+      {
+       "type": "deletion"
+      }
+     ],
+     "source": "policy-as-versioned-insurer/insurer",
+     "source_type": "Repository",
+     "target": "tag",
+     "updated_at": "2026-09-25T12:04:32.040+01:00"
+    }
+   ],
+   "tags": [
+    "v1.0.0"
+   ]
+  },
+  "ludlow": {
+   "branch_rules": {
+    "main": [
+     {
+      "ruleset_id": 23993310,
+      "ruleset_source": "policy-as-versioned-ludlow/ludlow",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993310,
+      "ruleset_source": "policy-as-versioned-ludlow/ludlow",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993310,
+      "ruleset_source": "policy-as-versioned-ludlow/ludlow",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ]
+   },
+   "branches": [
+    "bootstrap-apps-inventory",
+    "composed-set-v3.0.0",
+    "delivery-stage2-20261004",
+    "delivery-stage2-atomic-20261004",
+    "delivery-stage2-composed-B-20261004",
+    "ecosystem/build-2026-09-03",
+    "ecosystem/thin-slice",
+    "fix-scheduled-tools-20260910",
+    "implement-platform-tools-20260910",
+    "implement-ticket-86-20260910",
+    "implement-twin-clock-20260910",
+    "main",
+    "phase-b-claim-policy-5",
+    "platform-v4.0.0-retire-4",
+    "policy-composition/tickets-09-16-wip",
+    "renovate/https-github.com-policy-as-versioned-feeds-feeds-3.x",
+    "renovate/https-github.com-policy-as-versioned-ico-ico-4.x",
+    "repair/every-composing-job-fetches-its-parents",
+    "rollout-330-feeds-eol-v2",
+    "rollout-platform-v3.3.0",
+    "ticket-33-lift-ledger-storefront-and-reports",
+    "ticket-34-followup-2026-09-08",
+    "ticket-34-handbook-as-a-compose-time-render",
+    "ticket-60-grade-the-lane-sample",
+    "ticket-60-sampler-waits",
+    "ticket-62-and-77",
+    "ticket-64-the-twin-is-three-adopters",
+    "ticket-67-the-record-matches-the-surface",
+    "ticket-84-being-behind-costs-something",
+    "ticket-86-the-cage-enters-the-citable-number",
+    "ticket-101-the-gates-verify-a-real-signature",
+    "ticket-105-pinned-trust-roots",
+    "ticket-107-the-sampler-waits-for-what-exists",
+    "ticket-130-the-composed-root-is-delivered",
+    "ticket-131-sibling-cut-release",
+    "ticket-132-gate-reads-acceptance",
+    "ticket-140-fact4-omitted-zero",
+    "ticket-143a-twin-sweep-split",
+    "ticket-147-declared-engine",
+    "ticket-161-reference-workload",
+    "truth-surface-reconcile",
+    "wargamer/retire-ludlow-feeds-threat-register-v1-to-v2"
+   ],
+   "default_branch": "main",
+   "remote": "policy-as-versioned-ludlow/ludlow",
+   "rulesets": [
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-ludlow/ludlow/rules/23993310"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-ludlow/ludlow/rulesets/23993310"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~DEFAULT_BRANCH"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:21.839+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993310,
+     "name": "main-keeps-its-history",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c6dzgFuG94",
+     "rules": [
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-ludlow/ludlow",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-10-04T14:26:58.165+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-ludlow/ludlow/rules/23993311"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-ludlow/ludlow/rulesets/23993311"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "refs/heads/release/**"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:22.782+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993311,
+     "name": "release-branches-are-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c6dzgFuG98",
+     "rules": [
+      {
+       "type": "creation"
+      },
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-ludlow/ludlow",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:22.866+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-ludlow/ludlow/rules/23993313"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-ludlow/ludlow/rulesets/23993313"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~ALL"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:23.619+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993313,
+     "name": "release-tags-hold",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c6dzgFuG-E",
+     "rules": [
+      {
+       "type": "update"
+      },
+      {
+       "type": "deletion"
+      }
+     ],
+     "source": "policy-as-versioned-ludlow/ludlow",
+     "source_type": "Repository",
+     "target": "tag",
+     "updated_at": "2026-09-25T12:04:23.665+01:00"
+    }
+   ],
+   "tags": [
+    "v4.0.1",
+    "v4.0.0",
+    "v3.0.1",
+    "v3.0.0",
+    "v2.0.0",
+    "v1.1.0",
+    "v1.0.0"
+   ]
+  },
+  "nist": {
+   "branch_rules": {
+    "main": [
+     {
+      "ruleset_id": 23993314,
+      "ruleset_source": "policy-as-versioned-nist/nist",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993314,
+      "ruleset_source": "policy-as-versioned-nist/nist",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993314,
+      "ruleset_source": "policy-as-versioned-nist/nist",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ]
+   },
+   "branches": [
+    "ecosystem/build-2026-09-03",
+    "ecosystem/thin-slice",
+    "main",
+    "observations",
+    "policy-composition/tickets-09-16-wip",
+    "renovate/configure",
+    "ticket-56-and-85",
+    "ticket-67-the-record-matches-the-surface",
+    "ticket-103-release-gate-computes-the-bump"
+   ],
+   "default_branch": "main",
+   "remote": "policy-as-versioned-nist/nist",
+   "rulesets": [
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-nist/nist/rules/23993314"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-nist/nist/rulesets/23993314"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~DEFAULT_BRANCH"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:24.306+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993314,
+     "name": "main-is-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c7fzgFuG-I",
+     "rules": [
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-nist/nist",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:24.344+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-nist/nist/rules/23993315"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-nist/nist/rulesets/23993315"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "refs/heads/release/**"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:25.097+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993315,
+     "name": "release-branches-are-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c7fzgFuG-M",
+     "rules": [
+      {
+       "type": "creation"
+      },
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-nist/nist",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:25.149+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-nist/nist/rules/23993317"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-nist/nist/rulesets/23993317"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~ALL"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:25.741+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993317,
+     "name": "release-tags-hold",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c7fzgFuG-U",
+     "rules": [
+      {
+       "type": "update"
+      },
+      {
+       "type": "deletion"
+      }
+     ],
+     "source": "policy-as-versioned-nist/nist",
+     "source_type": "Repository",
+     "target": "tag",
+     "updated_at": "2026-09-25T12:04:25.770+01:00"
+    }
+   ],
+   "tags": [
+    "v1.1.0",
+    "v1.0.0"
+   ]
+  },
+  "platform": {
+   "branch_rules": {
+    "main": [
+     {
+      "ruleset_id": 23993294,
+      "ruleset_source": "policy-as-versioned-platform/platform",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993294,
+      "ruleset_source": "policy-as-versioned-platform/platform",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993294,
+      "ruleset_source": "policy-as-versioned-platform/platform",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ]
+   },
+   "branches": [
+    "ecosystem/build-2026-09-03",
+    "ecosystem/thin-slice",
+    "fix-2026-09-09-absence-count-is-derived",
+    "fix-transition-replay-20260910",
+    "implement-engine-fixtures-20260910",
+    "implement-floor-change-evidence-20260910",
+    "main",
+    "observations",
+    "policy-composition/tickets-09-16-wip",
+    "release/2.0.x",
+    "renovate/configure",
+    "repair/array-commit-for-4-0-0",
+    "repair/evidence-reaches-main",
+    "repair-2026-09-04-gate-regressions",
+    "resume/2026-10-03-security6",
+    "resume/2026-10-04-compatibility7",
+    "retire-policy-4-0-0",
+    "ticket-34-followup-2026-09-08",
+    "ticket-34-handbook-as-a-compose-time-render",
+    "ticket-45-switching-cost-computed-in-composition",
+    "ticket-55-instrument-faults",
+    "ticket-62-and-77",
+    "ticket-67-the-record-matches-the-surface",
+    "ticket-79-the-pound-inputs",
+    "ticket-80-three-forks-not-a-config-base",
+    "ticket-84-being-behind-costs-something",
+    "ticket-89-deny-is-not-a-rung",
+    "ticket-91-the-currency-controller-is-owned",
+    "ticket-98-refusal-by-another-name",
+    "ticket-106-composition-selfcheck-fixture-namespace",
+    "ticket-110-offline-supersede",
+    "ticket-110-selfcheck-derives-supersede",
+    "ticket-111-the-cage-delivers-its-classes",
+    "ticket-113-infra-is-a-role-not-a-rung",
+    "ticket-119-unlabelled-namespace-is-priced",
+    "ticket-121-implementing-a-control-moves-the-price",
+    "ticket-122-ramp-survives-rename",
+    "ticket-123-a-withdrawal-is-the-regulators",
+    "ticket-124-price-the-removal",
+    "ticket-126-a-withdrawn-control-is-not-selectable",
+    "ticket-128-behind-a-major-unreadable",
+    "ticket-130-the-composed-root-is-delivered",
+    "ticket-134-observation-is-not-source",
+    "ticket-136-vendor-by-feed-name",
+    "ticket-137-parent-tree-per-feed-edge",
+    "ticket-138-as-of-docstring",
+    "ticket-139-since-after-as-of",
+    "ticket-141-party-declares-pricing-threshold",
+    "ticket-145-agent-cage-price",
+    "ticket-146-engine-cells",
+    "ticket-148-unsupported-pairing",
+    "truth-surface-computed-semver",
+    "truth-surface-live-tails"
+   ],
+   "default_branch": "main",
+   "remote": "policy-as-versioned-platform/platform",
+   "rulesets": [
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-platform/platform/rules/23993294"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-platform/platform/rulesets/23993294"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~DEFAULT_BRANCH"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:15.519+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993294,
+     "name": "main-keeps-its-history",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c1IzgFuG84",
+     "rules": [
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-platform/platform",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-10-04T14:26:56.419+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-platform/platform/rules/23993296"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-platform/platform/rulesets/23993296"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "refs/heads/release/**"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:16.367+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993296,
+     "name": "release-branches-are-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c1IzgFuG9A",
+     "rules": [
+      {
+       "type": "creation"
+      },
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-platform/platform",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:16.441+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-platform/platform/rules/23993299"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-platform/platform/rulesets/23993299"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~ALL"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:17.236+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993299,
+     "name": "release-tags-hold",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c1IzgFuG9M",
+     "rules": [
+      {
+       "type": "update"
+      },
+      {
+       "type": "deletion"
+      }
+     ],
+     "source": "policy-as-versioned-platform/platform",
+     "source_type": "Repository",
+     "target": "tag",
+     "updated_at": "2026-09-25T12:04:17.268+01:00"
+    }
+   ],
+   "tags": [
+    "v5.0.0",
+    "v4.0.0",
+    "v3.4.1",
+    "v3.4.0",
+    "v3.3.0",
+    "v3.2.0",
+    "v3.1.0",
+    "v3.0.0",
+    "v2.0.1",
+    "v2.0.0",
+    "v1.1.1",
+    "v1.1.0",
+    "v1.0.0",
+    "v0.1.1",
+    "v0.1.0",
+    "policy/v7.0.0",
+    "policy/v6.0.0",
+    "policy/v5.0.0",
+    "policy/v4.0.0",
+    "policy/v3.0.0",
+    "policy/v2.0.1",
+    "policy/v2.0.0"
+   ]
+  },
+  "tuppence": {
+   "branch_rules": {
+    "main": [
+     {
+      "ruleset_id": 23993306,
+      "ruleset_source": "policy-as-versioned-tuppence/tuppence",
+      "ruleset_source_type": "Repository",
+      "type": "deletion"
+     },
+     {
+      "ruleset_id": 23993306,
+      "ruleset_source": "policy-as-versioned-tuppence/tuppence",
+      "ruleset_source_type": "Repository",
+      "type": "non_fast_forward"
+     },
+     {
+      "parameters": {
+       "allowed_merge_methods": [
+        "merge",
+        "squash",
+        "rebase"
+       ],
+       "dismiss_stale_reviews_on_push": false,
+       "dismissal_restriction": {
+        "allowed_actors": [],
+        "enabled": false
+       },
+       "require_code_owner_review": false,
+       "require_extra_approval_for_unattributed_changes": true,
+       "require_last_push_approval": false,
+       "required_approving_review_count": 1,
+       "required_review_thread_resolution": false,
+       "required_reviewers": []
+      },
+      "ruleset_id": 23993306,
+      "ruleset_source": "policy-as-versioned-tuppence/tuppence",
+      "ruleset_source_type": "Repository",
+      "type": "pull_request"
+     }
+    ]
+   },
+   "branches": [
+    "adopt-v3.0.0-composed",
+    "bootstrap-apps-inventory",
+    "delivery-stage2-20261004",
+    "delivery-stage2-atomic-20261004",
+    "delivery-stage2-composed-B-20261004",
+    "ecosystem/build-2026-09-03",
+    "ecosystem/thin-slice",
+    "fix-scheduled-tools-20260910",
+    "implement-platform-tools-20260910",
+    "implement-ticket-86-20260910",
+    "implement-twin-clock-20260910",
+    "main",
+    "phaseb-claim-policy-5",
+    "platform-tools-v3.4.1",
+    "platform-v4.0.0-retire-4",
+    "policy-composition/tickets-09-16-wip",
+    "renovate/https-github.com-policy-as-versioned-feeds-feeds-3.x",
+    "renovate/https-github.com-policy-as-versioned-ico-ico-4.x",
+    "repair/every-composing-job-fetches-its-parents",
+    "repair/fixture-stops-testing-the-calendar",
+    "rollout-330-feeds-cve-v2",
+    "rollout-platform-v3.3.0",
+    "ticket-33-lift-ledger-storefront-and-reports",
+    "ticket-34-followup-2026-09-08",
+    "ticket-34-handbook-as-a-compose-time-render",
+    "ticket-60-grade-the-lane-sample",
+    "ticket-60-sampler-waits",
+    "ticket-62-and-77",
+    "ticket-64-the-twin-is-three-adopters",
+    "ticket-67-the-record-matches-the-surface",
+    "ticket-84-being-behind-costs-something",
+    "ticket-86-the-cage-enters-the-citable-number",
+    "ticket-99-the-adopter-gate-grades-the-change",
+    "ticket-101-the-gates-verify-a-real-signature",
+    "ticket-105-pinned-trust-roots",
+    "ticket-107-the-sampler-waits-for-what-exists",
+    "ticket-130-the-composed-root-is-delivered",
+    "ticket-131-sibling-cut-release",
+    "ticket-132-gate-reads-acceptance",
+    "ticket-140-fact4-omitted-zero",
+    "ticket-143a-twin-sweep-split",
+    "ticket-147-declared-engine",
+    "ticket-161-reference-workload",
+    "truth-surface-reconcile",
+    "wargamer/retire-tuppence-feeds-threat-register-v1-to-v2"
+   ],
+   "default_branch": "main",
+   "remote": "policy-as-versioned-tuppence/tuppence",
+   "rulesets": [
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-tuppence/tuppence/rules/23993306"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-tuppence/tuppence/rulesets/23993306"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~DEFAULT_BRANCH"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:20.085+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993306,
+     "name": "main-keeps-its-history",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c5UzgFuG9o",
+     "rules": [
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-tuppence/tuppence",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-10-04T14:26:55.778+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-tuppence/tuppence/rules/23993307"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-tuppence/tuppence/rulesets/23993307"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "refs/heads/release/**"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:20.675+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993307,
+     "name": "release-branches-are-reviewed",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c5UzgFuG9s",
+     "rules": [
+      {
+       "type": "creation"
+      },
+      {
+       "type": "deletion"
+      },
+      {
+       "type": "non_fast_forward"
+      },
+      {
+       "parameters": {
+        "allowed_merge_methods": [
+         "merge",
+         "squash",
+         "rebase"
+        ],
+        "dismiss_stale_reviews_on_push": false,
+        "dismissal_restriction": {
+         "allowed_actors": [],
+         "enabled": false
+        },
+        "require_code_owner_review": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 1,
+        "required_review_thread_resolution": false,
+        "required_reviewers": []
+       },
+       "type": "pull_request"
+      }
+     ],
+     "source": "policy-as-versioned-tuppence/tuppence",
+     "source_type": "Repository",
+     "target": "branch",
+     "updated_at": "2026-09-25T12:04:20.717+01:00"
+    },
+    {
+     "_links": {
+      "html": {
+       "href": "https://github.com/policy-as-versioned-tuppence/tuppence/rules/23993309"
+      },
+      "self": {
+       "href": "https://api.github.com/repos/policy-as-versioned-tuppence/tuppence/rulesets/23993309"
+      }
+     },
+     "bypass_actors": [],
+     "conditions": {
+      "ref_name": {
+       "exclude": [],
+       "include": [
+        "~ALL"
+       ]
+      }
+     },
+     "created_at": "2026-09-25T12:04:21.272+01:00",
+     "current_user_can_bypass": "never",
+     "enforcement": "active",
+     "id": 23993309,
+     "name": "release-tags-hold",
+     "node_id": "RRS_lACqUmVwb3NpdG9yec5P7c5UzgFuG90",
+     "rules": [
+      {
+       "type": "update"
+      },
+      {
+       "type": "deletion"
+      }
+     ],
+     "source": "policy-as-versioned-tuppence/tuppence",
+     "source_type": "Repository",
+     "target": "tag",
+     "updated_at": "2026-09-25T12:04:21.304+01:00"
+    }
+   ],
+   "tags": [
+    "v4.0.1",
+    "v4.0.0",
+    "v3.0.1",
+    "v3.0.0",
+    "v2.0.0",
+    "v1.1.0",
+    "v1.0.0"
+   ]
+  }
+ },
+ "repository": "",
+ "run_id": ""
+}

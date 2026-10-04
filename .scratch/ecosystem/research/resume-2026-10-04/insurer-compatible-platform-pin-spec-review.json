@@ -1,0 +1,53 @@
+{
+  "verdict": "PASS",
+  "head": "ed17499668f368c55261729c760904662ab7e242",
+  "tree": "2a6c5ad76dbc710505ffbc48a0f269b644ea522d",
+  "base": "8d4a5ae684e4a58c8242bc8b6e50794473ef302b",
+  "packet_sha256": "6182b8614d365458cf8e89352ace9075dba69ba6304bb63f4db1888b12a5f292",
+  "signed_clean_source_verified": true,
+  "all_bound_hashes_match": true,
+  "findings": [],
+  "independent_actual_snapshot_quote_replay": {
+    "driftwood": {
+      "genuine_snapshot_tag": "v2.0.0",
+      "tag_object": "90144b731145469f13a9d9f0a39b2de2605b1255",
+      "commit": "c26d95cc7154a56df6b56f70904cd8fba3bfd404",
+      "unchanged_premium": {
+        "amount": 113403.3,
+        "currency": "GBP",
+        "perspective": "driftwood"
+      },
+      "changed_fields": [
+        "priced_against[0].version"
+      ]
+    },
+    "tuppence": {
+      "genuine_snapshot_tag": "v2.0.0",
+      "tag_object": "278780b78b83f8e1d0443075f7acaf0fe69b3c18",
+      "commit": "d5a4bfee9e01b658118140950693d757c08c59b9",
+      "unchanged_premium": {
+        "amount": 195000.0,
+        "currency": "GBP",
+        "perspective": "tuppence"
+      },
+      "changed_fields": [
+        "priced_against[0].version"
+      ]
+    },
+    "ludlow": {
+      "genuine_snapshot_tag": "v2.0.0",
+      "tag_object": "7a5fb379636de4fa443b03763e2b8e043d121b69",
+      "commit": "ab89691912d40f376b5f0c87b0dcf41294423491",
+      "unchanged_premium": {
+        "amount": 175794.98,
+        "currency": "GBP",
+        "perspective": "ludlow"
+      },
+      "changed_fields": [
+        "priced_against[0].version"
+      ]
+    }
+  },
+  "scope": "Two paired declaration/pin paths only; quote formula, terms, frozen bodies, historical exposure pins and missing-total guard unchanged; no cloud Kustomization or deployment. Parent rule byte-equal. Future parent provenance changes honestly.",
+  "historical_negative": "Old3.3 current catalogue lacks cloud path; no non-feed name invented; no historical snapshots re-composed."
+}
