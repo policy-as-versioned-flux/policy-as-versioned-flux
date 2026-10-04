@@ -1,0 +1,5 @@
+PASS: twin cage selfcheck -- five loosened workflows fail
+FAIL: driftwood served twin cage: served twin cage instrument is missing or malformed: 'twin'
+FAIL: tuppence served twin cage: served twin cage instrument is missing or malformed: 'twin'
+FAIL: ludlow served twin cage: served twin cage instrument is missing or malformed: 'twin'
+LIMIT: local-clock sandbox is configured; its live resistance to a rebuilt child environment remains unmeasured (ticket 142 item 3)

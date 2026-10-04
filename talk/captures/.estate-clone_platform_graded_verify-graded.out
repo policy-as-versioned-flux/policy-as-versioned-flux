@@ -2,9 +2,11 @@
 ok   selfcheck: cut/uncut partition; installed cages read off the CLUSTER, not the array, so two live cages skip the tail, one lets it speak, and a cut version with no cage still fails by name
 [1;36m==>[0m engine: kyverno 1.18.2 at /usr/local/bin/kyverno (binary sha256 791e5a4a68e50823f0c101761acfa7976f49c4c073a8b3d1e15b4461a4e21124), a row of engine/kyverno/engine-table.yaml
 [1;36m==>[0m 1. offline: the £ engine — the whole ladder, £ picks the tier, floor clamps, TCoR booked
+ok  twin-agent table v1.0.0: rungs ['baseline', 'restricted', 'quarantine', 'isolated'], cost 0 at every rung, reduce derived from the paths each rung closes (4 paths); restricted and quarantine carry baseline's residual, isolated collapses it; an underived reach is a named non-candidate
 ok  tiers ['baseline', 'restricted', 'quarantine', 'isolated'] | £ picks: band40k->baseline band20k->restricted band5k->quarantine band1k->isolated | scenario £33073: driftwood->baseline (TCoR £23651), ludlow->quarantine (TCoR £8646) | legacy-till (warn) -> baseline cage, OSCAL risk open £14952 -> observation resolves
 [1;36m==>[0m 2. offline: the NAMESPACE declares the tier; a governed ns with no tier falls closed to isolated; a forged pod label is clobbered; a declared 'true' survives
 [1;36m==>[0m 3. offline: reach is generated PER TIER (baseline normal, restricted/quarantine DNS-only, isolated nothing)
+{"family": "cage-netpol", "fixture": "generates.yaml", "outcome": "passed", "triggers": [{"documents": 0, "trigger": "caged-baseline"}, {"documents": 3, "trigger": "caged-restricted"}, {"documents": 3, "trigger": "caged-quarantine"}, {"documents": 3, "trigger": "caged-isolated"}, {"documents": 0, "trigger": "healthy"}, {"documents": 0, "trigger": "uncaged-restricted"}]}
 [1;36m==>[0m 4. offline: the Kyverno tier->dials map mirrors cage.py's TIERS (no drift), priority pair included
   ok   baseline: present in the Kyverno dial map
   ok   baseline: cpu 500m matches cage.py

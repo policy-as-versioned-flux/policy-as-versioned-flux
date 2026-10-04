@@ -1,0 +1,8 @@
+PASS: driftwood (forward: its committed tree composed by platform 703eff6aee95's composer and tree, declaring 1.18.2): no engine delta; header declared-engine {'engine': 'kyverno', 'version': '1.18.2', 'file': 'gitops/engine/kyverno.yaml'}
+FAIL: tuppence (forward, platform 703eff6aee95's composer and tree): the composition did not compose: [{'kind': 'missing-instrument', 'subject': 'tuppence', 'detail': 'missing instrument: cve subscription has no committed inventory/images.json (ADR-0035)', 'needs_composition': True}]
+PASS: ludlow (forward: its committed tree composed by platform 703eff6aee95's composer and tree, declaring 1.18.2): no engine delta; header declared-engine {'engine': 'kyverno', 'version': '1.18.2', 'file': 'gitops/engine/kyverno.yaml'}
+SKIP: planted: every row of the engine table is listed by every composed line, so no unsupported engine can be planted from the table
+SKIP: driftwood: its committed composed/HEADER.yaml carries no declared-engine, so it was composed by a composer from before ticket 148; re-composing is the adopter's push
+SKIP: tuppence: its committed composed/HEADER.yaml carries no declared-engine, so it was composed by a composer from before ticket 148; re-composing is the adopter's push
+SKIP: ludlow: its committed composed/HEADER.yaml carries no declared-engine, so it was composed by a composer from before ticket 148; re-composing is the adopter's push
+FAIL: 1 engine-pairing check(s) observed false

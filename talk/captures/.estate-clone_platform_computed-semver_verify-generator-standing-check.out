@@ -5,4 +5,4 @@ selfcheck ok: the three known-good bumps rederive exactly, and a deliberately wr
 == the standing check itself ==
 ok  the three known-good bumps rederive exactly
 ok  generated-corpus/manifest.yaml matches the live generator version
-ok  5.0.0: recomputes identically under the current generator
+NOTE: 7.0.0: recorded computed bump 'major' (generator 0.3.0) now recomputes as 'patch' under generator 0.3.0 -- a human decides whether the past release was mislabelled
