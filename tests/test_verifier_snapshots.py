@@ -50,9 +50,20 @@ class VerifierSnapshots(unittest.TestCase):
         self.served = git(self.repo, "rev-parse", "HEAD")
         git(self.repo, "tag", "apps/v1.0.0")
         git(self.repo, "update-ref", "refs/remotes/origin/main", self.served)
+        git(self.repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+        git(self.repo, "checkout", "-qb", "candidate-source")
         (self.repo / "apps.yaml").write_text("proposed digest\n")
         git(self.repo, "commit", "-qam", "Proposed source fixture")
         self.head = git(self.repo, "rev-parse", "HEAD")
+        # The observed clock is reachable only through a remote-tracking ref,
+        # newer than the local candidate branch. It must survive the local clone.
+        git(self.repo, "checkout", "--detach", self.served)
+        (self.repo / "clock.fixture").write_text("Authored fixture, not a live observation\n")
+        git(self.repo, "add", ".")
+        git(self.repo, "commit", "-qm", "Remote-only clock object fixture")
+        self.remote_main = git(self.repo, "rev-parse", "HEAD")
+        git(self.repo, "update-ref", "refs/remotes/origin/main", self.remote_main)
+        git(self.repo, "checkout", "candidate-source")
         (self.repo / "apps.yaml").write_text("uncommitted bytes must stay out\n")
 
     def assert_snapshot(self, directory):
@@ -60,7 +71,13 @@ class VerifierSnapshots(unittest.TestCase):
         self.assertEqual(git(directory, "rev-parse", "HEAD"), self.head)
         self.assertEqual(git(directory, "rev-parse", "apps/v1.0.0^{commit}"), self.served)
         self.assertEqual(git(directory, "show", "apps/v1.0.0:apps.yaml"), "served digest")
-        self.assertEqual(git(directory, "rev-parse", "refs/remotes/origin/main"), self.served)
+        self.assertEqual(git(directory, "rev-parse", "refs/remotes/origin/main"), self.remote_main)
+        self.assertEqual(git(directory, "show", "origin/main:clock.fixture"),
+                         "Authored fixture, not a live observation")
+        self.assertEqual(git(directory, "for-each-ref", "--format=%(refname)", "refs/remotes/origin/"),
+                         git(self.repo, "for-each-ref", "--format=%(refname)", "refs/remotes/origin/"))
+        self.assertEqual(git(directory, "symbolic-ref", "refs/remotes/origin/HEAD"),
+                         "refs/remotes/origin/main")
         self.assertEqual((directory / "apps.yaml").read_text(), "proposed digest\n")
 
     def test_engine_adopter_probe_preserves_its_real_object_context(self):
