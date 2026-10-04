@@ -4,14 +4,18 @@ ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
 ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not
 [1;36m==>[0m 2. the kyverno CLI against the engine this repository declares
    ok  kyverno CLI 1.18.2 is the engine gitops/engine/kyverno.yaml declares (1.18.2)
-[1;36m==>[0m 3. the CLI reads Namespace labels through a Values file (served cage-tier at v3.0.0)
-   ok  the CLI reads Namespace labels: a Namespace declaring `restricted` put a claiming pod on `restricted` (served cage-tier at v3.0.0)
-[1;36m==>[0m 4. the sampler's probe objects against composed/ at v3.0.0
-   ok  v3.0.0: 6 MutatingPolicy file(s), 2 GeneratingPolicy file(s), 5 `cage-` PriorityClass(es) served; the lowest is cage-isolated = -10000
-   ok  v3.0.0: the reference pod (no claim, Namespace declares nothing) is untouched by every served mutation and selected by no generated NetworkPolicy (0 written)
-   ok  v3.0.0: v5.0.0: the fall-closed pod lands on isolated at priority -10000 = cage-isolated, the lowest served `cage-` class, named class cage-isolated-5-0-0 is served, and ['cage-reach-isolated'] select(s) it with no rules and both types
+[1;36m==>[0m 3. the CLI reads Namespace labels through a Values file (served cage-tier at v4.0.1)
+   ok  the CLI reads Namespace labels: a Namespace declaring `restricted` put a claiming pod on `restricted` (served cage-tier at v4.0.1)
+[1;36m==>[0m 4. the sampler's probe objects against composed/ at v4.0.1
+   ok  v4.0.1: 10 MutatingPolicy file(s), 4 GeneratingPolicy file(s), 13 `cage-` PriorityClass(es) served; the lowest is cage-isolated = -10000
+   ok  v4.0.1: the reference pod (no claim, Namespace declares nothing) is untouched by every served mutation and selected by no generated NetworkPolicy (0 written)
+   ok  v4.0.1: v5.0.0: the fall-closed pod lands on isolated at priority -10000 = cage-isolated, the lowest served `cage-` class, named class cage-isolated-5-0-0 is served, and ['cage-reach-isolated'] select(s) it with no rules and both types
+   ok  v4.0.1: v6.0.0: the fall-closed pod lands on isolated at priority -10000 = cage-isolated, the lowest served `cage-` class, named class cage-isolated-6-0-0 is served, and ['cage-reach-isolated'] select(s) it with no rules and both types
+   ok  v4.0.1: v7.0.0: the fall-closed pod lands on isolated at priority -10000 = cage-isolated, the lowest served `cage-` class, named class cage-isolated-7-0-0 is served, and ['cage-reach-isolated'] select(s) it with no rules and both types
 [1;36m==>[0m 4. the sampler's probe objects against composed/ at HEAD
    ok  HEAD: 10 MutatingPolicy file(s), 4 GeneratingPolicy file(s), 13 `cage-` PriorityClass(es) served; the lowest is cage-isolated = -10000
    ok  HEAD: the reference pod (no claim, Namespace declares nothing) is untouched by every served mutation and selected by no generated NetworkPolicy (0 written)
    ok  HEAD: v5.0.0: the fall-closed pod lands on isolated at priority -10000 = cage-isolated, the lowest served `cage-` class, named class cage-isolated-5-0-0 is served, and ['cage-reach-isolated'] select(s) it with no rules and both types
-PASS: the served documents at v3.0.0 (the tag gitops/composed/composed-set.yaml pins) and at HEAD c5f33cc, run offline through kyverno 1.18.2 (the engine gitops/engine/kyverno.yaml declares), put the fall-closed pod on the ladder's bottom for every version the ResourceSet array installs (5.0.0): its priority is the lowest served `cage-` PriorityClass, the class the mutation names is served, and a generated NetworkPolicy with no rules and both policy types selects it; no served mutation touches the reference pod and no generated NetworkPolicy selects it; and drift/five-facts.py selfcheck passed. This is a proof about the documents, not about a cluster: the lane's facts 6 and 7 are that
+   ok  HEAD: v6.0.0: the fall-closed pod lands on isolated at priority -10000 = cage-isolated, the lowest served `cage-` class, named class cage-isolated-6-0-0 is served, and ['cage-reach-isolated'] select(s) it with no rules and both types
+   ok  HEAD: v7.0.0: the fall-closed pod lands on isolated at priority -10000 = cage-isolated, the lowest served `cage-` class, named class cage-isolated-7-0-0 is served, and ['cage-reach-isolated'] select(s) it with no rules and both types
+PASS: the served documents at v4.0.1 (the tag gitops/composed/composed-set.yaml pins) and at HEAD e7243d9, run offline through kyverno 1.18.2 (the engine gitops/engine/kyverno.yaml declares), put the fall-closed pod on the ladder's bottom for every version the ResourceSet array installs (5.0.0, 6.0.0, 7.0.0): its priority is the lowest served `cage-` PriorityClass, the class the mutation names is served, and a generated NetworkPolicy with no rules and both policy types selects it; no served mutation touches the reference pod and no generated NetworkPolicy selects it; and drift/five-facts.py selfcheck passed. This is a proof about the documents, not about a cluster: the lane's facts 6 and 7 are that
