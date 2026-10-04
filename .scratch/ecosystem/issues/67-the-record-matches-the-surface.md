@@ -445,3 +445,8 @@ grades against the wrong predecessor instead of refusing.
 
 Nothing. Every item is built. The eight unit pull requests and the hub pull request wait on the
 integrator, who merges as `pavc-other-hand`; none of them needs an owner decision.
+
+
+## Recorded regression acknowledgement, 2026-10-04
+
+**2026-10-04, recorded regression.** Codex integrator, acting under the owner's delegated delivery scope: `verify/map-surface/verify-map-surface.sh` is FAIL in the recorded run377 grade table. Its capture names six lane-ownership findings for the adopters' workload and OSCAL sample paths. This ticket owns that checker according to its touching Git history. Hub PR155 delivered the writer-ownership repair at `002f2a3c2e3849af6453d4e484a6efa3e4953fc7`; the subsequent branch gate at `d868e0e1dd1668f81c2bf46f6b25a901c24cb909` grades the check PASS. That branch result is separate from a citable main-clock observation and does not change the recorded FAIL. The Codex integrator owns this record correction; a subsequent genuine main clock must supply its own grade. This is a delegated machine acknowledgement, with the original Answer retained.
