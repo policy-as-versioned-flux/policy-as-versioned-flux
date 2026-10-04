@@ -1,9 +1,9 @@
 PASS: sixteen rows graded; premature archives, wrong owners, archived hub and failed anonymous pulls are observed false
 PASS: policy-as-versioned-flux: hub must remain live
 PASS: apps: archived and its current prerequisite passes
-LIMIT: readiness-collector: row passes; archive has not been performed
-LIMIT: pr-gate-action: row passes; archive has not been performed
-LIMIT: renovate-config: row passes; archive has not been performed
+PASS: readiness-collector: archived and its current prerequisite passes
+PASS: pr-gate-action: archived and its current prerequisite passes
+PASS: renovate-config: archived and its current prerequisite passes
 LIMIT: handbook-generator: row passes; archive has not been performed
 PASS: ledger: forge names new owner policy-as-versioned-tuppence
 PASS: storefront: forge names new owner policy-as-versioned-driftwood

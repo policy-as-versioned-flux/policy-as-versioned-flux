@@ -5,13 +5,14 @@ ok  cve/v3/feed.json -> envelope + cve/payload.schema.json
 ok  eol/v1/feed.json -> envelope + eol/payload.schema.json
 ok  eol/v2/feed.json -> envelope + eol/payload.schema.json
 ok  fx/v1/feed.json -> envelope + fx/payload.schema.json
+ok  fx/v2/feed.json -> envelope + fx/payload.schema.json
 ok  market-moves/v1/feed.json -> envelope + market-moves/payload.schema.json
 ok  news/v1/feed.json -> envelope + news/payload.schema.json
 ok  threat-register/v1/feed.json -> envelope + threat-register/payload.schema.json
 ok  threat-register/v2/feed.json -> envelope + threat-register/payload.schema.json
 ok  threat-register/v3/feed.json -> envelope + threat-register/payload.schema.v3.json
 ok  threat-register/v4/feed.json -> envelope + threat-register/payload.schema.v4.json
-ok  12 published feed versions validated
+ok  13 published feed versions validated
 ok  party.yaml publishes threat-register
 ok  party.yaml publishes threat-register/payload.schema.json
 ok  party.yaml publishes cve
@@ -67,12 +68,12 @@ ok  1000 GBP -> 1336.70 USD at the 2026-08 HMRC rate 1.3367
 ok  1336.70 USD -> 1000.00 GBP, the same month's rate both ways
 ok  100 EUR -> 114.06 USD, crossed through the GBP base
 ok  a same-currency amount needs no rate and no date
-ok  2026-05-14 refuses (a month the feed does not publish): no fx rate published for 2026-05-14: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
-ok  2027-01-31 refuses (a month the feed has not reached): no fx rate published for 2027-01-31: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
+ok  2026-05-14 refuses (a month the feed does not publish): no fx rate published for 2026-05-14: the fx feed publishes 2025-12, 2026-08 (ADR-0020, a missing instrument refuses)
+ok  2027-01-31 refuses (a month the feed has not reached): no fx rate published for 2027-01-31: the fx feed publishes 2025-12, 2026-08 (ADR-0020, a missing instrument refuses)
 ok  an unquoted currency refuses: the fx feed for 2026-08 quotes no rate for XYZ (it quotes AED, ALL, AMD, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BHD, BIF, BMD, BND, BOB, BRL, BSD, BTN, BWP, BYN, BZD, CAD, CDF, CHF, CLP, CNY, COP, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, GBP, GEL, GHS, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KRW, KWD, KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MYR, MZN, NGN, NIO, NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SLE, SOS, SRD, SVC, SZL, THB, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, UYU, UZS, VES, VND, VUV, WST, XAF, XCD, XOF, XPF, YER, ZAR, ZMW, ZWG); ADR-0020, refusing
 ok  converters/fx.py selfcheck: 7 cases
 ok  1000 GBP -> 1336.7 USD on 2026-08-14, at the published HMRC rate
-ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
+ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14: the fx feed publishes 2025-12, 2026-08 (ADR-0020, a missing instrument refuses)
 
 
 == the threat register publishes its own magnitudes, and ships the converter that reads them ==

@@ -1,19 +1,19 @@
 PASS: composition.py emits none of new-hole, baseline-widening, new-ungoverned-namespace, removed-control
 PASS: party schema.json admits overlay.controls as bare ids and `party:id`, and says an addition and a removal are priced, never refused
 PASS: driftwood: no new-hole, baseline-widening or new-ungoverned-namespace refusal
-PASS: driftwood: 285 hole(s) keyed (source, id) under driftwood/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
+PASS: driftwood: 284 hole(s) keyed (source, id) under driftwood/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
 PASS: driftwood: every ungoverned Namespace the repo walk finds is priced (none)
 PASS: driftwood regime entry (penalty-schema): all 4 weighted holes carry the adopter's status (recorded)
 PASS: driftwood: 0 delta(s), each one of the 12 kinds under driftwood/GBP, matching the holes and namespaces they report
 PASS: ludlow: no new-hole, baseline-widening or new-ungoverned-namespace refusal
-PASS: ludlow: 285 hole(s) keyed (source, id) under ludlow/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
+PASS: ludlow: 284 hole(s) keyed (source, id) under ludlow/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
 PASS: ludlow: every ungoverned Namespace the repo walk finds is priced (none)
 PASS: ludlow regime entry (penalty-schema): all 4 weighted holes carry the adopter's status (recorded)
 PASS: ludlow: 0 delta(s), each one of the 12 kinds under ludlow/GBP, matching the holes and namespaces they report
 PASS: tuppence: no new-hole, baseline-widening or new-ungoverned-namespace refusal
-PASS: tuppence: 285 hole(s) keyed (source, id) under tuppence/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
-PASS: tuppence ungoverned openbao: 2,375,978.79 GBP = 1/4 workloads x ramp 1.0000 from since 2026-09-24 as of 2026-09-08, of 9,503,915.17
-PASS: tuppence ungoverned tuppence-reset: 7,401,336.68 GBP = 3/4 workloads x ramp 1.0384 from since 2026-08-25 as of 2026-09-08, of 9,503,915.17
+PASS: tuppence: 284 hole(s) keyed (source, id) under tuppence/GBP, 4 priced by a pinned weight or a signed scenario, the rest a named absence
+PASS: tuppence ungoverned openbao: 26,351,497.00 GBP = 1/4 workloads x ramp 1.0247 from since 2026-09-24 as of 2026-10-03, of 102,869,480.25
+PASS: tuppence ungoverned tuppence-reset: 85,395,760.32 GBP = 3/4 workloads x ramp 1.1068 from since 2026-08-25 as of 2026-10-03, of 102,869,480.25
 PASS: tuppence: every ungoverned Namespace the repo walk finds is priced (openbao, tuppence-reset)
 PASS: tuppence regime entry (penalty-schema): all 4 weighted holes carry the adopter's status (recorded)
 PASS: tuppence: 0 delta(s), each one of the 12 kinds under tuppence/GBP, matching the holes and namespaces they report

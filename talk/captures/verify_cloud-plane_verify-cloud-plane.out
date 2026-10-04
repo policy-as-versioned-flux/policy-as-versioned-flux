@@ -1,1 +1,1 @@
-FAIL: cloud plane: [Errno 2] No such file or directory: '/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/tuppence/gitops/cloud/claims.yaml'
+SKIP: cloud plane waits for a citable e2e step 4 PASS on its registered question (tickets 157 and 161); offline cloud replay is a separate self-proof

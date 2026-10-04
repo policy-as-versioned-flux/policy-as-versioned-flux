@@ -1,12 +1,12 @@
-PASS: the overlay loads and re-renders twin/forward-intel/v1/feed.json byte-identically
+PASS: the overlay loads and re-renders twin/forward-intel/v2/feed.json byte-identically
 PASS: payload vs twin/forward-intel/payload.schema.json
-PASS: vendored payload schema is byte-identical to platform/feeds/forward-intel.payload.schema.json
+PASS: owned payload schema preserves the immutable canonical contract plus exactly the optional valuation and rests_on_grade declarations
 PASS: perspective 'driftwood' is party='employer' (the overlay floor needs one employer seat)
 PASS: perspective currency 'GBP', payload currency 'GBP', party.yaml reporting_currency 'GBP'
 PASS: payload perspective 'driftwood' names the party whose balance sheet this is ('driftwood')
 PASS: overlay floor: 4 positioned components
 PASS: overlay floor: 2 role(s) declared as people
-PASS: overlay floor: 1 graded causal edge(s) reaching the declared cash flow 'checkout-revenue' at or inside the admission threshold (2)
+PASS: overlay floor: 1 graded causal edge(s) reaching the declared cash flow 'checkout-revenue' at or inside the admission threshold (3)
 PASS: no action-shaped key anywhere in the payload
 PASS: no recommended-action field in the emitted bytes
 PASS: the twin carries no frequency it does not have: lef=None, and derived_from pins 1 subscribed feed(s) to supply it
