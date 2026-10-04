@@ -1,0 +1,50 @@
+{
+  "scope": "Actual signed scheduled source and unmodified local graders; no citable truth run created",
+  "source": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "checks": {
+    "source-signature": {
+      "argv": [
+        "gitsign",
+        "verify",
+        "a1707bb7d13447edaeba85f26c3240cd8884a415",
+        "--certificate-identity=https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/drift-sample.yml@refs/heads/main",
+        "--certificate-oidc-issuer=https://token.actions.githubusercontent.com",
+        "--certificate-github-workflow-trigger=schedule",
+        "--certificate-github-workflow-sha=872d5c7f44801b496731b11cd40881f304f8a09a"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-source-signature.log",
+      "sha256": "fc568ce78c2a7664c0190afef8f30a9b9108cc3acceae0d9f76a85869d07e27f"
+    },
+    "five-facts-grade": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "drift/five-facts.py",
+        "grade"
+      ],
+      "exit": 3,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-unconfigured-five-facts-grade.log",
+      "sha256": "6ce7bebc905d3d31586ec48eec6f80c6ff19dd4ff0d4598154ce9df757193880"
+    },
+    "served-workloads-grade": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "drift/served_apps.py",
+        "grade"
+      ],
+      "exit": 3,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-unconfigured-served-workloads-grade.log",
+      "sha256": "5c46a7d7c7cfc64864fb3f5620f5f3374a226057ec3011e8cd091c41ab72b8cb"
+    },
+    "oscal-grade": {
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "drift/oscal_lane.py",
+        "grade"
+      ],
+      "exit": 3,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-clock-a170-unconfigured-oscal-grade.log",
+      "sha256": "6ce7bebc905d3d31586ec48eec6f80c6ff19dd4ff0d4598154ce9df757193880"
+    }
+  }
+}

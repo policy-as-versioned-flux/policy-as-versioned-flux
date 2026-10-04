@@ -1,0 +1,97 @@
+[
+  {
+    "policy": "cage-netpol-7-0-0",
+    "result": "pass",
+    "count": 1
+  },
+  {
+    "policy": "cage-tier-5-0-0",
+    "result": "skip",
+    "count": 44
+  },
+  {
+    "policy": "cage-tier-6-0-0",
+    "result": "skip",
+    "count": 44
+  },
+  {
+    "policy": "cage-tier-7-0-0",
+    "result": "fail",
+    "count": 4
+  },
+  {
+    "policy": "cage-tier-7-0-0",
+    "result": "skip",
+    "count": 40
+  },
+  {
+    "policy": "governed-namespace-requires-claim",
+    "result": "skip",
+    "count": 4
+  },
+  {
+    "policy": "governed-namespace-unclaimed-report",
+    "result": "pass",
+    "count": 4
+  },
+  {
+    "policy": "policy-version-orphan-cage",
+    "result": "skip",
+    "count": 44
+  },
+  {
+    "policy": "policy-version-orphan-guard",
+    "result": "pass",
+    "count": 4
+  },
+  {
+    "policy": "policy-version-orphan-guard",
+    "result": "skip",
+    "count": 40
+  },
+  {
+    "policy": "require-nonroot-5-0-0",
+    "result": "skip",
+    "count": 44
+  },
+  {
+    "policy": "require-nonroot-6-0-0",
+    "result": "skip",
+    "count": 44
+  },
+  {
+    "policy": "require-nonroot-7-0-0",
+    "result": "pass",
+    "count": 4
+  },
+  {
+    "policy": "require-nonroot-7-0-0",
+    "result": "skip",
+    "count": 40
+  },
+  {
+    "policy": "stamp-posture-5-0-0",
+    "result": "skip",
+    "count": 44
+  },
+  {
+    "policy": "stamp-posture-6-0-0",
+    "result": "skip",
+    "count": 44
+  },
+  {
+    "policy": "stamp-posture-7-0-0",
+    "result": "fail",
+    "count": 3
+  },
+  {
+    "policy": "stamp-posture-7-0-0",
+    "result": "pass",
+    "count": 1
+  },
+  {
+    "policy": "stamp-posture-7-0-0",
+    "result": "skip",
+    "count": 40
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "finding": "Default INPUT referenced missing publication-final-source-manifest.json; relative output failed when interpreted from temporary clone",
+  "correction": "Default reads retained publication-delivered-source-manifest.json and CLI manifest/output are resolved before cloning",
+  "actual_validation": {
+    "cwd": "/private/tmp",
+    "explicit_manifest_argument": false,
+    "output_argument": "pavf-default-relative-export-proof-20261004",
+    "exit": 0,
+    "nine_published_reverse_apply_checks": "PASS",
+    "log": "published-export-default-input-and-relative-output.log",
+    "log_sha256": "85d84fcfe33640333cd4a484a48439b145a4d303aab6e356e7eadbdb3f12068c"
+  },
+  "exporter_sha256": "48fc02d8e2c074b01b4783b9a8923a9e46e8c3898a7033be3c2cf537a9f8b355",
+  "published_bundle_manifest_sha256": "03e976f02c69eff3779bcdb85e3abd1d55bfac66d363b0391fafd637b19d16f6",
+  "earlier_proofs_preserved": true,
+  "source_worktrees_changed": false
+}

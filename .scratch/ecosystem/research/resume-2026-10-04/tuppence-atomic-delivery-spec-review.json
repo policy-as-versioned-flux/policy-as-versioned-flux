@@ -1,0 +1,48 @@
+{
+  "result": "PASS",
+  "scope": "Exact atomic A delivery source; no live activation or composition B publication asserted",
+  "head": "0dd1cf6987f04484a00141b2a962a3e69af200f8",
+  "tree": "f8ad854469bfe76f591c72746d76334e7d1fa290",
+  "base_and_pinned_A_commit": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "genuine_tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e",
+  "normal_ssh_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0",
+  "independent_offline_tag_trust": {
+    "Git": true,
+    "Rekor": true,
+    "certificate_claims": true,
+    "identity": "https://github.com/policy-as-versioned-tuppence/tuppence/.github/workflows/cut-release.yml@refs/heads/main",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "tlog_index": "3077499916"
+  },
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json"
+  ],
+  "file_sha256": {
+    "composed/HEADER.yaml": "bcd6fad78cd339c345f2ef6606bd515ce31d6cc3681a1e80165d5bc7878adc70",
+    "gitops/composed/composed-set.yaml": "ec4974e339c6d3c0b6656b90701f068c42f9193593344ce2ed5a787500b66c19",
+    "gitops/flux-system/gotk-sync.yaml": "fdd242a22ec42606e0583ad84cf5c3dce9008ce7c008063fb98f96f1ad4aeb15",
+    "inventory/PROVENANCE.json": "aabe367897040d6b7113b3087c2bc9c239efa889e3aa3f8cf0eec691e105d690"
+  },
+  "inventory_bytes_and_all_scan_metadata_preserved": true,
+  "unchanged_real_immutable_image_graph": [
+    "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5"
+  ],
+  "primary_raw_reports_reproduce_native_rows": true,
+  "versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "full_signature_gates": true,
+  "engine_and_cloud_source_unchanged": true,
+  "receipts_sha256": {
+    "tuppence-atomic-delivery-candidate.json": "c30b93166577a84078e9ea9cf91d7aea67855a65f13d93fe92ba2fc64f8e38b3",
+    "tuppence-atomic-delivery-final-checks.json": "c961b0c56e5c8c1225066a620926544072c2f9b8eb3f681a7daa8367ee998d42",
+    "tuppence-source-A-authentic-release.json": "f1696e1c4b856948c76bf43c7cbe0ed549c743105c2a8b6bad29cd773738b0d7"
+  },
+  "source_edits": false,
+  "external_mutations": false
+}

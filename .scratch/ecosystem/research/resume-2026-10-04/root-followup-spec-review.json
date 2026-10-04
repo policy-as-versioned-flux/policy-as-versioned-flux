@@ -1,0 +1,42 @@
+{
+  "axis": "Spec",
+  "result": "PASS \u2014 no actionable finding in reviewed followup scope",
+  "baseline": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+  "reviewed_commit": "5bc47331a536476f3580542be794908f5053f816",
+  "source_sha256": {
+    "twin/valuation.py": "d859628b0e82315defecd2ad085bb6df754107b91ac123d78a8958828c259ccf",
+    "tests/test_valuation_currency.py": "f57bab8ca237795a1faaac16d528261c96353a1ffa4ee9745604bd667472e4b2",
+    "tests/test_loophole_adr_0026.py": "fd05d371b9a7b05e444abdbfe34f0f7cb19d1ff1c8dadd88fc9f8df304fc2350"
+  },
+  "findings": [],
+  "contract": {
+    "foreign_currency": "A signed FX payload covers its named calendar month. Foreign currency requires a valid party.size.as_of calendar date and equal YYYY-MM; missing, malformed or out-of-month instruments raise MissingInstrument.",
+    "native_currency": "Same-currency rederivation retains its existing early return; no unrelated FX/date instrument is required.",
+    "emitter": "Real adopter valuation_amount wrappers catch MissingInstrument as CannotLook; public producer returns 3 without fabricating a rate or accepted price. Exact tag/commit and keyless identity verification remain ahead of foreign-currency rederivation.",
+    "fixture": "Only copied ADR0026 party loses its unrelated CVE edge when genuine inventory is absent. Inventory-bearing layouts keep the edge and copied real instrument. New public-composer negative regression restores the real edge and requires missing-instrument refusal."
+  },
+  "evidence": {
+    "valuation": "Root recorded meaningful red 6 / pass 1, then green 7 / fail 0; no repeated unchanged test run.",
+    "typecheck": "Root CI-style mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores passed 205 source files; valuation-only typecheck also passed.",
+    "fixture": "Independent actual apps3.0.1 old-isolated and inventory-bearing new-native runs each passed all 27 cases; prior copytree failures and legitimate original-CVE refusal retained as separate red records.",
+    "spec": "Issue144 requires signed dated FX for USD figures reported in GBP; ADR0032 requires priced conclusions from named admissible published evidence.",
+    "caller_review": "Read actual adopter producer valuation_amount pin/tag/commit/gitsign/public-payload path and MissingInstrument\u2192CannotLook mapping; no producer default-money behavior introduced."
+  },
+  "publication_data": {
+    "scan": ".scratch/ecosystem/research/resume-2026-10-04/root-followup-spec-data-scan.json",
+    "files": 207,
+    "high_confidence_credentials_found": false,
+    "claim_checks": [
+      "Current PR body preserves live coverage-floor red status and does not claim overall green CI.",
+      "Foundation completed six release claims match the authentic cut/release/tag receipts already reviewed.",
+      "Historical invalid Ludlow conversion is explicitly a negative semantic record and removed from adopter candidate; it is not an accepted or served price.",
+      "December2025 HMRC primary evidence is prospective FX2 source, not an already published instrument."
+    ]
+  },
+  "remaining_conditions": [
+    "Normal corrected-hub source delivery and actual pinned producer replay remain required.",
+    "December2025 FX2 must pass its independent publisher gates and genuine signed release before Ludlow can consume that instrument.",
+    "Fresh adopter exact-head review remains required; old SourceA approvals do not approve later pin/data deltas."
+  ],
+  "scope_limit": "Read-only implementation review; no source edits, external mutations or overall CI/observational admission claim."
+}

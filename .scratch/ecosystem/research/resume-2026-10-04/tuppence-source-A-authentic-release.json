@@ -1,0 +1,19 @@
+{
+  "observed_at": "2026-10-04T10:23:16.882982+00:00",
+  "institution": "tuppence",
+  "tag": "v4.0.0",
+  "tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e",
+  "peeled_commit": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "reviewed_source": "d1dbe766e09bb8112efa609836af0aa95cbe0ee4",
+  "cut_run": 37195060525,
+  "release_run": 37195133182,
+  "github_release": "https://github.com/policy-as-versioned-tuppence/tuppence/releases/tag/v4.0.0",
+  "published_at": "2026-10-04T10:22:11Z",
+  "draft": false,
+  "prerelease": false,
+  "git_signature": true,
+  "rekor_entry": true,
+  "certificate_claims": true,
+  "delivery_edits_may_begin": true,
+  "live_delivery_claimed": false
+}

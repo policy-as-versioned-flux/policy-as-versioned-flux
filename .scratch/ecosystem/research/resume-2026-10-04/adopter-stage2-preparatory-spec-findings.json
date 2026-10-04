@@ -1,0 +1,101 @@
+{
+  "axis": "Spec",
+  "status": "Preparatory findings only; no exact-head final approval",
+  "source_locator": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-isolated.json",
+  "snapshots": {
+    "driftwood": {
+      "head": "aa923631de95276615e4985e67ee41971efacf25",
+      "working_sha256": {
+        "party.yaml": "21aa2562d04a2ce3048fdce16a4abf5a1f66c43319a7aeb2aa18876c7ed27570",
+        "twin/PIN.yaml": "eddefe91847ad5b683918f38e275b48e4a840ed1f8e4c79c679eb03f7fbbcac1",
+        "twin/emit-forward-intel.py": "5868e4b2e908580ea978007bff62a976c9fa27ef68cb2f35536a939a451c738d",
+        ".github/workflows/twin-sweep.yml": "372e83f2ee2c6ee1d0741907167c15ad715d480712032e3ba53da619d84b542b",
+        ".github/platform-tools-pin.yaml": "988fbc16fdfa5f444398373e6534a4549f43b366f62536af0511bb9f6183bdd9",
+        "inventory/PROVENANCE.json": "8da9a8d9f71fdc0e50e4e7fb24fabd6f8873fc818d8ca9cd0a90309870ba5c5a",
+        "gitops/flux-system/gotk-sync.yaml": "1ef771ce6175c4fae4af409ac7949f7505d2678f68a51734b8ce381bacf81ad7",
+        "gitops/flux-system/gotk-sync-fx.yaml": "065d2741dc76e9faa5ee46f745fc4e731d6ca9d7bd30dc09ffb24f15f3b32ff0",
+        "gitops/composed/composed-set.yaml": "0ba77134b5d82e7df0bd8a571fc43ba532c910130e7dc670e9eac51b3ee8cd1e",
+        "gitops/engine/kyverno.yaml": "b9b4f35f4509e4b7c5988a08b405d7bae291e122fcdcb023e148482aeb879de1"
+      }
+    },
+    "tuppence": {
+      "head": "c70edb11086527c439b9adbc094eca6140136ae0",
+      "working_sha256": {
+        "party.yaml": "540033f6a7262fc3dcf740602cd5c068b130d8af4fe910c73a05f6763ed08113",
+        "twin/PIN.yaml": "9f8babd7f835722d51162dbc1490019fe9805d36694192cf52ba4508d04c9d89",
+        "twin/emit-forward-intel.py": "57d74da57fe19b77cfb004219e60855ea8eae08182e9a46284ba2fcd3da8677c",
+        ".github/workflows/twin-sweep.yml": "48ba413d537ccf9a52f58e6cd205b5ce66d2e5472a54ce0b4a50fa1fa08ae192",
+        ".github/platform-tools-pin.yaml": "988fbc16fdfa5f444398373e6534a4549f43b366f62536af0511bb9f6183bdd9",
+        "inventory/PROVENANCE.json": "3768554fe1cedb3a79a0a71674eeb5920e1b72a58cbe9e9dc98efe0638077f55",
+        "gitops/flux-system/gotk-sync.yaml": "92415e7e5c5cb987b0ef5cfa913ace6e4b03bbadddfa4f337b099940f3b06bc7",
+        "gitops/flux-system/gotk-sync-fx.yaml": "065d2741dc76e9faa5ee46f745fc4e731d6ca9d7bd30dc09ffb24f15f3b32ff0",
+        "gitops/composed/composed-set.yaml": "be1216bfb2b92705d08c85d07fc30f1d05fcafad928c848bbee5b9d803b96752",
+        "gitops/engine/kyverno.yaml": "98c5732422f811d75507441f4164f758f97bde2ee803ba70e0a488d597588f30"
+      }
+    },
+    "ludlow": {
+      "head": "4f81da7eca50ae9adadcb905813cf06f17a5d9a1",
+      "working_sha256": {
+        "party.yaml": "08f65d7c62164d03df8e1b3a0fe0f69d32f5ec9f494f621aba22452b85d0d884",
+        "twin/PIN.yaml": "9f8babd7f835722d51162dbc1490019fe9805d36694192cf52ba4508d04c9d89",
+        "twin/emit-forward-intel.py": "91a909768cd04a7c7d04fcc81208c5c3ae6a7d92e86e36f3dcac5ac07579e98d",
+        ".github/workflows/twin-sweep.yml": "ac39c42696f505f66656a9943d589d559b6dd3f0e470e2d9f5169f1bb9a05ae3",
+        ".github/platform-tools-pin.yaml": "988fbc16fdfa5f444398373e6534a4549f43b366f62536af0511bb9f6183bdd9",
+        "inventory/PROVENANCE.json": "fc608573dae988e8339bc9ca58a2449724364d40ea85eac2f6d38f1da82b2e0e",
+        "gitops/flux-system/gotk-sync.yaml": "7884df0e2b2119899d5d79c34cef9dcd2e8c84aa30f0a0e68487f256556f4d25",
+        "gitops/flux-system/gotk-sync-fx.yaml": "065d2741dc76e9faa5ee46f745fc4e731d6ca9d7bd30dc09ffb24f15f3b32ff0",
+        "gitops/composed/composed-set.yaml": "96d99b2a4f177b08f91dd64247ad5df1aa11af6e080fbfb2665b60ee74210e55",
+        "gitops/engine/kyverno.yaml": "abdcd1740f14d327626d54401c6a487dd96195bba993de3ef8ef0f401aed51a1"
+      }
+    }
+  },
+  "implementation_findings": [
+    {
+      "priority": "P2",
+      "subject": "Ludlow scheduled twin cannot acquire declared FX instrument",
+      "paths": [
+        "ludlow/.github/workflows/twin-sweep.yml",
+        "ludlow/twin/emit-forward-intel.py:287"
+      ],
+      "behavior": "Twin read job checks out adopter and pinned hub but not feeds; gitsign install is inside tag_cut:true branch although current twin PIN tag_cut:false. Foreign USD valuation always reads HUB/.estate-clone/feeds and invokes gitsign. Clean runner therefore CannotLook even after authentic FX2 exists; successful local replay has extra source/tool context.",
+      "required_fix": "Provide the actual FX tag+commit checkout and checksummed verifier in existing read-only twin job. Preserve pin verification, contents:read, isolated writer hold and code/write token separation.",
+      "owner_notified": "cloud_plane and root"
+    }
+  ],
+  "authored_claim_findings": [
+    {
+      "subject": "Current Ludlow prose contradicts explicit threshold3 declaration",
+      "paths": [
+        "ludlow/twin/emit-forward-intel.py top docstring",
+        "ludlow/twin/VENDORED.md",
+        "ludlow/twin/orgs/ludlow/edges/member-records-loss-cuts-plan-administration-fees.yaml note",
+        "ludlow/twin/orgs/ludlow/scenarios/penalty-published-2026.yaml note",
+        "ludlow/twin/orgs/ludlow/components/plan-administration-fees.yaml description"
+      ],
+      "behavior": "Current prose asserts no size/amount, mandatory local grade1/2 and threshold2 refusal, although party declares size and pricing_threshold3. Actual code retains grade3 comparable/not-observed evidence and computes rests_on_grade3; no silent regrade found.",
+      "required_fix": "Explain actual explicit comparable-evidence admission, while preserving grade3/not-observed and grade5 mitigation absence.",
+      "owner_notified": "cloud_plane owns fresh docs"
+    },
+    {
+      "subject": "Tuppence/Ludlow first actual emission declaration date",
+      "paths": [
+        "tuppence/twin/emit-forward-intel.py PUBLISHED_AT",
+        "ludlow/twin/emit-forward-intel.py PUBLISHED_AT"
+      ],
+      "behavior": "Current September4 constant predates actual first publication preparation. Locally retained genuine v1.0.0/v1.1.0/v2.0.0/v3.0.0/v3.0.1 tags contain no forward-intel feed for either adopter.",
+      "required_fix": "Use explicit authored October4 declaration for first genuine emission; retain immutable historical tags.",
+      "owner_notified": "root"
+    }
+  ],
+  "version_conclusion": "No additional 1.0.1 required for T/L unserved candidate refreshes: authentic retained old releases have no forward feed. D old v1/1.0.0 is unchanged and new unserved major v2/2.0.0 already expresses its measured shape change. Whole adopter sourceA signature does not override own envelope contracts, but no already published version is being restated here.",
+  "retained_contracts": [
+    "Tools and implementations independently pin authentic v5.0.0/703eff6; generated policy5/6/7 coexist.",
+    "Institutional acceptances explicitly record owner delegation, not human preparation.",
+    "Apps+inventory retain actual3.0.1 bootstrap and original primary scanner/database times; no rescan/relabel claim.",
+    "Current composed3.0.0 pointer/5-only array remain real until atomic sourceA apps/provenance/composedA delivery move plus exact rerender.",
+    "SourceA\u2192post-pin rerender\u2192ordinary compositionB\u2192composedB rerender protocol remains necessary.",
+    "Engine1.18.2 and cloud false are retained; no scheduled engine baseline, cloud trigger, AWS activation or retirement inferred.",
+    "No actual Pod workload-price binding added; missing risk remains absent rather than invented green."
+  ],
+  "limits": "Working source is being revised by its owner. Genuine FX2 and corrected published hub producer replay and fresh signed exact-head review remain required. No broad tests rerun."
+}

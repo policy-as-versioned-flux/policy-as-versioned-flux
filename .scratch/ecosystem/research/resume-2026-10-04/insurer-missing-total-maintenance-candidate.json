@@ -1,0 +1,34 @@
+{
+  "directory": "/private/tmp/pavf-insurer-maintenance-20261004",
+  "branch": "maintenance/2026-10-04-missing-exposure-total",
+  "head": "16b4857260f12458e5e0c797b2f99c60b1e03295",
+  "tree": "edad5232c2c12086406140142ae1635f1c59b444",
+  "base": "32ea73d5757ee4fc9d136ab9900ffed81d6c6eed",
+  "SSH_signature": "G",
+  "clean": true,
+  "changed_paths": [
+    "pricing/quote.py",
+    "pricing/test_quote_missing_total.py",
+    "verify-insurer-quote.sh"
+  ],
+  "red_errors": 2,
+  "green_tests": 4,
+  "existing_formula_selfcheck_exit": 0,
+  "public_verifier_selfcheck_exit": 0,
+  "focused_mypy_exit": 0,
+  "authentic_LU_B_None_refuses_without_pricing": true,
+  "no_missing_total_to_zero": true,
+  "legacy_insurer_cloud_pin_mismatch_not_changed": true,
+  "remote_mutations": false,
+  "negative_high_confidence_changed_source_scan": true,
+  "artifacts_sha256": {
+    "insurer-missing-total-regression-red.log": "ce64e9d36b5c05e384bc72f4d9c0e553d547d93989159785226958fe6e2788a2",
+    "insurer-missing-total-regression-green.log": "c607aaa9eb9348c2535677e7d014f7a29f1b354e063c5baa88a63586e12e73d8",
+    "insurer-missing-total-existing-selfcheck.log": "3f33676e3eeb18774d762a7f1df02ae807df0ecbff6d4e718290ae63170b2d97",
+    "insurer-missing-total-public-selfcheck.log": "91eacdc0ccf244c6be54df506903316b72cc8be195b0328ee913652f42134fe6",
+    "insurer-missing-total-mypy.log": "5d4b6d285b77932e3d08212c3b4974d0a803f98ec60408ac6ccf6a063fa6c19e",
+    "insurer-missing-total-authentic-exposure-replay.json": "2cd1075b976b9d4802e251dc736e31a58f3b9d29c02ebf4b4f6f4c53fcbf2f09",
+    "insurer-missing-total-source-signature.log": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907",
+    "insurer-missing-total.patch": "d61648f0c407924bd20f9c1506fc60983353efadfee0bdf71ef6fc09401374ae"
+  }
+}

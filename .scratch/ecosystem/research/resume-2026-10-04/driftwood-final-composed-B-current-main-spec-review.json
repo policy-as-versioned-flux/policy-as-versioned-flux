@@ -1,0 +1,38 @@
+{
+  "verdict": "PASS",
+  "findings": [],
+  "reviewed_at": "2026-10-04T12:47:34.482231+00:00",
+  "head": "2dd89404f699a4af70e6a44451793347a4af11ef",
+  "tree": "510b579cfc616e822cef0a59955acd5b3a1f921b",
+  "candidate_parent": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "institution": "driftwood",
+  "packet_sha256": "b277eb8ee06ea6a20ea408f74b6416c7246acf7bcbf3c0a1996d8b93d6b40b80",
+  "source_check_sha256": "afcc4e786bd404ad4d19913bcec2eba1f826138dc8d3f6d3dc4da2225601197d",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "checks": {
+    "exact_signed_clean_source": true,
+    "authentic_A_and_B_tag_objects_match": true,
+    "apps_and_inventory_provenance_remain_A": true,
+    "primary_raw_trim_and_inventory_equal": true,
+    "HEADER_only_after_fingerprint": true,
+    "all_other_bytes_preserved_against_actual_parent": true,
+    "complete_5_6_7_array_and_four_signature_gates": true,
+    "genuine_703_compose_and_byte_verify": true,
+    "genuine_B_reach": true,
+    "exact_head_institutional_none_gate": true,
+    "postcommit_real_layout_tests": 3,
+    "postcommit_real_layout_skips": 0,
+    "all_checked_receipt_hashes_match": true
+  },
+  "retained_engine": "1.18.2",
+  "cloud_activation": false,
+  "live_or_scheduled_observation_claimed": false,
+  "historical_negatives_preserved": true,
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false,
+  "genuine_clock_main_and_three_clock_file_changes_preserved": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "supersedes_source_review_only": "Historical 226a319 review does not authorize this new source; independently reviewed 2dd89404."
+}

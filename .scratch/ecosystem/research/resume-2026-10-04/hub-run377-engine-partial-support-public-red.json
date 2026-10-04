@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_verifier_snapshots.py",
+    "-v"
+  ],
+  "exit": 1,
+  "log_sha256": "9a8246bfac5a126036767c5db66b416fb8281479a573220892c9fd380786f44e",
+  "old_all_supported_predicate_retained_for_red_regression": true
+}

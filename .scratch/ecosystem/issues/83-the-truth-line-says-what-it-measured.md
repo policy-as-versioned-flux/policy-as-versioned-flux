@@ -273,3 +273,7 @@ scheduled runs, and a branch's line would enter `main`'s `talk/truth.log` if tha
 without a rebase. Checked on 2026-09-04: every `hub=` commit in `main`'s log is an ancestor of
 `main`, so the citable record is clean today. Worth a rule (record only on the default branch, or
 mark a branch run in the line) before it is not.
+
+## Regression acknowledgement, 2026-10-04
+
+**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/truth-line/verify-truth-line.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: three discovered checks lacked manifest rows; Spec owns the exact source classification/entrypoint correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed hub source `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`, with exact manifest/entrypoint repairs and independent review; publication and its next actual collector grade remain separate.

@@ -1,0 +1,6 @@
+tlog index: 3077567855
+gitsign: Signature made using certificate ID 0x9c83b193d4db3f8ec85887f2b45c0729fbbc7b1c | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true

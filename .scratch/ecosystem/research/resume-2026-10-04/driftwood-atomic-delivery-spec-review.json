@@ -1,0 +1,52 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent exact-head Spec review of atomic Source A delivery; subsequent Composition B needs fresh published-main render/review",
+  "institution": "driftwood",
+  "head": "98d13782173342bbdfbd14271e1626e3b11b0d73",
+  "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "base_genuine_A": {
+    "tag": "v4.0.0",
+    "tag_object": "bff31936b9e34074a7ce078e873d3a0df31ecd35",
+    "commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+    "tlog_index": "3077567350"
+  },
+  "packet_sha256": "5c233b0bbd1866562c32b0aac2f160fed1e19b9ad11be7c1eaa0074b52701b09",
+  "normal_SSH_signature": "G",
+  "clean": true,
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json"
+  ],
+  "inventory_sha256": "3673e27a8447f33a48430ec6b586ffd7732a352363b7cc533c5df23af428ecca",
+  "native_graph_primary_trim": "PASS",
+  "non_apps_primary_metadata": "unchanged",
+  "HEADER_only_delta": "comparison-inputs.after",
+  "comparison_after": "40282e7a51941ab5c974ee362d75d6124d05f776f2ea16348949e1e64c9584cf",
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "all_four_gitsign_gates": true,
+  "authentic_tools_compose_verify_reach_exits": [
+    0,
+    0,
+    0
+  ],
+  "postcommit_real_layout_exit": 0,
+  "institutional_gate": {
+    "composed_bump": "none",
+    "declared_bump": "none",
+    "added": [],
+    "retired": [],
+    "reasons": [],
+    "weaker_than_declared": false
+  },
+  "engine": "1.18.2",
+  "cloud_and_live_activation_claims_added": false,
+  "findings": [],
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

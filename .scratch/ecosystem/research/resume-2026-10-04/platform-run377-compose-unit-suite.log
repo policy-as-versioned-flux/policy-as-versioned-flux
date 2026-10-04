@@ -1,0 +1,208 @@
+.....FFFFFFF.....................................FF.FFFFF...........................................EEE.
+======================================================================
+ERROR: test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine (test_workload_risk.WorkloadRisk.test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine) (party='driftwood')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_workload_risk.py", line 131, in test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine
+    spec.loader.exec_module(lane)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 755, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 892, in get_code
+  File "<frozen importlib._bootstrap_external>", line 950, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/pavf-run377-platform-estate-20261004/driftwood/drift/oscal_lane.py'
+
+======================================================================
+ERROR: test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine (test_workload_risk.WorkloadRisk.test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine) (party='tuppence')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_workload_risk.py", line 131, in test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine
+    spec.loader.exec_module(lane)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 755, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 892, in get_code
+  File "<frozen importlib._bootstrap_external>", line 950, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/pavf-run377-platform-estate-20261004/tuppence/drift/oscal_lane.py'
+
+======================================================================
+ERROR: test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine (test_workload_risk.WorkloadRisk.test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine) (party='ludlow')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_workload_risk.py", line 131, in test_the_lane_joins_the_actual_bound_decision_with_its_pinned_engine
+    spec.loader.exec_module(lane)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 755, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 892, in get_code
+  File "<frozen importlib._bootstrap_external>", line 950, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/pavf-run377-platform-estate-20261004/ludlow/drift/oscal_lane.py'
+
+======================================================================
+FAIL: test_control_and_namespace_changes_retain_their_original_comparison (test_comparison_history.ComparisonHistory.test_control_and_namespace_changes_retain_their_original_comparison)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_comparison_history.py", line 90, in test_control_and_namespace_changes_retain_their_original_comparison
+    self.assertIn('baseline-widening', kinds)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'baseline-widening' not found in []
+
+======================================================================
+FAIL: test_corrupt_recorded_inputs_refuse_instead_of_bootstrapping (test_comparison_history.ComparisonHistory.test_corrupt_recorded_inputs_refuse_instead_of_bootstrapping)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_comparison_history.py", line 123, in test_corrupt_recorded_inputs_refuse_instead_of_bootstrapping
+    self.assertEqual(result['outcome'], 'refused')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'composed' != 'refused'
+- composed
++ refused
+
+
+======================================================================
+FAIL: test_legacy_refresh_records_existing_state_without_inventing_lost_transition (test_comparison_history.ComparisonHistory.test_legacy_refresh_records_existing_state_without_inventing_lost_transition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_comparison_history.py", line 71, in test_legacy_refresh_records_existing_state_without_inventing_lost_transition
+    self.assertEqual(refreshed['deltas'], [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'kind': 'new-untagged-pin', 'source': 'f[486 chars]ed"}] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+{'kind': 'new-untagged-pin', 'source': 'fixture-publisher', 'name': 'cve', 'version': 'v1', 'perspective': 'fixture-adopter14', 'currency': 'GBP', 'amount': 2552.807873377145, 'priced_by': 'fixture-publisher cve@v1: the exposure the pin prices, read off a feed no signed tag carries', 'detail': "fixture-adopter14 pins fixture-publisher/cve@v1 and no signed tag cve/v1.x.y (or v1.x.y) exists on the fixture-publisher parent's checkout, which carries 1 tag(s) of its own; 2552.81 GBP of exposure is booked against an unsigned feed"}
+
+Diff is 644 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_malformed_history_and_changed_replay_inputs_refuse (test_comparison_history.ComparisonHistory.test_malformed_history_and_changed_replay_inputs_refuse)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_comparison_history.py", line 52, in test_malformed_history_and_changed_replay_inputs_refuse
+    self.assertEqual(result['outcome'], 'refused')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'composed' != 'refused'
+- composed
++ refused
+
+
+======================================================================
+FAIL: test_next_source_transition_advances_history_then_replays (test_comparison_history.ComparisonHistory.test_next_source_transition_advances_history_then_replays)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_comparison_history.py", line 35, in test_next_source_transition_advances_history_then_replays
+    self.assertEqual([d['kind'] for d in closed['deltas']], ['closed-untagged-pin'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != ['closed-untagged-pin']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'closed-untagged-pin'
+
+- []
++ ['closed-untagged-pin']
+
+======================================================================
+FAIL: test_publisher_version_comparison_survives_save_and_replay (test_comparison_history.ComparisonHistory.test_publisher_version_comparison_survives_save_and_replay)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_comparison_history.py", line 108, in test_publisher_version_comparison_survives_save_and_replay
+    self.assertEqual(feed['old_version'], 'v1')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'v2' != 'v1'
+- v2
++ v1
+
+
+======================================================================
+FAIL: test_restatement_cage_transition_replays_then_advances_on_next_source_edit (test_comparison_history.ComparisonHistory.test_restatement_cage_transition_replays_then_advances_on_next_source_edit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_comparison_history.py", line 154, in test_restatement_cage_transition_replays_then_advances_on_next_source_edit
+    self.assertFalse(changed['cages'][0]['changed'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_explicit_null_history_is_invalid_not_an_absent_legacy_record (test_floor_change.FloorChange.test_explicit_null_history_is_invalid_not_an_absent_legacy_record)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_floor_change.py", line 142, in test_explicit_null_history_is_invalid_not_an_absent_legacy_record
+    self.assertEqual(doc['outcome'], 'refused')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'composed' != 'refused'
+- composed
++ refused
+
+
+======================================================================
+FAIL: test_floor_change_with_no_selected_tier_change_still_records_zero (test_floor_change.FloorChange.test_floor_change_with_no_selected_tier_change_still_records_zero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_floor_change.py", line 82, in test_floor_change_with_no_selected_tier_change_still_records_zero
+    self.assertTrue(changed['floor_change']['changed'])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None is not true
+
+======================================================================
+FAIL: test_lowering_is_visible_without_changing_publisher_comparison (test_floor_change.FloorChange.test_lowering_is_visible_without_changing_publisher_comparison)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_floor_change.py", line 31, in test_lowering_is_visible_without_changing_publisher_comparison
+    self.assertEqual(effect['before'], {'known': True, 'value': 'isolated'})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'known': False} != {'known': True, 'value': 'isolated'}
+- {'known': False}
++ {'known': True, 'value': 'isolated'}
+
+======================================================================
+FAIL: test_malformed_recorded_history_refuses_instead_of_guessing (test_floor_change.FloorChange.test_malformed_recorded_history_refuses_instead_of_guessing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_floor_change.py", line 130, in test_malformed_recorded_history_refuses_instead_of_guessing
+    self.assertEqual(doc['outcome'], 'refused')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'composed' != 'refused'
+- composed
++ refused
+
+
+======================================================================
+FAIL: test_publisher_move_is_held_at_current_inputs_for_both_floor_sides (test_floor_change.FloorChange.test_publisher_move_is_held_at_current_inputs_for_both_floor_sides)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_floor_change.py", line 101, in test_publisher_move_is_held_at_current_inputs_for_both_floor_sides
+    self.assertNotEqual(price['old_price'], price['new_price'])
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 5105.61574675429 == 5105.61574675429
+
+======================================================================
+FAIL: test_removal_is_known_absence_not_unknown_history (test_floor_change.FloorChange.test_removal_is_known_absence_not_unknown_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_floor_change.py", line 53, in test_removal_is_known_absence_not_unknown_history
+    self.assertTrue(effect['changed'])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: None is not true
+
+======================================================================
+FAIL: test_tightening_prices_retained_residual_not_uncaged_exposure (test_floor_change.FloorChange.test_tightening_prices_retained_residual_not_uncaged_exposure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_floor_change.py", line 59, in test_tightening_prices_retained_residual_not_uncaged_exposure
+    self.assertEqual((line['before_tier'], line['after_tier']), ('baseline', 'isolated'))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (None, 'isolated') != ('baseline', 'isolated')
+
+First differing element 0:
+None
+'baseline'
+
+- (None, 'isolated')
+?  ^^
+
++ ('baseline', 'isolated')
+?  ^^^^^^^  +
+
+
+----------------------------------------------------------------------
+Ran 102 tests in 76.322s
+
+FAILED (failures=14, errors=3)

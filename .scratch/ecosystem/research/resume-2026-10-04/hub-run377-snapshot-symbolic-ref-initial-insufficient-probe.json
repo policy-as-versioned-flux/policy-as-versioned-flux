@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_verifier_snapshots.py",
+    "-v"
+  ],
+  "exit": 0,
+  "log_sha256": "2515ea890b4e72db3b9aa24fe1c3c730344c3e9db4a959ff59fb9c22a325e173",
+  "prior_candidate": "bc9601b8cbf6e5febe03511dc8e1e23320c891d1",
+  "scope": "Initial insufficient fixture probe: source branch still main; observed exit0. Not red proof and not a clock observation.",
+  "superseded_by": "hub-run377-snapshot-remote-closure-red.json"
+}

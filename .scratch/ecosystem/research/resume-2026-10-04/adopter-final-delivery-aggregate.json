@@ -1,0 +1,11 @@
+{
+  "all_three_final_source_deliveries_complete": true,
+  "live_activation_claimed": false,
+  "primary_receipts_sha256": {
+    "driftwood-final-delivery-complete.json": "7b2be8b1eec67c7b49ab89b8bcf99f05186abea164c6083a479bb92d38d176dc",
+    "ludlow-delivery-complete.json": "61e004efa2a9d4d5990cfde21f08378dda5839d35d78046b4a47830249e0ebaa",
+    "tuppence-final-delivery-complete.json": "f49b64939aa994e568ff527c7c108fd09fffae01fdb94d4166c4e37c994df864"
+  },
+  "current_aggregate": "delivery-report.md",
+  "prior_aggregate_preserved": "delivery-report-before-final-pointer-completion.md"
+}

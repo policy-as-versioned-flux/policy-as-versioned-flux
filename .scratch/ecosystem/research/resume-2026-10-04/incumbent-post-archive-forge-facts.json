@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "observed_at": "2026-10-04T09:39:00.873630+00:00",
+  "repositories": {
+    "policy-as-versioned-flux": {
+      "full_name": "policy-as-versioned-flux/policy-as-versioned-flux",
+      "archived": false
+    },
+    "apps": {
+      "full_name": "policy-as-versioned-flux/apps",
+      "archived": true
+    },
+    "readiness-collector": {
+      "full_name": "policy-as-versioned-flux/readiness-collector",
+      "archived": true
+    },
+    "pr-gate-action": {
+      "full_name": "policy-as-versioned-flux/pr-gate-action",
+      "archived": true
+    },
+    "renovate-config": {
+      "full_name": "policy-as-versioned-flux/renovate-config",
+      "archived": true
+    },
+    "handbook-generator": {
+      "full_name": "policy-as-versioned-flux/handbook-generator",
+      "archived": false
+    },
+    "ledger": {
+      "full_name": "policy-as-versioned-tuppence/ledger",
+      "archived": false
+    },
+    "storefront": {
+      "full_name": "policy-as-versioned-driftwood/storefront",
+      "archived": false
+    },
+    "api": {
+      "full_name": "policy-as-versioned-driftwood/api",
+      "archived": false
+    },
+    "reports": {
+      "full_name": "policy-as-versioned-ludlow/reports",
+      "archived": false
+    },
+    "c2p-collector": {
+      "full_name": "policy-as-versioned-flux/c2p-collector",
+      "archived": false
+    },
+    "datastore": {
+      "full_name": "policy-as-versioned-flux/datastore",
+      "archived": false
+    },
+    "cloud": {
+      "full_name": "policy-as-versioned-flux/cloud",
+      "archived": false
+    },
+    "governance-agent": {
+      "full_name": "policy-as-versioned-flux/governance-agent",
+      "archived": false
+    },
+    "policy": {
+      "full_name": "policy-as-versioned-flux/policy",
+      "archived": false
+    },
+    "fleet": {
+      "full_name": "policy-as-versioned-flux/fleet",
+      "archived": false
+    }
+  },
+  "images": [
+    {
+      "image": "ghcr.io/policy-as-versioned-flux/readiness-collector:v1.0.0",
+      "pullable": true,
+      "status": 200,
+      "digest": "sha256:8c5d78146351822a31935cf5e7cfc54bb855d7a1300bdb56ff0311b9d84786cd"
+    }
+  ]
+}

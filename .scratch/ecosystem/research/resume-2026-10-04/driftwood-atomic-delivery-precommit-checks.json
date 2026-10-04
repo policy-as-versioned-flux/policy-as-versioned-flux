@@ -1,0 +1,46 @@
+{
+  "base": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "directory": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+  "estate": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json"
+  ],
+  "engine_and_cloud_declarations_preserved": true,
+  "inventory_and_primary_measurement_preserved": true,
+  "coupled_target_and_gates_match": true,
+  "checks": {
+    "public-tests": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-public-tests.log",
+      "log_sha256": "59dfac589192b6c072efa8c9fe6ba2f66405d339d110599da241e61100cd625c"
+    },
+    "workflow-tests": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".github/tests",
+        "-p",
+        "test_*.py"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-workflow-tests.log",
+      "log_sha256": "f78d387b44b149f600781c1f53859480e8cc027122fa79dfa572996fc2eaf012"
+    }
+  }
+}

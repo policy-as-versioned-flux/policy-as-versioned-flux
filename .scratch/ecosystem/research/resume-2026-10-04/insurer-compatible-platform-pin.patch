@@ -1,0 +1,73 @@
+diff --git a/gitops/platform/platform-pin.yaml b/gitops/platform/platform-pin.yaml
+index b6a75e6..8072cf5 100644
+--- a/gitops/platform/platform-pin.yaml
++++ b/gitops/platform/platform-pin.yaml
+@@ -32,6 +32,12 @@
+ # this party and is not one of its parents. quote.py reads nothing else out of
+ # this checkout: its formula is its own code, so the pin moves no premium by
+ # itself. The premiums move with the exposure pins in party.yaml.
++# 2026-10-04: move the pure-consumer parent to genuine v5.0.0, the existing
++# complete tree containing every current implementations discovery path.
++# The historical v3.3.0 exposure snapshots, signed terms, and all published
++# quote bodies remain unchanged. Future re-quote provenance records this
++# parent move; no premium is changed by editing the pin. No Kustomization
++# or cloud activation is added: this remains a GitRepository document only.
+ apiVersion: source.toolkit.fluxcd.io/v1
+ kind: GitRepository
+ metadata:
+@@ -41,5 +47,5 @@ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-platform/platform
+   ref:
+-    tag: v3.3.0
+-    commit: 38089a68769453db9ea3faf0ee637ae93f309980
++    tag: v5.0.0
++    commit: 703eff6aee959843c4160aa54fd03413f62858cc
+diff --git a/party.yaml b/party.yaml
+index 93f2b7c..5915da4 100644
+--- a/party.yaml
++++ b/party.yaml
+@@ -22,18 +22,22 @@ reporting_currency: GBP
+ # alone -- the pin, which is all the checker reads and all Renovate bumps -- and
+ # no Kustomization: a pure consumer pins the platform without pretending to
+ # reconcile it. The file is the estate's one declared shape for "which signed
+-# version of platform am I on", and this party is on v3.3.0 of it, which is the
+-# fair.py and composition its pricer's arithmetic and its premium line share.
+-# v3.3.0 is the release driftwood, tuppence and ludlow composed their v2.0.0
+-# artefacts under (each v2.0.0 composed/HEADER.yaml names platform 3.3.0 at
+-# 38089a6), so the exposures below and the platform this party prices them
+-# with are one release. It is also a release that carries party/pin_content.py,
+-# the rule pricing/quote.py reads out of this pin (eco-system ticket 77 item 1);
+-# v3.0.0 is the first tag that does. It read v1.1.1 until 2026-09-24. The
+-# release gate's own platform checkout is pinned separately, as verifier
+-# software, in release.yml's env (PLATFORM_TAG); that pin grades this file and
+-# is not a parent. This line and gitops/platform/platform-pin.yaml move
+-# together, always: that is what party_artefact.py checks.
++# version of platform am I on". This party now pins the genuine v5.0.0 complete
++# implementation/tool tree, at 703eff6, which carries party/pin_content.py and
++# every currently declared implementations package. The old v3.3.0 tree lacks
++# the cloud package that the publisher's current catalogue resolves first for
++# the existing unnamed implementations edge. No non-feed member name is
++# invented: the current resolver treats that name as meaningless.
++#
++# This insurer consumes one rule from this tree, party/pin_content.py. Its
++# quote formula and signed terms remain its own. The parent move changes
++# future priced_against provenance, not any existing quote body or premium.
++# The exposure pins below stay at the genuine v2.0.0 releases they name;
++# each was composed under platform v3.3.0 at 38089a6. Moving the verifier
++# parent does not assert that those historical snapshots were re-composed.
++# The release gate's platform checkout is pinned separately, as verifier
++# software, in release.yml's env (PLATFORM_TAG), and is not this parent.
++# This line and gitops/platform/platform-pin.yaml move together, always.
+ #
+ # Each `<adopter>/feed:exposure` edge pins the adopter's OWN signed exposure
+ # section, rendered into its composed artefact by composition.py and signed
+@@ -67,7 +71,7 @@ reporting_currency: GBP
+ # human merges. Moving to a newer adopter tag is a reviewed pull request that
+ # edits these lines; `verify/feed-contract/` resolves them on every gate run.
+ inherits:
+-  - { party: platform,  kind: implementations, version: "3.3.0", since: '2026-08-28' }
++  - { party: platform,  kind: implementations, version: "5.0.0", since: '2026-08-28' }
+   - { party: driftwood, kind: feed, name: exposure, version: "v2.0.0", since: '2026-08-28' }
+   - { party: tuppence,  kind: feed, name: exposure, version: "v2.0.0", since: '2026-08-28' }
+   - { party: ludlow,    kind: feed, name: exposure, version: "v2.0.0", since: '2026-08-28' }

@@ -1,0 +1,37 @@
+{
+  "hub_commit": "5bc47331a536476f3580542be794908f5053f816",
+  "published_main_merge": "14ec4902bcbd4be58ac43e0ab47d0ea1f4c8250d",
+  "published_main_contains_pin": true,
+  "hub_signature_verification": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0\n",
+  "feeds_checkout": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+  "current_FX_pin": "fx/v1.1.0",
+  "scope": "unchanged actual producers, exact clean published corrected hub, genuine existing signedFX1.1 source; local disposable copies only",
+  "adopters": {
+    "driftwood": {
+      "exit": 0,
+      "stdout": "ok  twin/forward-intel/v2/feed.json is byte-identical to a fresh render of the overlay\n",
+      "stderr": "",
+      "correct_semantic_result": true,
+      "result_semantics": "actual same-currency producer exact bytes PASS",
+      "source_forward_intel_unchanged": true
+    },
+    "tuppence": {
+      "exit": 0,
+      "stdout": "ok  twin/forward-intel/v1/feed.json is byte-identical to a fresh render of the overlay\n",
+      "stderr": "",
+      "correct_semantic_result": true,
+      "result_semantics": "actual same-currency producer exact bytes PASS",
+      "source_forward_intel_unchanged": true
+    },
+    "ludlow": {
+      "exit": 3,
+      "stdout": "CANNOT LOOK: pinned FX month 2026-08 has no rate for valuation date 2025-12-31\n",
+      "stderr": "",
+      "correct_semantic_result": true,
+      "result_semantics": "honest missing dated instrument; not emitted or admitted",
+      "source_forward_intel_unchanged": true
+    }
+  },
+  "FX_tag_object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+  "clean_hub_tracked_tree_unchanged": true
+}

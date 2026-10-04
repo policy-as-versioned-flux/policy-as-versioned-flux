@@ -1,0 +1,37 @@
+{
+  "verdict": "PASS",
+  "findings": [],
+  "reviewed_at": "2026-10-04T12:47:34.481192+00:00",
+  "head": "b84006a176e6c783bbb45fc2463c46be6ba73071",
+  "tree": "3cd9ee3f18b4cd5c189e747a540b143988aee073",
+  "candidate_parent": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "institution": "ludlow",
+  "packet_sha256": "f15fd69d81a1fbcc7540ea78bc8d3a84d9a40578db7846a5bd674fecad271f8d",
+  "source_check_sha256": "24e229a05bd8c6f332f48e2d0292480383a468238b3536e8ec81f169cb04cf66",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "checks": {
+    "exact_signed_clean_source": true,
+    "authentic_A_and_B_tag_objects_match": true,
+    "apps_and_inventory_provenance_remain_A": true,
+    "primary_raw_trim_and_inventory_equal": true,
+    "HEADER_only_after_fingerprint": true,
+    "all_other_bytes_preserved_against_actual_parent": true,
+    "complete_5_6_7_array_and_four_signature_gates": true,
+    "genuine_703_compose_and_byte_verify": true,
+    "genuine_B_reach": true,
+    "exact_head_institutional_none_gate": true,
+    "postcommit_real_layout_tests": 37,
+    "postcommit_real_layout_skips": 0,
+    "all_checked_receipt_hashes_match": true
+  },
+  "retained_engine": "1.18.2",
+  "cloud_activation": false,
+  "live_or_scheduled_observation_claimed": false,
+  "historical_negatives_preserved": true,
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false,
+  "gate_semantics": "Same platform pin early return is accurately labelled; composed evidence independently unchanged. Grade-3 comparable valuation is retained, not an observed claim."
+}

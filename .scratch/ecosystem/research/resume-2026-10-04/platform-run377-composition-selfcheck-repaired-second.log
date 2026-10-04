@@ -1,0 +1,20 @@
+OK compose(): the real driftwood composes against its real pinned parents; platform's two formerly-dangling claims are fixed, zero refusals
+OK document: carries outcome, parents[], members[], refusals[], restatements[], cages[], holes[], ungoverned[], prices[], deltas[], limits[]
+OK prices[]: computed on the real driftwood's very first composition too, with no prior signed artefact to compare a bump against -- old and new both price at this run's own pin, an honest 'no move'
+OK prices[]: every entry names its perspective, currency, source and kind, and restates its own amount per customer against driftwood's OWN signed size (240000 customers)
+OK agent-cage: a real-declaration fixture pinned to threat-register@v2 carries ONE twin-agent cage line, unpriced by name: v2 publishes no `scheduled-agent-misuses-write-credential` row -- proposing no rung
+OK agent-cage: with the register pin moved to a major 4 carrying the row, driftwood's twin-agent cage prices at 0.0000 GBP a year (gap 0.00 over 1.0 day(s), frequency [8.4186e-05, 8.4186e-05, 0.00029465]), restricted and quarantine carry baseline's residual, isolated 0; driftwood's own selection policy 1.1.0 picks 'baseline'; the Namespace fold gives 'isolated' with the line and without it
+OK agent-cage: the reach is read off the served tree -- a sweep without contents: write leaves the token paths could-not-look and the pick falls closed to 'isolated'; a pull-request gate without the recompose step, with its drift test commented out, or with the exit after it turned to zero, leaves the proposal path could-not-look and the pick falls to 'quarantine'
+OK prices[]: the insurer's signed quote books as one `premium` cost line under driftwood's own perspective (113403.30 GBP), and the insurer's layer arithmetic stays under its own
+OK prices[]: a quote insuring another party, or booking its premium on another party's sheet, refuses as a missing instrument and prices nothing
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/composition.py", line 9475, in <module>
+    sys.exit(main(sys.argv))
+             ~~~~^^^^^^^^^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/composition.py", line 6040, in main
+    selfcheck()
+    ~~~~~~~~~^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/composition.py", line 6819, in selfcheck
+    assert math.isclose(exposure["total"], sum(e["amount"] for e in priced)), exposure["total"]
+                                           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'

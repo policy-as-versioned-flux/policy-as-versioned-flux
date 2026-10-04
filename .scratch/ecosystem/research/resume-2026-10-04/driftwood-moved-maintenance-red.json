@@ -1,0 +1,11 @@
+{
+  "directory": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/driftwood",
+  "hub": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub",
+  "hub_commit": "5bc47331a536476f3580542be794908f5053f816",
+  "base": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "branch": "maintenance-current-moved-feed-20261004",
+  "source_isolated": true,
+  "publication_hold": "Separate maintenance; refresh actual final-pointer merged-main base, rerender, sign and exact independent reviews required.",
+  "red_exit": 1,
+  "red_output": "PASS: the sweep step under `bash -e` on a fresh copy exits 0 and writes moved=false, swept_at=2026-10-04T12:33:41Z\nFAIL: the sweep step under `bash -e` on a stale feed exits 0 and writes moved=false, swept_at=2026-10-04T12:33:43Z -- wanted exit 0 and moved=true; step said: ok  twin/forward-intel/v2/feed.json is byte-identical to a fresh render of the overlay | ok  twin/signals.yaml: every pin on party.yaml resolves to its row at the pinned version\nPASS: the sweep step under `bash -e` on a stale signal lookup exits 0 and writes moved=true, swept_at=2026-10-04T12:33:46Z\nSKIP: the moved path has not fired live yet: observations/twin-sweep.jsonl carries no line with \"moved\": true (the step is proven offline above; the live firing is the half only the clock can supply, once the overlay or a pin moves under it)\nTOTAL: 2 pass, 1 fail, 1 could-not-look\nFAIL: 1 twin-sweep moved-path check(s) observed false\n"
+}

@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/e2e/step2_reprice.py",
+    "--estate",
+    "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/.estate-clone"
+  ],
+  "exit": 0,
+  "log_sha256": "81f2d2d92f251967ca1155828295f50998b3df097524ee7506bfa9243d801aca",
+  "actual_scheduled_run_regraded": false
+}

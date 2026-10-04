@@ -1,0 +1,9 @@
+    fixture pins fixture/threat-register at v1; v2 is on disk
+test_engine_adopter_probe_preserves_its_real_object_context (test_verifier_snapshots.VerifierSnapshots.test_engine_adopter_probe_preserves_its_real_object_context) ... ok
+test_mixed_policy_window_still_has_unsupported_pairings (test_verifier_snapshots.VerifierSnapshots.test_mixed_policy_window_still_has_unsupported_pairings) ... ok
+test_reprice_probe_preserves_context_before_calling_the_composer (test_verifier_snapshots.VerifierSnapshots.test_reprice_probe_preserves_context_before_calling_the_composer) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.889s
+
+OK

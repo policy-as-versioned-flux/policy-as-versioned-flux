@@ -1,0 +1,25 @@
+{
+  "exit": 3,
+  "lines": [
+    "  ok   accepted refusal (2026-09-05): cage-tier-5-0-0, cage-tier-6-0-0, cage-tier-7-0-0 write 13 field(s) a running pod forbids on UPDATE -- spec.containers[*].name, spec.containers[*].resources.limits, spec.containers[*].securityContext.allowPrivilegeEscalation, spec.containers[*].securityContext.capabilities, spec.containers[*].securityContext.privileged, spec.containers[*].securityContext.readOnlyRootFilesystem, spec.containers[*].securityContext.runAsNonRoot, spec.hostIPC, spec.hostNetwork, spec.hostPID, spec.preemptionPolicy, spec.priority, spec.priorityClassName",
+    "         reason: the shared cage matches UPDATE so that a forged `posture.acme.io/tier` label on a running pod is clobbered back to its Namespace's rung -- the pod label is an OUTPUT only. For a pod whose rung has not changed the mutation writes exactly what the pod already carries, which is why it is admitted and why leg B measures byte-identity on every run. It differs only when the pod's rung CHANGES under it, and the one way that happens is ticket 89's live instance: a pod the guard caged on the bottom rung is given a served-version claim, so `cage-tier` takes it over and rewrites `tier: isolated -> baseline`, `priorityClassName: cage-isolated -> cage-baseline-4-0-0` and `priority: -10000 -> -10`. The last two are immutable on a running pod and the API server refuses the edit. Ticket 89 (S3, delegated, 2026-09-05) decided the refusal is CORRECT: letting it through would be a workload moving itself off the bottom rung by asserting a label, which is the self-service exemption principle 1 bans. A pod's cage is written at admission from what it declared then",
+    "         remediation: recreate the pod with the claim declared, which is the route CONTEXT.md's De-postured entry already describes -- adding a label to a running pod is not a remediation and never was",
+    "         bounded by: leg B (refusal_probe.py) applies each of these bodies to its own output on every run and requires the result to be identical. The acceptance covers a value that CHANGES; it does not cover a body that rewrites a pod it has already caged, and the day one does, leg B goes red rather than this row growing to cover it",
+    "  ??   cloud-cage-rds: platform/implementations/cloud/policies/cloud-cage-rds.yaml carries a mutating policy on a path this scan cannot place: it is not a version tree, not a ResourceSet template and not a composed machinery object, so this scan does not know whether anything delivers it. It is graded for everything that does not turn on the delivery path -- a reference name, the priority trio, the fields it writes on each operation -- and the path itself is a could-not-look",
+    "  ??   cloud-cage-rds (platform/implementations/cloud/policies/cloud-cage-rds.yaml) mutates instances and only the pod's mutability is tabulated here -- not graded",
+    "  ??   cloud-cage-s3: platform/implementations/cloud/policies/cloud-cage-s3.yaml carries a mutating policy on a path this scan cannot place: it is not a version tree, not a ResourceSet template and not a composed machinery object, so this scan does not know whether anything delivers it. It is graded for everything that does not turn on the delivery path -- a reference name, the priority trio, the fields it writes on each operation -- and the path itself is a could-not-look",
+    "  ??   cloud-cage-s3 (platform/implementations/cloud/policies/cloud-cage-s3.yaml) mutates bucketserversideencryptionconfigurations and only the pod's mutability is tabulated here -- not graded"
+  ],
+  "actual_source_policy_names": [
+    "cage-tier-5-0-0",
+    "cage-tier-6-0-0",
+    "cage-tier-7-0-0"
+  ],
+  "same_thirteen_UPDATE_fields_each_named_body": true,
+  "narrowed_name_guard_exit": 1,
+  "narrowed_field_guard_exit": 1,
+  "selfcheck_exit": 0,
+  "selfcheck_log_sha256": "5c3e5ccae8bf1851c8888f6e9f37b7dcd70a3f278506c392757b94af513aa29c",
+  "register_sha256": "914d74777e80c8532f976c4e0694e00cb9c6469f00611e31eb882fc3a5290525",
+  "scheduled_run_regraded": false
+}

@@ -1,0 +1,168 @@
+{
+  "scope": "Separate native admission ordering and current-version moved selfcheck",
+  "directory": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/driftwood",
+  "estate": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone",
+  "base": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+  "checks": {
+    "compose": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        ".github/scripts/platform-tools.py",
+        "--adopter-dir",
+        ".",
+        "--tools-dir",
+        "../platform-tools",
+        "compose",
+        ".",
+        "--estate-clone",
+        ".."
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-compose.log",
+      "sha256": "b8427d5b88e6d2789a51bc7013d852ef776e4c1f81fce305eb1835872c16da5a"
+    },
+    "verify": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        ".github/scripts/platform-tools.py",
+        "--adopter-dir",
+        ".",
+        "--tools-dir",
+        "../platform-tools",
+        "verify",
+        ".",
+        "--estate-clone",
+        ".."
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-verify.log",
+      "sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    },
+    "reach": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "scripts/render_composed.py",
+        "reach",
+        "--ref",
+        "v4.0.1"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-reach.log",
+      "sha256": "6f3c2637b29fb47c1c5c8ba0c1e02463bbedf5f3d6dc9aabb259e168c98350b3"
+    },
+    "public-tests": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-public-tests.log",
+      "sha256": "df16b8d20231c8b639ac7736101bb04e3370d1906ed55754516fa297669c7ad5"
+    },
+    "moved-selfcheck": {
+      "argv": [
+        "bash",
+        "twin/verify-twin-sweep-moved.sh"
+      ],
+      "exit": 3,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-moved-selfcheck.log",
+      "sha256": "82db619d174720e140d40e019de9c5902e7b93250e27690203b07b1fd7118063"
+    },
+    "diff-check": {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-diff-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "source-signature": {
+      "argv": [
+        "git",
+        "verify-commit",
+        "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-source-signature.log",
+      "sha256": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907"
+    },
+    "gate": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        ".github/scripts/adopter-gate.py",
+        "compose",
+        "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/platform",
+        "v4.0.1",
+        "UNRELEASED-DELIVERY-ORDER-MAINTENANCE",
+        "--adopter-dir",
+        "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/driftwood",
+        "--base-ref",
+        "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+        "--head-ref",
+        "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+        "--out",
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-gate.json"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-gate.log",
+      "sha256": "8766164ee36d07a67c2674cf30974f4c787e0975cc0ba9a83f12768b0d030691",
+      "result": {
+        "composed_bump": "none",
+        "declared_bump": "none",
+        "added": [],
+        "retired": [],
+        "reasons": [],
+        "weaker_than_declared": false
+      }
+    },
+    "postcommit-verify": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        ".github/scripts/platform-tools.py",
+        "--adopter-dir",
+        ".",
+        "--tools-dir",
+        "../platform-tools",
+        "verify",
+        ".",
+        "--estate-clone",
+        ".."
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance-postcommit-verify.log",
+      "sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    }
+  },
+  "remote_mutations": false,
+  "cloud_activation": false,
+  "engine_preserved": "1.18.2",
+  "webhook_readiness_claimed": false,
+  "head": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+  "tree": "b2c8a4b5c3ab9f1cf3ef85e86e20776098cd0072",
+  "branch": "maintenance-delivery-order-after-final-20261004",
+  "normal_SSH_signature": "G",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "tests/test_apps_dependencies.py",
+    "twin/verify-twin-sweep-moved.sh"
+  ],
+  "patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-delivery-order-maintenance.patch",
+  "patch_sha256": "1636240bda49b77e0f7c99d0726736266069c7e73ab8fca503d769503be4361f",
+  "file_sha256": {
+    "composed/HEADER.yaml": "52420cb5db23f915b0d5e45a67ba6c83ab6bdf36359fb65cc51fb5ce684fac90",
+    "gitops/flux-system/gotk-sync.yaml": "277148642ca96fc8b5274fc587a8fc945f622cd5dcb7dd69bb7e7a5ccdc88c28",
+    "tests/test_apps_dependencies.py": "898f5ac403e868cb77b70eec82ef7a8f9bdfcdabdef7d75cd3290f61205fdc7a",
+    "twin/verify-twin-sweep-moved.sh": "9c8e1c17b6a553ca25006e7e911f696f198a48981a2953e8de41034ed814893f"
+  },
+  "measured_bump": "none",
+  "source_clean": true,
+  "publication_hold": "Fresh exact Standards/Spec review and ordinary authorized publication"
+}

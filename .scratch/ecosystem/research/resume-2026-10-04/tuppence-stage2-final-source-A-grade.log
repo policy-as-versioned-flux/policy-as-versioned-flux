@@ -1,0 +1,6 @@
+ok  platform checked out at v5.0.0, resolved commit matches the pinned commit field (703eff6aee959843c4160aa54fd03413f62858cc)
+declared (platform tag v4.0.0 -> v5.0.0): major
+composed (this institution, over what this pull request moves -- added ['6.0.0', '7.0.0'], retired []; window at the head is ['5.0.0', '6.0.0', '7.0.0']): major
+acceptance: 6.0.0 is a major, accepted for tuppence by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: "you tell me, you control them all, you don't need me to answer"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-6.0.0.yaml at d1dbe766e09b)
+acceptance: 7.0.0 is a major, accepted for tuppence by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: "you tell me, you control them all, you don't need me to answer"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-7.0.0.yaml at d1dbe766e09b)
+PASS: composed bump is major, admitted: every major this pull request adds is accepted by a record in accepted-majors/ (eco-system ticket 132); v5.0.0 may be adopted

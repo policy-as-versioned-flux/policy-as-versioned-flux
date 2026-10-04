@@ -1,0 +1,14 @@
+E
+======================================================================
+ERROR: test_committed_apps_objects_travel_without_dirty_bytes_or_prior_comparison (test_real_adopter_fixture.RealAdopterFixture.test_committed_apps_objects_travel_without_dirty_bytes_or_prior_comparison)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/test_real_adopter_fixture.py", line 23, in test_committed_apps_objects_travel_without_dirty_bytes_or_prior_comparison
+    before=ct._head_sha(adopter)
+           ^^^^^^^^^^^^
+AttributeError: module 'composition' has no attribute '_head_sha'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.284s
+
+FAILED (errors=1)

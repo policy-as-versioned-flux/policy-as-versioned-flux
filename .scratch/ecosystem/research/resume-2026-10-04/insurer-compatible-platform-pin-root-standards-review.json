@@ -1,0 +1,17 @@
+{
+  "axis": "Standards",
+  "verdict": "PASS",
+  "head": "ed17499668f368c55261729c760904662ab7e242",
+  "tree": "2a6c5ad76dbc710505ffbc48a0f269b644ea522d",
+  "base": "8d4a5ae684e4a58c8242bc8b6e50794473ef302b",
+  "changed_paths": [
+    "gitops/platform/platform-pin.yaml",
+    "party.yaml"
+  ],
+  "source_and_primary_artifact_hashes_checked": true,
+  "normal_signature": "G",
+  "clean": true,
+  "review_sha256": "0b876c98fc161b1f35f421150f9d0de9fd13d7826c2c34cd075a1f013522b796",
+  "hash_audit": "hub-and-insurer-root-standards-hash-audit.json",
+  "substantive_findings": []
+}

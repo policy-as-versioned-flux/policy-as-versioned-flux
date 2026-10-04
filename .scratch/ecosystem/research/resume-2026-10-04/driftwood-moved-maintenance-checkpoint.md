@@ -1,0 +1,9 @@
+Driftwood's separate moved-path selfcheck repair is prepared locally in the checkout recorded by `driftwood-moved-maintenance-checkout.json`. It does not alter the final composed-pointer candidate.
+
+The genuine pinned hub5bc rehearsal reproduces the reported failure: the helper appends a newline to retained `forward-intel/v1/feed.json`, while the actual emitter's declaration is 2.0.0 and its `--check` reads v2. Consequently the planted stale-feed case says `moved=false` and exits 1. The fresh and stale-signal cases already pass; the live evidence half correctly reports SKIP.
+
+The narrow helper repair reads exactly one literal semantic `VERSION` from the real emitter's AST and selects that major's current feed. Its actual workflow shell still executes under `bash -e`. An additional offline case confirms corruption of retained v1 remains `moved=false`. No historical feed bytes or live observation is changed.
+
+The same genuine hub and native producer now yield 4 offline PASS / 0 FAIL plus the unchanged live SKIP exit 3. A disposable fixture with a real emitter declaration 3.0.0 and freshly rendered v3 yields 5 offline PASS / 0 FAIL plus live SKIP; this is a fixture, not a proposed release. Duplicate VERSION and absent declared-current output each refuse with exit 1. Raw logs and hashes are retained in the red/green/fixtures JSON records. The frozen v1 digest remains 4668062dc40058aac100fd768353e220c8ce0276155c9b8c17f78c9a5c16edc2.
+
+The repair is still uncommitted and unserved. Before a separate maintenance PR, refresh its base to actual merged final-pointer main, retain all clock/source bytes, rerender with authentic tools 5, run byte verification and exact-head gate, sign normally, and obtain fresh independent Standards/Spec reviews. It grants no engine upgrade, cloud activation, or live moved-path grade.

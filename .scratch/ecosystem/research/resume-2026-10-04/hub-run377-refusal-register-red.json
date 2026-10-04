@@ -1,0 +1,17 @@
+{
+  "exit": 1,
+  "lines": [
+    "  ??   cloud-cage-rds: platform/implementations/cloud/policies/cloud-cage-rds.yaml carries a mutating policy on a path this scan cannot place: it is not a version tree, not a ResourceSet template and not a composed machinery object, so this scan does not know whether anything delivers it. It is graded for everything that does not turn on the delivery path -- a reference name, the priority trio, the fields it writes on each operation -- and the path itself is a could-not-look",
+    "  ??   cloud-cage-rds (platform/implementations/cloud/policies/cloud-cage-rds.yaml) mutates instances and only the pod's mutability is tabulated here -- not graded",
+    "  ??   cloud-cage-s3: platform/implementations/cloud/policies/cloud-cage-s3.yaml carries a mutating policy on a path this scan cannot place: it is not a version tree, not a ResourceSet template and not a composed machinery object, so this scan does not know whether anything delivers it. It is graded for everything that does not turn on the delivery path -- a reference name, the priority trio, the fields it writes on each operation -- and the path itself is a could-not-look",
+    "  ??   cloud-cage-s3 (platform/implementations/cloud/policies/cloud-cage-s3.yaml) mutates bucketserversideencryptionconfigurations and only the pod's mutability is tabulated here -- not graded",
+    "  FAIL register row cage-tier* names ['cage-tier-5-0-0'] and the served surface matches ['cage-tier-5-0-0', 'cage-tier-6-0-0', 'cage-tier-7-0-0'] -- NOT NAMED: ['cage-tier-6-0-0', 'cage-tier-7-0-0'], and an accepted refusal covers only the policies its row names"
+  ],
+  "actual_source_policy_names": [
+    "cage-tier-5-0-0",
+    "cage-tier-6-0-0",
+    "cage-tier-7-0-0"
+  ],
+  "register_sha256": "4fc40175bdc5f125ed45ecf00a12a5a45e1d2a8e2fb3c92d1c7759916ea75e7d",
+  "scheduled_run_regraded": false
+}

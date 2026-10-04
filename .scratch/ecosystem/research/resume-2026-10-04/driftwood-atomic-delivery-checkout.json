@@ -1,0 +1,10 @@
+{
+  "directory": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+  "estate": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate",
+  "source_A_repository": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+  "source_A_branch_preserved": true,
+  "base": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "branch": "delivery-stage2-atomic-20261004",
+  "release_receipt": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-source-A-authentic-release.json",
+  "external_mutations": false
+}

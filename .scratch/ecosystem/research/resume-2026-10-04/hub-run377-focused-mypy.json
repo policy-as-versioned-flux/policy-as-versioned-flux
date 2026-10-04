@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "mypy",
+    "--explicit-package-bases",
+    "--follow-imports=silent",
+    "--ignore-missing-imports",
+    "verify/_snapshot.py",
+    "verify/map-surface/map_surface.py",
+    "verify/engine-pairing/engine_pairing.py",
+    "verify/e2e/step2_reprice.py"
+  ],
+  "exit": 1,
+  "log_sha256": "9ec4b85529fc10ca0a7c02a98352a3a63a71104f1a0171ac0946dcc8f28b7cfa"
+}

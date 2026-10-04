@@ -1,0 +1,77 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent exact-head Spec for native verifier/test fixture and claim enumeration repair; no publisher release authorization inferred",
+  "head": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "tree": "0a2b87aeacceecf5d5423b2e24df4b6e7db1f1b2",
+  "base": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "packet_sha256": "4a54983579aadfa98b01a50eec58e61b03946b26fcf67eb8371d57ee1e826238",
+  "source_log_patch_hashes_verified": true,
+  "clean_normal_signature": true,
+  "changed_paths": [
+    "compose/composition.py",
+    "compose/fixture_inventory.py",
+    "compose/test_comparison_history.py",
+    "compose/test_floor_change.py",
+    "compose/test_portable_observations.py",
+    "compose/test_real_adopter_fixture.py",
+    "feeds/verify-feeds.sh",
+    "oscal/lint_claims.py",
+    "oscal/test_lint_claims.py"
+  ],
+  "only_changed_composition_functions": [
+    "_adopter_copy",
+    "_commit_header",
+    "selfcheck"
+  ],
+  "all_other_top_level_AST_unchanged": true,
+  "independent_tests": {
+    "real-fixture": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "compose",
+        "-p",
+        "test_real_adopter_fixture.py",
+        "-v"
+      ],
+      "exit": 0,
+      "log_sha256": "f145fcf10b823786eee6e6582b9392ee844edaf7f430894ed0db939d5b13c22d"
+    },
+    "machinery-claims": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "oscal",
+        "-p",
+        "test_lint_claims.py",
+        "-v"
+      ],
+      "exit": 0,
+      "log_sha256": "014f5e3be00980ec3e88916bb03f714782ea92d40b0f0a79be7a81c1d4c3e504"
+    }
+  },
+  "author_checks": {
+    "native_assembled_composition_selfcheck": 0,
+    "compose_103_tests": 0,
+    "oscal_2_tests": 0,
+    "inventory_and_CVE_13_tests": 0,
+    "public_feed_check": 0,
+    "public_oscal_check": 0,
+    "git_diff_check": 0
+  },
+  "findings": [],
+  "interpretation": [
+    "Explicit synthetic inventory is confined to disposable fixtures; original apps tag objects are fetched unchanged from local source; committed comparison history reflects real reader contract.",
+    "Dynamic assertions bind actual declared feeds/parents/dates/window/vendored invocations and current whole5/6/7 window; historical v1/v2 examples remain explicit planted fixtures.",
+    "Unpriced total stays None; only isolated known-priced aggregate fixtures use their named subset.",
+    "Claims resolve against actual machinery through existing renderer; removed/non-policy members cannot retain remembered policy names.",
+    "No production price/grade/converter/inventory guard/frozen policy or native primary data change."
+  ],
+  "historical_limit": "Genuine run377 failures and hub floor failure remain unchanged; local selfchecks do not create a clock observation."
+}

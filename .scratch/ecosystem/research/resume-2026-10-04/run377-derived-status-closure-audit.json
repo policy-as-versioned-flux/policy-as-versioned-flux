@@ -1,0 +1,54 @@
+{
+  "scope": "Read-only textual closure audit, not a grade-table replay or owner quote",
+  "primary_run377_capture": "hub-run377-captures/verify_derived-status_verify-derived-status.out",
+  "records": [
+    {
+      "ticket": 62,
+      "path": ".scratch/ecosystem/issues/62-the-feed-parents-are-consumed-pinned-and-signed.md",
+      "sha256": "198dc8f2827309f4cab3cdae682245ab963174ce96b95e3eb8147024f4b34b6b",
+      "check": "verify/feed-contract/verify-feed-contract.sh",
+      "existing_acknowledgement": false,
+      "proposed_format_accepted_by_unchanged_helper": true,
+      "proposed_append": "## Regression acknowledgement, 2026-10-04\n\n**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/feed-contract/verify-feed-contract.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: insurer declared a platform implementations pin whose authentic tree lacks its claimed cloud path; Standards owns the exact compatible-parent correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed insurer source `ed17499668f368c55261729c760904662ab7e242`, reviewed against the genuine tools5 tag and commit `703eff6aee959843c4160aa54fd03413f62858cc`; its normal public PR 8 was last captured open, so no completed merge or fresh clock grade is claimed.\n",
+      "genuine_corrective_source_binding": "local signed and reviewed; no future/published merge invented"
+    },
+    {
+      "ticket": 77,
+      "path": ".scratch/ecosystem/issues/77-every-pin-is-checked-for-content.md",
+      "sha256": "9e4eb50204ce0a63d24636e07f24bf28e03a3773cd06ffec20aa4fd7177c5440",
+      "check": "verify/feed-contract/verify-feed-contract.sh",
+      "existing_acknowledgement": false,
+      "proposed_format_accepted_by_unchanged_helper": true,
+      "proposed_append": "## Regression acknowledgement, 2026-10-04\n\n**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/feed-contract/verify-feed-contract.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: insurer declared a platform implementations pin whose authentic tree lacks its claimed cloud path; Standards owns the exact compatible-parent correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed insurer source `ed17499668f368c55261729c760904662ab7e242`, reviewed against the genuine tools5 tag and commit `703eff6aee959843c4160aa54fd03413f62858cc`; its normal public PR 8 was last captured open, so no completed merge or fresh clock grade is claimed.\n",
+      "genuine_corrective_source_binding": "local signed and reviewed; no future/published merge invented"
+    },
+    {
+      "ticket": 83,
+      "path": ".scratch/ecosystem/issues/83-the-truth-line-says-what-it-measured.md",
+      "sha256": "fcf022257110e750df0f92e817d713fa945e26fa5ac2405604a904aa4b2d67ec",
+      "check": "verify/truth-line/verify-truth-line.sh",
+      "existing_acknowledgement": false,
+      "proposed_format_accepted_by_unchanged_helper": true,
+      "proposed_append": "## Regression acknowledgement, 2026-10-04\n\n**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/truth-line/verify-truth-line.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: three discovered checks lacked manifest rows; Spec owns the exact source classification/entrypoint correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed hub source `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`, with exact manifest/entrypoint repairs and independent review; publication and its next actual collector grade remain separate.\n",
+      "genuine_corrective_source_binding": "local signed and reviewed; no future/published merge invented"
+    },
+    {
+      "ticket": 96,
+      "path": ".scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md",
+      "sha256": "b427ef01b0ad70934c777b90570456096955dc31d940c27368007891417ea0ed",
+      "check": "verify/truth-line/verify-truth-line.sh",
+      "existing_acknowledgement": false,
+      "proposed_format_accepted_by_unchanged_helper": true,
+      "proposed_append": "## Regression acknowledgement, 2026-10-04\n\n**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/truth-line/verify-truth-line.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: three discovered checks lacked manifest rows; Spec owns the exact source classification/entrypoint correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed hub source `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`, with exact manifest/entrypoint repairs and independent review; publication and its next actual collector grade remain separate.\n",
+      "genuine_corrective_source_binding": "local signed and reviewed; no future/published merge invented"
+    }
+  ],
+  "source_edits": false,
+  "primary_regrade": false,
+  "criteria": [
+    "Append after the complete Answer section under a new ## heading.",
+    "Use a current bold dated lead-in and the exact check path in backticks.",
+    "Name machine actor/delegated scope, actual owned failure and accountable source repair.",
+    "Retain regressed grade; no fabricated human acceptance, live PASS, historical date or floor waiver."
+  ]
+}

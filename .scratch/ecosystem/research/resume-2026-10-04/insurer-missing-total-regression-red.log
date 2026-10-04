@@ -1,0 +1,35 @@
+test_known_subset_and_excluded_unpriced_regime_cannot_supply_missing_total (test_quote_missing_total.MissingExposureTotal.test_known_subset_and_excluded_unpriced_regime_cannot_supply_missing_total) ... ERROR
+test_known_total_preserves_the_existing_exclusion_and_layer_formula (test_quote_missing_total.MissingExposureTotal.test_known_total_preserves_the_existing_exclusion_and_layer_formula) ... ok
+test_known_zero_total_is_distinct_from_a_missing_instrument (test_quote_missing_total.MissingExposureTotal.test_known_zero_total_is_distinct_from_a_missing_instrument) ... ok
+test_unknown_total_refuses_without_pricing_or_mutating_the_input (test_quote_missing_total.MissingExposureTotal.test_unknown_total_refuses_without_pricing_or_mutating_the_input) ... ERROR
+
+======================================================================
+ERROR: test_known_subset_and_excluded_unpriced_regime_cannot_supply_missing_total (test_quote_missing_total.MissingExposureTotal.test_known_subset_and_excluded_unpriced_regime_cannot_supply_missing_total)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-insurer-maintenance-20261004/pricing/test_quote_missing_total.py", line 32, in test_known_subset_and_excluded_unpriced_regime_cannot_supply_missing_total
+    quote.price(self.exposure, terms)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-insurer-maintenance-20261004/pricing/quote.py", line 256, in price
+    excluded = excluded_amount(exposure, terms.get("exclusions"))
+  File "/private/tmp/pavf-insurer-maintenance-20261004/pricing/quote.py", line 228, in excluded_amount
+    total += float(regime["amount"])
+             ~~~~~^^^^^^^^^^^^^^^^^^
+TypeError: float() argument must be a string or a real number, not 'NoneType'
+
+======================================================================
+ERROR: test_unknown_total_refuses_without_pricing_or_mutating_the_input (test_quote_missing_total.MissingExposureTotal.test_unknown_total_refuses_without_pricing_or_mutating_the_input)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-insurer-maintenance-20261004/pricing/test_quote_missing_total.py", line 26, in test_unknown_total_refuses_without_pricing_or_mutating_the_input
+    quote.price(self.exposure, self.terms)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-insurer-maintenance-20261004/pricing/quote.py", line 257, in price
+    insured = float(exposure["total"]) - excluded
+              ~~~~~^^^^^^^^^^^^^^^^^^^
+TypeError: float() argument must be a string or a real number, not 'NoneType'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.002s
+
+FAILED (errors=2)

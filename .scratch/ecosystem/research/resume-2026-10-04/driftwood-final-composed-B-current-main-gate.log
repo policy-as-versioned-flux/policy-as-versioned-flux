@@ -1,0 +1,9 @@
+{
+  "composed_bump": "none",
+  "declared_bump": "none",
+  "added": [],
+  "retired": [],
+  "reasons": [],
+  "weaker_than_declared": false
+}
+OK: composed bump is 'none'

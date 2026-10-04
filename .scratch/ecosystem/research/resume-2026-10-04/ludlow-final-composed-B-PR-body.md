@@ -1,0 +1,5 @@
+Ludlow's composed source now serves its authentic signed `v4.0.1` Composition B at `3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289`. Apps and inventory provenance remain at authentic `v4.0.0` Source A, so Composition B carries the app binding from which its policy artifacts were rendered.
+
+Only the composed tag/commit, explanatory comments and HEADER comparison fingerprint change. The complete policy 5/6/7 array and four signature gates remain intact; every other committed byte, including scans, dates, native valuation, policy bodies, engine 1.18.2 and inactive cloud declarations, is preserved.
+
+Validation: actual B cut/release succeeded; exact cut-main Actions identity, Git signature, Rekor entry and certificate claims verified. Authentic tools5 compose/byte verify, genuine B reach, normal exact-head none gate and 37 enabled public tests including relocated real compiler layout pass. The none gate's same-platform-pin early return is recorded explicitly, with independently byte-equal composed evidence. These checks make no new live PolicyReport claim.

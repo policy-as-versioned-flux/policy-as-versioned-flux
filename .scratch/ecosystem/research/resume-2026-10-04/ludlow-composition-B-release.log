@@ -1,0 +1,283 @@
+release	Set up job	﻿2026-10-04T12:24:11.1392551Z Current runner version: '2.337.0'
+release	Set up job	2026-10-04T12:24:11.1409478Z ##[group]Runner Image Provisioner
+release	Set up job	2026-10-04T12:24:11.1410027Z Hosted Compute Agent
+release	Set up job	2026-10-04T12:24:11.1410376Z Version: 20260901.588
+release	Set up job	2026-10-04T12:24:11.1410897Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+release	Set up job	2026-10-04T12:24:11.1411330Z Build Date: 2026-09-01T19:56:44Z
+release	Set up job	2026-10-04T12:24:11.1411775Z Worker ID: {08487cc4-a474-4b34-a54f-0f2bc813879b}
+release	Set up job	2026-10-04T12:24:11.1412200Z Azure Region: centralus
+release	Set up job	2026-10-04T12:24:11.1412543Z ##[endgroup]
+release	Set up job	2026-10-04T12:24:11.1413448Z ##[group]Operating System
+release	Set up job	2026-10-04T12:24:11.1413817Z Ubuntu
+release	Set up job	2026-10-04T12:24:11.1414161Z 24.04.5
+release	Set up job	2026-10-04T12:24:11.1414484Z LTS
+release	Set up job	2026-10-04T12:24:11.1414794Z ##[endgroup]
+release	Set up job	2026-10-04T12:24:11.1415212Z ##[group]Runner Image
+release	Set up job	2026-10-04T12:24:11.1415579Z Image: ubuntu-24.04
+release	Set up job	2026-10-04T12:24:11.1415941Z Version: 20260927.320.1
+release	Set up job	2026-10-04T12:24:11.1416560Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+release	Set up job	2026-10-04T12:24:11.1418004Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+release	Set up job	2026-10-04T12:24:11.1418654Z ##[endgroup]
+release	Set up job	2026-10-04T12:24:11.1419328Z ##[group]GITHUB_TOKEN Permissions
+release	Set up job	2026-10-04T12:24:11.1420719Z Contents: write
+release	Set up job	2026-10-04T12:24:11.1421354Z Metadata: read
+release	Set up job	2026-10-04T12:24:11.1421695Z ##[endgroup]
+release	Set up job	2026-10-04T12:24:11.1422961Z Secret source: Actions
+release	Set up job	2026-10-04T12:24:11.1423564Z Cache mode: write
+release	Set up job	2026-10-04T12:24:11.1424100Z Prepare workflow directory
+release	Set up job	2026-10-04T12:24:11.1744943Z Prepare all required actions
+release	Set up job	2026-10-04T12:24:11.1775646Z Getting action download info
+release	Set up job	2026-10-04T12:24:11.4144423Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+release	Set up job	2026-10-04T12:24:11.6492333Z Complete job name: release
+release	Run actions/checkout@v4	﻿2026-10-04T12:24:11.6993159Z ##[group]Run actions/checkout@v4
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6993585Z with:
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6993810Z   fetch-depth: 0
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6994042Z   fetch-tags: true
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6994330Z   repository: policy-as-versioned-ludlow/ludlow
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6996421Z   token: ***
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6996651Z   ssh-strict: true
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6996884Z   ssh-user: git
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6997121Z   persist-credentials: true
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6997378Z   clean: true
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6997617Z   sparse-checkout-cone-mode: true
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6997890Z   show-progress: true
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6998127Z   lfs: false
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6998526Z   submodules: false
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6998768Z   set-safe-directory: true
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6999042Z   allow-unsafe-pr-checkout: false
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6999384Z env:
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6999594Z   TAG: v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:11.6999819Z   GITSIGN_VERSION: 0.17.1
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7000186Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7000622Z   KUSTOMIZE_VERSION: 5.8.1
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7000998Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7001785Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7002501Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7002854Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7630865Z Syncing repository: policy-as-versioned-ludlow/ludlow
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7632137Z ##[group]Getting Git version info
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7632489Z Working directory is '/home/runner/work/ludlow/ludlow'
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7632990Z [command]/usr/bin/git version
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7765014Z git version 2.55.0
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7801244Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7830699Z Temporarily overriding HOME='/home/runner/work/_temp/30fbddb6-b42e-4bab-a21b-ad8c3037cb27' before making global git config changes
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7833325Z Adding repository directory to the temporary git global config as a safe directory
+release	Run actions/checkout@v4	2026-10-04T12:24:11.7834255Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ludlow/ludlow
+release	Run actions/checkout@v4	2026-10-04T12:24:11.8145880Z Deleting the contents of '/home/runner/work/ludlow/ludlow'
+release	Run actions/checkout@v4	2026-10-04T12:24:11.8153071Z ##[group]Initializing the repository
+release	Run actions/checkout@v4	2026-10-04T12:24:11.8162798Z [command]/usr/bin/git init /home/runner/work/ludlow/ludlow
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9476215Z hint: Using 'master' as the name for the initial branch. This default branch name
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9477138Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9477910Z hint: to use in all of your new repositories, which will suppress this warning,
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9478507Z hint: call:
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9478863Z hint:
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9479307Z hint: 	git config --global init.defaultBranch <name>
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9479697Z hint:
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9480222Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9480849Z hint: 'development'. The just-created branch can be renamed via this command:
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9481316Z hint:
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9481653Z hint: 	git branch -m <name>
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9482052Z hint:
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9482402Z hint: Disable this message with "git config set advice.defaultBranchName false"
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9482951Z Initialized empty Git repository in /home/runner/work/ludlow/ludlow/.git/
+release	Run actions/checkout@v4	2026-10-04T12:24:11.9486066Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-ludlow/ludlow
+release	Run actions/checkout@v4	2026-10-04T12:24:12.0052088Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:12.0052534Z ##[group]Disabling automatic garbage collection
+release	Run actions/checkout@v4	2026-10-04T12:24:12.0055090Z [command]/usr/bin/git config --local gc.auto 0
+release	Run actions/checkout@v4	2026-10-04T12:24:12.0704657Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:12.0706599Z ##[group]Setting up auth
+release	Run actions/checkout@v4	2026-10-04T12:24:12.0713759Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+release	Run actions/checkout@v4	2026-10-04T12:24:12.0748202Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+release	Run actions/checkout@v4	2026-10-04T12:24:12.1132410Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+release	Run actions/checkout@v4	2026-10-04T12:24:12.1161502Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+release	Run actions/checkout@v4	2026-10-04T12:24:12.1347384Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+release	Run actions/checkout@v4	2026-10-04T12:24:12.1375784Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+release	Run actions/checkout@v4	2026-10-04T12:24:12.1561294Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+release	Run actions/checkout@v4	2026-10-04T12:24:12.1624904Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:12.1625818Z ##[group]Fetching the repository
+release	Run actions/checkout@v4	2026-10-04T12:24:12.1632958Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8967227Z From https://github.com/policy-as-versioned-ludlow/ludlow
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8968227Z  * [new branch]      bootstrap-apps-inventory -> origin/bootstrap-apps-inventory
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8969089Z  * [new branch]      composed-set-v3.0.0     -> origin/composed-set-v3.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8969647Z  * [new branch]      delivery-stage2-20261004 -> origin/delivery-stage2-20261004
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8970270Z  * [new branch]      delivery-stage2-atomic-20261004 -> origin/delivery-stage2-atomic-20261004
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8970914Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8971499Z  * [new branch]      ecosystem/thin-slice    -> origin/ecosystem/thin-slice
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8972175Z  * [new branch]      fix-scheduled-tools-20260910 -> origin/fix-scheduled-tools-20260910
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8972882Z  * [new branch]      implement-platform-tools-20260910 -> origin/implement-platform-tools-20260910
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8973807Z  * [new branch]      implement-ticket-86-20260910 -> origin/implement-ticket-86-20260910
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8974509Z  * [new branch]      implement-twin-clock-20260910 -> origin/implement-twin-clock-20260910
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8975065Z  * [new branch]      main                    -> origin/main
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8975707Z  * [new branch]      phase-b-claim-policy-5  -> origin/phase-b-claim-policy-5
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8976273Z  * [new branch]      platform-v4.0.0-retire-4 -> origin/platform-v4.0.0-retire-4
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8977113Z  * [new branch]      policy-composition/tickets-09-16-wip -> origin/policy-composition/tickets-09-16-wip
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8978394Z  * [new branch]      renovate/https-github.com-policy-as-versioned-feeds-feeds-3.x -> origin/renovate/https-github.com-policy-as-versioned-feeds-feeds-3.x
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8979622Z  * [new branch]      renovate/https-github.com-policy-as-versioned-ico-ico-4.x -> origin/renovate/https-github.com-policy-as-versioned-ico-ico-4.x
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8980611Z  * [new branch]      repair/every-composing-job-fetches-its-parents -> origin/repair/every-composing-job-fetches-its-parents
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8981341Z  * [new branch]      rollout-330-feeds-eol-v2 -> origin/rollout-330-feeds-eol-v2
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8981905Z  * [new branch]      rollout-platform-v3.3.0 -> origin/rollout-platform-v3.3.0
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8982615Z  * [new branch]      ticket-101-the-gates-verify-a-real-signature -> origin/ticket-101-the-gates-verify-a-real-signature
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8983362Z  * [new branch]      ticket-105-pinned-trust-roots -> origin/ticket-105-pinned-trust-roots
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8984157Z  * [new branch]      ticket-107-the-sampler-waits-for-what-exists -> origin/ticket-107-the-sampler-waits-for-what-exists
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8985129Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8985885Z  * [new branch]      ticket-131-sibling-cut-release -> origin/ticket-131-sibling-cut-release
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8987043Z  * [new branch]      ticket-132-gate-reads-acceptance -> origin/ticket-132-gate-reads-acceptance
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8988124Z  * [new branch]      ticket-140-fact4-omitted-zero -> origin/ticket-140-fact4-omitted-zero
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8989181Z  * [new branch]      ticket-143a-twin-sweep-split -> origin/ticket-143a-twin-sweep-split
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8990152Z  * [new branch]      ticket-147-declared-engine -> origin/ticket-147-declared-engine
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8991245Z  * [new branch]      ticket-161-reference-workload -> origin/ticket-161-reference-workload
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8992707Z  * [new branch]      ticket-33-lift-ledger-storefront-and-reports -> origin/ticket-33-lift-ledger-storefront-and-reports
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8993967Z  * [new branch]      ticket-34-followup-2026-09-08 -> origin/ticket-34-followup-2026-09-08
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8995199Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8996459Z  * [new branch]      ticket-60-grade-the-lane-sample -> origin/ticket-60-grade-the-lane-sample
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8997620Z  * [new branch]      ticket-60-sampler-waits -> origin/ticket-60-sampler-waits
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8998597Z  * [new branch]      ticket-62-and-77        -> origin/ticket-62-and-77
+release	Run actions/checkout@v4	2026-10-04T12:24:12.8999645Z  * [new branch]      ticket-64-the-twin-is-three-adopters -> origin/ticket-64-the-twin-is-three-adopters
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9000969Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9002312Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9003684Z  * [new branch]      ticket-86-the-cage-enters-the-citable-number -> origin/ticket-86-the-cage-enters-the-citable-number
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9005030Z  * [new branch]      truth-surface-reconcile -> origin/truth-surface-reconcile
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9006321Z  * [new branch]      wargamer/retire-ludlow-feeds-threat-register-v1-to-v2 -> origin/wargamer/retire-ludlow-feeds-threat-register-v1-to-v2
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9007037Z  * [new tag]         v1.0.0                  -> v1.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9007426Z  * [new tag]         v1.1.0                  -> v1.1.0
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9007806Z  * [new tag]         v2.0.0                  -> v2.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9008193Z  * [new tag]         v3.0.0                  -> v3.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9008845Z  * [new tag]         v3.0.1                  -> v3.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9009232Z  * [new tag]         v4.0.0                  -> v4.0.0
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9009610Z  * [new tag]         v4.0.1                  -> v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9010995Z [command]/usr/bin/git tag --list v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9017977Z v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9046149Z [command]/usr/bin/git rev-parse refs/tags/v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9057864Z efffeee3b39cc59dd5ecc1ac0536845e712d4c6f
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9074873Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289:refs/tags/v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9424875Z From https://github.com/policy-as-versioned-ludlow/ludlow
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9432153Z  t [tag update]      3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289 -> v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9434540Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9435465Z ##[group]Determining the checkout info
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9436486Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:12.9437106Z [command]/usr/bin/git sparse-checkout disable
+release	Run actions/checkout@v4	2026-10-04T12:24:13.0026360Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+release	Run actions/checkout@v4	2026-10-04T12:24:13.0613781Z ##[group]Checking out the ref
+release	Run actions/checkout@v4	2026-10-04T12:24:13.0616092Z [command]/usr/bin/git checkout --progress --force refs/tags/v4.0.1
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1205662Z Note: switching to 'refs/tags/v4.0.1'.
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1206999Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1207775Z You are in 'detached HEAD' state. You can look around, make experimental
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1209704Z changes and commit them, and you can discard any commits you make in this
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1211450Z state without impacting any branches by switching back to a branch.
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1212605Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1213694Z If you want to create a new branch to retain commits you create, you may
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1215214Z do so (now or later) by using -c with the switch command. Example:
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1216016Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1216438Z   git switch -c <new-branch-name>
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1217001Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1217386Z Or undo this operation with:
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1218012Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1218624Z   git switch -
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1219174Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1219955Z Turn off this advice by setting config variable advice.detachedHead to false
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1220867Z 
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1221812Z HEAD is now at 3b57f0c Merge pull request #52 from policy-as-versioned-ludlow/delivery-stage2-atomic-20261004
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1225519Z ##[endgroup]
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1265327Z [command]/usr/bin/git log -1 --format=%H
+release	Run actions/checkout@v4	2026-10-04T12:24:13.1288563Z 3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	﻿2026-10-04T12:24:13.1482472Z ##[group]Run set -euo pipefail
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1483378Z ^[[36;1mset -euo pipefail^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1485140Z ^[[36;1mcurl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1487081Z ^[[36;1mecho "${GITSIGN_SHA256}  gitsign" | sha256sum -c -^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1488255Z ^[[36;1mchmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1489479Z ^[[36;1m^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1491480Z ^[[36;1mcurl -sSL -o kustomize.tar.gz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1494117Z ^[[36;1mecho "${KUSTOMIZE_SHA256}  kustomize.tar.gz" | sha256sum -c -^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1495747Z ^[[36;1mtar xzf kustomize.tar.gz kustomize && chmod +x kustomize && sudo mv kustomize /usr/local/bin/kustomize^[[0m
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1803699Z shell: /usr/bin/bash -e {0}
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1804602Z env:
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1805191Z   TAG: v4.0.1
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1805820Z   GITSIGN_VERSION: 0.17.1
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1806919Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1808139Z   KUSTOMIZE_VERSION: 5.8.1
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1809348Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1811701Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1813877Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.1814919Z ##[endgroup]
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:13.7318099Z gitsign: OK
+release	install pinned gitsign + kustomize (binary + checksum, no marketplace actions)	2026-10-04T12:24:14.0381261Z kustomize.tar.gz: OK
+release	gitops tree builds cleanly (release gate)	﻿2026-10-04T12:24:14.3095278Z ##[group]Run set -euo pipefail
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3095500Z ^[[36;1mset -euo pipefail^[[0m
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3095656Z ^[[36;1mkustomize build gitops/apps > /dev/null^[[0m
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3095845Z ^[[36;1mkustomize build gitops/platform > /dev/null^[[0m
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3149744Z shell: /usr/bin/bash -e {0}
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3149886Z env:
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3149996Z   TAG: v4.0.1
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3150115Z   GITSIGN_VERSION: 0.17.1
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3150322Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3150550Z   KUSTOMIZE_VERSION: 5.8.1
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3150773Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3151252Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3151706Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	gitops tree builds cleanly (release gate)	2026-10-04T12:24:14.3151937Z ##[endgroup]
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	﻿2026-10-04T12:24:14.3782306Z ##[group]Run set -euo pipefail
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3782537Z ^[[36;1mset -euo pipefail^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3782759Z ^[[36;1m# actions/checkout's second fetch flattens the annotated tag object^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3783031Z ^[[36;1m# gitsign needs -- re-fetch the real tag ref before verifying it.^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3783279Z ^[[36;1mgit fetch origin "+refs/tags/${TAG}:refs/tags/${TAG}" --force^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3783483Z ^[[36;1mgitsign verify-tag "${TAG}" \^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3783696Z ^[[36;1m  --certificate-identity-regexp="${EXPECTED_IDENTITY_REGEXP}" \^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3783933Z ^[[36;1m  --certificate-oidc-issuer="${EXPECTED_ISSUER}"^[[0m
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3841656Z shell: /usr/bin/bash -e {0}
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3841799Z env:
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3841906Z   TAG: v4.0.1
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3842027Z   GITSIGN_VERSION: 0.17.1
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3842240Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3842494Z   KUSTOMIZE_VERSION: 5.8.1
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3842772Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3843244Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3843670Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3843872Z   GITSIGN_REKOR_MODE: offline
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.3844012Z ##[endgroup]
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.6456182Z From https://github.com/policy-as-versioned-ludlow/ludlow
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:14.6456461Z  t [tag update]      v4.0.1     -> v4.0.1
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:15.9434395Z tlog index: 3077655513
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:15.9434917Z gitsign: Signature made using certificate ID 0x1fb2e3c76f89bf0a2f348351328e4688774128da | CN=sigstore-intermediate,O=sigstore.dev
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:15.9436060Z gitsign: Good signature from [https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:15.9436508Z Validated Git signature: true
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:15.9436652Z Validated Rekor entry: true
+release	gitsign verify-tag, identity-pinned, offline Rekor bundle	2026-10-04T12:24:15.9436796Z Validated Certificate claims: true
+release	publish GitHub Release recording the resolved SHA	﻿2026-10-04T12:24:15.9497299Z ##[group]Run set -euo pipefail
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9497504Z ^[[36;1mset -euo pipefail^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9497661Z ^[[36;1mresolved=$(git rev-parse "${TAG}^{commit}")^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9497824Z ^[[36;1m{^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9498024Z ^[[36;1m  git tag -l --format='%(contents)' "${TAG}" | sed '/^-----BEGIN SIGNED MESSAGE-----$/,$d'^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9498422Z ^[[36;1m  echo "---"^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9498780Z ^[[36;1m  echo "Verified gitsign signature (identity regexp: ${EXPECTED_IDENTITY_REGEXP}, issuer: ${EXPECTED_ISSUER}). Resolved commit: ${resolved}."^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9499121Z ^[[36;1m} > release-notes.md^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9499262Z ^[[36;1mgh release create "${TAG}" \^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9499413Z ^[[36;1m  --title "${TAG}" \^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9499553Z ^[[36;1m  --notes-file release-notes.md^[[0m
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9551217Z shell: /usr/bin/bash -e {0}
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9551353Z env:
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9551459Z   TAG: v4.0.1
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9551574Z   GITSIGN_VERSION: 0.17.1
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9551802Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9552024Z   KUSTOMIZE_VERSION: 5.8.1
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9552228Z   KUSTOMIZE_SHA256: 029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9552694Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9553111Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9554842Z   GH_TOKEN: ***
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:15.9554961Z ##[endgroup]
+release	publish GitHub Release recording the resolved SHA	2026-10-04T12:24:16.9142949Z https://github.com/policy-as-versioned-ludlow/ludlow/releases/tag/v4.0.1
+release	Post Run actions/checkout@v4	﻿2026-10-04T12:24:16.9234127Z Post job cleanup.
+release	Post Run actions/checkout@v4	2026-10-04T12:24:16.9766922Z [command]/usr/bin/git version
+release	Post Run actions/checkout@v4	2026-10-04T12:24:16.9796861Z git version 2.55.0
+release	Post Run actions/checkout@v4	2026-10-04T12:24:16.9819004Z Temporarily overriding HOME='/home/runner/work/_temp/cea1fd76-b83c-4b06-9901-51090fc12279' before making global git config changes
+release	Post Run actions/checkout@v4	2026-10-04T12:24:16.9819706Z Adding repository directory to the temporary git global config as a safe directory
+release	Post Run actions/checkout@v4	2026-10-04T12:24:16.9821862Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ludlow/ludlow
+release	Post Run actions/checkout@v4	2026-10-04T12:24:16.9850843Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+release	Post Run actions/checkout@v4	2026-10-04T12:24:16.9875674Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+release	Post Run actions/checkout@v4	2026-10-04T12:24:17.0065784Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+release	Post Run actions/checkout@v4	2026-10-04T12:24:17.0085265Z http.https://github.com/.extraheader
+release	Post Run actions/checkout@v4	2026-10-04T12:24:17.0093823Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+release	Post Run actions/checkout@v4	2026-10-04T12:24:17.0130891Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+release	Post Run actions/checkout@v4	2026-10-04T12:24:17.0341292Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+release	Post Run actions/checkout@v4	2026-10-04T12:24:17.0369636Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+release	Complete job	﻿2026-10-04T12:24:17.0649667Z Cleaning up orphan processes
+release	Complete job	2026-10-04T12:24:17.0831176Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

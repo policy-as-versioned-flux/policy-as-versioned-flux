@@ -1,0 +1,327 @@
+diff --git a/.github/scripts/complete-feed-bump.sh b/.github/scripts/complete-feed-bump.sh
+index 1862cb420695e2a707782341f5e3537ec8953189..5dfa70b735f0ab2c202c775bfa4ca4fa50e11476 100755
+--- a/.github/scripts/complete-feed-bump.sh
++++ b/.github/scripts/complete-feed-bump.sh
+@@ -45,18 +45,6 @@ python3 .github/scripts/verify-pinned-checkouts.py \
+ # gitsign must be installed on the Renovate runner; the tool runner refuses
+ # missing verifiers and rejects an incorrect release identity before execution.
+ 
+-# Compose TWICE, deliberately. Composition reads the previous composed
+-# HEADER from disk to fill each price entry's old_version, so a single run
+-# here would commit a transition record (old_version v1, new_version v2)
+-# that the NEXT recompose -- compose-check on this PR, and on every PR
+-# after the merge -- can never reproduce, failing the drift check forever.
+-# The committed artefact must be the settled fixpoint (old == new); the
+-# pull request diff itself is the record of the transition.
+-python3 .github/scripts/platform-tools.py --tools-dir "$work/platform-tools" compose "$PWD" \
+-  --estate-clone "$work" --out "$PWD" > /dev/null
+-python3 .github/scripts/platform-tools.py --tools-dir "$work/platform-tools" compose "$PWD" \
+-  --estate-clone "$work" --out "$PWD"
+-
+ # --- the twin's derived artefacts follow the pin, in the SAME commit (ticket 72) ---
+ # The first real bump (PR #20, threat-register v1 -> v2) moved party.yaml and
+ # composed/ together and left twin/forward-intel/v1/feed.json carrying
+@@ -72,17 +60,16 @@ python3 .github/scripts/platform-tools.py --tools-dir "$work/platform-tools" com
+ # a pin with no row, or a row with no pin, is refused -- a human writes those.
+ python3 .github/scripts/rederive-signals.py
+ 
+-# The forward-intel feed: emit-forward-intel.py finds the hub's `twin` package
+-# by walking UP from the overlay (it does not self-version yet, ticket 29), and
+-# Renovate's branch workdir has no hub above it. So the hub is cloned into
+-# $work and the overlay's inputs are copied to the path clone-estate.sh would
+-# assemble -- the same plant verify-twin-overlay.sh uses -- rendered there, and
+-# the one output copied back. A copy, not a symlink: the emitter resolves
+-# symlinks before it walks, so a link would land it back here, hub-less.
+-git clone --quiet --depth 1 --branch main \
+-  "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux" "$work/hub"
+-mirror="$work/hub/.estate-clone/driftwood"
+-mkdir -p "$mirror"
+-cp -R twin selection-policy party.yaml "$mirror/"
+-python3 "$mirror/twin/emit-forward-intel.py"
+-cp "$mirror/twin/forward-intel/v1/feed.json" twin/forward-intel/v1/feed.json
++# Render against the exact published hub_commit in twin/PIN.yaml, never
++# whatever happens to be on main. A temporary mirror supplies the emitter's
++# hub layout, and only its declared current VERSION's feed is copied back.
++python3 .github/scripts/refresh-twin-feed.py "$work/hub"
++
++# All nonhidden twin inputs above participate in tools5's comparison identity.
++# Compose after deriving them so the committed output replays from this source.
++# Compose TWICE with the existing authenticated runner, after all derived inputs.
++# Both passes see the same final source; the second publishes the settled output.
++python3 .github/scripts/platform-tools.py --tools-dir "$work/platform-tools" compose "$PWD" \
++  --estate-clone "$work" --out "$PWD" > /dev/null
++python3 .github/scripts/platform-tools.py --tools-dir "$work/platform-tools" compose "$PWD" \
++  --estate-clone "$work" --out "$PWD"
+diff --git a/.github/scripts/refresh-twin-feed.py b/.github/scripts/refresh-twin-feed.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..3d3a66b54c63cc985cd75c67b8938283d4308599
+--- /dev/null
++++ b/.github/scripts/refresh-twin-feed.py
+@@ -0,0 +1,70 @@
++#!/usr/bin/env python3
++"""Refresh the current owned feed using the exact published twin producer pin."""
++from __future__ import annotations
++
++import ast
++from pathlib import Path
++import re
++import shutil
++import subprocess
++import sys
++
++import yaml
++
++
++class UniqueKeys(yaml.SafeLoader):
++    pass
++
++
++def mapping(loader, node, deep=False):
++    result = {}
++    for key_node, value_node in node.value:
++        key = loader.construct_object(key_node, deep=deep)
++        if key in result:
++            raise ValueError(f'duplicate pin key: {key}')
++        result[key] = loader.construct_object(value_node, deep=deep)
++    return result
++
++
++UniqueKeys.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, mapping)
++
++
++def refresh(hub: Path) -> None:
++    adopter = Path.cwd()
++    pin = yaml.load((adopter / 'twin/PIN.yaml').read_text(), Loader=UniqueKeys)
++    commit = str(pin['hub_commit'])
++    if not re.fullmatch(r'[0-9a-f]{40}', commit):
++        raise ValueError('twin/PIN.yaml requires a full hub_commit')
++    emitter = adopter / 'twin/emit-forward-intel.py'
++    versions = [node.value.value for node in ast.parse(emitter.read_text()).body
++                if isinstance(node, ast.Assign)
++                and any(isinstance(target, ast.Name) and target.id == 'VERSION' for target in node.targets)
++                and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str)]
++    if len(versions) != 1 or not re.fullmatch(r'\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?', versions[0]):
++        raise ValueError('emitter must declare one literal VERSION')
++    relative = Path('twin/forward-intel') / ('v' + versions[0].split('.')[0]) / 'feed.json'
++    subprocess.run(['git', 'clone', '--quiet', '--no-checkout', '--branch', 'main',
++                    'https://github.com/policy-as-versioned-flux/policy-as-versioned-flux',
++                    str(hub)], check=True)
++    subprocess.run(['git', '-C', str(hub), 'merge-base', '--is-ancestor', commit, 'origin/main'], check=True)
++    subprocess.run(['git', '-C', str(hub), 'checkout', '--quiet', '--detach', commit], check=True)
++    actual = subprocess.check_output(['git', '-C', str(hub), 'rev-parse', 'HEAD'], text=True).strip()
++    if actual != commit:
++        raise ValueError('hub checkout differs from twin/PIN.yaml')
++    mirror = hub / '.estate-clone/driftwood'
++    mirror.mkdir(parents=True)
++    for directory in ('twin', 'selection-policy'):
++        shutil.copytree(adopter / directory, mirror / directory)
++    shutil.copyfile(adopter / 'party.yaml', mirror / 'party.yaml')
++    subprocess.run([sys.executable, str(mirror / 'twin/emit-forward-intel.py')], check=True)
++    # Only the emitter's declared current major moves; frozen historical majors stay intact.
++    shutil.copyfile(mirror / relative, adopter / relative)
++
++
++if __name__ == '__main__':
++    try:
++        if len(sys.argv) != 2:
++            raise ValueError('usage: refresh-twin-feed.py HUB_CHECKOUT_DESTINATION')
++        refresh(Path(sys.argv[1]).resolve())
++    except (KeyError, ValueError, yaml.YAMLError, OSError, subprocess.CalledProcessError) as error:
++        sys.exit(f'REFUSED: twin feed refresh: {error}')
+diff --git a/.github/tests/test_complete_feed_bump.py b/.github/tests/test_complete_feed_bump.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..fee4e25a9a1d2c8517bcd0d29352811baaa870cd
+--- /dev/null
++++ b/.github/tests/test_complete_feed_bump.py
+@@ -0,0 +1,91 @@
++"""Run Renovate's real completer with local caller fixtures, without network or credentials.
++
++The composer fixture checks ordering only; genuine compiler authentication and
++byte replay are exercised separately by RealCompilerLayout.
++"""
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import tempfile
++import unittest
++
++ROOT = Path(__file__).resolve().parents[2]
++
++
++class FeedCompletion(unittest.TestCase):
++    def test_exact_hub_pin_refreshes_current_major_before_composition(self):
++        with tempfile.TemporaryDirectory() as temp:
++            root = Path(temp)
++            hub, adopter = root / 'hub-source', root / 'adopter'
++            hub.mkdir()
++            env = dict(os.environ, GIT_CONFIG_COUNT='3', GIT_EDITOR='true',
++                       GIT_CONFIG_KEY_0='commit.gpgsign', GIT_CONFIG_VALUE_0='false',
++                       GIT_CONFIG_KEY_1='core.hooksPath', GIT_CONFIG_VALUE_1='/dev/null',
++                       GIT_CONFIG_KEY_2='url.' + str(hub) + '.insteadOf',
++                       GIT_CONFIG_VALUE_2='https://github.com/policy-as-versioned-')
++            # Each production clone URL has its suffix; map those exact URLs
++            # to the same harmless local fixture repository instead.
++            urls = [('flux/policy-as-versioned-flux', 'hub'), ('platform/platform', 'platform'),
++                    ('nist/nist', 'nist'), ('ico/ico', 'ico'), ('feeds/feeds', 'feeds'),
++                    ('insurer/insurer', 'insurer')]
++            env['GIT_CONFIG_COUNT'] = str(2 + len(urls))
++            for index, (suffix, _) in enumerate(urls, 2):
++                env[f'GIT_CONFIG_KEY_{index}'] = 'url.' + str(hub) + '.insteadOf'
++                env[f'GIT_CONFIG_VALUE_{index}'] = 'https://github.com/policy-as-versioned-' + suffix
++            def git(*args):
++                return subprocess.check_output(['git', '-C', str(hub), *args],
++                                               env=env, text=True).strip()
++            git('init', '-q', '-b', 'main')
++            git('config', 'user.name', 'Caller fixture')
++            git('config', 'user.email', 'fixture@example.invalid')
++            (hub / 'producer.txt').write_text('reviewed exact hub')
++            git('add', '.')
++            git('commit', '-qm', 'pinned producer fixture')
++            pinned = git('rev-parse', 'HEAD')
++            git('-c', 'tag.gpgsign=false', 'tag', 'fixture')
++            (hub / 'producer.txt').write_text('WRONG moving main')
++            git('add', '.')
++            git('commit', '-qm', 'later moving main fixture')
++            scripts = adopter / '.github/scripts'
++            scripts.mkdir(parents=True)
++            shutil.copy(ROOT / '.github/scripts/complete-feed-bump.sh', scripts)
++            refresh = ROOT / '.github/scripts/refresh-twin-feed.py'
++            if refresh.exists():
++                shutil.copy(refresh, scripts)
++            (scripts / 'read-pins.py').write_text("print(' '.join(f'{name}_tag=fixture' for name in ('tools','platform','nist','ico','feeds','insurer')))\n")
++            (scripts / 'verify-pinned-checkouts.py').write_text('pass\n')
++            (scripts / 'rederive-signals.py').write_text("from pathlib import Path\nPath('twin/signals.yaml').write_text('version: 4\\n')\n")
++            (scripts / 'platform-tools.py').write_text("from pathlib import Path\nassert Path('twin/signals.yaml').read_text() == 'version: 4\\n', 'signals stale before compose'\nassert Path('twin/forward-intel/v2/feed.json').read_text() == 'reviewed exact hub', 'current feed stale or wrong hub before compose'\nwith Path('compose-calls').open('a') as out: out.write('compose\\n')\n")
++            twin = adopter / 'twin'
++            (twin / 'forward-intel/v1').mkdir(parents=True)
++            (twin / 'forward-intel/v2').mkdir()
++            (twin / 'PIN.yaml').write_text(f'hub_commit: {pinned}\n')
++            (twin / 'signals.yaml').write_text('version: 3\n')
++            old = b'authentic historical major fixture\n'
++            (twin / 'forward-intel/v1/feed.json').write_bytes(old)
++            (twin / 'forward-intel/v2/feed.json').write_text('stale current feed')
++            (twin / 'emit-forward-intel.py').write_text("from pathlib import Path\nVERSION = '2.0.0'\nhere = Path(__file__).resolve().parent\nhub = here.parents[2]\n(here / 'forward-intel' / ('v' + VERSION.split('.')[0]) / 'feed.json').write_text((hub / 'producer.txt').read_text())\n")
++            (adopter / 'selection-policy').mkdir()
++            (adopter / 'party.yaml').write_text('id: driftwood\n')
++            env['PATH'] = str(Path(sys.executable).parent) + os.pathsep + env['PATH']
++            command = ['bash', str(scripts / 'complete-feed-bump.sh')]
++            run = subprocess.run(command, cwd=adopter, env=env, text=True, capture_output=True)
++            self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
++            self.assertEqual((twin / 'forward-intel/v1/feed.json').read_bytes(), old)
++            self.assertEqual((twin / 'forward-intel/v2/feed.json').read_text(), 'reviewed exact hub')
++            self.assertEqual((adopter / 'compose-calls').read_text(), 'compose\ncompose\n')
++            # An unavailable full pin must refuse before copying a feed or composing.
++            (adopter / 'compose-calls').unlink()
++            (twin / 'PIN.yaml').write_text('hub_commit: ' + '0' * 40 + '\n')
++            (twin / 'forward-intel/v2/feed.json').write_text('unchanged on refusal')
++            rejected = subprocess.run(command, cwd=adopter, env=env, text=True, capture_output=True)
++            self.assertNotEqual(rejected.returncode, 0)
++            self.assertEqual((twin / 'forward-intel/v2/feed.json').read_text(), 'unchanged on refusal')
++            self.assertEqual((twin / 'forward-intel/v1/feed.json').read_bytes(), old)
++            self.assertFalse((adopter / 'compose-calls').exists())
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/.github/workflows/shift-left.yml b/.github/workflows/shift-left.yml
+index ee9233fdc63b430c8bc2a6cdb7dd46d74b7983ee..ae1169f17b6d63ba7c2ebcdda83a52e7a614fb2f 100644
+--- a/.github/workflows/shift-left.yml
++++ b/.github/workflows/shift-left.yml
+@@ -70,7 +70,7 @@ jobs:
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v4
+-        with: { path: driftwood }
++        with: { path: driftwood, fetch-depth: 0 }
+ 
+       - name: install pyyaml (adopter-gate.py needs it early, to read the platform pin)
+         run: pip install --quiet pyyaml
+@@ -81,7 +81,7 @@ jobs:
+           set -euo pipefail
+           python3 driftwood/.github/scripts/adopter-gate.py read-pin \
+             driftwood/gitops/platform/platform-pin.yaml | sed 's/^/head_/' >> "$GITHUB_OUTPUT"
+-          git -C driftwood fetch --depth=1 origin "${{ github.event.pull_request.base.sha }}"
++          git -C driftwood fetch origin "${{ github.event.pull_request.base.sha }}"
+           git -C driftwood show "${{ github.event.pull_request.base.sha }}:gitops/platform/platform-pin.yaml" \
+             | python3 driftwood/.github/scripts/adopter-gate.py read-pin /dev/stdin | sed 's/^/base_/' >> "$GITHUB_OUTPUT"
+           cat "$GITHUB_OUTPUT"
+@@ -178,7 +178,7 @@ jobs:
+         run: |
+           set -euo pipefail
+           tag="$(python3 -c 'import sys; sys.path.insert(0, "driftwood/scripts"); import render_composed as rc; print(rc.pinned_tag())')"
+-          git -C driftwood fetch --quiet --depth=1 origin "refs/tags/${tag}:refs/tags/${tag}"
++          git -C driftwood fetch --quiet origin "refs/tags/${tag}:refs/tags/${tag}"
+           bash driftwood/verify-cage-probe.sh
+ 
+       - name: install pinned cosign (binary + checksum, no marketplace action)
+@@ -359,7 +359,7 @@ jobs:
+       contents: read
+     steps:
+       - uses: actions/checkout@v4
+-        with: { path: driftwood }
++        with: { path: driftwood, fetch-depth: 0 }
+ 
+       - name: Install pinned identity verifier
+         uses: ./driftwood/.github/actions/install-gitsign
+@@ -465,7 +465,7 @@ jobs:
+         # delivered by exactly one Kustomization that ResourceSet generates, the array must be the
+         # version directories that tag carries, and every machinery allow-list must be the array.
+         # The ResourceSet is read from this pull request's head, composed/ from the tag, which is
+-        # how the lane applies them. Tags are fetched because the checkout above is shallow.
++        # how the lane applies them. Refresh tags without truncating the complete checkout history.
+         run: |
+           set -euo pipefail
+           git -C driftwood fetch --quiet --tags origin
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index 424d214d7fef3acf3cf33164c20696ecab710ec2..c70072fdc0066d2f64e467487205550f974f7084 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -624,7 +624,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: 7e5655b9dfd7aec6b740e986a86e80dd94573483fd82074e0e5d3d6298cd8533
++  after: 7a8c808567b174d792fb597116ce4aa39f3d6bcf27da076b6e05b4f7fc26e55d
+   before:
+     header:
+       parents:
+diff --git a/tests/test_platform_tools.py b/tests/test_platform_tools.py
+index 7ccabf3701b5bb08af989c4fadaa0ffacd4abde6..a09373f8345694ec00b2ebb72335411a93b12186 100644
+--- a/tests/test_platform_tools.py
++++ b/tests/test_platform_tools.py
+@@ -130,6 +130,24 @@ class ToolBoundary(unittest.TestCase):
+             self.assertNotEqual(result.returncode, 0)
+ 
+ 
++class WorkflowHistory(unittest.TestCase):
++    def test_history_reading_jobs_fetch_the_immutable_apps_tags_and_keep_history(self):
++        import yaml
++        workflow = yaml.safe_load((ROOT / '.github/workflows/shift-left.yml').read_text())
++        for name in ('shift-left', 'compose-check'):
++            with self.subTest(job=name):
++                steps = workflow['jobs'][name]['steps']
++                own = next(step for step in steps if step.get('uses', '').startswith('actions/checkout@')
++                           and step.get('with', {}).get('path') == 'driftwood'
++                           and 'repository' not in step.get('with', {}))
++                self.assertEqual(own['with'].get('fetch-depth', 1), 0,
++                                 'inventory and since pricing require genuine adopter tags/history')
++                for step in steps:
++                    for line in step.get('run', '').splitlines():
++                        if 'git -C driftwood fetch' in line:
++                            self.assertNotIn('--depth', line, 'a later fetch must not truncate signed history')
++
++
+ @unittest.skipUnless(os.environ.get('PAVF_REAL_ESTATE'), 'set PAVF_REAL_ESTATE for signed real-compiler layout regression')
+ class RealCompilerLayout(unittest.TestCase):
+     def test_composition_bytes_do_not_depend_on_checkout_prefix(self):
+@@ -144,7 +162,7 @@ class RealCompilerLayout(unittest.TestCase):
+                            'compose', adopter_arg, '--estate-clone', os.path.relpath(estate, cwd),
+                            '--out', os.path.relpath(out, cwd)]
+                 result = subprocess.run(command, cwd=cwd, capture_output=True, text=True)
+-                self.assertEqual(result.returncode, 0, result.stderr)
++                self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+                 outputs.append({str(p.relative_to(out)): p.read_bytes() for p in out.rglob('*') if p.is_file()})
+             changed = [p for p in outputs[0] if outputs[0][p] != outputs[1].get(p)]
+             self.assertEqual(changed, [], 'layout changed generated bytes')

@@ -1,0 +1,11 @@
+test_ambiguous_or_unrelated_absence_does_not_supply_consequence_declaration (test_scenario_pricing.ConsequenceDeclaration.test_ambiguous_or_unrelated_absence_does_not_supply_consequence_declaration) ... ok
+test_explicit_unpriced_consequence_with_missing_native_amount (test_scenario_pricing.ConsequenceDeclaration.test_explicit_unpriced_consequence_with_missing_native_amount) ... ok
+test_known_zero_is_priced_and_false_absence_fails (test_scenario_pricing.ConsequenceDeclaration.test_known_zero_is_priced_and_false_absence_fails) ... ok
+test_no_cash_flow_or_no_unique_causal_edge_cannot_back_priced_claim (test_scenario_pricing.ConsequenceDeclaration.test_no_cash_flow_or_no_unique_causal_edge_cannot_back_priced_claim) ... ok
+test_priced_basis_is_admitted_without_regrading_mitigation_or_observation (test_scenario_pricing.ConsequenceDeclaration.test_priced_basis_is_admitted_without_regrading_mitigation_or_observation) ... ok
+test_priced_claim_requires_real_admitted_native_and_mechanism_grades (test_scenario_pricing.ConsequenceDeclaration.test_priced_claim_requires_real_admitted_native_and_mechanism_grades) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+OK

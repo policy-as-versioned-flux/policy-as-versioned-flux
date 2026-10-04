@@ -1,0 +1,13 @@
+{
+  "prior_reviewed_head": "226a319f475fb34a16745d836197807331efa3d9",
+  "prior_base": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "actual_current_main": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "clock_paths_preserved": [
+    "drift/oscal-samples.jsonl",
+    "drift/samples.jsonl",
+    "drift/workload-samples.jsonl"
+  ],
+  "new_branch": "delivery-stage2-composed-B-current-main-20261004",
+  "source_A_and_B_refs_unchanged": true,
+  "no_external_mutations": true
+}

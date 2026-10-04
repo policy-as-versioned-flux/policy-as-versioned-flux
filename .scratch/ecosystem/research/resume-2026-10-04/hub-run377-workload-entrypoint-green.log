@@ -1,0 +1,7 @@
+test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv (test_workload_lane_entrypoint.WorkloadLaneEntrypoint.test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv) ... ok
+test_explicit_unavailable_interpreter_still_refuses (test_workload_lane_entrypoint.WorkloadLaneEntrypoint.test_explicit_unavailable_interpreter_still_refuses) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.427s
+
+OK

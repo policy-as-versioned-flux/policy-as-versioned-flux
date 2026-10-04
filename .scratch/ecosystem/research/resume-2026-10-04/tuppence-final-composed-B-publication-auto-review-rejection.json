@@ -1,0 +1,9 @@
+{
+  "action": "Push final two-file composed B pointer branch to public Tuppence repository",
+  "repository": "policy-as-versioned-tuppence/tuppence",
+  "head": "b2abe26c155beea87366bcdf9775faae991f0803",
+  "public_write_executed": false,
+  "reason": "Automatic approval review required authorization for this exact public payload and destination",
+  "no_workaround_attempted": true,
+  "resolution": "Later trusted user reply: Approve exact Tuppence change; same normal push may legitimately retry"
+}

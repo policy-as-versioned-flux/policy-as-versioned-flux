@@ -1,0 +1,21 @@
+{
+  "action": "Push isolated delivery-stage2-atomic-20261004 branch and create public PR with reviewed body",
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "head": "98d13782173342bbdfbd14271e1626e3b11b0d73",
+  "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json"
+  ],
+  "patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery.patch",
+  "body": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-PR-body.md",
+  "source_unchanged": true,
+  "public_write_executed": false,
+  "risk": "Publishing these exact committed delivery/provenance/header bytes and PR body to a public repository",
+  "reason": "Automatic approval review: user has not explicitly authorized exporting this exact payload to that destination",
+  "no_workaround_attempted": true,
+  "active_sessions": [],
+  "required_next_step": "Trusted user approval for this concrete public export, or primary evidence of already explicit exact-destination authorization; then same normal publication path"
+}

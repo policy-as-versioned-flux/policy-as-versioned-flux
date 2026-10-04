@@ -1,0 +1,16 @@
+{
+  "hub-run377-maintenance-candidate.json": {
+    "head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+    "tree": "555196f32a7fe029354f0314af83636e79643360",
+    "source_and_primary_log_hashes_match": true,
+    "clean": true,
+    "signature": "G"
+  },
+  "insurer-compatible-platform-pin-candidate.json": {
+    "head": "ed17499668f368c55261729c760904662ab7e242",
+    "tree": "2a6c5ad76dbc710505ffbc48a0f269b644ea522d",
+    "source_and_primary_log_hashes_match": true,
+    "clean": true,
+    "signature": "G"
+  }
+}

@@ -1,0 +1,1 @@
+SKIP: fact_8_each_served_workload_runs_in_its_cage: checkout-svc: the API server has not recorded this workload inside its cage ; storefront: the API server has not recorded this workload inside its cage ; api: the API server has not recorded this workload inside its cage

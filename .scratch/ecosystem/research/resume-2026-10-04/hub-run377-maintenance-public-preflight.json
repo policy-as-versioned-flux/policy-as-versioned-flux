@@ -1,0 +1,39 @@
+{
+  "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+  "public": true,
+  "authenticated_admin": true,
+  "archived": false,
+  "main": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "main_tree": "6208a5079e8ff6f400c6495aa149d8bb2b711dc9",
+  "github_main_signature": {
+    "verified": false,
+    "reason": "bad_cert"
+  },
+  "main_same_as_reviewed_base": true,
+  "reviewed_source_head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "reviewed_source_tree": "555196f32a7fe029354f0314af83636e79643360",
+  "payload_scope": [
+    "talk/verify-manifest.txt",
+    "tests/test_map_observation_ownership.py",
+    "tests/test_refusal_by_another_name.py",
+    "tests/test_verifier_snapshots.py",
+    "tests/test_workload_lane_entrypoint.py",
+    "verify/_snapshot.py",
+    "verify/e2e/step2_reprice.py",
+    "verify/engine-pairing/engine_pairing.py",
+    "verify/map-surface/map_surface.py",
+    "verify/refusal-by-another-name/refusal_scan.py",
+    "verify/refusal-by-another-name/register.yaml",
+    "verify/served-workloads/verify-served-workloads.sh"
+  ],
+  "source_only": true,
+  "high_confidence_secret_scan": {
+    "private_key": 0,
+    "github_credential": 0,
+    "aws_access_key": 0
+  },
+  "primary_clock_records_in_payload": false,
+  "repo_metadata_observed_via_normal_gh_api": true,
+  "observed_at": "2026-10-04T14:06:51.602223+00:00",
+  "external_write_attempted": false
+}

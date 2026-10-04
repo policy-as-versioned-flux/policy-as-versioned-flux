@@ -1,0 +1,36 @@
+{
+  "institution": "tuppence",
+  "scope": "Source and GitOps delivery references published; scheduled observation remains separate",
+  "source_A_tag": "v4.0.0",
+  "source_A_commit": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "composition_B_tag": "v4.0.1",
+  "composition_B_commit": "dbaa026f6510fe5c0042f33f29081f3840ea59c3",
+  "final_main": "55bf5aa14d80f6cee4c524394d08b244b1461846",
+  "final_tree": "5dcedc2fbc951c25251ee56b9c13bcf844ab044e",
+  "final_PR": "https://github.com/policy-as-versioned-tuppence/tuppence/pull/56",
+  "merged_at": "2026-10-04T11:58:51Z",
+  "matching_head_App_merge": true,
+  "GitHub_merge_signature_verified": true,
+  "reviewed_candidate_tree_equals_final_main": true,
+  "actual_CI": [
+    {
+      "name": "shift-left",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37200356974/job/111430601229"
+    },
+    {
+      "name": "compose-check",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37200356974/job/111430601089"
+    }
+  ],
+  "apps_A_and_inventory_preserved": true,
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "engine": "1.18.2",
+  "cloud_activation": false,
+  "live_observation_claimed": false
+}

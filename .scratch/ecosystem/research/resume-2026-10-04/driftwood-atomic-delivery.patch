@@ -1,0 +1,115 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index c70072fdc0066d2f64e467487205550f974f7084..c2641766b708ea24ca7cd3c9d62ca50a6475e40c 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -624,7 +624,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: 7a8c808567b174d792fb597116ce4aa39f3d6bcf27da076b6e05b4f7fc26e55d
++  after: 40282e7a51941ab5c974ee362d75d6124d05f776f2ea16348949e1e64c9584cf
+   before:
+     header:
+       parents:
+diff --git a/gitops/composed/composed-set.yaml b/gitops/composed/composed-set.yaml
+index eb518578dae6294e359b795602d68c3ddc731d71..c04da688a30bfc3a144d8f9089f48cddc1cfa53c 100644
+--- a/gitops/composed/composed-set.yaml
++++ b/gitops/composed/composed-set.yaml
+@@ -24,10 +24,8 @@
+ #     install platform's tree; it installs the artefact its own composition rendered from
+ #     platform's and nist's signed parents (composed/HEADER.yaml records those parent SHAs, and
+ #     fact 3 of the sample checks the live platform and nist pins against them).
+-#   * the tag is v3.0.0, not the v1.0.0 in gitops/flux-system/gotk-sync.yaml. v1.0.0 predates
+-#     composed/ and does not carry the tree this reconciles. A self-pin bump is a reviewed PR that
+-#     moves tag and commit together (renovate.json's customManagers track nist and platform, not
+-#     the self-pin).
++#   * apps and composed delivery use the same genuine v4.0.0 Source A release.
++#     Its complete policy window and signature gates move with the inventory binding.
+ #   * there is no `spec.verify` here. Flux's GitRepository.spec.verify speaks OpenPGP, and one
+ #     signature -- the gitsign tag -- is the only one this estate has (ADR-0023, D3). Verification
+ #     at the source boundary is the identity-pinned gitsign-verifying controller of ticket 41,
+@@ -64,17 +62,17 @@ metadata:
+     # verified with somebody else's identity is observed false rather than merely 'verified'.
+     policy-as-versioned.dev/gitsign-identity-regexp: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+     policy-as-versioned.dev/gitsign-issuer: https://token.actions.githubusercontent.com
+-    policy-as-versioned.dev/gitsign-gates: flux-system/composed-v5-0-0,flux-system/composed-machinery
++    policy-as-versioned.dev/gitsign-gates: flux-system/composed-v5-0-0,flux-system/composed-v6-0-0,flux-system/composed-v7-0-0,flux-system/composed-machinery
+   labels:
+     policy-as-versioned.dev/composed-for: driftwood
+ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-driftwood/driftwood
+   ref:
+-    tag: v3.0.0
+-    commit: bf9889aa6a6d979c87a5633240a1447765d73503
+-    # The resolved SHA driftwood's own v3.0.0 tag points to (`git ls-remote origin 'refs/tags/v3.0.0^{}'`,
+-    # 2026-09-24). Belt-and-braces immutability, ADR-0001.
++    tag: v4.0.0
++    commit: 1cd446f62a531c0aeee7e50c0a59a11ac5d00d67
++    # The resolved SHA of the genuine signed v4.0.0 Source A release.
++    # Belt-and-braces immutability, ADR-0001.
+ ---
+ apiVersion: fluxcd.controlplane.io/v1
+ kind: ResourceSet
+@@ -92,11 +90,10 @@ spec:
+         # directories the pinned tag carries and every machinery allow-list at that tag. Move it
+         # in the same pull request that moves the tag.
+         - { version: "5.0.0" }
+-        # v3.0.0 carries composed/policies/v5.0.0 only, and every machinery allow-list at that
+-        # tag admits 5.0.0 only. It was composed under platform v4.0.0, which retires policy 4.0.0
+-        # (owner-instructed 2026-09-24). Every workload driftwood declares moved its claim to
+-        # 5.0.0 before this tag (Phase B), so dropping 4.0.0 here leaves no claim uncaged.
+-        # Dropping it prunes the composed-v4-0-0 Kustomization's objects.
++        - { version: "6.0.0" }
++        - { version: "7.0.0" }
++        # This array and all verification gates match the genuine signed target tree.
++        # Current workload declarations claim 7.0.0; older supported claims remain caged.
+   resourcesTemplate: |
+     << range $v := (index (inputs) "versions") >>
+     ---
+diff --git a/gitops/flux-system/gotk-sync.yaml b/gitops/flux-system/gotk-sync.yaml
+index 7b1ab402111246d5891cbd4e5c843a17454afd81..0e822fa82bc48373abf4b373a437c6199fbe314f 100644
+--- a/gitops/flux-system/gotk-sync.yaml
++++ b/gitops/flux-system/gotk-sync.yaml
+@@ -18,10 +18,10 @@ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-driftwood/driftwood
+   ref:
+-    tag: v3.0.1
+-    commit: 17302ecd20041df61a52428e67246c330294d2a6
++    tag: v4.0.0
++    commit: 1cd446f62a531c0aeee7e50c0a59a11ac5d00d67
+     # commit pinned at release (belt-and-braces immutability, ADR-0001) --
+-    # the resolved SHA driftwood's own signed v3.0.1 apps release points to. Not covered by the
++    # the resolved SHA driftwood's own signed v4.0.0 apps release points to. Not covered by the
+     # Renovate customManagers in renovate.json (those track nist and platform
+     # only); a self-pin bump is a reviewed PR that moves both fields together.
+ ---
+diff --git a/inventory/PROVENANCE.json b/inventory/PROVENANCE.json
+index a3f6ec35ba1f0aaea1e5dc54bab02aaecf3cf371..73d1b2b5dd05e4937aff7bfeb16cd1f337014f5a 100644
+--- a/inventory/PROVENANCE.json
++++ b/inventory/PROVENANCE.json
+@@ -1,6 +1,6 @@
+ {
+   "apps_source": {
+-    "commit": "17302ecd20041df61a52428e67246c330294d2a6",
++    "commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+     "path": "gitops/apps",
+     "repository": "https://github.com/policy-as-versioned-driftwood/driftwood",
+     "signature": {
+@@ -9,11 +9,11 @@
+       "identity": "https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main",
+       "issuer": "https://token.actions.githubusercontent.com",
+       "rekor": true,
+-      "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511413",
+-      "tlog_index": "3075511413"
++      "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3077567350",
++      "tlog_index": "3077567350"
+     },
+-    "tag": "v3.0.1",
+-    "tag_object": "4cdf9152d2af61d9e476f5e0f487d85a2808f42f"
++    "tag": "v4.0.0",
++    "tag_object": "bff31936b9e34074a7ce078e873d3a0df31ecd35"
+   },
+   "binding": "The complete exact tagged apps graph and primary reports reproduce images.json; no release or cluster activation is asserted.",
+   "cached_database_unchanged": true,

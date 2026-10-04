@@ -1,0 +1,118 @@
+{
+  "sha": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+  "node_id": "C_kwDOT-3Nm9oAKDJlYmRlN2VmZDFmM2MxMTA3MTcxOWQyNWYyY2JhMjMzNjhjZmNkZDc",
+  "commit": {
+    "author": {
+      "name": "Chris Nesbitt-Smith",
+      "email": "chris@cns.me.uk",
+      "date": "2026-10-04T13:24:54Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-10-04T13:24:54Z"
+    },
+    "message": "Merge pull request #56 from policy-as-versioned-driftwood/delivery-stage2-composed-B-current-main-20261004\n\nDeliver signed composition B while retaining apps Source A",
+    "tree": {
+      "sha": "895ed1d6af98b6a6275a0456053d14adbc4bb30f",
+      "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/git/trees/895ed1d6af98b6a6275a0456053d14adbc4bb30f"
+    },
+    "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/git/commits/2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+    "comment_count": 0,
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqwlOmCRC1aQ7uu5UhlAAAgNMQAIiHg4Y/XYA1LQ8izvKX7MlP\nyppk510Jo+QxNnrsoNK7Apb5C54FCNgZ/lUjvnvyLKTmEXMeCY2Qib1iR6Q505nd\nxQCyIB+lpQx3ACJahLsSA41dJddBke1GgehfljXIjZ0aqk5JZegouTB0sMnHmk6h\n8fUbSQVTEJXcX1dUJGic1C/6N0je/s1skFOfQzWng779jK1CAAWAf7Dtx8i/fXEc\nrxWH7P2Kd5fiyJ1C3ipD0pL+6LA0Dnr0bv3eWFVpmG5FP9YNIJB4Aop55NR8ogiP\nQKFVTiphrIdQWoR3NLp2vDge56ZeLi/4LjqWvwgdDM+Yfl4tDSBEt5f8ZGuV2kN5\noKhoRRiEES/ZqWVsJJszm81mdwZrw+PjAj0arG2SzEHjGiqx/hGUTCScReXlYGwb\nQRrKbw3B9XtvZ8BDeZ8kRykvlowD8IJJ4T8VGseZqdnvEnTqNmYBW8OiVjR16igi\n1Lyg01yNXYHH794DySXkV40h+2MNeD+uTzVEje8wP5oze2btqWNE84lv5BHKKWx9\nzs7PfubZjXTHu42l/KYnt8Svbz7d0g1mim0bbKbzdP6U1frChRvgWK6RWDAhg3PB\n4iu1LhaXWdo5M7frC1nXiUi1eifA4RpidXLLJPEsGxWMX2DrWAg5SAzR/UQdSiQw\nA71cNbMmZPyL2z8g2cpF\n=Grq5\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 895ed1d6af98b6a6275a0456053d14adbc4bb30f\nparent 2e04b9803a57cd0d61afa3ef2deeca74f749d969\nparent 2dd89404f699a4af70e6a44451793347a4af11ef\nauthor Chris Nesbitt-Smith <chris@cns.me.uk> 1791120294 +0100\ncommitter GitHub <noreply@github.com> 1791120294 +0100\n\nMerge pull request #56 from policy-as-versioned-driftwood/delivery-stage2-composed-B-current-main-20261004\n\nDeliver signed composition B while retaining apps Source A",
+      "verified_at": "2026-10-04T13:24:55Z"
+    }
+  },
+  "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/commits/2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+  "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/commit/2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+  "comments_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/commits/2ebde7efd1f3c11071719d25f2cba23368cfcdd7/comments",
+  "author": {
+    "login": "chrisns",
+    "id": 715120,
+    "node_id": "MDQ6VXNlcjcxNTEyMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/715120?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/chrisns",
+    "html_url": "https://github.com/chrisns",
+    "followers_url": "https://api.github.com/users/chrisns/followers",
+    "following_url": "https://api.github.com/users/chrisns/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chrisns/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chrisns/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chrisns/subscriptions",
+    "organizations_url": "https://api.github.com/users/chrisns/orgs",
+    "repos_url": "https://api.github.com/users/chrisns/repos",
+    "events_url": "https://api.github.com/users/chrisns/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chrisns/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "committer": {
+    "login": "web-flow",
+    "id": 19864447,
+    "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/web-flow",
+    "html_url": "https://github.com/web-flow",
+    "followers_url": "https://api.github.com/users/web-flow/followers",
+    "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+    "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+    "organizations_url": "https://api.github.com/users/web-flow/orgs",
+    "repos_url": "https://api.github.com/users/web-flow/repos",
+    "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/web-flow/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "parents": [
+    {
+      "sha": "2e04b9803a57cd0d61afa3ef2deeca74f749d969",
+      "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/commits/2e04b9803a57cd0d61afa3ef2deeca74f749d969",
+      "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/commit/2e04b9803a57cd0d61afa3ef2deeca74f749d969"
+    },
+    {
+      "sha": "2dd89404f699a4af70e6a44451793347a4af11ef",
+      "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/commits/2dd89404f699a4af70e6a44451793347a4af11ef",
+      "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/commit/2dd89404f699a4af70e6a44451793347a4af11ef"
+    }
+  ],
+  "stats": {
+    "total": 13,
+    "additions": 7,
+    "deletions": 6
+  },
+  "files": [
+    {
+      "sha": "0ef6a28e952b1dcc5eacaef32a060411516ea50a",
+      "filename": "composed/HEADER.yaml",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/policy-as-versioned-driftwood/driftwood/blob/2ebde7efd1f3c11071719d25f2cba23368cfcdd7/composed%2FHEADER.yaml",
+      "raw_url": "https://github.com/policy-as-versioned-driftwood/driftwood/raw/2ebde7efd1f3c11071719d25f2cba23368cfcdd7/composed%2FHEADER.yaml",
+      "contents_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/contents/composed%2FHEADER.yaml?ref=2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+      "patch": "@@ -624,7 +624,7 @@ ungoverned-namespaces: []\n withdrawn-selectable: false\n comparison-inputs:\n   schema: 1\n-  after: 40282e7a51941ab5c974ee362d75d6124d05f776f2ea16348949e1e64c9584cf\n+  after: e9dcdf11ebbbd9a9d851b2b0c6bb1adb03a3a2f23e32bb814a8871d7a9f56e87\n   before:\n     header:\n       parents:"
+    },
+    {
+      "sha": "989ff53c8860f99c9c6b74a1d7c9a7598e9df7db",
+      "filename": "gitops/composed/composed-set.yaml",
+      "status": "modified",
+      "additions": 6,
+      "deletions": 5,
+      "changes": 11,
+      "blob_url": "https://github.com/policy-as-versioned-driftwood/driftwood/blob/2ebde7efd1f3c11071719d25f2cba23368cfcdd7/gitops%2Fcomposed%2Fcomposed-set.yaml",
+      "raw_url": "https://github.com/policy-as-versioned-driftwood/driftwood/raw/2ebde7efd1f3c11071719d25f2cba23368cfcdd7/gitops%2Fcomposed%2Fcomposed-set.yaml",
+      "contents_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/contents/gitops%2Fcomposed%2Fcomposed-set.yaml?ref=2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+      "patch": "@@ -24,8 +24,9 @@\n #     install platform's tree; it installs the artefact its own composition rendered from\n #     platform's and nist's signed parents (composed/HEADER.yaml records those parent SHAs, and\n #     fact 3 of the sample checks the live platform and nist pins against them).\n-#   * apps and composed delivery use the same genuine v4.0.0 Source A release.\n-#     Its complete policy window and signature gates move with the inventory binding.\n+#   * composed delivery uses genuine v4.0.1 Composition B, whose signed tree binds\n+#     apps and native inventory to Source A v4.0.0. Its complete window is5.0.0,6.0.0,7.0.0.\n+#     Apps and inventory remain A; this reviewed pointer moves only composed delivery to B.\n #   * there is no `spec.verify` here. Flux's GitRepository.spec.verify speaks OpenPGP, and one\n #     signature -- the gitsign tag -- is the only one this estate has (ADR-0023, D3). Verification\n #     at the source boundary is the identity-pinned gitsign-verifying controller of ticket 41,\n@@ -69,9 +70,9 @@ spec:\n   interval: 1m\n   url: https://github.com/policy-as-versioned-driftwood/driftwood\n   ref:\n-    tag: v4.0.0\n-    commit: 1cd446f62a531c0aeee7e50c0a59a11ac5d00d67\n-    # The resolved SHA of the genuine signed v4.0.0 Source A release.\n+    tag: v4.0.1\n+    commit: 872d5c7f44801b496731b11cd40881f304f8a09a\n+    # The resolved SHA of the genuine signed v4.0.1 Composition B release.\n     # Belt-and-braces immutability, ADR-0001.\n ---\n apiVersion: fluxcd.controlplane.io/v1"
+    }
+  ]
+}

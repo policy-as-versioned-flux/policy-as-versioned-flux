@@ -1,0 +1,6 @@
+test_committed_apps_objects_travel_without_dirty_bytes_or_prior_comparison (test_real_adopter_fixture.RealAdopterFixture.test_committed_apps_objects_travel_without_dirty_bytes_or_prior_comparison) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.013s
+
+OK

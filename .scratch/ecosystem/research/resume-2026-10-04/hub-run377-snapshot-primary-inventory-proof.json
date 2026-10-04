@@ -1,0 +1,16 @@
+{
+  "baseline_archive": {
+    "refused": true,
+    "reason": "apps source or pinned tree is unreadable: Command '['git', '-C', '/private/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp84qjb3pp/baseline', 'rev-parse', '--show-toplevel']' returned non-zero exit status 128."
+  },
+  "repaired_real_git_copy": {
+    "PASS": true,
+    "images": [
+      "ghcr.io/policy-as-versioned-ludlow/reports:v1.0.1@sha256:fa1b651ace9b00a636a4c0622fa9be63667fcdfe61a34e3ed8b618f07f0397e2"
+    ],
+    "equal_to_source_pin": true
+  },
+  "tools_commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "actual_scheduled_run_regraded": false,
+  "inventory_reader_source_sha256": "2cb807ab1edb765773b0288cb24bb88fa63a0db75965525a9af6c60568271cfb"
+}

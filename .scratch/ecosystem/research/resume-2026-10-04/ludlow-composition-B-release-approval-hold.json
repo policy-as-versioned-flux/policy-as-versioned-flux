@@ -1,0 +1,19 @@
+{
+  "head": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63",
+  "proposed_tag": "v4.0.1",
+  "ludlow_cut_attempted": false,
+  "ludlow_release_attempted": false,
+  "root_reported_driftwood_dispatch_rejection": {
+    "execution_occurred": false,
+    "reason": "Exact public atomic branch/PR/merge approval does not cover a distinct immutable v4.0.1 signed tag and release."
+  },
+  "required_next_authorization": "Root's explicit both-DW/LU B cut/release question, after fresh LU Spec closure",
+  "root_standards": "ludlow-composition-B-root-standards-review.json",
+  "fresh_composition_packet": "ludlow-composition-B-published-main-candidate.json",
+  "no_alternate_executor_or_workaround": true,
+  "normal_workflow_inputs_read": {
+    "cut-release.yml": {"ref": "main", "inputs": ["version", "message"]},
+    "release.yml": {"required_ref": "v4.0.1", "inputs": {"tag": "v4.0.1"}, "reason": "Checkout uses workflow dispatch ref; tag input alone does not select immutable source."}
+  }
+}

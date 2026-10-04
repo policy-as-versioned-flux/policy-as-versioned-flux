@@ -1,0 +1,36 @@
+{
+  "driftwood": {
+    "head": "de03c5bfc3bde938b30c538d6027508e7f14ee38",
+    "tree": "464b1b4ab6cade9b4252ad8977ff2eaa01fdb30f",
+    "argv": [
+      "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+      "-m",
+      "unittest",
+      "test_platform_tools.WorkflowHistory",
+      "test_platform_tools.RealCompilerLayout"
+    ],
+    "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+    "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate",
+    "exit": 0,
+    "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-source-A-ci-repaired-postcommit-layout.log",
+    "stdout": "",
+    "stderr": "..\n----------------------------------------------------------------------\nRan 2 tests in 19.882s\n\nOK\n"
+  },
+  "ludlow": {
+    "head": "323a1b09dc9d7f4c243c66a3f53f12ea1a4cfeea",
+    "tree": "05b424c162450b3cd85e7117b0589303ac7ec73b",
+    "argv": [
+      "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+      "-m",
+      "unittest",
+      "test_platform_tools.WorkflowHistory",
+      "test_platform_tools.RealCompilerLayout"
+    ],
+    "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+    "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate",
+    "exit": 0,
+    "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-source-A-ci-repaired-postcommit-layout.log",
+    "stdout": "",
+    "stderr": "..\n----------------------------------------------------------------------\nRan 2 tests in 23.498s\n\nOK\n"
+  }
+}

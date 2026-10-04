@@ -1,0 +1,61 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent exact-head Spec review of final composed pointer to authentic released Composition B; apps remain A; no live activation",
+  "head": "b2abe26c155beea87366bcdf9775faae991f0803",
+  "tree": "5dcedc2fbc951c25251ee56b9c13bcf844ab044e",
+  "candidate_packet_sha256": "32aa2fbf928e86606641ff340ac26310cfcbb5b9093d3d4889ea6132078647e3",
+  "source_checks_sha256": "3bfdfa65d3b27b5b62b40774ee84d28cc6662fcaddf9e30bf11a70b0c13cc2a5",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "changed_file_sha256": {
+    "composed/HEADER.yaml": "819d5b6e6a070f0384a18db8232604cfac3880def82b86c15d74c2e8b3a657f8",
+    "gitops/composed/composed-set.yaml": "41cd63c04654f319c3909015bdb8e6da967cf30a43892c838b844c485389bbdf"
+  },
+  "source_A": {
+    "tag": "v4.0.0",
+    "tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e",
+    "commit": "f575dc12de130c444d98a831de0ca21fd68b9c46"
+  },
+  "composed_B": {
+    "tag": "v4.0.1",
+    "tag_object": "9d0fbbbbf1d1ab8ef2d7da5c553f2b86bee22a5c",
+    "commit": "dbaa026f6510fe5c0042f33f29081f3840ea59c3",
+    "tlog_index": "3077582720"
+  },
+  "apps_and_primary_provenance_A_preserved": true,
+  "native_primary_trim": "PASS",
+  "HEADER_only_delta": "comparison-inputs.after",
+  "comparison_after": "1acb6430e97697a50d878ef343bb3b97cce117a3ff2f0e593642d63150a38273",
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "four_gitsign_gates_preserved": true,
+  "engine": "1.18.2",
+  "native_prices_and_OSCAL_nulls_preserved": true,
+  "cloud_activation_or_observed_claims_added": false,
+  "normal_compose_verify_reach_exits": [
+    0,
+    0,
+    0
+  ],
+  "exact_head_gate": {
+    "added": [],
+    "composed": "none",
+    "declared": "none",
+    "elements": [],
+    "new_commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+    "new_tag": "v5.0.0",
+    "old_tag": "v5.0.0",
+    "retired": []
+  },
+  "postcommit_real_layout_exit": 0,
+  "normal_SSH_signature": "G",
+  "clean": true,
+  "findings": [],
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

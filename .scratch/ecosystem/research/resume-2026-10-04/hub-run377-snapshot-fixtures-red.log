@@ -1,0 +1,76 @@
+    fixture pins fixture/threat-register at v1; v2 is on disk
+test_engine_adopter_probe_preserves_its_real_object_context (test_verifier_snapshots.VerifierSnapshots.test_engine_adopter_probe_preserves_its_real_object_context) ... ERROR
+test_reprice_probe_preserves_context_before_calling_the_composer (test_verifier_snapshots.VerifierSnapshots.test_reprice_probe_preserves_context_before_calling_the_composer) ... ERROR
+
+======================================================================
+ERROR: test_engine_adopter_probe_preserves_its_real_object_context (test_verifier_snapshots.VerifierSnapshots.test_engine_adopter_probe_preserves_its_real_object_context)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 61, in test_engine_adopter_probe_preserves_its_real_object_context
+    self.assert_snapshot(copied)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 49, in assert_snapshot
+    self.assertEqual(git(directory, "rev-parse", "--show-toplevel"), str(directory.resolve()))
+                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 22, in git
+    return subprocess.check_output([
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+        "git", "-C", str(repo), "-c", "commit.gpgsign=false",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "-c", "tag.gpgsign=false", "-c", "core.hooksPath=/dev/null",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "-c", "user.name=Snapshot fixture", "-c", "user.email=fixture@example.invalid",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        *args], stderr=subprocess.PIPE, text=True).strip()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 473, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               **kwargs).stdout
+               ^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['git', '-C', '/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmp56fpd02u/work/adopters/forward/fixture', '-c', 'commit.gpgsign=false', '-c', 'tag.gpgsign=false', '-c', 'core.hooksPath=/dev/null', '-c', 'user.name=Snapshot fixture', '-c', 'user.email=fixture@example.invalid', 'rev-parse', '--show-toplevel']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_reprice_probe_preserves_context_before_calling_the_composer (test_verifier_snapshots.VerifierSnapshots.test_reprice_probe_preserves_context_before_calling_the_composer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 77, in test_reprice_probe_preserves_context_before_calling_the_composer
+    reprice.try_bump("fixture", {"name": "threat-register", "party": "fixture"}, "v1", "v2")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/e2e/step2_reprice.py", line 158, in try_bump
+    before = compose(work, work, f"{adopter} at {pinned}")["prices"]
+             ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 71, in composer
+    self.assert_snapshot(Path(directory))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 49, in assert_snapshot
+    self.assertEqual(git(directory, "rev-parse", "--show-toplevel"), str(directory.resolve()))
+                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 22, in git
+    return subprocess.check_output([
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+        "git", "-C", str(repo), "-c", "commit.gpgsign=false",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "-c", "tag.gpgsign=false", "-c", "core.hooksPath=/dev/null",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "-c", "user.name=Snapshot fixture", "-c", "user.email=fixture@example.invalid",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        *args], stderr=subprocess.PIPE, text=True).strip()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 473, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               **kwargs).stdout
+               ^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['git', '-C', '/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/tmpfil6t811/fixture', '-c', 'commit.gpgsign=false', '-c', 'tag.gpgsign=false', '-c', 'core.hooksPath=/dev/null', '-c', 'user.name=Snapshot fixture', '-c', 'user.email=fixture@example.invalid', 'rev-parse', '--show-toplevel']' returned non-zero exit status 128.
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.461s
+
+FAILED (errors=2)

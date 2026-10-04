@@ -1,0 +1,29 @@
+{
+  "scope": "Root independent Standards review of actual committed atomic delivery bytes and final check receipts",
+  "head": "98d13782173342bbdfbd14271e1626e3b11b0d73",
+  "base": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "source_clean": true,
+  "SSH_signature": "G",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json"
+  ],
+  "file_sha256": {
+    "composed/HEADER.yaml": "a8872d6a1b2b09988af2486f1c6815a108c63ef7fd6b3abe85e98a4d63c555e0",
+    "gitops/composed/composed-set.yaml": "630541ffaf1006680039a7ae680d2370052b279b829b7155c79cfe752df344b7",
+    "gitops/flux-system/gotk-sync.yaml": "a9af59b4e5e4ce3da81877c55602c8f9725e91e1b84c8faa6c80b537a68b7911",
+    "inventory/PROVENANCE.json": "db7d91d245db4a2de8dc8d92d62966f6752afc24ad8feb4b52e20933159e1f22"
+  },
+  "hand_authored_diff_inspected": true,
+  "native_inventory_and_primary_metadata_preserved": true,
+  "genuine_source_A_provenance_matches_root_crypto_receipt": true,
+  "composed_HEADER_fingerprint_only": true,
+  "all_other_source_bytes_preserved": true,
+  "packet_sha256": "5c233b0bbd1866562c32b0aac2f160fed1e19b9ad11be7c1eaa0074b52701b09",
+  "hard_findings": [],
+  "result": "PASS",
+  "publication_requires": "Exact Spec PASS plus actual ordinary PR CI and matching-head App review"
+}

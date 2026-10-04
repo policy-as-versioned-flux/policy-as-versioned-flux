@@ -1,0 +1,111 @@
+{
+  "scope": "independent exact committed source inspection; no external actions or source edits",
+  "packet_sha256": "e52ed27f6ddba571dabab735ece6d69503d754cc8f49b3be0f9763967ebf8535",
+  "adopters": {
+    "driftwood": {
+      "head": "eac40457ffb4b593dfbe17015c525db3f0914f5f",
+      "tree": "bd42b04976d0c74f08228fb0eb6115c0a81207b7",
+      "normal_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0",
+      "clean": true,
+      "critical_file_sha256": {
+        "verify-twin-overlay.sh": "7dafa7970e97dc7967838da6636c36139f9505070361eaeee54d8265f568bd07",
+        "twin/VENDORED.md": "2d0c2aa4c612706184f75dc454043f2d54e1d65ef9276f06b641505d8b8005c3",
+        "twin/PIN.yaml": "7bc8c412950f8ace3d657c132c136e61d12276c71369c3f99cf044300d0c8d30",
+        "twin/emit-forward-intel.py": "5868e4b2e908580ea978007bff62a976c9fa27ef68cb2f35536a939a451c738d",
+        "twin/forward-intel/payload.schema.json": "25af0b779905a5a92e0dfeeeae82decb59ab7b518b3287ba0577ec3a79a3aacc",
+        ".github/workflows/twin-sweep.yml": "372e83f2ee2c6ee1d0741907167c15ad715d480712032e3ba53da619d84b542b",
+        "gitops/flux-system/gotk-sync-fx.yaml": "065d2741dc76e9faa5ee46f745fc4e731d6ca9d7bd30dc09ffb24f15f3b32ff0"
+      },
+      "patch_sha256": "fa4fd05f5f3b1846f72496f93235d0e1b5066b422027ef27ef0c91504dbd5422",
+      "retained_upstream_apps_paths": 7,
+      "canonical_sha256": "08c5bcec9af6f03a2fad39a3fefa4d63312354e047a7965f987d325f3f833cf2",
+      "typed_optional_schema_extensions": "PASS",
+      "schema_negative_mutations_refused": [
+        "base_required",
+        "unknown_extension",
+        "required_optional_metadata",
+        "grade_outside_ladder"
+      ],
+      "served_apps_ref_retained": {
+        "tag": "v3.0.1",
+        "commit": "17302ecd20041df61a52428e67246c330294d2a6"
+      },
+      "composed_ref_retained": {
+        "tag": "v3.0.0",
+        "commit": "bf9889aa6a6d979c87a5633240a1447765d73503"
+      },
+      "clean_producer_payloads_match_committed_tree": true,
+      "canonical_present_helper_and_postcommit_byte_replay": "PASS"
+    },
+    "tuppence": {
+      "head": "d1dbe766e09bb8112efa609836af0aa95cbe0ee4",
+      "tree": "229bb619b07e1d2410573d81e8768791b15b2191",
+      "normal_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0",
+      "clean": true,
+      "critical_file_sha256": {
+        "verify-twin-overlay.sh": "48e0b96cbbe1015aef4edcb3f96af2652bbfe641e65102b5aac9d7268adda047",
+        "twin/VENDORED.md": "d926b6c8aa0ae59b95d7ae2faae3f8ab77120a0c92e16134db151dde1bf9723a",
+        "twin/PIN.yaml": "954c7ae260b559abec0636ad2a716844915505fc99c4e5f262f6ed775821b50d",
+        "twin/emit-forward-intel.py": "7f3172f9e566ba479f5af78b249bd1c26e74793308767c4757df787dd011d460",
+        "twin/forward-intel/payload.schema.json": "25af0b779905a5a92e0dfeeeae82decb59ab7b518b3287ba0577ec3a79a3aacc",
+        ".github/workflows/twin-sweep.yml": "48ba413d537ccf9a52f58e6cd205b5ce66d2e5472a54ce0b4a50fa1fa08ae192",
+        "gitops/flux-system/gotk-sync-fx.yaml": "065d2741dc76e9faa5ee46f745fc4e731d6ca9d7bd30dc09ffb24f15f3b32ff0"
+      },
+      "patch_sha256": "6104bf670085dffca5742637216023e9984e205495602746bb49d60c929faa04",
+      "retained_upstream_apps_paths": 6,
+      "canonical_sha256": "08c5bcec9af6f03a2fad39a3fefa4d63312354e047a7965f987d325f3f833cf2",
+      "typed_optional_schema_extensions": "PASS",
+      "schema_negative_mutations_refused": [
+        "base_required",
+        "unknown_extension",
+        "required_optional_metadata",
+        "grade_outside_ladder"
+      ],
+      "served_apps_ref_retained": {
+        "tag": "v3.0.1",
+        "commit": "d8dead25e0e5e275172640b1a637562e45edb15d"
+      },
+      "composed_ref_retained": {
+        "tag": "v3.0.0",
+        "commit": "3d64a4d65d5eb5d81deedc10a0826c8b02d0ad39"
+      },
+      "clean_producer_payloads_match_committed_tree": true,
+      "canonical_present_helper_and_postcommit_byte_replay": "PASS"
+    },
+    "ludlow": {
+      "head": "926d6b38384fd9b532305c668313920ff943653a",
+      "tree": "7c91c4e52346d9477a5bae17d2487463674141c9",
+      "normal_signature": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0",
+      "clean": true,
+      "critical_file_sha256": {
+        "verify-twin-overlay.sh": "2bd66bf850b493d798c5aea41370b5871b1aa11d7626fdab4c2a57d84b887ab2",
+        "twin/VENDORED.md": "8146a4b49a88dac5ff77d80f958d633c4209e9ee2b9f6bdef66958e05c5b29cd",
+        "twin/PIN.yaml": "954c7ae260b559abec0636ad2a716844915505fc99c4e5f262f6ed775821b50d",
+        "twin/emit-forward-intel.py": "95f6e2d5332c878c16662ada9abd540edc663f04b99f8294691cba50fcdc89df",
+        "twin/forward-intel/payload.schema.json": "25af0b779905a5a92e0dfeeeae82decb59ab7b518b3287ba0577ec3a79a3aacc",
+        ".github/workflows/twin-sweep.yml": "ec761804e7b4ae81fb4a034cb9b472e606c5219c286b067553433a4810f5549c",
+        "gitops/flux-system/gotk-sync-fx.yaml": "82523e77add5045687839845e8bca5493d7cbe3cd206c4f3a7bbd5a8bb18ddb5"
+      },
+      "patch_sha256": "e751f3285d9aeff4decff0a145d2678a4f6c0c88e7147be68fb1c9ece54da490",
+      "retained_upstream_apps_paths": 6,
+      "canonical_sha256": "08c5bcec9af6f03a2fad39a3fefa4d63312354e047a7965f987d325f3f833cf2",
+      "typed_optional_schema_extensions": "PASS",
+      "schema_negative_mutations_refused": [
+        "base_required",
+        "unknown_extension",
+        "required_optional_metadata",
+        "grade_outside_ladder"
+      ],
+      "served_apps_ref_retained": {
+        "tag": "v3.0.1",
+        "commit": "5ff463673cf05af71a5db2ed0c38deaf263464d2"
+      },
+      "composed_ref_retained": {
+        "tag": "v3.0.0",
+        "commit": "45b3fbd21d2838f8882dfa6265b3a6e8fa61b3a9"
+      },
+      "clean_producer_payloads_match_committed_tree": true,
+      "canonical_present_helper_and_postcommit_byte_replay": "PASS"
+    }
+  }
+}

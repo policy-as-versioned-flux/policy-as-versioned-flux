@@ -1,0 +1,50 @@
+{
+  "v3.3.0": {
+    "object": "a7070f22f23e510effb3eb5f1e6781972cf7df9f",
+    "commit": "38089a68769453db9ea3faf0ee637ae93f309980",
+    "cloud_paths": [],
+    "pin_rule": "party/pin_content.py"
+  },
+  "v3.4.0": {
+    "object": "64dbcbb70f1d45389ed3ba49a5926f51018005f3",
+    "commit": "0ceb549e91eba8477d8cd634eb250ad8f3e7d1c4",
+    "cloud_paths": [],
+    "pin_rule": "party/pin_content.py"
+  },
+  "v3.4.1": {
+    "object": "f06a8a579f4d32fa03711138651f89324b9d458c",
+    "commit": "bfd5361d2d6c29a74ed971d5dbc7080b5c0c2841",
+    "cloud_paths": [],
+    "pin_rule": "party/pin_content.py"
+  },
+  "v4.0.0": {
+    "object": "149f8e2142021d203e74b47d18f26100619f3bfa",
+    "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+    "cloud_paths": [],
+    "pin_rule": "party/pin_content.py"
+  },
+  "v5.0.0": {
+    "object": "6ab1d49cf4ded25b4939ba16f8e8e741a5c2b8f0",
+    "commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+    "cloud_paths": [
+      "implementations/cloud/README.md",
+      "implementations/cloud/VERSION",
+      "implementations/cloud/cloud-rbac.yaml",
+      "implementations/cloud/component-definition.json",
+      "implementations/cloud/crossplane-dials.yaml",
+      "implementations/cloud/package.yaml",
+      "implementations/cloud/policies/cloud-cage-rds.yaml",
+      "implementations/cloud/policies/cloud-cage-s3.yaml",
+      "implementations/cloud/policies/require-rds-multi-az.yaml",
+      "implementations/cloud/policies/require-s3-bucket-encryption.yaml",
+      "implementations/cloud/release_check.py",
+      "implementations/cloud/render.py",
+      "implementations/cloud/replay.py",
+      "implementations/cloud/tests/cases.yaml",
+      "implementations/cloud/tests/resource-mapping-crds.yaml",
+      "implementations/cloud/trigger.py",
+      "implementations/cloud/verify-cloud-package.sh"
+    ],
+    "pin_rule": "party/pin_content.py"
+  }
+}

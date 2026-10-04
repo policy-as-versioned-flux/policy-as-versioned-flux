@@ -1,0 +1,45 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent Spec review of fresh Composition B on actual published Ludlow main; genuine B publication readiness only",
+  "head": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63",
+  "packet_sha256": "13902752d3ea6d6a760e8b4f59d45eacd8a97ea6ae713a8f2c52d3330f9a395f",
+  "valid_GitHub_merge_signature_receipt": true,
+  "main_receipt_sha256": "f1bf2611fb9fbe8172cda43ae62cff9b25757f0dacb800b6e9d7947eb08b4811",
+  "fresh_authentic_compose_verify_reach_exits": [
+    0,
+    0,
+    0
+  ],
+  "all_committed_render_files_independently_matched": 55,
+  "source_output_diff": [],
+  "source_clean": true,
+  "source_A": {
+    "tag": "v4.0.0",
+    "tag_object": "36a1d2634beb4a2321414b020a6527bc714a0aba",
+    "commit": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae"
+  },
+  "apps_and_primary_inventory_A_preserved": true,
+  "native_graph_primary_trim": "PASS",
+  "native_valuation_grade3_and_FX2_inputs": "unchanged",
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "four_gitsign_gates_preserved": true,
+  "comparison_after": "e0f436a51b2094a650661fdf613f74847415186ea003f2d9ad912f3079081b6b",
+  "institutional_gate": {
+    "exit": 0,
+    "declared": "none",
+    "composed": "none",
+    "same_pin_early_return": true,
+    "composed_evidence_independently_byte_equal": true
+  },
+  "engine": "1.18.2",
+  "cloud_or_observed_claims_added": false,
+  "prospective_B_tag": "v4.0.1",
+  "findings": [],
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

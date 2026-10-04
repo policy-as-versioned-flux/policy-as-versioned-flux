@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/engine-pairing/engine_pairing.py",
+    "check"
+  ],
+  "exit": 3,
+  "estate": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/.estate-clone",
+  "input_commits": {
+    "platform": "703eff6aee959843c4160aa54fd03413f62858cc",
+    "driftwood": "2dd89404f699a4af70e6a44451793347a4af11ef",
+    "tuppence": "b2abe26c155beea87366bcdf9775faae991f0803",
+    "ludlow": "b84006a176e6c783bbb45fc2463c46be6ba73071"
+  },
+  "log_sha256": "037ad9a7bdacfa5c0f9725a9519b0821c795db0fdf3a78660308be3cdf6303ee",
+  "actual_scheduled_run_regraded": false
+}

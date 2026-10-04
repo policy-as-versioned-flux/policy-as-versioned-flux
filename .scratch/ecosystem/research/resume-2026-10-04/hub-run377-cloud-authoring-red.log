@@ -1,0 +1,20 @@
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_prepared_cloud_inputs_are_authoring_but_a_delivered_unknown_cr_is_not_exempt _
+[gw0] darwin -- Python 3.14.7 /Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python
+
+    def test_prepared_cloud_inputs_are_authoring_but_a_delivered_unknown_cr_is_not_exempt() -> None:
+        source = rs.classify("platform/implementations/cloud/policies/cloud-cage-rds.yaml", {}, {})
+>       assert source.surface == "authoring" and not source.graded
+E       AssertionError: assert ('other' == 'authoring'
+E         
+E         - authoring
+E         + other)
+
+tests/test_refusal_by_another_name.py:241: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_refusal_by_another_name.py::test_prepared_cloud_inputs_are_authoring_but_a_delivered_unknown_cr_is_not_exempt
+1 failed in 1.24s

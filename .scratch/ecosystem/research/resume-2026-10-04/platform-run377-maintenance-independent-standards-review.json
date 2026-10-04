@@ -1,0 +1,47 @@
+{
+  "axis": "Independent Standards",
+  "verdict": "PASS",
+  "hard_findings": [],
+  "smell_findings": [],
+  "base": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "head": "0547a5fa7babe34227be5085ff63b1cf196d8cae",
+  "tree": "0a2b87aeacceecf5d5423b2e24df4b6e7db1f1b2",
+  "source_clean": true,
+  "normal_SSH_signature": "G",
+  "candidate_sha256": "4a54983579aadfa98b01a50eec58e61b03946b26fcf67eb8371d57ee1e826238",
+  "all_source_artifact_patch_hashes_joined": true,
+  "changed_since_draft": [
+    "compose/composition.py"
+  ],
+  "reviewed_final_additions": [
+    "switching since and window use each actual signed edge date",
+    "vendored source records use each current declared feed pin",
+    "unknown total remains None; no partial sum",
+    "legacy unsigned CVE2 remains honestly behind actual signed major ahead"
+  ],
+  "composition_changed_functions": [
+    "_adopter_copy",
+    "_commit_header",
+    "selfcheck"
+  ],
+  "production_compose_converter_inventory_guard_and_frozen_policies_preserved": true,
+  "independent_focused_tests": {
+    "real_adopter_fixture": 1,
+    "machinery": 2,
+    "result": "PASS",
+    "session": 9561,
+    "drained": true,
+    "hashes_unchanged_since_independent_run": true
+  },
+  "bound_root_full_check_receipts": {
+    "native_assembled_composition_selfcheck": 0,
+    "compose_103_tests": 0,
+    "oscal_2_tests": 0,
+    "inventory_and_CVE_13_tests": 0,
+    "public_feed_check": 0,
+    "public_oscal_check": 0,
+    "git_diff_check": 0
+  },
+  "primary_regrade_or_world_claim": false,
+  "reviewer_source_index_branch_changes": false
+}

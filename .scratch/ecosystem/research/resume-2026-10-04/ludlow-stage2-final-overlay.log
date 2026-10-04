@@ -1,0 +1,20 @@
+PASS: the overlay loads and re-renders twin/forward-intel/v1/feed.json byte-identically
+PASS: owned payload schema preserves the immutable canonical contract plus exactly the optional valuation and rests_on_grade declarations
+PASS: perspective 'ludlow' is party='employer' (the overlay floor needs one employer seat)
+PASS: perspective currency 'GBP' and party.yaml reporting_currency 'GBP' agree
+PASS: this overlay names the party whose balance sheet it is ('ludlow')
+PASS: overlay floor: 4 positioned components
+PASS: overlay floor: 2 role(s) declared as people
+PASS: overlay floor: 1 causal edge(s) reach the declared cash flow 'plan-administration-fees' (this payload prices one shock, so exactly one is what the emitter needs)
+PASS: overlay floor: 1 graded causal edge(s) reaching 'plan-administration-fees' at or inside the admission threshold (3)
+PASS: the priced valuation on 'plan-administration-fees' names a fact that resolves in the signed party artefact ('size.turnover')
+PASS: every declared rung ['baseline', 'restricted', 'quarantine', 'isolated'] is priced by a response in this overlay
+PASS: twin/ladder.yaml's rungs ['baseline', 'restricted', 'quarantine', 'isolated'] are platform's own published ladder ['baseline', 'restricted', 'quarantine', 'isolated']
+PASS: no action-shaped key anywhere in the overlay
+PASS: publishes[] declares the emitted feed
+PASS: planted a perspective valuing in a currency the party does not report in -> REFUSED: perspective 'ludlow' values in USD and party.yaml reports in GBP. Restating one in the other needs an FX rate from the signed fx fe
+PASS: planted a world_ref that no longer describes the vendored bytes -> REFUSED: orgs/ludlow/meta.yaml pins world_ref c2d07330a778ed547b60cfbb87217bcf9813181f, and the vendored world layer stages to 29f0cafc871aa
+PASS: planted a ladder rung the overlay prices no response for -> REFUSED: twin/ladder.yaml declares rung(s) 'quarantine' and this overlay prices no response for them. A curve missing a rung reads as a rung
+PASS: planted a twin release PIN.yaml does not pin -> REFUSED: twin/PIN.yaml pins twin 9.9.9 and the twin package rendering this overlay is 0.1.0. Re-vendor the world layer at the pinned release
+TOTAL: 18 pass, 0 fail, 0 could-not-look
+PASS: ludlow's twin overlay loads, is labelled, prices every rung it declares and emits its feed

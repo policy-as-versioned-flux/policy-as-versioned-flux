@@ -1,0 +1,88 @@
+{
+  "scope": "Actual normal GitHub API updates; preserved all existing main rules and empty bypass",
+  "rows": [
+    {
+      "repository": "driftwood",
+      "ruleset_id": 23993301,
+      "enforcement": "active",
+      "rules": [
+        "deletion",
+        "non_fast_forward",
+        "pull_request"
+      ],
+      "approving_reviews": 1,
+      "bypass_actors": [],
+      "request_sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "response_sha256": "7329bce125c33fbfc12b2dee225993cbadecb9d5c613fece648d961d2c917505"
+    },
+    {
+      "repository": "ludlow",
+      "ruleset_id": 23993310,
+      "enforcement": "active",
+      "rules": [
+        "deletion",
+        "non_fast_forward",
+        "pull_request"
+      ],
+      "approving_reviews": 1,
+      "bypass_actors": [],
+      "request_sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "response_sha256": "feadfdd1ea114f70cf9424ba109362a77ef454212af106cc3cb7b21816886f4c"
+    },
+    {
+      "repository": "tuppence",
+      "ruleset_id": 23993306,
+      "enforcement": "active",
+      "rules": [
+        "deletion",
+        "non_fast_forward",
+        "pull_request"
+      ],
+      "approving_reviews": 1,
+      "bypass_actors": [],
+      "request_sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "response_sha256": "3bd11a085a93438d6e39322ddeaccfd2c71044f578faee9cb65eba6bad5818c8"
+    },
+    {
+      "repository": "platform",
+      "ruleset_id": 23993294,
+      "enforcement": "active",
+      "rules": [
+        "deletion",
+        "non_fast_forward",
+        "pull_request"
+      ],
+      "approving_reviews": 1,
+      "bypass_actors": [],
+      "request_sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "response_sha256": "99386c5a0d9d64672859fc89a5451c80faf05c40fb98da3fc0c38766b0dae796"
+    },
+    {
+      "repository": "hub",
+      "ruleset_id": 23950610,
+      "enforcement": "active",
+      "rules": [
+        "deletion",
+        "non_fast_forward",
+        "pull_request"
+      ],
+      "approving_reviews": 1,
+      "bypass_actors": [],
+      "request_sha256": "50c3a8a6b2648ba740048192a1f058ffee09e79de936bc0f44a0b767fe93a358",
+      "response_sha256": "31b15a75787f27c881942d494ecf4151ed57559a40795bf61e17bbce0dcf989b"
+    }
+  ],
+  "forge_full_grader_pending": false,
+  "fresh_full_grade": {
+    "exit": 0,
+    "repositories": 9,
+    "log": ".scratch/ecosystem/research/resume-2026-10-04/forge-current-complete-grade-after-review-repair.log",
+    "sha256": "b4d71ea2b57d835b09ccec81099d05bdf6e428e9cc6fc043dfd704b2ec1b0a8e",
+    "facts": "forge-current-complete-facts-after-review-repair.json",
+    "fact_sha256": "139430efe4eec4fdc9e367b0a7de6b726b8ee486871a44dfa317427bbc659c28",
+    "source_context": "forge-current-checker-estate-context.json",
+    "SKIP": 0,
+    "FAIL": 0,
+    "all_bypass_lists_read_and_empty": true
+  }
+}

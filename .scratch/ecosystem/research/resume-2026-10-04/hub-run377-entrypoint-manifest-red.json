@@ -1,0 +1,25 @@
+{
+  "runtime": {
+    "served-workloads": {
+      "exit": 3,
+      "no_hub_interpreter": true,
+      "output": "SKIP: no hub interpreter for the workload lane"
+    },
+    "oscal-lane": {
+      "exit": 3,
+      "no_hub_interpreter": true,
+      "output": "SKIP: no hub interpreter for the workload lane"
+    }
+  },
+  "missing_manifest_rows": [
+    "verify/cve-inventory/verify-cve-inventory.sh",
+    "verify/engine-pairing/verify-engine-pairing.sh",
+    "verify/twin-cage/verify-twin-cage.sh"
+  ],
+  "genuine_CVE_PASS_output_counted_as_fail": 1,
+  "genuine_CVE_PASS_output_counted_as_pass": 0,
+  "manifest_explanation": [
+    "FAIL manifest: verify/cve-inventory/verify-cve-inventory.sh passed but has no line in talk/verify-manifest.txt, so the split cannot place it; add `verify/cve-inventory/verify-cve-inventory.sh | <class> | -`"
+  ],
+  "live_or_scheduled_observation_claimed": false
+}

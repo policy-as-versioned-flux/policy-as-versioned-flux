@@ -1,0 +1,26 @@
+{
+  "scope": "Local validation logs only; no primary observations, source, tags or receipts changed",
+  "detail": "Fresh helper reused four public consumer validation log filenames from superseded848/457 rehearsal. Preserve the old JSON receipts as historical; these four old log files now contain the later current-clock validation, relocated under distinct current-clock names. Do not claim old source-head replay from the overwritten log filenames. All fresh proof references point to distinct new names.",
+  "collisions": [
+    {
+      "old_local_validation_filename": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-scenario-order-actual-standing-checker.log",
+      "fresh_current_clock_log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-scenario-order-current-clock-actual-standing-checker.log",
+      "sha256": "4188e6101e9b66b877d4d15b004d51ec08f9500f004e3fbd5db378e412dd7cf5"
+    },
+    {
+      "old_local_validation_filename": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-scenario-order-public-tests.log",
+      "fresh_current_clock_log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-scenario-order-current-clock-public-tests.log",
+      "sha256": "140b5ae90035a2de347af8414f7b5830a328d27c037249e23bc1b9a797b408ef"
+    },
+    {
+      "old_local_validation_filename": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-actual-standing-checker.log",
+      "fresh_current_clock_log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-current-clock-actual-standing-checker.log",
+      "sha256": "e74a1a92dc7cdb61f1111c2738d46278175db7feb366b3fca3d99ba7db78dce8"
+    },
+    {
+      "old_local_validation_filename": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-public-tests.log",
+      "fresh_current_clock_log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-current-clock-public-tests.log",
+      "sha256": "94459002edd4b679902a4ce0f1e9524e90198db59b22c76a0f4e673528603296"
+    }
+  ]
+}

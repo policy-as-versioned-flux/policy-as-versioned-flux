@@ -1,0 +1,142 @@
+{
+  "driftwood": {
+    "compose": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood/.github/scripts/platform-tools.py",
+        "--adopter-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+        "--tools-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/platform-tools",
+        "compose",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+        "--estate-clone",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-source-A-ci-repair-compose.log"
+    },
+    "verify": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood/.github/scripts/platform-tools.py",
+        "--adopter-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+        "--tools-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/platform-tools",
+        "verify",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+        "--estate-clone",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-source-A-ci-repair-verify.log"
+    },
+    "public-tests": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-source-A-ci-repair-public-tests.log"
+    },
+    "workflow-tests": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".github/tests",
+        "-p",
+        "test_*.py"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-source-A-ci-repair-workflow-tests.log"
+    }
+  },
+  "ludlow": {
+    "compose": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow/.github/scripts/platform-tools.py",
+        "--adopter-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+        "--tools-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/platform-tools",
+        "compose",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+        "--estate-clone",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-source-A-ci-repair-compose.log"
+    },
+    "verify": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow/.github/scripts/platform-tools.py",
+        "--adopter-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+        "--tools-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/platform-tools",
+        "verify",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+        "--estate-clone",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-source-A-ci-repair-verify.log"
+    },
+    "public-tests": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-source-A-ci-repair-public-tests.log"
+    },
+    "workflow-tests": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        ".github/tests",
+        "-p",
+        "test_*.py"
+      ],
+      "cwd": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "PAVF_REAL_ESTATE": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate",
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-source-A-ci-repair-workflow-tests.log"
+    }
+  }
+}

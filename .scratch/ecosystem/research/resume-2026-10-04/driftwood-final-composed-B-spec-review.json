@@ -1,0 +1,60 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent exact-head Spec review of final composed pointer to genuine published B; apps remain A; no live activation",
+  "head": "226a319f475fb34a16745d836197807331efa3d9",
+  "tree": "deaabb66afb86eaacc14c9c5945d4dae63cda64d",
+  "candidate_packet_sha256": "29b572a403c54c7666d40e70391fbedbcec4640fa142416ba69a80323ce6e35f",
+  "source_checks_sha256": "f4031841db20e0cc54bb9bfc06ec3ce651aaaafb0b3a24a9bd7545291c2e4b18",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "changed_file_sha256": {
+    "composed/HEADER.yaml": "1f6302dbb257e2ecc4f8c7c02d5768577632abd719739ad78d883dce6273d815",
+    "gitops/composed/composed-set.yaml": "289ef0ced35464aa74442df9dae5e09991bba8ba4d6eefe2a243e87e4632aa14"
+  },
+  "source_A": {
+    "tag": "v4.0.0",
+    "tag_object": "bff31936b9e34074a7ce078e873d3a0df31ecd35",
+    "commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67"
+  },
+  "composed_B": {
+    "tag": "v4.0.1",
+    "tag_object": "1faa6914677d8da75ecf5fd4f03c7e338282c789",
+    "commit": "872d5c7f44801b496731b11cd40881f304f8a09a",
+    "tlog_index": "3077655413"
+  },
+  "apps_and_primary_provenance_A_preserved": true,
+  "native_primary_trim": "PASS",
+  "HEADER_only_delta": "comparison-inputs.after",
+  "comparison_after": "e9dcdf11ebbbd9a9d851b2b0c6bb1adb03a3a2f23e32bb814a8871d7a9f56e87",
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "four_gitsign_gates_preserved": true,
+  "engine": "1.18.2",
+  "native_prices_and_OSCAL_nulls_preserved": true,
+  "cloud_activation_or_observed_claims_added": false,
+  "normal_compose_verify_reach_exits": [
+    0,
+    0,
+    0
+  ],
+  "exact_head_gate": {
+    "added": [],
+    "composed_bump": "none",
+    "declared_bump": "none",
+    "reasons": [],
+    "retired": [],
+    "weaker_than_declared": false
+  },
+  "postcommit_real_layout_tests": 3,
+  "normal_SSH_signature": "G",
+  "clean": true,
+  "findings": [],
+  "validation_metadata_correction": "Handoff said4; primary executed log is3. Record actual3; no source/test modification needed.",
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

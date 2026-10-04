@@ -1,0 +1,36 @@
+{
+  "axis": "Standards",
+  "verdict": "PASS",
+  "candidate_sha256": "2414fb3a25350072eff1c76d88cb6edc089fc9c1ab21632034eac02e918ad82b",
+  "adopters": {
+    "ludlow": {
+      "head": "b6aac1e5b0419a96ac675326adf5d2110d786c81",
+      "tree": "7e510770eb2d96b4bdfc594211d7e1050f13e17d",
+      "base": "035c9b991c5e2d69134737db7967437a62d6f288",
+      "normal_signature": "G",
+      "clean": true,
+      "source_and_primary_artifact_hashes_match": true,
+      "HEADER_fingerprint_only": true,
+      "actual_clock_preserved": true,
+      "all_other_source_bytes_preserved": true,
+      "independent_tests": 10,
+      "independent_subtests": 19,
+      "independent_test_log_sha256": "414da7f495eae3d4a215d3ec708484a05a69e58c6329e8338c7975c3dc3f75f8"
+    },
+    "tuppence": {
+      "head": "02c35b74a9044be9f02c580dd94103c85923a009",
+      "tree": "13d698baa99283a93601d90839a27e8844cbb55b",
+      "base": "7b3b0bd7aeb0895a0557a0cb8de6b17bdaba91f2",
+      "normal_signature": "G",
+      "clean": true,
+      "source_and_primary_artifact_hashes_match": true,
+      "HEADER_fingerprint_only": true,
+      "actual_clock_preserved": true,
+      "all_other_source_bytes_preserved": true,
+      "independent_tests": 10,
+      "independent_subtests": 19,
+      "independent_test_log_sha256": "414da7f495eae3d4a215d3ec708484a05a69e58c6329e8338c7975c3dc3f75f8"
+    }
+  },
+  "substantive_findings": []
+}

@@ -1,0 +1,114 @@
+diff --git a/composed/HEADER.yaml b/composed/HEADER.yaml
+index d44a945..feda986 100644
+--- a/composed/HEADER.yaml
++++ b/composed/HEADER.yaml
+@@ -624,7 +624,7 @@ ungoverned-namespaces: []
+ withdrawn-selectable: false
+ comparison-inputs:
+   schema: 1
+-  after: 2fa71b01e3673accce0ae551ac967431470920e08e41424e1d3413849bee77dc
++  after: e0f436a51b2094a650661fdf613f74847415186ea003f2d9ad912f3079081b6b
+   before:
+     header:
+       parents:
+diff --git a/gitops/composed/composed-set.yaml b/gitops/composed/composed-set.yaml
+index 170e4a3..ad51b3a 100644
+--- a/gitops/composed/composed-set.yaml
++++ b/gitops/composed/composed-set.yaml
+@@ -24,11 +24,8 @@
+ #     install platform's tree; it installs the artefact its own composition rendered from
+ #     platform's and nist's signed parents (composed/HEADER.yaml records those parent SHAs, and
+ #     fact 3 of the sample checks the live platform and nist pins against them).
+-#   * the tag is v3.0.0, not the v1.0.0 in gitops/flux-system/gotk-sync.yaml. v1.0.0 predates
+-#     composed/ and does not carry the tree this reconciles. v3.0.0 is the first tag composed
+-#     under platform v4.0.0, which retired policy 4.0.0. A self-pin bump is a reviewed PR that
+-#     moves tag and commit together (renovate.json's customManagers track nist and platform, not
+-#     the self-pin).
++#   * apps and composed delivery use the same genuine v4.0.0 Source A release.
++#     Its complete policy window and signature gates move with the inventory binding.
+ #   * there is no `spec.verify` here. Flux's GitRepository.spec.verify speaks OpenPGP, and one
+ #     signature -- the gitsign tag -- is the only one this estate has (ADR-0023, D3). Verification
+ #     at the source boundary is the identity-pinned gitsign-verifying controller of ticket 41,
+@@ -67,17 +64,17 @@ metadata:
+     # verified with somebody else's identity is observed false rather than merely 'verified'.
+     policy-as-versioned.dev/gitsign-identity-regexp: ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+     policy-as-versioned.dev/gitsign-issuer: https://token.actions.githubusercontent.com
+-    policy-as-versioned.dev/gitsign-gates: flux-system/composed-v5-0-0,flux-system/composed-machinery
++    policy-as-versioned.dev/gitsign-gates: flux-system/composed-v5-0-0,flux-system/composed-v6-0-0,flux-system/composed-v7-0-0,flux-system/composed-machinery
+   labels:
+     policy-as-versioned.dev/composed-for: ludlow
+ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-ludlow/ludlow
+   ref:
+-    tag: v3.0.0
+-    commit: 45b3fbd21d2838f8882dfa6265b3a6e8fa61b3a9
+-    # The resolved SHA ludlow's own v3.0.0 tag points to (`git ls-remote origin 'refs/tags/v3.0.0^{}'`,
+-    # 2026-09-24). Belt-and-braces immutability, ADR-0001.
++    tag: v4.0.0
++    commit: c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae
++    # The resolved SHA of the genuine signed v4.0.0 Source A release.
++    # Belt-and-braces immutability, ADR-0001.
+ ---
+ apiVersion: fluxcd.controlplane.io/v1
+ kind: ResourceSet
+@@ -95,9 +92,10 @@ spec:
+         # directories the pinned tag carries and every machinery allow-list at that tag. Move it
+         # in the same pull request that moves the tag.
+         - { version: "5.0.0" }
+-        # v3.0.0 carries composed/policies/v5.0.0 only. It was composed under platform v4.0.0,
+-        # which retired policy 4.0.0 (owner-instructed 2026-09-24), so 4.0.0 left this array in
+-        # the same pull request that moved the tag. The workloads ludlow declares claim 5.0.0.
++        - { version: "6.0.0" }
++        - { version: "7.0.0" }
++        # This array and all verification gates match the genuine signed target tree.
++        # Current workload declarations claim 7.0.0; older supported claims remain caged.
+   resourcesTemplate: |
+     << range $v := (index (inputs) "versions") >>
+     ---
+diff --git a/gitops/flux-system/gotk-sync.yaml b/gitops/flux-system/gotk-sync.yaml
+index e7ea2eb..4fd7de0 100644
+--- a/gitops/flux-system/gotk-sync.yaml
++++ b/gitops/flux-system/gotk-sync.yaml
+@@ -18,10 +18,10 @@ spec:
+   interval: 1m
+   url: https://github.com/policy-as-versioned-ludlow/ludlow
+   ref:
+-    tag: v3.0.1
+-    commit: 5ff463673cf05af71a5db2ed0c38deaf263464d2
++    tag: v4.0.0
++    commit: c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae
+     # commit pinned at release (belt-and-braces immutability, ADR-0001) --
+-    # the resolved SHA ludlow's own signed v3.0.1 apps release points to. Not covered by the
++    # the resolved SHA ludlow's own signed v4.0.0 apps release points to. Not covered by the
+     # Renovate customManagers in renovate.json (those track nist and platform
+     # only); a self-pin bump is a reviewed PR that moves both fields together.
+ ---
+diff --git a/inventory/PROVENANCE.json b/inventory/PROVENANCE.json
+index 7dce496..e4225e8 100644
+--- a/inventory/PROVENANCE.json
++++ b/inventory/PROVENANCE.json
+@@ -1,6 +1,6 @@
+ {
+   "apps_source": {
+-    "commit": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
++    "commit": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae",
+     "path": "gitops/apps",
+     "repository": "https://github.com/policy-as-versioned-ludlow/ludlow",
+     "signature": {
+@@ -9,11 +9,11 @@
+       "identity": "https://github.com/policy-as-versioned-ludlow/ludlow/.github/workflows/cut-release.yml@refs/heads/main",
+       "issuer": "https://token.actions.githubusercontent.com",
+       "rekor": true,
+-      "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511349",
+-      "tlog_index": "3075511349"
++      "rekor_entry": "https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3077567855",
++      "tlog_index": "3077567855"
+     },
+-    "tag": "v3.0.1",
+-    "tag_object": "2cc62f42b297f1f7ed65babc381a6dad561f3240"
++    "tag": "v4.0.0",
++    "tag_object": "36a1d2634beb4a2321414b020a6527bc714a0aba"
+   },
+   "binding": "The complete exact tagged apps graph and primary reports reproduce images.json; no release or cluster activation is asserted.",
+   "cached_database_unchanged": true,

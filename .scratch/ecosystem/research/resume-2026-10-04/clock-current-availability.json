@@ -1,0 +1,476 @@
+{
+  "adopters": {
+    "driftwood": {
+      "errors": [],
+      "latest_committed_sample_run": "37120458169",
+      "latest_committed_samples": [
+        {
+          "pin": {
+            "commit": "bf9889aa6a6d979c87a5633240a1447765d73503",
+            "consumer": "resourceset",
+            "pin_from": "gitops/composed/composed-set.yaml",
+            "tag": "v3.0.0",
+            "url": "https://github.com/policy-as-versioned-driftwood/driftwood"
+          },
+          "policy_version_in_force": "5.0.0",
+          "rendered_from": "v3.0.0",
+          "revision": "sha1:92034b0927eb0c15aa9760deddbe6da2960038f0",
+          "run": "37120458169",
+          "source": "driftwood-composed",
+          "ts": "2026-10-03T11:42:49Z",
+          "verdict": "COULD-NOT-LOOK"
+        },
+        {
+          "pin": {
+            "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+            "consumer": "verified-source-only",
+            "pin_from": "gitops/platform/platform-pin.yaml",
+            "tag": "v4.0.0",
+            "url": "https://github.com/policy-as-versioned-platform/platform"
+          },
+          "policy_version_in_force": "5.0.0",
+          "rendered_from": "v3.0.0",
+          "revision": "sha1:92034b0927eb0c15aa9760deddbe6da2960038f0",
+          "run": "37120458169",
+          "source": "platform",
+          "ts": "2026-10-03T11:42:49Z",
+          "verdict": "COULD-NOT-LOOK"
+        },
+        {
+          "pin": {
+            "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "consumer": "verified-source-only",
+            "pin_from": "gitops/flux-system/gotk-sync-nist.yaml",
+            "tag": "v1.1.0",
+            "url": "https://github.com/policy-as-versioned-nist/nist"
+          },
+          "policy_version_in_force": "5.0.0",
+          "rendered_from": "v3.0.0",
+          "revision": "sha1:92034b0927eb0c15aa9760deddbe6da2960038f0",
+          "run": "37120458169",
+          "source": "nist",
+          "ts": "2026-10-03T11:42:49Z",
+          "verdict": "COULD-NOT-LOOK"
+        }
+      ],
+      "latest_scheduled_runs": [
+        {
+          "conclusion": "success",
+          "created_at": "2026-10-03T11:41:22Z",
+          "event": "schedule",
+          "head_branch": "main",
+          "head_sha": "a1b311d44beaab64a3e9a82169446445c078ed22",
+          "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37120458169",
+          "id": 37120458169,
+          "status": "completed",
+          "updated_at": "2026-10-03T11:43:05Z"
+        },
+        {
+          "conclusion": "success",
+          "created_at": "2026-10-02T12:37:57Z",
+          "event": "schedule",
+          "head_branch": "main",
+          "head_sha": "ac8149c121c34000f86cb21099ab63eb60954036",
+          "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37007847248",
+          "id": 37007847248,
+          "status": "completed",
+          "updated_at": "2026-10-02T12:39:50Z"
+        },
+        {
+          "conclusion": "success",
+          "created_at": "2026-10-01T13:18:39Z",
+          "event": "schedule",
+          "head_branch": "main",
+          "head_sha": "278a5958023d7935388397e99cfff7765eb9686c",
+          "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/36867745153",
+          "id": 36867745153,
+          "status": "completed",
+          "updated_at": "2026-10-01T13:20:49Z"
+        }
+      ],
+      "main_at_read": "872d5c7f44801b496731b11cd40881f304f8a09a",
+      "qualified_new_source_PolicyReport_baseline": "Not established: retained five-facts samples and successful workflow metadata alone do not prove a new-source PolicyReport baseline.",
+      "reads": {
+        "samples": {
+          "blob_sha": "ce4f0794734c5178f1eef06905d855b97e4df305",
+          "bytes": 598432,
+          "path": "drift/samples.jsonl",
+          "ref": "872d5c7f44801b496731b11cd40881f304f8a09a",
+          "sha256": "600a5e2f86ae3e689bc23c10128d895a897d36b1885729324dd306d5313c3260"
+        }
+      },
+      "repository": "policy-as-versioned-driftwood/driftwood"
+    },
+    "ludlow": {
+      "errors": [],
+      "latest_committed_sample_run": "37129105076",
+      "latest_committed_samples": [
+        {
+          "pin": {
+            "commit": "45b3fbd21d2838f8882dfa6265b3a6e8fa61b3a9",
+            "consumer": "resourceset",
+            "pin_from": "gitops/composed/composed-set.yaml",
+            "tag": "v3.0.0",
+            "url": "https://github.com/policy-as-versioned-ludlow/ludlow"
+          },
+          "policy_version_in_force": "5.0.0",
+          "rendered_from": "v3.0.0",
+          "revision": "sha1:7bd9973be43de0b5d1d13b7eb46a1a60b01516ec",
+          "run": "37129105076",
+          "source": "ludlow-composed",
+          "ts": "2026-10-03T14:19:26Z",
+          "verdict": "COULD-NOT-LOOK"
+        },
+        {
+          "pin": {
+            "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+            "consumer": "verified-source-only",
+            "pin_from": "gitops/platform/platform-pin.yaml",
+            "tag": "v4.0.0",
+            "url": "https://github.com/policy-as-versioned-platform/platform"
+          },
+          "policy_version_in_force": "5.0.0",
+          "rendered_from": "v3.0.0",
+          "revision": "sha1:7bd9973be43de0b5d1d13b7eb46a1a60b01516ec",
+          "run": "37129105076",
+          "source": "platform",
+          "ts": "2026-10-03T14:19:26Z",
+          "verdict": "COULD-NOT-LOOK"
+        },
+        {
+          "pin": {
+            "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "consumer": "verified-source-only",
+            "pin_from": "gitops/flux-system/gotk-sync-nist.yaml",
+            "tag": "v1.1.0",
+            "url": "https://github.com/policy-as-versioned-nist/nist"
+          },
+          "policy_version_in_force": "5.0.0",
+          "rendered_from": "v3.0.0",
+          "revision": "sha1:7bd9973be43de0b5d1d13b7eb46a1a60b01516ec",
+          "run": "37129105076",
+          "source": "nist",
+          "ts": "2026-10-03T14:19:26Z",
+          "verdict": "COULD-NOT-LOOK"
+        }
+      ],
+      "latest_scheduled_runs": [
+        {
+          "conclusion": "success",
+          "created_at": "2026-10-03T14:17:51Z",
+          "event": "schedule",
+          "head_branch": "main",
+          "head_sha": "9858e78d0470583e4919db78af2d99b3b7cf848f",
+          "html_url": "https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/37129105076",
+          "id": 37129105076,
+          "status": "completed",
+          "updated_at": "2026-10-03T14:19:42Z"
+        },
+        {
+          "conclusion": "success",
+          "created_at": "2026-10-02T15:45:49Z",
+          "event": "schedule",
+          "head_branch": "main",
+          "head_sha": "a4f996fbfab63128cfc8bd82430ff7e2289bcb36",
+          "html_url": "https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/37029256742",
+          "id": 37029256742,
+          "status": "completed",
+          "updated_at": "2026-10-02T15:47:29Z"
+        },
+        {
+          "conclusion": "success",
+          "created_at": "2026-10-01T16:24:30Z",
+          "event": "schedule",
+          "head_branch": "main",
+          "head_sha": "b36330312fe22843811aaa456a96d6d3872ee313",
+          "html_url": "https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/36891753336",
+          "id": 36891753336,
+          "status": "completed",
+          "updated_at": "2026-10-01T16:26:46Z"
+        }
+      ],
+      "main_at_read": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+      "qualified_new_source_PolicyReport_baseline": "Not established: retained five-facts samples and successful workflow metadata alone do not prove a new-source PolicyReport baseline.",
+      "reads": {
+        "samples": {
+          "blob_sha": "b9a45f58260323a4a8b241e0b68f5752c945e879",
+          "bytes": 596512,
+          "path": "drift/samples.jsonl",
+          "ref": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+          "sha256": "9c29fcec36b64d19d17486767a258741e11f73a87164484ddb7f6396225bf82d"
+        }
+      },
+      "repository": "policy-as-versioned-ludlow/ludlow"
+    },
+    "tuppence": {
+      "errors": [],
+      "latest_committed_sample_run": "37126409593",
+      "latest_committed_samples": [
+        {
+          "pin": {
+            "commit": "3d64a4d65d5eb5d81deedc10a0826c8b02d0ad39",
+            "consumer": "resourceset",
+            "pin_from": "gitops/composed/composed-set.yaml",
+            "tag": "v3.0.0",
+            "url": "https://github.com/policy-as-versioned-tuppence/tuppence"
+          },
+          "policy_version_in_force": "5.0.0",
+          "rendered_from": "v3.0.0",
+          "revision": "sha1:9862d846332031d7cb5cf38894d3b0ed321928df",
+          "run": "37126409593",
+          "source": "tuppence-composed",
+          "ts": "2026-10-03T13:32:07Z",
+          "verdict": "COULD-NOT-LOOK"
+        },
+        {
+          "pin": {
+            "commit": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+            "consumer": "verified-source-only",
+            "pin_from": "gitops/platform/platform-pin.yaml",
+            "tag": "v4.0.0",
+            "url": "https://github.com/policy-as-versioned-platform/platform"
+          },
+          "policy_version_in_force": "5.0.0",
+          "rendered_from": "v3.0.0",
+          "revision": "sha1:9862d846332031d7cb5cf38894d3b0ed321928df",
+          "run": "37126409593",
+          "source": "platform",
+          "ts": "2026-10-03T13:32:07Z",
+          "verdict": "COULD-NOT-LOOK"
+        },
+        {
+          "pin": {
+            "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "consumer": "verified-source-only",
+            "pin_from": "gitops/flux-system/gotk-sync-nist.yaml",
+            "tag": "v1.1.0",
+            "url": "https://github.com/policy-as-versioned-nist/nist"
+          },
+          "policy_version_in_force": "5.0.0",
+          "rendered_from": "v3.0.0",
+          "revision": "sha1:9862d846332031d7cb5cf38894d3b0ed321928df",
+          "run": "37126409593",
+          "source": "nist",
+          "ts": "2026-10-03T13:32:07Z",
+          "verdict": "COULD-NOT-LOOK"
+        }
+      ],
+      "latest_scheduled_runs": [
+        {
+          "conclusion": "success",
+          "created_at": "2026-10-03T13:30:23Z",
+          "event": "schedule",
+          "head_branch": "main",
+          "head_sha": "524c13cd4f3b00d0580106f38162d4f98b400fc7",
+          "html_url": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37126409593",
+          "id": 37126409593,
+          "status": "completed",
+          "updated_at": "2026-10-03T13:32:23Z"
+        },
+        {
+          "conclusion": "success",
+          "created_at": "2026-10-02T14:47:24Z",
+          "event": "schedule",
+          "head_branch": "main",
+          "head_sha": "7023ccc87254526afc12e512868be18283323edf",
+          "html_url": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37022330661",
+          "id": 37022330661,
+          "status": "completed",
+          "updated_at": "2026-10-02T14:49:16Z"
+        },
+        {
+          "conclusion": "success",
+          "created_at": "2026-10-01T15:30:39Z",
+          "event": "schedule",
+          "head_branch": "main",
+          "head_sha": "8dce79d5c2e28f6177afae109d69475bed5251e6",
+          "html_url": "https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/36884826828",
+          "id": 36884826828,
+          "status": "completed",
+          "updated_at": "2026-10-01T15:32:24Z"
+        }
+      ],
+      "main_at_read": "55bf5aa14d80f6cee4c524394d08b244b1461846",
+      "qualified_new_source_PolicyReport_baseline": "Not established: retained five-facts samples and successful workflow metadata alone do not prove a new-source PolicyReport baseline.",
+      "reads": {
+        "samples": {
+          "blob_sha": "59d3ab735817be98f4150a38ef6bf6004eff1733",
+          "bytes": 606090,
+          "path": "drift/samples.jsonl",
+          "ref": "55bf5aa14d80f6cee4c524394d08b244b1461846",
+          "sha256": "47af8a8b51a54ead4d388a4e744592f82544dfca1b92f243b1279fc781e8ed86"
+        }
+      },
+      "repository": "policy-as-versioned-tuppence/tuppence"
+    }
+  },
+  "completed_at": "2026-10-04T12:09:49.952714+00:00",
+  "historical_record_preserved": "adopter-stage2-clock-availability.json",
+  "hub": {
+    "errors": [],
+    "grades": {
+      "blob_sha": "ac980d1a135e1bbafe6cb202774726421799d35e",
+      "bytes": 24966,
+      "path": "talk/captures/_grades.tsv",
+      "ref": "48324860b8b9f7dc4762e9c9f841206881a28705",
+      "sha256": "fa8d5a89bb8b41588deed6358dd84271136b7310b20bf00b04e11712e59dcc26"
+    },
+    "latest_modern_truth_line": "TRUTH 2026-10-04T11:39Z run=377 hub=14ec490 enact=development units=[driftwood=1cd446f@v4.0.0 feeds=8c84a66@fx/v2.0.0 ico=abcb3a8@main insurer=32ea73d@main ludlow=c5f33cc@v4.0.0 nist=f83126f@main platform=703eff6@v5.0.0 tuppence=dbaa026@v4.0.1] pass=88 [observed=28 self=50 simulated=3 meta=7] fail=25 skip=22 [never=10 waits=12] excluded=8 total=143 ceiling=124",
+    "latest_modern_truth_parsed": {
+      "ceiling": 124,
+      "enact": "development",
+      "excluded": 8,
+      "fail": 25,
+      "fixture": false,
+      "hub": "14ec490",
+      "live": false,
+      "pass": 88,
+      "run": "377",
+      "skip": 22,
+      "skip_split": {
+        "never": 10,
+        "waits": 12
+      },
+      "split": {
+        "meta": 7,
+        "observed": 28,
+        "self": 50,
+        "simulated": 3
+      },
+      "total": 143,
+      "ts": "2026-10-04T11:39Z",
+      "units": {
+        "driftwood": "1cd446f@v4.0.0",
+        "feeds": "8c84a66@fx/v2.0.0",
+        "ico": "abcb3a8@main",
+        "insurer": "32ea73d@main",
+        "ludlow": "c5f33cc@v4.0.0",
+        "nist": "f83126f@main",
+        "platform": "703eff6@v5.0.0",
+        "tuppence": "dbaa026@v4.0.1"
+      }
+    },
+    "latest_scheduled_truth_runs": [
+      {
+        "conclusion": "failure",
+        "created_at": "2026-10-04T11:17:06Z",
+        "event": "schedule",
+        "head_branch": "main",
+        "head_sha": "14ec4902bcbd4be58ac43e0ab47d0ea1f4c8250d",
+        "html_url": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/37198209169",
+        "id": 37198209169,
+        "status": "completed",
+        "updated_at": "2026-10-04T11:39:54Z"
+      },
+      {
+        "conclusion": "failure",
+        "created_at": "2026-10-03T10:37:07Z",
+        "event": "schedule",
+        "head_branch": "main",
+        "head_sha": "7067f4443edb5f5efdfa06c8cbd6fc8469ff32df",
+        "html_url": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/37117007808",
+        "id": 37117007808,
+        "status": "completed",
+        "updated_at": "2026-10-03T11:02:17Z"
+      },
+      {
+        "conclusion": "failure",
+        "created_at": "2026-10-02T11:21:32Z",
+        "event": "schedule",
+        "head_branch": "main",
+        "head_sha": "446272fb3738c4f35b714add86d8f9aaf00e32e4",
+        "html_url": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/37000560267",
+        "id": 37000560267,
+        "status": "completed",
+        "updated_at": "2026-10-02T11:47:28Z"
+      }
+    ],
+    "latest_truth_line": "TRUTH 2026-10-04T11:39Z run=377 hub=14ec490 enact=development units=[driftwood=1cd446f@v4.0.0 feeds=8c84a66@fx/v2.0.0 ico=abcb3a8@main insurer=32ea73d@main ludlow=c5f33cc@v4.0.0 nist=f83126f@main platform=703eff6@v5.0.0 tuppence=dbaa026@v4.0.1] pass=88 [observed=28 self=50 simulated=3 meta=7] fail=25 skip=22 [never=10 waits=12] excluded=8 total=143 ceiling=124",
+    "latest_truth_parsed": {
+      "ceiling": 124,
+      "enact": "development",
+      "excluded": 8,
+      "fail": 25,
+      "fixture": false,
+      "hub": "14ec490",
+      "live": false,
+      "pass": 88,
+      "run": "377",
+      "skip": 22,
+      "skip_split": {
+        "never": 10,
+        "waits": 12
+      },
+      "split": {
+        "meta": 7,
+        "observed": 28,
+        "self": 50,
+        "simulated": 3
+      },
+      "total": 143,
+      "ts": "2026-10-04T11:39Z",
+      "units": {
+        "driftwood": "1cd446f@v4.0.0",
+        "feeds": "8c84a66@fx/v2.0.0",
+        "ico": "abcb3a8@main",
+        "insurer": "32ea73d@main",
+        "ludlow": "c5f33cc@v4.0.0",
+        "nist": "f83126f@main",
+        "platform": "703eff6@v5.0.0",
+        "tuppence": "dbaa026@v4.0.1"
+      }
+    },
+    "main_at_read": "48324860b8b9f7dc4762e9c9f841206881a28705",
+    "repository": "policy-as-versioned-flux/policy-as-versioned-flux",
+    "step4": {
+      "blob_sha": "c0dda4fbd11c9be4b8ff1a367ccbf654936d1b2c",
+      "bytes": 8548,
+      "path": "talk/captures/verify_e2e_verify-e2e-step4-flux-reconciles-cage.out",
+      "ref": "48324860b8b9f7dc4762e9c9f841206881a28705",
+      "sha256": "3bacca59fd46ca1db5fcf2e013d6238e654689a2a5dad5400f1254a02c2a2080"
+    },
+    "step4_capture_tail": [
+      "     driftwood-composed   ?     fact_2_tag_signature_verified_at_the_source_boundary: nothing checked a signature at this source boundary: the GitRepository declares no spec.verify (Flux speaks OpenPGP and SSH only) and carries no verdict from the identity-pinned gitsign-verifying controller (ticket 41). Not looked at, and a thing not looked at is never a pass",
+      "     driftwood-composed   true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming driftwood-composed applied bf9889aa6a6d",
+      "     driftwood-composed   true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 17 rendered objects are live and equal to the offline render",
+      "     driftwood-composed   true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 17 rendered objects appear in a Flux inventory",
+      "     driftwood-composed   ?     fact_6_the_bottom_rung_is_admitted_and_runs: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4)",
+      "     driftwood-composed   ?     fact_7_the_bottom_rung_reaches_nothing_while_the_reference_reaches: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4)",
+      "     nist                 true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote",
+      "     nist                 true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\\.com/policy-as-versioned-nist/nist/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+      "     nist                 true  fact_3_last_applied_revision_equals_the_pinned_commit: nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524. ONE LINK, NOT A SECOND PROOF: this reads composed/HEADER.yaml, the same composed set whose own fact 3 is the applied revision above -- the three fact-3 lines in this sample are one chain of custody, not three independent observations of a revision in force (ecosystem ticket 76)",
+      "     nist                 true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 17 rendered objects are live and equal to the offline render",
+      "     nist                 true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 17 rendered objects appear in a Flux inventory",
+      "     nist                 ?     fact_6_the_bottom_rung_is_admitted_and_runs: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4)",
+      "     nist                 ?     fact_7_the_bottom_rung_reaches_nothing_while_the_reference_reaches: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4)",
+      "     platform             true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote",
+      "     platform             true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v4.0.0 was verified at the source boundary against platform's own pinned identity ^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+      "     platform             true  fact_3_last_applied_revision_equals_the_pinned_commit: platform is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 557c1538fe02 vs pin 557c1538fe02. ONE LINK, NOT A SECOND PROOF: this reads composed/HEADER.yaml, the same composed set whose own fact 3 is the applied revision above -- the three fact-3 lines in this sample are one chain of custody, not three independent observations of a revision in force (ecosystem ticket 76)",
+      "     platform             true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 17 rendered objects are live and equal to the offline render",
+      "     platform             true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 17 rendered objects appear in a Flux inventory",
+      "     platform             ?     fact_6_the_bottom_rung_is_admitted_and_runs: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4)",
+      "     platform             ?     fact_7_the_bottom_rung_reaches_nothing_while_the_reference_reaches: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4)",
+      "     fact 3 is ONE CHAIN, not 3 independent proofs: 1 applied revision(s) observed on the cluster, and nist, platform (2 verified-source-only publisher(s)) read back through composed/HEADER.yaml to that same composed set",
+      "     FALSIFIER NOT LOOKED AT: cluster_side_verification_passes_a_tag_that_identity_pinned_ci_rejects on platform -- platform's own release.yml is not in this checkout, so the identity it pins cannot be read here",
+      "     FALSIFIER NOT LOOKED AT: cluster_side_verification_passes_a_tag_that_identity_pinned_ci_rejects on nist -- nist's own release.yml is not in this checkout, so the identity it pins cannot be read here",
+      "   SKIP: 3 could-not-look(s), and a fact not looked at is never a pass: fact_2_tag_signature_verified_at_the_source_boundary on driftwood-composed: nothing checked a signature at this source boundary: the GitRepository declares no spec.verify (Flux speaks OpenPGP and SSH only) and carries no verdict from the identity-pinned gitsign-verifying controller (ticket 41). Not looked at, and a thing not looked at is never a pass; fact_6_the_bottom_rung_is_admitted_and_runs on driftwood-composed, nist, platform: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4); fact_7_the_bottom_rung_reaches_nothing_while_the_reference_reaches on driftwood-composed, nist, platform: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4)",
+      "SKIP: no cluster on this runner, and the lane sample cannot stand in: 3 could-not-look(s), and a fact not looked at is never a pass: fact_2_tag_signature_verified_at_the_source_boundary on driftwood-composed: nothing checked a signature at this source boundary: the GitRepository declares no spec.verify (Flux speaks OpenPGP and SSH only) and carries no verdict from the identity-pinned gitsign-verifying controller (ticket 41). Not looked at, and a thing not looked at is never a pass; fact_6_the_bottom_rung_is_admitted_and_runs on driftwood-composed, nist, platform: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4); fact_7_the_bottom_rung_reaches_nothing_while_the_reference_reaches on driftwood-composed, nist, platform: this sample was taken 2026-10-03T11:42:49Z, before the cage facts were registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main; a question not yet asked is never a pass (ticket 152 Q4)"
+    ],
+    "step4_grade_rows": [
+      "verify/e2e/verify-e2e-step4-flux-reconciles-cage.sh\tSKIP\tSKIP: no cluster on this runner, and the lane sample cannot stand in: 3 could-not-look(s), and a fact not looked at is never a pass: fact_2_tag_signature_verifi"
+    ],
+    "truth_log": {
+      "blob_sha": "c22cbdddb43f770abec8907618e27dfc1a1e9e4c",
+      "bytes": 36026,
+      "path": "talk/truth.log",
+      "ref": "48324860b8b9f7dc4762e9c9f841206881a28705",
+      "sha256": "55076ff76ed47652163a623445a25ab6aec159b8f917958d141f0f31eb836ac5"
+    }
+  },
+  "last_read_at": "2026-10-04T12:09:49.952755+00:00",
+  "new_qualifying_baseline_established_by_this_audit": false,
+  "no_dispatch_trigger_or_external_mutation": true,
+  "scope": "Read-only public Actions metadata and committed primary observation availability",
+  "started_at": "2026-10-04T12:09:42.376368+00:00",
+  "workflow_success_is_not_qualified_new_source_PolicyReport_baseline": true
+}

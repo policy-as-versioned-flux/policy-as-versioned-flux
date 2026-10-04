@@ -1,0 +1,88 @@
+{
+  "source_checks": "PASS",
+  "normal_receipt_review": "pending",
+  "institution": "driftwood",
+  "head": "226a319f475fb34a16745d836197807331efa3d9",
+  "tree": "deaabb66afb86eaacc14c9c5945d4dae63cda64d",
+  "base_B": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "source_A": {
+    "observed_at": "2026-10-04T11:05:18.661777+00:00",
+    "institution": "driftwood",
+    "tag": "v4.0.0",
+    "tag_object": "bff31936b9e34074a7ce078e873d3a0df31ecd35",
+    "peeled_commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+    "reviewed_source": "de03c5bfc3bde938b30c538d6027508e7f14ee38",
+    "cut_run": 37197118689,
+    "release_run": 37197387378,
+    "github_release": "https://github.com/policy-as-versioned-driftwood/driftwood/releases/tag/v4.0.0",
+    "published_at": "2026-10-04T11:03:05Z",
+    "draft": false,
+    "prerelease": false,
+    "git_signature": true,
+    "rekor_entry": true,
+    "certificate_claims": true,
+    "tlog_index": "3077567350",
+    "delivery_edits_may_begin": true,
+    "live_delivery_claimed": false
+  },
+  "source_B": {
+    "institution": "driftwood",
+    "tag": "v4.0.1",
+    "tag_object": "1faa6914677d8da75ecf5fd4f03c7e338282c789",
+    "peeled_commit": "872d5c7f44801b496731b11cd40881f304f8a09a",
+    "cut_run": 37201470734,
+    "cut_conclusion": "success",
+    "signature_argv": [
+      "gitsign",
+      "verify-tag",
+      "v4.0.1",
+      "--certificate-identity=https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main",
+      "--certificate-oidc-issuer=https://token.actions.githubusercontent.com"
+    ],
+    "signature_exit": 0,
+    "git_signature": true,
+    "rekor_entry": true,
+    "certificate_claims": true,
+    "identity": "https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "tlog_index": "3077655413",
+    "immutable_release_publication_pending": false,
+    "final_composed_pointer_edits_may_begin": true,
+    "manual_tag_created": false,
+    "release_run": 37201994132,
+    "release_conclusion": "success",
+    "release_url": "https://github.com/policy-as-versioned-driftwood/driftwood/releases/tag/v4.0.1",
+    "published_at": "2026-10-04T12:24:41Z",
+    "draft": false,
+    "prerelease": false,
+    "live_activation_claimed": false
+  },
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "changed_file_sha256": {
+    "composed/HEADER.yaml": "1f6302dbb257e2ecc4f8c7c02d5768577632abd719739ad78d883dce6273d815",
+    "gitops/composed/composed-set.yaml": "289ef0ced35464aa74442df9dae5e09991bba8ba4d6eefe2a243e87e4632aa14"
+  },
+  "normal_SSH_signature": "G",
+  "clean": true,
+  "HEADER_only_delta": "comparison-inputs.after",
+  "comparison_after": "e9dcdf11ebbbd9a9d851b2b0c6bb1adb03a3a2f23e32bb814a8871d7a9f56e87",
+  "apps_and_primary_provenance_A_preserved": true,
+  "primary_trim_equal": true,
+  "served_images": [
+    "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3",
+    "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6",
+    "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+  ],
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "four_gitsign_gates_preserved": true,
+  "engine": "1.18.2",
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

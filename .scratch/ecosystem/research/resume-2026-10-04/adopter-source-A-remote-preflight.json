@@ -1,0 +1,44 @@
+{
+  "observed_at": "2026-10-04T10:11:55.213914+00:00",
+  "results": {
+    "driftwood": {
+      "repository": "policy-as-versioned-driftwood/driftwood",
+      "main": "17302ecd20041df61a52428e67246c330294d2a6",
+      "tags": [
+        "v3.0.1",
+        "v3.0.0",
+        "v2.0.0",
+        "v1.1.0",
+        "v1.0.0"
+      ],
+      "prospective_tag": "v4.0.0",
+      "unused": true
+    },
+    "tuppence": {
+      "repository": "policy-as-versioned-tuppence/tuppence",
+      "main": "d8dead25e0e5e275172640b1a637562e45edb15d",
+      "tags": [
+        "v3.0.1",
+        "v3.0.0",
+        "v2.0.0",
+        "v1.1.0",
+        "v1.0.0"
+      ],
+      "prospective_tag": "v4.0.0",
+      "unused": true
+    },
+    "ludlow": {
+      "repository": "policy-as-versioned-ludlow/ludlow",
+      "main": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+      "tags": [
+        "v3.0.1",
+        "v3.0.0",
+        "v2.0.0",
+        "v1.1.0",
+        "v1.0.0"
+      ],
+      "prospective_tag": "v4.0.0",
+      "unused": true
+    }
+  }
+}

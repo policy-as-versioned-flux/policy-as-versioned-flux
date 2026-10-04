@@ -1,0 +1,1 @@
+selfcheck ok: writes are read out of the CEL body, an unrecorded hazard fails, an accepted one is reported with its reason, a stale row fails, a row whose field set or named policy set has drifted fails, a dangling reference name fails, and operations: ["*"] reaches the UPDATE join instead of vanishing from it

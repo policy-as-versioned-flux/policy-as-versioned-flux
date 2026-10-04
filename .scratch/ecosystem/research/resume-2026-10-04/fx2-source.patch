@@ -1,0 +1,767 @@
+diff --git a/fetch/source/hmrc/2025-12.csv b/fetch/source/hmrc/2025-12.csv
+new file mode 100644
+index 0000000000000000000000000000000000000000..c80a73f4885fc8a0dabc25fee1fcdc87552ea461
+--- /dev/null
++++ b/fetch/source/hmrc/2025-12.csv
+@@ -0,0 +1,165 @@
++Country/Territories,Currency,Currency Code,Currency Units per £1,Start date,End date
++Abu Dhabi,Dirham,AED,4.8204,01/12/2025,31/12/2025
++Albania,Lek,ALL,109.5037,01/12/2025,31/12/2025
++Algeria,Dinar,DZD,171.1817,01/12/2025,31/12/2025
++Angola,Readj Kwanza,AOA,1201.0841,01/12/2025,31/12/2025
++Antigua,E Caribbean Dollar,XCD,3.5518,01/12/2025,31/12/2025
++Argentina,Peso,ARS,1838.1443,01/12/2025,31/12/2025
++Armenia,Dram,AMD,499.7654,01/12/2025,31/12/2025
++Aruba,Florin,AWG,2.3495,01/12/2025,31/12/2025
++Australia,Dollar,AUD,2.0226,01/12/2025,31/12/2025
++Azerbaijan,New Manat,AZN,2.2313,01/12/2025,31/12/2025
++Bahamas,Dollar,BSD,1.3126,01/12/2025,31/12/2025
++Bahrain,Dinar,BHD,0.4935,01/12/2025,31/12/2025
++Bangladesh,Taka,BDT,160.5873,01/12/2025,31/12/2025
++Barbados,Dollar,BBD,2.6251,01/12/2025,31/12/2025
++Belarus,Rouble,BYN,4.4824,01/12/2025,31/12/2025
++Belize,Dollar,BZD,2.6435,01/12/2025,31/12/2025
++Benin,CFA Franc,XOF,743.0970,01/12/2025,31/12/2025
++Bermuda,Dollar (US),BMD,1.3126,01/12/2025,31/12/2025
++Bhutan,Ngultrum,BTN,116.2366,01/12/2025,31/12/2025
++Bolivia,Boliviano,BOB,9.0809,01/12/2025,31/12/2025
++Bosnia- Herzegovinia,Marka,BAM,2.2157,01/12/2025,31/12/2025
++Botswana,Pula,BWP,17.6973,01/12/2025,31/12/2025
++Brazil,Real,BRL,6.9885,01/12/2025,31/12/2025
++Brunei,Dollar,BND,1.7114,01/12/2025,31/12/2025
++Bulgaria,Lev,BGN,2.2157,01/12/2025,31/12/2025
++Burkina Faso,CFA Franc,XOF,743.0970,01/12/2025,31/12/2025
++Burundi,Franc,BIF,3876.0939,01/12/2025,31/12/2025
++Cambodia,Riel,KHR,5257.4325,01/12/2025,31/12/2025
++Cameroon Republic,CFA Franc,XAF,743.0970,01/12/2025,31/12/2025
++Canada,Dollar,CAD,1.8382,01/12/2025,31/12/2025
++Cape Verde Islands,Escudo,CVE,124.9187,01/12/2025,31/12/2025
++Cayman Islands,Dollar,KYD,1.0886,01/12/2025,31/12/2025
++Central African Republic,CFA Franc,XAF,743.0970,01/12/2025,31/12/2025
++Chad,CFA Franc,XAF,743.0970,01/12/2025,31/12/2025
++Chile,Peso,CLP,1221.3103,01/12/2025,31/12/2025
++China,Yuan,CNY,9.3331,01/12/2025,31/12/2025
++Colombia,Peso,COP,4883.0857,01/12/2025,31/12/2025
++Comoros,Franc,KMF,557.3228,01/12/2025,31/12/2025
++Congo (Brazaville),CFA Franc,XAF,743.0970,01/12/2025,31/12/2025
++Congo (DemRep),Congo Fr,CDF,2986.0494,01/12/2025,31/12/2025
++Costa Rica,Colon,CRC,656.6043,01/12/2025,31/12/2025
++Cote d'Ivoire,CFA Franc,XOF,743.0970,01/12/2025,31/12/2025
++Cuba,Peso,CUP,31.4776,01/12/2025,31/12/2025
++Czech Republic,Koruna,CZK,27.3744,01/12/2025,31/12/2025
++Denmark,Krone,DKK,8.4616,01/12/2025,31/12/2025
++Djibouti,Franc,DJF,234.1972,01/12/2025,31/12/2025
++Dominica,E Caribbean Dollar,XCD,3.5518,01/12/2025,31/12/2025
++Dominican Republic,Peso,DOP,83.9620,01/12/2025,31/12/2025
++Dubai,Dirham,AED,4.8204,01/12/2025,31/12/2025
++Egypt,Pound,EGP,62.2092,01/12/2025,31/12/2025
++El Salvador,Colon,SVC,11.4848,01/12/2025,31/12/2025
++Equatorial Guinea,CFA Franc,XAF,743.0970,01/12/2025,31/12/2025
++Eritrea,Nakfa,ERN,19.6883,01/12/2025,31/12/2025
++Ethiopia,Birr,ETB,203.7889,01/12/2025,31/12/2025
++Eurozone,Euro,EUR,1.1328,01/12/2025,31/12/2025
++Fiji Islands,Dollar,FJD,2.9983,01/12/2025,31/12/2025
++Fr. Polynesia,CFP Franc,XPF,135.1843,01/12/2025,31/12/2025
++Gabon,CFA Franc,XAF,743.0970,01/12/2025,31/12/2025
++Gambia,Dalasi,GMD,96.6410,01/12/2025,31/12/2025
++Georgia,Lari,GEL,3.5496,01/12/2025,31/12/2025
++Ghana,Cedi,GHS,14.4535,01/12/2025,31/12/2025
++Grenada,E Caribbean Dollar,XCD,3.5518,01/12/2025,31/12/2025
++Guatemala,Quetzal,GTQ,10.0542,01/12/2025,31/12/2025
++Guinea Bissau,CFA Franc,XOF,743.0970,01/12/2025,31/12/2025
++Guinea Republic,Franc,GNF,11410.1642,01/12/2025,31/12/2025
++Guyana,Dollar,GYD,274.6965,01/12/2025,31/12/2025
++Haiti,Gourde,HTG,172.2254,01/12/2025,31/12/2025
++Honduras,Lempira,HNL,34.5488,01/12/2025,31/12/2025
++Hong Kong,Dollar,HKD,10.2200,01/12/2025,31/12/2025
++Hungary,Forint,HUF,433.3110,01/12/2025,31/12/2025
++Iceland,Krona,ISK,166.3575,01/12/2025,31/12/2025
++India,Rupee,INR,116.2366,01/12/2025,31/12/2025
++Indonesia,Rupiah,IDR,21950.6920,01/12/2025,31/12/2025
++Iraq,Dinar,IQD,1720.8643,01/12/2025,31/12/2025
++Israel,Shekel,ILS,4.2894,01/12/2025,31/12/2025
++Jamaica,Dollar,JMD,210.8915,01/12/2025,31/12/2025
++Japan,Yen,JPY,204.8929,01/12/2025,31/12/2025
++Jordan,Dinar,JOD,0.9306,01/12/2025,31/12/2025
++Kazakhstan,Tenge,KZT,680.7221,01/12/2025,31/12/2025
++Kenya,Schilling,KES,170.5808,01/12/2025,31/12/2025
++Kuwait,Dinar,KWD,0.4031,01/12/2025,31/12/2025
++Kyrgyz Republic,Som,KGS,114.8368,01/12/2025,31/12/2025
++Lao People's Dem Rep,Kip,LAK,28435.2205,01/12/2025,31/12/2025
++Lebanon,Pound,LBP,117965.0934,01/12/2025,31/12/2025
++Lesotho,Loti,LSL,22.5147,01/12/2025,31/12/2025
++Liberia,Dollar,LRD,237.0998,01/12/2025,31/12/2025
++Libya,Dinar,LYD,7.1618,01/12/2025,31/12/2025
++Macao,Pataca,MOP,10.5266,01/12/2025,31/12/2025
++Macedonia,Denar,MKD,69.7211,01/12/2025,31/12/2025
++Madagascar,Malagasy Ariary,MGA,5890.8664,01/12/2025,31/12/2025
++Malawi,Kwacha,MWK,2277.1723,01/12/2025,31/12/2025
++Malaysia,Ringgit,MYR,5.4469,01/12/2025,31/12/2025
++Maldive Islands,Rufiyaa,MVR,20.2597,01/12/2025,31/12/2025
++Mali Republic,CFA Franc,XOF,743.0970,01/12/2025,31/12/2025
++Mauritania,Ouguiya,MRU,52.1296,01/12/2025,31/12/2025
++Mauritius,Rupee,MUR,60.2630,01/12/2025,31/12/2025
++Mexico,Mexican Peso,MXN,24.0402,01/12/2025,31/12/2025
++Moldova,Leu,MDL,22.2585,01/12/2025,31/12/2025
++Mongolia,Tugrik,MNT,4685.5492,01/12/2025,31/12/2025
++Montserrat,E Caribbean Dollar,XCD,3.5518,01/12/2025,31/12/2025
++Morocco,Dirham,MAD,12.1440,01/12/2025,31/12/2025
++Mozambique,Metical,MZN,83.8617,01/12/2025,31/12/2025
++Myanmar,Kyat,MMK,2756.2148,01/12/2025,31/12/2025
++Nepal,Rupee,NPR,186.0657,01/12/2025,31/12/2025
++New Caledonia,CFP Franc,XPF,135.1843,01/12/2025,31/12/2025
++New Zealand,Dollar,NZD,2.3307,01/12/2025,31/12/2025
++Nicaragua,Gold Cordoba,NIO,48.3110,01/12/2025,31/12/2025
++Niger Republic,CFA Franc,XOF,743.0970,01/12/2025,31/12/2025
++Nigeria,Naira,NGN,1903.3812,01/12/2025,31/12/2025
++Norway,Norwegian Krone,NOK,13.3032,01/12/2025,31/12/2025
++Oman,Rial,OMR,0.5050,01/12/2025,31/12/2025
++Pakistan,Rupee,PKR,370.9532,01/12/2025,31/12/2025
++Panama,Balboa,PAB,1.3126,01/12/2025,31/12/2025
++Papua New Guinea,Kina,PGK,5.5517,01/12/2025,31/12/2025
++Paraguay,Guarani,PYG,9236.4794,01/12/2025,31/12/2025
++Peru,New Sol,PEN,4.4238,01/12/2025,31/12/2025
++Philippines,Peso,PHP,77.3109,01/12/2025,31/12/2025
++Poland,Zloty,PLN,4.7923,01/12/2025,31/12/2025
++Qatar,Riyal,QAR,4.7777,01/12/2025,31/12/2025
++Romania,New Leu,RON,5.7651,01/12/2025,31/12/2025
++Russia,Rouble,RUB,105.9667,01/12/2025,31/12/2025
++Rwanda,Franc,RWF,1909.1178,01/12/2025,31/12/2025
++Saudi Arabia,Riyal,SAR,4.9221,01/12/2025,31/12/2025
++Senegal,CFA Franc,XOF,743.0970,01/12/2025,31/12/2025
++Serbia,Dinar,RSD,132.8126,01/12/2025,31/12/2025
++Seychelles,Rupee,SCR,18.3013,01/12/2025,31/12/2025
++Sierra Leone,Leone,SLE,30.0508,01/12/2025,31/12/2025
++Singapore,Dollar,SGD,1.7114,01/12/2025,31/12/2025
++Soloman Islands,Dollar,SBD,10.8139,01/12/2025,31/12/2025
++Somali Republic,Schilling,SOS,747.8634,01/12/2025,31/12/2025
++South Africa,Rand,ZAR,22.5147,01/12/2025,31/12/2025
++South Korea,Won,KRW,1924.4352,01/12/2025,31/12/2025
++Sri Lanka,Rupee,LKR,404.3503,01/12/2025,31/12/2025
++St Christopher & Anguilla,E Caribbean Dollar,XCD,3.5518,01/12/2025,31/12/2025
++St Lucia,E Caribbean Dollar,XCD,3.5518,01/12/2025,31/12/2025
++St Vincent,E Caribbean Dollar,XCD,3.5518,01/12/2025,31/12/2025
++Sudan Republic,Pound,SDG,787.3727,01/12/2025,31/12/2025
++Surinam,Dollar,SRD,50.6428,01/12/2025,31/12/2025
++Swaziland,Lilangeni,SZL,22.5147,01/12/2025,31/12/2025
++Sweden,Krona,SEK,12.4529,01/12/2025,31/12/2025
++Switzerland,Franc,CHF,1.0523,01/12/2025,31/12/2025
++Taiwan,Dollar,TWD,40.9663,01/12/2025,31/12/2025
++Tanzania,Schilling,TZS,3190.7091,01/12/2025,31/12/2025
++Thailand,Baht,THB,42.5477,01/12/2025,31/12/2025
++Togo Republic,CFA Franc,XOF,743.0970,01/12/2025,31/12/2025
++Tonga Islands,Pa'anga (AUS),TOP,3.1469,01/12/2025,31/12/2025
++Trinidad/Tobago,Dollar,TTD,8.8961,01/12/2025,31/12/2025
++Tunisia,Dinar,TND,3.8716,01/12/2025,31/12/2025
++Turkey,Turkish  Lira,TRY,55.5844,01/12/2025,31/12/2025
++Turkmenistan,New Manat,TMT,4.5917,01/12/2025,31/12/2025
++UAE,Dirham,AED,4.8204,01/12/2025,31/12/2025
++USA,Dollar,USD,1.3126,01/12/2025,31/12/2025
++Uganda,Schilling,UGX,4788.0958,01/12/2025,31/12/2025
++Ukraine,Hryvnia,UAH,55.2617,01/12/2025,31/12/2025
++Uruguay,Peso,UYU,52.2715,01/12/2025,31/12/2025
++Uzbekistan,Sum,UZS,15700.9387,01/12/2025,31/12/2025
++Vanuatu,Vatu,VUV,160.1906,01/12/2025,31/12/2025
++Venezuela,Venezuelan Bolivar,VED,311.0557,01/12/2025,31/12/2025
++Vietnam,Dong,VND,34628.6075,01/12/2025,31/12/2025
++Wallis & Futuna Islands,CFP Franc,XPF,135.1843,01/12/2025,31/12/2025
++Western Samoa,Tala,WST,3.6973,01/12/2025,31/12/2025
++Yemen (Rep of),Rial,YER,313.0956,01/12/2025,31/12/2025
++Zambia,Kwacha,ZMW,29.8901,01/12/2025,31/12/2025
++Zimbabwe,Zimbabwe Gold,ZWG,34.5908,01/12/2025,31/12/2025
+diff --git a/fetch/source/hmrc/2026-08.csv b/fetch/source/hmrc/2026-08.csv
+new file mode 100644
+index 0000000000000000000000000000000000000000..c601cd6fbd4d1f7472e765a14eb6718dcf8266ae
+--- /dev/null
++++ b/fetch/source/hmrc/2026-08.csv
+@@ -0,0 +1,164 @@
++Country/Territories,Currency,Currency Code,Currency Units per £1,Start date,End date
++Abu Dhabi,Dirham,AED,4.9091,01/08/2026,31/08/2026
++Albania,Lek,ALL,109.7955,01/08/2026,31/08/2026
++Algeria,Dinar,DZD,177.9594,01/08/2026,31/08/2026
++Angola,Readj Kwanza,AOA,1224.3306,01/08/2026,31/08/2026
++Antigua,E Caribbean Dollar,XCD,3.6196,01/08/2026,31/08/2026
++Argentina,Peso,ARS,1975.2991,01/08/2026,31/08/2026
++Armenia,Dram,AMD,488.5373,01/08/2026,31/08/2026
++Aruba,Florin,AWG,2.3927,01/08/2026,31/08/2026
++Australia,Dollar,AUD,1.9112,01/08/2026,31/08/2026
++Azerbaijan,New Manat,AZN,2.2724,01/08/2026,31/08/2026
++Bahamas,Dollar,BSD,1.3367,01/08/2026,31/08/2026
++Bahrain,Dinar,BHD,0.5026,01/08/2026,31/08/2026
++Bangladesh,Taka,BDT,164.9731,01/08/2026,31/08/2026
++Barbados,Dollar,BBD,2.6734,01/08/2026,31/08/2026
++Belarus,Rouble,BYN,3.8578,01/08/2026,31/08/2026
++Belize,Dollar,BZD,2.6915,01/08/2026,31/08/2026
++Benin,CFA Franc,XOF,768.7193,01/08/2026,31/08/2026
++Bermuda,Dollar (US),BMD,1.3367,01/08/2026,31/08/2026
++Bhutan,Ngultrum,BTN,129.0145,01/08/2026,31/08/2026
++Bolivia,Boliviano,BOB,14.4494,01/08/2026,31/08/2026
++Bosnia- Herzegovinia,Marka,BAM,2.2920,01/08/2026,31/08/2026
++Botswana,Pula,BWP,18.2092,01/08/2026,31/08/2026
++Brazil,Real,BRL,6.7858,01/08/2026,31/08/2026
++Brunei,Dollar,BND,1.7262,01/08/2026,31/08/2026
++Burkina Faso,CFA Franc,XOF,768.7193,01/08/2026,31/08/2026
++Burundi,Franc,BIF,3987.4698,01/08/2026,31/08/2026
++Cambodia,Riel,KHR,5399.6005,01/08/2026,31/08/2026
++Cameroon Republic,CFA Franc,XAF,768.7193,01/08/2026,31/08/2026
++Canada,Dollar,CAD,1.8835,01/08/2026,31/08/2026
++Cape Verde Islands,Escudo,CVE,129.2260,01/08/2026,31/08/2026
++Cayman Islands,Dollar,KYD,1.1117,01/08/2026,31/08/2026
++Central African Republic,CFA Franc,XAF,768.7193,01/08/2026,31/08/2026
++Chad,CFA Franc,XAF,768.7193,01/08/2026,31/08/2026
++Chile,Peso,CLP,1250.6398,01/08/2026,31/08/2026
++China,Yuan,CNY,9.0479,01/08/2026,31/08/2026
++Colombia,Peso,COP,4314.3386,01/08/2026,31/08/2026
++Comoros,Franc,KMF,576.5395,01/08/2026,31/08/2026
++Congo (Brazaville),CFA Franc,XAF,768.7193,01/08/2026,31/08/2026
++Congo (DemRep),Congo Fr,CDF,3083.1421,01/08/2026,31/08/2026
++Costa Rica,Colon,CRC,606.4354,01/08/2026,31/08/2026
++Cote d'Ivoire,CFA Franc,XOF,768.7193,01/08/2026,31/08/2026
++Cuba,Peso,CUP,32.0872,01/08/2026,31/08/2026
++Czech Republic,Koruna,CZK,28.3253,01/08/2026,31/08/2026
++Denmark,Krone,DKK,8.7609,01/08/2026,31/08/2026
++Djibouti,Franc,DJF,238.0030,01/08/2026,31/08/2026
++Dominica,E Caribbean Dollar,XCD,3.6196,01/08/2026,31/08/2026
++Dominican Republic,Peso,DOP,77.7899,01/08/2026,31/08/2026
++Dubai,Dirham,AED,4.9091,01/08/2026,31/08/2026
++Egypt,Pound,EGP,68.6327,01/08/2026,31/08/2026
++El Salvador,Colon,SVC,11.6963,01/08/2026,31/08/2026
++Equatorial Guinea,CFA Franc,XAF,768.7193,01/08/2026,31/08/2026
++Eritrea,Nakfa,ERN,20.0508,01/08/2026,31/08/2026
++Eswatini,Lilangeni,SZL,22.0219,01/08/2026,31/08/2026
++Ethiopia,Birr,ETB,215.7325,01/08/2026,31/08/2026
++Eurozone,Euro,EUR,1.1719,01/08/2026,31/08/2026
++Fiji Islands,Dollar,FJD,2.9874,01/08/2026,31/08/2026
++Fr. Polynesia,CFP Franc,XPF,139.8455,01/08/2026,31/08/2026
++Gabon,CFA Franc,XAF,768.7193,01/08/2026,31/08/2026
++Gambia,Dalasi,GMD,98.7774,01/08/2026,31/08/2026
++Georgia,Lari,GEL,3.5045,01/08/2026,31/08/2026
++Ghana,Cedi,GHS,15.5267,01/08/2026,31/08/2026
++Grenada,E Caribbean Dollar,XCD,3.6196,01/08/2026,31/08/2026
++Guatemala,Quetzal,GTQ,10.1958,01/08/2026,31/08/2026
++Guinea Bissau,CFA Franc,XOF,768.7193,01/08/2026,31/08/2026
++Guinea Republic,Franc,GNF,11726.9754,01/08/2026,31/08/2026
++Guyana,Dollar,GYD,279.6097,01/08/2026,31/08/2026
++Haiti,Gourde,HTG,174.7475,01/08/2026,31/08/2026
++Honduras,Lempira,HNL,35.7968,01/08/2026,31/08/2026
++Hong Kong,Dollar,HKD,10.4805,01/08/2026,31/08/2026
++Hungary,Forint,HUF,426.6463,01/08/2026,31/08/2026
++Iceland,Krona,ISK,167.5923,01/08/2026,31/08/2026
++India,Rupee,INR,129.0145,01/08/2026,31/08/2026
++Indonesia,Rupiah,IDR,23940.4179,01/08/2026,31/08/2026
++Iraq,Dinar,IQD,1751.2405,01/08/2026,31/08/2026
++Israel,Shekel,ILS,4.0939,01/08/2026,31/08/2026
++Jamaica,Dollar,JMD,212.1160,01/08/2026,31/08/2026
++Japan,Yen,JPY,217.9907,01/08/2026,31/08/2026
++Jordan,Dinar,JOD,0.9477,01/08/2026,31/08/2026
++Kazakhstan,Tenge,KZT,624.7684,01/08/2026,31/08/2026
++Kenya,Schilling,KES,172.9979,01/08/2026,31/08/2026
++Kuwait,Dinar,KWD,0.4145,01/08/2026,31/08/2026
++Kyrgyz Republic,Som,KGS,116.8827,01/08/2026,31/08/2026
++Lao People's Dem Rep,Kip,LAK,30210.7962,01/08/2026,31/08/2026
++Lebanon,Pound,LBP,119912.1356,01/08/2026,31/08/2026
++Lesotho,Loti,LSL,22.0219,01/08/2026,31/08/2026
++Liberia,Dollar,LRD,241.9123,01/08/2026,31/08/2026
++Libya,Dinar,LYD,8.5770,01/08/2026,31/08/2026
++Macao,Pataca,MOP,10.7949,01/08/2026,31/08/2026
++Macedonia,Denar,MKD,72.1754,01/08/2026,31/08/2026
++Madagascar,Malagasy Ariary,MGA,5702.5645,01/08/2026,31/08/2026
++Malawi,Kwacha,MWK,2317.8777,01/08/2026,31/08/2026
++Malaysia,Ringgit,MYR,5.4633,01/08/2026,31/08/2026
++Maldive Islands,Rufiyaa,MVR,20.6650,01/08/2026,31/08/2026
++Mali Republic,CFA Franc,XOF,768.7193,01/08/2026,31/08/2026
++Mauritania,Ouguiya,MRU,53.3836,01/08/2026,31/08/2026
++Mauritius,Rupee,MUR,63.1965,01/08/2026,31/08/2026
++Mexico,Mexican Peso,MXN,23.2925,01/08/2026,31/08/2026
++Moldova,Leu,MDL,23.5148,01/08/2026,31/08/2026
++Mongolia,Tugrik,MNT,4799.6502,01/08/2026,31/08/2026
++Montserrat,E Caribbean Dollar,XCD,3.6196,01/08/2026,31/08/2026
++Morocco,Dirham,MAD,12.5477,01/08/2026,31/08/2026
++Mozambique,Metical,MZN,85.3111,01/08/2026,31/08/2026
++Myanmar,Kyat,MMK,2806.6019,01/08/2026,31/08/2026
++Nepal,Rupee,NPR,206.5199,01/08/2026,31/08/2026
++New Caledonia,CFP Franc,XPF,139.8455,01/08/2026,31/08/2026
++New Zealand,Dollar,NZD,2.2978,01/08/2026,31/08/2026
++Nicaragua,Gold Cordoba,NIO,49.1887,01/08/2026,31/08/2026
++Niger Republic,CFA Franc,XOF,768.7193,01/08/2026,31/08/2026
++Nigeria,Naira,NGN,1838.2793,01/08/2026,31/08/2026
++Norway,Norwegian Krone,NOK,12.8322,01/08/2026,31/08/2026
++Oman,Rial,OMR,0.5141,01/08/2026,31/08/2026
++Pakistan,Rupee,PKR,371.3406,01/08/2026,31/08/2026
++Panama,Balboa,PAB,1.3367,01/08/2026,31/08/2026
++Papua New Guinea,Kina,PGK,5.9800,01/08/2026,31/08/2026
++Paraguay,Guarani,PYG,8093.9309,01/08/2026,31/08/2026
++Peru,New Sol,PEN,4.5467,01/08/2026,31/08/2026
++Philippines,Peso,PHP,82.5755,01/08/2026,31/08/2026
++Poland,Zloty,PLN,5.0757,01/08/2026,31/08/2026
++Qatar,Riyal,QAR,4.8657,01/08/2026,31/08/2026
++Romania,New Leu,RON,6.1387,01/08/2026,31/08/2026
++Russia,Rouble,RUB,105.0552,01/08/2026,31/08/2026
++Rwanda,Franc,RWF,1966.3449,01/08/2026,31/08/2026
++Saudi Arabia,Riyal,SAR,5.0127,01/08/2026,31/08/2026
++Senegal,CFA Franc,XOF,768.7193,01/08/2026,31/08/2026
++Serbia,Dinar,RSD,137.5785,01/08/2026,31/08/2026
++Seychelles,Rupee,SCR,18.7582,01/08/2026,31/08/2026
++Sierra Leone,Leone,SLE,30.6308,01/08/2026,31/08/2026
++Singapore,Dollar,SGD,1.7262,01/08/2026,31/08/2026
++Soloman Islands,Dollar,SBD,10.7861,01/08/2026,31/08/2026
++Somali Republic,Schilling,SOS,763.0606,01/08/2026,31/08/2026
++South Africa,Rand,ZAR,22.0219,01/08/2026,31/08/2026
++South Korea,Won,KRW,1979.0292,01/08/2026,31/08/2026
++Sri Lanka,Rupee,LKR,449.5212,01/08/2026,31/08/2026
++St Christopher & Anguilla,E Caribbean Dollar,XCD,3.6196,01/08/2026,31/08/2026
++St Lucia,E Caribbean Dollar,XCD,3.6196,01/08/2026,31/08/2026
++St Vincent,E Caribbean Dollar,XCD,3.6196,01/08/2026,31/08/2026
++Sudan Republic,Pound,SDG,802.2719,01/08/2026,31/08/2026
++Surinam,Dollar,SRD,50.4674,01/08/2026,31/08/2026
++Sweden,Krona,SEK,12.9869,01/08/2026,31/08/2026
++Switzerland,Franc,CHF,1.0863,01/08/2026,31/08/2026
++Taiwan,Dollar,TWD,43.3972,01/08/2026,31/08/2026
++Tanzania,Schilling,TZS,3528.7398,01/08/2026,31/08/2026
++Thailand,Baht,THB,45.2030,01/08/2026,31/08/2026
++Togo Republic,CFA Franc,XOF,768.7193,01/08/2026,31/08/2026
++Tonga Islands,Pa'anga (AUS),TOP,3.2194,01/08/2026,31/08/2026
++Trinidad/Tobago,Dollar,TTD,9.0721,01/08/2026,31/08/2026
++Tunisia,Dinar,TND,3.9407,01/08/2026,31/08/2026
++Turkey,Turkish  Lira,TRY,63.1095,01/08/2026,31/08/2026
++Turkmenistan,New Manat,TMT,4.6756,01/08/2026,31/08/2026
++UAE,Dirham,AED,4.9091,01/08/2026,31/08/2026
++USA,Dollar,USD,1.3367,01/08/2026,31/08/2026
++Uganda,Schilling,UGX,4995.2411,01/08/2026,31/08/2026
++Ukraine,Hryvnia,UAH,59.9097,01/08/2026,31/08/2026
++Uruguay,Peso,UYU,53.6316,01/08/2026,31/08/2026
++Uzbekistan,Sum,UZS,16045.3862,01/08/2026,31/08/2026
++Vanuatu,Vatu,VUV,159.1429,01/08/2026,31/08/2026
++Venezuela,Venezuelan Bolivar,VES,984.1686,01/08/2026,31/08/2026
++Vietnam,Dong,VND,35216.6818,01/08/2026,31/08/2026
++Wallis & Futuna Islands,CFP Franc,XPF,139.8455,01/08/2026,31/08/2026
++Western Samoa,Tala,WST,3.6653,01/08/2026,31/08/2026
++Yemen (Rep of),Rial,YER,318.1262,01/08/2026,31/08/2026
++Zambia,Kwacha,ZMW,24.5976,01/08/2026,31/08/2026
++Zimbabwe,Zimbabwe Gold,ZWG,35.8198,01/08/2026,31/08/2026
+diff --git a/fetch/source/hmrc/PROVENANCE.json b/fetch/source/hmrc/PROVENANCE.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..79786899f09384a28942cf9f1fa272a512dacf7f
+--- /dev/null
++++ b/fetch/source/hmrc/PROVENANCE.json
+@@ -0,0 +1,49 @@
++{
++  "schema": 1,
++  "authority": "HM Revenue & Customs",
++  "units": "currency units per GBP1",
++  "base": "GBP",
++  "captured_at": "2026-10-04T08:59:27.483535+00:00",
++  "scope": "captured official public data; source preparation only, no signed release claim",
++  "normalizer": "fetch/fx.py parse",
++  "normalizer_sha256": "fdb122ad480e634b0d9016204f0dab63bc640a6eb28b73bd3e40974e722b648a",
++  "periods": {
++    "2025-12": {
++      "source_url": "https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_2025-12.csv",
++      "raw_csv": "fetch/source/hmrc/2025-12.csv",
++      "raw_sha256": "48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26",
++      "raw_bytes": 8629,
++      "normalized_payload_sha256": "3062828d54e4ad8576bc40c06d2f37949d51c95294e32444c2e8a65156d24e7c",
++      "unique_currency_count": 142,
++      "USD_units_per_GBP1": 1.3126,
++      "offline_replay_payload": "fetch/source/periods/2025-12/fx.json",
++      "offline_replay_payload_sha256": "5d0cc698e4b85657ffdd882c50a900ac87fbe535b50c2e0db4225782ebdb07ef",
++      "prepared_envelope": "fx/v2/feed.json",
++      "prepared_envelope_sha256": "14506a4273543a059aad84903f65742b54bebcb3e2af34dcdac8c6e635924194"
++    },
++    "2026-08": {
++      "source_url": "https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_2026-8.csv",
++      "raw_csv": "fetch/source/hmrc/2026-08.csv",
++      "raw_sha256": "8da9e83a830282c94cbcb31779cbeb93d7a2a739d1bb898cbec62182b7b29fad",
++      "raw_bytes": 8583,
++      "normalized_payload_sha256": "646ed6176b18642670623d855278c915aae0ebb8a7c21d81bff9f1a6bbd9df2c",
++      "unique_currency_count": 141,
++      "USD_units_per_GBP1": 1.3367
++    }
++  },
++  "preserved_published_baseline": {
++    "tag": "fx/v1.1.0",
++    "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
++    "envelope": "fx/v1/feed.json",
++    "envelope_sha256": "eb5732c627eb362149ad479ffa56c183a4712777c3d7e07d308b622d2917a5a2"
++  },
++  "computed_bump": "major",
++  "prospective_version": "2.0.0",
++  "removed_currency_codes": [
++    "VES"
++  ],
++  "added_currency_codes": [
++    "BGN",
++    "VED"
++  ]
++}
+diff --git a/fetch/source/periods/2025-12/fx.json b/fetch/source/periods/2025-12/fx.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..4fa0c0c312d7821f1e72ed8117d93d9e279ffbe4
+--- /dev/null
++++ b/fetch/source/periods/2025-12/fx.json
+@@ -0,0 +1,150 @@
++{
++  "source": "HMRC monthly exchange rates",
++  "period": "2025-12",
++  "base": "GBP",
++  "rates": {
++    "AED": 4.8204,
++    "ALL": 109.5037,
++    "AMD": 499.7654,
++    "AOA": 1201.0841,
++    "ARS": 1838.1443,
++    "AUD": 2.0226,
++    "AWG": 2.3495,
++    "AZN": 2.2313,
++    "BAM": 2.2157,
++    "BBD": 2.6251,
++    "BDT": 160.5873,
++    "BGN": 2.2157,
++    "BHD": 0.4935,
++    "BIF": 3876.0939,
++    "BMD": 1.3126,
++    "BND": 1.7114,
++    "BOB": 9.0809,
++    "BRL": 6.9885,
++    "BSD": 1.3126,
++    "BTN": 116.2366,
++    "BWP": 17.6973,
++    "BYN": 4.4824,
++    "BZD": 2.6435,
++    "CAD": 1.8382,
++    "CDF": 2986.0494,
++    "CHF": 1.0523,
++    "CLP": 1221.3103,
++    "CNY": 9.3331,
++    "COP": 4883.0857,
++    "CRC": 656.6043,
++    "CUP": 31.4776,
++    "CVE": 124.9187,
++    "CZK": 27.3744,
++    "DJF": 234.1972,
++    "DKK": 8.4616,
++    "DOP": 83.962,
++    "DZD": 171.1817,
++    "EGP": 62.2092,
++    "ERN": 19.6883,
++    "ETB": 203.7889,
++    "EUR": 1.1328,
++    "FJD": 2.9983,
++    "GEL": 3.5496,
++    "GHS": 14.4535,
++    "GMD": 96.641,
++    "GNF": 11410.1642,
++    "GTQ": 10.0542,
++    "GYD": 274.6965,
++    "HKD": 10.22,
++    "HNL": 34.5488,
++    "HTG": 172.2254,
++    "HUF": 433.311,
++    "IDR": 21950.692,
++    "ILS": 4.2894,
++    "INR": 116.2366,
++    "IQD": 1720.8643,
++    "ISK": 166.3575,
++    "JMD": 210.8915,
++    "JOD": 0.9306,
++    "JPY": 204.8929,
++    "KES": 170.5808,
++    "KGS": 114.8368,
++    "KHR": 5257.4325,
++    "KMF": 557.3228,
++    "KRW": 1924.4352,
++    "KWD": 0.4031,
++    "KYD": 1.0886,
++    "KZT": 680.7221,
++    "LAK": 28435.2205,
++    "LBP": 117965.0934,
++    "LKR": 404.3503,
++    "LRD": 237.0998,
++    "LSL": 22.5147,
++    "LYD": 7.1618,
++    "MAD": 12.144,
++    "MDL": 22.2585,
++    "MGA": 5890.8664,
++    "MKD": 69.7211,
++    "MMK": 2756.2148,
++    "MNT": 4685.5492,
++    "MOP": 10.5266,
++    "MRU": 52.1296,
++    "MUR": 60.263,
++    "MVR": 20.2597,
++    "MWK": 2277.1723,
++    "MXN": 24.0402,
++    "MYR": 5.4469,
++    "MZN": 83.8617,
++    "NGN": 1903.3812,
++    "NIO": 48.311,
++    "NOK": 13.3032,
++    "NPR": 186.0657,
++    "NZD": 2.3307,
++    "OMR": 0.505,
++    "PAB": 1.3126,
++    "PEN": 4.4238,
++    "PGK": 5.5517,
++    "PHP": 77.3109,
++    "PKR": 370.9532,
++    "PLN": 4.7923,
++    "PYG": 9236.4794,
++    "QAR": 4.7777,
++    "RON": 5.7651,
++    "RSD": 132.8126,
++    "RUB": 105.9667,
++    "RWF": 1909.1178,
++    "SAR": 4.9221,
++    "SBD": 10.8139,
++    "SCR": 18.3013,
++    "SDG": 787.3727,
++    "SEK": 12.4529,
++    "SGD": 1.7114,
++    "SLE": 30.0508,
++    "SOS": 747.8634,
++    "SRD": 50.6428,
++    "SVC": 11.4848,
++    "SZL": 22.5147,
++    "THB": 42.5477,
++    "TMT": 4.5917,
++    "TND": 3.8716,
++    "TOP": 3.1469,
++    "TRY": 55.5844,
++    "TTD": 8.8961,
++    "TWD": 40.9663,
++    "TZS": 3190.7091,
++    "UAH": 55.2617,
++    "UGX": 4788.0958,
++    "USD": 1.3126,
++    "UYU": 52.2715,
++    "UZS": 15700.9387,
++    "VED": 311.0557,
++    "VND": 34628.6075,
++    "VUV": 160.1906,
++    "WST": 3.6973,
++    "XAF": 743.097,
++    "XCD": 3.5518,
++    "XOF": 743.097,
++    "XPF": 135.1843,
++    "YER": 313.0956,
++    "ZAR": 22.5147,
++    "ZMW": 29.8901,
++    "ZWG": 34.5908
++  },
++  "note": "Authentic HMRC monthly CSV, units of foreign currency per GBP1; valid 2025-12. Source: https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_2025-12.csv. Raw SHA256: 48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26. Filing dates and conversion month are separate recorded facts."
++}
+diff --git a/fx/README.md b/fx/README.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5483524540eef29f65dee650f6685ed7732142d9
+--- /dev/null
++++ b/fx/README.md
+@@ -0,0 +1,35 @@
++# Dated HMRC FX snapshots
++
++Each envelope quotes foreign-currency units per GBP1 for its own calendar month.
++GBP is the base and has rate 1. A USD amount reaches GBP by dividing by that
++month's USD rate; a date in another month has no instrument in this envelope.
++
++The August 2026 `fx/v1/feed.json` (signed fx/v1.1.0) and its default offline replay
++remain byte unchanged. The December 2025 source at `fx/v2/feed.json` is normalized
++from HMRC's complete official monthly CSV. Its USD rate is 1.3126 per GBP1 for
++1–31 December 2025. Consumption requires the ordinary genuine signed fx/v2.0.0
++release; these source bytes do not create a tag or verify a signature.
++
++`fetch/source/hmrc/` retains both complete primary CSVs and `PROVENANCE.json`
++records their official URLs, byte hashes, parser identity and derived payload
++hashes. The actual published `fetch/fx.py` parser reproduces both tables.
++`fetch/source/periods/2025-12/fx.json` is an explicit offline December replay;
++the default `fetch/source/fx.json` continues to carry August. A replay does not
++claim a new upstream observation:
++
++```sh
++FEEDS_SOURCE_DIR=fetch/source/periods/2025-12 python3 fetch/fx.py --dry-run
++```
++
++The unchanged publisher rule measures the December snapshot as **major**
++against 1.1.0: VES is absent in December, while BGN and VED are present. No
++currency code is silently renamed, no rate is projected, and the earlier
++August envelope remains available. The normal next-version function yields
++2.0.0. `party.yaml` already publishes the FX namespace and payload schema;
++its catalogue needs no duplicate row for another major.
++
++The existing converter reads all major directories by their actual `period`.
++It can therefore retain August and resolve December without a new payload
++shape. A consumer must pin the actual signed tag and peeled commit for the
++matching month. No matching signed rate means a missing instrument, never
++zero or another month's number.
+diff --git a/fx/bump.yaml b/fx/bump.yaml
+index fd05903f0c001f37554307fb95358c175451886b..d56d68ac971b5c886fef4532c85f4d31d990429a 100644
+--- a/fx/bump.yaml
++++ b/fx/bump.yaml
+@@ -2,4 +2,4 @@
+ # ADR-0019). The scheduled fetch rewrites this line in the PR it opens; a
+ # human reviews it against what bump.py computed. "none" means nothing is
+ # queued for release.
+-bump: minor
++bump: major
+diff --git a/fx/v2/feed.json b/fx/v2/feed.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..ed51551cc8bd66d3df134f49e9c651949902278a
+--- /dev/null
++++ b/fx/v2/feed.json
+@@ -0,0 +1,158 @@
++{
++  "kind": "feed",
++  "name": "fx",
++  "version": "2.0.0",
++  "published_by": "feeds",
++  "published_at": "2026-10-04T00:00:00Z",
++  "payload_schema": "fx/payload.schema.json",
++  "payload": {
++    "source": "HMRC monthly exchange rates",
++    "period": "2025-12",
++    "base": "GBP",
++    "rates": {
++      "AED": 4.8204,
++      "ALL": 109.5037,
++      "AMD": 499.7654,
++      "AOA": 1201.0841,
++      "ARS": 1838.1443,
++      "AUD": 2.0226,
++      "AWG": 2.3495,
++      "AZN": 2.2313,
++      "BAM": 2.2157,
++      "BBD": 2.6251,
++      "BDT": 160.5873,
++      "BGN": 2.2157,
++      "BHD": 0.4935,
++      "BIF": 3876.0939,
++      "BMD": 1.3126,
++      "BND": 1.7114,
++      "BOB": 9.0809,
++      "BRL": 6.9885,
++      "BSD": 1.3126,
++      "BTN": 116.2366,
++      "BWP": 17.6973,
++      "BYN": 4.4824,
++      "BZD": 2.6435,
++      "CAD": 1.8382,
++      "CDF": 2986.0494,
++      "CHF": 1.0523,
++      "CLP": 1221.3103,
++      "CNY": 9.3331,
++      "COP": 4883.0857,
++      "CRC": 656.6043,
++      "CUP": 31.4776,
++      "CVE": 124.9187,
++      "CZK": 27.3744,
++      "DJF": 234.1972,
++      "DKK": 8.4616,
++      "DOP": 83.962,
++      "DZD": 171.1817,
++      "EGP": 62.2092,
++      "ERN": 19.6883,
++      "ETB": 203.7889,
++      "EUR": 1.1328,
++      "FJD": 2.9983,
++      "GEL": 3.5496,
++      "GHS": 14.4535,
++      "GMD": 96.641,
++      "GNF": 11410.1642,
++      "GTQ": 10.0542,
++      "GYD": 274.6965,
++      "HKD": 10.22,
++      "HNL": 34.5488,
++      "HTG": 172.2254,
++      "HUF": 433.311,
++      "IDR": 21950.692,
++      "ILS": 4.2894,
++      "INR": 116.2366,
++      "IQD": 1720.8643,
++      "ISK": 166.3575,
++      "JMD": 210.8915,
++      "JOD": 0.9306,
++      "JPY": 204.8929,
++      "KES": 170.5808,
++      "KGS": 114.8368,
++      "KHR": 5257.4325,
++      "KMF": 557.3228,
++      "KRW": 1924.4352,
++      "KWD": 0.4031,
++      "KYD": 1.0886,
++      "KZT": 680.7221,
++      "LAK": 28435.2205,
++      "LBP": 117965.0934,
++      "LKR": 404.3503,
++      "LRD": 237.0998,
++      "LSL": 22.5147,
++      "LYD": 7.1618,
++      "MAD": 12.144,
++      "MDL": 22.2585,
++      "MGA": 5890.8664,
++      "MKD": 69.7211,
++      "MMK": 2756.2148,
++      "MNT": 4685.5492,
++      "MOP": 10.5266,
++      "MRU": 52.1296,
++      "MUR": 60.263,
++      "MVR": 20.2597,
++      "MWK": 2277.1723,
++      "MXN": 24.0402,
++      "MYR": 5.4469,
++      "MZN": 83.8617,
++      "NGN": 1903.3812,
++      "NIO": 48.311,
++      "NOK": 13.3032,
++      "NPR": 186.0657,
++      "NZD": 2.3307,
++      "OMR": 0.505,
++      "PAB": 1.3126,
++      "PEN": 4.4238,
++      "PGK": 5.5517,
++      "PHP": 77.3109,
++      "PKR": 370.9532,
++      "PLN": 4.7923,
++      "PYG": 9236.4794,
++      "QAR": 4.7777,
++      "RON": 5.7651,
++      "RSD": 132.8126,
++      "RUB": 105.9667,
++      "RWF": 1909.1178,
++      "SAR": 4.9221,
++      "SBD": 10.8139,
++      "SCR": 18.3013,
++      "SDG": 787.3727,
++      "SEK": 12.4529,
++      "SGD": 1.7114,
++      "SLE": 30.0508,
++      "SOS": 747.8634,
++      "SRD": 50.6428,
++      "SVC": 11.4848,
++      "SZL": 22.5147,
++      "THB": 42.5477,
++      "TMT": 4.5917,
++      "TND": 3.8716,
++      "TOP": 3.1469,
++      "TRY": 55.5844,
++      "TTD": 8.8961,
++      "TWD": 40.9663,
++      "TZS": 3190.7091,
++      "UAH": 55.2617,
++      "UGX": 4788.0958,
++      "USD": 1.3126,
++      "UYU": 52.2715,
++      "UZS": 15700.9387,
++      "VED": 311.0557,
++      "VND": 34628.6075,
++      "VUV": 160.1906,
++      "WST": 3.6973,
++      "XAF": 743.097,
++      "XCD": 3.5518,
++      "XOF": 743.097,
++      "XPF": 135.1843,
++      "YER": 313.0956,
++      "ZAR": 22.5147,
++      "ZMW": 29.8901,
++      "ZWG": 34.5908
++    },
++    "note": "Authentic HMRC monthly CSV, units of foreign currency per GBP1; valid 2025-12. Source: https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_2025-12.csv. Raw SHA256: 48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26. Filing dates and conversion month are separate recorded facts."
++  }
++}

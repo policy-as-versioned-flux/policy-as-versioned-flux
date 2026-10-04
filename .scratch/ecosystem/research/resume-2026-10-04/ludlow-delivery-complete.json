@@ -1,0 +1,46 @@
+{
+  "B_cut": 37201479463,
+  "B_release": 37201969669,
+  "B_tag_object": "efffeee3b39cc59dd5ecc1ac0536845e712d4c6f",
+  "B_tlog_index": 3077655513,
+  "actual_main": "179e4e0d8e754044b07a65933754244352e28ec5",
+  "actual_main_signature_valid": true,
+  "apps_source": {
+    "commit": "c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae",
+    "tag": "v4.0.0"
+  },
+  "atomic_PR": 52,
+  "atomic_main": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "cloud_activation": false,
+  "complete_policy_window": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "composed_source": {
+    "commit": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+    "tag": "v4.0.1"
+  },
+  "final_merged_at": "2026-10-04T12:55:12Z",
+  "final_pointer_PR": 53,
+  "four_signature_gates_preserved": true,
+  "maintenance_not_in_delivery_candidate": true,
+  "new_live_PolicyReport_baseline_claimed": false,
+  "primary_scans_dates_native_valuation_and_engine_cloud_preserved": true,
+  "receipts_sha256": {
+    "ludlow-atomic-delivery-actual-merge.json": "c8f8d676ff070ab8b3ddf00e97742ac5960d93c8d1c4545a5efdb4723a5bc85f",
+    "ludlow-composition-B-authentic-release.json": "1dd5a24faa29317926d7581ec109d0b47af6fa698252610def8f5e2364d2f1ca",
+    "ludlow-final-composed-B-actual-merge.json": "c2fd096204f73e776efc11501c235fd5077bc30755b8ba3378933aabf699dcbe",
+    "ludlow-final-composed-B-app-review.json": "80841b28a5f3dd58491eefe5d7b5a6cc1a4feffc9d6e11fadd1cb2b95f81c46a",
+    "ludlow-final-composed-B-candidate.json": "f15fd69d81a1fbcc7540ea78bc8d3a84d9a40578db7846a5bd674fecad271f8d",
+    "ludlow-final-composed-B-main-commit-verification.json": "7a12240b28ec245f35fc5d668b97fa5c5cf324eee136ed3ebfafe02c197e035c",
+    "ludlow-final-composed-B-root-standards-review.json": "935510c2afd4acd2bc0abe336e43f2da43badef747e40306993a37cb3c5682a5",
+    "ludlow-final-composed-B-spec-review.json": "592d5df2e78ce7f3c63d2dff476f138b0526b4ab6bedf215e171a133a9346aec"
+  },
+  "repository": "policy-as-versioned-ludlow/ludlow",
+  "retained_engine": "1.18.2",
+  "reviewed_final_head": "b84006a176e6c783bbb45fc2463c46be6ba73071",
+  "run377_red_findings_preserved": "hub-run377-failure-classification.md",
+  "status": "Delivered through ordinary reviewed CI/App/matching-head merges and genuine releases",
+  "tree": "3cd9ee3f18b4cd5c189e747a540b143988aee073"
+}

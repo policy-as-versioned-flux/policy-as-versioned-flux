@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "scope": "Only the changed exporter helper and two new default-input/relative-output proof records; prior 1167-file primary audit remains immutable",
+  "inputs": [
+    {
+      "path": ".scratch/ecosystem/patches/resume-2026-10-04/export_published_estate.py",
+      "bytes": 3543,
+      "sha256": "48fc02d8e2c074b01b4783b9a8923a9e46e8c3898a7033be3c2cf537a9f8b355"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/published-export-default-input-and-relative-output.log",
+      "bytes": 483,
+      "sha256": "85d84fcfe33640333cd4a484a48439b145a4d303aab6e356e7eadbdb3f12068c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/published-export-default-path-finding-closure.json",
+      "bytes": 946,
+      "sha256": "e9e5b9b83cb1225254ab3c53053f3aef445ee2868c34d276b28dab6f77ec1201"
+    }
+  ],
+  "changed_helper_only_default_filename_line": true,
+  "previous_helper_sha256": "5de906c80a22e2b0cb51cd94cbfbb33bc0db1a8b2d9f6e45361c00c9e82335b2",
+  "high_confidence_credential_findings": [],
+  "invalid_json": [],
+  "actual_default_input_relative_output_log_nine_reverse_apply_checks": "PASS",
+  "prior_primary_audit_json_sha256": "14b3d7d59b4ded1ceb07e26bc0170c192c3cea58e62f512e4c21550208140562",
+  "prior_primary_audit_markdown_sha256": "b6928fbdc68aa0e939ba99871c0b875556ede09096204c1ed8e800eadda425ee",
+  "published_nine_repository_bundle_and_manifest_bytes_preserved": true,
+  "prior_path_normalization_histories_preserved": true,
+  "all_input_hashes_stable_on_second_read": true,
+  "external_mutations": false,
+  "historical_raw_negatives_modified": false,
+  "limitations": "Independent bounded data scan and receipt join; no new CI or live-baseline grade inferred. Prototype remains outside this incremental receipt.",
+  "closure_actual_command_fields_and_recorded_hashes_independently_joined": true,
+  "actual_validation": {
+    "cwd": "/private/tmp",
+    "explicit_manifest_argument": false,
+    "output_argument": "pavf-default-relative-export-proof-20261004",
+    "exit": 0,
+    "nine_published_reverse_apply_checks": "PASS",
+    "log_sha256": "85d84fcfe33640333cd4a484a48439b145a4d303aab6e356e7eadbdb3f12068c"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "scope": "Independent Root Standards review of insurer missing-total maintenance",
+  "head": "16b4857260f12458e5e0c797b2f99c60b1e03295",
+  "base": "32ea73d5757ee4fc9d136ab9900ffed81d6c6eed",
+  "tree": "edad5232c2c12086406140142ae1635f1c59b444",
+  "changed_paths": [
+    "pricing/quote.py",
+    "pricing/test_quote_missing_total.py",
+    "verify-insurer-quote.sh"
+  ],
+  "SSH_signature": "G",
+  "source_clean": true,
+  "all_other_source_and_signed_feed_bytes_preserved": true,
+  "proof_artifact_hashes_match": true,
+  "four_public_tests_and_formula_and_types_pass_recorded": true,
+  "missing_total_refusal_and_known_zero_formula_inspected": true,
+  "legacy_cloud_pin_separate": true,
+  "hard_findings": [],
+  "result": "PASS"
+}

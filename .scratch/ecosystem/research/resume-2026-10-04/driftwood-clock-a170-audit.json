@@ -1,0 +1,130 @@
+{
+  "scope": "Read-only actual scheduled Driftwood clock audit; no inferred live or engine/cloud activation",
+  "source_commit": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "source_clock_parent": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "run": 37201959785,
+  "event": "schedule",
+  "run_conclusion": "success",
+  "run_url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37201959785",
+  "source_API_signature_verified": false,
+  "source_API_signature_reason": "no_user",
+  "engine_declaration": {
+    "schema": 1,
+    "engine": "kyverno",
+    "version": "1.18.2",
+    "install": {
+      "url": "https://github.com/kyverno/kyverno/releases/download/v1.18.2/install.yaml",
+      "sha256": "3dcd43eaf11f0719084217148cd0c82a8fa49faa9b1a783ea5bea2cf84041bda"
+    },
+    "cli": {
+      "linux_x86_64": {
+        "file": "kyverno-cli_v1.18.2_linux_x86_64.tar.gz",
+        "sha256": "cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b"
+      }
+    }
+  },
+  "engine_declaration_sha256": "b9b4f35f4509e4b7c5988a08b405d7bae291e122fcdcb023e148482aeb879de1",
+  "engine_install_primary_log_lines": [
+    "sample\tread the engine this repository declares (gitops/engine/kyverno.yaml, ticket 147)\t2026-10-04T12:24:05.0027702Z version=1.18.2",
+    "sample\tread the engine this repository declares (gitops/engine/kyverno.yaml, ticket 147)\t2026-10-04T12:24:05.0029350Z install_sha256=3dcd43eaf11f0719084217148cd0c82a8fa49faa9b1a783ea5bea2cf84041bda",
+    "sample\tinstall the pinned tools (binary + checksum, no marketplace action)\t2026-10-04T12:24:06.6609024Z kyverno.yaml: OK"
+  ],
+  "run_log_sha256": "31494c6a10ab90ecb06ebcc866cd7b79c72e3461b559a022355500bcae7b1b58",
+  "files": {
+    "drift/samples.jsonl": {
+      "sha256": "29e3514b0abb5614fdd0d284c3435cc0008100ca6c8f12c08d3d14dda7fac9db",
+      "bytes": 629624,
+      "rows": 108,
+      "added_rows": 3
+    },
+    "drift/oscal-samples.jsonl": {
+      "sha256": "11280327038b11f091c213f291ef43e44a2fa9f95e64476db6587c9a734bd45b",
+      "bytes": 337418,
+      "rows": 1,
+      "added_rows": 1
+    },
+    "drift/workload-samples.jsonl": {
+      "sha256": "1894729561f4faabc45f4f6f7c7b1b747c28c2535fbf046f1b6354ed601721fe",
+      "bytes": 4010,
+      "rows": 1,
+      "added_rows": 1
+    }
+  },
+  "five_facts": {
+    "sample_tag": "v4.0.0",
+    "sample_commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+    "policy_version_in_force": "7.0.0",
+    "row_lines": [
+      106,
+      107,
+      108
+    ],
+    "all_seven_observed_facts": true,
+    "equality_ceiling": "Declared equality with API defaults/omitted zeros handled, not strict byte identity",
+    "reach_ceiling": "Two pods; four reads per target over18s, reference before/after; finite two-target TCP evidence"
+  },
+  "served_workloads": {
+    "apps_ref": "v4.0.0",
+    "observed": null,
+    "workloads": [
+      {
+        "name": "checkout-svc",
+        "image": [
+          "nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2"
+        ],
+        "Running": true,
+        "observed": null,
+        "why": "the API server has not recorded this workload inside its cage"
+      },
+      {
+        "name": "storefront",
+        "image": [
+          "ghcr.io/policy-as-versioned-driftwood/storefront:v1.0.1@sha256:6affc441f4181ec9e43976ab4115e8b239fe5a73ba30de8f61f5ff691de303d6"
+        ],
+        "Running": true,
+        "observed": null,
+        "why": "the API server has not recorded this workload inside its cage"
+      },
+      {
+        "name": "api",
+        "image": [
+          "ghcr.io/policy-as-versioned-driftwood/api:v1.0.1@sha256:90ccb85d903b8137863695681c2cf6b8cb85ba59835be5e24857e72895b977a3"
+        ],
+        "Running": true,
+        "observed": null,
+        "why": "the API server has not recorded this workload inside its cage"
+      }
+    ]
+  },
+  "PolicyReport_capture": {
+    "report_count": 44,
+    "converted_observations": 493,
+    "served_policies": 12,
+    "mapped_served_policies": 9,
+    "unmapped_machinery": 3,
+    "missing_risk_observations": 7,
+    "raw_PolicyReport_objects_retained": false,
+    "require_nonroot7_results": {
+      "pass": 4,
+      "skip": 40
+    },
+    "cage_tier7_results": {
+      "fail": 4,
+      "skip": 40
+    }
+  },
+  "eligibility": {
+    "DW_scheduled_declared_1_18_2_report_capture": "Present; actual install/checksum and converter capture are primary recorded observations",
+    "chosen_Ludlow_ticket150_baseline": "Not supplied by a Driftwood run; actual chosen-adopter baseline still required",
+    "citable_modern_hub_step4_PASS": "Not established by this audit or by a local rehearsal; requires registered citable truth grade",
+    "engine_move": false,
+    "cloud_activation": false
+  },
+  "diagnosis": {
+    "bindings": "No restatements/cages; direct version7 selector covers the real claims in a governed isolated namespace",
+    "apps_dependsOn_before_fix": [],
+    "strong_evidence": "API container was Running12:25:15 before composed-v7 Kustomization creation around12:25:17; Ready12:25:21. Later probe is stamped7/caged.",
+    "inference": "Cold-cluster admission ordering/synchronize gap, not intentional baseline/unbound workloads",
+    "primary_limit": "Raw Pod creation and webhook-ready timestamps not captured; inference does not prove every Pod causal timing or webhook readiness from Flux readiness."
+  }
+}

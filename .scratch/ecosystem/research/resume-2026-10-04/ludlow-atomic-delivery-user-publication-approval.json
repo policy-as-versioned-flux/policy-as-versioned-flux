@@ -1,0 +1,19 @@
+{
+  "LU_head": "6de0d00ce850ea820777f46fbea5c93a3238ea68",
+  "LU_tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63",
+  "PR_body_sha256": "e140aa5a355dfe83d05e70843b483981ac7f0a9cbf5be8bf7cfe2b62a4a64cc2",
+  "Spec_receipt": "ludlow-atomic-delivery-spec-review.json",
+  "approved_scope": [
+    "exact four-path branch push",
+    "saved PR body publication",
+    "ordinary CI",
+    "App review and normal matching-head merge"
+  ],
+  "candidate_sha256": "44a03945d1fb49d7692a5d452ae7fd6d2dfc73fc23a19538d005ee8bac731338",
+  "no_policy_or_verification_override": true,
+  "public_destination": "https://github.com/policy-as-versioned-ludlow/ludlow",
+  "recorded_at": "2026-10-04T11:55:52.879276+00:00",
+  "root_Standards_receipt": "ludlow-atomic-delivery-root-standards-review.json",
+  "source": "Root relayed the actual trusted user response to its pending exact-publication question",
+  "user_response": "Approve both exact public changes"
+}

@@ -1,0 +1,13 @@
+{
+  "trusted_user_response": "Approve both signed B releases",
+  "root_relay": "Actual trusted user replied to explicit question naming DW v4.0.1 cut/release from872d5c7 and LU from3b57f0c after fresh both axes PASS.",
+  "repository": "policy-as-versioned-ludlow/ludlow",
+  "exact_LU_B_source": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63",
+  "approved_tag": "v4.0.1",
+  "approved_actions": ["ordinary signed cut-release.yml at reviewed main", "ordinary release.yml at immutable v4.0.1 with input tag=v4.0.1"],
+  "fresh_Standards_receipt": "ludlow-composition-B-root-standards-review.json",
+  "fresh_Spec_receipt": "ludlow-composition-B-spec-review.json",
+  "historical_hold_preserved": "ludlow-composition-B-release-approval-hold.json",
+  "no_override_or_alternate_executor": true
+}

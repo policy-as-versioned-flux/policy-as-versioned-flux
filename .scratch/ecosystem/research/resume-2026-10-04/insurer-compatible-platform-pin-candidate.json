@@ -1,0 +1,39 @@
+{
+  "SSH_signature": "G",
+  "actual_3_pinned_exposure_snapshots_numeric_quotes_equal": true,
+  "all_old_signed_quote_bodies_terms_and_other_source_bytes_preserved": true,
+  "artifacts_sha256": {
+    "insurer-compatible-platform-pin-PR-body.md": "053019c0f18a099ff991a2c84168a36b75bf844b81a426070e0df0a995531519",
+    "insurer-compatible-platform-pin-party-check.log": "3b6288a669fbfd0da0afeb7db2a478c45714732afbc17e333688e9fc31737177",
+    "insurer-compatible-platform-pin-postcommit-snapshot-check.json": "f380d228642ce02c3d8247d3ac13145c23db65134f84a2e8727479246bf31d55",
+    "insurer-compatible-platform-pin-public-party-check.log": "3c18d24711b491f2f316313d03185493585814dcd0b3703aea9362ee0f7d1f16",
+    "insurer-compatible-platform-pin-public-selfcheck.log": "8320fe28627c35b806cca45586a71541e7820d41ae41853505145117d1cba36f",
+    "insurer-compatible-platform-pin-snapshot-check.json": "f380d228642ce02c3d8247d3ac13145c23db65134f84a2e8727479246bf31d55",
+    "insurer-compatible-platform-pin-source-signature.log": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907",
+    "insurer-compatible-platform-pin.patch": "990a107d38037cd49d3e922ad630f1d67bb945b3294b1d115f81b4d8cef2d897"
+  },
+  "base": "8d4a5ae684e4a58c8242bc8b6e50794473ef302b",
+  "canonical_party_exit": 0,
+  "changed_paths": [
+    "gitops/platform/platform-pin.yaml",
+    "party.yaml"
+  ],
+  "clean": true,
+  "commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+  "compatible_published_tag": "v5.0.0",
+  "directory": "/private/tmp/pavf-insurer-maintenance-20261004",
+  "future_quote_platform_parent_provenance_only_changes": true,
+  "head": "ed17499668f368c55261729c760904662ab7e242",
+  "negative_high_confidence_secret_scan": true,
+  "no_cloud_activation_or_implementation_name_invention": true,
+  "patch_sha256": "990a107d38037cd49d3e922ad630f1d67bb945b3294b1d115f81b4d8cef2d897",
+  "postcommit_snapshot_exit": 0,
+  "public_party_exit": 0,
+  "public_quote_selfcheck_exit": 0,
+  "snapshot_report": "insurer-compatible-platform-pin-snapshot-check.json",
+  "source_sha256": {
+    "gitops/platform/platform-pin.yaml": "bf97be42ac9eddfbd934149211c95725b7dd9232429738050b36bba8d071e87a",
+    "party.yaml": "5524931912b47453f7e22d89da68e0adfdf867ba38ad9aca1d25444008ee6a63"
+  },
+  "tree": "2a6c5ad76dbc710505ffbc48a0f269b644ea522d"
+}

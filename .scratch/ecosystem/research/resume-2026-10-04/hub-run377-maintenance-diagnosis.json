@@ -1,0 +1,131 @@
+{
+  "head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+  "tree": "555196f32a7fe029354f0314af83636e79643360",
+  "bounded_source_repair": true,
+  "changes": [
+    "Committed local probe clones retain tag objects, exact source origin refs and symbolic origin/HEAD, including newer remote-only clock objects; dirty edits remain excluded. Missing immutable objects are fetched from local source only.",
+    "Mixed carried5/6/7 windows test an engine unsupported by any carried policy line, using only real table rows.",
+    "Default workload wrapper falls back to installed python3 only when no explicit PYTHON was supplied.",
+    "CVE inventory, engine pairing and twin cage registered as estate-observation with no accepted skips.",
+    "New ledger ownership requires the served workflow writer command and literal directory-bound default, not a lane declaration; redirects and working-copy changes cannot widen ownership.",
+    "Refusal row names exact5/6/7 bodies with identical13UPDATE hazard fields; narrowed-name and narrowed-field controls still fail. Prepared publisher cloud source inputs are authoring; delivered unknown interfaces retain SKIP."
+  ],
+  "remaining": {
+    "pound_seam": {
+      "status": "genuine disagreement retained",
+      "orgs": [
+        "ludlow",
+        "tuppence"
+      ],
+      "cause": "Own mitigation claims grade5 are outside declared pricing_threshold3 and earn no credit. Platform calibration table uses reductions; the cheapest published own-curve rung is baseline while table is isolated. No regrading or price rewrite.",
+      "source_artifact": "hub-run377-captures/verify_pound-seam_verify-pound-seam.out"
+    },
+    "provider_CR_mutability": {
+      "status": "unknown interface remains SKIP for a delivered CR",
+      "source_authoring": "Only platform/implementations/cloud/policies is classified authoring; package.yaml and render.py name these inputs and emit claim-bound composed/cloud copies. A new public test proves a delivered non-Pod CR remains exit3; arbitrary unclassified paths remain visible."
+    },
+    "forge": {
+      "status": "Historical five main-review failures preserved; root normal API remediation and fresh genuine complete forge grade PASS. No replacement run377 clock observation.",
+      "receipt": "forge-main-review-protection-updates-complete.json",
+      "fresh_grade": "forge-current-complete-grade-after-review-repair.log",
+      "fresh_grade_sha256": "b4d71ea2b57d835b09ccec81099d05bdf6e428e9cc6fc043dfd704b2ec1b0a8e"
+    },
+    "clock": {
+      "status": "genuine run377 remains88PASS25FAIL22SKIP; local fixtures/replays create no replacement TRUTH line"
+    },
+    "floors": {
+      "status": "no waived floors, no SKIP-to-PASS interpretation, no invented workload/OSCAL binding or signature"
+    },
+    "upstream_maintenance": {
+      "status": "separate root/platform and sibling/adopter/insurer changes, not included in this hub source"
+    }
+  },
+  "historical_primary_captures_modified": false,
+  "user_untracked_modified": false,
+  "root_shared_source_modified": false,
+  "external_mutations": false,
+  "supersedes": "bc9601b8cbf6e5febe03511dc8e1e23320c891d1",
+  "checks": {
+    "head": "4c4b53c7163b0da7e11e9d0574057bcbc24e298d",
+    "checks": {
+      "signature": {
+        "argv": [
+          "git",
+          "verify-commit",
+          "4c4b53c7163b0da7e11e9d0574057bcbc24e298d"
+        ],
+        "exit": 0,
+        "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-signature.log",
+        "sha256": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907"
+      },
+      "mypy": {
+        "argv": [
+          "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+          "-m",
+          "mypy",
+          "--explicit-package-bases",
+          "--follow-imports=silent",
+          "--ignore-missing-imports",
+          "verify/_snapshot.py",
+          "verify/map-surface/map_surface.py",
+          "verify/engine-pairing/engine_pairing.py",
+          "verify/e2e/step2_reprice.py"
+        ],
+        "exit": 0,
+        "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-mypy.log",
+        "sha256": "71144743c83babea384888a735db0c4daba3d4d7b7942b6839984bd5c21b52bb"
+      },
+      "focused": {
+        "argv": [
+          "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_workload_lane_entrypoint.py",
+          "tests/test_verifier_snapshots.py",
+          "tests/test_map_observation_ownership.py",
+          "tests/test_truth_manifest.py",
+          "tests/test_map_surface.py",
+          "tests/test_refusal_by_another_name.py"
+        ],
+        "exit": 0,
+        "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-focused.log",
+        "sha256": "ebbced0fe1aa3b278598a88178352d68ab8e518636f0ec16e3ba4e59edb0831f"
+      },
+      "engine": {
+        "argv": [
+          "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+          "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/engine-pairing/engine_pairing.py",
+          "check"
+        ],
+        "exit": 0,
+        "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-engine.log",
+        "sha256": "a54548f109f397fde1305656a74cab9e4dcc30d668c4cf2b415ebda6b57843cd"
+      },
+      "e2e": {
+        "argv": [
+          "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+          "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/e2e/step2_reprice.py",
+          "--estate",
+          "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/.estate-clone"
+        ],
+        "exit": 0,
+        "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-followup-e2e.log",
+        "sha256": "81f2d2d92f251967ca1155828295f50998b3df097524ee7506bfa9243d801aca"
+      }
+    },
+    "external_mutations": false,
+    "scheduled_run_regraded": false,
+    "clean": true
+  },
+  "snapshot_followup": {
+    "red": "hub-run377-snapshot-remote-closure-red.json",
+    "green": "hub-run377-snapshot-remote-closure-green.json",
+    "actual_red_failures": 2,
+    "exact_source_origin_ref_set": true,
+    "symbolic_origin_HEAD_restored": true,
+    "newer_remote_only_clock_object_readable": true,
+    "missing_immutable_object_recovery": "Local source-SHA fetch only, no forge/network",
+    "initial_insufficient_probe": "hub-run377-snapshot-symbolic-ref-initial-insufficient-probe.json"
+  }
+}

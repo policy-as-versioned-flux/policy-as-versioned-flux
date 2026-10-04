@@ -1,0 +1,132 @@
+{
+  "HEADER_fingerprint_only": true,
+  "apps_A_commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "apps_inventory_all_other_bytes_preserved": true,
+  "authentic_release_receipt": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-composition-B-authentic-release.json",
+  "authentic_release_receipt_sha256": "d926705e6746ae0619b7933d64799f0c662103305979f2d85e80211a33fe4f12",
+  "base": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "branch": "delivery-stage2-composed-B-20261004",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "checks": {
+    "compose": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        ".github/scripts/platform-tools.py",
+        "--adopter-dir",
+        ".",
+        "--tools-dir",
+        "../platform-tools",
+        "compose",
+        ".",
+        "--estate-clone",
+        ".."
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-compose.log",
+      "log_sha256": "b8427d5b88e6d2789a51bc7013d852ef776e4c1f81fce305eb1835872c16da5a"
+    },
+    "gate": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        ".github/scripts/adopter-gate.py",
+        "compose",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/platform",
+        "v4.0.1",
+        "UNRELEASED-FINAL-COMPOSED-POINTER",
+        "--adopter-dir",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+        "--base-ref",
+        "872d5c7f44801b496731b11cd40881f304f8a09a",
+        "--head-ref",
+        "226a319f475fb34a16745d836197807331efa3d9",
+        "--out",
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-gate.json"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-gate.log",
+      "log_sha256": "8766164ee36d07a67c2674cf30974f4c787e0975cc0ba9a83f12768b0d030691",
+      "result": {
+        "added": [],
+        "composed_bump": "none",
+        "declared_bump": "none",
+        "reasons": [],
+        "retired": [],
+        "weaker_than_declared": false
+      }
+    },
+    "postcommit-real-layout": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_platform_tools.py",
+        "-v"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-postcommit-real-layout.log",
+      "log_sha256": "433df6e5bc8b89d1b12534f2d497773308b1c2374cf0f92d68ab385089377685"
+    },
+    "reach": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "scripts/render_composed.py",
+        "reach",
+        "--ref",
+        "v4.0.1"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-reach.log",
+      "log_sha256": "6f3c2637b29fb47c1c5c8ba0c1e02463bbedf5f3d6dc9aabb259e168c98350b3"
+    },
+    "source-signature": {
+      "argv": [
+        "git",
+        "verify-commit",
+        "226a319f475fb34a16745d836197807331efa3d9"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-source-signature.log",
+      "log_sha256": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907"
+    },
+    "verify": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        ".github/scripts/platform-tools.py",
+        "--adopter-dir",
+        ".",
+        "--tools-dir",
+        "../platform-tools",
+        "verify",
+        ".",
+        "--estate-clone",
+        ".."
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-final-composed-B-verify.log",
+      "log_sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    }
+  },
+  "composed_B_commit": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "composed_B_tag": "v4.0.1",
+  "composed_B_tag_object": "1faa6914677d8da75ecf5fd4f03c7e338282c789",
+  "directory": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+  "file_sha256": {
+    "composed/HEADER.yaml": "1f6302dbb257e2ecc4f8c7c02d5768577632abd719739ad78d883dce6273d815",
+    "gitops/composed/composed-set.yaml": "289ef0ced35464aa74442df9dae5e09991bba8ba4d6eefe2a243e87e4632aa14"
+  },
+  "head": "226a319f475fb34a16745d836197807331efa3d9",
+  "measured_bump": "none",
+  "normal_SSH_signature": "G",
+  "patch_sha256": "804d0269af9d914b271725eaf9777778480fbe7c22c89f820781fb5cb068e9b0",
+  "remote_mutations": false,
+  "scope": "Reviewed final composed-only pointer to genuine released B; apps stay A; no activation",
+  "source_clean": true,
+  "tree": "deaabb66afb86eaacc14c9c5945d4dae63cda64d"
+}

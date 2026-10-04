@@ -1,0 +1,9 @@
+test_known_subset_and_excluded_unpriced_regime_cannot_supply_missing_total (test_quote_missing_total.MissingExposureTotal.test_known_subset_and_excluded_unpriced_regime_cannot_supply_missing_total) ... ok
+test_known_total_preserves_the_existing_exclusion_and_layer_formula (test_quote_missing_total.MissingExposureTotal.test_known_total_preserves_the_existing_exclusion_and_layer_formula) ... ok
+test_known_zero_total_is_distinct_from_a_missing_instrument (test_quote_missing_total.MissingExposureTotal.test_known_zero_total_is_distinct_from_a_missing_instrument) ... ok
+test_unknown_total_refuses_without_pricing_or_mutating_the_input (test_quote_missing_total.MissingExposureTotal.test_unknown_total_refuses_without_pricing_or_mutating_the_input) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK

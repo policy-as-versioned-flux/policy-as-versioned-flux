@@ -1,0 +1,104 @@
+{
+  "axis": "Spec",
+  "reviewed_head": "d62f74e52ed992798a75cf3f4f138ec9c83db80a",
+  "base": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+  "result": "PASS",
+  "findings": [],
+  "actual_primary_replay": {
+    "2025-12": {
+      "raw_sha256": "48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26",
+      "rows": 164,
+      "currency_codes": 142,
+      "USD": 1.3126,
+      "dates": [
+        [
+          "01/12/2025",
+          "31/12/2025"
+        ]
+      ],
+      "entire_actual_parser_payload_matches": true,
+      "normalized_sha256": "3062828d54e4ad8576bc40c06d2f37949d51c95294e32444c2e8a65156d24e7c"
+    },
+    "2026-08": {
+      "raw_sha256": "8da9e83a830282c94cbcb31779cbeb93d7a2a739d1bb898cbec62182b7b29fad",
+      "rows": 163,
+      "currency_codes": 141,
+      "USD": 1.3367,
+      "dates": [
+        [
+          "01/08/2026",
+          "31/08/2026"
+        ]
+      ],
+      "entire_actual_parser_payload_matches": true,
+      "normalized_sha256": "646ed6176b18642670623d855278c915aae0ebb8a7c21d81bff9f1a6bbd9df2c"
+    }
+  },
+  "frozen_major_payloads": {
+    "cve/v1/feed.json": "1fd7b340a35c81076bb67e36d455cf0ec778802f880f8c0ec1b08ad1a0e6f4a9",
+    "cve/v2/feed.json": "76d35faa3f0e3d46cc34a2a0be6fca9e707e98fc747e52f18a83ddd3dee16657",
+    "cve/v3/feed.json": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+    "eol/v1/feed.json": "b26f94cbaefd255624be0050365c5eccb4a637d9f60f3025a3f0502ea1993eeb",
+    "eol/v2/feed.json": "401f564c7b370833888c74d612afffee80f947d7522e63b2be66d1a41b6f533b",
+    "fx/v1/feed.json": "eb5732c627eb362149ad479ffa56c183a4712777c3d7e07d308b622d2917a5a2",
+    "market-moves/v1/feed.json": "b0ddb8f67ba43208e4c7af75a8bbe54fd4ec97e71cee5cdfd6c628903d9f1ffe",
+    "news/v1/feed.json": "42b4f4ac35b73237f0f4775fd5632a1251b7c3624434de786db8155427acfa36",
+    "threat-register/v1/feed.json": "50af335e60b247d2a202fa747fd3a2b80c485fc587896dc0ab4841f0e54a8b60",
+    "threat-register/v2/feed.json": "c94ae8335d13edcbdc63b2d8f7c7cda3fbefd4d80e78022be51aba30d70b9a6c",
+    "threat-register/v3/feed.json": "7529798024dbab0971dba04ec29ba4e7214b6a920f3c2fb2a5d185da8976081a",
+    "threat-register/v4/feed.json": "e88332226c882103e469b43770bd177ff10384500825236f2fcdaf11dda168fd"
+  },
+  "unchanged_contracts": [
+    "party.yaml",
+    "fx/payload.schema.json",
+    "fx/rule.yaml",
+    "fetch/fx.py",
+    "fetch/lib.py",
+    "fetch/source/fx.json",
+    "converters/fx.py",
+    "bump.py",
+    ".github/workflows/cut-release.yml",
+    ".github/workflows/release.yml"
+  ],
+  "source_sha256": {
+    "fetch/source/hmrc/2025-12.csv": "48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26",
+    "fetch/source/hmrc/2026-08.csv": "8da9e83a830282c94cbcb31779cbeb93d7a2a739d1bb898cbec62182b7b29fad",
+    "fetch/source/hmrc/PROVENANCE.json": "575baf902acf4b69361cc01971385ae44fe0b2993ac7df4329e22c66688df321",
+    "fetch/source/periods/2025-12/fx.json": "5d0cc698e4b85657ffdd882c50a900ac87fbe535b50c2e0db4225782ebdb07ef",
+    "fx/README.md": "138fb7deff3b62544a918a86de6ac8675b8aab88f9d5e75c2f774573a076afe8",
+    "fx/bump.yaml": "3e2d110c9a64e0cf60a910737ef86993eb572badb9b6986527f1b03ffd43163c",
+    "fx/v2/feed.json": "14506a4273543a059aad84903f65742b54bebcb3e2af34dcdac8c6e635924194"
+  },
+  "computed_bump": "major",
+  "removed_codes": [
+    "VES"
+  ],
+  "added_codes": [
+    "BGN",
+    "VED"
+  ],
+  "new_envelope_metadata": {
+    "kind": "feed",
+    "name": "fx",
+    "version": "2.0.0",
+    "published_by": "feeds",
+    "published_at": "2026-10-04T00:00:00Z",
+    "payload_schema": "fx/payload.schema.json"
+  },
+  "December2025_USD_to_GBP": 6456650921.834527,
+  "missing_months_refused": [
+    "2025-11-30",
+    "2026-01-01"
+  ],
+  "source_only": "No authentic FX2 tag or served adopter price claimed; normal reviewed merge, main cut and immutable release verification remain required.",
+  "signature_verification": {
+    "exit": 0,
+    "output": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0\n"
+  },
+  "normal_next_version": "2.0.0",
+  "public_payload_scan": {
+    "changed_files": 7,
+    "high_confidence_matches": [],
+    "payload_scope": "Public official HMRC country/currency/rate/date rows, public URLs and adapter-normalized envelopes; no private user data."
+  }
+}

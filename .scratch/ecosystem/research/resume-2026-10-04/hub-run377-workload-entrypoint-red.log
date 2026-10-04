@@ -1,0 +1,29 @@
+test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv (test_workload_lane_entrypoint.WorkloadLaneEntrypoint.test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv) ... 
+  test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv (test_workload_lane_entrypoint.WorkloadLaneEntrypoint.test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv) (lane='served-workloads') ... FAIL
+  test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv (test_workload_lane_entrypoint.WorkloadLaneEntrypoint.test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv) (lane='oscal-lane') ... FAIL
+test_explicit_unavailable_interpreter_still_refuses (test_workload_lane_entrypoint.WorkloadLaneEntrypoint.test_explicit_unavailable_interpreter_still_refuses) ... ok
+
+======================================================================
+FAIL: test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv (test_workload_lane_entrypoint.WorkloadLaneEntrypoint.test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv) (lane='served-workloads')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_workload_lane_entrypoint.py", line 37, in test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv
+    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 3 != 0 : SKIP: no hub interpreter for the workload lane
+
+
+======================================================================
+FAIL: test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv (test_workload_lane_entrypoint.WorkloadLaneEntrypoint.test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv) (lane='oscal-lane')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_workload_lane_entrypoint.py", line 37, in test_both_wrappers_reach_adopter_instruments_without_a_local_virtualenv
+    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 3 != 0 : SKIP: no hub interpreter for the workload lane
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.062s
+
+FAILED (failures=2)

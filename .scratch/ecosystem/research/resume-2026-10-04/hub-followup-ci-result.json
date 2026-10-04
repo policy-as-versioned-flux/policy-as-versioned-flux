@@ -1,0 +1,19 @@
+{
+  "head": "5bc47331a536476f3580542be794908f5053f816",
+  "run": 37190805362,
+  "pytest": {
+    "passed": 2899,
+    "skipped": 24,
+    "failed": 1,
+    "seconds": 215.74
+  },
+  "sole_failure": "flux_coverage_floor_is_still_reachable",
+  "invariants": {
+    "passed": 72,
+    "failed": 1,
+    "skipped": 2
+  },
+  "functional_fixture_failures": 0,
+  "typecheck_demo_determinism_reproduction": "PASS",
+  "overall_CI": "failure; unchanged historical sample deficit, no overall green claim"
+}

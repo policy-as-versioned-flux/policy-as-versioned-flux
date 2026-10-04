@@ -1,0 +1,11 @@
+{
+  "trusted_user_response": "Approve both signed B releases",
+  "approval_relay": "Root actual async approval question explicitly named DWv4.0.1 from872d5c7 and LUv4.0.1 from3b57f0c after fresh exact both-axisPASS",
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "tag": "v4.0.1",
+  "head": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "approved_action": "Same ordinary cut-release.yml main/versionv4.0.1, signed immutabletag and release.yml on that actual tag with explicit inputtag",
+  "final_pointer_requires_concrete_checks_and_reviews": true,
+  "no_authority_expansion": true
+}

@@ -1,0 +1,14 @@
+{
+  "action": "Archive policy-as-versioned-flux/readiness-collector, then post-action anonymous OCI probe before the other unconditional drops.",
+  "executed": false,
+  "review": "automatic approval review",
+  "reason": "Significant service-state mutation with potentially costly reversal; trusted user transcript does not explicitly authorize this specific repository, and historical local assertions do not establish approval.",
+  "blocked_repositories": [
+    "policy-as-versioned-flux/readiness-collector",
+    "policy-as-versioned-flux/pr-gate-action",
+    "policy-as-versioned-flux/renovate-config"
+  ],
+  "current_read_only_preconditions": "current forge and anonymous OCI facts captured; transferred apps correct and permanent image HTTP200",
+  "approval_question": "Explicit approval for the named three archive acts pending; no answer inferred.",
+  "other_work": "Adopter fixes, source review, normal authorized PR/cut/release delivery continue."
+}

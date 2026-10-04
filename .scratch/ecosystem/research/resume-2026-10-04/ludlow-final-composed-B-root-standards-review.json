@@ -1,0 +1,22 @@
+{
+  "scope": "Root independent Standards review of exact final composed-only B pointer and normal proof receipts",
+  "head": "b84006a176e6c783bbb45fc2463c46be6ba73071",
+  "base": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "tree": "3cd9ee3f18b4cd5c189e747a540b143988aee073",
+  "packet_sha256": "f15fd69d81a1fbcc7540ea78bc8d3a84d9a40578db7846a5bd674fecad271f8d",
+  "source_clean": true,
+  "SSH_signature": "G",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "hand_authored_diff_inspected": true,
+  "HEADER_fingerprint_only": true,
+  "all_other_committed_bytes_unchanged": true,
+  "authentic_released_B_tag_object_and_peel_match": true,
+  "apps_A_and_primary_inventory_preserved": true,
+  "normal_check_receipts_hash_joined": true,
+  "hard_findings": [],
+  "result": "PASS",
+  "publication_requires": "Exact Spec PASS and normal CI/App matching-head review; user exact public authorization if required"
+}

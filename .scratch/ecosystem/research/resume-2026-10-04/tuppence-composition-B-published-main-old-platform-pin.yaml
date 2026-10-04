@@ -1,0 +1,57 @@
+# tuppence consumes `platform` as a PINNED, SIGNED dependency (the config-base
+# pattern, one level up): the same governance machinery is inherited, not
+# copy-pasted. tuppence does not author policy versions — it pins a signed
+# release of platform and lets Flux fan the version array out into this cluster.
+# Same pattern as driftwood's gitops/platform/platform-pin.yaml.
+#
+# Opt-in, NOT wired into gitops/apps (whose Kustomization health-gates on
+# wait: true) so it can't affect the Phase-0 reconcile beat. Apply it once the
+# cluster has its prerequisites (see estate/platform/distribution/README.md):
+#   * Kyverno       (the ValidatingPolicy CRDs the versions install)
+#   * flux-operator (the ResourceSet CRD that fans the array out)
+# then:  kubectl apply -k estate/tuppence/gitops/platform/
+#
+# Bump = one reviewed PR changing .spec.ref.tag (+commit) here — tuppence adopts
+# a platform improvement on its own cadence.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: platform
+  namespace: flux-system
+  annotations:
+    # Ticket 41's identity-pinned gitsign-verifying controller reads these three. Flux's own
+    # spec.verify cannot verify a gitsign tag (ADR-0023 D3, fluxcd/source-controller#1068), so
+    # this controller verifies platform's tag; platform is a verified source only, so it gates nothing.
+    # The regexp and issuer are the constants platform's own release.yml pins; the five-fact
+    # sample re-reads them off the live object and grades fact 2 against them, so a boundary that
+    # verified with somebody else's identity is observed false rather than merely 'verified'.
+    policy-as-versioned.dev/gitsign-identity-regexp: ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+    policy-as-versioned.dev/gitsign-issuer: https://token.actions.githubusercontent.com
+spec:
+  interval: 1m
+  url: https://github.com/policy-as-versioned-platform/platform
+  ref:
+    tag: v5.0.0
+    commit: 703eff6aee959843c4160aa54fd03413f62858cc
+    # commit pinned at release (belt-and-braces immutability, ADR-0001) --
+    # the resolved SHA platform v1.1.0 tag points to, real as of policy-
+    # mo-10. Bumped by a Renovate customManager (git-refs datasource, both
+    # fields together) whenever platform ships a newer tag -- never by hand,
+    # never a moving branch.
+
+# ONE DOCUMENT, ON PURPOSE (ecosystem ticket 42, widening ticket 40; ticket 16 answer item Q5):
+# this file is now the platform GitRepository and nothing else, so it can be applied on its own as
+# a VERIFIED SOURCE with no second policy install behind it. The Kustomization that used to sit
+# below it -- the one that fans platform's own version array out onto the cluster -- moved to
+# platform-distribution.yaml beside it. `kubectl apply -k gitops/platform/` still applies both and
+# is unchanged; the five-fact sample's ephemeral cluster applies only this file.
+#
+# Why it matters, found by running it on driftwood and re-run here on an ephemeral cluster
+# (2026-08-29): with platform's fan-out installed alongside this adopter's composed set, BOTH
+# ResourceSets render a cluster-scoped ValidatingPolicy called policy-version-orphan-guard, and
+# both render every cage policy under the same names. Whichever applied last won. The sample
+# taken with both installed reported fact 4 as "0 of 16 rendered objects are absent and 16 are
+# live but unequal to the offline render" -- platform's copies carry no composed-for label and
+# none of this adopter's annotations, so the composed set was not in force at all. It is not just
+# the guard; it is the whole set. Q5's rationale ("the boundary stays observable with no second
+# policy install") is exactly this.

@@ -1,0 +1,47 @@
+{
+  "observed_at": "2026-10-04T10:55:01.964007+00:00",
+  "repositories": {
+    "platform": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/platform",
+      "commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "tree": "bba72befc0b76e339aa1f5536671a708b84a5878",
+      "remote": "https://github.com/policy-as-versioned-platform/platform",
+      "scope": "Normal remote main fetch; release trust receipts remain separate"
+    },
+    "feeds": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/feeds",
+      "commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+      "tree": "b88fb77f96cadf1a9639cae369ed529bd4e1731c",
+      "remote": "https://github.com/policy-as-versioned-feeds/feeds.git",
+      "scope": "Normal remote main fetch; release trust receipts remain separate"
+    },
+    "app-ledger": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-ledger",
+      "commit": "d3255fa6fc0ccd25c84043f61b128b4d2e929ac0",
+      "tree": "e0f96aa9dc47e8fd7f8c624a9d478d0aaf87f6e4",
+      "remote": "https://github.com/policy-as-versioned-tuppence/ledger",
+      "scope": "Normal remote main fetch; release trust receipts remain separate"
+    },
+    "app-storefront": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-storefront",
+      "commit": "deb25d3467c9b7c59a83b39bbb8023c790fbad31",
+      "tree": "43b3bba638bf5c8e446df56fc3d0d26979208551",
+      "remote": "https://github.com/policy-as-versioned-driftwood/storefront",
+      "scope": "Normal remote main fetch; release trust receipts remain separate"
+    },
+    "app-api": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-api",
+      "commit": "d9b5f4f922cb4ff4b30d75733d48975c86c6df61",
+      "tree": "1d166d6a6e9407a57db5e89887f2fee2183586a3",
+      "remote": "https://github.com/policy-as-versioned-driftwood/api",
+      "scope": "Normal remote main fetch; release trust receipts remain separate"
+    },
+    "app-reports": {
+      "directory": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-publish/app-reports",
+      "commit": "f21bff06fac89401bf180ffc40dd46a37c36db51",
+      "tree": "922e5d6feaab6699550ea426652f38c482c9c7ff",
+      "remote": "https://github.com/policy-as-versioned-ludlow/reports",
+      "scope": "Normal remote main fetch; release trust receipts remain separate"
+    }
+  }
+}

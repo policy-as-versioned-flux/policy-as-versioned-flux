@@ -1,0 +1,11 @@
+{
+  "authentic_adopter": "ludlow",
+  "tag": "v4.0.1",
+  "commit": "3b57f0ce3a9b3da79abf78d4a0ab3ff67dc6e289",
+  "HEADER_sha256": "a604912982d6491ec8f571693ed313ebba38144d5c0a68a373cdc82ebca4fbe1",
+  "total": null,
+  "input_exposure_sha256": "sha256:f7d7b54fc6b079801fa5cc0aa180bdff5118ec80d72f854f962ee8ec7e1d0aa2",
+  "typed_refusal": "missing instrument: ludlow's signed exposure carries no priced total -- an unpriced book supplies neither a layer nor a premium",
+  "input_unchanged": true,
+  "no_premium_or_zero_total_created": true
+}

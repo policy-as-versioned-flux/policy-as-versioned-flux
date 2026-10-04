@@ -1,0 +1,11 @@
+{
+  "source": "Trusted user response relayed by coordinating root agent",
+  "trusted_user_reply": "Approve exact Driftwood final pointer",
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "exact_head": "2dd89404f699a4af70e6a44451793347a4af11ef",
+  "body": "driftwood-final-composed-B-current-main-PR-body.md",
+  "authorized_actions": ["normal exact public branch push", "ordinary PR with saved body", "actual CI", "matching-head other-hand App approval", "ordinary matching-head merge"],
+  "scope": "Exact reviewed two-path final pointer; preserve later genuine observation clock through ordinary merge",
+  "no_authority_expansion": true,
+  "retry": "Same normal approved exec path; no alternate executor or protection override"
+}

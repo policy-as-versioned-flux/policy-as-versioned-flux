@@ -1,0 +1,51 @@
+{
+  "adopters": {
+    "ludlow": {
+      "GitHub_merge_signature_verified": true,
+      "PR": "https://github.com/policy-as-versioned-ludlow/ludlow/pull/54",
+      "actual_CI_success": true,
+      "all_published_merge_source_blobs_equal_reviewed_candidate": true,
+      "candidate_branch_G_clean_preserved": true,
+      "genuine_latest_clock_byte_preserved": true,
+      "main": "e7243d917c323364c0fb74d312f921d0d1ec1356",
+      "mergedAt": "2026-10-04T14:24:57Z",
+      "normal_scoped_App_matching_head_merge": true,
+      "receipts_sha256": {
+        "adopter-scenario-order-current-clock-maintenance-postcommit.json": "7b8c1ea2d11a15c6376bbbdd1a947c38a50f710a7e7f55d039f474c7f991cfe4",
+        "adopter-scenario-order-current-clock-maintenance-root-standards-review.json": "16acf75f8b504698ec0e314d159db4eee83d4773225f261717d942db2481112c",
+        "adopter-scenario-order-current-clock-maintenance-spec-review.json": "f54290d2365ed54824677dfa7fd2ad51bc75027c96f3c1482d02fd1cdb4b44d1",
+        "ludlow-scenario-order-current-clock-maintenance-App-review.json": "dae91ba7dbb4806ae59c864b5f8d93c3d45ee5069f7aa8cf04332e9c1c4cd52c",
+        "ludlow-scenario-order-current-clock-maintenance-PR-body.md": "cfbd03e4281c35c9d05ed8c37bd601e2d923e20c92f53f83c0d2314be2743d37",
+        "ludlow-scenario-order-current-clock-maintenance-actual-CI.json": "f5a4a24eb6459010eced1dbccb8a80053038b80358e08a26bf13be2fd3301303",
+        "ludlow-scenario-order-current-clock-maintenance-actual-merge.json": "6dfece8401744fa1984819558a33194aaf21c3dca2b1c0c7b002371b459f7ddc",
+        "ludlow-scenario-order-current-clock-maintenance-main-commit-verification.json": "9316b888323fbac84ed8dcd35cbd2774d43d439ecbb10367a470560836063f0e"
+      },
+      "source": "b6aac1e5b0419a96ac675326adf5d2110d786c81",
+      "tree": "7e510770eb2d96b4bdfc594211d7e1050f13e17d"
+    },
+    "tuppence": {
+      "GitHub_merge_signature_verified": true,
+      "PR": "https://github.com/policy-as-versioned-tuppence/tuppence/pull/57",
+      "actual_CI_success": true,
+      "all_published_merge_source_blobs_equal_reviewed_candidate": true,
+      "candidate_branch_G_clean_preserved": true,
+      "genuine_latest_clock_byte_preserved": true,
+      "main": "011942de87ba827b5bc2949da0057d862b6b69f6",
+      "mergedAt": "2026-10-04T14:25:04Z",
+      "normal_scoped_App_matching_head_merge": true,
+      "receipts_sha256": {
+        "adopter-scenario-order-current-clock-maintenance-postcommit.json": "7b8c1ea2d11a15c6376bbbdd1a947c38a50f710a7e7f55d039f474c7f991cfe4",
+        "adopter-scenario-order-current-clock-maintenance-root-standards-review.json": "16acf75f8b504698ec0e314d159db4eee83d4773225f261717d942db2481112c",
+        "adopter-scenario-order-current-clock-maintenance-spec-review.json": "f54290d2365ed54824677dfa7fd2ad51bc75027c96f3c1482d02fd1cdb4b44d1",
+        "tuppence-scenario-order-current-clock-maintenance-App-review.json": "ca286537d91cd0043106c93ab1ed84d6f71e49c63c2e9f735bc12c0714a1b5c9",
+        "tuppence-scenario-order-current-clock-maintenance-PR-body.md": "c9f3f16355ed540759c9ab04dc87590b1bbcb74fd6f32a3f4cea7e2e6113af14",
+        "tuppence-scenario-order-current-clock-maintenance-actual-CI.json": "6e205dd155a59561df92606926a44e5bdb220f917d8486e2d938994a7b62241c",
+        "tuppence-scenario-order-current-clock-maintenance-actual-merge.json": "b9e9fa4dc2b9d61d280218484fd08f3713c648362e049b8b03f5ddf7ebfd3aa9",
+        "tuppence-scenario-order-current-clock-maintenance-main-commit-verification.json": "2415aa125441114a1728a369717364843b49820fc8f95a36d463cfc19d310b20"
+      },
+      "source": "02c35b74a9044be9f02c580dd94103c85923a009",
+      "tree": "13d698baa99283a93601d90839a27e8844cbb55b"
+    }
+  },
+  "scope": "Normal public maintenance PR delivery complete; no cut/release or new qualified live observation"
+}

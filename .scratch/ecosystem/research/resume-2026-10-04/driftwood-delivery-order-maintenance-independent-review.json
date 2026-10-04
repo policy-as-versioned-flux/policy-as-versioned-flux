@@ -1,0 +1,26 @@
+{
+  "verdict": "PASS",
+  "axis": "Independent source Standards and contract review",
+  "head": "8d9ae2ec514ca75c2c460b4f057a3a741e69b21a",
+  "tree": "b2c8a4b5c3ab9f1cf3ef85e86e20776098cd0072",
+  "base": "2ebde7efd1f3c11071719d25f2cba23368cfcdd7",
+  "hard_findings": [],
+  "smell_findings": [],
+  "source_G_clean": true,
+  "exact4paths_and_all_other_blobs_preserved": true,
+  "all_source_patch_and_check_hashes_joined": true,
+  "patch_format": "binary full-index",
+  "HEADER_fingerprint_only": true,
+  "apps_only_dependency_fields_match_actual_composed_routes": true,
+  "moved_check_reads_literal_current_emitter_version": true,
+  "moved_retained_major_ignored_and_current_major_observed": true,
+  "actual_recorded_moved_result": "4 offline PASS, live could-not-look3 preserved",
+  "validation": {
+    "public_enabled_tests": 28,
+    "skips": 0,
+    "normal_tools703_compose_verify_reach_postcommit": true,
+    "institutional_gate": "none"
+  },
+  "no_source_edits_or_remote_mutations_by_reviewer": true,
+  "candidate_sha256": "e0d5d3616bdc4da2de213cafd2c329cccbfc6d698ed312baecc99079e7536c68"
+}

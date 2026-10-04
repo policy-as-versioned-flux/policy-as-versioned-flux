@@ -1,0 +1,40 @@
+{
+  "id": 5405933992,
+  "node_id": "PRR_kwDOT-3Nm88AAAABQjgBqA",
+  "user": {
+    "login": "pavc-other-hand[bot]",
+    "id": 324560547,
+    "node_id": "BOT_kgDOE1hmow",
+    "avatar_url": "https://avatars.githubusercontent.com/u/304952089?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D",
+    "html_url": "https://github.com/apps/pavc-other-hand",
+    "followers_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pavc-other-hand%5Bbot%5D/received_events",
+    "type": "Bot",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "body": "Reviewed exact head 98d13782173342bbdfbd14271e1626e3b11b0d73. Independent Standards and Spec pass; actual shift-left and compose-check CI both succeed on this head. The four-path delivery keeps primary inventory and policy bytes intact, uses the genuine signed apps/composed A release, matches5/6/7 gates, and passes authenticated rerender/replay plus the no-change institutional gate. Approving the ordinary reviewed merge.\n",
+  "state": "APPROVED",
+  "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/55#pullrequestreview-5405933992",
+  "pull_request_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/pulls/55",
+  "author_association": "CONTRIBUTOR",
+  "_links": {
+    "html": {
+      "href": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/55#pullrequestreview-5405933992"
+    },
+    "pull_request": {
+      "href": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/pulls/55"
+    }
+  },
+  "submitted_at": "2026-10-04T11:58:45Z",
+  "commit_id": "98d13782173342bbdfbd14271e1626e3b11b0d73"
+}

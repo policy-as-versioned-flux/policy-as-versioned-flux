@@ -1,0 +1,291 @@
+{
+  "drift/samples.jsonl": {
+    "sha256": "29e3514b0abb5614fdd0d284c3435cc0008100ca6c8f12c08d3d14dda7fac9db",
+    "bytes": 629624,
+    "rows": 108,
+    "added_rows": 3,
+    "added": [
+      {
+        "kind": "flux.five-facts/v1",
+        "run": "37201959785",
+        "ts": "2026-10-04T12:26:18Z",
+        "party": "driftwood",
+        "source": "driftwood-composed",
+        "pin": {
+          "commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+          "consumer": "resourceset",
+          "pin_from": "gitops/composed/composed-set.yaml",
+          "tag": "v4.0.0",
+          "url": "https://github.com/policy-as-versioned-driftwood/driftwood"
+        },
+        "verdict": "PASS",
+        "cluster": "dsample-37201959785",
+        "context": "kind-dsample-37201959785",
+        "reachable": false,
+        "reason": "this is a five-fact Flux sample taken on dsample-37201959785, not kind-driftwood: build ticket 64's three subjects were not sampled by this run",
+        "schema_version": 3,
+        "line": 106,
+        "keys": [
+          "cluster",
+          "context",
+          "event",
+          "facts",
+          "falsifiers",
+          "kind",
+          "party",
+          "pin",
+          "reachable",
+          "reason",
+          "revision",
+          "run",
+          "schema_version",
+          "source",
+          "subjects",
+          "ts",
+          "verdict"
+        ],
+        "facts": {
+          "fact_1_ready_at_the_pin_on_the_real_remote": {
+            "observed": true,
+            "why": "Ready at the pinned tag and commit, from the publisher's real remote"
+          },
+          "fact_2_tag_signature_verified_at_the_source_boundary": {
+            "observed": true,
+            "why": "the gitsign tag v4.0.0 was verified at the source boundary against driftwood's own pinned identity ^https://github\\.com/policy-as-versioned-driftwood/driftwood/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$"
+          },
+          "fact_3_last_applied_revision_equals_the_pinned_commit": {
+            "observed": true,
+            "why": "every Kustomization consuming driftwood-composed applied 1cd446f62a53"
+          },
+          "fact_4_rendered_objects_byte_equal_to_an_offline_render": {
+            "observed": true,
+            "why": "all 34 rendered objects are live and equal to the offline render",
+            "ceiling": "declared_equal, not byte identity: the API server defaults fields the render never declared. strict_equal is recorded per unequal object. A declared zero that the API server omits (an omitempty field of a built-in type, listed in render_composed.API_OMITTED_ZERO) reads as equal, and each object read that way is named under objects_read_through_omitted_zero (ticket 140)."
+          },
+          "fact_5_every_rendered_object_is_in_the_flux_inventory": {
+            "observed": true,
+            "why": "all 34 rendered objects appear in a Flux inventory"
+          },
+          "fact_6_the_bottom_rung_is_admitted_and_runs": {
+            "observed": true,
+            "why": "the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-7-0-0 (priority -10000, the lowest `cage-` PriorityClass on this cluster), carrying 2 container(s) including waf-sidecar injected by the cage",
+            "ceiling": "the sidecar the cage injects at a hardened rung is a stand-in built from platform's own graded/waf-placeholder at the tag this repo pins. Running here means the caged workload started with the sidecar the cage added, not that a real WAF inspected anything."
+          },
+          "fact_7_the_bottom_rung_reaches_nothing_while_the_reference_reaches": {
+            "observed": true,
+            "why": "the workload the cage put on its bottom rung (isolated) reached NEITHER the API server nor 1.1.1.1 on 4 reads per target spanning 18s, while the reference workload, which the cage did not select, reached both from the same cluster with the same image BEFORE and AFTER -- a connection refused by the cage, not a YAML read. The rung is the ladder's bottom by priority (-10000, the lowest `cage-` PriorityClass on this cluster) and by a reach policy with no rules",
+            "ceiling": "two pods in two namespaces, not one pod twice: in this cage the rung is a property of the NAMESPACE (ADR-0022) and never of the pod, so the reference cannot be the same workload. The reference is OUTSIDE the cage, so this fact compares the bottom rung with no cage at all: it shows that the bottom rung reaches nothing on a network that works, and it says nothing about the rungs between. Two TCP connects on two ports each -- the API server's ClusterIP and one address outside the cluster -- is not a proof that nothing at all is reachable. Reach is graded on the four connection results and the reference, never on a NetworkPolicy; the NetworkPolicy that selects the bottom-rung pod is read for one purpose only, its rule count is half of the bottom check. The reference brackets the cage's reads rather than running simultaneously with them, so an outage entirely contained between two working reference reads is still unobservable here; it is narrower than one read, not zero."
+          }
+        }
+      },
+      {
+        "kind": "flux.five-facts/v1",
+        "run": "37201959785",
+        "ts": "2026-10-04T12:26:18Z",
+        "party": "platform",
+        "source": "platform",
+        "pin": {
+          "commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+          "consumer": "verified-source-only",
+          "pin_from": "gitops/platform/platform-pin.yaml",
+          "tag": "v5.0.0",
+          "url": "https://github.com/policy-as-versioned-platform/platform"
+        },
+        "verdict": "PASS",
+        "cluster": "dsample-37201959785",
+        "context": "kind-dsample-37201959785",
+        "reachable": false,
+        "reason": "this is a five-fact Flux sample taken on dsample-37201959785, not kind-driftwood: build ticket 64's three subjects were not sampled by this run",
+        "schema_version": 3,
+        "line": 107,
+        "keys": [
+          "cluster",
+          "context",
+          "event",
+          "facts",
+          "falsifiers",
+          "kind",
+          "party",
+          "pin",
+          "reachable",
+          "reason",
+          "revision",
+          "run",
+          "schema_version",
+          "source",
+          "subjects",
+          "ts",
+          "verdict"
+        ],
+        "facts": {
+          "fact_1_ready_at_the_pin_on_the_real_remote": {
+            "observed": true,
+            "why": "Ready at the pinned tag and commit, from the publisher's real remote"
+          },
+          "fact_2_tag_signature_verified_at_the_source_boundary": {
+            "observed": true,
+            "why": "the gitsign tag v5.0.0 was verified at the source boundary against platform's own pinned identity ^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$"
+          },
+          "fact_3_last_applied_revision_equals_the_pinned_commit": {
+            "observed": true,
+            "why": "platform is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 703eff6aee95 vs pin 703eff6aee95. ONE LINK, NOT A SECOND PROOF: this reads composed/HEADER.yaml, the same composed set whose own fact 3 is the applied revision above -- the three fact-3 lines in this sample are one chain of custody, not three independent observations of a revision in force (ecosystem ticket 76)"
+          },
+          "fact_4_rendered_objects_byte_equal_to_an_offline_render": {
+            "observed": true,
+            "why": "all 34 rendered objects are live and equal to the offline render",
+            "ceiling": "declared_equal, not byte identity: the API server defaults fields the render never declared. strict_equal is recorded per unequal object. A declared zero that the API server omits (an omitempty field of a built-in type, listed in render_composed.API_OMITTED_ZERO) reads as equal, and each object read that way is named under objects_read_through_omitted_zero (ticket 140)."
+          },
+          "fact_5_every_rendered_object_is_in_the_flux_inventory": {
+            "observed": true,
+            "why": "all 34 rendered objects appear in a Flux inventory"
+          },
+          "fact_6_the_bottom_rung_is_admitted_and_runs": {
+            "observed": true,
+            "why": "the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-7-0-0 (priority -10000, the lowest `cage-` PriorityClass on this cluster), carrying 2 container(s) including waf-sidecar injected by the cage",
+            "ceiling": "the sidecar the cage injects at a hardened rung is a stand-in built from platform's own graded/waf-placeholder at the tag this repo pins. Running here means the caged workload started with the sidecar the cage added, not that a real WAF inspected anything."
+          },
+          "fact_7_the_bottom_rung_reaches_nothing_while_the_reference_reaches": {
+            "observed": true,
+            "why": "the workload the cage put on its bottom rung (isolated) reached NEITHER the API server nor 1.1.1.1 on 4 reads per target spanning 18s, while the reference workload, which the cage did not select, reached both from the same cluster with the same image BEFORE and AFTER -- a connection refused by the cage, not a YAML read. The rung is the ladder's bottom by priority (-10000, the lowest `cage-` PriorityClass on this cluster) and by a reach policy with no rules",
+            "ceiling": "two pods in two namespaces, not one pod twice: in this cage the rung is a property of the NAMESPACE (ADR-0022) and never of the pod, so the reference cannot be the same workload. The reference is OUTSIDE the cage, so this fact compares the bottom rung with no cage at all: it shows that the bottom rung reaches nothing on a network that works, and it says nothing about the rungs between. Two TCP connects on two ports each -- the API server's ClusterIP and one address outside the cluster -- is not a proof that nothing at all is reachable. Reach is graded on the four connection results and the reference, never on a NetworkPolicy; the NetworkPolicy that selects the bottom-rung pod is read for one purpose only, its rule count is half of the bottom check. The reference brackets the cage's reads rather than running simultaneously with them, so an outage entirely contained between two working reference reads is still unobservable here; it is narrower than one read, not zero."
+          }
+        }
+      },
+      {
+        "kind": "flux.five-facts/v1",
+        "run": "37201959785",
+        "ts": "2026-10-04T12:26:18Z",
+        "party": "nist",
+        "source": "nist",
+        "pin": {
+          "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+          "consumer": "verified-source-only",
+          "pin_from": "gitops/flux-system/gotk-sync-nist.yaml",
+          "tag": "v1.1.0",
+          "url": "https://github.com/policy-as-versioned-nist/nist"
+        },
+        "verdict": "PASS",
+        "cluster": "dsample-37201959785",
+        "context": "kind-dsample-37201959785",
+        "reachable": false,
+        "reason": "this is a five-fact Flux sample taken on dsample-37201959785, not kind-driftwood: build ticket 64's three subjects were not sampled by this run",
+        "schema_version": 3,
+        "line": 108,
+        "keys": [
+          "cluster",
+          "context",
+          "event",
+          "facts",
+          "falsifiers",
+          "kind",
+          "party",
+          "pin",
+          "reachable",
+          "reason",
+          "revision",
+          "run",
+          "schema_version",
+          "source",
+          "subjects",
+          "ts",
+          "verdict"
+        ],
+        "facts": {
+          "fact_1_ready_at_the_pin_on_the_real_remote": {
+            "observed": true,
+            "why": "Ready at the pinned tag and commit, from the publisher's real remote"
+          },
+          "fact_2_tag_signature_verified_at_the_source_boundary": {
+            "observed": true,
+            "why": "the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\\.com/policy-as-versioned-nist/nist/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$"
+          },
+          "fact_3_last_applied_revision_equals_the_pinned_commit": {
+            "observed": true,
+            "why": "nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524. ONE LINK, NOT A SECOND PROOF: this reads composed/HEADER.yaml, the same composed set whose own fact 3 is the applied revision above -- the three fact-3 lines in this sample are one chain of custody, not three independent observations of a revision in force (ecosystem ticket 76)"
+          },
+          "fact_4_rendered_objects_byte_equal_to_an_offline_render": {
+            "observed": true,
+            "why": "all 34 rendered objects are live and equal to the offline render",
+            "ceiling": "declared_equal, not byte identity: the API server defaults fields the render never declared. strict_equal is recorded per unequal object. A declared zero that the API server omits (an omitempty field of a built-in type, listed in render_composed.API_OMITTED_ZERO) reads as equal, and each object read that way is named under objects_read_through_omitted_zero (ticket 140)."
+          },
+          "fact_5_every_rendered_object_is_in_the_flux_inventory": {
+            "observed": true,
+            "why": "all 34 rendered objects appear in a Flux inventory"
+          },
+          "fact_6_the_bottom_rung_is_admitted_and_runs": {
+            "observed": true,
+            "why": "the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-7-0-0 (priority -10000, the lowest `cage-` PriorityClass on this cluster), carrying 2 container(s) including waf-sidecar injected by the cage",
+            "ceiling": "the sidecar the cage injects at a hardened rung is a stand-in built from platform's own graded/waf-placeholder at the tag this repo pins. Running here means the caged workload started with the sidecar the cage added, not that a real WAF inspected anything."
+          },
+          "fact_7_the_bottom_rung_reaches_nothing_while_the_reference_reaches": {
+            "observed": true,
+            "why": "the workload the cage put on its bottom rung (isolated) reached NEITHER the API server nor 1.1.1.1 on 4 reads per target spanning 18s, while the reference workload, which the cage did not select, reached both from the same cluster with the same image BEFORE and AFTER -- a connection refused by the cage, not a YAML read. The rung is the ladder's bottom by priority (-10000, the lowest `cage-` PriorityClass on this cluster) and by a reach policy with no rules",
+            "ceiling": "two pods in two namespaces, not one pod twice: in this cage the rung is a property of the NAMESPACE (ADR-0022) and never of the pod, so the reference cannot be the same workload. The reference is OUTSIDE the cage, so this fact compares the bottom rung with no cage at all: it shows that the bottom rung reaches nothing on a network that works, and it says nothing about the rungs between. Two TCP connects on two ports each -- the API server's ClusterIP and one address outside the cluster -- is not a proof that nothing at all is reachable. Reach is graded on the four connection results and the reference, never on a NetworkPolicy; the NetworkPolicy that selects the bottom-rung pod is read for one purpose only, its rule count is half of the bottom check. The reference brackets the cage's reads rather than running simultaneously with them, so an outage entirely contained between two working reference reads is still unobservable here; it is narrower than one read, not zero."
+          }
+        }
+      }
+    ]
+  },
+  "drift/oscal-samples.jsonl": {
+    "sha256": "11280327038b11f091c213f291ef43e44a2fa9f95e64476db6587c9a734bd45b",
+    "bytes": 337418,
+    "rows": 1,
+    "added_rows": 1,
+    "added": [
+      {
+        "kind": "flux.oscal-lane/v1",
+        "run": "37201959785",
+        "ts": "2026-10-04T12:27:26Z",
+        "context": "kind-dsample-37201959785",
+        "line": 1,
+        "keys": [
+          "assessment_results",
+          "context",
+          "event",
+          "kind",
+          "mapped_served_policy_count",
+          "missing_risk_observations",
+          "report_count",
+          "report_read_errors",
+          "risk_validation_errors",
+          "risks",
+          "run",
+          "served_policy_count",
+          "status",
+          "ts",
+          "unmapped_failed_results",
+          "unmapped_served_policies",
+          "why"
+        ]
+      }
+    ]
+  },
+  "drift/workload-samples.jsonl": {
+    "sha256": "1894729561f4faabc45f4f6f7c7b1b747c28c2535fbf046f1b6354ed601721fe",
+    "bytes": 4010,
+    "rows": 1,
+    "added_rows": 1,
+    "added": [
+      {
+        "kind": "flux.served-workloads/v1",
+        "run": "37201959785",
+        "ts": "2026-10-04T12:27:18Z",
+        "context": "kind-dsample-37201959785",
+        "line": 1,
+        "keys": [
+          "apps_ref",
+          "context",
+          "event",
+          "fact",
+          "kind",
+          "observed",
+          "run",
+          "runner_ceiling",
+          "ts",
+          "why",
+          "workloads"
+        ]
+      }
+    ]
+  }
+}

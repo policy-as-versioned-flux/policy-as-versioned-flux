@@ -1,0 +1,257 @@
+{
+  "capture_reads": [
+    {
+      "bytes": 911,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 1 twin-sweep moved-path check(s) observed false",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/.estate-clone_driftwood_twin_verify-twin-sweep-moved.out",
+      "path": "talk/captures/.estate-clone_driftwood_twin_verify-twin-sweep-moved.out",
+      "script": ".estate-clone/driftwood/twin/verify-twin-sweep-moved.sh",
+      "sha256": "433c0ca435967796d98bd63a562eaf3e7738e1a1172152039afdee075a43e2af"
+    },
+    {
+      "bytes": 1200,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: a check above observed false (exit 1); its own error line is the last one before this",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/.estate-clone_insurer_verify-insurer-quote.out",
+      "path": "talk/captures/.estate-clone_insurer_verify-insurer-quote.out",
+      "script": ".estate-clone/insurer/verify-insurer-quote.sh",
+      "sha256": "9b330c7d98549195fcb9b8a48e466133a1fd75a3df228238073b511bfbcfe861"
+    },
+    {
+      "bytes": 2015,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 1 standing-scenario check(s) observed false",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/.estate-clone_ludlow_twin_verify-twin-scenarios.out",
+      "path": "talk/captures/.estate-clone_ludlow_twin_verify-twin-scenarios.out",
+      "script": ".estate-clone/ludlow/twin/verify-twin-scenarios.sh",
+      "sha256": "6ae8356adc9d01b1572f700641dc3f3d934f9b4982a5e3948d0d0edadd0a7af7"
+    },
+    {
+      "bytes": 90584,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: portable observations",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/.estate-clone_platform_compose_verify-composition.out",
+      "path": "talk/captures/.estate-clone_platform_compose_verify-composition.out",
+      "script": ".estate-clone/platform/compose/verify-composition.sh",
+      "sha256": "80c61682c7f2b2927992055f7637b73b940cf04b81d826c5a46bbaf29b6e1738"
+    },
+    {
+      "bytes": 845,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "missing instrument: cve subscription has no committed image inventory",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/.estate-clone_platform_feeds_verify-feeds.out",
+      "path": "talk/captures/.estate-clone_platform_feeds_verify-feeds.out",
+      "script": ".estate-clone/platform/feeds/verify-feeds.sh",
+      "sha256": "1461eb4175cc88cb7f6177ecbb110314905281c8b2bec1e315935f044232d4bf"
+    },
+    {
+      "bytes": 956,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: lint_claims.py --selfcheck",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/.estate-clone_platform_oscal_verify-claims.out",
+      "path": "talk/captures/.estate-clone_platform_oscal_verify-claims.out",
+      "script": ".estate-clone/platform/oscal/verify-claims.sh",
+      "sha256": "0688054ecb2795126ee25400dfdd8aec80d1008de06f117b514fe386f8e7b626"
+    },
+    {
+      "bytes": 2012,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 1 standing-scenario check(s) observed false",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/.estate-clone_tuppence_twin_verify-twin-scenarios.out",
+      "path": "talk/captures/.estate-clone_tuppence_twin_verify-twin-scenarios.out",
+      "script": ".estate-clone/tuppence/twin/verify-twin-scenarios.sh",
+      "sha256": "2356d803bbad3ddb6d03a1b7e9cb75a0c64d9aabc580cd9651d2af419ff4c5b3"
+    },
+    {
+      "bytes": 336,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "PASS: ludlow served CVE line prices its digest-matched inventory intersection",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_cve-inventory_verify-cve-inventory.out",
+      "path": "talk/captures/verify_cve-inventory_verify-cve-inventory.out",
+      "script": "verify/cve-inventory/verify-cve-inventory.sh",
+      "sha256": "c09b5f494ef098ae9be91741c040e9fab3bb1d449b98de5d317652ba4a8a11bc"
+    },
+    {
+      "bytes": 636,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: the built deck does not survive its own checks",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_demo_verify-demo.out",
+      "path": "talk/captures/verify_demo_verify-demo.out",
+      "script": "verify/demo/verify-demo.sh",
+      "sha256": "bb1a1327c4299afca95df959c07290ec7d4f23fe7af91ff564a68e135794a36f"
+    },
+    {
+      "bytes": 3566,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 1 fault(s) -- a ticket's Status: is typed rather than derived (ticket 59), or a ticket number names more than one file (ticket 117)",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_derived-status_verify-derived-status.out",
+      "path": "talk/captures/verify_derived-status_verify-derived-status.out",
+      "script": "verify/derived-status/verify-derived-status.sh",
+      "sha256": "028023f98870d497c1c24f2f1a83fbecc440da67ba5efc75c5307196c207bdb9"
+    },
+    {
+      "bytes": 444,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: composition refused driftwood at v3 (refused): {\"detail\": \"missing instrument: CVE inventory: apps source or pinned tree is unreadable: Command '['git', '",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_e2e_verify-e2e-step2-renovate-pins-and-reprices.out",
+      "path": "talk/captures/verify_e2e_verify-e2e-step2-renovate-pins-and-reprices.out",
+      "script": "verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh",
+      "sha256": "a6d4ee0a88f077238cd856ea338d20767bd09554ec132546a8ad3b6d52826fd4"
+    },
+    {
+      "bytes": 2935,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: step 5 is false where an adopter's own checks are: driftwood/twin/verify-twin-sweep-moved.sh observed false: FAIL: 1 twin-sweep moved-path check(s) observ",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_e2e_verify-e2e-step5-twin-forecasts.out",
+      "path": "talk/captures/verify_e2e_verify-e2e-step5-twin-forecasts.out",
+      "script": "verify/e2e/verify-e2e-step5-twin-forecasts.sh",
+      "sha256": "66df674a1997b81c754ddd4fc37a2353f4678ccaa5b0e49495d6bbf9edb1d628"
+    },
+    {
+      "bytes": 2955,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 1 provenance claim(s) are false (see BAD lines above)",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_e2e_verify-e2e-step6-provenance.out",
+      "path": "talk/captures/verify_e2e_verify-e2e-step6-provenance.out",
+      "script": "verify/e2e/verify-e2e-step6-provenance.sh",
+      "sha256": "a45102591a9d834943d0a1ab9b16ffcc38cedaea5854355cc87ea5a50968cacb"
+    },
+    {
+      "bytes": 2048,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 4 engine-pairing check(s) observed false",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_engine-pairing_verify-engine-pairing.out",
+      "path": "talk/captures/verify_engine-pairing_verify-engine-pairing.out",
+      "script": "verify/engine-pairing/verify-engine-pairing.sh",
+      "sha256": "ab14a7b6f7b7dc6802d714c16c9a3cc2d14f1549cb15387d651968841c6a6e10"
+    },
+    {
+      "bytes": 9125,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 1 feed-contract check(s) observed false",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_feed-contract_verify-feed-contract.out",
+      "path": "talk/captures/verify_feed-contract_verify-feed-contract.out",
+      "script": "verify/feed-contract/verify-feed-contract.sh",
+      "sha256": "6abcffa54b5b641121a7a3ab7155a3360634dcf274227fdf5d8dfc35d3564453"
+    },
+    {
+      "bytes": 4265,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 5 forge protection(s) observed missing: driftwood: main is admitted by the cut-release.yml, propose-tier.yml pin and lacks ['pull_request']",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_forge-review_verify-forge-review.out",
+      "path": "talk/captures/verify_forge-review_verify-forge-review.out",
+      "script": "verify/forge-review/verify-forge-review.sh",
+      "sha256": "86ffe00465db10cfba60d397f05cd9770bb71702a1528dfea7969fade3badee9"
+    },
+    {
+      "bytes": 6807,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: a served workload is not admitted and caged at CREATE by the set its own adopter serves, or that adopter's own gate cannot discover it",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_lifted-apps_verify-lifted-apps.out",
+      "path": "talk/captures/verify_lifted-apps_verify-lifted-apps.out",
+      "script": "verify/lifted-apps/verify-lifted-apps.sh",
+      "sha256": "35440bf58f55dbb62b61241c835adfb533850f7701b95500df912d66b9b2df88"
+    },
+    {
+      "bytes": 8101,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: the record and the surface disagree -- 1 of this script's legs observed false; the ' == ' tally above says how many findings of which kind, and every one ",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_map-surface_verify-map-surface.out",
+      "path": "talk/captures/verify_map-surface_verify-map-surface.out",
+      "script": "verify/map-surface/verify-map-surface.sh",
+      "sha256": "d88cbf9ac55a911a9fc75d0c08e6f86d94d66d7930c0963eaa1fd9936d087c0d"
+    },
+    {
+      "bytes": 47,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "SKIP: no hub interpreter for the workload lane",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_oscal-lane_verify-oscal-lane.out",
+      "path": "talk/captures/verify_oscal-lane_verify-oscal-lane.out",
+      "script": "verify/oscal-lane/verify-oscal-lane.sh",
+      "sha256": "0c385824ea75701f6364f5ed4ec72f52cc1ba8354b51e8d026a09b7a374f954a"
+    },
+    {
+      "bytes": 11948,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 2 \u00a3-seam check(s) observed false",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_pound-seam_verify-pound-seam.out",
+      "path": "talk/captures/verify_pound-seam_verify-pound-seam.out",
+      "script": "verify/pound-seam/verify-pound-seam.sh",
+      "sha256": "c9989b7d4e767327778f154d5ee6f897b2da12353bb49a631ede2ccb152f2f22"
+    },
+    {
+      "bytes": 6389,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: an instance this estate really produced was NOT caught by the check built to catch it",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_refusal-by-another-name_verify-refusal-by-another-name.out",
+      "path": "talk/captures/verify_refusal-by-another-name_verify-refusal-by-another-name.out",
+      "script": "verify/refusal-by-another-name/verify-refusal-by-another-name.sh",
+      "sha256": "3e309d81064a5c5673355bbef3015e357da193e1a9c34039f6bfe6feaaddd2e2"
+    },
+    {
+      "bytes": 21852,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 4 schedule/cage check(s) observed false: feeds/fetch.yml insurer/fetch.yml ludlow/twin-sweep.yml tuppence/twin-sweep.yml",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_schedules_verify-schedules.out",
+      "path": "talk/captures/verify_schedules_verify-schedules.out",
+      "script": "verify/schedules/verify-schedules.sh",
+      "sha256": "25b2fa54a379e948edfae1da04b22483a6e00c24f91887cf7dcec78a2ae863ec"
+    },
+    {
+      "bytes": 47,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "SKIP: no hub interpreter for the workload lane",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_served-workloads_verify-served-workloads.out",
+      "path": "talk/captures/verify_served-workloads_verify-served-workloads.out",
+      "script": "verify/served-workloads/verify-served-workloads.sh",
+      "sha256": "0c385824ea75701f6364f5ed4ec72f52cc1ba8354b51e8d026a09b7a374f954a"
+    },
+    {
+      "bytes": 2643,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "FAIL: 1 truth-line check(s) observed false (named above): the split, the ceiling or the manifest behind them cannot be trusted",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_truth-line_verify-truth-line.out",
+      "path": "talk/captures/verify_truth-line_verify-truth-line.out",
+      "script": "verify/truth-line/verify-truth-line.sh",
+      "sha256": "12320090234553364ec62e2755d6a26eef9ba03fb194ea7348ee46523a8d39c6"
+    },
+    {
+      "bytes": 378,
+      "exit": 0,
+      "grade": "FAIL",
+      "grade_lastline": "LIMIT: local-clock sandbox is configured; its live resistance to a rebuilt child environment remains unmeasured (ticket 142 item 3)",
+      "local_file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/hub-run377-captures/verify_twin-cage_verify-twin-cage.out",
+      "path": "talk/captures/verify_twin-cage_verify-twin-cage.out",
+      "script": "verify/twin-cage/verify-twin-cage.sh",
+      "sha256": "89d15bd8d5d70df61c4848e98b8e438904a226cac503bf8705556656bbda3285"
+    }
+  ],
+  "clock_run": 377,
+  "read_only": true,
+  "ref": "48324860b8b9f7dc4762e9c9f841206881a28705"
+}

@@ -1,0 +1,35 @@
+{
+  "verdict": "PASS",
+  "head": "bc9601b8cbf6e5febe03511dc8e1e23320c891d1",
+  "tree": "b5f7f6f7dfdb242a6f907554de9a4e68816bea07",
+  "base": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "axis": "Independent Spec",
+  "source_and_proof_hash_join": true,
+  "source_G_clean": true,
+  "hard_findings": [],
+  "reviewed_contracts": [
+    "Run377 authentic primary counts/captures remain unchanged; manifests classify actually owned new instruments without skip waivers",
+    "Committed disposable adopter probes retain actual immutable apps/history and source observed origin/main; no working edit leakage",
+    "Mixed engine support rejects when any carried policy does not support engine; real1.18.2 public32UPDATE replay passes",
+    "Owned new workload/OSCAL lanes join served writer command plus literal directory-bound default, not declaration alone",
+    "Cloud source is authoring; delivered unknown CR remains qualified SKIP instead of exemption",
+    "6/7 refusal register keeps same explicit13 fields and per-policy decision; no new wildcards",
+    "Interpreter fallback preserves explicit invalid PYTHON refusal; both public wrappers reach selfcheck/grade"
+  ],
+  "evidence": {
+    "postcommit_tests": 140,
+    "subtests": 2,
+    "focused_mypy": 0,
+    "engine_cli": 0,
+    "e2e_cli": 0,
+    "refusal": {
+      "exit": 0,
+      "actual_engine": "1.18.2",
+      "executed_UPDATE_mutations": 32,
+      "receipt": "hub-run377-refusal-pinned-1-18-final.json"
+    }
+  },
+  "no_independent_source_mutations": true,
+  "candidate_sha256": "c0343a96270f20fa49c89af0a5ee67ac391487ee40c884130bfa43b6c682bc95",
+  "status": "Historical exactbc960 assessment; subsequent symbolic origin/HEAD defect found by author and a revised signed candidate is required before publication"
+}

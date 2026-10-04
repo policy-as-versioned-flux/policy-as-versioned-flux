@@ -1,0 +1,227 @@
+{
+  "status": "PASS: authentic signed FX2 cut and immutable release delivered",
+  "tag_trust": {
+    "tag": "fx/v2.0.0",
+    "tag_object": "f6edadce94b98a01479a517a1babda92ce8b2243",
+    "peeled_commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+    "tree": "b88fb77f96cadf1a9639cae369ed529bd4e1731c",
+    "reviewed_source": "d62f74e52ed992798a75cf3f4f138ec9c83db80a",
+    "reviewed_tree_matches": true,
+    "identity": "https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "gitsign_rekor_mode": "offline",
+    "signature_exit": 0,
+    "Git": true,
+    "Rekor": true,
+    "Certificate": true,
+    "tlog_index": "3077401757",
+    "raw_signature_log": "fx2-independent-signature.log",
+    "raw_signature_log_sha256": "27522b4b20efb9cddd3aa695a4957b918314e3b02807c5801813c0486c28d43f",
+    "source_HEAD_and_worktree_preserved": true,
+    "scope": "genuine local tag verification against default Sigstore trust; normal public tag fetch only; no checkout/reset or workflow mutation",
+    "reviewer_parser_note": "crypto command exited0; initial record parser expected a different gitsign output format, so actual raw Validated lines are used without rerunning crypto"
+  },
+  "actual_release_run": {
+    "conclusion": "success",
+    "databaseId": 37191573516,
+    "headBranch": "fx/v2.0.0",
+    "headSha": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+    "jobs": [
+      {
+        "completedAt": "2026-10-04T09:15:49Z",
+        "conclusion": "success",
+        "databaseId": 111404681357,
+        "name": "release",
+        "startedAt": "2026-10-04T09:15:37Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-04T09:15:40Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-04T09:15:39Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:40Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-04T09:15:40Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:41Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 3,
+            "startedAt": "2026-10-04T09:15:40Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:41Z",
+            "conclusion": "success",
+            "name": "platform is at the {tag, commit} pair this workflow pins",
+            "number": 4,
+            "startedAt": "2026-10-04T09:15:41Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:42Z",
+            "conclusion": "success",
+            "name": "install pinned gitsign (binary + checksum, no marketplace action)",
+            "number": 5,
+            "startedAt": "2026-10-04T09:15:41Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:42Z",
+            "conclusion": "success",
+            "name": "offline verify (release gate -- must be a real pass, not a skip)",
+            "number": 6,
+            "startedAt": "2026-10-04T09:15:42Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:43Z",
+            "conclusion": "success",
+            "name": "offline verify -- market-moves and news",
+            "number": 7,
+            "startedAt": "2026-10-04T09:15:42Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:44Z",
+            "conclusion": "success",
+            "name": "gitsign verify-tag, identity-pinned, offline Rekor bundle",
+            "number": 8,
+            "startedAt": "2026-10-04T09:15:43Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:44Z",
+            "conclusion": "skipped",
+            "name": "tag still resolves to the commit this run was triggered from",
+            "number": 9,
+            "startedAt": "2026-10-04T09:15:44Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:47Z",
+            "conclusion": "success",
+            "name": "publish GitHub Release recording the resolved SHA",
+            "number": 10,
+            "startedAt": "2026-10-04T09:15:44Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:47Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 19,
+            "startedAt": "2026-10-04T09:15:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:48Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 20,
+            "startedAt": "2026-10-04T09:15:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-04T09:15:48Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 21,
+            "startedAt": "2026-10-04T09:15:48Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37191573516/job/111404681357"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37191573516"
+  },
+  "actual_GitHub_release": {
+    "body": "Primary HMRC December 2025 snapshot; measured major for withdrawn currency; retain August history\n---\nVerified gitsign signature (identity regexp: ^https://github\\.com/policy-as-versioned-feeds/feeds/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$, issuer: https://token.actions.githubusercontent.com). Resolved commit: 8c84a66951ce89834f33e008380b2c47f054b7c0.\n",
+    "isDraft": false,
+    "isPrerelease": false,
+    "name": "fx/v2.0.0",
+    "publishedAt": "2026-10-04T09:15:47Z",
+    "tagName": "fx/v2.0.0",
+    "targetCommitish": "main",
+    "url": "https://github.com/policy-as-versioned-feeds/feeds/releases/tag/fx/v2.0.0"
+  },
+  "frozen_envelopes_at_actual_tag": [
+    {
+      "path": "cve/v1/feed.json",
+      "sha256": "1fd7b340a35c81076bb67e36d455cf0ec778802f880f8c0ec1b08ad1a0e6f4a9",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "cve/v2/feed.json",
+      "sha256": "76d35faa3f0e3d46cc34a2a0be6fca9e707e98fc747e52f18a83ddd3dee16657",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "cve/v3/feed.json",
+      "sha256": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "eol/v1/feed.json",
+      "sha256": "b26f94cbaefd255624be0050365c5eccb4a637d9f60f3025a3f0502ea1993eeb",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "eol/v2/feed.json",
+      "sha256": "401f564c7b370833888c74d612afffee80f947d7522e63b2be66d1a41b6f533b",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "fx/v1/feed.json",
+      "sha256": "eb5732c627eb362149ad479ffa56c183a4712777c3d7e07d308b622d2917a5a2",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "market-moves/v1/feed.json",
+      "sha256": "b0ddb8f67ba43208e4c7af75a8bbe54fd4ec97e71cee5cdfd6c628903d9f1ffe",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "news/v1/feed.json",
+      "sha256": "42b4f4ac35b73237f0f4775fd5632a1251b7c3624434de786db8155427acfa36",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "threat-register/v1/feed.json",
+      "sha256": "50af335e60b247d2a202fa747fd3a2b80c485fc587896dc0ab4841f0e54a8b60",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "threat-register/v2/feed.json",
+      "sha256": "c94ae8335d13edcbdc63b2d8f7c7cda3fbefd4d80e78022be51aba30d70b9a6c",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "threat-register/v3/feed.json",
+      "sha256": "7529798024dbab0971dba04ec29ba4e7214b6a920f3c2fb2a5d185da8976081a",
+      "actual_tag_equals_frozen_base": true
+    },
+    {
+      "path": "threat-register/v4/feed.json",
+      "sha256": "e88332226c882103e469b43770bd177ff10384500825236f2fcdaf11dda168fd",
+      "actual_tag_equals_frozen_base": true
+    }
+  ],
+  "actual_default_August_payload_sha256": "ad0cafb1b7804825dbf516a3b1263b0ad94afb315510411434d5f33c7582f267",
+  "actual_default_August_byte_exact": true,
+  "actual_December_payload_period": "2025-12",
+  "actual_December_USD_units_per_GBP1": 1.3126,
+  "scope": "read-only actual tag/default trust/source-integrity and public receipt verification; only authorized local tag fetch; no checkout/reset/source edits or workflow mutation",
+  "consumer_activation_not_asserted": true
+}

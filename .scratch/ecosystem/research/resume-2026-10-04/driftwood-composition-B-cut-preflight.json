@@ -1,0 +1,22 @@
+{
+  "repository": "policy-as-versioned-driftwood/driftwood",
+  "current_main": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "candidate_tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "prospective_tag": "v4.0.1",
+  "tag_unused": true,
+  "measured_policy_window_bump": "none",
+  "source": "Fresh exact published-main normal gate; only signed composition/provenance context revision under unchanged5/6/7 window",
+  "ordinary_cut_workflow": "cut-release.yml",
+  "cut_ref": "main",
+  "cut_inputs": {
+    "version": "v4.0.1",
+    "message": "Bind the signed composed HEADER to genuine claim7 apps Source A; retain policy5/6/7, measured inventory and engine declarations"
+  },
+  "ordinary_release_workflow": "release.yml",
+  "release_ref": "refs/tags/v4.0.1",
+  "release_inputs": {
+    "tag": "v4.0.1"
+  },
+  "cut_executed": false,
+  "hold": "Fresh Spec PASS must match actualmain872 and root Standards before dispatch"
+}

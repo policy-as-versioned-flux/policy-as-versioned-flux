@@ -1,0 +1,6 @@
+tlog index: 3077679841
+gitsign: Signature made using certificate ID 0xf5fca3c63535493568437b3ec609e31375a643b7 | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/drift-sample.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true

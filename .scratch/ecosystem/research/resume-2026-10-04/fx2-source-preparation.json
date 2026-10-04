@@ -1,0 +1,72 @@
+{
+  "base": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+  "branch": "resume/2026-10-04-dated-fx",
+  "computed_bump": "major",
+  "prospective_version": "2.0.0",
+  "frozen_major_payloads": {
+    "cve/v1/feed.json": "1fd7b340a35c81076bb67e36d455cf0ec778802f880f8c0ec1b08ad1a0e6f4a9",
+    "cve/v2/feed.json": "76d35faa3f0e3d46cc34a2a0be6fca9e707e98fc747e52f18a83ddd3dee16657",
+    "cve/v3/feed.json": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+    "fx/v1/feed.json": "eb5732c627eb362149ad479ffa56c183a4712777c3d7e07d308b622d2917a5a2",
+    "eol/v1/feed.json": "b26f94cbaefd255624be0050365c5eccb4a637d9f60f3025a3f0502ea1993eeb",
+    "eol/v2/feed.json": "401f564c7b370833888c74d612afffee80f947d7522e63b2be66d1a41b6f533b",
+    "market-moves/v1/feed.json": "b0ddb8f67ba43208e4c7af75a8bbe54fd4ec97e71cee5cdfd6c628903d9f1ffe",
+    "threat-register/v1/feed.json": "50af335e60b247d2a202fa747fd3a2b80c485fc587896dc0ab4841f0e54a8b60",
+    "threat-register/v2/feed.json": "c94ae8335d13edcbdc63b2d8f7c7cda3fbefd4d80e78022be51aba30d70b9a6c",
+    "threat-register/v4/feed.json": "e88332226c882103e469b43770bd177ff10384500825236f2fcdaf11dda168fd",
+    "threat-register/v3/feed.json": "7529798024dbab0971dba04ec29ba4e7214b6a920f3c2fb2a5d185da8976081a",
+    "news/v1/feed.json": "42b4f4ac35b73237f0f4775fd5632a1251b7c3624434de786db8155427acfa36"
+  },
+  "all_frozen_major_payloads_byte_exact": true,
+  "default_august_replay_byte_exact": true,
+  "provenance": {
+    "schema": 1,
+    "authority": "HM Revenue & Customs",
+    "units": "currency units per GBP1",
+    "base": "GBP",
+    "captured_at": "2026-10-04T08:59:27.483535+00:00",
+    "scope": "captured official public data; source preparation only, no signed release claim",
+    "normalizer": "fetch/fx.py parse",
+    "normalizer_sha256": "fdb122ad480e634b0d9016204f0dab63bc640a6eb28b73bd3e40974e722b648a",
+    "periods": {
+      "2025-12": {
+        "source_url": "https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_2025-12.csv",
+        "raw_csv": "fetch/source/hmrc/2025-12.csv",
+        "raw_sha256": "48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26",
+        "raw_bytes": 8629,
+        "normalized_payload_sha256": "3062828d54e4ad8576bc40c06d2f37949d51c95294e32444c2e8a65156d24e7c",
+        "unique_currency_count": 142,
+        "USD_units_per_GBP1": 1.3126,
+        "offline_replay_payload": "fetch/source/periods/2025-12/fx.json",
+        "offline_replay_payload_sha256": "5d0cc698e4b85657ffdd882c50a900ac87fbe535b50c2e0db4225782ebdb07ef",
+        "prepared_envelope": "fx/v2/feed.json",
+        "prepared_envelope_sha256": "14506a4273543a059aad84903f65742b54bebcb3e2af34dcdac8c6e635924194"
+      },
+      "2026-08": {
+        "source_url": "https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_2026-8.csv",
+        "raw_csv": "fetch/source/hmrc/2026-08.csv",
+        "raw_sha256": "8da9e83a830282c94cbcb31779cbeb93d7a2a739d1bb898cbec62182b7b29fad",
+        "raw_bytes": 8583,
+        "normalized_payload_sha256": "646ed6176b18642670623d855278c915aae0ebb8a7c21d81bff9f1a6bbd9df2c",
+        "unique_currency_count": 141,
+        "USD_units_per_GBP1": 1.3367
+      }
+    },
+    "preserved_published_baseline": {
+      "tag": "fx/v1.1.0",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "envelope": "fx/v1/feed.json",
+      "envelope_sha256": "eb5732c627eb362149ad479ffa56c183a4712777c3d7e07d308b622d2917a5a2"
+    },
+    "computed_bump": "major",
+    "prospective_version": "2.0.0",
+    "removed_currency_codes": [
+      "VES"
+    ],
+    "added_currency_codes": [
+      "BGN",
+      "VED"
+    ]
+  },
+  "external_mutations": false
+}

@@ -1,0 +1,30 @@
+{
+  "baseRefOid": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "headRefOid": "98d13782173342bbdfbd14271e1626e3b11b0d73",
+  "number": 55,
+  "reviewDecision": "",
+  "state": "OPEN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-04T11:56:07Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37200361298/job/111430613455",
+      "name": "shift-left",
+      "startedAt": "2026-10-04T11:55:34Z",
+      "status": "COMPLETED",
+      "workflowName": "shift-left policy check"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-04T11:56:06Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37200361298/job/111430613517",
+      "name": "compose-check",
+      "startedAt": "2026-10-04T11:55:34Z",
+      "status": "COMPLETED",
+      "workflowName": "shift-left policy check"
+    }
+  ],
+  "url": "https://github.com/policy-as-versioned-driftwood/driftwood/pull/55"
+}

@@ -1,0 +1,142 @@
+{
+  "sha": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "node_id": "C_kwDOT-3Nm9oAKDg3MmQ1YzdmNDQ4MDFiNDk2NzMxYjExY2Q0MDg4MWYzMDRmOGEwOWE",
+  "commit": {
+    "author": {
+      "name": "Chris Nesbitt-Smith",
+      "email": "chris@cns.me.uk",
+      "date": "2026-10-04T12:00:21Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-10-04T12:00:21Z"
+    },
+    "message": "Merge pull request #55 from policy-as-versioned-driftwood/delivery-stage2-atomic-20261004\n\nDeliver claim7 apps and the complete composed policy window",
+    "tree": {
+      "sha": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+      "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/git/trees/49a55a07be3b2ac24ba3b1e00b08f7ca302cc342"
+    },
+    "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/git/commits/872d5c7f44801b496731b11cd40881f304f8a09a",
+    "comment_count": 0,
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqwj/VCRC1aQ7uu5UhlAAAlM4QACjYkjqYd6/nvW06GhbobhUf\nzSlTejjoOnETkE0ierqXwcsy7eeygUpevkC1S//pLkYSRN92f4JOugJy8OIYafry\n9hU98HXQ3VVOCFH1LxsFKIdTQhKPOAOsJrnFn2gRJjGEk69HZ0+PLHLhktDU80yo\n8DBy88/P2rmF2ehXqBot3MtqrQtl3LKzBeNgmh0LyPS/YT1GKZ/CnRzqEiAw+I4v\nqDOW7srFdoNPnPoeFSATzI1BTtU7nbnE0vEGNlJ4T8YxP22I39cO4q6VNS1qfxBs\nuh2aWdghUrG+0oJG4RoWoeT6mxYz5MFDmLL/y1GuWwhX8+gH7LCgscvB1eT1RO4X\nX+/8BCTumB46qikT1sxiDD7sfFunF+Z1CqfXrQchB2PAhkF/o6cM6BKx6dVa3c0h\ncgcp8vaJjlbH1jASWwPXVeix9eKzqY3smrUkk2sZ1/UWyyJaqlgDGdoRL4VLDgYD\nlzEtC9zJGpj6z1MaNt/WX4J4g2/4Nb1BgswlVOGXzbyxMenI8tr24/JUuwpgQr4r\nlXRfNhRpeXylHCBaB0ik4hTtqwvzQgWp+EiZa/az8v/XCxrQinEEU6s5dSAEX/Mu\nACaKUaCqvrPgNuk3XFnothHcfCOUwv186XweFkxqOfbrUB5AeTcYiiJR/2S6e+Xk\nYxrNRQejw+PzdRf1ykAF\n=BtYa\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 49a55a07be3b2ac24ba3b1e00b08f7ca302cc342\nparent 1cd446f62a531c0aeee7e50c0a59a11ac5d00d67\nparent 98d13782173342bbdfbd14271e1626e3b11b0d73\nauthor Chris Nesbitt-Smith <chris@cns.me.uk> 1791115221 +0100\ncommitter GitHub <noreply@github.com> 1791115221 +0100\n\nMerge pull request #55 from policy-as-versioned-driftwood/delivery-stage2-atomic-20261004\n\nDeliver claim7 apps and the complete composed policy window",
+      "verified_at": "2026-10-04T12:00:22Z"
+    }
+  },
+  "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/commits/872d5c7f44801b496731b11cd40881f304f8a09a",
+  "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/commit/872d5c7f44801b496731b11cd40881f304f8a09a",
+  "comments_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/commits/872d5c7f44801b496731b11cd40881f304f8a09a/comments",
+  "author": {
+    "login": "chrisns",
+    "id": 715120,
+    "node_id": "MDQ6VXNlcjcxNTEyMA==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/715120?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/chrisns",
+    "html_url": "https://github.com/chrisns",
+    "followers_url": "https://api.github.com/users/chrisns/followers",
+    "following_url": "https://api.github.com/users/chrisns/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chrisns/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chrisns/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chrisns/subscriptions",
+    "organizations_url": "https://api.github.com/users/chrisns/orgs",
+    "repos_url": "https://api.github.com/users/chrisns/repos",
+    "events_url": "https://api.github.com/users/chrisns/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chrisns/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "committer": {
+    "login": "web-flow",
+    "id": 19864447,
+    "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/web-flow",
+    "html_url": "https://github.com/web-flow",
+    "followers_url": "https://api.github.com/users/web-flow/followers",
+    "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+    "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+    "organizations_url": "https://api.github.com/users/web-flow/orgs",
+    "repos_url": "https://api.github.com/users/web-flow/repos",
+    "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/web-flow/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "parents": [
+    {
+      "sha": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+      "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/commits/1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+      "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/commit/1cd446f62a531c0aeee7e50c0a59a11ac5d00d67"
+    },
+    {
+      "sha": "98d13782173342bbdfbd14271e1626e3b11b0d73",
+      "url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/commits/98d13782173342bbdfbd14271e1626e3b11b0d73",
+      "html_url": "https://github.com/policy-as-versioned-driftwood/driftwood/commit/98d13782173342bbdfbd14271e1626e3b11b0d73"
+    }
+  ],
+  "stats": {
+    "total": 43,
+    "additions": 20,
+    "deletions": 23
+  },
+  "files": [
+    {
+      "sha": "c2641766b708ea24ca7cd3c9d62ca50a6475e40c",
+      "filename": "composed/HEADER.yaml",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/policy-as-versioned-driftwood/driftwood/blob/872d5c7f44801b496731b11cd40881f304f8a09a/composed%2FHEADER.yaml",
+      "raw_url": "https://github.com/policy-as-versioned-driftwood/driftwood/raw/872d5c7f44801b496731b11cd40881f304f8a09a/composed%2FHEADER.yaml",
+      "contents_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/contents/composed%2FHEADER.yaml?ref=872d5c7f44801b496731b11cd40881f304f8a09a",
+      "patch": "@@ -624,7 +624,7 @@ ungoverned-namespaces: []\n withdrawn-selectable: false\n comparison-inputs:\n   schema: 1\n-  after: 7a8c808567b174d792fb597116ce4aa39f3d6bcf27da076b6e05b4f7fc26e55d\n+  after: 40282e7a51941ab5c974ee362d75d6124d05f776f2ea16348949e1e64c9584cf\n   before:\n     header:\n       parents:"
+    },
+    {
+      "sha": "c04da688a30bfc3a144d8f9089f48cddc1cfa53c",
+      "filename": "gitops/composed/composed-set.yaml",
+      "status": "modified",
+      "additions": 11,
+      "deletions": 14,
+      "changes": 25,
+      "blob_url": "https://github.com/policy-as-versioned-driftwood/driftwood/blob/872d5c7f44801b496731b11cd40881f304f8a09a/gitops%2Fcomposed%2Fcomposed-set.yaml",
+      "raw_url": "https://github.com/policy-as-versioned-driftwood/driftwood/raw/872d5c7f44801b496731b11cd40881f304f8a09a/gitops%2Fcomposed%2Fcomposed-set.yaml",
+      "contents_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/contents/gitops%2Fcomposed%2Fcomposed-set.yaml?ref=872d5c7f44801b496731b11cd40881f304f8a09a",
+      "patch": "@@ -24,10 +24,8 @@\n #     install platform's tree; it installs the artefact its own composition rendered from\n #     platform's and nist's signed parents (composed/HEADER.yaml records those parent SHAs, and\n #     fact 3 of the sample checks the live platform and nist pins against them).\n-#   * the tag is v3.0.0, not the v1.0.0 in gitops/flux-system/gotk-sync.yaml. v1.0.0 predates\n-#     composed/ and does not carry the tree this reconciles. A self-pin bump is a reviewed PR that\n-#     moves tag and commit together (renovate.json's customManagers track nist and platform, not\n-#     the self-pin).\n+#   * apps and composed delivery use the same genuine v4.0.0 Source A release.\n+#     Its complete policy window and signature gates move with the inventory binding.\n #   * there is no `spec.verify` here. Flux's GitRepository.spec.verify speaks OpenPGP, and one\n #     signature -- the gitsign tag -- is the only one this estate has (ADR-0023, D3). Verification\n #     at the source boundary is the identity-pinned gitsign-verifying controller of ticket 41,\n@@ -64,17 +62,17 @@ metadata:\n     # verified with somebody else's identity is observed false rather than merely 'verified'.\n     policy-as-versioned.dev/gitsign-identity-regexp: ^https://github\\.com/policy-as-versioned-driftwood/driftwood/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$\n     policy-as-versioned.dev/gitsign-issuer: https://token.actions.githubusercontent.com\n-    policy-as-versioned.dev/gitsign-gates: flux-system/composed-v5-0-0,flux-system/composed-machinery\n+    policy-as-versioned.dev/gitsign-gates: flux-system/composed-v5-0-0,flux-system/composed-v6-0-0,flux-system/composed-v7-0-0,flux-system/composed-machinery\n   labels:\n     policy-as-versioned.dev/composed-for: driftwood\n spec:\n   interval: 1m\n   url: https://github.com/policy-as-versioned-driftwood/driftwood\n   ref:\n-    tag: v3.0.0\n-    commit: bf9889aa6a6d979c87a5633240a1447765d73503\n-    # The resolved SHA driftwood's own v3.0.0 tag points to (`git ls-remote origin 'refs/tags/v3.0.0^{}'`,\n-    # 2026-09-24). Belt-and-braces immutability, ADR-0001.\n+    tag: v4.0.0\n+    commit: 1cd446f62a531c0aeee7e50c0a59a11ac5d00d67\n+    # The resolved SHA of the genuine signed v4.0.0 Source A release.\n+    # Belt-and-braces immutability, ADR-0001.\n ---\n apiVersion: fluxcd.controlplane.io/v1\n kind: ResourceSet\n@@ -92,11 +90,10 @@ spec:\n         # directories the pinned tag carries and every machinery allow-list at that tag. Move it\n         # in the same pull request that moves the tag.\n         - { version: \"5.0.0\" }\n-        # v3.0.0 carries composed/policies/v5.0.0 only, and every machinery allow-list at that\n-        # tag admits 5.0.0 only. It was composed under platform v4.0.0, which retires policy 4.0.0\n-        # (owner-instructed 2026-09-24). Every workload driftwood declares moved its claim to\n-        # 5.0.0 before this tag (Phase B), so dropping 4.0.0 here leaves no claim uncaged.\n-        # Dropping it prunes the composed-v4-0-0 Kustomization's objects.\n+        - { version: \"6.0.0\" }\n+        - { version: \"7.0.0\" }\n+        # This array and all verification gates match the genuine signed target tree.\n+        # Current workload declarations claim 7.0.0; older supported claims remain caged.\n   resourcesTemplate: |\n     << range $v := (index (inputs) \"versions\") >>\n     ---"
+    },
+    {
+      "sha": "0e822fa82bc48373abf4b373a437c6199fbe314f",
+      "filename": "gitops/flux-system/gotk-sync.yaml",
+      "status": "modified",
+      "additions": 3,
+      "deletions": 3,
+      "changes": 6,
+      "blob_url": "https://github.com/policy-as-versioned-driftwood/driftwood/blob/872d5c7f44801b496731b11cd40881f304f8a09a/gitops%2Fflux-system%2Fgotk-sync.yaml",
+      "raw_url": "https://github.com/policy-as-versioned-driftwood/driftwood/raw/872d5c7f44801b496731b11cd40881f304f8a09a/gitops%2Fflux-system%2Fgotk-sync.yaml",
+      "contents_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/contents/gitops%2Fflux-system%2Fgotk-sync.yaml?ref=872d5c7f44801b496731b11cd40881f304f8a09a",
+      "patch": "@@ -18,10 +18,10 @@ spec:\n   interval: 1m\n   url: https://github.com/policy-as-versioned-driftwood/driftwood\n   ref:\n-    tag: v3.0.1\n-    commit: 17302ecd20041df61a52428e67246c330294d2a6\n+    tag: v4.0.0\n+    commit: 1cd446f62a531c0aeee7e50c0a59a11ac5d00d67\n     # commit pinned at release (belt-and-braces immutability, ADR-0001) --\n-    # the resolved SHA driftwood's own signed v3.0.1 apps release points to. Not covered by the\n+    # the resolved SHA driftwood's own signed v4.0.0 apps release points to. Not covered by the\n     # Renovate customManagers in renovate.json (those track nist and platform\n     # only); a self-pin bump is a reviewed PR that moves both fields together.\n ---"
+    },
+    {
+      "sha": "73d1b2b5dd05e4937aff7bfeb16cd1f337014f5a",
+      "filename": "inventory/PROVENANCE.json",
+      "status": "modified",
+      "additions": 5,
+      "deletions": 5,
+      "changes": 10,
+      "blob_url": "https://github.com/policy-as-versioned-driftwood/driftwood/blob/872d5c7f44801b496731b11cd40881f304f8a09a/inventory%2FPROVENANCE.json",
+      "raw_url": "https://github.com/policy-as-versioned-driftwood/driftwood/raw/872d5c7f44801b496731b11cd40881f304f8a09a/inventory%2FPROVENANCE.json",
+      "contents_url": "https://api.github.com/repos/policy-as-versioned-driftwood/driftwood/contents/inventory%2FPROVENANCE.json?ref=872d5c7f44801b496731b11cd40881f304f8a09a",
+      "patch": "@@ -1,6 +1,6 @@\n {\n   \"apps_source\": {\n-    \"commit\": \"17302ecd20041df61a52428e67246c330294d2a6\",\n+    \"commit\": \"1cd446f62a531c0aeee7e50c0a59a11ac5d00d67\",\n     \"path\": \"gitops/apps\",\n     \"repository\": \"https://github.com/policy-as-versioned-driftwood/driftwood\",\n     \"signature\": {\n@@ -9,11 +9,11 @@\n       \"identity\": \"https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main\",\n       \"issuer\": \"https://token.actions.githubusercontent.com\",\n       \"rekor\": true,\n-      \"rekor_entry\": \"https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3075511413\",\n-      \"tlog_index\": \"3075511413\"\n+      \"rekor_entry\": \"https://rekor.sigstore.dev/api/v1/log/entries?logIndex=3077567350\",\n+      \"tlog_index\": \"3077567350\"\n     },\n-    \"tag\": \"v3.0.1\",\n-    \"tag_object\": \"4cdf9152d2af61d9e476f5e0f487d85a2808f42f\"\n+    \"tag\": \"v4.0.0\",\n+    \"tag_object\": \"bff31936b9e34074a7ce078e873d3a0df31ecd35\"\n   },\n   \"binding\": \"The complete exact tagged apps graph and primary reports reproduce images.json; no release or cluster activation is asserted.\",\n   \"cached_database_unchanged\": true,"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "directory": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+  "estate": "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate",
+  "base": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "head": "98d13782173342bbdfbd14271e1626e3b11b0d73",
+  "tree": "49a55a07be3b2ac24ba3b1e00b08f7ca302cc342",
+  "branch": "delivery-stage2-atomic-20261004",
+  "normal_SSH_signature": "G",
+  "signature_log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-source-signature.log",
+  "source_clean": true,
+  "remote_mutations": false,
+  "future_composition_B_tag_created": false,
+  "apps_A_tag": "v4.0.0",
+  "apps_A_commit": "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+  "apps_A_tag_object": "bff31936b9e34074a7ce078e873d3a0df31ecd35",
+  "apps_tag_tlog_index": "3077567350",
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "policy_trees_unchanged_from_source_A": true,
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json"
+  ],
+  "file_sha256": {
+    "composed/HEADER.yaml": "a8872d6a1b2b09988af2486f1c6815a108c63ef7fd6b3abe85e98a4d63c555e0",
+    "gitops/composed/composed-set.yaml": "630541ffaf1006680039a7ae680d2370052b279b829b7155c79cfe752df344b7",
+    "gitops/flux-system/gotk-sync.yaml": "a9af59b4e5e4ce3da81877c55602c8f9725e91e1b84c8faa6c80b537a68b7911",
+    "inventory/PROVENANCE.json": "db7d91d245db4a2de8dc8d92d62966f6752afc24ad8feb4b52e20933159e1f22"
+  },
+  "patch": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery.patch",
+  "patch_sha256": "4ca835224921db446e1b9b3d462128a3cfc860bb1e1dc77dabc26c57516f8821",
+  "inventory_sha256": "3673e27a8447f33a48430ec6b586ffd7732a352363b7cc533c5df23af428ecca",
+  "primary_inventory_preserved": true,
+  "engine_and_cloud_declarations_preserved": true,
+  "source_A_branch_preserved": true,
+  "checks": {
+    "gate": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood/.github/scripts/adopter-gate.py",
+        "compose",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/platform",
+        "v4.0.0",
+        "UNRELEASED-ATOMIC-DELIVERY",
+        "--adopter-dir",
+        "/private/tmp/pavf-driftwood-atomic-20261004-fm_sqsq7/driftwood-estate/driftwood",
+        "--base-ref",
+        "1cd446f62a531c0aeee7e50c0a59a11ac5d00d67",
+        "--head-ref",
+        "98d13782173342bbdfbd14271e1626e3b11b0d73",
+        "--out",
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-gate.json",
+        "--markdown-out",
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-gate.md"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-gate.log",
+      "log_sha256": "8766164ee36d07a67c2674cf30974f4c787e0975cc0ba9a83f12768b0d030691",
+      "result": {
+        "composed_bump": "none",
+        "declared_bump": "none",
+        "added": [],
+        "retired": [],
+        "reasons": [],
+        "weaker_than_declared": false
+      }
+    },
+    "postcommit_real_layout": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "test_platform_tools.WorkflowHistory",
+        "test_platform_tools.RealCompilerLayout"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-atomic-delivery-postcommit_real_layout.log",
+      "log_sha256": "456780096942defa923150f6886f02829e9d133ec708b12e0a65752dab8ec6db"
+    }
+  },
+  "publication_hold": "Independent exact-head review and root-coordinated normal PR/CI/merge; no live activation claim.",
+  "measured_bump": "none",
+  "source_still_clean": true
+}

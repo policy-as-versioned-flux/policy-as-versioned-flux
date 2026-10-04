@@ -1,0 +1,2 @@
+verify/map-surface/map_surface.py:606: error: Need type annotation for "differs" (hint: "differs: list[<type>] = ...")  [var-annotated]
+Found 1 error in 1 file (checked 4 source files)

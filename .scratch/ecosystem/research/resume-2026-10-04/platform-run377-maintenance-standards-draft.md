@@ -1,0 +1,11 @@
+Standards draft review: PASS, no hard violations or actionable smell findings. This is a read-only review of nine source paths against genuine tools5/policy7 commit `703eff6aee959843c4160aa54fd03413f62858cc`; final signed-head binding remains pending.
+
+The declared synthetic inventory has an explicit example.invalid image, digest and fixture-only scanner label. It is bound through actual disposable Git apps objects rather than a default production inventory. The real-adopter copy archives committed selected inputs, retains the source's immutable tag objects and starts a clearly unsigned synthetic history without a previous composition. Its new regression proves dirty app bytes do not travel, excluded history remains absent and the real source HEAD is preserved.
+
+Comparison/floor tests now record the fixture state that the existing committed-history reader actually consumes, including corrupt-history negatives. Historical threat cases declare their intended v1/v2 pin explicitly. Known-priced aggregate cases isolate that subset, while the actual whole-book assertion retains `total: null` and names absence-only lines; it does not invent zero amounts. These changes follow the documented named-absence contract in CONTEXT.md.
+
+Machinery claims resolve through the shared production renderer and filter actual policy kinds. The removal regression prevents a vanished optional renderer from remaining a remembered shipped name; non-policy machinery and unshipped names stay excluded. This follows ADR-0017's ownership and shipped-implementation rule. No additional catalogue is introduced.
+
+Independent AST comparison found exactly `_adopter_copy`, `_commit_header` and `selfcheck` changed in composition.py. Load-bearing compose/converter functions, wargamer's inventory guard, frozen distribution policy trees and the component-definition have no diff. The focused real-adopter fixture test and both machinery tests independently passed (three tests total, session 9561 drained exit 0).
+
+`platform-run377-maintenance-standards-draft.json` records the full source path/hash snapshot and unchanged seams. Root's comprehensive native selfcheck is a separate active check; this report does not assert its result or approve an unbound future commit. No source, index, branch, tags or parent bytes were edited by this reviewer.

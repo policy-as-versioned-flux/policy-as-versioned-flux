@@ -1,0 +1,29 @@
+    fixture pins fixture/threat-register at v1; v2 is on disk
+test_engine_adopter_probe_preserves_its_real_object_context (test_verifier_snapshots.VerifierSnapshots.test_engine_adopter_probe_preserves_its_real_object_context) ... ok
+test_mixed_policy_window_still_has_unsupported_pairings (test_verifier_snapshots.VerifierSnapshots.test_mixed_policy_window_still_has_unsupported_pairings) ... FAIL
+test_reprice_probe_preserves_context_before_calling_the_composer (test_verifier_snapshots.VerifierSnapshots.test_reprice_probe_preserves_context_before_calling_the_composer) ... ok
+
+======================================================================
+FAIL: test_mixed_policy_window_still_has_unsupported_pairings (test_verifier_snapshots.VerifierSnapshots.test_mixed_policy_window_still_has_unsupported_pairings)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 33, in test_mixed_policy_window_still_has_unsupported_pairings
+    self.assertEqual(engine.unsupported_pairing_engines(table, {
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "5.0.0": ["1.18.2"], "6.0.0": ["1.18.2"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "7.0.0": ["1.18.2", "1.19.1"]}), ["1.19.1"])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != ['1.19.1']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'1.19.1'
+
+- []
++ ['1.19.1']
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.367s
+
+FAILED (failures=1)

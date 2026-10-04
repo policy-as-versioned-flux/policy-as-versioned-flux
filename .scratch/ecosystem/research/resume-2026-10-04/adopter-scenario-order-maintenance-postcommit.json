@@ -1,0 +1,179 @@
+{
+  "adopters": {
+    "ludlow": {
+      "base": "179e4e0d8e754044b07a65933754244352e28ec5",
+      "checks": {
+        "gate": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            ".github/scripts/adopter_gate.py",
+            "--platform-dir",
+            "/private/tmp/pavf-ludlow-maintenance-20261004-estate/platform",
+            "--ludlow-dir",
+            "/private/tmp/pavf-ludlow-maintenance-20261004-estate/ludlow",
+            "--old-ref",
+            "179e4e0d8e754044b07a65933754244352e28ec5",
+            "--new-ref",
+            "848eb0c721cce1334a565fb4a13f61f1844bc871",
+            "--composed-base-ref",
+            "179e4e0d8e754044b07a65933754244352e28ec5",
+            "--composed-head-ref",
+            "848eb0c721cce1334a565fb4a13f61f1844bc871",
+            "--identity-regexp",
+            "^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+            "--issuer",
+            "https://token.actions.githubusercontent.com",
+            "--out-comment",
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-scenario-order-postcommit-gate.md"
+          ],
+          "composed": "none",
+          "composed_evidence_independently_byte_equal": true,
+          "declared": "none",
+          "exit": 0,
+          "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-scenario-order-postcommit-gate.log",
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "result_sha256": "420a7b6f5f577590bea7f2fa4bc57805dbae7f13023361d88a990b3461fd1dbc",
+          "same_pin_early_return": true
+        },
+        "public-tests": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests",
+            "-p",
+            "test_*.py",
+            "-v"
+          ],
+          "exit": 0,
+          "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-scenario-order-postcommit-public-tests.log",
+          "log_sha256": "e45729d9e37a40d8672e5ea10916527fcdf3cd3a0131d81fea00d7328d9afc65",
+          "skips": 0,
+          "test_count": 47
+        },
+        "reach": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            "scripts/render_composed.py",
+            "reach",
+            "--ref",
+            "v4.0.1"
+          ],
+          "exit": 0,
+          "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-scenario-order-postcommit-reach.log",
+          "log_sha256": "6f3c2637b29fb47c1c5c8ba0c1e02463bbedf5f3d6dc9aabb259e168c98350b3"
+        },
+        "verify": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            ".github/scripts/platform-tools.py",
+            "--adopter-dir",
+            ".",
+            "--tools-dir",
+            "../platform-tools",
+            "verify",
+            ".",
+            "--estate-clone",
+            ".."
+          ],
+          "exit": 0,
+          "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-scenario-order-postcommit-verify.log",
+          "log_sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+        }
+      },
+      "clean_after_checks": true,
+      "head": "848eb0c721cce1334a565fb4a13f61f1844bc871",
+      "tree": "0a51351ac56266b9983916db1f95f5f2a52727d7"
+    },
+    "tuppence": {
+      "base": "55bf5aa14d80f6cee4c524394d08b244b1461846",
+      "checks": {
+        "gate": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            ".github/scripts/adopter-gate.py",
+            "--platform-dir",
+            "/private/tmp/pavf-tuppence-maintenance-20261004-estate/platform",
+            "--new-pin-yaml",
+            "gitops/platform/platform-pin.yaml",
+            "--old-pin-yaml",
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-old-platform-pin.yaml",
+            "--identity-regexp",
+            "^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+            "--issuer",
+            "https://token.actions.githubusercontent.com",
+            "--adopter-dir",
+            "/private/tmp/pavf-tuppence-maintenance-20261004-estate/tuppence",
+            "--base-ref",
+            "55bf5aa14d80f6cee4c524394d08b244b1461846",
+            "--head-ref",
+            "45776a89efc021c6e10bd666fdbf9f57915d1b6e",
+            "--out",
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-postcommit-gate.json"
+          ],
+          "composed": "none",
+          "composed_evidence_independently_byte_equal": true,
+          "declared": "none",
+          "exit": 0,
+          "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-postcommit-gate.log",
+          "log_sha256": "e338fcbab7e00798f49770064fc2fe239176fa3ce0851d16f7134a42529423b7",
+          "result_sha256": "34239aa4e18c35bf76b198f6a9ba432965998eb1593586a4b405e85235aa6eb8",
+          "same_pin_early_return": true
+        },
+        "public-tests": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests",
+            "-p",
+            "test_*.py",
+            "-v"
+          ],
+          "exit": 0,
+          "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-postcommit-public-tests.log",
+          "log_sha256": "a3928ea6e57b99e56b50079be822a0ad67fc60eafd83e400fdacbf9d37b26e44",
+          "skips": 0,
+          "test_count": 47
+        },
+        "reach": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            "scripts/render_composed.py",
+            "reach",
+            "--ref",
+            "v4.0.1"
+          ],
+          "exit": 0,
+          "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-postcommit-reach.log",
+          "log_sha256": "6f3c2637b29fb47c1c5c8ba0c1e02463bbedf5f3d6dc9aabb259e168c98350b3"
+        },
+        "verify": {
+          "argv": [
+            "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+            ".github/scripts/platform-tools.py",
+            "--adopter-dir",
+            ".",
+            "--tools-dir",
+            "../platform-tools",
+            "verify",
+            ".",
+            "--estate-clone",
+            ".."
+          ],
+          "exit": 0,
+          "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-scenario-order-postcommit-verify.log",
+          "log_sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+        }
+      },
+      "clean_after_checks": true,
+      "head": "45776a89efc021c6e10bd666fdbf9f57915d1b6e",
+      "tree": "a30506b57b738c2d000498fab7c937e9bef1c66e"
+    }
+  },
+  "remote_mutations": false
+}

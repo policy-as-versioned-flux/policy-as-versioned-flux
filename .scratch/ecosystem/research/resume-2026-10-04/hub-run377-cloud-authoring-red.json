@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_refusal_by_another_name.py",
+    "-k",
+    "prepared_cloud"
+  ],
+  "exit": 1,
+  "log_sha256": "0fd2b35d48cb689a48a7e15172f3ea3961bd1336f9eebfa62dc691d1d46bd46b"
+}

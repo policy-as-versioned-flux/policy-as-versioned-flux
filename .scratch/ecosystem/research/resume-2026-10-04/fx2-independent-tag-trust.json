@@ -1,0 +1,21 @@
+{
+  "tag": "fx/v2.0.0",
+  "tag_object": "f6edadce94b98a01479a517a1babda92ce8b2243",
+  "peeled_commit": "8c84a66951ce89834f33e008380b2c47f054b7c0",
+  "tree": "b88fb77f96cadf1a9639cae369ed529bd4e1731c",
+  "reviewed_source": "d62f74e52ed992798a75cf3f4f138ec9c83db80a",
+  "reviewed_tree_matches": true,
+  "identity": "https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "gitsign_rekor_mode": "offline",
+  "signature_exit": 0,
+  "Git": true,
+  "Rekor": true,
+  "Certificate": true,
+  "tlog_index": "3077401757",
+  "raw_signature_log": "fx2-independent-signature.log",
+  "raw_signature_log_sha256": "27522b4b20efb9cddd3aa695a4957b918314e3b02807c5801813c0486c28d43f",
+  "source_HEAD_and_worktree_preserved": true,
+  "scope": "genuine local tag verification against default Sigstore trust; normal public tag fetch only; no checkout/reset or workflow mutation",
+  "reviewer_parser_note": "crypto command exited0; initial record parser expected a different gitsign output format, so actual raw Validated lines are used without rerunning crypto"
+}

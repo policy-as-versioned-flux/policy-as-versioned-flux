@@ -1,0 +1,47 @@
+{
+  "ludlow": {
+    "metadata": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "isPrivate": false,
+      "nameWithOwner": "policy-as-versioned-ludlow/ludlow",
+      "url": "https://github.com/policy-as-versioned-ludlow/ludlow",
+      "viewerPermission": "ADMIN"
+    },
+    "actual_remote_main": "035c9b991c5e2d69134737db7967437a62d6f288",
+    "candidate_base": "179e4e0d8e754044b07a65933754244352e28ec5",
+    "base_matches_remote": false,
+    "head": "848eb0c721cce1334a565fb4a13f61f1844bc871"
+  },
+  "tuppence": {
+    "metadata": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "isPrivate": false,
+      "nameWithOwner": "policy-as-versioned-tuppence/tuppence",
+      "url": "https://github.com/policy-as-versioned-tuppence/tuppence",
+      "viewerPermission": "ADMIN"
+    },
+    "actual_remote_main": "7b3b0bd7aeb0895a0557a0cb8de6b17bdaba91f2",
+    "candidate_base": "55bf5aa14d80f6cee4c524394d08b244b1461846",
+    "base_matches_remote": false,
+    "head": "45776a89efc021c6e10bd666fdbf9f57915d1b6e"
+  },
+  "insurer": {
+    "metadata": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "isPrivate": false,
+      "nameWithOwner": "policy-as-versioned-insurer/insurer",
+      "url": "https://github.com/policy-as-versioned-insurer/insurer",
+      "viewerPermission": "ADMIN"
+    },
+    "actual_remote_main": "8d4a5ae684e4a58c8242bc8b6e50794473ef302b",
+    "candidate_base": "8d4a5ae684e4a58c8242bc8b6e50794473ef302b",
+    "base_matches_remote": true,
+    "head": "ed17499668f368c55261729c760904662ab7e242"
+  }
+}

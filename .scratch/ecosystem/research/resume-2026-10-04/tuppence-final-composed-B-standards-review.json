@@ -1,0 +1,21 @@
+{
+  "HEADER_fingerprint_only": true,
+  "all_other_source_and_artifact_bytes_preserved": true,
+  "base": "dbaa026f6510fe5c0042f33f29081f3840ea59c3",
+  "candidate_sha256": "32aa2fbf928e86606641ff340ac26310cfcbb5b9093d3d4889ea6132078647e3",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "genuine_B_tag_crypto_receipt_bound": true,
+  "hard_findings": [],
+  "head": "b2abe26c155beea87366bcdf9775faae991f0803",
+  "none_gate_and_postcommit_real_layout_joined": true,
+  "normal_SSH_verified": true,
+  "only_semantic_resource_change": "composed GitRepository ref to genuine v4.0.1 at actual B commit dbaa",
+  "receipt_sha256": "dec6d1c2fbd6d013fc65c4ebfc0de8bca9971007e5e9405662b9bfa109e5b936",
+  "remote_mutations": false,
+  "scope": "Independent read-only Standards review of root-authored final TU composed B pointer delta",
+  "tree": "5dcedc2fbc951c25251ee56b9c13bcf844ab044e",
+  "verdict": "PASS"
+}

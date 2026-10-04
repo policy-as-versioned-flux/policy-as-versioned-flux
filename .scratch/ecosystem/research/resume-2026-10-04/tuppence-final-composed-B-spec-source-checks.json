@@ -1,0 +1,73 @@
+{
+  "source_checks": "PASS",
+  "normal_receipt_review": "pending",
+  "institution": "tuppence",
+  "head": "b2abe26c155beea87366bcdf9775faae991f0803",
+  "tree": "5dcedc2fbc951c25251ee56b9c13bcf844ab044e",
+  "base_B": "dbaa026f6510fe5c0042f33f29081f3840ea59c3",
+  "source_A": {
+    "observed_at": "2026-10-04T10:23:16.882982+00:00",
+    "institution": "tuppence",
+    "tag": "v4.0.0",
+    "tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e",
+    "peeled_commit": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+    "reviewed_source": "d1dbe766e09bb8112efa609836af0aa95cbe0ee4",
+    "cut_run": 37195060525,
+    "release_run": 37195133182,
+    "github_release": "https://github.com/policy-as-versioned-tuppence/tuppence/releases/tag/v4.0.0",
+    "published_at": "2026-10-04T10:22:11Z",
+    "draft": false,
+    "prerelease": false,
+    "git_signature": true,
+    "rekor_entry": true,
+    "certificate_claims": true,
+    "delivery_edits_may_begin": true,
+    "live_delivery_claimed": false
+  },
+  "source_B": {
+    "observed_at": "2026-10-04T11:35:55.350791+00:00",
+    "institution": "tuppence",
+    "tag": "v4.0.1",
+    "tag_object": "9d0fbbbbf1d1ab8ef2d7da5c553f2b86bee22a5c",
+    "peeled_commit": "dbaa026f6510fe5c0042f33f29081f3840ea59c3",
+    "cut_run": 37197768058,
+    "release_run": 37197899599,
+    "github_release": "https://github.com/policy-as-versioned-tuppence/tuppence/releases/tag/v4.0.1",
+    "published_at": "2026-10-04T11:11:53Z",
+    "draft": false,
+    "prerelease": false,
+    "git_signature": true,
+    "rekor_entry": true,
+    "certificate_claims": true,
+    "tlog_index": "3077582720",
+    "final_composed_pointer_edits_may_begin": true,
+    "live_delivery_claimed": false,
+    "prior_cut_rejection_resolved_by_fresh_rerender_and_independent_review": true
+  },
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml"
+  ],
+  "changed_file_sha256": {
+    "composed/HEADER.yaml": "819d5b6e6a070f0384a18db8232604cfac3880def82b86c15d74c2e8b3a657f8",
+    "gitops/composed/composed-set.yaml": "41cd63c04654f319c3909015bdb8e6da967cf30a43892c838b844c485389bbdf"
+  },
+  "normal_SSH_signature": "G",
+  "clean": true,
+  "HEADER_only_delta": "comparison-inputs.after",
+  "comparison_after": "1acb6430e97697a50d878ef343bb3b97cce117a3ff2f0e593642d63150a38273",
+  "apps_and_primary_provenance_A_preserved": true,
+  "primary_trim_equal": true,
+  "served_images": [
+    "ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5"
+  ],
+  "policy_versions": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ],
+  "four_gitsign_gates_preserved": true,
+  "engine": "1.18.2",
+  "reviewer_source_edits": false,
+  "reviewer_external_mutations": false
+}

@@ -1,0 +1,51 @@
+    fixture pins fixture/threat-register at v1; v2 is on disk
+test_engine_adopter_probe_preserves_its_real_object_context (test_verifier_snapshots.VerifierSnapshots.test_engine_adopter_probe_preserves_its_real_object_context) ... FAIL
+test_mixed_policy_window_still_has_unsupported_pairings (test_verifier_snapshots.VerifierSnapshots.test_mixed_policy_window_still_has_unsupported_pairings) ... ok
+test_reprice_probe_preserves_context_before_calling_the_composer (test_verifier_snapshots.VerifierSnapshots.test_reprice_probe_preserves_context_before_calling_the_composer) ... FAIL
+
+======================================================================
+FAIL: test_engine_adopter_probe_preserves_its_real_object_context (test_verifier_snapshots.VerifierSnapshots.test_engine_adopter_probe_preserves_its_real_object_context)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 88, in test_engine_adopter_probe_preserves_its_real_object_context
+    self.assert_snapshot(copied)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 77, in assert_snapshot
+    self.assertEqual(git(directory, "for-each-ref", "--format=%(refname)", "refs/remotes/origin/"),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     git(self.repo, "for-each-ref", "--format=%(refname)", "refs/remotes/origin/"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'refs[22 chars]refs/remotes/origin/candidate-source\nrefs/remotes/origin/main' != 'refs[22 chars]refs/remotes/origin/main'
+  refs/remotes/origin/HEAD
+- refs/remotes/origin/candidate-source
+  refs/remotes/origin/main
+
+
+======================================================================
+FAIL: test_reprice_probe_preserves_context_before_calling_the_composer (test_verifier_snapshots.VerifierSnapshots.test_reprice_probe_preserves_context_before_calling_the_composer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 104, in test_reprice_probe_preserves_context_before_calling_the_composer
+    reprice.try_bump("fixture", {"name": "threat-register", "party": "fixture"}, "v1", "v2")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/e2e/step2_reprice.py", line 158, in try_bump
+    before = compose(work, work, f"{adopter} at {pinned}")["prices"]
+             ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 98, in composer
+    self.assert_snapshot(Path(directory))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/tests/test_verifier_snapshots.py", line 77, in assert_snapshot
+    self.assertEqual(git(directory, "for-each-ref", "--format=%(refname)", "refs/remotes/origin/"),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     git(self.repo, "for-each-ref", "--format=%(refname)", "refs/remotes/origin/"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'refs[22 chars]refs/remotes/origin/candidate-source\nrefs/remotes/origin/main' != 'refs[22 chars]refs/remotes/origin/main'
+  refs/remotes/origin/HEAD
+- refs/remotes/origin/candidate-source
+  refs/remotes/origin/main
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.952s
+
+FAILED (failures=2)

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_verifier_snapshots.py",
+    "-v"
+  ],
+  "cwd": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "exit": 0,
+  "log_sha256": "2544218171bb610cf5bf63b880cf34d60f9de00a046da004d14bf07ca7934676",
+  "actual_scheduled_run_regraded": false
+}

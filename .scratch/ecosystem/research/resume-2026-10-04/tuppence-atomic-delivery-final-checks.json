@@ -1,0 +1,66 @@
+{
+  "base": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "branch": "delivery-stage2-atomic-20261004",
+  "checks": {
+    "gate": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/tuppence/.github/scripts/adopter-gate.py",
+        "--platform-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/platform",
+        "--new-pin-yaml",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/tuppence/gitops/platform/platform-pin.yaml",
+        "--old-pin-yaml",
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-atomic-delivery-old-platform-pin.yaml",
+        "--identity-regexp",
+        "^https://github\\.com/policy-as-versioned-platform/platform/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+        "--issuer",
+        "https://token.actions.githubusercontent.com",
+        "--adopter-dir",
+        "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/tuppence",
+        "--base-ref",
+        "f575dc12de130c444d98a831de0ca21fd68b9c46",
+        "--head-ref",
+        "0dd1cf6987f04484a00141b2a962a3e69af200f8",
+        "--out",
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-atomic-delivery-gate.json"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-atomic-delivery-gate.log",
+      "log_sha256": "e338fcbab7e00798f49770064fc2fe239176fa3ce0851d16f7134a42529423b7",
+      "result": {
+        "added": [],
+        "composed": "none",
+        "declared": "none",
+        "elements": [],
+        "new_commit": "703eff6aee959843c4160aa54fd03413f62858cc",
+        "new_tag": "v5.0.0",
+        "old_tag": "v5.0.0",
+        "retired": []
+      }
+    },
+    "postcommit_real_layout": {
+      "argv": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_platform_tools.py",
+        "-v"
+      ],
+      "exit": 0,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-atomic-delivery-postcommit_real_layout.log",
+      "log_sha256": "bcecb722d4e13100ee42a0ce58edb198571bd3b06f76c780edb23de0aa615d4d"
+    }
+  },
+  "future_source_B_tag_created": false,
+  "head": "0dd1cf6987f04484a00141b2a962a3e69af200f8",
+  "normal_SSH_signature": "G",
+  "remote_mutations": false,
+  "source_clean": true,
+  "source_still_clean": true,
+  "tree": "f8ad854469bfe76f591c72746d76334e7d1fa290"
+}

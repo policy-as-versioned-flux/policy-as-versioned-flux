@@ -1,0 +1,16 @@
+{
+  "directory": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/driftwood",
+  "hub": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub",
+  "hub_commit": "5bc47331a536476f3580542be794908f5053f816",
+  "base": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "branch": "maintenance-current-moved-feed-20261004",
+  "source_isolated": true,
+  "publication_hold": "Separate maintenance; refresh actual final-pointer merged-main base, rerender, sign and exact independent reviews required.",
+  "green_exit": 3,
+  "offline_checks": "4PASS/0FAIL",
+  "live_clock": "SKIP; retained honest could-not-look exit3",
+  "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-moved-maintenance-green.log",
+  "log_sha256": "514ffcde51fb29ee188b8eb15f1c39f7703611662e055ccc394f5dce9b916dee",
+  "frozen_v1_sha256": "4668062dc40058aac100fd768353e220c8ce0276155c9b8c17f78c9a5c16edc2",
+  "source_diff": " twin/verify-twin-sweep-moved.sh | 26 ++++++++++++++++++++++++--\n 1 file changed, 24 insertions(+), 2 deletions(-)\n"
+}

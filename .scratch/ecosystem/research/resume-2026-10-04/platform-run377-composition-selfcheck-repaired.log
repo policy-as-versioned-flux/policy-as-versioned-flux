@@ -1,0 +1,13 @@
+OK compose(): the real driftwood composes against its real pinned parents; platform's two formerly-dangling claims are fixed, zero refusals
+OK document: carries outcome, parents[], members[], refusals[], restatements[], cages[], holes[], ungoverned[], prices[], deltas[], limits[]
+Traceback (most recent call last):
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/composition.py", line 9466, in <module>
+    sys.exit(main(sys.argv))
+             ~~~~^^^^^^^^^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/composition.py", line 6040, in main
+    selfcheck()
+    ~~~~~~~~~^^
+  File "/private/tmp/pavf-run377-platform-estate-20261004/platform/compose/composition.py", line 6534, in selfcheck
+    assert {(p['source'],p.get('name')) for p in feed_prices} == feed_keys
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

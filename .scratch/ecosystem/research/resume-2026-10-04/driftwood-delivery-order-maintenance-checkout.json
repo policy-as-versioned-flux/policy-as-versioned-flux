@@ -1,0 +1,11 @@
+{
+  "directory": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub/.estate-clone/driftwood",
+  "hub": "/private/tmp/pavf-driftwood-moved-20261004-k0udi0xf/hub",
+  "hub_commit": "5bc47331a536476f3580542be794908f5053f816",
+  "base": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "branch": "maintenance-delivery-order-20261004",
+  "source_isolated": true,
+  "publication_hold": "Separate maintenance; refresh actual final-pointer merged-main base, rerender, sign and exact independent reviews required.",
+  "preserved_clock_commit": "a1707bb7d13447edaeba85f26c3240cd8884a415",
+  "final_pointer_merge_rebase_pending": true
+}

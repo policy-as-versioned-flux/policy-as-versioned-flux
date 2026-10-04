@@ -1,0 +1,5 @@
+Independent Standards and Spec reviews passed for exact SSH-signed head 6de0d00ce850ea820777f46fbea5c93a3238ea68, tree deff0089ff3c28f68d7fb0d097c926d7de4f6b63. Actual shift-left and compose-check in run 37200561569 both passed on that exact head.
+
+The four-path change couples the authentic v4.0.0 apps source and scan provenance with the composed source, complete policy 5/6/7 array and four signature gates. The primary scan/image/dates, native valuation, existing apps graph, engine 1.18.2 and inactive cloud scope remain byte-preserved. Authentic tools5 render/verify, v4.0.0 reach, the exact-head none gate and 37 enabled public tests passed.
+
+The destination is the existing public policy-as-versioned-ludlow/ludlow source repository. The user explicitly approved this exact public branch/PR and normal merge. The reviewed public defensive policy/source fixtures contain no private user data; the changed-source high-confidence secret scan was negative. No override or protection change is requested. Composition B requires a fresh published-main rerender and independent reviews before release.

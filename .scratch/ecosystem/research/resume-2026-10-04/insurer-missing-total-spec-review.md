@@ -1,0 +1,3 @@
+PASS — exact signed clean insurer commit `16b4857260f12458e5e0c797b2f99c60b1e03295` / tree `edad5232c2c12086406140142ae1635f1c59b444`. No hard finding.
+
+The three-file change refuses a missing or null signed exposure total through `Refused` before computing a layer or premium. Known zero keeps the existing zero formula, and a known total keeps the existing exclusion, attachment, limit and loading formula. A known subset or exclusion cannot turn an unpriced whole book into a quote. Four independent public regressions pass; the verifier discovers them before reading estate instruments. All supplied red/green, authentic Ludlow B null-exposure and signature receipt hashes match. No missing amount, cloud pin, grade or observation is invented.

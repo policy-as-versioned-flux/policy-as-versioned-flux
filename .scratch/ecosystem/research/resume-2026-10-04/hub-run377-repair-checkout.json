@@ -1,0 +1,8 @@
+{
+  "directory": "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub",
+  "base": "48324860b8b9f7dc4762e9c9f841206881a28705",
+  "branch": "repair/run377-hub-verifiers-20261004",
+  "source": "local authentic published hub object store",
+  "network": false,
+  "source_owner_checkout_modified": false
+}

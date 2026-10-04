@@ -1,0 +1,12 @@
+diff --git a/.scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md b/.scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md
+index 2dab19de0b121807b252dd42929f8b3db4eba6f8..33443785fe0cb79ca18631c29ab2cbb9392f01a5 100644
+--- a/.scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md
++++ b/.scratch/ecosystem/issues/96-the-citable-line-says-whether-the-twin-may-write.md
+@@ -237,3 +237,7 @@ this one deliberately does not either.
+ `operations` for its own calls, and names it on the detail line `./bin/twin verify` and the
+ `invariants` CI job already print. That restores a reader-visible report. It does not put the mode
+ on the citable line, which is what this ticket is for.
++
++## Regression acknowledgement, 2026-10-04
++
++**Observed red, 2026-10-04.** Codex integrator, acting under the owner's delegated implementation scope, records this acknowledgement; it is a machine statement, not a quoted human acceptance. `verify/truth-line/verify-truth-line.sh` is red in the genuine run377 snapshot at hub `48324860b8b9f7dc4762e9c9f841206881a28705`. The derived-status capture read the preceding run376 grade table and named this ticket as an owner without a later acknowledgement. The failure is concrete: three discovered checks lacked manifest rows; Spec owns the exact source classification/entrypoint correction and the future real collector grade. This acknowledgement records the owned regression and does not replace the original grade with a local PASS. The concrete local correction is signed hub source `4c4b53c7163b0da7e11e9d0574057bcbc24e298d`, with exact manifest/entrypoint repairs and independent review; publication and its next actual collector grade remain separate.

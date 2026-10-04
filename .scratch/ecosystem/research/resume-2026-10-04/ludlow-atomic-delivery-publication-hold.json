@@ -1,0 +1,26 @@
+{
+  "LU_external_mutation_executed": false,
+  "LU_external_publication_attempted": false,
+  "LU_local_preparation_complete": true,
+  "alternate_executor_or_retry": false,
+  "head": "6de0d00ce850ea820777f46fbea5c93a3238ea68",
+  "independent_Spec_receipt": "ludlow-atomic-delivery-spec-review.json",
+  "independent_Standards_receipt": "ludlow-atomic-delivery-root-standards-review.json",
+  "institution": "ludlow",
+  "observed_at": "2026-10-04T11:46:32.135953+00:00",
+  "pending_authorization": "Root user question for exact DW98d137 and LU6de0d00 public branch/PR/normal merge",
+  "read_only_preflight": {
+    "defaultBranch": "main",
+    "isPrivate": false,
+    "repository": "policy-as-versioned-ludlow/ludlow",
+    "viewerPermission": "ADMIN"
+  },
+  "root_reported_DW_auto_review_rejection": {
+    "action": "public branch push and PR creation",
+    "execution": false,
+    "reason": "precise public export authorization absent",
+    "scope_note": "reported by root; not a LU tool rejection"
+  },
+  "status": "held-awaiting-explicit-user-authorization",
+  "tree": "deff0089ff3c28f68d7fb0d097c926d7de4f6b63"
+}

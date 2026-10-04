@@ -1,0 +1,24 @@
+compose-check	Compiler boundary and real checkout-layout regression	﻿2026-10-04T10:17:47.0733629Z ##[group]Run set -euo pipefail
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.0733936Z ^[[36;1mset -euo pipefail^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.0734246Z ^[[36;1mpython3 -m unittest discover -s driftwood/tests -p test_platform_tools.py^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.0734678Z ^[[36;1m# Ticket 131: workflow-shape tests live under .github/ so they stay^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.0735044Z ^[[36;1m# outside the comparison identity that composed/ records.^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.0735415Z ^[[36;1mpython3 -m unittest discover -s driftwood/.github/tests -p 'test_*.py'^[[0m
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.0770509Z shell: /usr/bin/bash -e {0}
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.0770736Z env:
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.0770954Z   PAVF_REAL_ESTATE: /home/runner/work/driftwood/driftwood
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:47.0771225Z ##[endgroup]
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4498919Z F.
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4499279Z ======================================================================
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4499857Z FAIL: test_composition_bytes_do_not_depend_on_checkout_prefix (test_platform_tools.RealCompilerLayout.test_composition_bytes_do_not_depend_on_checkout_prefix)
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4500509Z ----------------------------------------------------------------------
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4500799Z Traceback (most recent call last):
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4501286Z   File "/home/runner/work/driftwood/driftwood/driftwood/tests/test_platform_tools.py", line 147, in test_composition_bytes_do_not_depend_on_checkout_prefix
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4502020Z     self.assertEqual(result.returncode, 0, result.stderr)
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4502282Z AssertionError: 1 != 0 : 
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4502404Z 
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4502525Z ----------------------------------------------------------------------
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4502779Z Ran 2 tests in 2.324s
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4502882Z 
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4502955Z FAILED (failures=1)
+compose-check	Compiler boundary and real checkout-layout regression	2026-10-04T10:17:49.4593668Z ##[error]Process completed with exit code 1.

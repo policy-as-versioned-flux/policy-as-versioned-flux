@@ -1,0 +1,208 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-10-04T12:15:19Z",
+  "databaseId": 37201470734,
+  "event": "workflow_dispatch",
+  "headBranch": "main",
+  "headSha": "872d5c7f44801b496731b11cd40881f304f8a09a",
+  "jobs": [
+    {
+      "completedAt": "2026-10-04T12:15:45Z",
+      "conclusion": "success",
+      "databaseId": 111433875664,
+      "name": "cut",
+      "startedAt": "2026-10-04T12:15:22Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-04T12:15:24Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-04T12:15:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:25Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-04T12:15:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:26Z",
+          "conclusion": "success",
+          "name": "Install pinned identity verifier",
+          "number": 3,
+          "startedAt": "2026-10-04T12:15:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:32Z",
+          "conclusion": "success",
+          "name": "Independently pinned compiler tools",
+          "number": 4,
+          "startedAt": "2026-10-04T12:15:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:33Z",
+          "conclusion": "success",
+          "name": "read driftwood's own pinned platform and nist tags",
+          "number": 5,
+          "startedAt": "2026-10-04T12:15:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:34Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 6,
+          "startedAt": "2026-10-04T12:15:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:35Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 7,
+          "startedAt": "2026-10-04T12:15:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:35Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 8,
+          "startedAt": "2026-10-04T12:15:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:36Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 9,
+          "startedAt": "2026-10-04T12:15:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:37Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 10,
+          "startedAt": "2026-10-04T12:15:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:37Z",
+          "conclusion": "success",
+          "name": "every parent is at the {tag, commit} pair this repository pins",
+          "number": 11,
+          "startedAt": "2026-10-04T12:15:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:39Z",
+          "conclusion": "success",
+          "name": "ticket 18 -- re-render the composed artefact from the recorded parent SHAs, byte-for-byte, before any tag is cut",
+          "number": 12,
+          "startedAt": "2026-10-04T12:15:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:39Z",
+          "conclusion": "success",
+          "name": "reject a tag that already exists (no force-move, ever)",
+          "number": 13,
+          "startedAt": "2026-10-04T12:15:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:40Z",
+          "conclusion": "success",
+          "name": "create the signed annotated tag (ambient Actions identity, no interactive login)",
+          "number": 14,
+          "startedAt": "2026-10-04T12:15:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:42Z",
+          "conclusion": "success",
+          "name": "push the tag (git push only -- never the git-data REST API)",
+          "number": 15,
+          "startedAt": "2026-10-04T12:15:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:42Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 24,
+          "startedAt": "2026-10-04T12:15:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:42Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 25,
+          "startedAt": "2026-10-04T12:15:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:42Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 26,
+          "startedAt": "2026-10-04T12:15:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:42Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 27,
+          "startedAt": "2026-10-04T12:15:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:42Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 28,
+          "startedAt": "2026-10-04T12:15:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:43Z",
+          "conclusion": "success",
+          "name": "Post Independently pinned compiler tools",
+          "number": 29,
+          "startedAt": "2026-10-04T12:15:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:43Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 30,
+          "startedAt": "2026-10-04T12:15:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:15:43Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 31,
+          "startedAt": "2026-10-04T12:15:43Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37201470734/job/111433875664"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-10-04T12:15:45Z",
+  "url": "https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37201470734"
+}

@@ -1,0 +1,42 @@
+{
+  "base": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "changed_paths": [
+    "composed/HEADER.yaml",
+    "gitops/composed/composed-set.yaml",
+    "gitops/flux-system/gotk-sync.yaml",
+    "inventory/PROVENANCE.json"
+  ],
+  "composed_and_cloud_remain_opt_in": true,
+  "coupled_apps_composed_pins": {
+    "commit": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+    "tag": "v4.0.0"
+  },
+  "gitsign_gates": [
+    "flux-system/composed-v5-0-0",
+    "flux-system/composed-v6-0-0",
+    "flux-system/composed-v7-0-0",
+    "flux-system/composed-machinery"
+  ],
+  "head": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "inventory_primary_metadata_unchanged": true,
+  "original_signed_source_A_branch_preserved": true,
+  "other_composed_bytes_unchanged": 24,
+  "policy_bytes_unchanged": 26,
+  "preserved_files_sha256": {
+    "composed/evidence.json": "dcc5038096572ae73e57e93c17f5474dfedb07d6d4f36019fe7c1fd45767a54e",
+    "gitops/apps/kustomization.yaml": "6f4d781ac46013f72c94acc2f1198e191fcc5ce20b45974ca0a4d130853a0d3c",
+    "gitops/cloud/claims.yaml": "340657fbf52678182e2456a4e0e2e3f3834c52ba39af23eb4c05fc18c2893d73",
+    "gitops/cloud/cloud-delivery.yaml": "dc5c6819af3153bf71ac76e227d8d39fc97cf6f657a1d5708a0e21febbcab7c7",
+    "gitops/engine/kyverno.yaml": "98c5732422f811d75507441f4164f758f97bde2ee803ba70e0a488d597588f30",
+    "inventory/images.json": "b100844ba2f1b5e776eec6415e677704045fa01d3d0f860f74adacf4b472df18",
+    "party.yaml": "540033f6a7262fc3dcf740602cd5c068b130d8af4fe910c73a05f6763ed08113"
+  },
+  "pricing_threshold": 3,
+  "remote_mutations": false,
+  "tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e",
+  "version_array": [
+    "5.0.0",
+    "6.0.0",
+    "7.0.0"
+  ]
+}

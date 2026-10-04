@@ -1,0 +1,48 @@
+{
+  "adopter": "tuppence",
+  "apps_and_composed_tag": "v4.0.0",
+  "artifacts": {
+    "tuppence-atomic-delivery-PR-body.md": "65129153d983dcc85d591eafb7efc505a84304b20520b66491d8d4afd7cd951d",
+    "tuppence-atomic-delivery-final-checks.json": "c961b0c56e5c8c1225066a620926544072c2f9b8eb3f681a7daa8367ee998d42",
+    "tuppence-atomic-delivery-gate.json": "34239aa4e18c35bf76b198f6a9ba432965998eb1593586a4b405e85235aa6eb8",
+    "tuppence-atomic-delivery-implementation.md": "b4c5183fc4a5fdff622f6c2753433521f4a67a5a304302a042e4fcce1b2f4adb",
+    "tuppence-atomic-delivery-released-inventory-check.json": "0c34045be5a439570ff76f3e409df4f82132db73f7853f9d420a2391a3fadf92",
+    "tuppence-atomic-delivery-sanity.json": "335dbeda8a271858ac16932995ab374b98db6dd1bf5ec5227c7507a255dabfc5",
+    "tuppence-atomic-delivery-source-signature.log": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907",
+    "tuppence-atomic-delivery.patch": "0b22739904e29c4da21f4a79d28b0480f67824eea9418b5674c7a189b9c99ef3"
+  },
+  "base": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "branch": "delivery-stage2-atomic-20261004",
+  "changed_files": {
+    "composed/HEADER.yaml": {
+      "bytes": 19962,
+      "sha256": "bcd6fad78cd339c345f2ef6606bd515ce31d6cc3681a1e80165d5bc7878adc70"
+    },
+    "gitops/composed/composed-set.yaml": {
+      "bytes": 8383,
+      "sha256": "ec4974e339c6d3c0b6656b90701f068c42f9193593344ce2ed5a787500b66c19"
+    },
+    "gitops/flux-system/gotk-sync.yaml": {
+      "bytes": 2271,
+      "sha256": "fdd242a22ec42606e0583ad84cf5c3dce9008ce7c008063fb98f96f1ad4aeb15"
+    },
+    "inventory/PROVENANCE.json": {
+      "bytes": 3280,
+      "sha256": "aabe367897040d6b7113b3087c2bc9c239efa889e3aa3f8cf0eec691e105d690"
+    }
+  },
+  "clean": true,
+  "computed_institutional_bump": "none",
+  "directory": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/tuppence",
+  "future_source_B_tag_created": false,
+  "head": "0dd1cf6987f04484a00141b2a962a3e69af200f8",
+  "high_confidence_secret_patterns_found": 0,
+  "normal_SSH_signature": "G",
+  "parent": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "postcommit_real_layout_passed": true,
+  "remote_mutations": false,
+  "scope": "Local atomic delivery implementation for independent root Standards and Spec review; no remote action or live activation",
+  "tag_commit": "f575dc12de130c444d98a831de0ca21fd68b9c46",
+  "tag_object": "17070ad568397bb7c394f80cb0d51ebcf560089e",
+  "tree": "f8ad854469bfe76f591c72746d76334e7d1fa290"
+}

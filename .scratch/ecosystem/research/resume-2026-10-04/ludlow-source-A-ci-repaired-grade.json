@@ -1,0 +1,6 @@
+{
+  "composed_bump": "major",
+  "acceptance_admitted": true,
+  "normal_gate_stdout": "PASS: declared=major composed=major, admitted: every major this pull request adds is accepted by a record in accepted-majors/ (eco-system ticket 132) -- 6.0.0 is a major, accepted for ludlow by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-6.0.0.yaml at 323a1b09dc9d); 7.0.0 is a major, accepted for ludlow by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-7.0.0.yaml at 323a1b09dc9d)\n",
+  "rendered_grade": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-source-A-ci-repaired-grade.md"
+}

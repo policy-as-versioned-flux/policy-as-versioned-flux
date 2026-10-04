@@ -1,0 +1,8 @@
+{
+  "observed_date": "2026-10-04",
+  "action": "Normal cut-release.yml dispatch for tuppence v4.0.1 from main",
+  "executed": false,
+  "reason": "The command would cut immutable release v4.0.1, but the transcript does not establish the required fresh Composition B rerender and exact-head review; verifying that main equals the prior atomic-delivery tree is insufficient and could publish an unverified composition.",
+  "remediation": "Fresh genuine-tools rerender and byte verification of the actual merged Composition B checkout, followed by independent exact-head review. Any changed render requires a reviewed signed source change before retrying the normal cut.",
+  "bypass_authorized": false
+}

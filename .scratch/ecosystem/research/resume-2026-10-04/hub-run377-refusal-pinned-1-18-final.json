@@ -1,0 +1,14 @@
+{
+  "head": "bc9601b8cbf6e5febe03511dc8e1e23320c891d1",
+  "argv": [
+    "bash",
+    "/private/tmp/pavf-hub-run377-repair-d72i2rav/hub/verify/refusal-by-another-name/verify-refusal-by-another-name.sh"
+  ],
+  "exit": 0,
+  "binary": "/private/tmp/pavf-kyverno-engines/1.18.2/kyverno",
+  "binary_sha256": "e22e36099762401ad1c82ebe00c0b80aac0317c5e11396d613b407a7668107df",
+  "version": "Version: 1.18.2\nTime: 2026-07-10T01:17:50Z\nGit commit ID: 945ac9ce8546ea6cd51370f24b615148c577da5e\n",
+  "matches_actual_truth_workflow_engine": "1.18.2",
+  "log_sha256": "4393bc55f27365a431b87abaec519ce722a580c37ae9684bf328c84f3b32492d",
+  "actual_scheduled_run_regraded": false
+}

@@ -1,0 +1,4754 @@
+[
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod cage-probe-fallclosed/cage-probe",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "9fb36d26-4446-5356-8d4f-a9f2e0cdd403",
+        "title": "Pod cage-probe-fallclosed/cage-probe",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "0913e1e1-2254-51a1-93f3-7495c5285165"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod cage-probe-fallclosed/cage-probe",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "9fb36d26-4446-5356-8d4f-a9f2e0cdd403",
+        "title": "Pod cage-probe-fallclosed/cage-probe",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "0913e1e1-2254-51a1-93f3-7495c5285165"
+  },
+  {
+    "description": "require-nonroot-7-0-0 pass on Pod cage-probe-fallclosed/cage-probe",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "pass"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=pass"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "9fb36d26-4446-5356-8d4f-a9f2e0cdd403",
+        "title": "Pod cage-probe-fallclosed/cage-probe",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "0913e1e1-2254-51a1-93f3-7495c5285165"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod cage-probe-reference/cage-probe",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "575d76f2-b3b2-5ca1-8bbf-5a8480c29d40",
+        "title": "Pod cage-probe-reference/cage-probe",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "1e3ab4df-2a1e-5d30-bbaa-ce559ca37adb"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod cage-probe-reference/cage-probe",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "575d76f2-b3b2-5ca1-8bbf-5a8480c29d40",
+        "title": "Pod cage-probe-reference/cage-probe",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "1e3ab4df-2a1e-5d30-bbaa-ce559ca37adb"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod cage-probe-reference/cage-probe",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "575d76f2-b3b2-5ca1-8bbf-5a8480c29d40",
+        "title": "Pod cage-probe-reference/cage-probe",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "1e3ab4df-2a1e-5d30-bbaa-ce559ca37adb"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod driftwood/api",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "f5c6844e-1f3e-5a67-a667-03f48b3c5a8b",
+        "title": "Pod driftwood/api",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "78905e95-df90-57d3-896c-2640204754eb"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod driftwood/api",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "f5c6844e-1f3e-5a67-a667-03f48b3c5a8b",
+        "title": "Pod driftwood/api",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "78905e95-df90-57d3-896c-2640204754eb"
+  },
+  {
+    "description": "require-nonroot-7-0-0 pass on Pod driftwood/api",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "pass"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=pass"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "f5c6844e-1f3e-5a67-a667-03f48b3c5a8b",
+        "title": "Pod driftwood/api",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "78905e95-df90-57d3-896c-2640204754eb"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod driftwood/storefront",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "3cbd4d94-b7bf-51b2-aa30-8bbce1da29ed",
+        "title": "Pod driftwood/storefront",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "6a9fe808-22dd-5d6c-bdea-e632cb22f0c9"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod driftwood/storefront",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "3cbd4d94-b7bf-51b2-aa30-8bbce1da29ed",
+        "title": "Pod driftwood/storefront",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "6a9fe808-22dd-5d6c-bdea-e632cb22f0c9"
+  },
+  {
+    "description": "require-nonroot-7-0-0 pass on Pod driftwood/storefront",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "pass"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=pass"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "3cbd4d94-b7bf-51b2-aa30-8bbce1da29ed",
+        "title": "Pod driftwood/storefront",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "6a9fe808-22dd-5d6c-bdea-e632cb22f0c9"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod driftwood/checkout-svc",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "234743ee-f1fa-5aab-aa97-f578a2c9809f",
+        "title": "Pod driftwood/checkout-svc",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "ef72a216-0fe8-528e-b6f7-a0a214f0fad8"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod driftwood/checkout-svc",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "234743ee-f1fa-5aab-aa97-f578a2c9809f",
+        "title": "Pod driftwood/checkout-svc",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "ef72a216-0fe8-528e-b6f7-a0a214f0fad8"
+  },
+  {
+    "description": "require-nonroot-7-0-0 pass on Pod driftwood/checkout-svc",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "pass"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=pass"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "234743ee-f1fa-5aab-aa97-f578a2c9809f",
+        "title": "Pod driftwood/checkout-svc",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "ef72a216-0fe8-528e-b6f7-a0a214f0fad8"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet flux-system/flux-operator-645566467f",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "eefc2813-50a1-5a02-8c48-4d79566c7350",
+        "title": "ReplicaSet flux-system/flux-operator-645566467f",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "cc4081a4-c62b-5b1d-a717-6b745b735dec"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet flux-system/flux-operator-645566467f",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "eefc2813-50a1-5a02-8c48-4d79566c7350",
+        "title": "ReplicaSet flux-system/flux-operator-645566467f",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "cc4081a4-c62b-5b1d-a717-6b745b735dec"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet flux-system/flux-operator-645566467f",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "eefc2813-50a1-5a02-8c48-4d79566c7350",
+        "title": "ReplicaSet flux-system/flux-operator-645566467f",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "cc4081a4-c62b-5b1d-a717-6b745b735dec"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod flux-system/source-controller-7cd45b65cb-nc96z",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "b65b20d9-5e97-5cb2-9613-a2c103c72746",
+        "title": "Pod flux-system/source-controller-7cd45b65cb-nc96z",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a9d0c02d-1d5f-50e7-bb80-297702f16f80"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod flux-system/source-controller-7cd45b65cb-nc96z",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "b65b20d9-5e97-5cb2-9613-a2c103c72746",
+        "title": "Pod flux-system/source-controller-7cd45b65cb-nc96z",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a9d0c02d-1d5f-50e7-bb80-297702f16f80"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod flux-system/source-controller-7cd45b65cb-nc96z",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "b65b20d9-5e97-5cb2-9613-a2c103c72746",
+        "title": "Pod flux-system/source-controller-7cd45b65cb-nc96z",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a9d0c02d-1d5f-50e7-bb80-297702f16f80"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet flux-system/kustomize-controller-6c76f4d57c",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "8cfbe92a-0517-58b7-b3e1-957f9dfa96c6",
+        "title": "ReplicaSet flux-system/kustomize-controller-6c76f4d57c",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "049699de-6bab-5a1f-a5d5-a5be88795b0f"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet flux-system/kustomize-controller-6c76f4d57c",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "8cfbe92a-0517-58b7-b3e1-957f9dfa96c6",
+        "title": "ReplicaSet flux-system/kustomize-controller-6c76f4d57c",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "049699de-6bab-5a1f-a5d5-a5be88795b0f"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet flux-system/kustomize-controller-6c76f4d57c",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "8cfbe92a-0517-58b7-b3e1-957f9dfa96c6",
+        "title": "ReplicaSet flux-system/kustomize-controller-6c76f4d57c",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "049699de-6bab-5a1f-a5d5-a5be88795b0f"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment flux-system/kustomize-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "1ad61b75-d9b5-5c1e-a666-e3ab61eaa86d",
+        "title": "Deployment flux-system/kustomize-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "e6bd6da0-c4e6-5a85-a9be-87832a3af12e"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment flux-system/kustomize-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "1ad61b75-d9b5-5c1e-a666-e3ab61eaa86d",
+        "title": "Deployment flux-system/kustomize-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "e6bd6da0-c4e6-5a85-a9be-87832a3af12e"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment flux-system/kustomize-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "1ad61b75-d9b5-5c1e-a666-e3ab61eaa86d",
+        "title": "Deployment flux-system/kustomize-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "e6bd6da0-c4e6-5a85-a9be-87832a3af12e"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod flux-system/flux-operator-645566467f-cpctm",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "5963f1d1-5432-5381-8921-dfb6f13c359b",
+        "title": "Pod flux-system/flux-operator-645566467f-cpctm",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "deb80d40-8e00-5faa-9453-6a6ef298c330"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod flux-system/flux-operator-645566467f-cpctm",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "5963f1d1-5432-5381-8921-dfb6f13c359b",
+        "title": "Pod flux-system/flux-operator-645566467f-cpctm",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "deb80d40-8e00-5faa-9453-6a6ef298c330"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod flux-system/flux-operator-645566467f-cpctm",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "5963f1d1-5432-5381-8921-dfb6f13c359b",
+        "title": "Pod flux-system/flux-operator-645566467f-cpctm",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "deb80d40-8e00-5faa-9453-6a6ef298c330"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment flux-system/gitsign-verifier",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "687b5f80-6e09-5c3b-ab71-aed60e2d057e",
+        "title": "Deployment flux-system/gitsign-verifier",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "47e4b5af-9298-5349-988a-0db6b66890b1"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment flux-system/gitsign-verifier",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "687b5f80-6e09-5c3b-ab71-aed60e2d057e",
+        "title": "Deployment flux-system/gitsign-verifier",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "47e4b5af-9298-5349-988a-0db6b66890b1"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment flux-system/gitsign-verifier",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "687b5f80-6e09-5c3b-ab71-aed60e2d057e",
+        "title": "Deployment flux-system/gitsign-verifier",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "47e4b5af-9298-5349-988a-0db6b66890b1"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet flux-system/source-controller-7cd45b65cb",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "3069bab2-7b3f-5557-b6bb-bbb965274a2a",
+        "title": "ReplicaSet flux-system/source-controller-7cd45b65cb",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "30a0652a-b7bb-5b09-940c-f9f188084735"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet flux-system/source-controller-7cd45b65cb",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "3069bab2-7b3f-5557-b6bb-bbb965274a2a",
+        "title": "ReplicaSet flux-system/source-controller-7cd45b65cb",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "30a0652a-b7bb-5b09-940c-f9f188084735"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet flux-system/source-controller-7cd45b65cb",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "3069bab2-7b3f-5557-b6bb-bbb965274a2a",
+        "title": "ReplicaSet flux-system/source-controller-7cd45b65cb",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "30a0652a-b7bb-5b09-940c-f9f188084735"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod flux-system/gitsign-verifier-7895cf5948-chc4j",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "c86b792b-0d0e-5dd1-af47-c96623b4f7c1",
+        "title": "Pod flux-system/gitsign-verifier-7895cf5948-chc4j",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "b8592b8b-f83c-5898-a0ef-f8b385dbd677"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod flux-system/gitsign-verifier-7895cf5948-chc4j",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "c86b792b-0d0e-5dd1-af47-c96623b4f7c1",
+        "title": "Pod flux-system/gitsign-verifier-7895cf5948-chc4j",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "b8592b8b-f83c-5898-a0ef-f8b385dbd677"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod flux-system/gitsign-verifier-7895cf5948-chc4j",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "c86b792b-0d0e-5dd1-af47-c96623b4f7c1",
+        "title": "Pod flux-system/gitsign-verifier-7895cf5948-chc4j",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "b8592b8b-f83c-5898-a0ef-f8b385dbd677"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment flux-system/flux-operator",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "ceb34e0a-c6c2-5d3e-a09a-ba8cd0274b20",
+        "title": "Deployment flux-system/flux-operator",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "638be156-650f-56c2-bf29-9e0e2899e635"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment flux-system/flux-operator",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "ceb34e0a-c6c2-5d3e-a09a-ba8cd0274b20",
+        "title": "Deployment flux-system/flux-operator",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "638be156-650f-56c2-bf29-9e0e2899e635"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment flux-system/flux-operator",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "ceb34e0a-c6c2-5d3e-a09a-ba8cd0274b20",
+        "title": "Deployment flux-system/flux-operator",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "638be156-650f-56c2-bf29-9e0e2899e635"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod flux-system/kustomize-controller-6c76f4d57c-s96g6",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "3b6b8ea0-035a-5187-adcd-435cf63ce553",
+        "title": "Pod flux-system/kustomize-controller-6c76f4d57c-s96g6",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "716cd885-4127-5575-baee-15a55dfdc533"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod flux-system/kustomize-controller-6c76f4d57c-s96g6",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "3b6b8ea0-035a-5187-adcd-435cf63ce553",
+        "title": "Pod flux-system/kustomize-controller-6c76f4d57c-s96g6",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "716cd885-4127-5575-baee-15a55dfdc533"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod flux-system/kustomize-controller-6c76f4d57c-s96g6",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "3b6b8ea0-035a-5187-adcd-435cf63ce553",
+        "title": "Pod flux-system/kustomize-controller-6c76f4d57c-s96g6",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "716cd885-4127-5575-baee-15a55dfdc533"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment flux-system/source-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "4d56755c-5d76-50aa-a3e9-d82f5ddd5918",
+        "title": "Deployment flux-system/source-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "7b88e11b-8e72-5856-b88d-025f4dedc68b"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment flux-system/source-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "4d56755c-5d76-50aa-a3e9-d82f5ddd5918",
+        "title": "Deployment flux-system/source-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "7b88e11b-8e72-5856-b88d-025f4dedc68b"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment flux-system/source-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "4d56755c-5d76-50aa-a3e9-d82f5ddd5918",
+        "title": "Deployment flux-system/source-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "7b88e11b-8e72-5856-b88d-025f4dedc68b"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet flux-system/gitsign-verifier-7895cf5948",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "0271f8b8-383c-58d1-a43b-aec1fe1aee7e",
+        "title": "ReplicaSet flux-system/gitsign-verifier-7895cf5948",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "11743216-66b7-511b-af0c-d910cd475699"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet flux-system/gitsign-verifier-7895cf5948",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "0271f8b8-383c-58d1-a43b-aec1fe1aee7e",
+        "title": "ReplicaSet flux-system/gitsign-verifier-7895cf5948",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "11743216-66b7-511b-af0c-d910cd475699"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet flux-system/gitsign-verifier-7895cf5948",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "0271f8b8-383c-58d1-a43b-aec1fe1aee7e",
+        "title": "ReplicaSet flux-system/gitsign-verifier-7895cf5948",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "11743216-66b7-511b-af0c-d910cd475699"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on DaemonSet kube-system/kube-proxy",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "12c75a53-02e3-5143-95a1-1f54e104138c",
+        "title": "DaemonSet kube-system/kube-proxy",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "7080e370-671e-5f45-b296-818347e50ecf"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on DaemonSet kube-system/kube-proxy",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "12c75a53-02e3-5143-95a1-1f54e104138c",
+        "title": "DaemonSet kube-system/kube-proxy",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "7080e370-671e-5f45-b296-818347e50ecf"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on DaemonSet kube-system/kube-proxy",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "12c75a53-02e3-5143-95a1-1f54e104138c",
+        "title": "DaemonSet kube-system/kube-proxy",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "7080e370-671e-5f45-b296-818347e50ecf"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kube-system/kube-scheduler-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "952ea4f0-5789-5e4f-9712-f33b718ee732",
+        "title": "Pod kube-system/kube-scheduler-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a1e8fb4f-c182-583a-9b70-508511a773bb"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kube-system/kube-scheduler-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "952ea4f0-5789-5e4f-9712-f33b718ee732",
+        "title": "Pod kube-system/kube-scheduler-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a1e8fb4f-c182-583a-9b70-508511a773bb"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kube-system/kube-scheduler-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "952ea4f0-5789-5e4f-9712-f33b718ee732",
+        "title": "Pod kube-system/kube-scheduler-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a1e8fb4f-c182-583a-9b70-508511a773bb"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kube-system/kindnet-qn6xl",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "92cb134e-4f99-559b-93c2-b3e41f6354ae",
+        "title": "Pod kube-system/kindnet-qn6xl",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "b25f1b7c-c3ca-5c12-8bf3-c97c1742c368"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kube-system/kindnet-qn6xl",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "92cb134e-4f99-559b-93c2-b3e41f6354ae",
+        "title": "Pod kube-system/kindnet-qn6xl",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "b25f1b7c-c3ca-5c12-8bf3-c97c1742c368"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kube-system/kindnet-qn6xl",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "92cb134e-4f99-559b-93c2-b3e41f6354ae",
+        "title": "Pod kube-system/kindnet-qn6xl",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "b25f1b7c-c3ca-5c12-8bf3-c97c1742c368"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet kube-system/coredns-589f44dc88",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "78e86d9b-aad1-5906-8b0d-d6f9aa07f075",
+        "title": "ReplicaSet kube-system/coredns-589f44dc88",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "e5b50a1d-8088-59ca-93cb-b64d038bc38c"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet kube-system/coredns-589f44dc88",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "78e86d9b-aad1-5906-8b0d-d6f9aa07f075",
+        "title": "ReplicaSet kube-system/coredns-589f44dc88",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "e5b50a1d-8088-59ca-93cb-b64d038bc38c"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet kube-system/coredns-589f44dc88",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "78e86d9b-aad1-5906-8b0d-d6f9aa07f075",
+        "title": "ReplicaSet kube-system/coredns-589f44dc88",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "e5b50a1d-8088-59ca-93cb-b64d038bc38c"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment kube-system/coredns",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "1b0c78c7-478f-5ff0-8831-2840fce1c1bd",
+        "title": "Deployment kube-system/coredns",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a9922568-874d-504c-a58e-bdf4dbf70b2b"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment kube-system/coredns",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "1b0c78c7-478f-5ff0-8831-2840fce1c1bd",
+        "title": "Deployment kube-system/coredns",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a9922568-874d-504c-a58e-bdf4dbf70b2b"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment kube-system/coredns",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "1b0c78c7-478f-5ff0-8831-2840fce1c1bd",
+        "title": "Deployment kube-system/coredns",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a9922568-874d-504c-a58e-bdf4dbf70b2b"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on DaemonSet kube-system/kindnet",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "8c068d48-071b-5cd9-a609-92f96743d44d",
+        "title": "DaemonSet kube-system/kindnet",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "bf10cda3-590a-5dc8-afff-534b1015a4b1"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on DaemonSet kube-system/kindnet",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "8c068d48-071b-5cd9-a609-92f96743d44d",
+        "title": "DaemonSet kube-system/kindnet",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "bf10cda3-590a-5dc8-afff-534b1015a4b1"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on DaemonSet kube-system/kindnet",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "8c068d48-071b-5cd9-a609-92f96743d44d",
+        "title": "DaemonSet kube-system/kindnet",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "bf10cda3-590a-5dc8-afff-534b1015a4b1"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kube-system/kube-controller-manager-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "b7959aee-dd12-5ff7-a867-59098e891cba",
+        "title": "Pod kube-system/kube-controller-manager-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a5d4ee9a-438d-59f2-9d63-81d958f4cde7"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kube-system/kube-controller-manager-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "b7959aee-dd12-5ff7-a867-59098e891cba",
+        "title": "Pod kube-system/kube-controller-manager-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a5d4ee9a-438d-59f2-9d63-81d958f4cde7"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kube-system/kube-controller-manager-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "b7959aee-dd12-5ff7-a867-59098e891cba",
+        "title": "Pod kube-system/kube-controller-manager-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "a5d4ee9a-438d-59f2-9d63-81d958f4cde7"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kube-system/coredns-589f44dc88-r2shl",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "43a020d8-5aa8-5c2f-9805-0f3a3c84adda",
+        "title": "Pod kube-system/coredns-589f44dc88-r2shl",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "4428b57a-f39d-5b1e-b8df-e6db581f5897"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kube-system/coredns-589f44dc88-r2shl",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "43a020d8-5aa8-5c2f-9805-0f3a3c84adda",
+        "title": "Pod kube-system/coredns-589f44dc88-r2shl",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "4428b57a-f39d-5b1e-b8df-e6db581f5897"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kube-system/coredns-589f44dc88-r2shl",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "43a020d8-5aa8-5c2f-9805-0f3a3c84adda",
+        "title": "Pod kube-system/coredns-589f44dc88-r2shl",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "4428b57a-f39d-5b1e-b8df-e6db581f5897"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kube-system/coredns-589f44dc88-w5vn5",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "647484d2-e765-5d63-9c70-55a6b65cfa55",
+        "title": "Pod kube-system/coredns-589f44dc88-w5vn5",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "05d6afca-727f-55f7-921c-63f64f981c1c"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kube-system/coredns-589f44dc88-w5vn5",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "647484d2-e765-5d63-9c70-55a6b65cfa55",
+        "title": "Pod kube-system/coredns-589f44dc88-w5vn5",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "05d6afca-727f-55f7-921c-63f64f981c1c"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kube-system/coredns-589f44dc88-w5vn5",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "647484d2-e765-5d63-9c70-55a6b65cfa55",
+        "title": "Pod kube-system/coredns-589f44dc88-w5vn5",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "05d6afca-727f-55f7-921c-63f64f981c1c"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kube-system/kube-proxy-ffd8k",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "fd3556b1-41ad-53ea-83b2-86da250924f7",
+        "title": "Pod kube-system/kube-proxy-ffd8k",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "fcb92726-bc30-5e46-8256-2335e379fccb"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kube-system/kube-proxy-ffd8k",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "fd3556b1-41ad-53ea-83b2-86da250924f7",
+        "title": "Pod kube-system/kube-proxy-ffd8k",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "fcb92726-bc30-5e46-8256-2335e379fccb"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kube-system/kube-proxy-ffd8k",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "fd3556b1-41ad-53ea-83b2-86da250924f7",
+        "title": "Pod kube-system/kube-proxy-ffd8k",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "fcb92726-bc30-5e46-8256-2335e379fccb"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kube-system/etcd-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "db80b5b8-7645-5259-8f91-932f71f5bd58",
+        "title": "Pod kube-system/etcd-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "07808c44-54e8-5924-bfc3-cf670b719eb1"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kube-system/etcd-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "db80b5b8-7645-5259-8f91-932f71f5bd58",
+        "title": "Pod kube-system/etcd-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "07808c44-54e8-5924-bfc3-cf670b719eb1"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kube-system/etcd-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "db80b5b8-7645-5259-8f91-932f71f5bd58",
+        "title": "Pod kube-system/etcd-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "07808c44-54e8-5924-bfc3-cf670b719eb1"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kube-system/kube-apiserver-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "447afdeb-ac97-5712-876b-539fafa40792",
+        "title": "Pod kube-system/kube-apiserver-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "0df9de61-d87d-566c-9237-b601a7e74444"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kube-system/kube-apiserver-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "447afdeb-ac97-5712-876b-539fafa40792",
+        "title": "Pod kube-system/kube-apiserver-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "0df9de61-d87d-566c-9237-b601a7e74444"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kube-system/kube-apiserver-dsample-37201959785-control-plane",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "447afdeb-ac97-5712-876b-539fafa40792",
+        "title": "Pod kube-system/kube-apiserver-dsample-37201959785-control-plane",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "0df9de61-d87d-566c-9237-b601a7e74444"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet kyverno/kyverno-admission-controller-656b594944",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "0f1731d5-9c46-520c-bfc3-207afc09bfd8",
+        "title": "ReplicaSet kyverno/kyverno-admission-controller-656b594944",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "b012f40a-0351-504b-8299-beef606aa5d9"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet kyverno/kyverno-admission-controller-656b594944",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "0f1731d5-9c46-520c-bfc3-207afc09bfd8",
+        "title": "ReplicaSet kyverno/kyverno-admission-controller-656b594944",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "b012f40a-0351-504b-8299-beef606aa5d9"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet kyverno/kyverno-admission-controller-656b594944",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "0f1731d5-9c46-520c-bfc3-207afc09bfd8",
+        "title": "ReplicaSet kyverno/kyverno-admission-controller-656b594944",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "b012f40a-0351-504b-8299-beef606aa5d9"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet kyverno/kyverno-cleanup-controller-657f9dd6d5",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "abf467c1-9f8b-5235-8fad-90c18f095fd5",
+        "title": "ReplicaSet kyverno/kyverno-cleanup-controller-657f9dd6d5",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "9a50e927-65f7-5ffe-9cba-72dd54115cf4"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet kyverno/kyverno-cleanup-controller-657f9dd6d5",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "abf467c1-9f8b-5235-8fad-90c18f095fd5",
+        "title": "ReplicaSet kyverno/kyverno-cleanup-controller-657f9dd6d5",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "9a50e927-65f7-5ffe-9cba-72dd54115cf4"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet kyverno/kyverno-cleanup-controller-657f9dd6d5",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "abf467c1-9f8b-5235-8fad-90c18f095fd5",
+        "title": "ReplicaSet kyverno/kyverno-cleanup-controller-657f9dd6d5",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "9a50e927-65f7-5ffe-9cba-72dd54115cf4"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment kyverno/kyverno-admission-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "d09f02cd-f266-5295-81b0-1627e2c41f94",
+        "title": "Deployment kyverno/kyverno-admission-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "4ccefb4f-7d72-55d0-950c-22649a08f550"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment kyverno/kyverno-admission-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "d09f02cd-f266-5295-81b0-1627e2c41f94",
+        "title": "Deployment kyverno/kyverno-admission-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "4ccefb4f-7d72-55d0-950c-22649a08f550"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment kyverno/kyverno-admission-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "d09f02cd-f266-5295-81b0-1627e2c41f94",
+        "title": "Deployment kyverno/kyverno-admission-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "4ccefb4f-7d72-55d0-950c-22649a08f550"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kyverno/kyverno-admission-controller-656b594944-6t9zx",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "a23a39f4-0569-5545-9545-1eb08e39600f",
+        "title": "Pod kyverno/kyverno-admission-controller-656b594944-6t9zx",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "3efa9f6b-a3ce-5966-8a8b-49cb501fdeea"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kyverno/kyverno-admission-controller-656b594944-6t9zx",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "a23a39f4-0569-5545-9545-1eb08e39600f",
+        "title": "Pod kyverno/kyverno-admission-controller-656b594944-6t9zx",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "3efa9f6b-a3ce-5966-8a8b-49cb501fdeea"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kyverno/kyverno-admission-controller-656b594944-6t9zx",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "a23a39f4-0569-5545-9545-1eb08e39600f",
+        "title": "Pod kyverno/kyverno-admission-controller-656b594944-6t9zx",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "3efa9f6b-a3ce-5966-8a8b-49cb501fdeea"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kyverno/kyverno-background-controller-59bd999b84-d5jxs",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "9e3d127a-1167-58fb-b034-31c55852cc69",
+        "title": "Pod kyverno/kyverno-background-controller-59bd999b84-d5jxs",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "92c01a32-59ed-5b1f-9bbc-58ec5e0b7b53"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kyverno/kyverno-background-controller-59bd999b84-d5jxs",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "9e3d127a-1167-58fb-b034-31c55852cc69",
+        "title": "Pod kyverno/kyverno-background-controller-59bd999b84-d5jxs",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "92c01a32-59ed-5b1f-9bbc-58ec5e0b7b53"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kyverno/kyverno-background-controller-59bd999b84-d5jxs",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "9e3d127a-1167-58fb-b034-31c55852cc69",
+        "title": "Pod kyverno/kyverno-background-controller-59bd999b84-d5jxs",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "92c01a32-59ed-5b1f-9bbc-58ec5e0b7b53"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kyverno/kyverno-cleanup-controller-657f9dd6d5-z6cp9",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "cc3967ee-13dd-5d04-ad19-b57ef8b17479",
+        "title": "Pod kyverno/kyverno-cleanup-controller-657f9dd6d5-z6cp9",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "c6b3a85a-4828-59b8-9e53-252c127ad896"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kyverno/kyverno-cleanup-controller-657f9dd6d5-z6cp9",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "cc3967ee-13dd-5d04-ad19-b57ef8b17479",
+        "title": "Pod kyverno/kyverno-cleanup-controller-657f9dd6d5-z6cp9",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "c6b3a85a-4828-59b8-9e53-252c127ad896"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kyverno/kyverno-cleanup-controller-657f9dd6d5-z6cp9",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "cc3967ee-13dd-5d04-ad19-b57ef8b17479",
+        "title": "Pod kyverno/kyverno-cleanup-controller-657f9dd6d5-z6cp9",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "c6b3a85a-4828-59b8-9e53-252c127ad896"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment kyverno/kyverno-background-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "1d2dbd88-8a39-572c-8016-1df77c1d816f",
+        "title": "Deployment kyverno/kyverno-background-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "82739687-3d8a-5731-98ad-f23c6f0b2c9e"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment kyverno/kyverno-background-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "1d2dbd88-8a39-572c-8016-1df77c1d816f",
+        "title": "Deployment kyverno/kyverno-background-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "82739687-3d8a-5731-98ad-f23c6f0b2c9e"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment kyverno/kyverno-background-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "1d2dbd88-8a39-572c-8016-1df77c1d816f",
+        "title": "Deployment kyverno/kyverno-background-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "82739687-3d8a-5731-98ad-f23c6f0b2c9e"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment kyverno/kyverno-cleanup-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "f0e4aa30-4782-576c-ba19-9c0c43b42ed9",
+        "title": "Deployment kyverno/kyverno-cleanup-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "d9af7039-ff6e-5a56-a37a-32c96cebcb8f"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment kyverno/kyverno-cleanup-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "f0e4aa30-4782-576c-ba19-9c0c43b42ed9",
+        "title": "Deployment kyverno/kyverno-cleanup-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "d9af7039-ff6e-5a56-a37a-32c96cebcb8f"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment kyverno/kyverno-cleanup-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "f0e4aa30-4782-576c-ba19-9c0c43b42ed9",
+        "title": "Deployment kyverno/kyverno-cleanup-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "d9af7039-ff6e-5a56-a37a-32c96cebcb8f"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet kyverno/kyverno-background-controller-59bd999b84",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "4f57e11e-4a1e-5961-ad72-ea21bf61a3e0",
+        "title": "ReplicaSet kyverno/kyverno-background-controller-59bd999b84",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "912a7811-f49c-56b1-88ab-d4bf879ec5df"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet kyverno/kyverno-background-controller-59bd999b84",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "4f57e11e-4a1e-5961-ad72-ea21bf61a3e0",
+        "title": "ReplicaSet kyverno/kyverno-background-controller-59bd999b84",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "912a7811-f49c-56b1-88ab-d4bf879ec5df"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet kyverno/kyverno-background-controller-59bd999b84",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "4f57e11e-4a1e-5961-ad72-ea21bf61a3e0",
+        "title": "ReplicaSet kyverno/kyverno-background-controller-59bd999b84",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "912a7811-f49c-56b1-88ab-d4bf879ec5df"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod kyverno/kyverno-reports-controller-746c796cf8-c5dvz",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "4f40ae0d-087c-5429-b01d-f46e768e2804",
+        "title": "Pod kyverno/kyverno-reports-controller-746c796cf8-c5dvz",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "18a93aaa-9c84-5d4d-9fef-f9a2e71ba602"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod kyverno/kyverno-reports-controller-746c796cf8-c5dvz",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "4f40ae0d-087c-5429-b01d-f46e768e2804",
+        "title": "Pod kyverno/kyverno-reports-controller-746c796cf8-c5dvz",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "18a93aaa-9c84-5d4d-9fef-f9a2e71ba602"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod kyverno/kyverno-reports-controller-746c796cf8-c5dvz",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "4f40ae0d-087c-5429-b01d-f46e768e2804",
+        "title": "Pod kyverno/kyverno-reports-controller-746c796cf8-c5dvz",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "18a93aaa-9c84-5d4d-9fef-f9a2e71ba602"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment kyverno/kyverno-reports-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "6413768c-a874-5c61-b9f6-1c904805b251",
+        "title": "Deployment kyverno/kyverno-reports-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "d171a6fd-f0ad-5b32-90f0-1077afc3ec29"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment kyverno/kyverno-reports-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "6413768c-a874-5c61-b9f6-1c904805b251",
+        "title": "Deployment kyverno/kyverno-reports-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "d171a6fd-f0ad-5b32-90f0-1077afc3ec29"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment kyverno/kyverno-reports-controller",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "6413768c-a874-5c61-b9f6-1c904805b251",
+        "title": "Deployment kyverno/kyverno-reports-controller",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "d171a6fd-f0ad-5b32-90f0-1077afc3ec29"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet kyverno/kyverno-reports-controller-746c796cf8",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "72f4f3de-0734-538c-81c8-c1cf42859118",
+        "title": "ReplicaSet kyverno/kyverno-reports-controller-746c796cf8",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "c1b2caa0-5350-5b38-b9c9-d1efc948b291"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet kyverno/kyverno-reports-controller-746c796cf8",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "72f4f3de-0734-538c-81c8-c1cf42859118",
+        "title": "ReplicaSet kyverno/kyverno-reports-controller-746c796cf8",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "c1b2caa0-5350-5b38-b9c9-d1efc948b291"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet kyverno/kyverno-reports-controller-746c796cf8",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "72f4f3de-0734-538c-81c8-c1cf42859118",
+        "title": "ReplicaSet kyverno/kyverno-reports-controller-746c796cf8",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "c1b2caa0-5350-5b38-b9c9-d1efc948b291"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on ReplicaSet local-path-storage/local-path-provisioner-855c7b7774",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "25b462be-494e-53b7-b057-36d88ff28079",
+        "title": "ReplicaSet local-path-storage/local-path-provisioner-855c7b7774",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "779616eb-b29d-54de-8672-c9de509d83f2"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on ReplicaSet local-path-storage/local-path-provisioner-855c7b7774",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "25b462be-494e-53b7-b057-36d88ff28079",
+        "title": "ReplicaSet local-path-storage/local-path-provisioner-855c7b7774",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "779616eb-b29d-54de-8672-c9de509d83f2"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on ReplicaSet local-path-storage/local-path-provisioner-855c7b7774",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "25b462be-494e-53b7-b057-36d88ff28079",
+        "title": "ReplicaSet local-path-storage/local-path-provisioner-855c7b7774",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "779616eb-b29d-54de-8672-c9de509d83f2"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Deployment local-path-storage/local-path-provisioner",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "09328347-4f3c-5ce8-8f1a-58040d3373d8",
+        "title": "Deployment local-path-storage/local-path-provisioner",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "33dc5516-4d5e-5e6d-a116-790650abc493"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Deployment local-path-storage/local-path-provisioner",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "09328347-4f3c-5ce8-8f1a-58040d3373d8",
+        "title": "Deployment local-path-storage/local-path-provisioner",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "33dc5516-4d5e-5e6d-a116-790650abc493"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Deployment local-path-storage/local-path-provisioner",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "09328347-4f3c-5ce8-8f1a-58040d3373d8",
+        "title": "Deployment local-path-storage/local-path-provisioner",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "33dc5516-4d5e-5e6d-a116-790650abc493"
+  },
+  {
+    "description": "require-nonroot-5-0-0 skip on Pod local-path-storage/local-path-provisioner-855c7b7774-hkbh9",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-5-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "5-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-5-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "e72ec583-ecd4-5545-a1ee-ba8d68c91371",
+        "title": "Pod local-path-storage/local-path-provisioner-855c7b7774-hkbh9",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "dc6028a6-211e-5b0c-ae13-24705ed9d44b"
+  },
+  {
+    "description": "require-nonroot-6-0-0 skip on Pod local-path-storage/local-path-provisioner-855c7b7774-hkbh9",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-6-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "6-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-6-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "e72ec583-ecd4-5545-a1ee-ba8d68c91371",
+        "title": "Pod local-path-storage/local-path-provisioner-855c7b7774-hkbh9",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "dc6028a6-211e-5b0c-ae13-24705ed9d44b"
+  },
+  {
+    "description": "require-nonroot-7-0-0 skip on Pod local-path-storage/local-path-provisioner-855c7b7774-hkbh9",
+    "methods": [
+      "TEST-AUTOMATED"
+    ],
+    "props": [
+      {
+        "name": "policy",
+        "value": "require-nonroot-7-0-0"
+      },
+      {
+        "name": "policy-version",
+        "value": "7-0-0"
+      },
+      {
+        "name": "result",
+        "value": "skip"
+      }
+    ],
+    "relevant-evidence": [
+      {
+        "description": "Kyverno PolicyReport result: policy=require-nonroot-7-0-0 result=skip"
+      }
+    ],
+    "subjects": [
+      {
+        "subject-uuid": "e72ec583-ecd4-5545-a1ee-ba8d68c91371",
+        "title": "Pod local-path-storage/local-path-provisioner-855c7b7774-hkbh9",
+        "type": "resource"
+      }
+    ],
+    "types": [
+      "control-objective"
+    ],
+    "uuid": "dc6028a6-211e-5b0c-ae13-24705ed9d44b"
+  }
+]

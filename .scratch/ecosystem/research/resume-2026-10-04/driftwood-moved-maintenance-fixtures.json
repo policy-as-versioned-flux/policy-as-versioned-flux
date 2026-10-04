@@ -1,0 +1,23 @@
+{
+  "scope": "Disposable future-major and refused-declaration fixtures; not a proposed feed release",
+  "actual_hub_commit": "5bc47331a536476f3580542be794908f5053f816",
+  "cases": {
+    "future-major": {
+      "exit": 3,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-moved-maintenance-future-major.log",
+      "sha256": "38c98e24f9429a8b2113ba86edbecba5e32caf2666097cac68e9c4db78deded3"
+    },
+    "duplicate-declaration": {
+      "exit": 1,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-moved-maintenance-duplicate-declaration.log",
+      "sha256": "46252b2f83723f4fdf68f2fef1ee98a4e3ecea476a7c8eb1d8d9fe201d29b857"
+    },
+    "missing-current": {
+      "exit": 1,
+      "log": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-moved-maintenance-missing-current.log",
+      "sha256": "ce837715a18bf2a6310faa5c2e275022bcbd04c72a75573589afdd7f46ee271a"
+    }
+  },
+  "source_mutated": false,
+  "publications": false
+}
