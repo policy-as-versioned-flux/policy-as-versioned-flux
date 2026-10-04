@@ -1,0 +1,152 @@
+{
+  "status": "published_and_verified",
+  "verified_at": "2026-10-04T07:18:31.857564+00:00",
+  "approval": "Explicit user approval on 2026-10-04 for source merge and reviewed signed-release sequence; Oct3 stops remain historical.",
+  "repository": "policy-as-versioned-feeds/feeds",
+  "merge": {
+    "pr": "https://github.com/policy-as-versioned-feeds/feeds/pull/10",
+    "head": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+    "merge_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "merged_at": "2026-10-03T23:14:35Z",
+    "merged_by": "pavc-other-hand[bot]",
+    "main_after": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "tree_matches_reviewed_head": true,
+    "tree": "e70d9c00caea6313cc0b3c4f65ee0205fc42c709",
+    "parents": [
+      "ff3ac9ab00bdc73e1bbf83cabf91c767d35b8e88",
+      "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+    ]
+  },
+  "releases": {
+    "cve/v3.0.0": {
+      "tag_object": "647f4961eb02d0858092ee6f91a43cb1657bdd97",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "published_at": "2026-10-04T02:08:11Z",
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/releases/tag/cve/v3.0.0",
+      "cut_run": {
+        "id": 37161227853,
+        "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161227853",
+        "conclusion": "success"
+      },
+      "verify_publish_run": {
+        "id": 37170113406,
+        "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37170113406",
+        "ref": "main",
+        "conclusion": "success",
+        "source_checkout_equals_tag_commit": true
+      },
+      "signature": {
+        "git": true,
+        "rekor": true,
+        "certificate_claims": true,
+        "identity": "https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main",
+        "issuer": "https://token.actions.githubusercontent.com",
+        "verification_exit": 0,
+        "rekor_mode": "offline"
+      },
+      "verification_steps": {
+        "Set up job": "success",
+        "Run actions/checkout@v4": "success",
+        "platform is at the {tag, commit} pair this workflow pins": "success",
+        "install pinned gitsign (binary + checksum, no marketplace action)": "success",
+        "offline verify (release gate -- must be a real pass, not a skip)": "success",
+        "offline verify -- market-moves and news": "success",
+        "gitsign verify-tag, identity-pinned, offline Rekor bundle": "success",
+        "tag still resolves to the commit this run was triggered from": "skipped",
+        "publish GitHub Release recording the resolved SHA": "success",
+        "Post Run actions/checkout@v4": "success",
+        "Complete job": "success"
+      }
+    },
+    "fx/v1.1.0": {
+      "tag_object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "published_at": "2026-10-04T04:38:38Z",
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/releases/tag/fx/v1.1.0",
+      "cut_run": {
+        "id": 37161252190,
+        "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161252190",
+        "conclusion": "success"
+      },
+      "verify_publish_run": {
+        "id": 37177589644,
+        "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37177589644",
+        "ref": "main",
+        "conclusion": "success",
+        "source_checkout_equals_tag_commit": true
+      },
+      "signature": {
+        "git": true,
+        "rekor": true,
+        "certificate_claims": true,
+        "identity": "https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main",
+        "issuer": "https://token.actions.githubusercontent.com",
+        "verification_exit": 0,
+        "rekor_mode": "offline"
+      },
+      "verification_steps": {
+        "Set up job": "success",
+        "Run actions/checkout@v4": "success",
+        "platform is at the {tag, commit} pair this workflow pins": "success",
+        "install pinned gitsign (binary + checksum, no marketplace action)": "success",
+        "offline verify (release gate -- must be a real pass, not a skip)": "success",
+        "offline verify -- market-moves and news": "success",
+        "gitsign verify-tag, identity-pinned, offline Rekor bundle": "success",
+        "tag still resolves to the commit this run was triggered from": "skipped",
+        "publish GitHub Release recording the resolved SHA": "success",
+        "Post Run actions/checkout@v4": "success",
+        "Complete job": "success"
+      }
+    },
+    "threat-register/v4.0.0": {
+      "tag_object": "57cfe4af7aa85301e27dc720f0227834bfd0574f",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+      "published_at": "2026-10-04T07:00:34Z",
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/releases/tag/threat-register/v4.0.0",
+      "cut_run": {
+        "id": 37161274961,
+        "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37161274961",
+        "conclusion": "success"
+      },
+      "verify_publish_run": {
+        "id": 37184479972,
+        "url": "https://github.com/policy-as-versioned-feeds/feeds/actions/runs/37184479972",
+        "ref": "threat-register/v4.0.0",
+        "conclusion": "success",
+        "source_checkout_equals_tag_commit": true
+      },
+      "signature": {
+        "git": true,
+        "rekor": true,
+        "certificate_claims": true,
+        "identity": "https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main",
+        "issuer": "https://token.actions.githubusercontent.com",
+        "verification_exit": 0,
+        "rekor_mode": "offline"
+      },
+      "verification_steps": {
+        "Set up job": "success",
+        "Run actions/checkout@v4": "success",
+        "platform is at the {tag, commit} pair this workflow pins": "success",
+        "install pinned gitsign (binary + checksum, no marketplace action)": "success",
+        "offline verify (release gate -- must be a real pass, not a skip)": "success",
+        "offline verify -- market-moves and news": "success",
+        "gitsign verify-tag, identity-pinned, offline Rekor bundle": "success",
+        "tag still resolves to the commit this run was triggered from": "skipped",
+        "publish GitHub Release recording the resolved SHA": "success",
+        "Post Run actions/checkout@v4": "success",
+        "Complete job": "success"
+      }
+    }
+  },
+  "owner_source_changed": false,
+  "delivery_clone_source_head": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+  "verification_identity": "https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main",
+  "verification_issuer": "https://token.actions.githubusercontent.com",
+  "transport_reset": {
+    "affected_tag": "fx/v1.1.0",
+    "accepted_actual_run": 37177589644,
+    "duplicate_dispatch": false
+  },
+  "scope_remaining": "No outstanding feed publication action. Adopter adoption and platform publication are separately owned."
+}

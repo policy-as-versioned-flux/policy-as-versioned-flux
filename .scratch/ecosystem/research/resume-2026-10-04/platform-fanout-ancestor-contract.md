@@ -1,0 +1,13 @@
+# Platform live fanout ancestor-pin contract — 2026-10-04
+
+The A/B inequality does not itself break the current platform fanout. `distribution/versions.yaml:164` emits both tagB and commitA, with no `spec.verify` and no gitsign annotations on the internal policy GitRepositories. Flux selects explicit commitA ahead of the tag; it does not demand equality between those fields. This matches the repository’s recorded live source-controller1.9.3 experiment: the ancestor pair without verification was Ready atA (`distribution/verify/PRECONDITION-h6-12.md:58`). [Official Flux ref contract](https://fluxcd.io/flux/components/source/gitrepositories/#commit-example).
+
+Adding `verify.mode=Tag` would be a different contract. The recorded experiment with the same ancestor pair and Tag verification stalled with InvalidVerificationMode (`PRECONDITION-h6-12.md:45`); the current fanout has no such block. No new live Ready observation was performed by this reviewer.
+
+The own gitsign controller does not bind this pair at runtime. Its watcher selects only objects with identity+issuer annotations (`identity/gitsign-verifier/verify_gitsign.py:440`), so these internal unannotated sources are not watched. `reconcile_one:365` verifies the declared ref.tag and never compares ref.commit. Its README138 explicitly says committed sources must stay unset for signature/artifact binding. The experiment’s decision84–88 already declares no boundary verification for internal ancestor-pinned fanout sources.
+
+An independent offline call of the unchanged actual `reconcile_one` verified both genuine6/7 tag objects with their actual A/B pairs and shipped60-second certificate-timing declaration. Only fetching was replaced with the already-authentic local checkout; Kubernetes writes were captured in memory. Both returnedTrue for the tag signature/main identity/issuer. This proves acceptance of the actual tags by the existing own verifier, not artifact binding or a live controller result. That controller’s documented Rekor limitation remains; genuine release-workflow Rekor proofs are recorded separately.
+
+For authentic6 and7, B’s direct parent isA and the corresponding policy subtree identifiers are byte-equal acrossA/B. Those release-side facts validate the intended delivered policy content and the deliberate metadata gap. They do not turn the internal leaf into a runtime verified-tag source. [Exact proof](platform-fanout-ancestor-contract.json).
+
+No frozen files, source, real Git index, cluster or external service were mutated. Preserve the current A metadata; do not replace it withB merely to enforce equality. Record the existing boundary-verification ceiling separately rather than claiming a live acceptance observation.

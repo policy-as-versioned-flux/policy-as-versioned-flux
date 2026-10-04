@@ -1,0 +1,20 @@
+{
+  "scope": "explicit owner authorization after automatic publication review stops",
+  "received_utc": "2026-10-03T23:14:30.139744+00:00",
+  "user_words": "approve",
+  "answered_question": "Approve merging platform PR49 and feeds PR10, then running the reviewed signed-release sequence",
+  "approved_heads": {
+    "platform": "e18d0e2faca3b8ae5c1c4c8a03a9560008a42b5e",
+    "feeds": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+  },
+  "sequence": [
+    "policy/v6.0.0",
+    "policy/v7.0.0",
+    "platform tools v5.0.0",
+    "cve/v3.0.0",
+    "fx/v1.1.0",
+    "threat-register/v4.0.0"
+  ],
+  "earlier_adopter_rollout_delegation_persists": true,
+  "reference": ".scratch/ecosystem/research/resume-2026-10-03/publication-approval-scope.md"
+}

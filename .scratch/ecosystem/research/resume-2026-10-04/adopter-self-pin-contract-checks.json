@@ -1,0 +1,93 @@
+{
+  "checked_at": "2026-10-04T08:07:17.427970+00:00",
+  "scope": "Read-only in-memory source identity probe; no tag or source mutation",
+  "adopters": {
+    "driftwood": {
+      "baseline_versions": [
+        "5.0.0"
+      ],
+      "prepared_versions": [
+        "5.0.0",
+        "6.0.0",
+        "7.0.0"
+      ],
+      "added": [
+        "6.0.0",
+        "7.0.0"
+      ],
+      "retired": [],
+      "self_pin_replay": {
+        "gitops/flux-system/gotk-sync.yaml": {
+          "source_identity_changes": true,
+          "old_history_replay_refuses": "comparison history does not match current source inputs"
+        },
+        "inventory/PROVENANCE.json": {
+          "source_identity_changes": true,
+          "old_history_replay_refuses": "comparison history does not match current source inputs"
+        },
+        "gitops/composed/composed-set.yaml": {
+          "source_identity_changes": true,
+          "old_history_replay_refuses": "comparison history does not match current source inputs"
+        }
+      }
+    },
+    "tuppence": {
+      "baseline_versions": [
+        "5.0.0"
+      ],
+      "prepared_versions": [
+        "5.0.0",
+        "6.0.0",
+        "7.0.0"
+      ],
+      "added": [
+        "6.0.0",
+        "7.0.0"
+      ],
+      "retired": [],
+      "self_pin_replay": {
+        "gitops/flux-system/gotk-sync.yaml": {
+          "source_identity_changes": true,
+          "old_history_replay_refuses": "comparison history does not match current source inputs"
+        },
+        "inventory/PROVENANCE.json": {
+          "source_identity_changes": true,
+          "old_history_replay_refuses": "comparison history does not match current source inputs"
+        },
+        "gitops/composed/composed-set.yaml": {
+          "source_identity_changes": true,
+          "old_history_replay_refuses": "comparison history does not match current source inputs"
+        }
+      }
+    },
+    "ludlow": {
+      "baseline_versions": [
+        "5.0.0"
+      ],
+      "prepared_versions": [
+        "5.0.0",
+        "6.0.0",
+        "7.0.0"
+      ],
+      "added": [
+        "6.0.0",
+        "7.0.0"
+      ],
+      "retired": [],
+      "self_pin_replay": {
+        "gitops/flux-system/gotk-sync.yaml": {
+          "source_identity_changes": true,
+          "old_history_replay_refuses": "comparison history does not match current source inputs"
+        },
+        "inventory/PROVENANCE.json": {
+          "source_identity_changes": true,
+          "old_history_replay_refuses": "comparison history does not match current source inputs"
+        },
+        "gitops/composed/composed-set.yaml": {
+          "source_identity_changes": true,
+          "old_history_replay_refuses": "comparison history does not match current source inputs"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,500 @@
+cut	UNKNOWN STEP	﻿2026-10-04T03:19:07.1984498Z Current runner version: '2.337.0'
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2000342Z ##[group]Runner Image Provisioner
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2000880Z Hosted Compute Agent
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2001247Z Version: 20260901.588
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2001657Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2002077Z Build Date: 2026-09-01T19:56:44Z
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2002497Z Worker ID: {48b17008-8d7a-4a5b-a017-e9b01a5c55de}
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2002909Z Azure Region: centralus
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2003278Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2004083Z ##[group]Operating System
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2004432Z Ubuntu
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2004993Z 24.04.5
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2005335Z LTS
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2005634Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2005986Z ##[group]Runner Image
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2006328Z Image: ubuntu-24.04
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2006648Z Version: 20260927.320.1
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2007450Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2008477Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2009014Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2009719Z ##[group]GITHUB_TOKEN Permissions
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2011011Z Contents: write
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2011338Z Metadata: read
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2011714Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2012892Z Secret source: Actions
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2013507Z Cache mode: write
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2014020Z Prepare workflow directory
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2249865Z Prepare all required actions
+cut	UNKNOWN STEP	2026-10-04T03:19:07.2279226Z Getting action download info
+cut	UNKNOWN STEP	2026-10-04T03:19:07.4573337Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+cut	UNKNOWN STEP	2026-10-04T03:19:07.5552717Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+cut	UNKNOWN STEP	2026-10-04T03:19:07.7362272Z Complete job name: cut
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8348915Z ##[group]Run actions/checkout@v4
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8349304Z with:
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8349536Z   fetch-depth: 0
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8349814Z   repository: policy-as-versioned-platform/platform
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8351763Z   token: ***
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8351982Z   ssh-strict: true
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8352208Z   ssh-user: git
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8352439Z   persist-credentials: true
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8352689Z   clean: true
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8352921Z   sparse-checkout-cone-mode: true
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8353187Z   fetch-tags: false
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8353416Z   show-progress: true
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8353649Z   lfs: false
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8353866Z   submodules: false
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8354101Z   set-safe-directory: true
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8354366Z   allow-unsafe-pr-checkout: false
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8354694Z env:
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8354907Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8355293Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8355698Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8356086Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8356493Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8356861Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8357261Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8961989Z Syncing repository: policy-as-versioned-platform/platform
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8963422Z ##[group]Getting Git version info
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8963978Z Working directory is '/home/runner/work/platform/platform'
+cut	UNKNOWN STEP	2026-10-04T03:19:07.8964811Z [command]/usr/bin/git version
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9033665Z git version 2.55.0
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9046056Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9055346Z Temporarily overriding HOME='/home/runner/work/_temp/e2789052-e75a-447e-ab9b-6af99ecf887d' before making global git config changes
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9056620Z Adding repository directory to the temporary git global config as a safe directory
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9060023Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/platform/platform
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9099899Z Deleting the contents of '/home/runner/work/platform/platform'
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9102565Z ##[group]Initializing the repository
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9104964Z [command]/usr/bin/git init /home/runner/work/platform/platform
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9186313Z hint: Using 'master' as the name for the initial branch. This default branch name
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9187140Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9188169Z hint: to use in all of your new repositories, which will suppress this warning,
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9189291Z hint: call:
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9190181Z hint:
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9198541Z hint: 	git config --global init.defaultBranch <name>
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9199145Z hint:
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9199633Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9200456Z hint: 'development'. The just-created branch can be renamed via this command:
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9200931Z hint:
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9201151Z hint: 	git branch -m <name>
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9201402Z hint:
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9201727Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9202289Z Initialized empty Git repository in /home/runner/work/platform/platform/.git/
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9203905Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-platform/platform
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9243338Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9243944Z ##[group]Disabling automatic garbage collection
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9246588Z [command]/usr/bin/git config --local gc.auto 0
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9271107Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9271669Z ##[group]Setting up auth
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9275907Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9302628Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9592566Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9621157Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9784318Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9810466Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	UNKNOWN STEP	2026-10-04T03:19:07.9971967Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cut	UNKNOWN STEP	2026-10-04T03:19:08.0002606Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:08.0003167Z ##[group]Fetching the repository
+cut	UNKNOWN STEP	2026-10-04T03:19:08.0008667Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1648700Z From https://github.com/policy-as-versioned-platform/platform
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1650346Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1651825Z  * [new branch]      ecosystem/thin-slice    -> origin/ecosystem/thin-slice
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1653552Z  * [new branch]      fix-2026-09-09-absence-count-is-derived -> origin/fix-2026-09-09-absence-count-is-derived
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1655644Z  * [new branch]      fix-transition-replay-20260910 -> origin/fix-transition-replay-20260910
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1657714Z  * [new branch]      implement-engine-fixtures-20260910 -> origin/implement-engine-fixtures-20260910
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1659966Z  * [new branch]      implement-floor-change-evidence-20260910 -> origin/implement-floor-change-evidence-20260910
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1661414Z  * [new branch]      main                    -> origin/main
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1662525Z  * [new branch]      observations            -> origin/observations
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1663845Z  * [new branch]      policy-composition/tickets-09-16-wip -> origin/policy-composition/tickets-09-16-wip
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1665338Z  * [new branch]      release/2.0.x           -> origin/release/2.0.x
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1666397Z  * [new branch]      renovate/configure      -> origin/renovate/configure
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1667805Z  * [new branch]      repair-2026-09-04-gate-regressions -> origin/repair-2026-09-04-gate-regressions
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1669504Z  * [new branch]      repair/array-commit-for-4-0-0 -> origin/repair/array-commit-for-4-0-0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1671004Z  * [new branch]      repair/evidence-reaches-main -> origin/repair/evidence-reaches-main
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1672509Z  * [new branch]      resume/2026-10-03-security6 -> origin/resume/2026-10-03-security6
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1673867Z  * [new branch]      retire-policy-4-0-0     -> origin/retire-policy-4-0-0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1675833Z  * [new branch]      ticket-106-composition-selfcheck-fixture-namespace -> origin/ticket-106-composition-selfcheck-fixture-namespace
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1677901Z  * [new branch]      ticket-110-offline-supersede -> origin/ticket-110-offline-supersede
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1679785Z  * [new branch]      ticket-110-selfcheck-derives-supersede -> origin/ticket-110-selfcheck-derives-supersede
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1681808Z  * [new branch]      ticket-111-the-cage-delivers-its-classes -> origin/ticket-111-the-cage-delivers-its-classes
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1683748Z  * [new branch]      ticket-113-infra-is-a-role-not-a-rung -> origin/ticket-113-infra-is-a-role-not-a-rung
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1685840Z  * [new branch]      ticket-119-unlabelled-namespace-is-priced -> origin/ticket-119-unlabelled-namespace-is-priced
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1690226Z  * [new branch]      ticket-121-implementing-a-control-moves-the-price -> origin/ticket-121-implementing-a-control-moves-the-price
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1692641Z  * [new branch]      ticket-122-ramp-survives-rename -> origin/ticket-122-ramp-survives-rename
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1694898Z  * [new branch]      ticket-123-a-withdrawal-is-the-regulators -> origin/ticket-123-a-withdrawal-is-the-regulators
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1697434Z  * [new branch]      ticket-124-price-the-removal -> origin/ticket-124-price-the-removal
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1700234Z  * [new branch]      ticket-126-a-withdrawn-control-is-not-selectable -> origin/ticket-126-a-withdrawn-control-is-not-selectable
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1703312Z  * [new branch]      ticket-128-behind-a-major-unreadable -> origin/ticket-128-behind-a-major-unreadable
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1706350Z  * [new branch]      ticket-130-the-composed-root-is-delivered -> origin/ticket-130-the-composed-root-is-delivered
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1708777Z  * [new branch]      ticket-134-observation-is-not-source -> origin/ticket-134-observation-is-not-source
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1710524Z  * [new branch]      ticket-136-vendor-by-feed-name -> origin/ticket-136-vendor-by-feed-name
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1712314Z  * [new branch]      ticket-137-parent-tree-per-feed-edge -> origin/ticket-137-parent-tree-per-feed-edge
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1714443Z  * [new branch]      ticket-138-as-of-docstring -> origin/ticket-138-as-of-docstring
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1715979Z  * [new branch]      ticket-139-since-after-as-of -> origin/ticket-139-since-after-as-of
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1717871Z  * [new branch]      ticket-141-party-declares-pricing-threshold -> origin/ticket-141-party-declares-pricing-threshold
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1720067Z  * [new branch]      ticket-145-agent-cage-price -> origin/ticket-145-agent-cage-price
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1722077Z  * [new branch]      ticket-146-engine-cells -> origin/ticket-146-engine-cells
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1724284Z  * [new branch]      ticket-148-unsupported-pairing -> origin/ticket-148-unsupported-pairing
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1726684Z  * [new branch]      ticket-34-followup-2026-09-08 -> origin/ticket-34-followup-2026-09-08
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1729338Z  * [new branch]      ticket-34-handbook-as-a-compose-time-render -> origin/ticket-34-handbook-as-a-compose-time-render
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1731618Z  * [new branch]      ticket-45-switching-cost-computed-in-composition -> origin/ticket-45-switching-cost-computed-in-composition
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1734429Z  * [new branch]      ticket-55-instrument-faults -> origin/ticket-55-instrument-faults
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1736711Z  * [new branch]      ticket-62-and-77        -> origin/ticket-62-and-77
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1739051Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1741506Z  * [new branch]      ticket-79-the-pound-inputs -> origin/ticket-79-the-pound-inputs
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1744072Z  * [new branch]      ticket-80-three-forks-not-a-config-base -> origin/ticket-80-three-forks-not-a-config-base
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1746906Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1749467Z  * [new branch]      ticket-89-deny-is-not-a-rung -> origin/ticket-89-deny-is-not-a-rung
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1751393Z  * [new branch]      ticket-91-the-currency-controller-is-owned -> origin/ticket-91-the-currency-controller-is-owned
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1753427Z  * [new branch]      ticket-98-refusal-by-another-name -> origin/ticket-98-refusal-by-another-name
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1755059Z  * [new branch]      truth-surface-computed-semver -> origin/truth-surface-computed-semver
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1756578Z  * [new branch]      truth-surface-live-tails -> origin/truth-surface-live-tails
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1757736Z  * [new tag]         policy/v2.0.0           -> policy/v2.0.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1759174Z  * [new tag]         policy/v2.0.1           -> policy/v2.0.1
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1760180Z  * [new tag]         policy/v3.0.0           -> policy/v3.0.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1761263Z  * [new tag]         policy/v4.0.0           -> policy/v4.0.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1762244Z  * [new tag]         policy/v5.0.0           -> policy/v5.0.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1763171Z  * [new tag]         v0.1.0                  -> v0.1.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1764049Z  * [new tag]         v0.1.1                  -> v0.1.1
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1764928Z  * [new tag]         v1.0.0                  -> v1.0.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1765798Z  * [new tag]         v1.1.0                  -> v1.1.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1766669Z  * [new tag]         v1.1.1                  -> v1.1.1
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1767540Z  * [new tag]         v2.0.0                  -> v2.0.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1768551Z  * [new tag]         v2.0.1                  -> v2.0.1
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1769434Z  * [new tag]         v3.0.0                  -> v3.0.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1770293Z  * [new tag]         v3.1.0                  -> v3.1.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1771153Z  * [new tag]         v3.2.0                  -> v3.2.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1772032Z  * [new tag]         v3.3.0                  -> v3.3.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1772900Z  * [new tag]         v3.4.0                  -> v3.4.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1773763Z  * [new tag]         v3.4.1                  -> v3.4.1
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1774620Z  * [new tag]         v4.0.0                  -> v4.0.0
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1776772Z [command]/usr/bin/git branch --list --remote origin/main
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1777647Z   origin/main
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1779202Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1780154Z 885ec98cf11b6326bf2e1f47f9f17089db8bc4a9
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1782034Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1783018Z ##[group]Determining the checkout info
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1784130Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:09.1784764Z [command]/usr/bin/git sparse-checkout disable
+cut	UNKNOWN STEP	2026-10-04T03:19:09.2490201Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cut	UNKNOWN STEP	2026-10-04T03:19:09.2604276Z ##[group]Checking out the ref
+cut	UNKNOWN STEP	2026-10-04T03:19:09.2609192Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+cut	UNKNOWN STEP	2026-10-04T03:19:09.3787118Z Switched to a new branch 'main'
+cut	UNKNOWN STEP	2026-10-04T03:19:09.3798997Z branch 'main' set up to track 'origin/main'.
+cut	UNKNOWN STEP	2026-10-04T03:19:09.3802541Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:09.3837939Z [command]/usr/bin/git log -1 --format=%H
+cut	UNKNOWN STEP	2026-10-04T03:19:09.3860874Z 885ec98cf11b6326bf2e1f47f9f17089db8bc4a9
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4084662Z ##[group]Run set -euo pipefail
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4085111Z ^[[36;1mset -euo pipefail^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4085706Z ^[[36;1mcurl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4086233Z ^[[36;1mecho "${GITSIGN_SHA256}  gitsign" | sha256sum -c -^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4086591Z ^[[36;1mchmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4086897Z ^[[36;1m^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4087297Z ^[[36;1mcurl -sSL -o cosign "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64"^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4087788Z ^[[36;1mecho "${COSIGN_SHA256}  cosign" | sha256sum -c -^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4088366Z ^[[36;1mchmod +x cosign && sudo mv cosign /usr/local/bin/cosign^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4088671Z ^[[36;1m^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4089166Z ^[[36;1mcurl -sSL -o kyverno.tar.gz "https://github.com/kyverno/kyverno/releases/download/v${KYVERNO_VERSION}/kyverno-cli_v${KYVERNO_VERSION}_linux_x86_64.tar.gz"^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4089725Z ^[[36;1mecho "${KYVERNO_SHA256}  kyverno.tar.gz" | sha256sum -c -^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4090149Z ^[[36;1mtar xzf kyverno.tar.gz kyverno && chmod +x kyverno && sudo mv kyverno /usr/local/bin/kyverno^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4090511Z ^[[36;1m^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4090746Z ^[[36;1mpip install --quiet pyyaml^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4577618Z shell: /usr/bin/bash -e {0}
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4577902Z env:
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4578330Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4578684Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4579035Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4579380Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4579742Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4580082Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:19:09.4580439Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:10.2386907Z gitsign: OK
+cut	UNKNOWN STEP	2026-10-04T03:19:10.8601331Z cosign: OK
+cut	UNKNOWN STEP	2026-10-04T03:19:11.4319186Z kyverno.tar.gz: OK
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1307037Z ##[group]Run set -euo pipefail
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1307261Z ^[[36;1mset -euo pipefail^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1307476Z ^[[36;1mpython3 .github/scripts/cut-release-normalize.py > tags.json^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1307702Z ^[[36;1mcat tags.json^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1358698Z shell: /usr/bin/bash -e {0}
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1358862Z env:
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1359001Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1359226Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1359464Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1359697Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1359951Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1360185Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1360444Z   VERSION_INPUT: 
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1360578Z   MESSAGE_INPUT: 
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1360971Z   TAGS_INPUT: [
+cut	UNKNOWN STEP	  {
+cut	UNKNOWN STEP	    "tag": "policy/v6.0.0",
+cut	UNKNOWN STEP	    "message": "Security major: use pod runAsNonRoot fallback and trust tier only from governed Namespaces; preserve frozen5.0.0."
+cut	UNKNOWN STEP	  }
+cut	UNKNOWN STEP	]
+cut	UNKNOWN STEP	
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1361354Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1579019Z [{"tag": "policy/v6.0.0", "message": "Security major: use pod runAsNonRoot fallback and trust tier only from governed Namespaces; preserve frozen5.0.0."}]
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1610753Z ##[group]Run ./.github/scripts/cut-release-refuse-existing.sh tags.json
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1611056Z ^[[36;1m./.github/scripts/cut-release-refuse-existing.sh tags.json^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1657757Z shell: /usr/bin/bash -e {0}
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1657915Z env:
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1659886Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1660257Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1660595Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1662841Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1664811Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1665055Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1665319Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1845021Z ok: policy/v6.0.0 does not exist yet
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1867593Z ##[group]Run python3 .github/scripts/cut-release-gate.py tags.json
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1867872Z ^[[36;1mpython3 .github/scripts/cut-release-gate.py tags.json^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1913920Z shell: /usr/bin/bash -e {0}
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1914085Z env:
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1914222Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1914455Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1914693Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1914910Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1915147Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1915369Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:19:13.1915604Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:20:39.4406912Z Using payload from: /home/runner/work/platform/platform/computed-semver/evidence/6.0.0.json
+cut	UNKNOWN STEP	2026-10-04T03:20:39.4407443Z Generating ephemeral keys...
+cut	UNKNOWN STEP	2026-10-04T03:20:39.5619001Z Retrieving signed certificate...
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5117439Z Successfully verified SCT...
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5117840Z 
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5118679Z 	The sigstore service, hosted by sigstore a Series of LF Projects, LLC, is provided pursuant to the Hosted Project Tools Terms of Use, available at https://lfprojects.org/policies/hosted-project-tools-terms-of-use/.
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5119704Z 	Note that if your submission includes personal data associated with this signed artifact, it will be part of an immutable record.
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5120408Z 	This may include the email address associated with the account with which you authenticate your contractual Agreement.
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5121471Z 	This information will be used for signing this artifact and will be stored in public transparency logs and cannot be removed later, and is subject to the Immutable Record notice at https://lfprojects.org/policies/hosted-project-tools-immutable-records/.
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5122292Z 
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5122827Z By typing 'y', you attest that (1) you are not submitting the personal data of any other person; and (2) you understand and agree to the statement and the Agreement terms at the URLs listed above.
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5123536Z using ephemeral certificate:
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5123683Z -----BEGIN CERTIFICATE-----
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5123919Z MIIHwDCCB0agAwIBAgIUZBcjiH/MZAPxx2TmPWmZyO5bkCswCgYIKoZIzj0EAwMw
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5124195Z NzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQDExVzaWdzdG9yZS1pbnRl
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5124472Z cm1lZGlhdGUwHhcNMjYxMDA0MDMyMDM5WhcNMjYxMDA0MDMzMDM5WjAAMFkwEwYH
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5124771Z KoZIzj0CAQYIKoZIzj0DAQcDQgAEugWHWkC6AAFGsEbFadhAzO/pFUjkdZZMKsZP
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5125026Z 9x4NyaHKlcIq99mQ5EF9/cVch7oVqWUtKyw6vMQKw8sumD8r0qOCBmUwggZhMA4G
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5125283Z A1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDAzAdBgNVHQ4EFgQUNdPT
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5125555Z cYk+76g1lLZTmMSWoDGJHuUwHwYDVR0jBBgwFoAU39Ppz1YkEZb5qNjpKFWixi4Y
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5125825Z ZD8weAYDVR0RAQH/BG4wbIZqaHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5126098Z ZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0vLmdpdGh1Yi93b3JrZmxvd3MvY3V0
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5126363Z LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA5BgorBgEEAYO/MAEBBCtodHRw
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5126629Z czovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tMB8GCisGAQQB
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5127171Z g78wAQIEEXdvcmtmbG93X2Rpc3BhdGNoMDYGCisGAQQBg78wAQMEKDg4NWVjOThj
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5127440Z ZjExYjYzMjZiZjJlMWY0N2Y5ZjE3MDg5ZGI4YmM0YTkwGQYKKwYBBAGDvzABBAQL
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5127708Z Y3V0LXJlbGVhc2UwMwYKKwYBBAGDvzABBQQlcG9saWN5LWFzLXZlcnNpb25lZC1w
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5127967Z bGF0Zm9ybS9wbGF0Zm9ybTAdBgorBgEEAYO/MAEGBA9yZWZzL2hlYWRzL21haW4w
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5128502Z OwYKKwYBBAGDvzABCAQtDCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNl
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5128915Z cmNvbnRlbnQuY29tMHoGCisGAQQBg78wAQkEbAxqaHR0cHM6Ly9naXRodWIuY29t
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5129301Z L3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0vLmdpdGh1Yi93
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5129723Z b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA4BgorBgEE
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5129991Z AYO/MAEKBCoMKDg4NWVjOThjZjExYjYzMjZiZjJlMWY0N2Y5ZjE3MDg5ZGI4YmM0
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5130262Z YTkwHQYKKwYBBAGDvzABCwQPDA1naXRodWItaG9zdGVkMEgGCisGAQQBg78wAQwE
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5130528Z Ogw4aHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZv
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5130818Z cm0vcGxhdGZvcm0wOAYKKwYBBAGDvzABDQQqDCg4ODVlYzk4Y2YxMWI2MzI2YmYy
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5131087Z ZTFmNDdmOWYxNzA4OWRiOGJjNGE5MB8GCisGAQQBg78wAQ4EEQwPcmVmcy9oZWFk
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5131348Z cy9tYWluMBoGCisGAQQBg78wAQ8EDAwKMTM0MDk4NDY0ODA/BgorBgEEAYO/MAEQ
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5131606Z BDEML2h0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRm
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5131874Z b3JtMBkGCisGAQQBg78wAREECwwJMzA4NDc5NzI1MHoGCisGAQQBg78wARIEbAxq
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5132141Z aHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZvcm0v
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5132406Z cGxhdGZvcm0vLmdpdGh1Yi93b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMv
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5132670Z aGVhZHMvbWFpbjA4BgorBgEEAYO/MAETBCoMKDg4NWVjOThjZjExYjYzMjZiZjJl
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5132928Z MWY0N2Y5ZjE3MDg5ZGI4YmM0YTkwIQYKKwYBBAGDvzABFAQTDBF3b3JrZmxvd19k
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5133187Z aXNwYXRjaDBsBgorBgEEAYO/MAEVBF4MXGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xp
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5133449Z Y3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3JtL2FjdGlvbnMvcnVucy8z
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5133721Z NzE3MzcxODUwNi9hdHRlbXB0cy8xMBYGCisGAQQBg78wARYECAwGcHVibGljMGMG
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5133989Z CisGAQQBg78wARgEVQxTcmVwbzpwb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3Jt
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5134259Z QDMwODQ3OTcyNS9wbGF0Zm9ybUAxMzQwOTg0NjQ4OnJlZjpyZWZzL2hlYWRzL21h
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5134528Z aW4wgYkGCisGAQQB1nkCBAIEewR5AHcAdQDdPTBqxscRMmMZHhyZZzcCokpeuN48
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5134800Z rf+HinKALynujgAAAaEE7Y4pAAAEAwBGMEQCICsOQkqpblSz26mw5emixmNhODf1
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5135066Z nvSGNJJXAUXAX21eAiALJGmDPnUiOp03DWlED7O5CZOij9PcduxEic7XyYBdrTAK
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5135332Z BggqhkjOPQQDAwNoADBlAjEAxJIA9YHHKDErf11xvaBEPNAH3MIda7hqhWimdnBO
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5135594Z AzC67HNshVE5PFsxsbDw04Y6AjBtbS/S7rH5z3WTFSCpEbbJ7EFkCoR7elzf5HUc
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5135793Z UvTlJW02txXeAhMXy5uJj3Si0Ms=
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5135932Z -----END CERTIFICATE-----
+cut	UNKNOWN STEP	2026-10-04T03:20:40.5136015Z 
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9061096Z tlog entry created with index: 3076307568
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9061404Z using ephemeral certificate:
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9061643Z -----BEGIN CERTIFICATE-----
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9061943Z MIIHwDCCB0agAwIBAgIUZBcjiH/MZAPxx2TmPWmZyO5bkCswCgYIKoZIzj0EAwMw
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9062346Z NzEVMBMGA1UEChMMc2lnc3RvcmUuZGV2MR4wHAYDVQQDExVzaWdzdG9yZS1pbnRl
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9062764Z cm1lZGlhdGUwHhcNMjYxMDA0MDMyMDM5WhcNMjYxMDA0MDMzMDM5WjAAMFkwEwYH
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9063178Z KoZIzj0CAQYIKoZIzj0DAQcDQgAEugWHWkC6AAFGsEbFadhAzO/pFUjkdZZMKsZP
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9063577Z 9x4NyaHKlcIq99mQ5EF9/cVch7oVqWUtKyw6vMQKw8sumD8r0qOCBmUwggZhMA4G
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9063974Z A1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDAzAdBgNVHQ4EFgQUNdPT
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9064400Z cYk+76g1lLZTmMSWoDGJHuUwHwYDVR0jBBgwFoAU39Ppz1YkEZb5qNjpKFWixi4Y
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9064804Z ZD8weAYDVR0RAQH/BG4wbIZqaHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9065208Z ZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0vLmdpdGh1Yi93b3JrZmxvd3MvY3V0
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9065715Z LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA5BgorBgEEAYO/MAEBBCtodHRw
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9066356Z czovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tMB8GCisGAQQB
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9066760Z g78wAQIEEXdvcmtmbG93X2Rpc3BhdGNoMDYGCisGAQQBg78wAQMEKDg4NWVjOThj
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9067170Z ZjExYjYzMjZiZjJlMWY0N2Y5ZjE3MDg5ZGI4YmM0YTkwGQYKKwYBBAGDvzABBAQL
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9067579Z Y3V0LXJlbGVhc2UwMwYKKwYBBAGDvzABBQQlcG9saWN5LWFzLXZlcnNpb25lZC1w
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9067973Z bGF0Zm9ybS9wbGF0Zm9ybTAdBgorBgEEAYO/MAEGBA9yZWZzL2hlYWRzL21haW4w
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9068483Z OwYKKwYBBAGDvzABCAQtDCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNl
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9068890Z cmNvbnRlbnQuY29tMHoGCisGAQQBg78wAQkEbAxqaHR0cHM6Ly9naXRodWIuY29t
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9069433Z L3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZvcm0vcGxhdGZvcm0vLmdpdGh1Yi93
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9069837Z b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMvaGVhZHMvbWFpbjA4BgorBgEE
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9070237Z AYO/MAEKBCoMKDg4NWVjOThjZjExYjYzMjZiZjJlMWY0N2Y5ZjE3MDg5ZGI4YmM0
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9070644Z YTkwHQYKKwYBBAGDvzABCwQPDA1naXRodWItaG9zdGVkMEgGCisGAQQBg78wAQwE
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9071062Z Ogw4aHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZv
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9071466Z cm0vcGxhdGZvcm0wOAYKKwYBBAGDvzABDQQqDCg4ODVlYzk4Y2YxMWI2MzI2YmYy
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9071870Z ZTFmNDdmOWYxNzA4OWRiOGJjNGE5MB8GCisGAQQBg78wAQ4EEQwPcmVmcy9oZWFk
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9072262Z cy9tYWluMBoGCisGAQQBg78wAQ8EDAwKMTM0MDk4NDY0ODA/BgorBgEEAYO/MAEQ
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9072654Z BDEML2h0dHBzOi8vZ2l0aHViLmNvbS9wb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRm
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9073056Z b3JtMBkGCisGAQQBg78wAREECwwJMzA4NDc5NzI1MHoGCisGAQQBg78wARIEbAxq
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9073455Z aHR0cHM6Ly9naXRodWIuY29tL3BvbGljeS1hcy12ZXJzaW9uZWQtcGxhdGZvcm0v
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9073855Z cGxhdGZvcm0vLmdpdGh1Yi93b3JrZmxvd3MvY3V0LXJlbGVhc2UueW1sQHJlZnMv
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9074247Z aGVhZHMvbWFpbjA4BgorBgEEAYO/MAETBCoMKDg4NWVjOThjZjExYjYzMjZiZjJl
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9074651Z MWY0N2Y5ZjE3MDg5ZGI4YmM0YTkwIQYKKwYBBAGDvzABFAQTDBF3b3JrZmxvd19k
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9075049Z aXNwYXRjaDBsBgorBgEEAYO/MAEVBF4MXGh0dHBzOi8vZ2l0aHViLmNvbS9wb2xp
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9075452Z Y3ktYXMtdmVyc2lvbmVkLXBsYXRmb3JtL3BsYXRmb3JtL2FjdGlvbnMvcnVucy8z
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9075869Z NzE3MzcxODUwNi9hdHRlbXB0cy8xMBYGCisGAQQBg78wARYECAwGcHVibGljMGMG
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9076286Z CisGAQQBg78wARgEVQxTcmVwbzpwb2xpY3ktYXMtdmVyc2lvbmVkLXBsYXRmb3Jt
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9076705Z QDMwODQ3OTcyNS9wbGF0Zm9ybUAxMzQwOTg0NjQ4OnJlZjpyZWZzL2hlYWRzL21h
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9077125Z aW4wgYkGCisGAQQB1nkCBAIEewR5AHcAdQDdPTBqxscRMmMZHhyZZzcCokpeuN48
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9077543Z rf+HinKALynujgAAAaEE7Y4pAAAEAwBGMEQCICsOQkqpblSz26mw5emixmNhODf1
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9077962Z nvSGNJJXAUXAX21eAiALJGmDPnUiOp03DWlED7O5CZOij9PcduxEic7XyYBdrTAK
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9078510Z BggqhkjOPQQDAwNoADBlAjEAxJIA9YHHKDErf11xvaBEPNAH3MIda7hqhWimdnBO
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9078926Z AzC67HNshVE5PFsxsbDw04Y6AjBtbS/S7rH5z3WTFSCpEbbJ7EFkCoR7elzf5HUc
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9079252Z UvTlJW02txXeAhMXy5uJj3Si0Ms=
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9079467Z -----END CERTIFICATE-----
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9079603Z 
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9079878Z Wrote bundle to file /home/runner/work/platform/platform/computed-semver/evidence/6.0.0.json.bundle
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9080500Z MEQCIBs8tcKmbBv3OMKs1GVZmSIGNA049lCecvnzoVU4YD1jAiAYyG7IWD63m1Of29N4c+ZxvQenMWz97KBmkjiJ4pkimg==
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9089488Z signed: /home/runner/work/platform/platform/computed-semver/evidence/6.0.0.json.bundle
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9089756Z ## Publisher gate
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9089825Z 
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9089892Z | tag | declared | computed | outcome | reason |
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9090058Z | --- | --- | --- | --- | --- |
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9090217Z | `policy/v6.0.0` | major | major | passed |  |
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9090329Z 
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9090579Z GATE: cut-release.yml must cut policy/v6.0.0 in Actions -- a gitsign tag and a keyless cosign bundle need a live Actions signing identity, which no local run has
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9090917Z GATE: passed for policy/v6.0.0
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9215933Z ##[group]Run set -euo pipefail
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9216120Z ^[[36;1mset -euo pipefail^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9216460Z ^[[36;1mbash engine/install-kyverno-engines.sh linux_x86_64 "$RUNNER_TEMP/kyverno-engines"^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9216807Z ^[[36;1mif python3 computed-semver/engine_compatibility.py --engine-dir "$RUNNER_TEMP/kyverno-engines" \^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9217083Z ^[[36;1m     >"$RUNNER_TEMP/engine-cells.txt"; then^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9217260Z ^[[36;1m  tail -n 8 "$RUNNER_TEMP/engine-cells.txt"^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9217412Z ^[[36;1melse^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9217542Z ^[[36;1m  tail -n 60 "$RUNNER_TEMP/engine-cells.txt"^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9217743Z ^[[36;1m  echo "::error::an engine cell did not pass; no tag is signed"^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9217921Z ^[[36;1m  exit 1^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9218248Z ^[[36;1mfi^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9267904Z shell: /usr/bin/bash -e {0}
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9268184Z env:
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9268310Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9268527Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9268742Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9268930Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9269137Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9269328Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:20:40.9269535Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:20:42.4149003Z installed kyverno 1.18.2 (linux_x86_64, archive sha256 cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b) at /home/runner/work/_temp/kyverno-engines/1.18.2/kyverno
+cut	UNKNOWN STEP	2026-10-04T03:20:43.7787094Z installed kyverno 1.19.1 (linux_x86_64, archive sha256 b38228f367fc0fdc2b08f4c83ea50ac5f16c60ff8d62d76a66157c33c47b70ae) at /home/runner/work/_temp/kyverno-engines/1.19.1/kyverno
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2402177Z     }
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2402385Z   }
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2402485Z }
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2402649Z subject       1.18.2          1.19.1          row
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2402867Z policy 5.0.0  passed          -               passed
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2403056Z policy 6.0.0  passed          -               passed
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2403229Z machinery     passed          passed          passed
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2403999Z PASS: engine cells -- passed; 4 cell(s): 4 passed; graded platform commit 885ec98cf11b6326bf2e1f47f9f17089db8bc4a9: policy 5.0.0 from refs/tags/policy/v5.0.0 at 5b88f1d0bb33274e3348db93645d972c893b3c2c, policy 6.0.0 (uncut candidate) from the graded commit, machinery rendered by compose/composition.py at the graded commit; each body read by git archive at that ref and run by the kyverno binaries above
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2459406Z ##[group]Run actions/upload-artifact@v4
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2459556Z with:
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2459668Z   name: publisher-gate-evidence
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2459807Z   path: computed-semver/evidence/
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2459946Z   if-no-files-found: ignore
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2460072Z   compression-level: 6
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2460186Z   overwrite: false
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2460307Z   include-hidden-files: false
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2460429Z env:
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2460528Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2460719Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2460925Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2461108Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2461314Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2461515Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:20:55.2461720Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:20:55.3434537Z (node:7685) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+cut	UNKNOWN STEP	2026-10-04T03:20:55.3434919Z (Use `node --trace-deprecation ...` to show where the warning was created)
+cut	UNKNOWN STEP	2026-10-04T03:20:55.3476828Z With the provided path, there will be 12 files uploaded
+cut	UNKNOWN STEP	2026-10-04T03:20:55.3478650Z Artifact name is valid!
+cut	UNKNOWN STEP	2026-10-04T03:20:55.3479199Z Root directory input is valid!
+cut	UNKNOWN STEP	2026-10-04T03:20:55.6312774Z Beginning upload of artifact content to blob storage
+cut	UNKNOWN STEP	2026-10-04T03:20:55.6506106Z (node:7685) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+cut	UNKNOWN STEP	2026-10-04T03:20:55.8187600Z Uploaded bytes 48778
+cut	UNKNOWN STEP	2026-10-04T03:20:55.8532727Z Finished uploading artifact content to blob storage!
+cut	UNKNOWN STEP	2026-10-04T03:20:55.8533273Z SHA256 digest of uploaded artifact zip is 192ae62633cac5a1ba6eb9f603853a673d67f82ab555c5f4deb319a7fbe74180
+cut	UNKNOWN STEP	2026-10-04T03:20:55.8534349Z Finalizing artifact upload
+cut	UNKNOWN STEP	2026-10-04T03:20:56.0875504Z Artifact publisher-gate-evidence.zip successfully finalized. Artifact ID 11292013787
+cut	UNKNOWN STEP	2026-10-04T03:20:56.0876066Z Artifact publisher-gate-evidence has been successfully uploaded! Final size is 48778 bytes. Artifact ID is 11292013787
+cut	UNKNOWN STEP	2026-10-04T03:20:56.0879811Z Artifact download URL: https://github.com/policy-as-versioned-platform/platform/actions/runs/37173718506/artifacts/11292013787
+cut	UNKNOWN STEP	2026-10-04T03:20:56.0974152Z ##[group]Run ./.github/scripts/cut-release-commit-evidence.sh tags.json
+cut	UNKNOWN STEP	2026-10-04T03:20:56.0974427Z ^[[36;1m./.github/scripts/cut-release-commit-evidence.sh tags.json^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1023583Z shell: /usr/bin/bash -e {0}
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1023715Z env:
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1023825Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1024024Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1024236Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1024427Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1024641Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1024835Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1025045Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1297039Z committed: signed release-gate evidence for policy/v6.0.0
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1325145Z ##[group]Run ./.github/scripts/cut-release-update-array-commit.sh tags.json
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1325425Z ^[[36;1m./.github/scripts/cut-release-update-array-commit.sh tags.json^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1368119Z shell: /usr/bin/bash -e {0}
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1368251Z env:
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1368359Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1368554Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1368765Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1368956Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1369173Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1369371Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1369580Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1867095Z committed: versions.yaml array element(s) for policy/v6.0.0 now point at evidence commit b18a0d8946f9dbeb5fbcf6bbe5233b9c919a7c8c
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1889102Z ##[group]Run ./.github/scripts/cut-release-create-tags.sh tags.json
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1889364Z ^[[36;1m./.github/scripts/cut-release-create-tags.sh tags.json^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1935287Z shell: /usr/bin/bash -e {0}
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1935419Z env:
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1935530Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1935732Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1935945Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1936136Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1936346Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1936540Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:20:56.1936750Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1211487Z tagged policy/v6.0.0
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1238439Z ##[group]Run ./.github/scripts/cut-release-push.sh tags.json origin
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1238708Z ^[[36;1m./.github/scripts/cut-release-push.sh tags.json origin^[[0m
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1286828Z shell: /usr/bin/bash -e {0}
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1286960Z env:
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1287071Z   GITSIGN_VERSION: 0.17.1
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1287273Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1287485Z   COSIGN_VERSION: 2.4.1
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1287677Z   COSIGN_SHA256: 8b24b946dd5809c6bd93de08033bcf6bc0ed7d336b7785787c080f574b89249b
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1287889Z   KYVERNO_VERSION: 1.18.2
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1288240Z   KYVERNO_SHA256: cb2feb8356149fd2fe774c894ccf0969f4a60a83867dd913af724f74ffbbc18b
+cut	UNKNOWN STEP	2026-10-04T03:20:57.1288449Z ##[endgroup]
+cut	UNKNOWN STEP	2026-10-04T03:20:58.5707336Z To https://github.com/policy-as-versioned-platform/platform
+cut	UNKNOWN STEP	2026-10-04T03:20:58.5707602Z    885ec98..59ec7ce  HEAD -> main
+cut	UNKNOWN STEP	2026-10-04T03:20:58.5707896Z  * [new tag]         policy/v6.0.0 -> policy/v6.0.0
+cut	UNKNOWN STEP	2026-10-04T03:20:58.5813536Z Post job cleanup.
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6342783Z [command]/usr/bin/git version
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6372949Z git version 2.55.0
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6395917Z Temporarily overriding HOME='/home/runner/work/_temp/da589f6b-783e-43e9-8af5-d49b40693e04' before making global git config changes
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6396630Z Adding repository directory to the temporary git global config as a safe directory
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6399974Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/platform/platform
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6426727Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6450607Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6635721Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6655155Z http.https://github.com/.extraheader
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6676947Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6690971Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6883903Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cut	UNKNOWN STEP	2026-10-04T03:20:58.6914950Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cut	UNKNOWN STEP	2026-10-04T03:20:58.7192359Z Cleaning up orphan processes
+cut	UNKNOWN STEP	2026-10-04T03:20:58.7372960Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import math
 import re
+from datetime import date
 from typing import Any
 
 
@@ -41,9 +42,18 @@ def rederive(party: dict[str, Any], valuation: dict[str, Any], currency: str,
     if fx is None:
         raise MissingInstrument("no signature-verified pinned FX feed for " + source_currency + " -> " + currency)
     payload = fx["payload"]
-    as_of = str(party["size"]["as_of"])
+    size = party.get("size")
+    as_of = size.get("as_of") if isinstance(size, dict) else None
+    if not isinstance(as_of, str) or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", as_of):
+        raise MissingInstrument("foreign-currency valuation names no valid valuation date")
+    try:
+        valuation_date = date.fromisoformat(as_of)
+    except ValueError as exc:
+        raise MissingInstrument("foreign-currency valuation names no valid valuation date: " + as_of) from exc
     if not re.fullmatch(r"[0-9]{4}-(0[1-9]|1[0-2])", str(payload.get("period", ""))):
         raise MissingInstrument("pinned FX feed names no valid conversion month")
+    if payload["period"] != valuation_date.isoformat()[:7]:
+        raise MissingInstrument("pinned FX month " + payload["period"] + " has no rate for valuation date " + as_of)
     rates = dict(payload["rates"], **{str(payload["base"]): 1.0})
     for code in (source_currency, currency):
         rate = float(rates.get(code, 0))

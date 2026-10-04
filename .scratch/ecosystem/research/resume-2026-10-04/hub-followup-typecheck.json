@@ -1,0 +1,6 @@
+{
+  "command": ".venv/bin/python -m mypy twin tests conftest.py --ignore-missing-imports --warn-unused-ignores",
+  "source_files": 205,
+  "result": "Success: no issues found",
+  "notes": "existing untyped function annotation note only"
+}

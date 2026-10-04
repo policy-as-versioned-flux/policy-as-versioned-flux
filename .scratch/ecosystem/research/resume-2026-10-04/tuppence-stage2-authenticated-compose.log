@@ -1,0 +1,3887 @@
+{
+  "outcome": "composed",
+  "party_artefact_errors": [],
+  "parents": [
+    {
+      "party": "platform",
+      "kind": "implementations",
+      "version": "5.0.0",
+      "sha": "703eff6aee959843c4160aa54fd03413f62858cc"
+    },
+    {
+      "party": "nist",
+      "kind": "controls",
+      "version": "1.1.0",
+      "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819"
+    },
+    {
+      "party": "ico",
+      "kind": "feed",
+      "name": "penalty-schema",
+      "version": "v3",
+      "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e"
+    },
+    {
+      "party": "feeds",
+      "kind": "feed",
+      "name": "threat-register",
+      "version": "v4",
+      "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+    },
+    {
+      "party": "feeds",
+      "kind": "feed",
+      "name": "cve",
+      "version": "v3",
+      "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+    }
+  ],
+  "members": [
+    {
+      "family": "graded-enforcement",
+      "name": "cage-baseline",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-netpol",
+      "kind": "GeneratingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-quarantine",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-restricted",
+      "kind": "PriorityClass",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-tier",
+      "kind": "MutatingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "posture",
+      "name": "posture-trust-boundary",
+      "kind": "ValidatingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": "Deny"
+    },
+    {
+      "family": "posture",
+      "name": "stamp-posture",
+      "kind": "MutatingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "require-nonroot",
+      "name": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "version": "5.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": "Audit"
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-baseline",
+      "kind": "PriorityClass",
+      "version": "6.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": "6.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-netpol",
+      "kind": "GeneratingPolicy",
+      "version": "6.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-quarantine",
+      "kind": "PriorityClass",
+      "version": "6.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-restricted",
+      "kind": "PriorityClass",
+      "version": "6.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-tier",
+      "kind": "MutatingPolicy",
+      "version": "6.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "posture",
+      "name": "posture-trust-boundary",
+      "kind": "ValidatingPolicy",
+      "version": "6.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": "Deny"
+    },
+    {
+      "family": "posture",
+      "name": "stamp-posture",
+      "kind": "MutatingPolicy",
+      "version": "6.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "require-nonroot",
+      "name": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "version": "6.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": "Audit"
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-baseline",
+      "kind": "PriorityClass",
+      "version": "7.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": "7.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-netpol",
+      "kind": "GeneratingPolicy",
+      "version": "7.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-quarantine",
+      "kind": "PriorityClass",
+      "version": "7.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-restricted",
+      "kind": "PriorityClass",
+      "version": "7.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "graded-enforcement",
+      "name": "cage-tier",
+      "kind": "MutatingPolicy",
+      "version": "7.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "posture",
+      "name": "stamp-posture",
+      "kind": "MutatingPolicy",
+      "version": "7.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "require-nonroot",
+      "name": "require-nonroot",
+      "kind": "ValidatingPolicy",
+      "version": "7.0.0",
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": "Audit"
+    },
+    {
+      "family": "platform-machinery",
+      "name": "policy-version-orphan-guard",
+      "kind": "ValidatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "governed-namespace-requires-claim",
+      "kind": "MutatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "policy-version-orphan-cage",
+      "kind": "MutatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "policy-version-orphan-cage-holds",
+      "kind": "MutatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "governed-namespace-cage-holds",
+      "kind": "MutatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "governed-namespace-unclaimed-report",
+      "kind": "ValidatingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "cage-netpol-bottom-rung",
+      "kind": "GeneratingPolicy",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    },
+    {
+      "family": "platform-machinery",
+      "name": "cage-isolated",
+      "kind": "PriorityClass",
+      "version": null,
+      "source_party": "platform",
+      "source_sha": "703eff6aee959843c4160aa54fd03413f62858cc",
+      "action": null
+    }
+  ],
+  "refusals": [],
+  "restatements": [],
+  "cages": [],
+  "holes": [
+    {
+      "source": "nist",
+      "control_id": "ac-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-11.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-12",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-14",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-17.4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-18",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-18.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-18.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-19",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-19.5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.13",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-2.5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-20",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-20.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-20.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-21",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-22",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-6.9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-2.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-2.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "at-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-12",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-3.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-6.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-6.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-7.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "au-9.4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 3581590.1393851372,
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.2"
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-2.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-7.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-7.4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ca-9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-12",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-12.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-2.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-2.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-2.7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-3.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-3.4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-4.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-7.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-7.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-7.5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-8.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-8.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cm-9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-10.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-2.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-2.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-2.8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-4.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-6.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-6.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-7.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-7.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-7.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-8.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-8.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-9.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "cp-9.8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-12",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-12.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-12.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-12.5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2.12",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-2.8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-4.4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-5.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-5.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-5.6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-8.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-8.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ia-8.4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-3.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-4.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-6.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-6.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-7.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ir-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 3581590.1393851372,
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.2"
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-3.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-3.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-3.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ma-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "mp-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-12",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-13",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-13.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-14",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-15",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-16",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-17",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-6.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pe-9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 5372385.209077706,
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.3"
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-4.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "pl-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ps-9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 5372385.209077706,
+      "priced_by": "ico penalty-schema@v3 uk-gdpr/lower-tier weight 0.3"
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-3.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-5.11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-5.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-5.5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ra-9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-15",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-15.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-22",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4.10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-4.9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-9",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sa-9.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-12",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-13",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-15",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-17",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-18",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-20",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-21",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-22",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-23",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-28",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-28.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-39",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-7.8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sc-8.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-12",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-16",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-2.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-4.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-4.4",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-4.5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-7.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-7.7",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "si-8.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-10",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-11",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-11.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-11.2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-12",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-2",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-2.1",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-3",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-5",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-6",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "sr-8",
+      "status": "recorded",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    },
+    {
+      "source": "nist",
+      "control_id": "ac-4",
+      "status": "closed",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null
+    }
+  ],
+  "ungoverned": [
+    {
+      "namespace": "openbao",
+      "status": "recorded",
+      "price": {
+        "perspective": "tuppence",
+        "currency": "GBP",
+        "amount": 26351496.995790914,
+        "share": 0.25,
+        "workloads": 1,
+        "workloads_total": 4,
+        "base": 102869480.25094849,
+        "ramp": 1.0246575342465754,
+        "since": "2026-09-24",
+        "since_by": "v2.0.0 names openbao",
+        "as_of": "2026-10-03",
+        "bounded": false,
+        "limits": []
+      }
+    },
+    {
+      "namespace": "tuppence-reset",
+      "status": "recorded",
+      "price": {
+        "perspective": "tuppence",
+        "currency": "GBP",
+        "amount": 85395760.31791066,
+        "share": 0.75,
+        "workloads": 3,
+        "workloads_total": 4,
+        "base": 102869480.25094849,
+        "ramp": 1.106849315068493,
+        "since": "2026-08-25",
+        "since_by": "v1.1.0 names tuppence-reset",
+        "as_of": "2026-10-03",
+        "bounded": false,
+        "limits": []
+      }
+    }
+  ],
+  "prices": [
+    {
+      "source": "ico",
+      "kind": "feed",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 17907950.696925685,
+      "per_customer": {
+        "amount": 3.6546838156991193,
+        "currency": "GBP"
+      },
+      "name": "penalty-schema",
+      "old_version": "v3",
+      "new_version": "v3",
+      "old_price": 17907950.696925685,
+      "new_price": 17907950.696925685,
+      "old_tier": "isolated",
+      "proposed_tier": "isolated",
+      "changed": false,
+      "lef": [
+        1,
+        2,
+        4
+      ],
+      "lef_basis": "lm sourced from ICO (Information Commissioner's Office) real public fines (UK GDPR / Data Protection Act 2018 s157). warn/deny lef are editorial (schema doesn't carry frequency). Scaled to a subscriber turnover of 861,741,000.00 GBP.",
+      "proposed_as": "label",
+      "holes": [
+        {
+          "source": "nist",
+          "id": "pl-2",
+          "weight": 0.3,
+          "amount": 5372385.209077706,
+          "status": "recorded"
+        },
+        {
+          "source": "nist",
+          "id": "ra-3",
+          "weight": 0.3,
+          "amount": 5372385.209077706,
+          "status": "recorded"
+        },
+        {
+          "source": "nist",
+          "id": "ca-2",
+          "weight": 0.2,
+          "amount": 3581590.1393851372,
+          "status": "recorded"
+        },
+        {
+          "source": "nist",
+          "id": "ir-8",
+          "weight": 0.2,
+          "amount": 3581590.1393851372,
+          "status": "recorded"
+        }
+      ],
+      "total": 17907950.696925685,
+      "pin_signature": {
+        "state": "signed",
+        "tag": "v3.0.0",
+        "detail": "tag v3.0.0 on the ico checkout carries a signature block"
+      },
+      "hole": null,
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+      "superseded": {
+        "state": "behind",
+        "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut; this checkout carries no directory for v4.0.0, so the line is priced from the signed tags alone"
+      }
+    },
+    {
+      "source": "ico",
+      "kind": "supersede",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 1128446.208299428,
+      "per_customer": {
+        "amount": 0.23029514455090366,
+        "currency": "GBP"
+      },
+      "name": "penalty-schema",
+      "version": "v3",
+      "newer": {
+        "version": "v4",
+        "tag": "v4.0.0",
+        "tagged": "2026-09-10",
+        "published_at": null,
+        "readable": false,
+        "since_tag": "v4.0.0",
+        "since": "2026-09-10"
+      },
+      "since": "2026-09-10",
+      "as_of": "2026-10-03",
+      "ramp": 1.063013698630137,
+      "base": 17907950.696925685,
+      "proposed_tier": null,
+      "changed": false,
+      "basis": "the pinned line's own amount x (eol_ramp(since, as_of) - 1): the surcharge the feeds module's EOL ramp puts on a version its publisher has superseded, +1x per year behind and capped at +4x, where `since` is the day the newer major's signing tag was cut; zero on that day, printed with both dates, and never summed into the exposure the line itself is already in",
+      "limits": [
+        "the pinned checkout carries no directory for v4.0.0, so the newer major's content is unread here: this line is priced from the signed tags alone, and no retirement to v4 is proposed until the ico pin reaches a commit that carries it"
+      ],
+      "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut; this checkout carries no directory for v4.0.0, so the line is priced from the signed tags alone"
+    },
+    {
+      "source": "feeds",
+      "kind": "feed",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 326139.1251644838,
+      "per_customer": {
+        "amount": 0.06655900513560893,
+        "currency": "GBP"
+      },
+      "name": "threat-register",
+      "old_version": "v1",
+      "new_version": "v4",
+      "old_price": 222574.31190283748,
+      "new_price": 326139.1251644838,
+      "old_tier": "isolated",
+      "proposed_tier": "isolated",
+      "changed": false,
+      "lef": [
+        4.0,
+        9.0,
+        20.0
+      ],
+      "lef_basis": "payment-fraud / account-takeover via API abuse (fintech, FCA/PCI, availability+fraud flavour). Frequency basis (editorial, read 2026-09-09): Annual loss-event frequency for this institution's headline threat. DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint COULD NOT LOOK: the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such. Magnitude basis (editorial, read 2026-09-09): Impact per payment-fraud / account-takeover event for a UK fintech: direct fraud loss plus reimbursement, higher per event than retail PII and far below a health record. COULD NOT LOOK: no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost.",
+      "proposed_as": "label",
+      "holes": [],
+      "total": null,
+      "pin_signature": {
+        "state": "signed",
+        "tag": "threat-register/v4.0.0",
+        "detail": "tag threat-register/v4.0.0 on the feeds checkout carries a signature block"
+      },
+      "hole": null,
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+      "superseded": {
+        "state": "current",
+        "detail": "no signed tag of the form threat-register/vN.x.y with N > 4 on the feeds checkout, so the pinned v4 is the newest published major"
+      }
+    },
+    {
+      "source": "feeds",
+      "kind": "feed",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 437107.3377948303,
+      "per_customer": {
+        "amount": 0.0892055791418021,
+        "currency": "GBP"
+      },
+      "name": "cve",
+      "old_version": "v2",
+      "new_version": "v3",
+      "old_price": null,
+      "new_price": 437107.3377948303,
+      "old_tier": null,
+      "proposed_tier": "isolated",
+      "changed": false,
+      "lef": [
+        0.99999,
+        1.99998,
+        5.9999400000000005
+      ],
+      "lef_basis": "Apache/Log4j2 CVSS 10.0 (critical), epss=0.99999. Source: CISA KEV; NVD CVE-2021-44228; FIRST EPSS 2026-10-03. headline entry CVE-2021-44228 of 2 (largest mode-product entry, mode lef x mode lm -- an ordinal proxy, not fair.py's PERT expectation; ticket 75 Q4); not priced by this line: CVE-2021-45046. Scanned intersection 2; 7 scanned CVE(s) outside the pinned feed carry no amount.",
+      "proposed_as": "label",
+      "old_absence_only": true,
+      "old_could_not_look": "No scanned CVE is in the pinned KEV feed; 9 scanned CVE(s) outside it are named absences carrying no amount.",
+      "priced_cve": "CVE-2021-44228",
+      "absences": [
+        {
+          "id": "CVE-2021-44832",
+          "amount": null,
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "id": "CVE-2021-45105",
+          "amount": null,
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "id": "CVE-2025-68161",
+          "amount": null,
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "id": "CVE-2026-34477",
+          "amount": null,
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "id": "CVE-2026-34480",
+          "amount": null,
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "id": "CVE-2026-46675",
+          "amount": null,
+          "reason": "outside pinned KEV feed"
+        },
+        {
+          "id": "CVE-2026-49844",
+          "amount": null,
+          "reason": "outside pinned KEV feed"
+        }
+      ],
+      "absence_count": 7,
+      "inventory_cve_count": 9,
+      "intersection_count": 2,
+      "holes": [],
+      "total": null,
+      "pin_signature": {
+        "state": "signed",
+        "tag": "cve/v3.0.0",
+        "detail": "tag cve/v3.0.0 on the feeds checkout carries a signature block"
+      },
+      "hole": {
+        "kind": "untagged-pin",
+        "source": "feeds",
+        "name": "cve",
+        "version": "v3",
+        "perspective": "tuppence",
+        "currency": "GBP",
+        "status": "closed",
+        "amount": 437107.3377948303,
+        "priced_by": "feeds cve@v3: the exposure the pin prices, read off a feed no signed tag carries",
+        "detail": "tag cve/v3.0.0 on the feeds checkout carries a signature block; the hole the last signed artefact recorded is closed"
+      },
+      "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
+      "superseded": {
+        "state": "current",
+        "detail": "no signed tag of the form cve/vN.x.y with N > 3 on the feeds checkout, so the pinned v3 is the newest published major"
+      }
+    },
+    {
+      "source": "twin",
+      "kind": "twin",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 84198283.0910635,
+      "per_customer": {
+        "amount": 17.18332307980888,
+        "currency": "GBP"
+      },
+      "name": "forward-intel",
+      "feed_version": "1.0.0",
+      "tail": "bounded-pert",
+      "policy_version": "1.1.0",
+      "policy_basis": "no priced tier is under the tolerance (15000.00 GBP), so the selection fails closed",
+      "residual_basis": "platform-cage-tiers@1.0.0",
+      "residuals": {
+        "baseline": 58938798.16374444,
+        "restricted": 25259484.927319054,
+        "quarantine": 6735862.647285077,
+        "isolated": 1683965.6618212715
+      },
+      "curve_hash": "sha256:b5dd65073f162cd3427be4668de3a4f7ec32547a48a9515b7bfc7f24a609888d",
+      "shock": "An exfiltration of the account and transaction record store suppresses fee income for a quarter.\nTHE TRIPLE IS AN ANCHOR, NOT A MEASUREMENT, and it is graded 3 for exactly that reason. This institution has no incident of its own to measure, so the three numbers are arithmetic on a comparable UK challenger bank's own published regulatory record, nested from the narrowest reading to the widest:\n\n  min  0.0640 = 28,959,426 / 452,800,000\n  mode 0.0698 = 28,959,426 / 414,814,000\n  max  0.0987 = 40,959,426 / 414,814,000\n\n28,959,426 GBP is the financial penalty in the FCA's Final Notice against Starling Bank Limited of 2024-09-27 (reference 730166), and 40,959,426 GBP is the same notice's figure before the 30% stage-one settlement discount. 452,800,000 GBP is the revenue the same notice states at 2.1 for 2023; 414,814,000 GBP is Total Income for the year ended 2023-03-31 in that bank's own audited Annual Report 2023, a different metric on a different reporting convention. Sources and the discrepancy are recorded in the hub's .scratch/ecosystem/research/94-studied-firms.md.\nWhat it is NOT: a conduct penalty is not a suppression of fee income, and that firm is not this one. Grade 3 on the published ladder is \"an established mechanism from published work, not observed here\", which is precisely the claim being made. Grade 3 is OUTSIDE the ladder's path_admission_threshold of 2, so no impact enters this perspective's pound through this edge and emit-forward-intel.py refuses to emit a priced payload while it is the only causal edge here. A grade-1 or grade-2 replacement is this institution's own dated incident record, and a regrade event has to record who moved it and why (twin/evidence.py).",
+      "horizon": 1,
+      "lef": [
+        4.0,
+        9.0,
+        20.0
+      ],
+      "lef_basis": "payment-fraud / account-takeover via API abuse (fintech, FCA/PCI, availability+fraud flavour). Frequency basis (editorial, read 2026-09-09): Annual loss-event frequency for this institution's headline threat. DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint COULD NOT LOOK: the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such. Magnitude basis (editorial, read 2026-09-09): Impact per payment-fraud / account-takeover event for a UK fintech: direct fraud loss plus reimbursement, higher per event than retail PII and far below a health record. COULD NOT LOOK: no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost.",
+      "lef_from": "threat-register",
+      "rests_on_grade": 3,
+      "old_tier": "isolated",
+      "proposed_tier": "isolated",
+      "changed": false,
+      "proposed_as": "label"
+    },
+    {
+      "source": "platform",
+      "kind": "agent-cage",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 18.69514626590289,
+      "per_customer": {
+        "amount": 3.815335972633243e-06,
+        "currency": "GBP"
+      },
+      "subject": "twin-agent",
+      "name": "twin-agent",
+      "residual_basis": "platform-twin-agent-table@1.0.0",
+      "proposed_as": "evidence",
+      "cost": {
+        "amount": 0.0,
+        "currency": "GBP",
+        "basis": "0 in cash at every rung: Actions minutes are free on a public repository and the local clock runs on the owner's own subscription (ticket 30 decision 15); booked in tcor, never read by the selection"
+      },
+      "window": {
+        "days": 1.0,
+        "source": "the hub's .github/workflows/truth.yml `schedule: cron: '47 5 * * *'` (once a day), read 2026-09-26 at policy-as-versioned-flux/policy-as-versioned-flux origin/main 9c3b1f22",
+        "detects": "a push to main or a merge made by a scheduled identity (verify/schedules/lane.py, eco-system ticket 142a) and a served declaration looser than the strictest priced line (verify/tier-binding)",
+        "assumes": [
+          "the truth run fires once a day as scheduled; the delay GitHub adds to a cron run (measured at up to ~5h on the estate's first firings) is not in the figure",
+          "the loss runs until detection, not until repair: a red gate is acted on the day it is read",
+          "one day is the schedule's whole interval, the upper bound on the wait for the next run; the mean wait is half of it"
+        ]
+      },
+      "proposed_tier": "baseline",
+      "old_tier": "baseline",
+      "changed": false,
+      "old_amount": 18.69514626590289,
+      "residuals": {
+        "baseline": 18.69514626590289,
+        "restricted": 18.69514626590289,
+        "quarantine": 18.69514626590289,
+        "isolated": 0.0
+      },
+      "closes": {
+        "baseline": [],
+        "restricted": [
+          "model-step-writes-a-wrong-binding-or-forecast"
+        ],
+        "quarantine": [
+          "misleading-proposal-merged-by-a-human",
+          "model-step-writes-a-wrong-binding-or-forecast"
+        ],
+        "isolated": [
+          "misleading-proposal-merged-by-a-human",
+          "model-step-writes-a-wrong-binding-or-forecast",
+          "writer-merges-or-tags-through-rest",
+          "writer-pushes-a-looser-declaration"
+        ]
+      },
+      "reach": {
+        "writer-pushes-a-looser-declaration": 1.0,
+        "writer-merges-or-tags-through-rest": 1.0,
+        "misleading-proposal-merged-by-a-human": 0.0,
+        "model-step-writes-a-wrong-binding-or-forecast": 0.0
+      },
+      "reach_basis": {
+        "writer-pushes-a-looser-declaration": ".github/workflows/twin-sweep.yml is scheduled (17 7 * * *) and its job(s) write run with contents: write on the repository that serves the governed Namespace, so a looser declaration the token pushes to main is served whole: the whole gap, until the hub gate reads the push (verify/schedules/lane.py grades a push to main by a scheduled identity as a FAIL, eco-system ticket 142a)",
+        "writer-merges-or-tags-through-rest": "the same contents: write token on .github/workflows/twin-sweep.yml (write) can merge a pull request through REST, landing the same looser declaration by another door, the whole gap; a REST tag signs only this party's own artefacts and moves no price under this perspective; the union of the two is the whole gap, until the hub gate reads the merge (lane.py grades a merge made by a scheduled identity as a FAIL, ticket 142a)",
+        "misleading-proposal-merged-by-a-human": "shift-left.yml job compose-check runs shift-left/tier_binding.py on every pull request, which refuses a declaration looser than the strictest priced line clamped to the floor, and shift-left.yml job compose-check recomposes the party artefact on every pull request and exits non-zero on drift against the committed composed/ tree (a compose invocation, a drift test on composed/ and a non-zero exit after it, read off the step's own run block), which refuses a hand-edited rung on this line; so a proposal a human merges through the gate serves none of the gap. A merge over a red gate is the human's act, not the twin agent's (ADR-0031 decision 1)",
+        "model-step-writes-a-wrong-binding-or-forecast": "no priced line rests on a grade above 3 (party/schema.json admits appetite.pricing_threshold 2 or 3 only, and a model's claim is grade 5, which never prices), so a wrong binding or forecast a model step writes reaches no figure this composition prices"
+      },
+      "scenario": {
+        "gap": 57254832.50192317,
+        "gap_currency": "GBP",
+        "loosest_pod_tier": "baseline",
+        "selected_pod_tier": "isolated",
+        "gap_from": "the `source: twin` line's residuals (platform-cage-tiers@1.0.0): baseline 58938798.16374444 minus isolated 1683965.6618212715",
+        "window_days": 1.0,
+        "window_source": "the hub's .github/workflows/truth.yml `schedule: cron: '47 5 * * *'` (once a day), read 2026-09-26 at policy-as-versioned-flux/policy-as-versioned-flux origin/main 9c3b1f22",
+        "window_detects": "a push to main or a merge made by a scheduled identity (verify/schedules/lane.py, eco-system ticket 142a) and a served declaration looser than the strictest priced line (verify/tier-binding)",
+        "window_assumes": [
+          "the truth run fires once a day as scheduled; the delay GitHub adds to a cron run (measured at up to ~5h on the estate's first firings) is not in the figure",
+          "the loss runs until detection, not until repair: a red gate is acted on the day it is read",
+          "one day is the schedule's whole interval, the upper bound on the wait for the next run; the mean wait is half of it"
+        ],
+        "lm": [
+          156755.18823250697,
+          156755.18823250697,
+          156755.18823250697
+        ],
+        "lm_basis": "the gap (57254832.50192317 GBP a year) times the window (1.0 day(s) of 365.25), a point magnitude: the loss of serving the loosest rung instead of the selected one for the window, per event",
+        "annualised_by": "expectation",
+        "annualised_basis": "E[events a year] x E[loss per event] over the PERT means (fair.expected_ale); fair.simulate at 10000 iterations rounds each year's event count to an integer and resolved 0.0000 of its years with an event (simulated ALE 0.0000), so the simulated mean is the engine's resolution, not the scenario's",
+        "simulated_ale": 0.0,
+        "simulated_p_gt_0": 0.0
+      },
+      "lef": [
+        8.4186e-05,
+        8.4186e-05,
+        0.00029465
+      ],
+      "lef_basis": "Frequency basis (published, read 2026-09-26): Annual frequency with which a marketplace action this institution's scheduled twin sweep runs by floating tag is compromised at that tag, taken as the frequency the sweep's write credential is misused. N x C / M with N = 1 (actions/checkout@v4, the one distinct marketplace action the served twin-sweep.yml references, read at tuppence origin/main 5deffe6 on 2026-09-26); C = 2 for the min and the mode (the marketplace actions CISA's alert of 2025-03-18 names as compromised in 2025: tj-actions/changed-files, CVE-2025-30066, used in over 23,000 repositories per StepSecurity's 2025-03-14 report, and reviewdog/action-setup, CVE-2025-30154) and 7 for the max (those two plus the five downstream reviewdog actions Wiz named on 2025-03-17 as compromised through action-setup: action-shellcheck, action-composite-template, action-staticcheck, action-ast-grep, action-typos); M = 23,757 marketplace actions counted over four months by Chaiwut and Nikiforakis (IEEE SecDev 2025). 8.42e-05 to 0.000295 events a year. Grade 3 on the estate's evidence ladder: published work, not observed here. COULD NOT LOOK: No publisher counts credential MISUSE after a compromise, so this rate counts every published compromise of a floating-tag marketplace action as a misuse of the sweep's token: an upper bound for that door, and the only door with a published count. Not in the rate: the hub checkout at `main` and `pip install pyyaml`, dependencies the served sweep runs unpinned today (eco-system ticket 143 pins both by hash, and hash-pinning closes the floating-tag door this rate counts); a maintainer's own compromised account pushing a workflow (GhostAction, GitGuardian, 2025-09-05: 327 users, 817 repositories, 3,325 secrets), which is a human credential, not the scheduled agent's; and a pwn request on the repository's own workflow (the Nx s1ngularity entry point, 2025-08-26). The count is one year's (2025): no second year is counted, so the min and mode are the two actions with a CVE and the max the seven Wiz names. No run of this estate has observed a misuse. What would close it: an institution's own dated incident record (grade 2), or a published per-repository annual rate of CI credential misuse.",
+      "lef_from": "threat-register",
+      "register_version": "v4",
+      "tail": "bounded-pert",
+      "policy_version": "1.1.0",
+      "policy_basis": "loosest tier whose caged residual (18.70 GBP) is within the tolerance (15000.00 GBP)",
+      "tcor": {
+        "tier": "baseline",
+        "residual": 18.69514626590289,
+        "cost_of_controls": 0.0,
+        "tcor": 18.69514626590289
+      },
+      "rests_on_grade": 3,
+      "rests_on_grade_basis": "the register row is published (grade 3 at best: published work, not observed here) and the twin line rests on grade 3; the weaker of the two"
+    },
+    {
+      "source": "ico",
+      "kind": "switching",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 17907950.69692567,
+      "per_customer": {
+        "amount": 3.654683815699116,
+        "currency": "GBP"
+      },
+      "name": "penalty-schema",
+      "version": "v3",
+      "since": "2026-08-28",
+      "as_of": "2026-10-03",
+      "pin_life_months": 2,
+      "over_pin_life": 2984658.4494876117,
+      "could_not_look": null,
+      "alternates": [],
+      "unpriceable": [
+        {
+          "kind": "feed",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 17907950.696925685
+        },
+        {
+          "kind": "supersede",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 1128446.208299428
+        }
+      ],
+      "sized": true,
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "dropped_edges": [
+        "ico/feed:penalty-schema@v3"
+      ]
+    },
+    {
+      "source": "feeds",
+      "kind": "switching",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "per_customer": null,
+      "name": "threat-register",
+      "version": "v4",
+      "since": "2026-08-28",
+      "as_of": "2026-10-03",
+      "pin_life_months": 2,
+      "over_pin_life": null,
+      "could_not_look": "missing instrument: twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at",
+      "alternates": [],
+      "unpriceable": [
+        {
+          "kind": "feed",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 17907950.696925685
+        },
+        {
+          "kind": "supersede",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 1128446.208299428
+        },
+        {
+          "kind": "feed",
+          "source": "feeds",
+          "name": "threat-register",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 326139.1251644838
+        },
+        {
+          "kind": "feed",
+          "source": "feeds",
+          "name": "cve",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 437107.3377948303
+        },
+        {
+          "kind": "twin",
+          "source": "twin",
+          "name": "forward-intel",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 84198283.0910635
+        },
+        {
+          "kind": "agent-cage",
+          "source": "platform",
+          "name": "twin-agent",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 18.69514626590289
+        }
+      ],
+      "sized": true,
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "dropped_edges": [
+        "feeds/feed:threat-register@v4",
+        "feeds/feed:cve@v3"
+      ]
+    },
+    {
+      "source": "feeds",
+      "kind": "switching",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "per_customer": null,
+      "name": "cve",
+      "version": "v3",
+      "since": "2026-09-08",
+      "as_of": "2026-10-03",
+      "pin_life_months": 1,
+      "over_pin_life": null,
+      "could_not_look": "missing instrument: twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at",
+      "alternates": [],
+      "unpriceable": [
+        {
+          "kind": "feed",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 17907950.696925685
+        },
+        {
+          "kind": "supersede",
+          "source": "ico",
+          "name": "penalty-schema",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 1128446.208299428
+        },
+        {
+          "kind": "feed",
+          "source": "feeds",
+          "name": "threat-register",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 326139.1251644838
+        },
+        {
+          "kind": "feed",
+          "source": "feeds",
+          "name": "cve",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 437107.3377948303
+        },
+        {
+          "kind": "twin",
+          "source": "twin",
+          "name": "forward-intel",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 84198283.0910635
+        },
+        {
+          "kind": "agent-cage",
+          "source": "platform",
+          "name": "twin-agent",
+          "perspective": "tuppence",
+          "currency": "GBP",
+          "amount": 18.69514626590289
+        }
+      ],
+      "sized": true,
+      "basis": "re-composed with this publisher's feed edges dropped",
+      "dropped_edges": [
+        "feeds/feed:threat-register@v4",
+        "feeds/feed:cve@v3"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "kind": "closed-hole",
+      "source": "nist",
+      "control_id": "ac-4",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": null,
+      "priced_by": null,
+      "detail": "nist:ac-4 was a recorded hole and a claim now covers it; no pinned instrument names a price for it"
+    },
+    {
+      "kind": "closed-untagged-pin",
+      "source": "feeds",
+      "name": "cve",
+      "version": "v3",
+      "perspective": "tuppence",
+      "currency": "GBP",
+      "amount": 437107.3377948303,
+      "priced_by": "feeds cve@v3: the exposure the pin prices, read off a feed no signed tag carries",
+      "detail": "tuppence pins feeds/cve@v3; tag cve/v3.0.0 on the feeds checkout carries a signature block; the hole the last signed artefact recorded is closed; 437107.34 GBP of exposure is again against a signed feed"
+    }
+  ],
+  "floor_change": {
+    "schema": 1,
+    "before": {
+      "known": false
+    },
+    "after": {
+      "known": true,
+      "value": null
+    },
+    "changed": null,
+    "basis": "floor-only counterfactual at current publisher, scenario, appetite and selection inputs",
+    "residual_basis": "platform-cage-tiers@1.0.0",
+    "lines": [
+      {
+        "source": "ico",
+        "kind": "feed",
+        "name": "penalty-schema",
+        "perspective": "tuppence",
+        "currency": "GBP",
+        "uncaged_amount": 17907950.696925685,
+        "before_tier": null,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "after_residual": 358159.013938514,
+        "residual_delta": null
+      },
+      {
+        "source": "feeds",
+        "kind": "feed",
+        "name": "threat-register",
+        "perspective": "tuppence",
+        "currency": "GBP",
+        "uncaged_amount": 326139.1251644838,
+        "before_tier": null,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "after_residual": 6522.782503289682,
+        "residual_delta": null
+      },
+      {
+        "source": "feeds",
+        "kind": "feed",
+        "name": "cve",
+        "perspective": "tuppence",
+        "currency": "GBP",
+        "uncaged_amount": 437107.3377948303,
+        "before_tier": null,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "after_residual": 8742.146755896614,
+        "residual_delta": null
+      },
+      {
+        "source": "twin",
+        "kind": "twin",
+        "name": "forward-intel",
+        "perspective": "tuppence",
+        "currency": "GBP",
+        "uncaged_amount": 84198283.0910635,
+        "before_tier": null,
+        "after_tier": "isolated",
+        "before_residual": null,
+        "after_residual": 1683965.6618212715,
+        "residual_delta": null
+      }
+    ],
+    "could_not_look": "previous floor was not recorded; absence of history is not an absent floor",
+    "limit": "selection evidence, not an enacted Namespace tier; platform reductions are self-declared calibration, not measured effectiveness"
+  },
+  "limits": [
+    {
+      "name": "two-publisher-conflict",
+      "detail": "the cross-party rule-conflict path above is only exercised in the real estate once a second implementations publisher is pinned",
+      "count": 1,
+      "status": "open"
+    },
+    {
+      "name": "pinned-parent-lacks-rendered-versions",
+      "detail": "the composed set renders policy versions the pinned parent commit does not contain; the header names a parent release that holds none of these trees. every rendered version is present at the pinned commit",
+      "count": 0,
+      "checked": 3,
+      "status": "closed"
+    },
+    {
+      "name": "publisher-clone-absent",
+      "detail": "every priced feed was read from its publisher's own pinned tree",
+      "count": 0,
+      "checked": 3,
+      "status": "closed"
+    }
+  ],
+  "vendored": [
+    {
+      "party": "ico",
+      "kind": "feed",
+      "name": "penalty-schema",
+      "version": "v3",
+      "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e",
+      "feed_path": "penalty-schema/v3/feed.json",
+      "party_artefact": "party.yaml",
+      "converter": "penalty-schema/to_fair_scenario.py",
+      "converter_from": "ico",
+      "invocation": [
+        "build",
+        "uk-gdpr",
+        "lower-tier",
+        "--turnover",
+        "861741000.00"
+      ],
+      "scenario_sha256": "9e70f53652573217262ae953b18d1834d70e6db8760e7de781f8a1ce7d246cf0",
+      "payload_version_key": "schema_version",
+      "published_at": "2026-08-28",
+      "files": {
+        "party.yaml": "6f7e82a9616ee49ba2bbe1f2824b43458f8f72fd859216e2d5ba32577364ac72",
+        "penalty-schema/to_fair_scenario.py": "560a38c04397e8e98d56a279ca5b88cb2b2707a8a22a5c8d71a9be74946bb982",
+        "penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda"
+      },
+      "publisher_observation": {
+        "schema": 1,
+        "party": "ico",
+        "name": "penalty-schema",
+        "version": "v3",
+        "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "v3.0.0",
+          "detail": "tag v3.0.0 on the ico checkout carries a signature block"
+        },
+        "newer": {
+          "version": "v4",
+          "tag": "v4.0.0",
+          "tagged": "2026-09-10",
+          "published_at": null,
+          "readable": false,
+          "since_tag": "v4.0.0",
+          "since": "2026-09-10"
+        },
+        "superseded": {
+          "state": "behind",
+          "detail": "tag v4.0.0, signed 2026-09-10, publishes penalty-schema v4 ahead of the pinned v3; behind since 2026-09-10, the day v4.0.0 was cut; this checkout carries no directory for v4.0.0, so the line is priced from the signed tags alone"
+        }
+      },
+      "path": "composed/feeds/ico/penalty-schema/v3"
+    },
+    {
+      "party": "feeds",
+      "kind": "feed",
+      "name": "threat-register",
+      "version": "v4",
+      "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+      "feed_path": "threat-register/v4/feed.json",
+      "party_artefact": "party.yaml",
+      "converter": "threat-register/to_fair_scenario.py",
+      "converter_from": "feeds",
+      "invocation": [
+        "threat",
+        "tuppence"
+      ],
+      "scenario_sha256": "39b75a99f70133cb6cdfdb7a1d1ab057a5908786c866f6a5637e81dde1ed96d4",
+      "payload_version_key": "feed_version",
+      "published_at": "2026-09-26",
+      "files": {
+        "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+        "threat-register/to_fair_scenario.py": "5b58162dd42404c0afc0ad3d063aeb4cd71a7076baca7ed7f7875e781d509d41",
+        "threat-register/v4/feed.json": "e88332226c882103e469b43770bd177ff10384500825236f2fcdaf11dda168fd"
+      },
+      "publisher_observation": {
+        "schema": 1,
+        "party": "feeds",
+        "name": "threat-register",
+        "version": "v4",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "threat-register/v4.0.0",
+          "detail": "tag threat-register/v4.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form threat-register/vN.x.y with N > 4 on the feeds checkout, so the pinned v4 is the newest published major"
+        }
+      },
+      "path": "composed/feeds/feeds/threat-register/v4"
+    },
+    {
+      "party": "feeds",
+      "kind": "feed",
+      "name": "cve",
+      "version": "v3",
+      "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+      "feed_path": "cve/v3/feed.json",
+      "party_artefact": "party.yaml",
+      "converter": "cve/to_fair_scenario.py",
+      "converter_from": "platform",
+      "invocation": [
+        "cve",
+        "--inventory-json",
+        "{\"images\":[{\"database_date\":\"2026-10-03T07:01:46.027466673Z\",\"digest\":\"sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5\",\"image\":\"ghcr.io/policy-as-versioned-tuppence/ledger:v1.0.1@sha256:4c769ab891a1e1b19b4f5f6884cf9a6ac37ef1cbc0f4aaeae02fdd7c2004d4c5\",\"scanner_version\":\"0.69.3\",\"vulnerabilities\":[{\"fixed_version\":\"2.15.0, 2.3.1, 2.12.2\",\"id\":\"CVE-2021-44228\",\"installed_version\":\"2.14.1\",\"package\":\"org.apache.logging.log4j:log4j-core\",\"severity\":\"CRITICAL\"},{\"fixed_version\":\"2.3.2, 2.12.4, 2.17.1\",\"id\":\"CVE-2021-44832\",\"installed_version\":\"2.14.1\",\"package\":\"org.apache.logging.log4j:log4j-core\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"2.16.0, 2.12.2, 2.3.1\",\"id\":\"CVE-2021-45046\",\"installed_version\":\"2.14.1\",\"package\":\"org.apache.logging.log4j:log4j-core\",\"severity\":\"CRITICAL\"},{\"fixed_version\":\"2.12.3, 2.17.0, 2.3.1\",\"id\":\"CVE-2021-45105\",\"installed_version\":\"2.14.1\",\"package\":\"org.apache.logging.log4j:log4j-core\",\"severity\":\"HIGH\"},{\"fixed_version\":\"2.25.3\",\"id\":\"CVE-2025-68161\",\"installed_version\":\"2.14.1\",\"package\":\"org.apache.logging.log4j:log4j-core\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"2.25.4\",\"id\":\"CVE-2026-34477\",\"installed_version\":\"2.14.1\",\"package\":\"org.apache.logging.log4j:log4j-core\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"2.25.4\",\"id\":\"CVE-2026-34480\",\"installed_version\":\"2.14.1\",\"package\":\"org.apache.logging.log4j:log4j-core\",\"severity\":\"MEDIUM\"},{\"fixed_version\":\"1.6.59-r0\",\"id\":\"CVE-2026-46675\",\"installed_version\":\"1.6.58-r1\",\"package\":\"libpng\",\"severity\":\"UNKNOWN\"},{\"fixed_version\":\"2.25.5, 2.26.1\",\"id\":\"CVE-2026-49844\",\"installed_version\":\"2.14.1\",\"package\":\"org.apache.logging.log4j:log4j-api\",\"severity\":\"MEDIUM\"}]}],\"schema_version\":\"1.0.0\"}"
+      ],
+      "scenario_sha256": "0c8a5bfa361241d742048cdcabbc4918484991bcc4db614b1666d5ccf0fdd9d0",
+      "payload_version_key": "feed_version",
+      "published_at": "2026-10-03",
+      "files": {
+        "cve/to_fair_scenario.py": "b83f29a6778a53dec94c752f6101a80adeb788a4f1f1d20ac2584a5d6ff34b7b",
+        "cve/v3/feed.json": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+        "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823"
+      },
+      "publisher_observation": {
+        "schema": 1,
+        "party": "feeds",
+        "name": "cve",
+        "version": "v3",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "cve/v3.0.0",
+          "detail": "tag cve/v3.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form cve/vN.x.y with N > 3 on the feeds checkout, so the pinned v3 is the newest published major"
+        }
+      },
+      "path": "composed/feeds/feeds/cve/v3"
+    }
+  ],
+  "engine": {
+    "declared": {
+      "engine": "kyverno",
+      "version": "1.18.2",
+      "file": "gitops/engine/kyverno.yaml"
+    },
+    "file": "gitops/engine/kyverno.yaml",
+    "pairings": [
+      {
+        "subject": "platform policy 5.0.0",
+        "party": "platform",
+        "line": "5.0.0",
+        "tree": "platform@5.0.0",
+        "read_from": "distribution/versions.yaml",
+        "tested_engines": [
+          "1.18.2"
+        ],
+        "status": "supported",
+        "reason": null,
+        "bodies": [
+          "cage-netpol",
+          "cage-tier",
+          "posture-trust-boundary",
+          "require-nonroot",
+          "stamp-posture"
+        ],
+        "controls": [
+          "ac-4",
+          "ac-6",
+          "cm-6"
+        ]
+      },
+      {
+        "subject": "platform policy 6.0.0",
+        "party": "platform",
+        "line": "6.0.0",
+        "tree": "platform@5.0.0",
+        "read_from": "distribution/versions.yaml",
+        "tested_engines": [
+          "1.18.2"
+        ],
+        "status": "supported",
+        "reason": null,
+        "bodies": [
+          "cage-netpol",
+          "cage-tier",
+          "posture-trust-boundary",
+          "require-nonroot",
+          "stamp-posture"
+        ],
+        "controls": [
+          "ac-4",
+          "ac-6",
+          "cm-6"
+        ]
+      },
+      {
+        "subject": "platform policy 7.0.0",
+        "party": "platform",
+        "line": "7.0.0",
+        "tree": "platform@5.0.0",
+        "read_from": "distribution/versions.yaml",
+        "tested_engines": [
+          "1.18.2",
+          "1.19.1"
+        ],
+        "status": "supported",
+        "reason": null,
+        "bodies": [
+          "cage-netpol",
+          "cage-tier",
+          "require-nonroot",
+          "stamp-posture"
+        ],
+        "controls": [
+          "ac-4",
+          "ac-6",
+          "cm-6"
+        ]
+      },
+      {
+        "subject": "platform machinery",
+        "party": "platform",
+        "line": "machinery",
+        "tree": "platform@5.0.0",
+        "read_from": "distribution/machinery.yaml",
+        "tested_engines": [
+          "1.18.2",
+          "1.19.1"
+        ],
+        "status": "supported",
+        "reason": null,
+        "bodies": [
+          "cage-netpol-bottom-rung",
+          "governed-namespace-cage-holds",
+          "governed-namespace-requires-claim",
+          "governed-namespace-unclaimed-report",
+          "policy-version-orphan-cage",
+          "policy-version-orphan-cage-holds",
+          "policy-version-orphan-guard"
+        ],
+        "controls": [
+          "ac-4",
+          "cm-6"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "hub_commit": "9c3b1f22dcdafebc0333557f76655014e4be216b",
+  "scope": "offline exact pinned hub source plus actual candidate producer --check in disposable relocated copies; no external actions or shared writes",
+  "adopters": {
+    "driftwood": {
+      "candidate": "aa923631de95276615e4985e67ee41971efacf25",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/driftwood/twin/emit-forward-intel.py\", line 367, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/driftwood/twin/emit-forward-intel.py\", line 352, in main\n    rendered = render()\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/driftwood/twin/emit-forward-intel.py\", line 344, in render\n    return json.dumps(envelope(payload(overlay, currency, party)), indent=2, ensure_ascii=False) + \"\\n\"\n                               ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/driftwood/twin/emit-forward-intel.py\", line 252, in payload\n    valuation_reading = valuation_amount(party, priced[cash_flow], currency)\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/driftwood/twin/emit-forward-intel.py\", line 212, in valuation_amount\n    from twin.valuation import MissingInstrument, rederive\nModuleNotFoundError: No module named 'twin.valuation'\n"
+    },
+    "tuppence": {
+      "candidate": "c70edb11086527c439b9adbc094eca6140136ae0",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/tuppence/twin/emit-forward-intel.py\", line 413, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/tuppence/twin/emit-forward-intel.py\", line 392, in main\n    rendered = render()\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/tuppence/twin/emit-forward-intel.py\", line 382, in render\n    return json.dumps(envelope(payload(overlay, currency, party, rungs)), indent=2,\n                               ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/tuppence/twin/emit-forward-intel.py\", line 317, in payload\n    valuation_reading = valuation_amount(party, overlay.perspectives[ORG][\"values\"][cash_flow], currency)\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/tuppence/twin/emit-forward-intel.py\", line 282, in valuation_amount\n    from twin.valuation import MissingInstrument, rederive\nModuleNotFoundError: No module named 'twin.valuation'\n"
+    },
+    "ludlow": {
+      "candidate": "4f81da7eca50ae9adadcb905813cf06f17a5d9a1",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/ludlow/twin/emit-forward-intel.py\", line 413, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/ludlow/twin/emit-forward-intel.py\", line 392, in main\n    rendered = render()\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/ludlow/twin/emit-forward-intel.py\", line 382, in render\n    return json.dumps(envelope(payload(overlay, currency, party, rungs)), indent=2,\n                               ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/ludlow/twin/emit-forward-intel.py\", line 317, in payload\n    valuation_reading = valuation_amount(party, overlay.perspectives[ORG][\"values\"][cash_flow], currency)\n  File \"/private/tmp/pavf-stage2-old-hub-review-tczax9ml/.estate-clone/ludlow/twin/emit-forward-intel.py\", line 282, in valuation_amount\n    from twin.valuation import MissingInstrument, rederive\nModuleNotFoundError: No module named 'twin.valuation'\n"
+    }
+  }
+}

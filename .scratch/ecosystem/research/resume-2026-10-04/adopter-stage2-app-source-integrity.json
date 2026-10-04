@@ -1,0 +1,60 @@
+{
+  "driftwood": [
+    {
+      "path": "apps/storefront/Dockerfile",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/storefront/README.md",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/storefront/package.json",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/storefront/public/index.html",
+      "retained_identically": true
+    }
+  ],
+  "tuppence": [
+    {
+      "path": "apps/ledger/Dockerfile",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/ledger/README.md",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/ledger/pom.xml",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/ledger/src/main/java/com/mycompany/ledger/Ledger.java",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/ledger/src/main/resources/log4j2.xml",
+      "retained_identically": true
+    }
+  ],
+  "ludlow": [
+    {
+      "path": "apps/reports/Dockerfile",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/reports/README.md",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/reports/app.py",
+      "retained_identically": true
+    },
+    {
+      "path": "apps/reports/requirements.txt",
+      "retained_identically": true
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "scope": "read-only authentic-pair contract inspection; no live reconciliation or production mutation",
+  "verdict": "No tag/commit fetch failure in current unverified fanout: Flux commit takes precedence. Internal leaf sources receive no runtime tag-boundary verification, a documented ceiling.",
+  "actual_fanout": {
+    "path": "distribution/versions.yaml",
+    "ref_fields": [
+      "tag",
+      "commit"
+    ],
+    "spec_verify_present": false,
+    "gitsign_annotations_present": false,
+    "effective_fetch": "array commit A",
+    "own_verifier_watched": false
+  },
+  "official_flux_reference": "https://fluxcd.io/flux/components/source/gitrepositories/#commit-example",
+  "prior_repository_live_proof": "distribution/verify/PRECONDITION-h6-12.md:58",
+  "own_verifier_scope": {
+    "watch_filter": "verify_gitsign.py:440",
+    "reconcile": "verify_gitsign.py:365",
+    "ref_commit_checked": false,
+    "tag_signature_only": true,
+    "rekor_checked_by_own_controller": false,
+    "readme_declared_commit_constraint": "README.md:138"
+  },
+  "offline_proof": {
+    "fetch": "stub returns already-authentic local repository; no network",
+    "kubernetes": "in-memory patches only",
+    "verifier_code_sha256": "6855f5da15eb3090fcaed391f3f7587bd213ae31797337c56604267ce71eb04c",
+    "tagger_skew_seconds_from_shipped_deployment": 60,
+    "authentic_pairs": [
+      {
+        "version": "6.0.0",
+        "tag": "policy/v6.0.0",
+        "array_commit_A": "b18a0d8946f9dbeb5fbcf6bbe5233b9c919a7c8c",
+        "tag_target_B": "59ec7ce39bcd658c2454b23ce1cc26082e737fdd",
+        "tag_target_parent_equals_array_commit": true,
+        "policy_tree_ids": {
+          "b18a0d8946f9dbeb5fbcf6bbe5233b9c919a7c8c": "3e0cf747eeecba8947a6f9f67b417dbd23137376",
+          "59ec7ce39bcd658c2454b23ce1cc26082e737fdd": "3e0cf747eeecba8947a6f9f67b417dbd23137376"
+        },
+        "offline_own_controller_result": true,
+        "offline_own_controller_reason": "policy/v6.0.0 signed by https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main at 1791084056",
+        "in_memory_patch_count": 1
+      },
+      {
+        "version": "7.0.0",
+        "tag": "policy/v7.0.0",
+        "array_commit_A": "393a40f707f2b23a3a174696a0c84a8473297ca9",
+        "tag_target_B": "703eff6aee959843c4160aa54fd03413f62858cc",
+        "tag_target_parent_equals_array_commit": true,
+        "policy_tree_ids": {
+          "393a40f707f2b23a3a174696a0c84a8473297ca9": "9af2c788bf22701a89de763104b18f98d387a1f1",
+          "703eff6aee959843c4160aa54fd03413f62858cc": "9af2c788bf22701a89de763104b18f98d387a1f1"
+        },
+        "offline_own_controller_result": true,
+        "offline_own_controller_reason": "policy/v7.0.0 signed by https://github.com/policy-as-versioned-platform/platform/.github/workflows/cut-release.yml@refs/heads/main at 1791098472 (certificate issued 1s later; chained at 1791098473)",
+        "in_memory_patch_count": 1
+      }
+    ]
+  },
+  "limits": [
+    "Official ref precedence plus prior recorded live p3 supports fetch acceptance; no new live Ready claim.",
+    "Adding Flux verify.mode=Tag would change this contract and previously stalled with commit present.",
+    "Equal policy trees and direct ancestry are release-side facts, not runtime signature/artifact binding.",
+    "The own controller verifies annotated ref.tag without validating ref.commit; actual internal fanout has no such annotations."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-10-03T23:15:13.526Z",
+  "root": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7",
+  "adopters": {
+    "driftwood": {
+      "estate": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate",
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+      "source": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/driftwood",
+      "source_base": "529e159397d3e64f94b0270cc7de69c235580961",
+      "stage1_clone": "/private/tmp/pavf-apps-bootstrap-lnuADR/driftwood-estate/driftwood",
+      "upstream": "https://github.com/policy-as-versioned-driftwood/driftwood"
+    },
+    "tuppence": {
+      "estate": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate",
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/tuppence",
+      "source": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/tuppence",
+      "source_base": "6e164faea7ca51529b35f4485e96ee8b92ce05d1",
+      "stage1_clone": "/private/tmp/pavf-apps-bootstrap-lnuADR/tuppence-estate/tuppence",
+      "upstream": "https://github.com/policy-as-versioned-tuppence/tuppence"
+    },
+    "ludlow": {
+      "estate": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate",
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+      "source": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/ludlow",
+      "source_base": "9df8efda60b4f4291b0407b4b4b9216c1d416dfb",
+      "stage1_clone": "/private/tmp/pavf-apps-bootstrap-lnuADR/ludlow-estate/ludlow",
+      "upstream": "https://github.com/policy-as-versioned-ludlow/ludlow"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "driftwood": {
+    "original_source_untouched": true,
+    "changed_original_paths": [],
+    "upstream_derived_and_clock_files_retained": {
+      "drift/samples.jsonl": true,
+      "observations/twin-sweep.jsonl": true,
+      "composed/HEADER.yaml": true
+    }
+  },
+  "tuppence": {
+    "original_source_untouched": true,
+    "changed_original_paths": [],
+    "upstream_derived_and_clock_files_retained": {
+      "drift/samples.jsonl": true,
+      "observations/twin-sweep.jsonl": true,
+      "composed/HEADER.yaml": true
+    }
+  },
+  "ludlow": {
+    "original_source_untouched": true,
+    "changed_original_paths": [],
+    "upstream_derived_and_clock_files_retained": {
+      "drift/samples.jsonl": true,
+      "observations/twin-sweep.jsonl": true,
+      "composed/HEADER.yaml": true
+    }
+  }
+}

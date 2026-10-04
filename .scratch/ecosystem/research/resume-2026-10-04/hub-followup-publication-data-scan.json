@@ -1,0 +1,994 @@
+{
+  "scope": "Heuristic high-confidence private-key and credential scan of Oct4 publication data; no secret values output, not an absolute proof. Source3files also reviewed; no workflow mutation.",
+  "files": 197,
+  "total_bytes": 11648525,
+  "matches": [],
+  "invalid_json": [],
+  "manifest": [
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-published-hub-reachability-review.json",
+      "bytes": 730,
+      "sha256": "fa75793ad196ee1f42c15dfd7216ba59b5a77348ab7fcc0f12021eee6d2be16b"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-self-pin-contract-checks.json",
+      "bytes": 2767,
+      "sha256": "1044b06e58938fe1d14f643a15b47ff3dd2bd9fc55dc150995529b9282875fd7"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-self-pin-sequence-spec-review.md",
+      "bytes": 2620,
+      "sha256": "dc123e16323bde3a56ee97ce22e736a1935937c3b279d20e213915557264ba17"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-actual-policy7-corpus.json",
+      "bytes": 13685,
+      "sha256": "f5d19f50edec43929d21dfa0eafdb518f45b519010d5c5f4899262a38850d9c3"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-actual-policy7-corpus.log",
+      "bytes": 128,
+      "sha256": "2b407defc1669ef73257d0707cf59dc63799f7d3e428016752b46d5d24201deb"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-actual-policy7-corpus.py",
+      "bytes": 1298,
+      "sha256": "a92a73b8c5d2ebfc19196a576038af0e89d5d3aa082bdaad4d7aa1d030a3e024"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-app-source-integrity.json",
+      "bytes": 1286,
+      "sha256": "c1de3b985fdaac06a8c4a09255c9ba151471ba3034f651a96190dcf9ef9ff021"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-authentic-feed-checkouts.json",
+      "bytes": 2020,
+      "sha256": "ee71c0bdb01a4945631f1bc65029008465995c8fec76774a2b7ba3ef532b3ae5"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-authentic-input-moves.json",
+      "bytes": 2035,
+      "sha256": "98fdf587748aa034b9aa5a87cb22c27f816c1e21530ffc6a7ec0b1b921a6913f"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-authentic-platform-checkouts.json",
+      "bytes": 1254,
+      "sha256": "be293ab9e2dc987a3c0239a31a1fc337b9906adbad52fe17e6137dbca6dd8fda"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-authenticated-compose.json",
+      "bytes": 12600,
+      "sha256": "f68ebef2026405612aabb98338d4cf7779406001a999f85cbb2d741f9f6fb56c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-authenticated-relocated-replay.json",
+      "bytes": 1238,
+      "sha256": "f4e6f557b6c3b20aa0c99b3eacda97b7ddfbf6d687beecf7f57602182ddf2844"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-authenticated-relocated-replay.log",
+      "bytes": 152,
+      "sha256": "40fa006b2605f1c62d97a667145f9e3f6966045024e0d5505f81611f92078e28"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-authenticated-relocated-replay.py",
+      "bytes": 1749,
+      "sha256": "3e1ad54f5456b549f8e1d4504107a58b752d5ac61217e921835eef9e31436d39"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-clock-availability.json",
+      "bytes": 31455,
+      "sha256": "ff98a2c305b9c80fef215e202998da561b72ac79c285c969215d4f16b72d1afc"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-corrected-standards-review.json",
+      "bytes": 6740,
+      "sha256": "2a5c881d88c8166bc458999c8d18d711c660698c819c64c64b0ae09db6a1ebad"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-declarations.json",
+      "bytes": 8789,
+      "sha256": "105a5030166728181c21f5b19dedb48089af3698c194210d5a3056e8bdc0f486"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-export-candidates.py",
+      "bytes": 4865,
+      "sha256": "c1d78a122adf3c495078fca7aa6ee6789ab910e91942e9be64c9f04b45c76972"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-feed-header-proof.json",
+      "bytes": 5058,
+      "sha256": "dabf002efe714d795508e1c4f80ccc35677d5a2f00236fd7ce01dabd5bc9b363"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-feed-header-proof.py",
+      "bytes": 638,
+      "sha256": "56533259e56319860c2350e1cb90d65e51a5373e1f3863407ed41568bdaec32c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-feed-resolution-proof.json",
+      "bytes": 2713,
+      "sha256": "0076e36a2098d0b5de876230b970fa73072536b4a128710635008c99f4e14323"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-final-source-standards-review.json",
+      "bytes": 81870,
+      "sha256": "8d9d526cf35edffaa86da94ece193fa93f0496c3533d414f4f9454f1f2413ed6"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-final-source-standards-review.md",
+      "bytes": 2480,
+      "sha256": "c20d756d4c10bfa7f4828eb4ae79b0bc8c236e2176d5c916c52d3de8d15a74f8"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-first-feed-refresh.json",
+      "bytes": 3969,
+      "sha256": "c02f6c648317bab8f5092f2432e6619b6ae5c16be891a8d055572fbe4c5d315b"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-focused-tests.log",
+      "bytes": 92,
+      "sha256": "41f5a0d013fd7c6079fef9c5242627d725cd5d401dd011f0f654f42f08c4ce53"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-grade-candidates.py",
+      "bytes": 3472,
+      "sha256": "050b51b12e93224748d593133a9884dbeb1a7eb71186868eabf0c361e147ddde"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-header-publisher-observations.json",
+      "bytes": 7292,
+      "sha256": "fb0f7d16faef415e729a9a1eaf3ad6580e9cc80894eebdc40753e0e86c9ae37d"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-header-publisher-observations.py",
+      "bytes": 863,
+      "sha256": "ba07bdeb65b7554f7122fd96d020cbf7f2bb0f6a3a583b5c8ca835b99df35173"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-initial-standards-review.json",
+      "bytes": 1346,
+      "sha256": "68e168d5c34b78f50d4152b0f32bba93cbb07bd0fd48db5bc966903250ff40b1"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-isolated.json",
+      "bytes": 1713,
+      "sha256": "17e4c344b65b8727c95bc074eca9b2baa299194f3ecbdd86c7255b392ef0daec"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-local-threeway.json",
+      "bytes": 66336,
+      "sha256": "76685f24929e7449fc21c7f908c45d9d24b02b892eaa908667df3558d188fca7"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-neutral-patch-manifest.json",
+      "bytes": 6509,
+      "sha256": "346ce39aafc75a4cb7f8a1e937f5daeb0de036a76b580b1e0360779d2e2db0fd"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-parent-checkouts.json",
+      "bytes": 4335,
+      "sha256": "c245d605c51fa4086d706916eada1e6a4ad1a3135d2190e27313cc99c12a1f75"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-pinned-hub-producer-negative.json",
+      "bytes": 4167,
+      "sha256": "884329705f77ab27f57afdac3a85807f4a7b25856ad2c3120e1715eb94933329"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-pre-pin-validation.json",
+      "bytes": 5793,
+      "sha256": "9ecbbff1a969c252aeac14f447780fdb9db16149c36fbd926979831e1c6187f9"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-precommit-status.json",
+      "bytes": 12239,
+      "sha256": "e520da907ca15b62ab6daa3b3c01f497c341cd14b7f36708db38bc7fc65cfc33"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-preparation-checkpoint.md",
+      "bytes": 4743,
+      "sha256": "3939b0d4beb29b7aa6cf9d959a5028653478d378f238d5caf8606bca4a75dc04"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-prune-obsolete-generated.py",
+      "bytes": 1552,
+      "sha256": "103827c13a9324c6f8ea49a08e16dde847037ad913b0fa27c6e3a073ba339d59"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-pruned-generated.json",
+      "bytes": 22363,
+      "sha256": "2b31776c116e64956da06d85b013d308e9be3f08bc0a16b5ee46c72119e68ecf"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-published-hub-compose.json",
+      "bytes": 2958,
+      "sha256": "bfc089328381df7725ce78b36c61cf0c727919c362511e67e93f786e123f0a29"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-published-hub-producers-initial-stale.json",
+      "bytes": 1288,
+      "sha256": "db90a9980ac6c81adb1f4a5bd99800829506f3f167930a4d58f9737ab61d7782"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-published-hub-producers.json",
+      "bytes": 7268,
+      "sha256": "bd0e8790f4f6aeab585864e6d31a8e5ba3933d6e68590c038fae93b8fd35fe6c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-published-hub-producers.py",
+      "bytes": 5563,
+      "sha256": "5ac29c059493a855467db227311b70b9786a16ccebfb8d6b48613f380b7eb105"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-published-hub-semantic-checkpoint.md",
+      "bytes": 3270,
+      "sha256": "4684a0e65e642e0b2c508560c9d36220760d31bdc538dd38b96d485b26299696"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-published-hub-working.json",
+      "bytes": 2099,
+      "sha256": "52f24d44c9421ff60efaae5052bcdce4d9d201bd219a29d4d33db5e615e2d983"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-refresh-compose.py",
+      "bytes": 1552,
+      "sha256": "6316b2cb9674c58847bf3a6f1a41391d120d31d21ff48e213fb49f4fb7a08aa8"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-source-A-candidates.json",
+      "bytes": 28404,
+      "sha256": "e78b57c62d9db56e41e552f50c0e826db3bcd29b8c2d367c20a590b6315f8ecf"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-source-A-grades.json",
+      "bytes": 21057,
+      "sha256": "9e5f2b35a95b93668e59a8d7b52e9d78b87c2679b64d646bc5ae00d3cf2cdb1c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-source-A-report.md",
+      "bytes": 8664,
+      "sha256": "7ac01da815bcd04054ee02b7bffcc388b8d8765d518ef064e004d8f745f1a693"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-source-contract-check.json",
+      "bytes": 1749,
+      "sha256": "0470f0343919806a80fe80af8d9b4a7f751d3c5fa9a2c93ec3ebcb8d594c88df"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-source-contract-check.py",
+      "bytes": 1651,
+      "sha256": "8eab663dd157632a013af72228dbf37353a7feb18d37ad76243f7f0fb7932e89"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-source-integrity.json",
+      "bytes": 800,
+      "sha256": "dfa29a6f9519839fb0b66bf62e85de27d9ac38cec17eb941d34b4a2cf978167e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-source-snapshot.json",
+      "bytes": 14569,
+      "sha256": "e3e68237f6916f27ea7db944ea115b895745619bf87c818a4c67c0f504ee7c23"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-spec-check.py",
+      "bytes": 4774,
+      "sha256": "e6d61932b61cb45fff452fbfb7b78fcd2964f9a750a1f2e27199724b1200f116"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-spec-pre-pin-checks.json",
+      "bytes": 9014,
+      "sha256": "38cd7cf4d2d449ba326eab991680047355cbe810aabe025d37853d3b3f0f467b"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-spec-pre-pin-review.md",
+      "bytes": 2812,
+      "sha256": "b1d429777c61f59f1984825bdceeb9735dce44d237983bd6855414d62e5c7e88"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-standards-review.md",
+      "bytes": 1605,
+      "sha256": "0f05affa5c6538da48afb36ddf2f0534993cf398492d897e7e75a0b207c29284"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-upstream-analysis.json",
+      "bytes": 12559,
+      "sha256": "62786374c3be143ccea8caa3757a2846890dfa22c5bb8cb24101e8d9684eb128"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-stage2-upstream-source-audit.json",
+      "bytes": 5516,
+      "sha256": "5c66b7b148d999628aa6e27d91077a2f27e1a3336401651216c3f7aff8c1667b"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/adopter-valuation-date-currency-research.json",
+      "bytes": 3053,
+      "sha256": "9238228a7d7b7e637ce0aedbdb01c45576e76592163f51c9543bc838e68b2575"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-authenticated-compose.log",
+      "bytes": 240923,
+      "sha256": "7c253d77fc7ecfa3266ac1e477addc63a1e707cdab5f6f80fd758ac2757e97fa"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-authenticated-verify.log",
+      "bytes": 77,
+      "sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-neutral-source.patch",
+      "bytes": 428943,
+      "sha256": "ee13549de0e0b7c5dc0571f8d35b6234f135e7ddcf3440d2f2903c0f12e86e00"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-published-hub-compose.log",
+      "bytes": 240409,
+      "sha256": "b8427d5b88e6d2789a51bc7013d852ef776e4c1f81fce305eb1835872c16da5a"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-published-hub-producer.log",
+      "bytes": 87,
+      "sha256": "1ee078d76ff422811588bb6d1c648e182a3174bf939ccac8766286456b3d072d"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-published-hub-verify.log",
+      "bytes": 77,
+      "sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-published-hub-working.patch",
+      "bytes": 1358832,
+      "sha256": "02a3d5e97091a2dc38491136b476fd23a06c508b57a01ec4d73cd8e78747ee53"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-source-A-grade.json",
+      "bytes": 15201,
+      "sha256": "9a2ebba7d896003e0baa375a47cb7e43f2fe6abdfdaedb22b07e900aaedffc27"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-source-A-grade.log",
+      "bytes": 3166,
+      "sha256": "59bd884e9c675f545cdf1c68dacdd182436be2967617ea6df204924d76efd320"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-source-A-grade.md",
+      "bytes": 4878,
+      "sha256": "701262af6e1d20478607f58ea48b946340854936aa1ceb2c8c4bcddc6eca8e01"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-source-A-pr-body.md",
+      "bytes": 1656,
+      "sha256": "bda789fbaad9c2abac5b9d8bbe1cc91280f2a306a86eb5fdf0999e47bcf6038d"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-source-A.patch",
+      "bytes": 1357568,
+      "sha256": "c613a9416a0d7e18e6aa5dfa1169da2f276c87b58a05d84f0d703866c2c9348b"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-source-commit-message.txt",
+      "bytes": 515,
+      "sha256": "a9ea38281aece088f7b01ddfdde30e260162ec5c50143f709db671b382ecc38e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-source-ssh-signature.log",
+      "bytes": 109,
+      "sha256": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/explicit-publication-authorization.json",
+      "bytes": 738,
+      "sha256": "c2b68e42ee7c57bb80e689ed1237a7e70166dea03e069eaeea08ac445a536af6"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-cut-release.yml",
+      "bytes": 5146,
+      "sha256": "0c9547888632513283306f33a5b6764c1ad9a5fc74c7f3aa89205e86c1a2d105"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-cut-runs.json",
+      "bytes": 15319,
+      "sha256": "dc73a4e4c724a38a3a3aa91c63b87789bfd1a47885e7938b8c7e8018744afd69"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-cve-v3.0.0-signature.log",
+      "bytes": 423,
+      "sha256": "305328fe478e7e29f0861f1065c1abef29aba470478544d8e03667c6efe5b48d"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-cve-v3.0.0.tag-object.txt",
+      "bytes": 3510,
+      "sha256": "534fb35ae96a9c4740f44196ff96dad5aff6321a8b5c4c6263681e24b67cf627"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-delivery-checkpoint.json",
+      "bytes": 3414,
+      "sha256": "5c3f7245f09202edcafa068bc42389650ecf8eab76615afb4fa1c36745cfa14f"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-fx-release-verification.log",
+      "bytes": 55939,
+      "sha256": "f0dbd9f292e54a91f9b3c205db75a6d06e3d7b6936621f41b4d01934345ecf5e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-fx-v1.1.0-signature.log",
+      "bytes": 423,
+      "sha256": "bd12978c3e3d85946645191f9a756260bb3090eb6352484e539997b7eb7d48a4"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-fx-v1.1.0.tag-object.txt",
+      "bytes": 3514,
+      "sha256": "4b1b1792f4c2b1e84dc9fa9eb06aa50908ba5e4a62a266e311223bc68dce4aae"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-github-release-receipts.json",
+      "bytes": 2928,
+      "sha256": "77c3e10b8c6f7c7e60032497ff78563905c160c7fa973609dfcd6f354f53b92e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-publication-artifact-sha256.json",
+      "bytes": 1862,
+      "sha256": "72b87a8dff9a10fffa6968230d01067ec8be3bd265bbeaf6c6939827c4dd0d88"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-publication-complete.json",
+      "bytes": 7042,
+      "sha256": "362eeb139ac60c373e33783830df05670bd1ba5bf6c85a186dc6f865dad4d86b"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-publication-complete.md",
+      "bytes": 3701,
+      "sha256": "58b8febcd96eb555eff33e335bf92e9b5e97c9c903ffb19dcca177f411ede774"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-release-runs.json",
+      "bytes": 15340,
+      "sha256": "8d473346ab386206a85314e561c1701486f0c857ee26a2cbabb0e1333fa1a79e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-release.yml",
+      "bytes": 6220,
+      "sha256": "00b4bf909ce99a93cfaab3ec2d814293dadf265f09ab73dc4d953bc607e7ee72"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-source-merge.json",
+      "bytes": 534,
+      "sha256": "852c7c45ed1582adf89a7070e52d7a2fcc15623b6a61fe95ae992598e8a0daf8"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-tag-signature-proof.json",
+      "bytes": 1917,
+      "sha256": "d14fd1410a37703707f44fc87519452d313500094de44f550876b08713d5b604"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-threat-register-v4.0.0-signature.log",
+      "bytes": 423,
+      "sha256": "fc2c59f43d44434bf8bdd81c080d84759fa7f6d698975b9cb6d1c01f9b8b6f57"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-threat-register-v4.0.0.tag-object.txt",
+      "bytes": 3532,
+      "sha256": "611f5f3d62a202dda7de8cba7e9430e8d49e6afacd320bd2701cb1d44fbd974e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/feeds-workflow-source-proof.json",
+      "bytes": 421,
+      "sha256": "bbcdfe5973664c6688a8524b80dc0ad52db650011d04cccc26ecce6d1f1a9ccd"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/foundation-publication-complete.md",
+      "bytes": 3154,
+      "sha256": "2cb38df6149fe9e97bac91bf05b0d5640ad4e0cd10259e01faa66f369f002dc8"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hmrc-december2025-full-row-table.json",
+      "bytes": 33802,
+      "sha256": "d831b52aa782a8355cd2def06fd27f393f353c69465258e1c41c24806b5dff21"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hmrc-december2025-normalized-payload.json",
+      "bytes": 3309,
+      "sha256": "5d0cc698e4b85657ffdd882c50a900ac87fbe535b50c2e0db4225782ebdb07ef"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hmrc-december2025-page-headers.txt",
+      "bytes": 415,
+      "sha256": "561f684358f63d51d5f36873ba5d7657592958d597eb5ad6d32163a3b731c898"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hmrc-december2025-primary-research.json",
+      "bytes": 2146,
+      "sha256": "264233ccac1b1f21ef36024e7c81a790fa4be6e3079974c858d20eee783b9284"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hmrc-monthly-2025-12-confirmed.csv",
+      "bytes": 8629,
+      "sha256": "48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hmrc-monthly-2025-12-headers.txt",
+      "bytes": 1102,
+      "sha256": "8e0a51c818331a456dc5626a838935ddc8580a146ea99527abc8507b316141eb"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hmrc-monthly-2025-12.csv",
+      "bytes": 8629,
+      "sha256": "48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hmrc-monthly-2026-08-headers.txt",
+      "bytes": 1092,
+      "sha256": "b8c10aad673703d2b0cfc3e4f7a2f4bea58a218eada482084af0f2ce44b54b3a"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hmrc-monthly-2026-08.csv",
+      "bytes": 8583,
+      "sha256": "8da9e83a830282c94cbcb31779cbeb93d7a2a739d1bb898cbec62182b7b29fad"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-fx-date-regression.json",
+      "bytes": 1478,
+      "sha256": "e6763532fb69e646d1789a2346d33088d021c390037408ab6d077beeb88bbee7"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-fx-date-regression.md",
+      "bytes": 1001,
+      "sha256": "52751f64f3041ff4c7243d02d5951bd7f21631c6b65871b6709e6a1482195630"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-loophole-inventory-fixture-repair.json",
+      "bytes": 2066,
+      "sha256": "6b1ad298cc517fc062be3227c039471fbd1c28464afc63b55d6e6915612581fb"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-loophole-inventory-fixture-repair.md",
+      "bytes": 2116,
+      "sha256": "02b59fc0564dedf4cbe6030ec65dcc46825f22c4700e560c12e178ec3084b29f"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-loophole-inventory-fixture-repair.patch",
+      "bytes": 3436,
+      "sha256": "f62262b540a171d37da876acb6c68a43fc15549388013ed6887868591f3ca67c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-pr-body.md",
+      "bytes": 1644,
+      "sha256": "5b91dfe4d249cc7dd4d5e837fcfd04744246246be2a1dc9ce400e35956c1011f"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-source-app-review.json",
+      "bytes": 2554,
+      "sha256": "ffc7310d74fc2ebe70216f1e6f6d6513290b54a539447076dff7191d722c50a7"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-source-ci-failures.log",
+      "bytes": 237176,
+      "sha256": "a3f6a846634917caa3a3d1d67431993e7f246093ce9d358e59cee88ed682ff30"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-source-ci-limits.json",
+      "bytes": 972,
+      "sha256": "71e50022832369841fd49f9148242ac6df47c149ee11e7f4dc125ae6634baf5b"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-source-ci-runs.json",
+      "bytes": 465,
+      "sha256": "3fbd46d71a7d0b55eb71438b69d6f683b585db5f57159d406dd6b6cba3502bcb"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-source-merge.json",
+      "bytes": 174,
+      "sha256": "d20740393425f930a79989cf85228a1078c32661b1997a10a52fda98c2c7f9ff"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-source-pr.json",
+      "bytes": 5027,
+      "sha256": "487f76979410c1b689ad33916368b3d24c2e742eeffec6cb3b15023084b9ce24"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-source-ready.json",
+      "bytes": 6011,
+      "sha256": "8eb358d669fc484743ffb674397a8d4ff3e7b4a18c78b96b4c366e3feaa4febe"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub-source-review-request.json",
+      "bytes": 838,
+      "sha256": "cb23cb9dc0dc9bd5fcfbd07bdb1b3d44b67b672c1a1956989fb9002e29e5bf9f"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub6ed-publication-data-scan.json",
+      "bytes": 137888,
+      "sha256": "d961f9f68fb10581854223f6540f7bd1bbb15cb64206444ac662465c041101a3"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub6ed-publication-effect-audit.json",
+      "bytes": 3860,
+      "sha256": "68d18f7d36c452bd8676b49197b3b0928a87a89e3c500670405f4b7b2ecf8a64"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/hub6ed-publication-effect-audit.md",
+      "bytes": 2880,
+      "sha256": "4720ad087dd7cdbfbc9bf607cfb76a583a187ecc0a51e99dbe9fc69d118287c6"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-layout-check.py",
+      "bytes": 3288,
+      "sha256": "405d4a041660b25bd243a9695532760d50e578871e669b37698c360522461571"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-new-final.json",
+      "bytes": 506,
+      "sha256": "32bfd320d3990ce878c9998c2988b1381d78b0c901a464a6934f0d4cb15ac3e2"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-new-final.log",
+      "bytes": 111,
+      "sha256": "77bdd8d35303e85088ecb442fea26a3c7dd52450febf8687b1481ffe0ab4a2e8"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-new-isolated-green.json",
+      "bytes": 506,
+      "sha256": "08d336c53fe95a4cdc6833dcb09a8076aa0564a62519ac659afd1ff62ba56183"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-new-isolated-green.log",
+      "bytes": 111,
+      "sha256": "5c2db15c70b38711bb55938a81d1ff0ba3f30a0387c4e01d1b97badff6357746"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-old-final.json",
+      "bytes": 506,
+      "sha256": "4fd0daaa59e90615dfeb97534464f6b28345a4ab8334df86389614d6a14523c8"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-old-final.log",
+      "bytes": 110,
+      "sha256": "f9f20b32952b242bec7b7a634f9ed0261c30702d93ee33df6e6825eb56c27766"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-old-isolated-green.json",
+      "bytes": 506,
+      "sha256": "a8cc9d0b932150aa538fef4c0696126a6336feaa1f6e32f4fbc9a637b85b47f9"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-old-isolated-green.log",
+      "bytes": 29056,
+      "sha256": "911eae53496bc416aa9a67d08eda221e47b2f001f5bea03e4614a3d6a0f82c36"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-old-isolated-red.json",
+      "bytes": 506,
+      "sha256": "0c414cf3abac6a0956706fbc88b0d01948e5b62391946ea4df97bc7ac12cb869"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-old-isolated-red.log",
+      "bytes": 67436,
+      "sha256": "22ef4bfd19c8b13560453fa2e22228b133f83c87b8ea854fb6b07e27b381898c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-old-red.json",
+      "bytes": 482,
+      "sha256": "224a93d6652659908b58b5f991c29caee19ccaee04ea2c1a3cfc409b1bf6cd71"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/loophole-inventory-old-red.log",
+      "bytes": 143,
+      "sha256": "c0e0cf9c2a1b352c88d811808d873228b531279c9630f8984f6e45c22be902d6"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-6ed-undated-fx-negative-feed.json",
+      "bytes": 4084,
+      "sha256": "2135f78d471ac12f2ce82bedf23654172e1a3a8104584e33eb09408f5be3a144"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-authenticated-compose.log",
+      "bytes": 143219,
+      "sha256": "4723228693fb1d08b6676b04280b4daf63433061c8efafc00b4ef58a7af068eb"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-authenticated-verify.log",
+      "bytes": 77,
+      "sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-neutral-source.patch",
+      "bytes": 359263,
+      "sha256": "12b03227946cc541b3bffe6d76115d7685c3b1080fc6a4a89834f2630ae7ac3a"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-published-hub-compose.log",
+      "bytes": 142710,
+      "sha256": "c71e47f2da392511332740e061f7bb3bfa526471eb188ca7c874bee80486075c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-published-hub-producer.log",
+      "bytes": 87,
+      "sha256": "0380ebdafb63951f0ad124c902189feb9ec485600444c87a44fa88afeb3fa4df"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-published-hub-verify.log",
+      "bytes": 77,
+      "sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-published-hub-working.patch",
+      "bytes": 1149658,
+      "sha256": "4a5ea85cc24511e65f45ea6135c0636674975361fe70423e858881f5b8f88f10"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-source-A-grade.json",
+      "bytes": 974,
+      "sha256": "7c09a9ee9c2246f705252202b2720c65409d2d598dfe0f9d17fb5c888f813e8f"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-source-A-grade.log",
+      "bytes": 720,
+      "sha256": "b4576f0a828397872753a8ee5e954b6ea116083f0285cfab264c13882404140c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-source-A-grade.md",
+      "bytes": 7697,
+      "sha256": "217495d6dfd8ad68c6bf9c567fb890c94098851d0db99e67fba31658716eee91"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-source-A-pr-body.md",
+      "bytes": 1656,
+      "sha256": "3face3877e38e341b8e52764823b7884c079d3c0df20d0ff389d7d2bd3bafb95"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-source-A.patch",
+      "bytes": 1148408,
+      "sha256": "8a87f3448d9e11de84bb2b37842b6d2321a5e1043ccd7b469c49172f0e3331da"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-source-commit-message.txt",
+      "bytes": 512,
+      "sha256": "b3ca9e65d28027449b3298d6914c0d92671cdf5d288a832da7f2b4d935dc7fd3"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-source-ssh-signature.log",
+      "bytes": 109,
+      "sha256": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-authentic6-candidate7-review.json",
+      "bytes": 5586,
+      "sha256": "f16e1c079379f8f8ec6dbb2af57cf57e0ccab70a30588e6ed9e0cbf09ceffad4"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-authentic6-candidate7-review.md",
+      "bytes": 1980,
+      "sha256": "216e46cecca295f45bba831a908e52a117e6c9178fd8c7ed8f68f11cdf8f03b2"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-authentic7-tools5-review.json",
+      "bytes": 8591,
+      "sha256": "384dde4ad6aa8301df8658341a71c64776da15d4e624dc318049e2e9ecc031f7"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-compatibility7-app-review.json",
+      "bytes": 2261,
+      "sha256": "439afde53594244e09a1243f67c9980f159f25222d4b2fd9c106132cf6fe46a6"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-compatibility7-pr-body.md",
+      "bytes": 587,
+      "sha256": "449402cede4a0256f3437e9eb9f33770b322ca81cc89fcf55badccb1c063be3e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-compatibility7-premerge.json",
+      "bytes": 100,
+      "sha256": "322d931c23004ca53c73e644362aca06b3f17059f627ed8e02182b64a848a2d0"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-compatibility7-review-request.json",
+      "bytes": 597,
+      "sha256": "788dd64e37a85e18a2bcf2ac4a79cdf58661b1be0e9fb41caff7f69b8b576b7d"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-compatibility7-source-merge.json",
+      "bytes": 247,
+      "sha256": "b47a17c198e9311c2f35825a20312f68e61379836261548aa2d83cf045346376"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-delivery-checkpoint.json",
+      "bytes": 1759,
+      "sha256": "b539967a01c5b58cc4393388056862950b2ea802d6103e20ac18f035e99529a3"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-fanout-ancestor-contract.json",
+      "bytes": 3458,
+      "sha256": "2264a56fb156e7094e09b839e539b36d5a4c8ac041d87fa62d5feb002ebf3e14"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-fanout-ancestor-contract.md",
+      "bytes": 2740,
+      "sha256": "0d82638e17e478dc4a78a0e150433e1daf1bdbad0c99a1cb393735c00c16893e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-foundation-delivery-review.md",
+      "bytes": 2580,
+      "sha256": "145e0f07bcfd53dec48a8f641a5d939d627c7d0e738f81f52433de089d3c51bc"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-normal-dispatch-plan.md",
+      "bytes": 2403,
+      "sha256": "fc626a1ba910dacac3b3bd4e72259e1438af445e6f5930e2901314854611dcdb"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy6-cut-run.json",
+      "bytes": 3653,
+      "sha256": "7189a4710bbadf2a92803d6848ed98eb126a5d325d99851cfde2153bf00788b8"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy6-cut.log",
+      "bytes": 52522,
+      "sha256": "ee922552206bd46dbe33c36345f3b2f570fadc3dfe2ecf1d83ec1a95b9838d3e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy6-release-run.json",
+      "bytes": 2360,
+      "sha256": "ac26a401a246871ab2136141614ee21c74fbe78f1a2cae38b9ebf9c5f393e294"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy6-release.json",
+      "bytes": 194,
+      "sha256": "c333b85c10d98525ac237c423db2fa3f59f98f1c10a12f10ce536697ab96fe5a"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy6-release.log",
+      "bytes": 296992,
+      "sha256": "ace1a11787bd79ebe648202873ea78e0dde5fb1db795e3c2d0886528b4f01fef"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy7-authentic6-UNSIGNED-LOCAL-REHEARSAL.json",
+      "bytes": 6347,
+      "sha256": "c6941fa32b2732189169ec316578a9001815a5db8f13b419196ee26730971db6"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy7-authentic6-engine-cells.log",
+      "bytes": 47126,
+      "sha256": "61428079fc38f0af314caf34732a0e9161d2d522bd2c5efa590656abc9af65dd"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy7-authentic6-gate.log",
+      "bytes": 478,
+      "sha256": "b6db658fc53ad0da30cdd08e17b65e5af81a7e8c8f14895f56bf5a29c5e24cf7"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy7-merge-tree-review.json",
+      "bytes": 331,
+      "sha256": "1e19f5becf55ce402800a9fbd6c2fa6ceaf1aa503589dc7012586d9d13ad3e4e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy7-release-run.json",
+      "bytes": 2360,
+      "sha256": "528e80cb457cc46852a92984b5bc737e14b7d69697c8c4e7a2752f44b137d54a"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy7-release.json",
+      "bytes": 194,
+      "sha256": "5174f91d6dfbbb339c3afbd85e4cdc321ea1132d232098268e6f8bc7c75eb0a1"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy7-release.log",
+      "bytes": 297394,
+      "sha256": "d851e4e2b9003a69c5a7ee46e79ed8283fe9dba75c3890f78a18c970af845231"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy7-tools5-cut-run.json",
+      "bytes": 3618,
+      "sha256": "2ff66825052adcf566067de866feb659e02403e10979087ce8fd89dbaf5443f8"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-policy7-tools5-cut.log",
+      "bytes": 79319,
+      "sha256": "03a8d74e3e524b726936023e302e4a693be03d802a6e568615923c563c5a6c3b"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-release-review.md",
+      "bytes": 3024,
+      "sha256": "0b22592775d8eb4970d1afaa0c2542f1e85de4963e760f371b4496721428862e"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-security6-source-merge.json",
+      "bytes": 247,
+      "sha256": "5ff3a58df5deba69ef172801963e034bd5b9288bd7487d811e4b134fc2c766f3"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-source-integrity.json",
+      "bytes": 5314,
+      "sha256": "2fcb8bd2d5721acbb9f0fc1019ca7fc3e8897d5b16106bd77a6b215fce2c2fc6"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-tools5-release-run.json",
+      "bytes": 2360,
+      "sha256": "8b47e80ebb9c835aed86740f5f918117731c192fe2fc77ee1bf0d6906941b398"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-tools5-release.json",
+      "bytes": 180,
+      "sha256": "b36645aa66891de56af21a1460bce09c8621ae99157dca9051e9f72d9d7d7f8d"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/platform-tools5-release.log",
+      "bytes": 292468,
+      "sha256": "e97aae5368109c6f518fdc792e562e448984510c76a25fe4a7302c57413c2c74"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/research-hmrc-december2025.py",
+      "bytes": 4360,
+      "sha256": "134217bbfb8dfa01f49cef3cbf8984ed2ddd74d754b6317232a925862136b658"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-authenticated-compose.log",
+      "bytes": 109850,
+      "sha256": "bf0254027f598730602ed26c667dea55342939818918ecb1c5036664cc11b198"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-authenticated-verify.log",
+      "bytes": 77,
+      "sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-neutral-source.patch",
+      "bytes": 330228,
+      "sha256": "fa5ba05b6bc88253c8db5f21c7bb12d294f6fcb0745823450a8d9f1f69e9a324"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-published-hub-compose.log",
+      "bytes": 108166,
+      "sha256": "00e405d550d4333b1343aa02dc2f263239ca53b18c2a84e7a379d053faa544cb"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-published-hub-producer.log",
+      "bytes": 87,
+      "sha256": "0380ebdafb63951f0ad124c902189feb9ec485600444c87a44fa88afeb3fa4df"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-published-hub-verify.log",
+      "bytes": 77,
+      "sha256": "01c3408b2db08b81adc0989165db088c8dd2f3437e951ec06e53f1574e1383fd"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-published-hub-working.patch",
+      "bytes": 1070493,
+      "sha256": "cc06b191a99997a46d72aa05d96292f9cbcca2dbd7ff5dccf233e61aa2061b14"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-source-A-grade.json",
+      "bytes": 14985,
+      "sha256": "a8524f8c0be6ff993ad1da075fecfdd0f21249fabdbbc21f384e646a934df172"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-source-A-grade.log",
+      "bytes": 1096,
+      "sha256": "310bd06b15b149751747464e45d789db4cba3ecf31830c1e50bffae3488a13da"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-source-A-old-platform-pin.yaml",
+      "bytes": 3770,
+      "sha256": "1a22c5e9f223b521d8ea163d30df2bda1c320a255986f1c18a3849b487ee1f8c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-source-A-pr-body.md",
+      "bytes": 1656,
+      "sha256": "1af965fbd3e04627018e07b280f37787afb94bc9602b948d1c382c990a028a9c"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-source-A.patch",
+      "bytes": 1070756,
+      "sha256": "3327113ed608bf731e59c92bd9295ecbd974bf07d2bccdcfdaaa33eb864119d6"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-source-commit-message.txt",
+      "bytes": 514,
+      "sha256": "a6a1e449769d06949f202143d78f47719e171f9025d5c351aaa79deb9c49c3df"
+    },
+    {
+      "path": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-source-ssh-signature.log",
+      "bytes": 109,
+      "sha256": "816e6f25ca9dec25e0a043725b2e4a958e7f3c2df7675d424413deadc72ea907"
+    }
+  ]
+}

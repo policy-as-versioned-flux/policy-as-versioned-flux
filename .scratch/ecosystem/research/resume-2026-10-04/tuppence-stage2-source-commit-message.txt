@@ -1,0 +1,9 @@
+tuppence: adopt authenticated policy7 and primary inventory inputs
+
+Pin genuine platform/tools v5.0.0 and released threat4/CVE3/FX data;
+claim accepted corrected policy7 while keeping supported5/6 and engine1.18.2.
+Carry exact-digest scan provenance, source-contained clock/OSCAL instruments,
+and the verified byte composition. Keep current real apps/composed self-pins
+until ordinary signed adopter releases allow the coupled delivery sequence.
+
+Prepared-by: Codex agent; no human was present during preparation.

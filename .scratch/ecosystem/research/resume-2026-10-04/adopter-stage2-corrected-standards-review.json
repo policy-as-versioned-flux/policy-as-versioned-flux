@@ -1,0 +1,177 @@
+{
+  "scope": "independent read-only corrected neutral Stage2 source verification; final authentic foundation pins and derived compose still pending",
+  "status": "PASS: initial app-source deletion finding closed",
+  "initial_capture_note": "The first command observed13 deletions. The later initial JSON was collected after cloud restoration and already lists no deletions; this final proof explicitly checks the13 restored paths from the upstream audit against Git objects.",
+  "adopters": {
+    "driftwood": {
+      "baseline": "17302ecd20041df61a52428e67246c330294d2a6",
+      "restored_app_source_count": 4,
+      "upstream_byte_checks": [
+        {
+          "path": "apps/storefront/Dockerfile",
+          "sha256": "4d3513dfd0fb0b5cad5ba47df47f9c0052f83a044e73ae5b47bb55de87ac39c1",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/storefront/README.md",
+          "sha256": "e20c04594e2dcd2c492101e8ad057009d1dea8684fd73c1f439405e4aa020b0b",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/storefront/package.json",
+          "sha256": "7086012fdf4c6222e743c0652f342ad0b807a4e836bfd68dcd45c824086049ae",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/storefront/public/index.html",
+          "sha256": "995bb639310a6e76dda06d1ef680e4f0b38bd11b19c7cb9b6cf37df7dbaaaa2d",
+          "equals_upstream": true
+        },
+        {
+          "path": "composed/HEADER.yaml",
+          "sha256": "7fa118dae299ea5fdfc3bd4f195c751411f38c3ed8e2c9b31dd28aab9f6e281b",
+          "equals_upstream": true
+        },
+        {
+          "path": "deploy/pod.yaml",
+          "sha256": "3411f432dbc00ce3776376e2bade31483a0dbdad7f443837c78f1437a2bc9c03",
+          "equals_upstream": true
+        },
+        {
+          "path": "drift/samples.jsonl",
+          "sha256": "600a5e2f86ae3e689bc23c10128d895a897d36b1885729324dd306d5313c3260",
+          "equals_upstream": true
+        },
+        {
+          "path": "gitops/apps/api.yaml",
+          "sha256": "d61c18f2892100fd0f38f32be331dfea4127b247dde2217fb65987b4b833dbfa",
+          "equals_upstream": true
+        },
+        {
+          "path": "gitops/apps/kustomization.yaml",
+          "sha256": "16e17d4f83f8bcb35a967b28851c5f3ce5a366f96cc7d5e6a68d1e87b4a08cb8",
+          "equals_upstream": true
+        },
+        {
+          "path": "gitops/apps/pod.yaml",
+          "sha256": "e86f5dbd3977d979bb1cab82a45a9e7c915b6b65da454ba1849396180b90f968",
+          "equals_upstream": true
+        },
+        {
+          "path": "gitops/apps/storefront.yaml",
+          "sha256": "a46b8ffdc044ac57c3e7acdecc82828faf627e7969c0d5a27e03525d0f6c93a0",
+          "equals_upstream": true
+        },
+        {
+          "path": "observations/twin-sweep.jsonl",
+          "sha256": "fb86fb8d4d67e6f40de94240b54330359ff14fb7a174028998ee2b6f532b8604",
+          "equals_upstream": true
+        }
+      ],
+      "remaining_deletions": [],
+      "real_index_changed": false
+    },
+    "tuppence": {
+      "baseline": "d8dead25e0e5e275172640b1a637562e45edb15d",
+      "restored_app_source_count": 5,
+      "upstream_byte_checks": [
+        {
+          "path": "apps/ledger/Dockerfile",
+          "sha256": "a7df56fbd08aa66ffbbff5c6ed662f95c8650185d12764ddcaf07054c479721a",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/ledger/README.md",
+          "sha256": "2bea43f0a83bc20cf7ad83397c67f02fdcf060fb5ee7f4ffd9bec6be01d5fef6",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/ledger/pom.xml",
+          "sha256": "e745e31d7a360e8ee4df742ba487e6be8fd36d4705f33c9237c36725fce34049",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/ledger/src/main/java/com/mycompany/ledger/Ledger.java",
+          "sha256": "f35acf13c5a4ae775f4d5a7ed06692229506bcd2dbbb0be9a7b7ce9bec99f655",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/ledger/src/main/resources/log4j2.xml",
+          "sha256": "3f017ad5c06b4e92f8d52a98f797d0bf0298e2b869b2b03ed411ada378e4b07a",
+          "equals_upstream": true
+        },
+        {
+          "path": "composed/HEADER.yaml",
+          "sha256": "cb6b6b65f154648ae0d0e79acb262ed05fd4891ed7377f58ab1f21cae566bd11",
+          "equals_upstream": true
+        },
+        {
+          "path": "drift/samples.jsonl",
+          "sha256": "47af8a8b51a54ead4d388a4e744592f82544dfca1b92f243b1279fc781e8ed86",
+          "equals_upstream": true
+        },
+        {
+          "path": "gitops/apps/ledger.yaml",
+          "sha256": "f1aae8ef83c171fbd17d5647dd0ff4f335d23c8d37da21480e20b5bf8bf04a8a",
+          "equals_upstream": true
+        },
+        {
+          "path": "observations/twin-sweep.jsonl",
+          "sha256": "14b437bb6dfaa4ad0aad69b4e46879e92ac488ea44f66b00b897618c5cb0c3fd",
+          "equals_upstream": true
+        }
+      ],
+      "remaining_deletions": [],
+      "real_index_changed": false
+    },
+    "ludlow": {
+      "baseline": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+      "restored_app_source_count": 4,
+      "upstream_byte_checks": [
+        {
+          "path": "apps/reports/Dockerfile",
+          "sha256": "34d27592b8e457707768b877715bb5f140c534df54567ef37e9d2dd1e28cbf12",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/reports/README.md",
+          "sha256": "6235aca47f59ad32e04aac53f5c11df5d592d3560380f48499f72ae12c1e70b1",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/reports/app.py",
+          "sha256": "c1aa4f194e6db0d43c8077b19cde0abee0f0d6b004f8f23f9edc58fd0a694a1a",
+          "equals_upstream": true
+        },
+        {
+          "path": "apps/reports/requirements.txt",
+          "sha256": "938b18618a3ce2de162c8ba5bf366a1f778f562445537e310ad71999699fb55d",
+          "equals_upstream": true
+        },
+        {
+          "path": "composed/HEADER.yaml",
+          "sha256": "67eac5622a4061b0ed960c3610363f631a5228d927b849a2c4eb3883247de70c",
+          "equals_upstream": true
+        },
+        {
+          "path": "drift/samples.jsonl",
+          "sha256": "9c29fcec36b64d19d17486767a258741e11f73a87164484ddb7f6396225bf82d",
+          "equals_upstream": true
+        },
+        {
+          "path": "gitops/apps/reports.yaml",
+          "sha256": "6a9b9d65bb208ebaef834773fb7578b7ae651e350d3fdb247fb34bff0b6cbf8c",
+          "equals_upstream": true
+        },
+        {
+          "path": "observations/twin-sweep.jsonl",
+          "sha256": "7221eb367710d1f147ca2ba6e296a09d25911185b077cf57ed35cbc00b337cb9",
+          "equals_upstream": true
+        }
+      ],
+      "remaining_deletions": [],
+      "real_index_changed": false
+    }
+  },
+  "real_indexes_changed": false
+}

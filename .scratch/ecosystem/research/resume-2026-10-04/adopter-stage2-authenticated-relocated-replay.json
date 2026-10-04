@@ -1,0 +1,32 @@
+{
+  "driftwood": {
+    "exit": 0,
+    "stdout": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs\n",
+    "stderr": "",
+    "authenticated_tools": "v5.0.0@703eff6aee959843c4160aa54fd03413f62858cc",
+    "temporary_relocated_copy": true,
+    "rendered_file_count": 53,
+    "source_composed_unchanged": true,
+    "scope": "genuine signed tools wrapper replay; no shared source writes"
+  },
+  "tuppence": {
+    "exit": 0,
+    "stdout": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs\n",
+    "stderr": "",
+    "authenticated_tools": "v5.0.0@703eff6aee959843c4160aa54fd03413f62858cc",
+    "temporary_relocated_copy": true,
+    "rendered_file_count": 50,
+    "source_composed_unchanged": true,
+    "scope": "genuine signed tools wrapper replay; no shared source writes"
+  },
+  "ludlow": {
+    "exit": 0,
+    "stdout": "OK: composed artefact re-renders byte-for-byte from the recorded parent SHAs\n",
+    "stderr": "",
+    "authenticated_tools": "v5.0.0@703eff6aee959843c4160aa54fd03413f62858cc",
+    "temporary_relocated_copy": true,
+    "rendered_file_count": 54,
+    "source_composed_unchanged": true,
+    "scope": "genuine signed tools wrapper replay; no shared source writes"
+  }
+}

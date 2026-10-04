@@ -1,0 +1,18 @@
+{
+  "head": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+  "pr": "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/153",
+  "actual_merge": "e62194b0c700f0d8a94787e6a2f7063608862ace",
+  "ci_run": 37188505195,
+  "pytest": {
+    "passed": 2878,
+    "skipped": 24,
+    "failed": 15
+  },
+  "failure_classes": {
+    "loophole_inventory_fixture_dependency": 14,
+    "unchanged_registered_coverage_floor_guard": 1
+  },
+  "correction": "Root initially misread a filtered CI excerpt as only the live guard. Full summary shows14 additional inventory-copy fixture failures against the current apps3.0.1 clone; a narrow fixture repair is in progress. No overall CI green claim.",
+  "production_producer_dependency": "published twin/valuation.py at reviewed source6ed; new adopter producer pin must move from9c3b with actual replay",
+  "source_typing_and_determinism": "actual CI typecheck, demo, three-architecture determinism and reproduce-elsewhere passed"
+}

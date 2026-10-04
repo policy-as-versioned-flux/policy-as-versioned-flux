@@ -1,0 +1,196 @@
+{
+  "driftwood": {
+    "header_keys": [
+      "policy-as-versioned.dev/composed",
+      "parents",
+      "baseline",
+      "declared-engine",
+      "floor-comparison",
+      "governed-namespaces",
+      "holes",
+      "overlay-controls",
+      "selected-controls",
+      "ungoverned-namespaces",
+      "withdrawn-selectable",
+      "comparison-inputs",
+      "vendored-feeds",
+      "selection-policy",
+      "exposure"
+    ],
+    "header_parent_and_observations": {
+      "parents": [
+        {
+          "party": "platform",
+          "kind": "implementations",
+          "version": "5.0.0",
+          "sha": "703eff6aee959843c4160aa54fd03413f62858cc"
+        },
+        {
+          "party": "nist",
+          "kind": "controls",
+          "version": "1.1.0",
+          "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819"
+        },
+        {
+          "party": "ico",
+          "kind": "feed",
+          "name": "penalty-schema",
+          "version": "v3",
+          "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e"
+        },
+        {
+          "party": "feeds",
+          "kind": "feed",
+          "name": "threat-register",
+          "version": "v4",
+          "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+        },
+        {
+          "party": "feeds",
+          "kind": "feed",
+          "name": "cve",
+          "version": "v3",
+          "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+        },
+        {
+          "party": "insurer",
+          "kind": "feed",
+          "name": "quote-driftwood",
+          "version": "v1",
+          "sha": "db767055119292e400edd63ed260785ce605eb4e"
+        }
+      ]
+    },
+    "primary_pin": {
+      "tag": "threat-register/v4.0.0",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+    }
+  },
+  "tuppence": {
+    "header_keys": [
+      "policy-as-versioned.dev/composed",
+      "parents",
+      "baseline",
+      "declared-engine",
+      "floor-comparison",
+      "governed-namespaces",
+      "holes",
+      "overlay-controls",
+      "selected-controls",
+      "ungoverned-namespaces",
+      "withdrawn-selectable",
+      "comparison-inputs",
+      "vendored-feeds",
+      "selection-policy",
+      "exposure"
+    ],
+    "header_parent_and_observations": {
+      "parents": [
+        {
+          "party": "platform",
+          "kind": "implementations",
+          "version": "5.0.0",
+          "sha": "703eff6aee959843c4160aa54fd03413f62858cc"
+        },
+        {
+          "party": "nist",
+          "kind": "controls",
+          "version": "1.1.0",
+          "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819"
+        },
+        {
+          "party": "ico",
+          "kind": "feed",
+          "name": "penalty-schema",
+          "version": "v3",
+          "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e"
+        },
+        {
+          "party": "feeds",
+          "kind": "feed",
+          "name": "threat-register",
+          "version": "v4",
+          "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+        },
+        {
+          "party": "feeds",
+          "kind": "feed",
+          "name": "cve",
+          "version": "v3",
+          "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+        }
+      ]
+    },
+    "primary_pin": {
+      "tag": "threat-register/v4.0.0",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+    }
+  },
+  "ludlow": {
+    "header_keys": [
+      "policy-as-versioned.dev/composed",
+      "parents",
+      "baseline",
+      "declared-engine",
+      "floor-comparison",
+      "governed-namespaces",
+      "holes",
+      "overlay-controls",
+      "selected-controls",
+      "ungoverned-namespaces",
+      "withdrawn-selectable",
+      "comparison-inputs",
+      "vendored-feeds",
+      "selection-policy",
+      "exposure"
+    ],
+    "header_parent_and_observations": {
+      "parents": [
+        {
+          "party": "platform",
+          "kind": "implementations",
+          "version": "5.0.0",
+          "sha": "703eff6aee959843c4160aa54fd03413f62858cc"
+        },
+        {
+          "party": "nist",
+          "kind": "controls",
+          "version": "1.1.0",
+          "sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819"
+        },
+        {
+          "party": "ico",
+          "kind": "feed",
+          "name": "penalty-schema",
+          "version": "v3",
+          "sha": "e1fb8eb5663e50088b13d872a4e44112476f516e"
+        },
+        {
+          "party": "feeds",
+          "kind": "feed",
+          "name": "threat-register",
+          "version": "v4",
+          "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+        },
+        {
+          "party": "feeds",
+          "kind": "feed",
+          "name": "cve",
+          "version": "v3",
+          "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+        },
+        {
+          "party": "feeds",
+          "kind": "feed",
+          "name": "eol",
+          "version": "v2",
+          "sha": "330fbf06872c2ec2c8637863b624cd902d5534ca"
+        }
+      ]
+    },
+    "primary_pin": {
+      "tag": "threat-register/v4.0.0",
+      "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+    }
+  }
+}

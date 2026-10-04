@@ -1,0 +1,18 @@
+{
+  "reviewed_source": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+  "genuine_main_merge": "e62194b0c700f0d8a94787e6a2f7063608862ace",
+  "source_is_ancestor_of_merge": true,
+  "source_signature": "G",
+  "source_tree": "57a55d92604efe058e436aff58a1fe2afb8699af",
+  "valuation_blob": "a470f9d464caa569d1e3a97609a51bc1fd0ec54f",
+  "merged_valuation_blob_unchanged": true,
+  "pr_merge_receipt": {
+    "headRefOid": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+    "mergeCommit": {
+      "oid": "e62194b0c700f0d8a94787e6a2f7063608862ace"
+    },
+    "mergedAt": "2026-10-04T08:29:35Z",
+    "state": "MERGED"
+  },
+  "scope": "read-only existing isolated hub Git objects; no fetch or external action; does not assert whole hub CI green"
+}

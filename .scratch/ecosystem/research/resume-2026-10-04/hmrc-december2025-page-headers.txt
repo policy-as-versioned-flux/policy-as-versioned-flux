@@ -1,0 +1,13 @@
+HTTP/2 403 
+server: CloudFront
+date: Sun, 04 Oct 2026 08:51:13 GMT
+content-type: text/html
+content-length: 919
+x-cache: Error from cloudfront
+via: 1.1 762cc2c903b0300a5ea0287c68b0bfa4.cloudfront.net (CloudFront)
+x-amz-cf-pop: LHR86-P1
+x-amz-cf-id: NGpnoEzKFg5ipRI6130JbMoc8pqm_R3HBXuehn8nmmoc4leVgMkylg==
+x-xss-protection: 0
+strict-transport-security: max-age=31536000; includeSubDomains
+vary: Origin
+

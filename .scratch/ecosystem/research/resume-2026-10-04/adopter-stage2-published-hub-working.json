@@ -1,0 +1,29 @@
+{
+  "driftwood": {
+    "directory": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/driftwood",
+    "committed_head": "aa923631de95276615e4985e67ee41971efacf25",
+    "status": " M composed/HANDBOOK.md\n M composed/HEADER.yaml\n M composed/evidence.json\n M twin/PIN.yaml\n M twin/forward-intel/v2/feed.json\n",
+    "patch": ".scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-published-hub-working.patch",
+    "patch_sha256": "02a3d5e97091a2dc38491136b476fd23a06c508b57a01ec4d73cd8e78747ee53",
+    "publication_ready": false,
+    "hold": "actual6ed producer misuses Aug2026FX for Dec2025Ludlow filing; await published dateinstrument fix + proper pinned replay and new signed heads"
+  },
+  "tuppence": {
+    "directory": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/tuppence",
+    "committed_head": "c70edb11086527c439b9adbc094eca6140136ae0",
+    "status": " M composed/HANDBOOK.md\n M composed/HEADER.yaml\n M composed/evidence.json\n M twin/PIN.yaml\n M twin/forward-intel/v1/feed.json\n",
+    "patch": ".scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-published-hub-working.patch",
+    "patch_sha256": "cc06b191a99997a46d72aa05d96292f9cbcca2dbd7ff5dccf233e61aa2061b14",
+    "publication_ready": false,
+    "hold": "actual6ed producer misuses Aug2026FX for Dec2025Ludlow filing; await published dateinstrument fix + proper pinned replay and new signed heads"
+  },
+  "ludlow": {
+    "directory": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ludlow",
+    "committed_head": "4f81da7eca50ae9adadcb905813cf06f17a5d9a1",
+    "status": " M composed/HANDBOOK.md\n M composed/HEADER.yaml\n M composed/evidence.json\n M twin/PIN.yaml\n",
+    "patch": ".scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-published-hub-working.patch",
+    "patch_sha256": "4a5ea85cc24511e65f45ea6135c0636674975361fe70423e858881f5b8f88f10",
+    "publication_ready": false,
+    "hold": "actual6ed producer misuses Aug2026FX for Dec2025Ludlow filing; await published dateinstrument fix + proper pinned replay and new signed heads"
+  }
+}

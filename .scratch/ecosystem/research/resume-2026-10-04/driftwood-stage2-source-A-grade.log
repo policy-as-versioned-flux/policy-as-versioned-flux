@@ -1,0 +1,44 @@
+{
+  "composed_bump": "major",
+  "declared_bump": "major",
+  "added": [
+    "6.0.0",
+    "7.0.0"
+  ],
+  "retired": [],
+  "reasons": [
+    "6.0.0: publisher declared 'major', computed 'major'",
+    "7.0.0: publisher declared 'major', computed 'major'",
+    "acceptance: 6.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-6.0.0.yaml at aa923631de95)",
+    "acceptance: 7.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-7.0.0.yaml at aa923631de95)"
+  ],
+  "weaker_than_declared": false,
+  "acceptance": {
+    "admitted": true,
+    "accepted": [
+      {
+        "version": "6.0.0",
+        "record": "accepted-majors/platform-6.0.0.yaml",
+        "accepted_by": "chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator",
+        "accepted_on": "2026-10-03"
+      },
+      {
+        "version": "7.0.0",
+        "record": "accepted-majors/platform-7.0.0.yaml",
+        "accepted_by": "chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator",
+        "accepted_on": "2026-10-03"
+      }
+    ],
+    "unaccepted": [],
+    "retired": [],
+    "lines": [
+      "6.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-6.0.0.yaml at aa923631de95)",
+      "7.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: \"you tell me, you control them all, you don't need me to answer\"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-7.0.0.yaml at aa923631de95)"
+    ]
+  }
+}
+  - 6.0.0: publisher declared 'major', computed 'major'
+  - 7.0.0: publisher declared 'major', computed 'major'
+  - acceptance: 6.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: "you tell me, you control them all, you don't need me to answer"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-6.0.0.yaml at aa923631de95)
+  - acceptance: 7.0.0 is a major, accepted for driftwood by chrisns (owner); decision delegated to the implementing assistant on 2026-10-03: "you tell me, you control them all, you don't need me to answer"; recorded by the integrator on 2026-10-03 (accepted-majors/platform-7.0.0.yaml at aa923631de95)
+OK: composed bump is 'major', admitted: every major this pull request adds is accepted by a record in accepted-majors/ (eco-system ticket 132)

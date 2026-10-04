@@ -1,0 +1,81 @@
+{
+  "checked_at": "2026-10-03T23:14:03.800905+00:00",
+  "scope": "owner explicitly approved concrete foundation publication sequence on2026-10-04; Oct3 rejection preserved",
+  "repository": {
+    "full_name": "policy-as-versioned-feeds/feeds",
+    "private": false,
+    "permissions": {
+      "admin": true,
+      "maintain": true,
+      "push": true,
+      "triage": true,
+      "pull": true
+    }
+  },
+  "pr": {
+    "url": "https://github.com/policy-as-versioned-feeds/feeds/pull/10",
+    "number": 10,
+    "state": "open",
+    "draft": false,
+    "head": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+    "base": "main",
+    "mergeable": true,
+    "mergeable_state": "clean"
+  },
+  "source_verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnl2Pa2GQK4HJeZ/d1FTiAVoV04\nQFpHrHy2XV5MJO4bwAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQB5MGi89DEZBJKHmzdW6SogqT8VeGA2zwflohuXRt2rLWtqluTmtvBNvxSP8ucBqqx\ns7b7EHQMYQTlXHtG79oAE=\n-----END SSH SIGNATURE-----",
+    "payload": "tree e70d9c00caea6313cc0b3c4f65ee0205fc42c709\nparent ff3ac9ab00bdc73e1bbf83cabf91c767d35b8e88\nauthor Chris Nesbitt-Smith <chris@cns.me.uk> 1791050682 +0100\ncommitter Chris Nesbitt-Smith <chris@cns.me.uk> 1791050682 +0100\n\nfeeds: publish captured KEV and HMRC inputs plus cited agent threat frequency\n\nPrepare cve 3.0.0, fx 1.1.0 and threat-register 4.0.0 behind review.\n\nPrepared-by: Codex agent; no human was present during preparation.\nNo release tags or adopter bindings were created.\n",
+    "verified_at": "2026-10-03T18:25:03Z"
+  },
+  "main_before": "ff3ac9ab00bdc73e1bbf83cabf91c767d35b8e88",
+  "app_approval": [
+    {
+      "actor": "pavc-other-hand[bot]",
+      "state": "APPROVED",
+      "commit": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+      "id": 5402174262,
+      "url": "https://github.com/policy-as-versioned-feeds/feeds/pull/10#pullrequestreview-5402174262"
+    }
+  ],
+  "proposed_tags_absent": [
+    "cve/v3.0.0",
+    "fx/v1.1.0",
+    "threat-register/v4.0.0"
+  ],
+  "external_actions": [
+    {
+      "action": "matching-head App source merge",
+      "at": "2026-10-03T23:14:35Z",
+      "receipt": {
+        "pr": "https://github.com/policy-as-versioned-feeds/feeds/pull/10",
+        "head": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "merge_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+        "merged_at": "2026-10-03T23:14:35Z",
+        "merged_by": "pavc-other-hand[bot]",
+        "main_after": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+        "tree_matches_reviewed_head": true,
+        "tree": "e70d9c00caea6313cc0b3c4f65ee0205fc42c709",
+        "parents": [
+          "ff3ac9ab00bdc73e1bbf83cabf91c767d35b8e88",
+          "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+        ]
+      }
+    }
+  ],
+  "merge": {
+    "pr": "https://github.com/policy-as-versioned-feeds/feeds/pull/10",
+    "head": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+    "merge_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "merged_at": "2026-10-03T23:14:35Z",
+    "merged_by": "pavc-other-hand[bot]",
+    "main_after": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "tree_matches_reviewed_head": true,
+    "tree": "e70d9c00caea6313cc0b3c4f65ee0205fc42c709",
+    "parents": [
+      "ff3ac9ab00bdc73e1bbf83cabf91c767d35b8e88",
+      "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+    ]
+  }
+}

@@ -1,0 +1,244 @@
+{
+  "driftwood": {
+    "removed_only_obsolete_generated_outputs": [
+      {
+        "path": "composed/feeds/feeds/threat-register/v2/PROVENANCE.json",
+        "sha256": "33d3869690eb7501295a41bcb5aefb92cacdfe0e3b0ad6000f5f3f5abb1c4736"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v2/party.yaml",
+        "sha256": "204f41b1138803ed5a43f7a7f910627d428d9f3ead7232c48b926da62f427e48"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v2/threat-register/to_fair_scenario.py",
+        "sha256": "10e2f5b412b09a16ff8bff2e1fe108938c79b25ac20b95b4047b4e17631bcbe7"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v2/threat-register/v2/feed.json",
+        "sha256": "c94ae8335d13edcbdc63b2d8f7c7cda3fbefd4d80e78022be51aba30d70b9a6c"
+      }
+    ],
+    "expected_rendered_count": 53,
+    "expected_sha256": {
+      "composed/HANDBOOK.md": "378d0d2c184de493ddf6041c9ca6081d1459f1716e1c4fd47c0d25d7c1d93fc5",
+      "composed/HEADER.yaml": "439b45eb86172b6980dadff167d4c7686901e839517e5c1ee7c847462328347b",
+      "composed/bottom-rung-netpol.yaml": "7700e73d5052e94fdfb0ec24d8871ac7616ee904cba4d5ea7010451bd68d147f",
+      "composed/bottom-rung-priorityclass.yaml": "22d56567fe618385bbf2f1912c1377d18c48fac047eec26489ab561ef86b511f",
+      "composed/feeds/feeds/cve/v3/PROVENANCE.json": "c3bacd21a5e915057b1f09a8d793a949314ac5dd3acaf4fb23a822b24cc53281",
+      "composed/feeds/feeds/cve/v3/cve/to_fair_scenario.py": "b83f29a6778a53dec94c752f6101a80adeb788a4f1f1d20ac2584a5d6ff34b7b",
+      "composed/feeds/feeds/cve/v3/cve/v3/feed.json": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+      "composed/feeds/feeds/cve/v3/party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+      "composed/feeds/feeds/threat-register/v4/PROVENANCE.json": "7cf80dab7f4a11273201b886299628a03df0fab86cea3e1e3889053ce8f7c90d",
+      "composed/feeds/feeds/threat-register/v4/party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+      "composed/feeds/feeds/threat-register/v4/threat-register/to_fair_scenario.py": "5b58162dd42404c0afc0ad3d063aeb4cd71a7076baca7ed7f7875e781d509d41",
+      "composed/feeds/feeds/threat-register/v4/threat-register/v4/feed.json": "e88332226c882103e469b43770bd177ff10384500825236f2fcdaf11dda168fd",
+      "composed/feeds/ico/penalty-schema/v3/PROVENANCE.json": "bf1bd613a055db91eb9e5f425dbaf9b32042f0329be085ccdc49c9aacee84025",
+      "composed/feeds/ico/penalty-schema/v3/party.yaml": "6f7e82a9616ee49ba2bbe1f2824b43458f8f72fd859216e2d5ba32577364ac72",
+      "composed/feeds/ico/penalty-schema/v3/penalty-schema/to_fair_scenario.py": "560a38c04397e8e98d56a279ca5b88cb2b2707a8a22a5c8d71a9be74946bb982",
+      "composed/feeds/ico/penalty-schema/v3/penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda",
+      "composed/feeds/insurer/quote-driftwood/v1/PROVENANCE.json": "d893755c1b1377d47d602b0e23e3b77cac02a6ab842fd204c04a47d106c4f067",
+      "composed/feeds/insurer/quote-driftwood/v1/party.yaml": "c35a3abee4bd822a5356ba6c3a8f67603561f99caabc9f7fe5a7dc3e4160a7e5",
+      "composed/feeds/insurer/quote-driftwood/v1/quote/driftwood/v1/feed.json": "e1c39816a12a13cfe21ff137073ce33492e89abc044423372c85284dc3760329",
+      "composed/floor-change.json": "e3439986411a42fe5301a9688c01e302b5430ea44ee7bfa587ad011cbff3fac1",
+      "composed/governed-namespace-guard.yaml": "9488d6002af28e940566d3fdfa82f0abc1e5901760ee96706ee51347d995e16d",
+      "composed/governed-namespace-holds.yaml": "fe49e6aaec9b8d37b72b87d0a783ddb0ec4b8f43f29f8e5e19dccd93ecfb51f5",
+      "composed/governed-namespace-report.yaml": "d1c7aaa61a2f2b48dd3b31d16834485d92342151ec9040b7d11edc031ead851e",
+      "composed/kustomization.yaml": "46644f6c27dd6ab013e59bbac1b8efbc7ae9ae8530b6395ebdea71d10ff2a381",
+      "composed/orphan-cage-holds.yaml": "e02e1fbea4b539b4530ce9b422d9f167d89b46a188111348053863f58f297b46",
+      "composed/orphan-cage.yaml": "64247e7490e3e1e10cc97bead14c9183785b37c784404beb23b3dfdf42e95f98",
+      "composed/orphan-guard.yaml": "7f6ba2f570819852e9effe61da14fd560e6642e16e87a1110f1f747e80503275",
+      "composed/policies/v5.0.0/cage-baseline.yaml": "5038e1b3da1e514811e282b0b4fa124ea1539d13db5e9201353a42a33ae62a77",
+      "composed/policies/v5.0.0/cage-isolated.yaml": "2dc3976b80b66362066d80b356be4e19eb72ef0d0170d8dd3b4fa49c0acab9d8",
+      "composed/policies/v5.0.0/cage-netpol.yaml": "ab1b5b142eab5afb5c1ce7a67c3b818bddd3e5cc98e61080a9144ae18f88c826",
+      "composed/policies/v5.0.0/cage-quarantine.yaml": "e29a9f9184c3122717da8c4b4bcebfe0a20b8770f43c837a7807ed0c14dd497b",
+      "composed/policies/v5.0.0/cage-restricted.yaml": "3df230a7b813bc7bd416812ec1efd2cdf0612958f1aec9290e95140b8c0982e2",
+      "composed/policies/v5.0.0/cage-tier.yaml": "1e63aa8161ef766bae02c28e3d11f59c594a63ae345181f572be1627c98d2700",
+      "composed/policies/v5.0.0/posture-trust-boundary.yaml": "02bbe40398f542e95f6d8f4ac29890933ec9387d436bde3e06b756029fcaf381",
+      "composed/policies/v5.0.0/require-nonroot.yaml": "db4ae1424cfdb9d34a78493fd64ec825dc3bec0471951b24236d1a10d5954e4c",
+      "composed/policies/v5.0.0/stamp-posture.yaml": "d1bb0dc3db1bc978bc6b92d8c1428a5241aed65364e8bd6d4f6fe65280c0f68e",
+      "composed/policies/v6.0.0/cage-baseline.yaml": "960e1b35a35c773e0ac5fa2dafeecadc2222d5614e3f209f4b3dda1ba39ff0b8",
+      "composed/policies/v6.0.0/cage-isolated.yaml": "e860abb3e13f350b5f753f3e348a50a88d2c6ad876f7970291f262bf93c9a0ef",
+      "composed/policies/v6.0.0/cage-netpol.yaml": "dfbbc633e99e06ff23ae5a52da15edd61aa8898ffc6253b938b2accd0ea36f1e",
+      "composed/policies/v6.0.0/cage-quarantine.yaml": "793ef0d2209c8936009983d76de0783d784c81e535cbd299e613a5a57caeb4d8",
+      "composed/policies/v6.0.0/cage-restricted.yaml": "da8feff5a2b06c164cde31ea585590735d45206aa9fa5689db20c15cf3b470bf",
+      "composed/policies/v6.0.0/cage-tier.yaml": "3631b7902250330834fe65e8d0463dfe1c6c6dcab4b01b4edc5ac0bc85ea3a5c",
+      "composed/policies/v6.0.0/posture-trust-boundary.yaml": "2404871e0ed3156336f91449254fd61b74d8426e24472e0852f6ab25d16d8762",
+      "composed/policies/v6.0.0/require-nonroot.yaml": "a5790acf37935c99ea9ba0496ad8cdaf76e257d0a07788c28d574f7eba6c4769",
+      "composed/policies/v6.0.0/stamp-posture.yaml": "f007c3d77e83b6d6944e574cf9cf5230a3cd3e90fc1090a1acc36b16de284923",
+      "composed/policies/v7.0.0/cage-baseline.yaml": "c0f9d070994e2c8d840c409aacd500f960a7b46c441404721f7cf5d2c889c9a4",
+      "composed/policies/v7.0.0/cage-isolated.yaml": "6a7f5c0b43aad1990bf1c833cf3fa622928d66b6580178b740f0be77a5b38624",
+      "composed/policies/v7.0.0/cage-netpol.yaml": "e5bfee859ecb508c9e396b32b7ea3b608f2813e9a352aad8a9026466e44e0b2e",
+      "composed/policies/v7.0.0/cage-quarantine.yaml": "1ce3942f7a2d581c98148fe836c2781b9f4867f890dc5f1f39e96f583355c75e",
+      "composed/policies/v7.0.0/cage-restricted.yaml": "e37b2e004fc872e7a726cc99cb0f98690ea11acd55e6374086db2d5e13b57c83",
+      "composed/policies/v7.0.0/cage-tier.yaml": "d9e9710be97c5436608d70e64873d26e6a2bf480784d29c818998a082c2999a8",
+      "composed/policies/v7.0.0/require-nonroot.yaml": "3c148ee613fc8af459cc6c8b4af4f6adb8b570d5dada3fe82dd2ecc6d97b3568",
+      "composed/policies/v7.0.0/stamp-posture.yaml": "c2ef001a5dd26a08322d0ae648b3bc775df835d19ff0e0c710d6578e6aa3de54"
+    }
+  },
+  "tuppence": {
+    "removed_only_obsolete_generated_outputs": [
+      {
+        "path": "composed/feeds/feeds/cve/v2/PROVENANCE.json",
+        "sha256": "4a4cc75f1b9a89664ade44019398fce0e9e527652c597aab5a3514a88e449987"
+      },
+      {
+        "path": "composed/feeds/feeds/cve/v2/cve/to_fair_scenario.py",
+        "sha256": "10e2f5b412b09a16ff8bff2e1fe108938c79b25ac20b95b4047b4e17631bcbe7"
+      },
+      {
+        "path": "composed/feeds/feeds/cve/v2/cve/v2/feed.json",
+        "sha256": "59cea1eb574ce459e839e37f35a1888e90669317df24890c52b008cb6a851595"
+      },
+      {
+        "path": "composed/feeds/feeds/cve/v2/party.yaml",
+        "sha256": "204f41b1138803ed5a43f7a7f910627d428d9f3ead7232c48b926da62f427e48"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v1/PROVENANCE.json",
+        "sha256": "6802bded0135e4ca33c90e22e939af15a38ab5f5f77758bae2f810025b5ccd1e"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v1/party.yaml",
+        "sha256": "204f41b1138803ed5a43f7a7f910627d428d9f3ead7232c48b926da62f427e48"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v1/threat-register/to_fair_scenario.py",
+        "sha256": "10e2f5b412b09a16ff8bff2e1fe108938c79b25ac20b95b4047b4e17631bcbe7"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v1/threat-register/v1/feed.json",
+        "sha256": "50af335e60b247d2a202fa747fd3a2b80c485fc587896dc0ab4841f0e54a8b60"
+      }
+    ],
+    "expected_rendered_count": 50,
+    "expected_sha256": {
+      "composed/HANDBOOK.md": "8070a2c2faeed781668518e173d7ea71c77ff6d7f263ba0ed9d19f8cbb7e5019",
+      "composed/HEADER.yaml": "63333e555f84d44f2d95751c228502393dea00876c0a4ebe130cd743e41bd4fd",
+      "composed/bottom-rung-netpol.yaml": "60222153605627f1388eccfcd55ef3fe743cba91f911d2cc2eafe2681f24a81e",
+      "composed/bottom-rung-priorityclass.yaml": "5bca2c9812c32ce78de963a63ee44fa1410c4e27a635ac65a90f6bc89f479ca3",
+      "composed/feeds/feeds/cve/v3/PROVENANCE.json": "a82d1970d5d0d2f6f33e060ede8a6c271872ca928c84befd7194fa931f430dcb",
+      "composed/feeds/feeds/cve/v3/cve/to_fair_scenario.py": "b83f29a6778a53dec94c752f6101a80adeb788a4f1f1d20ac2584a5d6ff34b7b",
+      "composed/feeds/feeds/cve/v3/cve/v3/feed.json": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+      "composed/feeds/feeds/cve/v3/party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+      "composed/feeds/feeds/threat-register/v4/PROVENANCE.json": "53ae5892562b58ebe9e0cf08e9cbb64b44c7cbeed58865272ee51698b40e5990",
+      "composed/feeds/feeds/threat-register/v4/party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+      "composed/feeds/feeds/threat-register/v4/threat-register/to_fair_scenario.py": "5b58162dd42404c0afc0ad3d063aeb4cd71a7076baca7ed7f7875e781d509d41",
+      "composed/feeds/feeds/threat-register/v4/threat-register/v4/feed.json": "e88332226c882103e469b43770bd177ff10384500825236f2fcdaf11dda168fd",
+      "composed/feeds/ico/penalty-schema/v3/PROVENANCE.json": "48e0283296c20bcc1ffa3d47ab786516851549883f7276d385e4791d86c8b5c4",
+      "composed/feeds/ico/penalty-schema/v3/party.yaml": "6f7e82a9616ee49ba2bbe1f2824b43458f8f72fd859216e2d5ba32577364ac72",
+      "composed/feeds/ico/penalty-schema/v3/penalty-schema/to_fair_scenario.py": "560a38c04397e8e98d56a279ca5b88cb2b2707a8a22a5c8d71a9be74946bb982",
+      "composed/feeds/ico/penalty-schema/v3/penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda",
+      "composed/floor-change.json": "1962fcdab524ccda7c2ae50398d62d7a1eb0c14b9c0d519b85b3d4c8b6fc604a",
+      "composed/governed-namespace-guard.yaml": "fb70d383cba2b8ac4027315ed7c1a76a39fe0257f64685b709b4fc9d18b06455",
+      "composed/governed-namespace-holds.yaml": "d52eb6a96cb678012091cc93b84a025d577583394e32e87718afcc2360bcb956",
+      "composed/governed-namespace-report.yaml": "00f56d1cdbad32f9dacbccde39533525dfff4cb934bfec7ae8d3acb0249caac2",
+      "composed/kustomization.yaml": "46644f6c27dd6ab013e59bbac1b8efbc7ae9ae8530b6395ebdea71d10ff2a381",
+      "composed/orphan-cage-holds.yaml": "e48552ce42a8312108ae91c59557540c7b766f155c8adb8af2eb33115c60eff9",
+      "composed/orphan-cage.yaml": "b16e1a72f2ec2bd08fc73796bba07216b668267b48de1825a3511ff7f877409f",
+      "composed/orphan-guard.yaml": "a72134223c2e9a13b03d9080ed60aad28480f5605e7146e77fb1ffc9d5df5773",
+      "composed/policies/v5.0.0/cage-baseline.yaml": "c52b7228d765906d014508845c52d75aaf4caabf56aad9b3c15668e1d7eec718",
+      "composed/policies/v5.0.0/cage-isolated.yaml": "b5745a037fdedb04d55c4b983505b93c1de12837165e7121841d0785d7e9e679",
+      "composed/policies/v5.0.0/cage-netpol.yaml": "79a09b94b053636108007335d63836ca2ad9cf9a9066be1ba2cdbd7129a40e71",
+      "composed/policies/v5.0.0/cage-quarantine.yaml": "6f844dc305e165a9b6b5dc1cf334c24f930f0af44abe97923a1601f1f8210846",
+      "composed/policies/v5.0.0/cage-restricted.yaml": "33d252de9290bcb71958f95ef45270202ce8716566c2452ba9c4dfaff82d9f65",
+      "composed/policies/v5.0.0/cage-tier.yaml": "96c47d8d0517a76c2a7d6722810807049c3a5d63d3f3e1cf8b0d69249450f8b6",
+      "composed/policies/v5.0.0/posture-trust-boundary.yaml": "19686ed4582b4d4057df5562e3509022cd9cdcaa358e73dc43710dc1d99ee95d",
+      "composed/policies/v5.0.0/require-nonroot.yaml": "c9bf8c124ea2e7ab0bc0114ea28694a60d19dcb92cf3d31b12687fbc6fcc6ddc",
+      "composed/policies/v5.0.0/stamp-posture.yaml": "641c7210b3d8555966347dc374cdbebea93467367a9b7a4a3c4c787177616cbd",
+      "composed/policies/v6.0.0/cage-baseline.yaml": "6d2068149d52eaaebfd538a6e136ed1f673e63f8d2e6781e63ef52c4b751031c",
+      "composed/policies/v6.0.0/cage-isolated.yaml": "ff7e7673458aafddb902f4d3e88de83b549dc2c16b34e5f7ac8dd77529028795",
+      "composed/policies/v6.0.0/cage-netpol.yaml": "a841751a633eb44decd47b29415b17891f0172526575903396d08e04d0a7ee66",
+      "composed/policies/v6.0.0/cage-quarantine.yaml": "313b10fcdaf3da9bf56da59f224477dd468ab22af43b42b685847b50cd22f1e0",
+      "composed/policies/v6.0.0/cage-restricted.yaml": "4007d56f21bbba8dab98e6d2a8256f017cd1e40e98e8844ead76f018e08755e1",
+      "composed/policies/v6.0.0/cage-tier.yaml": "8771df42c1f19619992576b15d86b1ab3f8035e9244e6b2d6707e5084f98059b",
+      "composed/policies/v6.0.0/posture-trust-boundary.yaml": "73de1eeb0db85df2ae950c499092a4cc205f41d8d6842f3beb8d58c7b25ab640",
+      "composed/policies/v6.0.0/require-nonroot.yaml": "8f2791ffedea466c0f8848ccb2722e8655e3a5f1bd65aa491132e31e3df18bdb",
+      "composed/policies/v6.0.0/stamp-posture.yaml": "13781f88425034e0be92c48986e380df71e6e044b456b6d6f5876a9bf285e86b",
+      "composed/policies/v7.0.0/cage-baseline.yaml": "aab49493274889a5a337c71b7b3e1f704900fa0d1bf0b7915916cc0032393a1f",
+      "composed/policies/v7.0.0/cage-isolated.yaml": "e83cbf84ffd64c65b41a0d24ffa50d1d72b4ab3ba766c19fb48044e0406afecc",
+      "composed/policies/v7.0.0/cage-netpol.yaml": "93dbcf58cb8c85f1004a7d06ebf797cf00fe4f2ddcecadb860c020b1d81441f4",
+      "composed/policies/v7.0.0/cage-quarantine.yaml": "68ea0a1b1303240bd0b2e6d59a3d123e70920979dec0c64547d33f68716f4de6",
+      "composed/policies/v7.0.0/cage-restricted.yaml": "a08c153bad2bb58454c5b37000a8f070b16f1153d4771c24269f75b18c035b1b",
+      "composed/policies/v7.0.0/cage-tier.yaml": "34ba7cceacca2e855e998889f705ab49e37645ddae2edf1a652a3d1ddb32d089",
+      "composed/policies/v7.0.0/require-nonroot.yaml": "f06e3953b76d834ec71f6626a7f0d21ca8b17afae3d02d4c33b77aab4b2407ea",
+      "composed/policies/v7.0.0/stamp-posture.yaml": "b06a8086e0a68fe466838d2d66c97e0043509f737340ae3b98786d657087ac0b"
+    }
+  },
+  "ludlow": {
+    "removed_only_obsolete_generated_outputs": [
+      {
+        "path": "composed/feeds/feeds/threat-register/v1/PROVENANCE.json",
+        "sha256": "10300e7c6eb8384563e96a0952f00a923566af69e67638e84927c24feabe81c5"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v1/party.yaml",
+        "sha256": "204f41b1138803ed5a43f7a7f910627d428d9f3ead7232c48b926da62f427e48"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v1/threat-register/to_fair_scenario.py",
+        "sha256": "10e2f5b412b09a16ff8bff2e1fe108938c79b25ac20b95b4047b4e17631bcbe7"
+      },
+      {
+        "path": "composed/feeds/feeds/threat-register/v1/threat-register/v1/feed.json",
+        "sha256": "50af335e60b247d2a202fa747fd3a2b80c485fc587896dc0ab4841f0e54a8b60"
+      }
+    ],
+    "expected_rendered_count": 54,
+    "expected_sha256": {
+      "composed/HANDBOOK.md": "7291eb5c041ced3c9f8d821dec03ceb355c3339a8bb0b319777009506e856de0",
+      "composed/HEADER.yaml": "703f3bea29c9e65e8124f24f3bc5f38ead955977fc2867cb9e94ec630b710d73",
+      "composed/bottom-rung-netpol.yaml": "312d6195da0ec8f9de44e3c5b3fc8c23372f114c675a0b5388dd8ac63808a17e",
+      "composed/bottom-rung-priorityclass.yaml": "f82d7e4405adb58fbd72510cda45684dd9df85375286b99c8fe65f8b70ea06da",
+      "composed/feeds/feeds/cve/v3/PROVENANCE.json": "f4bf12106925f40854a6e685d4d7205ac3a1609f38ad33021c6eba5fa771ec01",
+      "composed/feeds/feeds/cve/v3/cve/to_fair_scenario.py": "b83f29a6778a53dec94c752f6101a80adeb788a4f1f1d20ac2584a5d6ff34b7b",
+      "composed/feeds/feeds/cve/v3/cve/v3/feed.json": "bb56231c17a3ba513be0ec15de07b2bcfa438c9047b06edb3a402dac051d28f5",
+      "composed/feeds/feeds/cve/v3/party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+      "composed/feeds/feeds/eol/v2/PROVENANCE.json": "105493bb1fb2621dfea1e02570fcdb2128a2223a3a9464c28766e6038793aa1e",
+      "composed/feeds/feeds/eol/v2/eol/to_fair_scenario.py": "b83f29a6778a53dec94c752f6101a80adeb788a4f1f1d20ac2584a5d6ff34b7b",
+      "composed/feeds/feeds/eol/v2/eol/v2/feed.json": "401f564c7b370833888c74d612afffee80f947d7522e63b2be66d1a41b6f533b",
+      "composed/feeds/feeds/eol/v2/party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+      "composed/feeds/feeds/threat-register/v4/PROVENANCE.json": "fac4156419ad12f1e96cd9c948c234c34ecf49396426d3775034c560ff105a50",
+      "composed/feeds/feeds/threat-register/v4/party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
+      "composed/feeds/feeds/threat-register/v4/threat-register/to_fair_scenario.py": "5b58162dd42404c0afc0ad3d063aeb4cd71a7076baca7ed7f7875e781d509d41",
+      "composed/feeds/feeds/threat-register/v4/threat-register/v4/feed.json": "e88332226c882103e469b43770bd177ff10384500825236f2fcdaf11dda168fd",
+      "composed/feeds/ico/penalty-schema/v3/PROVENANCE.json": "15cf94f3183c8db4629376585557bed8801b3ad1ec94522de51bb3a826d2e154",
+      "composed/feeds/ico/penalty-schema/v3/party.yaml": "6f7e82a9616ee49ba2bbe1f2824b43458f8f72fd859216e2d5ba32577364ac72",
+      "composed/feeds/ico/penalty-schema/v3/penalty-schema/to_fair_scenario.py": "560a38c04397e8e98d56a279ca5b88cb2b2707a8a22a5c8d71a9be74946bb982",
+      "composed/feeds/ico/penalty-schema/v3/penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda",
+      "composed/floor-change.json": "731ad5565afef6a2ca13c1882bc0f9f01c1c41bd651e40bf2892d6e7680ae0fd",
+      "composed/governed-namespace-guard.yaml": "d2918847cb1816a420e99c2c207db27f41ac49ce879ba8cf9776e17ef50d4e9b",
+      "composed/governed-namespace-holds.yaml": "a564c3f5097e43650303ecb8dea733ee59c23dec6ac32cff755936735451b451",
+      "composed/governed-namespace-report.yaml": "61d0aec1128a0f6efe525381203b4daaa6e430069bb334f74f52d14e9d112836",
+      "composed/kustomization.yaml": "46644f6c27dd6ab013e59bbac1b8efbc7ae9ae8530b6395ebdea71d10ff2a381",
+      "composed/orphan-cage-holds.yaml": "6cf8efe736d132348aa38cf310b81d941a8b595c2cd8e8b637a3ed79ade74e34",
+      "composed/orphan-cage.yaml": "cc7ae4adf57bfd2f3ff4420d6fc8c5bf9865000708547669cfe83c65d9021383",
+      "composed/orphan-guard.yaml": "91d44ad8af33312386948b4ecd09fefcb27626cbda28d469d9b0aa32e92e15bd",
+      "composed/policies/v5.0.0/cage-baseline.yaml": "c0ca7179e5c7276c85c34d65568d6d7299dfe748c3d968960c8e6e2dc03c32c0",
+      "composed/policies/v5.0.0/cage-isolated.yaml": "d9c0263ea4da93a8662e68d289c7501f0fa5f24a246bbba4097edf5f269afad3",
+      "composed/policies/v5.0.0/cage-netpol.yaml": "03c6e1a31558558414490e815fb0f7438895c9755653126ed1b563b615ca6bb7",
+      "composed/policies/v5.0.0/cage-quarantine.yaml": "4f521f23779ba56fd89259ffa0800f87ac9cd3b951acfaf8d28ee4dd188d27c3",
+      "composed/policies/v5.0.0/cage-restricted.yaml": "33f794b7246b4315d7f3cbcc62baecc5f90d4bec7ef42ae6769b75e03f268d88",
+      "composed/policies/v5.0.0/cage-tier.yaml": "5c6c3891e9db9e0f0c6cea322eb877946c47f41f17f66959fc679c917afa7281",
+      "composed/policies/v5.0.0/posture-trust-boundary.yaml": "feb8de44e5c950784e609f09fea9d696f2ee2ca77f647c2cc0710a3fb0537221",
+      "composed/policies/v5.0.0/require-nonroot.yaml": "8801c523f734ae2ead5dadd14735dd8fc901b7b3024381d34e1bbef9a3496c39",
+      "composed/policies/v5.0.0/stamp-posture.yaml": "07f97c9094b7a6188d7fd99113700cb9d99a5000a3a1f928e892504526cb1a7c",
+      "composed/policies/v6.0.0/cage-baseline.yaml": "f283c4c11aa83ab911952e46f3e4bbb056ff4c69f766c29175d0618f0b4b543e",
+      "composed/policies/v6.0.0/cage-isolated.yaml": "3daeb4a66d644f0729b72fdf2e35eadcc483564261f47c821bfd7f37410f8a64",
+      "composed/policies/v6.0.0/cage-netpol.yaml": "ce003bb24ca2e4d888f7a28282b9e7a0458177a6317c710b37a48db25539ffeb",
+      "composed/policies/v6.0.0/cage-quarantine.yaml": "7e0d40500b5d434c8bae4bc2f7a8008523ee6db610f98c3a28eafcce112655b1",
+      "composed/policies/v6.0.0/cage-restricted.yaml": "0313257ebd3b0ad1b1a00c97dd42c7427231936550551ea0660e9d3734c49932",
+      "composed/policies/v6.0.0/cage-tier.yaml": "a46b78a58593ddef9390d34e0fb70c99922430c8a55c61b6f04af208c018bae5",
+      "composed/policies/v6.0.0/posture-trust-boundary.yaml": "c378cf64ff4b1925adec56270d754ff9a826e98ff599b933a86e0b1f22d6884a",
+      "composed/policies/v6.0.0/require-nonroot.yaml": "abfbf132a1285a15dd4a1f972b26f8efcbfb026c3b87be0382060c1e08e241de",
+      "composed/policies/v6.0.0/stamp-posture.yaml": "f59f807430df33a68aba92f027f356e3af7882dc708d0144224e0ea8fb71dc9e",
+      "composed/policies/v7.0.0/cage-baseline.yaml": "ec646cb2df9610d66698eede382d589915a75d66deab78ba644774e5562d71cf",
+      "composed/policies/v7.0.0/cage-isolated.yaml": "76b80dd01ace4106477b59504447fde221c35b98592270ff5af138e373979d69",
+      "composed/policies/v7.0.0/cage-netpol.yaml": "222aec110d275afda3e8513a7980b41f12ca1b3dccf0e62cbd9dc652ec9556a2",
+      "composed/policies/v7.0.0/cage-quarantine.yaml": "ba75cb1863b66bb7ba0b5bf06093babce376f0a0afc16771d344d400d15032b3",
+      "composed/policies/v7.0.0/cage-restricted.yaml": "0e307ec0e4d5a76550e6190b25ddd08cafb229cf511123524242e3bc8c9a942c",
+      "composed/policies/v7.0.0/cage-tier.yaml": "29b135dd808868128153baca331ab7aaa2c79f53279344fc7ff8b7644a5d7ff0",
+      "composed/policies/v7.0.0/require-nonroot.yaml": "54bb4894402d5ef890f837d7b7c72de682e81069e4035e35162ec6f368665733",
+      "composed/policies/v7.0.0/stamp-posture.yaml": "118baf8d59349ed835c9e956dc9b594a1fdbf2c0a236ba4591ee4c1c0c40e913"
+    }
+  }
+}

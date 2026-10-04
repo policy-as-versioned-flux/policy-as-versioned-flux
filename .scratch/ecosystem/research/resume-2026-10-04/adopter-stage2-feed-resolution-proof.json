@@ -1,0 +1,80 @@
+{
+  "driftwood": {
+    "checkout": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "clean": true,
+    "refs": {
+      "cve/v3.0.0": {
+        "type": "tag",
+        "tag_object": "647f4961eb02d0858092ee6f91a43cb1657bdd97",
+        "peeled_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "fx/v1.1.0": {
+        "type": "tag",
+        "tag_object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+        "peeled_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "threat-register/v4.0.0": {
+        "type": "tag",
+        "tag_object": "57cfe4af7aa85301e27dc720f0227834bfd0574f",
+        "peeled_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      }
+    },
+    "last_payload_edits": {
+      "cve/v3": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+      "threat-register/v4": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+    },
+    "tag_tree_matches_source_commit": true
+  },
+  "tuppence": {
+    "checkout": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "clean": true,
+    "refs": {
+      "cve/v3.0.0": {
+        "type": "tag",
+        "tag_object": "647f4961eb02d0858092ee6f91a43cb1657bdd97",
+        "peeled_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "fx/v1.1.0": {
+        "type": "tag",
+        "tag_object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+        "peeled_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "threat-register/v4.0.0": {
+        "type": "tag",
+        "tag_object": "57cfe4af7aa85301e27dc720f0227834bfd0574f",
+        "peeled_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      }
+    },
+    "last_payload_edits": {
+      "cve/v3": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+      "threat-register/v4": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+    },
+    "tag_tree_matches_source_commit": true
+  },
+  "ludlow": {
+    "checkout": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "clean": true,
+    "refs": {
+      "cve/v3.0.0": {
+        "type": "tag",
+        "tag_object": "647f4961eb02d0858092ee6f91a43cb1657bdd97",
+        "peeled_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "fx/v1.1.0": {
+        "type": "tag",
+        "tag_object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+        "peeled_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      },
+      "threat-register/v4.0.0": {
+        "type": "tag",
+        "tag_object": "57cfe4af7aa85301e27dc720f0227834bfd0574f",
+        "peeled_commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+      }
+    },
+    "last_payload_edits": {
+      "cve/v3": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+      "threat-register/v4": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6"
+    },
+    "tag_tree_matches_source_commit": true
+  }
+}

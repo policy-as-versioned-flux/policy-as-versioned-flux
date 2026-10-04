@@ -1,0 +1,4 @@
+# Diff context and raw verification logs preserve exact evidence bytes; source diffs are checked separately.
+*.patch -whitespace
+*.log -whitespace
+*headers.txt -whitespace

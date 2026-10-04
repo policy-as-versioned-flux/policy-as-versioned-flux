@@ -1,0 +1,31 @@
+{
+  "hub_commit": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+  "published_main_merge": "e62194b0c700f0d8a94787e6a2f7063608862ace",
+  "published_main_contains_exact_pin": true,
+  "hub_signature_verification": "Good \"git\" signature for chris@cns.me.uk with ED25519 key SHA256:fMF3vQA43IouAqJExGenHZH3YHfS4Lim+NqTalnVJS0\n",
+  "scope": "actual unmodified producer --check in disposable copies, clean exact published hub, genuine feeds; no external mutation",
+  "adopters": {
+    "driftwood": {
+      "exit": 1,
+      "stdout": "FAIL: twin/forward-intel/v2/feed.json is not what the overlay renders\n",
+      "stderr": "",
+      "pin": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+      "source_forward_intel_unchanged": true
+    },
+    "tuppence": {
+      "exit": 1,
+      "stdout": "FAIL: twin/forward-intel/v1/feed.json is not what the overlay renders\n",
+      "stderr": "",
+      "pin": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+      "source_forward_intel_unchanged": true
+    },
+    "ludlow": {
+      "exit": 1,
+      "stdout": "FAIL: twin/forward-intel/v1/feed.json is not what the overlay renders\n",
+      "stderr": "",
+      "pin": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+      "source_forward_intel_unchanged": true
+    }
+  },
+  "clean_hub_tracked_tree_unchanged": true
+}

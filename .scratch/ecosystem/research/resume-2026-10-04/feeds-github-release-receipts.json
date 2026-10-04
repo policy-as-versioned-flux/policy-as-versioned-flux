@@ -1,0 +1,44 @@
+{
+  "cve/v3.0.0": {
+    "id": 402782214,
+    "html_url": "https://github.com/policy-as-versioned-feeds/feeds/releases/tag/cve/v3.0.0",
+    "tag_name": "cve/v3.0.0",
+    "target_commitish": "main",
+    "name": "cve/v3.0.0",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2026-10-03T23:16:24Z",
+    "published_at": "2026-10-04T02:08:11Z",
+    "body": "CVE3: captured CISA KEV membership, NVD severity and FIRST EPSS dated 2026-10-03; 1733 primary-source records, with no invented inventory or loss magnitude.\n---\nVerified gitsign signature (identity regexp: ^https://github\\.com/policy-as-versioned-feeds/feeds/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$, issuer: https://token.actions.githubusercontent.com). Resolved commit: 974e73514e0d8d4cad2e6906acf51d1cc27028b3.\n",
+    "tag_object": "647f4961eb02d0858092ee6f91a43cb1657bdd97",
+    "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+  },
+  "fx/v1.1.0": {
+    "id": 402842617,
+    "html_url": "https://github.com/policy-as-versioned-feeds/feeds/releases/tag/fx/v1.1.0",
+    "tag_name": "fx/v1.1.0",
+    "target_commitish": "main",
+    "name": "fx/v1.1.0",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2026-10-03T23:16:53Z",
+    "published_at": "2026-10-04T04:38:38Z",
+    "body": "FX1.1: authentic HMRC August2026 monthly CSV, 141 foreign-currency units per GBP1; replaces illustrative August rates without claiming a newer observation month.\n---\nVerified gitsign signature (identity regexp: ^https://github\\.com/policy-as-versioned-feeds/feeds/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$, issuer: https://token.actions.githubusercontent.com). Resolved commit: 974e73514e0d8d4cad2e6906acf51d1cc27028b3.\n",
+    "tag_object": "fcd8697eafdd44de5d6748ac50b190c9139c5af0",
+    "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+  },
+  "threat-register/v4.0.0": {
+    "id": 402889892,
+    "html_url": "https://github.com/policy-as-versioned-feeds/feeds/releases/tag/threat-register/v4.0.0",
+    "tag_name": "threat-register/v4.0.0",
+    "target_commitish": "main",
+    "name": "threat-register/v4.0.0",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2026-10-03T23:17:19Z",
+    "published_at": "2026-10-04T07:00:34Z",
+    "body": "Threat-register4: cited scheduled-agent credential-misuse frequency with dated limitations; subscriber supplies its own magnitude and v3 headline prices remain unchanged.\n---\nVerified gitsign signature (identity regexp: ^https://github\\.com/policy-as-versioned-feeds/feeds/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$, issuer: https://token.actions.githubusercontent.com). Resolved commit: 974e73514e0d8d4cad2e6906acf51d1cc27028b3.\n",
+    "tag_object": "57cfe4af7aa85301e27dc720f0227834bfd0574f",
+    "commit": "974e73514e0d8d4cad2e6906acf51d1cc27028b3"
+  }
+}

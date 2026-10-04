@@ -1,0 +1,13 @@
+The safe minimal rollout is one signed source release followed by a reviewed, re-rendered delivery change. A bare self-pin change fails the actual tools5 verification contract.
+
+`compose/comparison_history.py:150` hashes every non-hidden, non-composed source file. The apps pin, inventory provenance and composed self-pin all participate. `resolve(..., replay=True)` at line290 refuses changed identities; `composition.py:5958` invokes this during byte verification. The independent in-memory probe changed no source files or tags and reproduced this refusal for all three paths on all three adopters. Results: `adopter-self-pin-contract-checks.json`.
+
+Required sequence:
+
+1. Finish composition and replay against genuine platform/tools `v5.0.0` and the authenticated feed trees. Release A may contain claim7 app manifests and composed policy5/6/7 while retaining real apps3.0.1 and composed3.0.0 delivery pins. Its inventory remains the authentic apps3.0.1 measurement. Cut and independently verify A before referring to its tag/commit.
+2. In one reviewed delivery change, move apps tag+commit to A and rebind provenance after exact tagged graph/digest validation. Existing primary reports remain valid only for unchanged image digests and retain their original scanner/database dates. Move composed tag+commit to A in the same change, with ResourceSet array and gitsign gates matching A's actual5/6/7 directories. This avoids claim7 apps landing while composition still delivers only5.
+3. Re-run the exact tools5 composer and byte verification, committing the updated render beside the pin changes. `render_composed.py:435` reads the current delivery array against the target tag's tree, so changing the array before a matching real tag exists fails reach.
+
+A subsequent composition release B is required if rollout must serve the exact post-apps-pin rendered artefact. Publish B, then move the composed pointer to B with another re-rendered reviewed change. This final pointer edit also changes history; omit neither its render nor its verification. A's already signed policy tree otherwise remains a valid declared delivery target; changed advisory history alone does not force another tag.
+
+Actual initial windows are5→5/6/7. Published6 and7 evidence both compute major, so the initial adoption fold is major and requires the existing explicit institutional acceptances. The pin-only follow-up adds/retires no policy version and folds none. Adopter release numbers belong to the adopter; do not confuse package5 or policy7 with that number. Engine1.18.2, risk absence and cloud activation gates remain unchanged.

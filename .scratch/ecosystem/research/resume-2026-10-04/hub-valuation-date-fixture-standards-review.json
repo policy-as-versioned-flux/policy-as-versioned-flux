@@ -1,0 +1,110 @@
+{
+  "status": "PASS: inspected minimal valuation date guard and test-only fixture repair; final consumer/source delivery remains pending",
+  "baseline": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+  "source": {
+    "twin/valuation.py": {
+      "sha256": "d859628b0e82315defecd2ad085bb6df754107b91ac123d78a8958828c259ccf",
+      "lines": 66
+    },
+    "tests/test_valuation_currency.py": {
+      "sha256": "f57bab8ca237795a1faaac16d528261c96353a1ffa4ee9745604bd667472e4b2",
+      "lines": 43
+    },
+    "tests/test_loophole_adr_0026.py": {
+      "sha256": "fd05d371b9a7b05e444abdbfe34f0f7cb19d1ff1c8dadd88fc9f8df304fc2350",
+      "lines": 1291
+    }
+  },
+  "three_file_diff_sha256": "a8eac472158f65ace6717c0023852388ecc97e253ec21271bc67659a8f613c66",
+  "read_only_review": true,
+  "source_edits_by_reviewer": false,
+  "FX_contract": {
+    "published_tag": "fx/v1.1.0",
+    "period": "2026-08",
+    "schema_period_contract": "The month these rates are in force for, YYYY-MM. A date outside it has no rate in this version.",
+    "same_currency_requires_no_FX": true,
+    "foreign_conversion_requires_valid_ISO_date_and_exact_period": true,
+    "date_failure_type": "MissingInstrument",
+    "signature_verification_remains_caller_owned": true
+  },
+  "December_primary_evidence": {
+    "raw_sha256": "48efcd590d4d21ea4309667ee5dce130146f1ee8b46962e2ad9747b085417b26",
+    "official_URL": "https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_csv_2025-12.csv",
+    "two_local_raw_files_identical": true,
+    "rows": 164,
+    "USD_per_GBP": "1.3126",
+    "all_rows_effective_month_matches": true,
+    "computed_bump_reported": "major",
+    "removed_currency_codes": [
+      "VES"
+    ],
+    "honest_next_version": "fx/v2.0.0",
+    "not_yet_signed_or_served": true
+  },
+  "validation": {
+    "root_reported_valuation_red": 6,
+    "root_reported_valuation_green": 7,
+    "root_reported_valuation_mypy": "one-file PASS",
+    "fixture_owned_proof": {
+      "checked_at": "2026-10-04T08:47:32.605433+00:00",
+      "baseline": "6ed89616d7d43dece00b5daa8f0a03c56b53d5e7",
+      "owned_source_path": "tests/test_loophole_adr_0026.py",
+      "patch_sha256": "f62262b540a171d37da876acb6c68a43fc15549388013ed6887868591f3ca67c",
+      "shared_source_clones_mutated": false,
+      "network_mutations": false,
+      "original_old_layout_red": "14 failed, 12 passed: absent inventory copy",
+      "conditional_only_old_layout": "14 failed, 12 passed: legitimate ADR0035 missing instrument (actual CVEv2 declaration)",
+      "old_scope_isolated_final": {
+        "layout": "old",
+        "estate": "/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-1z8un07t/estate",
+        "source_refs": {
+          "driftwood": "17302ecd20041df61a52428e67246c330294d2a6",
+          "tuppence": "d8dead25e0e5e275172640b1a637562e45edb15d",
+          "ludlow": "5ff463673cf05af71a5db2ed0c38deaf263464d2"
+        },
+        "platform_tools": {
+          "tag": "v5.0.0",
+          "commit": "703eff6aee959843c4160aa54fd03413f62858cc"
+        },
+        "pytest_exit": 0,
+        "source_mutations": false,
+        "isolated_cases": 27
+      },
+      "new_native_original26": "26 passed in151.31s before final negative regression",
+      "new_native_final": {
+        "layout": "new",
+        "estate": "/var/folders/6k/b9phx2zn05q_dr_mcxm6_f3h0000gn/T/pavf-loophole-inventory-80lmwx8g/estate",
+        "source_refs": {
+          "driftwood": "aa923631de95276615e4985e67ee41971efacf25",
+          "tuppence": "c70edb11086527c439b9adbc094eca6140136ae0",
+          "ludlow": "4f81da7eca50ae9adadcb905813cf06f17a5d9a1"
+        },
+        "platform_tools": {
+          "tag": "v5.0.0",
+          "commit": "703eff6aee959843c4160aa54fd03413f62858cc"
+        },
+        "pytest_exit": 0,
+        "source_mutations": false,
+        "isolated_cases": 27
+      },
+      "invalid_initial_run": "xdist workers did not inherit the local estate plugin; first26-pass result excluded",
+      "typecheck": "No selected test-file type-check gate configured; actual suite imports and executes source.",
+      "completed_at": "2026-10-04T08:49:19.187886+00:00",
+      "status": "old_isolated_and_new_native_both27PASS"
+    },
+    "reviewer_did_not_repeat_broad_suite": true
+  },
+  "known_independent_CI_failure": {
+    "name": "flux_coverage_floor_is_still_reachable",
+    "number": 45,
+    "measured": "3/1966 samples",
+    "unchanged": true,
+    "must_not_be_relabelled_PASS": true
+  },
+  "followup": [
+    "normal PR CI configured pytest, invariant and mypy jobs report their actual results; preserve the unchanged measured coverage failure",
+    "after corrected hub source publication, move all3 exact hub pins by reviewed change and replay real producer --check against that exact source and authentic signed FX2",
+    "retain honest CANNOT LOOK exit3 until the matching signed FX instrument exists",
+    "recompose/verify and bind final candidate heads; later authentic composition B moves served apps A provenance and 5/6/7 fanout before activation"
+  ]
+}

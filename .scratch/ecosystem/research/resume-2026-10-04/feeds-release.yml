@@ -1,0 +1,137 @@
+name: release
+
+# Runs on every `<feed>/vX.Y.Z` tag push. Verifies the tag's gitsign signature
+# identity-pinned against an offline Rekor bundle, checks the tag still
+# resolves to the commit this run was triggered from, runs the offline verify
+# script as a release gate, and publishes a GitHub Release. See
+# cut-release.yml for how the tag gets here, and ADR-0019 for why the tag is
+# the only signature this feed carries.
+#
+# EXPECTED_IDENTITY_REGEXP is cut-release.yml's own Actions identity (ambient
+# credential, no human login). Anchored to allow main or a
+# release/<major>.<minor>.x maintenance branch, so a backport's tag still
+# verifies.
+#
+# Also accepts workflow_dispatch: a workflow run started BY the default
+# Actions credential (cut-release.yml's own `git push`) does not, by GitHub
+# design, trigger other workflows -- the tag lands but this workflow's own
+# `push: tags:` event never fires. workflow_dispatch is the documented way
+# round that.
+
+on:
+  push:
+    tags:
+      - "*/v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "tag to verify + publish, e.g. cve/v2.1.0"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+  GITSIGN_VERSION: 0.17.1
+  GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+  # Ticket 77 item 4. This job checks `platform` out to use its schema and its engine as
+  # the RULER its own release gate is graded by, and did so at platform's DEFAULT BRANCH --
+  # an unpinned, unsigned consumption of another organisation, which is exactly what this
+  # estate tells its adopters never to do (NORTH-STAR section 2). The pin is a {tag, commit}
+  # pair like every other cross-org pin here. It lives in this file's `env:` and not in a
+  # gitops/ pin file because feeds runs no cluster and carries no renovate.json, so a pin
+  # file would gain nothing a constant beside GITSIGN_VERSION above does not already give;
+  # the day feeds gains a Renovate config, this moves to gitops/platform/platform-pin.yaml
+  # in the insurer's shape. Bumping it is a reviewed pull request that edits both lines.
+  PLATFORM_TAG: v2.0.1
+  PLATFORM_COMMIT: 533dccb0a823001b396fd60ab08014bf75065a37
+  EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+  EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/checkout@v4
+        with:
+          repository: policy-as-versioned-platform/platform
+          path: .platform
+          ref: ${{ env.PLATFORM_TAG }}
+
+      - name: platform is at the {tag, commit} pair this workflow pins
+        run: |
+          set -euo pipefail
+          head="$(git -C .platform rev-parse HEAD)"
+          if [ "${{ env.PLATFORM_COMMIT }}" != "${head}" ]; then
+            echo "REFUSED: .platform is at ${head}, but this workflow pins ${{ env.PLATFORM_TAG }} at ${{ env.PLATFORM_COMMIT }}" >&2
+            exit 1
+          fi
+          echo "ok  .platform is ${{ env.PLATFORM_TAG }} (${{ env.PLATFORM_COMMIT }})"
+
+      - name: install pinned gitsign (binary + checksum, no marketplace action)
+        run: |
+          set -euo pipefail
+          curl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"
+          echo "${GITSIGN_SHA256}  gitsign" | sha256sum -c -
+          chmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign
+
+      # verify-feeds.sh validates every envelope against platform's
+      # feeds/schema.json. It exits 3 (could-not-look) when it cannot find a
+      # platform checkout; here it can, so 3 would itself be a release fault.
+      - name: offline verify (release gate -- must be a real pass, not a skip)
+        env:
+          PLATFORM_DIR: .platform
+        run: ./verify-feeds.sh
+
+      # tickets 49 and 50: the series, the thresholds, the observation lane, the
+      # absence of niobium and the absence of a model on the clock. Offline, so a
+      # skip here would be a fault too. verify-news-headline-skill.sh is NOT run:
+      # it reads the skill in the hub checkout and would exit 3 on a runner.
+      - name: offline verify -- market-moves and news
+        run: ./verify-market-and-news.sh
+
+      - name: gitsign verify-tag, identity-pinned, offline Rekor bundle
+        env:
+          GITSIGN_REKOR_MODE: offline
+        run: |
+          set -euo pipefail
+          # actions/checkout's second fetch flattens the annotated tag object
+          # gitsign needs -- re-fetch the real tag ref before verifying it.
+          git fetch origin "+refs/tags/${TAG}:refs/tags/${TAG}" --force
+          gitsign verify-tag "${TAG}" \
+            --certificate-identity-regexp="${EXPECTED_IDENTITY_REGEXP}" \
+            --certificate-oidc-issuer="${EXPECTED_ISSUER}"
+
+      - name: tag still resolves to the commit this run was triggered from
+        if: github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          resolved=$(git rev-parse "${TAG}^{commit}")
+          if [ "${resolved}" != "${GITHUB_SHA}" ]; then
+            echo "FAIL: tag ${TAG} resolves to ${resolved}, run was triggered from ${GITHUB_SHA}"
+            exit 1
+          fi
+          echo "OK: ${TAG} -> ${resolved}"
+
+      - name: publish GitHub Release recording the resolved SHA
+        run: |
+          set -euo pipefail
+          resolved=$(git rev-parse "${TAG}^{commit}")
+          {
+            git tag -l --format='%(contents)' "${TAG}" | sed '/^-----BEGIN SIGNED MESSAGE-----$/,$d'
+            echo "---"
+            echo "Verified gitsign signature (identity regexp: ${EXPECTED_IDENTITY_REGEXP}, issuer: ${EXPECTED_ISSUER}). Resolved commit: ${resolved}."
+          } > release-notes.md
+          gh release create "${TAG}" \
+            --title "${TAG}" \
+            --notes-file release-notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+# registered 2026-09-01: this line exists so a push touches the workflow file (ecosystem ticket 57)

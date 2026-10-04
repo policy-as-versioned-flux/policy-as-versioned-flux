@@ -1,0 +1,9 @@
+# Authentic6 receipt and exact7 transition — 2026-10-04
+
+PASS: candidate `e0b6f9f3cb33e90e9208c59affdff5afb89fc637` (SSH signatureG) is precisely the five-file preparation reversal against real6 metadata. Its parent is authentic6 tag targetB `59ec7ce39bcd658c2454b23ce1cc26082e737fdd`; independent temporary-index tree `62f0a786ab6a1583837b11bcb2230942d623ad48` equals the actual candidate tree. No source or real-index edits were made by this reviewer.
+
+The6 array element remains byte-for-byte identical, naming real evidence commitA `b18a0d8946f9dbeb5fbcf6bbe5233b9c919a7c8c`. A’s parent is reviewed merge885; B’s parent isA. Source→A adds only signed6 evidence+bundle; A→B changes only the version array. Candidate7 retains both evidence files exactly, and all14 frozen5/6 hashes match A, B and candidate7. [Exact structural proof](platform-authentic6-candidate7-review.json).
+
+Real6 annotated tag object `53e1be9c04bbf3fe9437115386198e63ca95e894` peels toB. Its publisher receipt is clean `passed`, declared/computedmajor, exact6.0.0, without published_as/quarantine or not-looked-at entries. Successful cut37173718506 names reviewed source885. Successful release37184431028 checks out exactB; saved raw logs verify Git signature, Rekor entry, certificate claims, exact cut-release@main signer/GitHub Actions issuer and cosign `Verified OK`, then publish the genuine GitHub release. This independently binds actual workflow cryptographic proof to the local immutable tag/evidence; it does not claim a separate local crypto invocation.
+
+No hard standards/integrity finding remains in this transition. Full-window candidate publisher and all six declared engine cells have passed per saved Oct4 logs. Root can continue the normal exact-head independent review/merge and7+tools5 release sequence. The manual-release dispatch-ref issue is addressed by dispatching each release verification from its exact signed tag. No live adoption or cluster activation is inferred.

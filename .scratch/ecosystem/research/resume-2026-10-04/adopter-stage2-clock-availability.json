@@ -1,0 +1,535 @@
+{
+  "checked_at": "2026-10-04T07:45:34.734Z",
+  "scope": "retained local origin/main history; fresh Actions API read could not execute due unified runner FD exhaustion",
+  "hub_origin_main": "4c3ed061f5837281ac9b07c3bb0a6de3c5620063",
+  "step4_since_registration": [
+    {
+      "record_commit": "4c3ed061f5837281ac9b07c3bb0a6de3c5620063",
+      "final": "SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass",
+      "observed_pass": false
+    },
+    {
+      "record_commit": "7067f4443edb5f5efdfa06c8cbd6fc8469ff32df",
+      "final": "SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass",
+      "observed_pass": false
+    },
+    {
+      "record_commit": "446272fb3738c4f35b714add86d8f9aaf00e32e4",
+      "final": "SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass",
+      "observed_pass": false
+    },
+    {
+      "record_commit": "02232c6d1e3dd069c6f9f0350a888cc3ab60802c",
+      "final": "SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass",
+      "observed_pass": false
+    },
+    {
+      "record_commit": "827eb45a9e0aa4219b098256705053d285ac7aac",
+      "final": "SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass",
+      "observed_pass": false
+    },
+    {
+      "record_commit": "944eaacd9cbedbcacc4529d14ca7965f1ed9bc54",
+      "final": "SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass",
+      "observed_pass": false
+    },
+    {
+      "record_commit": "c0a77e46b5eea452483600c302a6e8816c1f2ebb",
+      "final": "SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass",
+      "observed_pass": false
+    },
+    {
+      "record_commit": "08621c3e3c16d514dbed0d39a140d3c7327ee50e",
+      "final": "SKIP: no cluster on this runner, and the lane sample cannot stand in: a fact could not be looked at, and a fact not looked at is never a pass",
+      "observed_pass": false
+    }
+  ],
+  "new_qualifying_trigger_available": false,
+  "adopter_last_retained_samples": {
+    "driftwood": {
+      "line_count": 105,
+      "last_record": {
+        "cluster": "dsample-37120458169",
+        "context": "kind-dsample-37120458169",
+        "facts": {
+          "fact_1_ready_at_the_pin_on_the_real_remote": {
+            "live_commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "live_tag": "v1.1.0",
+            "live_url": "https://github.com/policy-as-versioned-nist/nist",
+            "observed": true,
+            "why": "Ready at the pinned tag and commit, from the publisher's real remote"
+          },
+          "fact_2_tag_signature_verified_at_the_source_boundary": {
+            "cluster_verified_identity": null,
+            "cluster_verified_issuer": "https://token.actions.githubusercontent.com",
+            "cluster_verified_with": "^https://github\\.com/policy-as-versioned-nist/nist/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+            "controller_verdict": "true",
+            "observed": true,
+            "why": "the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\\.com/policy-as-versioned-nist/nist/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$"
+          },
+          "fact_3_last_applied_revision_equals_the_pinned_commit": {
+            "chain_link": true,
+            "header_parent_sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "observed": true,
+            "pinned_commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "why": "nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524. ONE LINK, NOT A SECOND PROOF: this reads composed/HEADER.yaml, the same composed set whose own fact 3 is the applied revision above -- the three fact-3 lines in this sample are one chain of custody, not three independent observations of a revision in force (ecosystem ticket 76)"
+          },
+          "fact_4_rendered_objects_byte_equal_to_an_offline_render": {
+            "ceiling": "declared_equal, not byte identity: the API server defaults fields the render never declared. strict_equal is recorded per unequal object. A declared zero that the API server omits (an omitempty field of a built-in type, listed in render_composed.API_OMITTED_ZERO) reads as equal, and each object read that way is named under objects_read_through_omitted_zero (ticket 140).",
+            "objects_absent": [],
+            "objects_declared": 17,
+            "objects_read_through_omitted_zero": {
+              "scheduling.k8s.io/v1/PriorityClass/cage-baseline-5-0-0": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-isolated": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-isolated-5-0-0": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-quarantine-5-0-0": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-restricted-5-0-0": [
+                ".globalDefault"
+              ]
+            },
+            "objects_unequal": [],
+            "observed": true,
+            "rendered_from": "v3.0.0",
+            "scope": "the composed set",
+            "why": "all 17 rendered objects are live and equal to the offline render"
+          },
+          "fact_5_every_rendered_object_is_in_the_flux_inventory": {
+            "inventory_entries": 22,
+            "objects_not_in_inventory": [],
+            "observed": true,
+            "scope": "the composed set",
+            "why": "all 17 rendered objects appear in a Flux inventory"
+          },
+          "fact_6_the_bottom_rung_is_admitted_and_runs": {
+            "ceiling": "the sidecar the cage injects at a hardened rung is a stand-in built from platform's own graded/waf-placeholder at the tag this repo pins. Running here means the caged workload started with the sidecar the cage added, not that a real WAF inspected anything.",
+            "control_namespace": "cage-probe-control",
+            "fall_closed_namespace": "cage-probe-fallclosed",
+            "observed": true,
+            "pod": {
+              "caged": "true",
+              "containers": [
+                "app",
+                "waf-sidecar"
+              ],
+              "containers_waiting": [],
+              "images": {
+                "app": "ghcr.io/acme/coraza-waf:cage",
+                "waf-sidecar": "ghcr.io/acme/coraza-waf:cage"
+              },
+              "namespace": "cage-probe-fallclosed",
+              "phase": "Running",
+              "priority": -10000,
+              "priority_class": "cage-isolated-5-0-0",
+              "ready": true,
+              "scheduled": "True",
+              "scheduling_reason": "",
+              "tier": "isolated",
+              "waiting_reasons": []
+            },
+            "policy_version_in_force": "5.0.0",
+            "probe_image": "ghcr.io/acme/coraza-waf:cage",
+            "scope": "the cage in force",
+            "why": "the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-5-0-0 (priority -10000), carrying 2 container(s) including waf-sidecar injected by the cage"
+          },
+          "fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches": {
+            "ceiling": "two pods in two namespaces, not one pod twice: in this cage the rung is a property of the NAMESPACE (ADR-0022) and never of the pod, so the control cannot be the same workload. Two TCP connects on two ports each -- the API server's ClusterIP and one address outside the cluster -- is not a proof that nothing at all is reachable. The control brackets the cage's reads rather than running simultaneously with them, so an outage entirely contained between two working control reads is still unobservable here; it is narrower than one read, not zero.",
+            "control_namespace": "cage-probe-control",
+            "control_tier": "isolated",
+            "fall_closed_namespace": "cage-probe-fallclosed",
+            "fall_closed_tier": "isolated",
+            "falsifier": "the_cage_puts_the_control_and_the_fall_closed_workload_on_the_same_rung",
+            "observed": null,
+            "policy_version_in_force": "5.0.0",
+            "probe_image": "ghcr.io/acme/coraza-waf:cage",
+            "scope": "the cage in force",
+            "why": "the cage in force put the fall-closed workload and the control on the SAME rung (isolated), so it has no bottom rung distinct from its loosest one and there was no bottom rung to look at"
+          }
+        },
+        "falsifiers": {
+          "cluster_side_verification_passes_a_tag_that_identity_pinned_ci_rejects": {
+            "ci_accepts": null,
+            "ci_pinned_identity": {
+              "issuer": "https://token.actions.githubusercontent.com",
+              "regexp": "^https://github\\.com/policy-as-versioned-driftwood/driftwood/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$"
+            },
+            "fired": null,
+            "id": "cluster_side_verification_passes_a_tag_that_identity_pinned_ci_rejects",
+            "why": "nist's own release.yml is not in this checkout, so the identity it pins cannot be read here"
+          },
+          "verified_source_ready_but_the_object_is_absent_or_unequal_and_unhealed": {
+            "fired": null,
+            "id": "verified_source_ready_but_the_object_is_absent_or_unequal_and_unhealed",
+            "kustomization_intervals": [
+              "5m"
+            ],
+            "objects_absent_or_unequal": [],
+            "source_ready": true,
+            "why": "unhealed is a property of consecutive samples; `five-facts.py grade` fires this one by walking the log against the live intervals above"
+          }
+        },
+        "kind": "flux.five-facts/v1",
+        "party": "nist",
+        "pin": {
+          "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+          "consumer": "verified-source-only",
+          "pin_from": "gitops/flux-system/gotk-sync-nist.yaml",
+          "tag": "v1.1.0",
+          "url": "https://github.com/policy-as-versioned-nist/nist"
+        },
+        "reachable": false,
+        "reason": "this is a five-fact Flux sample taken on dsample-37120458169, not kind-driftwood: build ticket 64's three subjects were not sampled by this run",
+        "revision": "sha1:92034b0927eb0c15aa9760deddbe6da2960038f0",
+        "run": "37120458169",
+        "schema_version": 2,
+        "source": "nist",
+        "subjects": {},
+        "ts": "2026-10-03T11:42:49Z",
+        "verdict": "COULD-NOT-LOOK"
+      },
+      "workflow_policyreport_lines": [
+        "# index or the tree -- and verify/schedules/verify-schedules.sh in the hub parses that env list.",
+        "  schedule:",
+        "    - cron: \"20 6 * * *\"",
+        "  # ADR-0023, D1. The ONLY path any scheduled job in this repository may commit. Declared here as",
+        "  # data so the cage step below and the hub's verify-schedules.sh read the same list.",
+        "  OBSERVATION_LANE: \"drift/samples.jsonl drift/workload-samples.jsonl drift/oscal-samples.jsonl\"",
+        "          # scheduled firing, 2026-09-01 11:41Z, died here), and the two downloaded manifests",
+        "          # fact 4, in no inventory for fact 5, on every scheduled sample from 2026-09-05 to",
+        "          python3 drift/oscal_lane.py collect --context \"${CTX}\" --platform .platform-src",
+        "          python3 drift/oscal_lane.py grade || true",
+        "            echo \"::error::the scheduled drift sample left a change outside the observation lane\""
+      ]
+    },
+    "tuppence": {
+      "line_count": 102,
+      "last_record": {
+        "cluster": "dsample-37126409593",
+        "context": "kind-dsample-37126409593",
+        "facts": {
+          "fact_1_ready_at_the_pin_on_the_real_remote": {
+            "live_commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "live_tag": "v1.1.0",
+            "live_url": "https://github.com/policy-as-versioned-nist/nist",
+            "observed": true,
+            "why": "Ready at the pinned tag and commit, from the publisher's real remote"
+          },
+          "fact_2_tag_signature_verified_at_the_source_boundary": {
+            "cluster_verified_identity": null,
+            "cluster_verified_issuer": "https://token.actions.githubusercontent.com",
+            "cluster_verified_with": "^https://github\\.com/policy-as-versioned-nist/nist/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+            "controller_verdict": "true",
+            "observed": true,
+            "why": "the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\\.com/policy-as-versioned-nist/nist/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$"
+          },
+          "fact_3_last_applied_revision_equals_the_pinned_commit": {
+            "header_parent_sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "observed": true,
+            "pinned_commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "why": "nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524"
+          },
+          "fact_4_rendered_objects_byte_equal_to_an_offline_render": {
+            "ceiling": "declared_equal, not byte identity: the API server defaults fields the render never declared. strict_equal is recorded per unequal object. A declared zero that the API server omits (an omitempty field of a built-in type, listed in render_composed.API_OMITTED_ZERO) reads as equal, and each object read that way is named under objects_read_through_omitted_zero (ticket 140).",
+            "objects_absent": [],
+            "objects_declared": 17,
+            "objects_read_through_omitted_zero": {
+              "scheduling.k8s.io/v1/PriorityClass/cage-baseline-5-0-0": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-isolated": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-isolated-5-0-0": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-quarantine-5-0-0": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-restricted-5-0-0": [
+                ".globalDefault"
+              ]
+            },
+            "objects_unequal": [],
+            "observed": true,
+            "rendered_from": "v3.0.0",
+            "scope": "the composed set",
+            "why": "all 17 rendered objects are live and equal to the offline render"
+          },
+          "fact_5_every_rendered_object_is_in_the_flux_inventory": {
+            "inventory_entries": 23,
+            "objects_not_in_inventory": [],
+            "observed": true,
+            "scope": "the composed set",
+            "why": "all 17 rendered objects appear in a Flux inventory"
+          },
+          "fact_6_the_bottom_rung_is_admitted_and_runs": {
+            "ceiling": "the sidecar the cage injects at a hardened rung is a stand-in built from platform's own graded/waf-placeholder at the tag this repo pins. Running here means the caged workload started with the sidecar the cage added, not that a real WAF inspected anything.",
+            "control_namespace": "cage-probe-control",
+            "fall_closed_namespace": "cage-probe-fallclosed",
+            "observed": true,
+            "pod": {
+              "caged": "true",
+              "containers": [
+                "app",
+                "waf-sidecar"
+              ],
+              "containers_waiting": [],
+              "images": {
+                "app": "ghcr.io/acme/coraza-waf:cage",
+                "waf-sidecar": "ghcr.io/acme/coraza-waf:cage"
+              },
+              "namespace": "cage-probe-fallclosed",
+              "phase": "Running",
+              "priority": -10000,
+              "priority_class": "cage-isolated-5-0-0",
+              "ready": true,
+              "scheduled": "True",
+              "scheduling_reason": "",
+              "tier": "isolated",
+              "waiting_reasons": []
+            },
+            "policy_version_in_force": "5.0.0",
+            "probe_image": "ghcr.io/acme/coraza-waf:cage",
+            "scope": "the cage in force",
+            "why": "the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-5-0-0 (priority -10000), carrying 2 container(s) including waf-sidecar injected by the cage"
+          },
+          "fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches": {
+            "ceiling": "two pods in two namespaces, not one pod twice: in this cage the rung is a property of the NAMESPACE (ADR-0022) and never of the pod, so the control cannot be the same workload. Two TCP connects on two ports each -- the API server's ClusterIP and one address outside the cluster -- is not a proof that nothing at all is reachable. The control brackets the cage's reads rather than running simultaneously with them, so an outage entirely contained between two working control reads is still unobservable here; it is narrower than one read, not zero.",
+            "control_namespace": "cage-probe-control",
+            "control_tier": "isolated",
+            "fall_closed_namespace": "cage-probe-fallclosed",
+            "fall_closed_tier": "isolated",
+            "falsifier": "the_cage_puts_the_control_and_the_fall_closed_workload_on_the_same_rung",
+            "observed": null,
+            "policy_version_in_force": "5.0.0",
+            "probe_image": "ghcr.io/acme/coraza-waf:cage",
+            "scope": "the cage in force",
+            "why": "the cage in force put the fall-closed workload and the control on the SAME rung (isolated), so it has no bottom rung distinct from its loosest one and there was no bottom rung to look at"
+          }
+        },
+        "falsifiers": {
+          "cluster_side_verification_passes_a_tag_that_identity_pinned_ci_rejects": {
+            "ci_accepts": null,
+            "ci_pinned_identity": {
+              "issuer": "https://token.actions.githubusercontent.com",
+              "regexp": "^https://github\\.com/policy-as-versioned-tuppence/tuppence/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$"
+            },
+            "fired": false,
+            "id": "cluster_side_verification_passes_a_tag_that_identity_pinned_ci_rejects",
+            "why": "nist's own release.yml is not in this checkout, so the identity it pins cannot be read here"
+          },
+          "verified_source_ready_but_the_object_is_absent_or_unequal_and_unhealed": {
+            "fired": null,
+            "id": "verified_source_ready_but_the_object_is_absent_or_unequal_and_unhealed",
+            "kustomization_intervals": [
+              "5m"
+            ],
+            "objects_absent_or_unequal": [],
+            "source_ready": true,
+            "why": "unhealed is a property of consecutive samples; `five-facts.py grade` fires this one by walking the log against the live intervals above"
+          }
+        },
+        "kind": "flux.five-facts/v1",
+        "party": "nist",
+        "pin": {
+          "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+          "consumer": "verified-source-only",
+          "pin_from": "gitops/flux-system/gotk-sync-nist.yaml",
+          "tag": "v1.1.0",
+          "url": "https://github.com/policy-as-versioned-nist/nist"
+        },
+        "reachable": true,
+        "reason": "",
+        "revision": "sha1:9862d846332031d7cb5cf38894d3b0ed321928df",
+        "run": "37126409593",
+        "schema_version": 2,
+        "source": "nist",
+        "ts": "2026-10-03T13:32:07Z",
+        "verdict": "COULD-NOT-LOOK"
+      },
+      "workflow_policyreport_lines": [
+        "# index or the tree -- and verify/schedules/verify-schedules.sh in the hub parses that env list.",
+        "  schedule:",
+        "    - cron: \"22 8 * * *\"",
+        "  # ADR-0023, D1. The ONLY path any scheduled job in this repository may commit. Declared here as",
+        "  # data so the cage step below and the hub's verify-schedules.sh read the same list.",
+        "  OBSERVATION_LANE: \"drift/samples.jsonl drift/workload-samples.jsonl drift/oscal-samples.jsonl\"",
+        "          # scheduled firing, 2026-09-01 11:41Z, died here), and the two downloaded manifests",
+        "          # fact 4, in no inventory for fact 5, on every scheduled sample from 2026-09-05 to",
+        "          python3 drift/oscal_lane.py collect --context \"${CTX}\" --platform .platform-src",
+        "          python3 drift/oscal_lane.py grade || true",
+        "            echo \"::error::the scheduled drift sample left a change outside the observation lane\""
+      ]
+    },
+    "ludlow": {
+      "line_count": 102,
+      "last_record": {
+        "cluster": "dsample-37129105076",
+        "context": "kind-dsample-37129105076",
+        "facts": {
+          "fact_1_ready_at_the_pin_on_the_real_remote": {
+            "live_commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "live_tag": "v1.1.0",
+            "live_url": "https://github.com/policy-as-versioned-nist/nist",
+            "observed": true,
+            "why": "Ready at the pinned tag and commit, from the publisher's real remote"
+          },
+          "fact_2_tag_signature_verified_at_the_source_boundary": {
+            "cluster_verified_identity": null,
+            "cluster_verified_issuer": "https://token.actions.githubusercontent.com",
+            "cluster_verified_with": "^https://github\\.com/policy-as-versioned-nist/nist/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$",
+            "controller_verdict": "true",
+            "observed": true,
+            "why": "the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\\.com/policy-as-versioned-nist/nist/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$"
+          },
+          "fact_3_last_applied_revision_equals_the_pinned_commit": {
+            "header_parent_sha": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "observed": true,
+            "pinned_commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+            "why": "nist is a verified source only (ticket 16 Q5): no Kustomization reconciles it, so the revision in force is the parent sha the composed set was built from. HEADER 33a05df1f524 vs pin 33a05df1f524"
+          },
+          "fact_4_rendered_objects_byte_equal_to_an_offline_render": {
+            "ceiling": "declared_equal, not byte identity: the API server defaults fields the render never declared. strict_equal is recorded per unequal object. A declared zero that the API server omits (an omitempty field of a built-in type, listed in render_composed.API_OMITTED_ZERO) reads as equal, and each object read that way is named under objects_read_through_omitted_zero (ticket 140).",
+            "objects_absent": [],
+            "objects_declared": 17,
+            "objects_read_through_omitted_zero": {
+              "scheduling.k8s.io/v1/PriorityClass/cage-baseline-5-0-0": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-isolated": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-isolated-5-0-0": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-quarantine-5-0-0": [
+                ".globalDefault"
+              ],
+              "scheduling.k8s.io/v1/PriorityClass/cage-restricted-5-0-0": [
+                ".globalDefault"
+              ]
+            },
+            "objects_unequal": [],
+            "observed": true,
+            "rendered_from": "v3.0.0",
+            "scope": "the composed set",
+            "why": "all 17 rendered objects are live and equal to the offline render"
+          },
+          "fact_5_every_rendered_object_is_in_the_flux_inventory": {
+            "inventory_entries": 23,
+            "objects_not_in_inventory": [],
+            "observed": true,
+            "scope": "the composed set",
+            "why": "all 17 rendered objects appear in a Flux inventory"
+          },
+          "fact_6_the_bottom_rung_is_admitted_and_runs": {
+            "ceiling": "the sidecar the cage injects at a hardened rung is a stand-in built from platform's own graded/waf-placeholder at the tag this repo pins. Running here means the caged workload started with the sidecar the cage added, not that a real WAF inspected anything.",
+            "control_namespace": "cage-probe-control",
+            "fall_closed_namespace": "cage-probe-fallclosed",
+            "observed": true,
+            "pod": {
+              "caged": "true",
+              "containers": [
+                "app",
+                "waf-sidecar"
+              ],
+              "containers_waiting": [],
+              "images": {
+                "app": "ghcr.io/acme/coraza-waf:cage",
+                "waf-sidecar": "ghcr.io/acme/coraza-waf:cage"
+              },
+              "namespace": "cage-probe-fallclosed",
+              "phase": "Running",
+              "priority": -10000,
+              "priority_class": "cage-isolated-5-0-0",
+              "ready": true,
+              "scheduled": "True",
+              "scheduling_reason": "",
+              "tier": "isolated",
+              "waiting_reasons": []
+            },
+            "policy_version_in_force": "5.0.0",
+            "probe_image": "ghcr.io/acme/coraza-waf:cage",
+            "scope": "the cage in force",
+            "why": "the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-5-0-0 (priority -10000), carrying 2 container(s) including waf-sidecar injected by the cage"
+          },
+          "fact_7_the_bottom_rung_reaches_nothing_while_the_control_reaches": {
+            "ceiling": "two pods in two namespaces, not one pod twice: in this cage the rung is a property of the NAMESPACE (ADR-0022) and never of the pod, so the control cannot be the same workload. Two TCP connects on two ports each -- the API server's ClusterIP and one address outside the cluster -- is not a proof that nothing at all is reachable. The control brackets the cage's reads rather than running simultaneously with them, so an outage entirely contained between two working control reads is still unobservable here; it is narrower than one read, not zero.",
+            "control_namespace": "cage-probe-control",
+            "control_tier": "isolated",
+            "fall_closed_namespace": "cage-probe-fallclosed",
+            "fall_closed_tier": "isolated",
+            "falsifier": "the_cage_puts_the_control_and_the_fall_closed_workload_on_the_same_rung",
+            "observed": null,
+            "policy_version_in_force": "5.0.0",
+            "probe_image": "ghcr.io/acme/coraza-waf:cage",
+            "scope": "the cage in force",
+            "why": "the cage in force put the fall-closed workload and the control on the SAME rung (isolated), so it has no bottom rung distinct from its loosest one and there was no bottom rung to look at"
+          }
+        },
+        "falsifiers": {
+          "cluster_side_verification_passes_a_tag_that_identity_pinned_ci_rejects": {
+            "ci_accepts": null,
+            "ci_pinned_identity": {
+              "issuer": "https://token.actions.githubusercontent.com",
+              "regexp": "^https://github\\.com/policy-as-versioned-ludlow/ludlow/\\.github/workflows/cut-release\\.yml@refs/heads/(main|release/[0-9]+\\.[0-9]+\\.x)$"
+            },
+            "fired": false,
+            "id": "cluster_side_verification_passes_a_tag_that_identity_pinned_ci_rejects",
+            "why": "nist's own release.yml is not in this checkout, so the identity it pins cannot be read here"
+          },
+          "verified_source_ready_but_the_object_is_absent_or_unequal_and_unhealed": {
+            "fired": null,
+            "id": "verified_source_ready_but_the_object_is_absent_or_unequal_and_unhealed",
+            "kustomization_intervals": [
+              "5m"
+            ],
+            "objects_absent_or_unequal": [],
+            "source_ready": true,
+            "why": "unhealed is a property of consecutive samples; `five-facts.py grade` fires this one by walking the log against the live intervals above"
+          }
+        },
+        "kind": "flux.five-facts/v1",
+        "party": "nist",
+        "pin": {
+          "commit": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+          "consumer": "verified-source-only",
+          "pin_from": "gitops/flux-system/gotk-sync-nist.yaml",
+          "tag": "v1.1.0",
+          "url": "https://github.com/policy-as-versioned-nist/nist"
+        },
+        "reachable": true,
+        "reason": "",
+        "revision": "sha1:7bd9973be43de0b5d1d13b7eb46a1a60b01516ec",
+        "run": "37129105076",
+        "schema_version": 2,
+        "source": "nist",
+        "ts": "2026-10-03T14:19:26Z",
+        "verdict": "COULD-NOT-LOOK"
+      },
+      "workflow_policyreport_lines": [
+        "# index or the tree -- and verify/schedules/verify-schedules.sh in the hub parses that env list.",
+        "  schedule:",
+        "    - cron: \"16 9 * * *\"",
+        "  # ADR-0023, D1. The ONLY path any scheduled job in this repository may commit. Declared here as",
+        "  # data so the cage step below and the hub's verify-schedules.sh read the same list.",
+        "  OBSERVATION_LANE: \"drift/samples.jsonl drift/workload-samples.jsonl drift/oscal-samples.jsonl\"",
+        "          # scheduled firing, 2026-09-01 11:41Z, died here), and the two downloaded manifests",
+        "          # fact 4, in no inventory for fact 5, on every scheduled sample from 2026-09-05 to",
+        "          python3 drift/oscal_lane.py collect --context \"${CTX}\" --platform .platform-src",
+        "          python3 drift/oscal_lane.py grade || true",
+        "            echo \"::error::the scheduled drift sample left a change outside the observation lane\""
+      ]
+    }
+  },
+  "scheduled_baseline_policyreport_capture": "not yet recorded: prepared workflow capture has not shipped",
+  "engine_move": "held at1.18.2 until genuine scheduled1.18.2 PolicyReport baseline, then real7-only retirement and scheduled1.19.1 comparison",
+  "cloud_activation": "false; modern signed-clock step4 PASS, signed cloud member/vendor schema and signed delivery required"
+}

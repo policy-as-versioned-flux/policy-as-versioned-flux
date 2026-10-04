@@ -1,0 +1,77 @@
+{
+  "driftwood": {
+    "base": "17302ecd20041df61a52428e67246c330294d2a6",
+    "file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/driftwood-stage2-neutral-source.patch",
+    "sha256": "ee13549de0e0b7c5dc0571f8d35b6234f135e7ddcf3440d2f2903c0f12e86e00",
+    "untracked": [
+      ".github/requirements/twin-sweep.txt",
+      ".github/tests/test_twin_sweep_split.py",
+      "accepted-majors/platform-6.0.0.yaml",
+      "accepted-majors/platform-6.0.1-superseded.md",
+      "accepted-majors/platform-7.0.0.yaml",
+      "drift/api-image-note.md",
+      "drift/cage_probe.py",
+      "drift/oscal_lane.py",
+      "drift/served_apps.py",
+      "inventory/PROVENANCE.json",
+      "inventory/images.json",
+      "twin/forward-intel/v2/feed.json",
+      "verify-cage-probe.sh"
+    ],
+    "stat": " .github/workflows/drift-sample.yml                 |  44 +-\n .github/workflows/propose-tier.yml                 |  29 +\n .github/workflows/shift-left.yml                   |  17 +\n .github/workflows/twin-sweep.yml                   | 373 ++++++--\n .gitignore                                         |   3 +\n drift/README.md                                    |  86 +-\n drift/five-facts.py                                | 982 ++++++++++++++++-----\n drift/window.yaml                                  | 200 ++++-\n gitops/flux-system/gotk-sync.yaml                  |   6 +-\n party.yaml                                         |   2 +\n renovate.json                                      |  30 +-\n twin/PIN.yaml                                      |   9 +\n twin/emit-forward-intel.py                         |  55 +-\n twin/forward-intel/bump.yaml                       |   2 +-\n twin/forward-intel/payload.schema.json             | 173 +++-\n .../edges/cart-pii-loss-cuts-checkout-revenue.yaml |  16 +-\n twin/orgs/driftwood/perspectives/driftwood.yaml    |  46 +-\n .../responses/run-the-checkout-at-baseline.yaml    |  24 +-\n .../responses/run-the-checkout-at-isolated.yaml    |  24 +-\n .../responses/run-the-checkout-at-quarantine.yaml  |  24 +-\n .../responses/run-the-checkout-at-restricted.yaml  |  24 +-\n twin/verify-twin-sweep-moved.sh                    |  11 +-\n 22 files changed, 1724 insertions(+), 456 deletions(-)\n"
+  },
+  "tuppence": {
+    "base": "d8dead25e0e5e275172640b1a637562e45edb15d",
+    "file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/tuppence-stage2-neutral-source.patch",
+    "sha256": "fa5ba05b6bc88253c8db5f21c7bb12d294f6fcb0745823450a8d9f1f69e9a324",
+    "untracked": [
+      ".github/requirements/twin-sweep.txt",
+      "accepted-majors/platform-6.0.0.yaml",
+      "accepted-majors/platform-6.0.1-superseded.md",
+      "accepted-majors/platform-7.0.0.yaml",
+      "drift/cage_probe.py",
+      "drift/oscal_lane.py",
+      "drift/served_apps.py",
+      "gitops/cloud/README.md",
+      "gitops/cloud/claims.yaml",
+      "gitops/cloud/cloud-delivery.yaml",
+      "gitops/cloud/kustomization.yaml",
+      "gitops/cloud/prepare.py",
+      "inventory/PROVENANCE.json",
+      "inventory/images.json",
+      "selection-policy/PIN.yaml",
+      "selection-policy/README.md",
+      "selection-policy/VERSION",
+      "selection-policy/selection_policy.py",
+      "twin/forward-intel/bump.yaml",
+      "twin/forward-intel/rule.yaml",
+      "twin/forward-intel/v1/feed.json",
+      "verify-cage-probe.sh"
+    ],
+    "stat": " .github/scripts/twin-sweep.py                 |  63 +-\n .github/workflows/drift-sample.yml            |  44 +-\n .github/workflows/propose-tier.yml            |  29 +\n .github/workflows/shift-left.yml              |  17 +\n .github/workflows/twin-sweep.yml              | 292 +++++++-\n .gitignore                                    |   3 +\n drift/README.md                               |  84 ++-\n drift/five-facts.py                           | 956 ++++++++++++++++++++------\n drift/window.yaml                             | 200 ++++--\n gitops/flux-system/gotk-sync.yaml             |   6 +-\n party.yaml                                    |  17 +-\n renovate.json                                 |  28 +-\n tests/test_twin_clock.py                      | 425 ++++++++++--\n twin/PIN.yaml                                 |   9 +\n twin/emit-forward-intel.py                    |  49 +-\n twin/forward-intel/payload.schema.json        | 173 ++++-\n twin/orgs/tuppence/perspectives/tuppence.yaml |  54 +-\n 17 files changed, 2019 insertions(+), 430 deletions(-)\n"
+  },
+  "ludlow": {
+    "base": "5ff463673cf05af71a5db2ed0c38deaf263464d2",
+    "file": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-2026-10-04/ludlow-stage2-neutral-source.patch",
+    "sha256": "12b03227946cc541b3bffe6d76115d7685c3b1080fc6a4a89834f2630ae7ac3a",
+    "untracked": [
+      ".github/requirements/twin-sweep.txt",
+      "accepted-majors/platform-6.0.0.yaml",
+      "accepted-majors/platform-6.0.1-superseded.md",
+      "accepted-majors/platform-7.0.0.yaml",
+      "drift/cage_probe.py",
+      "drift/oscal_lane.py",
+      "drift/served_apps.py",
+      "inventory/PROVENANCE.json",
+      "inventory/images.json",
+      "selection-policy/PIN.yaml",
+      "selection-policy/README.md",
+      "selection-policy/VERSION",
+      "selection-policy/selection_policy.py",
+      "twin/forward-intel/bump.yaml",
+      "twin/forward-intel/rule.yaml",
+      "verify-cage-probe.sh"
+    ],
+    "stat": " .github/scripts/twin-sweep.py             |  63 +-\n .github/workflows/drift-sample.yml        |  44 +-\n .github/workflows/propose-tier.yml        |  29 +\n .github/workflows/shift-left.yml          |  17 +\n .github/workflows/twin-sweep.yml          | 292 ++++++++-\n .gitignore                                |   3 +\n drift/README.md                           |  84 ++-\n drift/five-facts.py                       | 956 +++++++++++++++++++++++-------\n drift/window.yaml                         | 200 +++++--\n gitops/flux-system/gotk-sync.yaml         |   6 +-\n party.yaml                                |  16 +\n renovate.json                             |  28 +-\n tests/test_twin_clock.py                  | 425 +++++++++++--\n twin/PIN.yaml                             |   9 +\n twin/emit-forward-intel.py                |  49 +-\n twin/forward-intel/payload.schema.json    | 173 +++++-\n twin/orgs/ludlow/perspectives/ludlow.yaml |  53 +-\n 17 files changed, 2019 insertions(+), 428 deletions(-)\n"
+  }
+}

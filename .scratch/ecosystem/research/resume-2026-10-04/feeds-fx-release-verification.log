@@ -1,0 +1,509 @@
+release	UNKNOWN STEP	﻿2026-10-04T04:38:33.0657530Z Current runner version: '2.337.0'
+release	UNKNOWN STEP	2026-10-04T04:38:33.0676955Z ##[group]Runner Image Provisioner
+release	UNKNOWN STEP	2026-10-04T04:38:33.0677785Z Hosted Compute Agent
+release	UNKNOWN STEP	2026-10-04T04:38:33.0678188Z Version: 20260901.588
+release	UNKNOWN STEP	2026-10-04T04:38:33.0678643Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+release	UNKNOWN STEP	2026-10-04T04:38:33.0679174Z Build Date: 2026-09-01T19:56:44Z
+release	UNKNOWN STEP	2026-10-04T04:38:33.0679648Z Worker ID: {073300dc-16f5-4072-8e8f-243e3287151c}
+release	UNKNOWN STEP	2026-10-04T04:38:33.0680417Z Azure Region: centralus
+release	UNKNOWN STEP	2026-10-04T04:38:33.0680833Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:33.0681868Z ##[group]Operating System
+release	UNKNOWN STEP	2026-10-04T04:38:33.0682302Z Ubuntu
+release	UNKNOWN STEP	2026-10-04T04:38:33.0682678Z 24.04.5
+release	UNKNOWN STEP	2026-10-04T04:38:33.0683057Z LTS
+release	UNKNOWN STEP	2026-10-04T04:38:33.0683418Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:33.0683793Z ##[group]Runner Image
+release	UNKNOWN STEP	2026-10-04T04:38:33.0684210Z Image: ubuntu-24.04
+release	UNKNOWN STEP	2026-10-04T04:38:33.0684616Z Version: 20260927.320.1
+release	UNKNOWN STEP	2026-10-04T04:38:33.0685777Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+release	UNKNOWN STEP	2026-10-04T04:38:33.0686848Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+release	UNKNOWN STEP	2026-10-04T04:38:33.0687571Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:33.0688352Z ##[group]GITHUB_TOKEN Permissions
+release	UNKNOWN STEP	2026-10-04T04:38:33.0690332Z Contents: write
+release	UNKNOWN STEP	2026-10-04T04:38:33.0690739Z Metadata: read
+release	UNKNOWN STEP	2026-10-04T04:38:33.0691157Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:33.0692685Z Secret source: Actions
+release	UNKNOWN STEP	2026-10-04T04:38:33.0693327Z Cache mode: write
+release	UNKNOWN STEP	2026-10-04T04:38:33.0694034Z Prepare workflow directory
+release	UNKNOWN STEP	2026-10-04T04:38:33.1092873Z Prepare all required actions
+release	UNKNOWN STEP	2026-10-04T04:38:33.1133715Z Getting action download info
+release	UNKNOWN STEP	2026-10-04T04:38:33.3484321Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+release	UNKNOWN STEP	2026-10-04T04:38:33.5105764Z Complete job name: release
+release	UNKNOWN STEP	2026-10-04T04:38:33.5666002Z ##[group]Run actions/checkout@v4
+release	UNKNOWN STEP	2026-10-04T04:38:33.5666769Z with:
+release	UNKNOWN STEP	2026-10-04T04:38:33.5667120Z   fetch-depth: 0
+release	UNKNOWN STEP	2026-10-04T04:38:33.5667495Z   fetch-tags: true
+release	UNKNOWN STEP	2026-10-04T04:38:33.5667921Z   repository: policy-as-versioned-feeds/feeds
+release	UNKNOWN STEP	2026-10-04T04:38:33.5671532Z   token: ***
+release	UNKNOWN STEP	2026-10-04T04:38:33.5672083Z   ssh-strict: true
+release	UNKNOWN STEP	2026-10-04T04:38:33.5672556Z   ssh-user: git
+release	UNKNOWN STEP	2026-10-04T04:38:33.5673049Z   persist-credentials: true
+release	UNKNOWN STEP	2026-10-04T04:38:33.5673517Z   clean: true
+release	UNKNOWN STEP	2026-10-04T04:38:33.5673895Z   sparse-checkout-cone-mode: true
+release	UNKNOWN STEP	2026-10-04T04:38:33.5674367Z   show-progress: true
+release	UNKNOWN STEP	2026-10-04T04:38:33.5674714Z   lfs: false
+release	UNKNOWN STEP	2026-10-04T04:38:33.5675083Z   submodules: false
+release	UNKNOWN STEP	2026-10-04T04:38:33.5675448Z   set-safe-directory: true
+release	UNKNOWN STEP	2026-10-04T04:38:33.5675847Z   allow-unsafe-pr-checkout: false
+release	UNKNOWN STEP	2026-10-04T04:38:33.5676748Z env:
+release	UNKNOWN STEP	2026-10-04T04:38:33.5677093Z   TAG: fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:33.5677543Z   GITSIGN_VERSION: 0.17.1
+release	UNKNOWN STEP	2026-10-04T04:38:33.5678184Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	UNKNOWN STEP	2026-10-04T04:38:33.5678857Z   PLATFORM_TAG: v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:33.5679298Z   PLATFORM_COMMIT: 533dccb0a823001b396fd60ab08014bf75065a37
+release	UNKNOWN STEP	2026-10-04T04:38:33.5680458Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	UNKNOWN STEP	2026-10-04T04:38:33.5681469Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	UNKNOWN STEP	2026-10-04T04:38:33.5681983Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:33.6481624Z Syncing repository: policy-as-versioned-feeds/feeds
+release	UNKNOWN STEP	2026-10-04T04:38:33.6483350Z ##[group]Getting Git version info
+release	UNKNOWN STEP	2026-10-04T04:38:33.6483934Z Working directory is '/home/runner/work/feeds/feeds'
+release	UNKNOWN STEP	2026-10-04T04:38:33.6484813Z [command]/usr/bin/git version
+release	UNKNOWN STEP	2026-10-04T04:38:33.6541232Z git version 2.55.0
+release	UNKNOWN STEP	2026-10-04T04:38:33.6555746Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:33.6565850Z Temporarily overriding HOME='/home/runner/work/_temp/882e1f90-382c-4255-a846-55de176f2ac0' before making global git config changes
+release	UNKNOWN STEP	2026-10-04T04:38:33.6567479Z Adding repository directory to the temporary git global config as a safe directory
+release	UNKNOWN STEP	2026-10-04T04:38:33.6572379Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/feeds/feeds
+release	UNKNOWN STEP	2026-10-04T04:38:33.6613947Z Deleting the contents of '/home/runner/work/feeds/feeds'
+release	UNKNOWN STEP	2026-10-04T04:38:33.6618389Z ##[group]Initializing the repository
+release	UNKNOWN STEP	2026-10-04T04:38:33.6621765Z [command]/usr/bin/git init /home/runner/work/feeds/feeds
+release	UNKNOWN STEP	2026-10-04T04:38:33.6698127Z hint: Using 'master' as the name for the initial branch. This default branch name
+release	UNKNOWN STEP	2026-10-04T04:38:33.6699261Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+release	UNKNOWN STEP	2026-10-04T04:38:33.6700381Z hint: to use in all of your new repositories, which will suppress this warning,
+release	UNKNOWN STEP	2026-10-04T04:38:33.6701189Z hint: call:
+release	UNKNOWN STEP	2026-10-04T04:38:33.6701656Z hint:
+release	UNKNOWN STEP	2026-10-04T04:38:33.6702332Z hint: 	git config --global init.defaultBranch <name>
+release	UNKNOWN STEP	2026-10-04T04:38:33.6703001Z hint:
+release	UNKNOWN STEP	2026-10-04T04:38:33.6703664Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+release	UNKNOWN STEP	2026-10-04T04:38:33.6704618Z hint: 'development'. The just-created branch can be renamed via this command:
+release	UNKNOWN STEP	2026-10-04T04:38:33.6705564Z hint:
+release	UNKNOWN STEP	2026-10-04T04:38:33.6706071Z hint: 	git branch -m <name>
+release	UNKNOWN STEP	2026-10-04T04:38:33.6706623Z hint:
+release	UNKNOWN STEP	2026-10-04T04:38:33.6707317Z hint: Disable this message with "git config set advice.defaultBranchName false"
+release	UNKNOWN STEP	2026-10-04T04:38:33.6712390Z Initialized empty Git repository in /home/runner/work/feeds/feeds/.git/
+release	UNKNOWN STEP	2026-10-04T04:38:33.6718465Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-feeds/feeds
+release	UNKNOWN STEP	2026-10-04T04:38:33.6760351Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:33.6761035Z ##[group]Disabling automatic garbage collection
+release	UNKNOWN STEP	2026-10-04T04:38:33.6764852Z [command]/usr/bin/git config --local gc.auto 0
+release	UNKNOWN STEP	2026-10-04T04:38:33.6788451Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:33.6789193Z ##[group]Setting up auth
+release	UNKNOWN STEP	2026-10-04T04:38:33.6795364Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+release	UNKNOWN STEP	2026-10-04T04:38:33.6820588Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+release	UNKNOWN STEP	2026-10-04T04:38:33.7098359Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+release	UNKNOWN STEP	2026-10-04T04:38:33.7128497Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+release	UNKNOWN STEP	2026-10-04T04:38:33.7272499Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+release	UNKNOWN STEP	2026-10-04T04:38:33.7296034Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+release	UNKNOWN STEP	2026-10-04T04:38:33.7437718Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+release	UNKNOWN STEP	2026-10-04T04:38:33.7468198Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:33.7469303Z ##[group]Fetching the repository
+release	UNKNOWN STEP	2026-10-04T04:38:33.7476924Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+release	UNKNOWN STEP	2026-10-04T04:38:34.2974519Z From https://github.com/policy-as-versioned-feeds/feeds
+release	UNKNOWN STEP	2026-10-04T04:38:34.2975780Z  * [new branch]      ecosystem/build-2026-09-03 -> origin/ecosystem/build-2026-09-03
+release	UNKNOWN STEP	2026-10-04T04:38:34.2976745Z  * [new branch]      fetch/cve-2.0.1        -> origin/fetch/cve-2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:34.2977750Z  * [new branch]      fetch/eol-2.0.1        -> origin/fetch/eol-2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:34.2978557Z  * [new branch]      fetch/fx-1.1.0         -> origin/fetch/fx-1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.2979429Z  * [new branch]      fetch/threat-register-2.0.1 -> origin/fetch/threat-register-2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:34.2980825Z  * [new branch]      fetch/threat-register-3.0.1 -> origin/fetch/threat-register-3.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:34.2982519Z  * [new branch]      fix-skill-gate-drop-github-markers -> origin/fix-skill-gate-drop-github-markers
+release	UNKNOWN STEP	2026-10-04T04:38:34.2983861Z  * [new branch]      main                   -> origin/main
+release	UNKNOWN STEP	2026-10-04T04:38:34.2985119Z  * [new branch]      observations           -> origin/observations
+release	UNKNOWN STEP	2026-10-04T04:38:34.2986712Z  * [new branch]      reset-bump-after-threat-register-v3.0.0 -> origin/reset-bump-after-threat-register-v3.0.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.2988681Z  * [new branch]      resume/2026-10-03-primary-cve-fx-threat-feeds -> origin/resume/2026-10-03-primary-cve-fx-threat-feeds
+release	UNKNOWN STEP	2026-10-04T04:38:34.2990934Z  * [new branch]      ticket-145-agent-cage-price -> origin/ticket-145-agent-cage-price
+release	UNKNOWN STEP	2026-10-04T04:38:34.2992476Z  * [new branch]      ticket-56-and-85       -> origin/ticket-56-and-85
+release	UNKNOWN STEP	2026-10-04T04:38:34.2993533Z  * [new branch]      ticket-62-and-77       -> origin/ticket-62-and-77
+release	UNKNOWN STEP	2026-10-04T04:38:34.2994791Z  * [new branch]      ticket-67-the-record-matches-the-surface -> origin/ticket-67-the-record-matches-the-surface
+release	UNKNOWN STEP	2026-10-04T04:38:34.2996247Z  * [new branch]      ticket-79-the-pound-inputs -> origin/ticket-79-the-pound-inputs
+release	UNKNOWN STEP	2026-10-04T04:38:34.2997704Z  * [new branch]      ticket-84-being-behind-costs-something -> origin/ticket-84-being-behind-costs-something
+release	UNKNOWN STEP	2026-10-04T04:38:34.2999630Z  * [new tag]         cve/v3.0.0             -> cve/v3.0.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.3001273Z  * [new tag]         fx/v1.1.0              -> fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.3002286Z  * [new tag]         threat-register/v1.0.0 -> threat-register/v1.0.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.3003464Z  * [new tag]         threat-register/v2.0.0 -> threat-register/v2.0.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.3004617Z  * [new tag]         threat-register/v3.0.0 -> threat-register/v3.0.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.3005783Z  * [new tag]         threat-register/v4.0.0 -> threat-register/v4.0.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.3008244Z [command]/usr/bin/git branch --list --remote origin/main
+release	UNKNOWN STEP	2026-10-04T04:38:34.3019534Z   origin/main
+release	UNKNOWN STEP	2026-10-04T04:38:34.3029251Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+release	UNKNOWN STEP	2026-10-04T04:38:34.3052409Z 974e73514e0d8d4cad2e6906acf51d1cc27028b3
+release	UNKNOWN STEP	2026-10-04T04:38:34.3055474Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:34.3056916Z ##[group]Determining the checkout info
+release	UNKNOWN STEP	2026-10-04T04:38:34.3058402Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:34.3069428Z [command]/usr/bin/git sparse-checkout disable
+release	UNKNOWN STEP	2026-10-04T04:38:34.3114116Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+release	UNKNOWN STEP	2026-10-04T04:38:34.3138955Z ##[group]Checking out the ref
+release	UNKNOWN STEP	2026-10-04T04:38:34.3142273Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+release	UNKNOWN STEP	2026-10-04T04:38:34.3236940Z Switched to a new branch 'main'
+release	UNKNOWN STEP	2026-10-04T04:38:34.3240688Z branch 'main' set up to track 'origin/main'.
+release	UNKNOWN STEP	2026-10-04T04:38:34.3247187Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:34.3276358Z [command]/usr/bin/git log -1 --format=%H
+release	UNKNOWN STEP	2026-10-04T04:38:34.3294058Z 974e73514e0d8d4cad2e6906acf51d1cc27028b3
+release	UNKNOWN STEP	2026-10-04T04:38:34.3533627Z ##[group]Run actions/checkout@v4
+release	UNKNOWN STEP	2026-10-04T04:38:34.3534133Z with:
+release	UNKNOWN STEP	2026-10-04T04:38:34.3534595Z   repository: policy-as-versioned-platform/platform
+release	UNKNOWN STEP	2026-10-04T04:38:34.3535238Z   path: .platform
+release	UNKNOWN STEP	2026-10-04T04:38:34.3535614Z   ref: v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:34.3539094Z   token: ***
+release	UNKNOWN STEP	2026-10-04T04:38:34.3539488Z   ssh-strict: true
+release	UNKNOWN STEP	2026-10-04T04:38:34.3540123Z   ssh-user: git
+release	UNKNOWN STEP	2026-10-04T04:38:34.3540601Z   persist-credentials: true
+release	UNKNOWN STEP	2026-10-04T04:38:34.3541052Z   clean: true
+release	UNKNOWN STEP	2026-10-04T04:38:34.3541484Z   sparse-checkout-cone-mode: true
+release	UNKNOWN STEP	2026-10-04T04:38:34.3541955Z   fetch-depth: 1
+release	UNKNOWN STEP	2026-10-04T04:38:34.3542355Z   fetch-tags: false
+release	UNKNOWN STEP	2026-10-04T04:38:34.3542766Z   show-progress: true
+release	UNKNOWN STEP	2026-10-04T04:38:34.3543164Z   lfs: false
+release	UNKNOWN STEP	2026-10-04T04:38:34.3543542Z   submodules: false
+release	UNKNOWN STEP	2026-10-04T04:38:34.3543944Z   set-safe-directory: true
+release	UNKNOWN STEP	2026-10-04T04:38:34.3544385Z   allow-unsafe-pr-checkout: false
+release	UNKNOWN STEP	2026-10-04T04:38:34.3544884Z env:
+release	UNKNOWN STEP	2026-10-04T04:38:34.3545257Z   TAG: fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.3545714Z   GITSIGN_VERSION: 0.17.1
+release	UNKNOWN STEP	2026-10-04T04:38:34.3546397Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	UNKNOWN STEP	2026-10-04T04:38:34.3547157Z   PLATFORM_TAG: v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:34.3547671Z   PLATFORM_COMMIT: 533dccb0a823001b396fd60ab08014bf75065a37
+release	UNKNOWN STEP	2026-10-04T04:38:34.3548966Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	UNKNOWN STEP	2026-10-04T04:38:34.3550703Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	UNKNOWN STEP	2026-10-04T04:38:34.3551354Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:34.4185366Z Syncing repository: policy-as-versioned-platform/platform
+release	UNKNOWN STEP	2026-10-04T04:38:34.4187831Z ##[group]Getting Git version info
+release	UNKNOWN STEP	2026-10-04T04:38:34.4188958Z Working directory is '/home/runner/work/feeds/feeds/.platform'
+release	UNKNOWN STEP	2026-10-04T04:38:34.4213824Z [command]/usr/bin/git version
+release	UNKNOWN STEP	2026-10-04T04:38:34.4243562Z git version 2.55.0
+release	UNKNOWN STEP	2026-10-04T04:38:34.4258041Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:34.4267302Z Temporarily overriding HOME='/home/runner/work/_temp/88df74cf-0757-483e-96b0-820f62aa2cdf' before making global git config changes
+release	UNKNOWN STEP	2026-10-04T04:38:34.4269318Z Adding repository directory to the temporary git global config as a safe directory
+release	UNKNOWN STEP	2026-10-04T04:38:34.4271630Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/feeds/feeds/.platform
+release	UNKNOWN STEP	2026-10-04T04:38:34.4301103Z ##[group]Initializing the repository
+release	UNKNOWN STEP	2026-10-04T04:38:34.4302471Z [command]/usr/bin/git init /home/runner/work/feeds/feeds/.platform
+release	UNKNOWN STEP	2026-10-04T04:38:34.4333596Z hint: Using 'master' as the name for the initial branch. This default branch name
+release	UNKNOWN STEP	2026-10-04T04:38:34.4345949Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+release	UNKNOWN STEP	2026-10-04T04:38:34.4347672Z hint: to use in all of your new repositories, which will suppress this warning,
+release	UNKNOWN STEP	2026-10-04T04:38:34.4348931Z hint: call:
+release	UNKNOWN STEP	2026-10-04T04:38:34.4350044Z hint:
+release	UNKNOWN STEP	2026-10-04T04:38:34.4351898Z hint: 	git config --global init.defaultBranch <name>
+release	UNKNOWN STEP	2026-10-04T04:38:34.4352781Z hint:
+release	UNKNOWN STEP	2026-10-04T04:38:34.4353536Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+release	UNKNOWN STEP	2026-10-04T04:38:34.4354676Z hint: 'development'. The just-created branch can be renamed via this command:
+release	UNKNOWN STEP	2026-10-04T04:38:34.4355574Z hint:
+release	UNKNOWN STEP	2026-10-04T04:38:34.4356079Z hint: 	git branch -m <name>
+release	UNKNOWN STEP	2026-10-04T04:38:34.4356518Z hint:
+release	UNKNOWN STEP	2026-10-04T04:38:34.4357243Z hint: Disable this message with "git config set advice.defaultBranchName false"
+release	UNKNOWN STEP	2026-10-04T04:38:34.4358595Z Initialized empty Git repository in /home/runner/work/feeds/feeds/.platform/.git/
+release	UNKNOWN STEP	2026-10-04T04:38:34.4360698Z [command]/usr/bin/git remote add origin https://github.com/policy-as-versioned-platform/platform
+release	UNKNOWN STEP	2026-10-04T04:38:34.4368026Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:34.4368890Z ##[group]Disabling automatic garbage collection
+release	UNKNOWN STEP	2026-10-04T04:38:34.4371542Z [command]/usr/bin/git config --local gc.auto 0
+release	UNKNOWN STEP	2026-10-04T04:38:34.4395314Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:34.4396139Z ##[group]Setting up auth
+release	UNKNOWN STEP	2026-10-04T04:38:34.4401025Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+release	UNKNOWN STEP	2026-10-04T04:38:34.4424030Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+release	UNKNOWN STEP	2026-10-04T04:38:34.4587392Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+release	UNKNOWN STEP	2026-10-04T04:38:34.4612953Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+release	UNKNOWN STEP	2026-10-04T04:38:34.4768043Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+release	UNKNOWN STEP	2026-10-04T04:38:34.4791871Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+release	UNKNOWN STEP	2026-10-04T04:38:34.4950066Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+release	UNKNOWN STEP	2026-10-04T04:38:34.4982544Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:34.4983331Z ##[group]Fetching the repository
+release	UNKNOWN STEP	2026-10-04T04:38:34.4990618Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/v2.0.1*:refs/remotes/origin/v2.0.1* +refs/tags/v2.0.1*:refs/tags/v2.0.1*
+release	UNKNOWN STEP	2026-10-04T04:38:35.0534140Z From https://github.com/policy-as-versioned-platform/platform
+release	UNKNOWN STEP	2026-10-04T04:38:35.0535392Z  * [new tag]         v2.0.1     -> v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.0538619Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:35.0540237Z ##[group]Determining the checkout info
+release	UNKNOWN STEP	2026-10-04T04:38:35.0546626Z [command]/usr/bin/git branch --list --remote origin/v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.0573869Z [command]/usr/bin/git tag --list v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.0591077Z v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.0593969Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:35.0604219Z [command]/usr/bin/git sparse-checkout disable
+release	UNKNOWN STEP	2026-10-04T04:38:35.0636718Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+release	UNKNOWN STEP	2026-10-04T04:38:35.0660623Z ##[group]Checking out the ref
+release	UNKNOWN STEP	2026-10-04T04:38:35.0662282Z [command]/usr/bin/git checkout --progress --force refs/tags/v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.0825230Z Note: switching to 'refs/tags/v2.0.1'.
+release	UNKNOWN STEP	2026-10-04T04:38:35.0826491Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.0827322Z You are in 'detached HEAD' state. You can look around, make experimental
+release	UNKNOWN STEP	2026-10-04T04:38:35.0829136Z changes and commit them, and you can discard any commits you make in this
+release	UNKNOWN STEP	2026-10-04T04:38:35.0831189Z state without impacting any branches by switching back to a branch.
+release	UNKNOWN STEP	2026-10-04T04:38:35.0832271Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.0833007Z If you want to create a new branch to retain commits you create, you may
+release	UNKNOWN STEP	2026-10-04T04:38:35.0835014Z do so (now or later) by using -c with the switch command. Example:
+release	UNKNOWN STEP	2026-10-04T04:38:35.0836089Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.0836800Z   git switch -c <new-branch-name>
+release	UNKNOWN STEP	2026-10-04T04:38:35.0837957Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.0838612Z Or undo this operation with:
+release	UNKNOWN STEP	2026-10-04T04:38:35.0839736Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.0840450Z   git switch -
+release	UNKNOWN STEP	2026-10-04T04:38:35.0841275Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.0842224Z Turn off this advice by setting config variable advice.detachedHead to false
+release	UNKNOWN STEP	2026-10-04T04:38:35.0843541Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.0844397Z HEAD is now at 533dccb cs-27: signed release-gate evidence for policy/v4.0.0
+release	UNKNOWN STEP	2026-10-04T04:38:35.0847836Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:35.0857691Z [command]/usr/bin/git log -1 --format=%H
+release	UNKNOWN STEP	2026-10-04T04:38:35.0876449Z 533dccb0a823001b396fd60ab08014bf75065a37
+release	UNKNOWN STEP	2026-10-04T04:38:35.1037028Z ##[group]Run set -euo pipefail
+release	UNKNOWN STEP	2026-10-04T04:38:35.1038110Z ^[[36;1mset -euo pipefail^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1039136Z ^[[36;1mhead="$(git -C .platform rev-parse HEAD)"^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1040894Z ^[[36;1mif [ "533dccb0a823001b396fd60ab08014bf75065a37" != "${head}" ]; then^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1043049Z ^[[36;1m  echo "REFUSED: .platform is at ${head}, but this workflow pins v2.0.1 at 533dccb0a823001b396fd60ab08014bf75065a37" >&2^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1044781Z ^[[36;1m  exit 1^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1045529Z ^[[36;1mfi^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1046612Z ^[[36;1mecho "ok  .platform is v2.0.1 (533dccb0a823001b396fd60ab08014bf75065a37)"^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1213216Z shell: /usr/bin/bash -e {0}
+release	UNKNOWN STEP	2026-10-04T04:38:35.1214108Z env:
+release	UNKNOWN STEP	2026-10-04T04:38:35.1214792Z   TAG: fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:35.1215588Z   GITSIGN_VERSION: 0.17.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.1216831Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	UNKNOWN STEP	2026-10-04T04:38:35.1218249Z   PLATFORM_TAG: v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.1219213Z   PLATFORM_COMMIT: 533dccb0a823001b396fd60ab08014bf75065a37
+release	UNKNOWN STEP	2026-10-04T04:38:35.1221817Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	UNKNOWN STEP	2026-10-04T04:38:35.1224153Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	UNKNOWN STEP	2026-10-04T04:38:35.1225289Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:35.1318691Z ok  .platform is v2.0.1 (533dccb0a823001b396fd60ab08014bf75065a37)
+release	UNKNOWN STEP	2026-10-04T04:38:35.1376900Z ##[group]Run set -euo pipefail
+release	UNKNOWN STEP	2026-10-04T04:38:35.1377825Z ^[[36;1mset -euo pipefail^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1379666Z ^[[36;1mcurl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1382261Z ^[[36;1mecho "${GITSIGN_SHA256}  gitsign" | sha256sum -c -^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1383489Z ^[[36;1mchmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.1417612Z shell: /usr/bin/bash -e {0}
+release	UNKNOWN STEP	2026-10-04T04:38:35.1418478Z env:
+release	UNKNOWN STEP	2026-10-04T04:38:35.1419131Z   TAG: fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:35.1420024Z   GITSIGN_VERSION: 0.17.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.1421241Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	UNKNOWN STEP	2026-10-04T04:38:35.1422537Z   PLATFORM_TAG: v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.1423590Z   PLATFORM_COMMIT: 533dccb0a823001b396fd60ab08014bf75065a37
+release	UNKNOWN STEP	2026-10-04T04:38:35.1425931Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	UNKNOWN STEP	2026-10-04T04:38:35.1428251Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	UNKNOWN STEP	2026-10-04T04:38:35.1429351Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:35.7687885Z gitsign: OK
+release	UNKNOWN STEP	2026-10-04T04:38:35.7783622Z ##[group]Run ./verify-feeds.sh
+release	UNKNOWN STEP	2026-10-04T04:38:35.7783959Z ^[[36;1m./verify-feeds.sh^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:35.7821873Z shell: /usr/bin/bash -e {0}
+release	UNKNOWN STEP	2026-10-04T04:38:35.7822167Z env:
+release	UNKNOWN STEP	2026-10-04T04:38:35.7822404Z   TAG: fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:35.7822654Z   GITSIGN_VERSION: 0.17.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.7823007Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	UNKNOWN STEP	2026-10-04T04:38:35.7823367Z   PLATFORM_TAG: v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:35.7823650Z   PLATFORM_COMMIT: 533dccb0a823001b396fd60ab08014bf75065a37
+release	UNKNOWN STEP	2026-10-04T04:38:35.7824239Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	UNKNOWN STEP	2026-10-04T04:38:35.7824832Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	UNKNOWN STEP	2026-10-04T04:38:35.7825202Z   PLATFORM_DIR: .platform
+release	UNKNOWN STEP	2026-10-04T04:38:35.7825426Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:35.7903663Z == envelope schema: .platform/feeds/schema.json ==
+release	UNKNOWN STEP	2026-10-04T04:38:35.8235510Z ok  cve/v1/feed.json -> envelope + cve/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8236433Z ok  cve/v2/feed.json -> envelope + cve/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8236890Z ok  cve/v3/feed.json -> envelope + cve/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8237403Z ok  eol/v1/feed.json -> envelope + eol/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8237852Z ok  eol/v2/feed.json -> envelope + eol/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8238348Z ok  fx/v1/feed.json -> envelope + fx/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8238898Z ok  market-moves/v1/feed.json -> envelope + market-moves/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8239429Z ok  news/v1/feed.json -> envelope + news/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8240247Z ok  threat-register/v1/feed.json -> envelope + threat-register/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8240978Z ok  threat-register/v2/feed.json -> envelope + threat-register/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8241806Z ok  threat-register/v3/feed.json -> envelope + threat-register/payload.schema.v3.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8242651Z ok  threat-register/v4/feed.json -> envelope + threat-register/payload.schema.v4.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8243254Z ok  12 published feed versions validated
+release	UNKNOWN STEP	2026-10-04T04:38:35.8243647Z ok  party.yaml publishes threat-register
+release	UNKNOWN STEP	2026-10-04T04:38:35.8244130Z ok  party.yaml publishes threat-register/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8244556Z ok  party.yaml publishes cve
+release	UNKNOWN STEP	2026-10-04T04:38:35.8244943Z ok  party.yaml publishes cve/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8245389Z ok  party.yaml publishes eol
+release	UNKNOWN STEP	2026-10-04T04:38:35.8245782Z ok  party.yaml publishes eol/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8246243Z ok  party.yaml publishes fx
+release	UNKNOWN STEP	2026-10-04T04:38:35.8246620Z ok  party.yaml publishes fx/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8247115Z ok  party.yaml publishes market-moves
+release	UNKNOWN STEP	2026-10-04T04:38:35.8247667Z ok  party.yaml publishes market-moves/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8248154Z ok  party.yaml publishes news
+release	UNKNOWN STEP	2026-10-04T04:38:35.8248593Z ok  party.yaml publishes news/payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8249434Z ok  a twin scenario validates against .platform/feeds/forward-intel.payload.schema.json
+release	UNKNOWN STEP	2026-10-04T04:38:35.8250465Z ok  the same schema takes an lm triple as well as a lognormal-GPD severity spec
+release	UNKNOWN STEP	2026-10-04T04:38:35.8251292Z ok  a 1.0.0-shaped payload fails on all three C10 keys: 'claim_scope'; 'derived_from'; 'register' -- which is why C10 is one major
+release	UNKNOWN STEP	2026-10-04T04:38:35.8252138Z ok  a register entry takes a tier off the ladder ['baseline', 'restricted', 'quarantine', 'isolated', 'infra']
+release	UNKNOWN STEP	2026-10-04T04:38:35.8268055Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.8268441Z == bump ladder (ADR-0023, D2) ==
+release	UNKNOWN STEP	2026-10-04T04:38:35.8423978Z ok  unchanged -> none
+release	UNKNOWN STEP	2026-10-04T04:38:35.8424329Z ok  entry added -> minor
+release	UNKNOWN STEP	2026-10-04T04:38:35.8424695Z ok  entry removed -> major
+release	UNKNOWN STEP	2026-10-04T04:38:35.8424949Z ok  payload schema changed -> major
+release	UNKNOWN STEP	2026-10-04T04:38:35.8425243Z ok  numeric move inside tolerance -> none
+release	UNKNOWN STEP	2026-10-04T04:38:35.8425755Z ok  numeric move outside tolerance -> patch
+release	UNKNOWN STEP	2026-10-04T04:38:35.8426046Z ok  non-numeric field changed -> patch
+release	UNKNOWN STEP	2026-10-04T04:38:35.8426329Z ok  fx new month -> minor
+release	UNKNOWN STEP	2026-10-04T04:38:35.8426574Z ok  fx corrected rate -> patch
+release	UNKNOWN STEP	2026-10-04T04:38:35.8426869Z ok  fx currency added -> minor
+release	UNKNOWN STEP	2026-10-04T04:38:35.8427147Z ok  fx currency withdrawn -> major
+release	UNKNOWN STEP	2026-10-04T04:38:35.8427445Z ok  market-moves sub-threshold reading -> none
+release	UNKNOWN STEP	2026-10-04T04:38:35.8427777Z ok  market-moves reading at the threshold -> patch
+release	UNKNOWN STEP	2026-10-04T04:38:35.8428109Z ok  market-moves downward move over the threshold -> patch
+release	UNKNOWN STEP	2026-10-04T04:38:35.8428423Z ok  market-moves rule version changed -> minor
+release	UNKNOWN STEP	2026-10-04T04:38:35.8428739Z ok  market-moves market admitted -> minor
+release	UNKNOWN STEP	2026-10-04T04:38:35.8429022Z ok  market-moves question restated -> patch
+release	UNKNOWN STEP	2026-10-04T04:38:35.8429310Z ok  news re-read of the same pool -> none
+release	UNKNOWN STEP	2026-10-04T04:38:35.8429571Z ok  news event added -> minor
+release	UNKNOWN STEP	2026-10-04T04:38:35.8429938Z ok  news event withdrawn -> major
+release	UNKNOWN STEP	2026-10-04T04:38:35.8430304Z ok  news statement restated -> patch
+release	UNKNOWN STEP	2026-10-04T04:38:35.8430580Z ok  bump.py selfcheck: 21 cases
+release	UNKNOWN STEP	2026-10-04T04:38:35.8449125Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.8449688Z == the rule each feed publishes is the rule bump.py reads ==
+release	UNKNOWN STEP	2026-10-04T04:38:35.8623300Z ok  threat-register v1 -> v2 computes patch
+release	UNKNOWN STEP	2026-10-04T04:38:35.8792843Z ok  cve v1 -> v2 computes minor
+release	UNKNOWN STEP	2026-10-04T04:38:35.8973575Z ok  eol v1 -> v2 computes minor
+release	UNKNOWN STEP	2026-10-04T04:38:35.8973847Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.8974220Z == fx: the rule computes a new month as a minor and a corrected rate as a patch ==
+release	UNKNOWN STEP	2026-10-04T04:38:35.9302196Z ok  fx new-month computes minor
+release	UNKNOWN STEP	2026-10-04T04:38:35.9478282Z ok  fx corrected-rate computes patch
+release	UNKNOWN STEP	2026-10-04T04:38:35.9478576Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.9478844Z == fx: a rate lookup for a published date, and a refusal for one with no rate (ADR-0020) ==
+release	UNKNOWN STEP	2026-10-04T04:38:35.9613228Z ok  1000 GBP -> 1336.70 USD at the 2026-08 HMRC rate 1.3367
+release	UNKNOWN STEP	2026-10-04T04:38:35.9613655Z ok  1336.70 USD -> 1000.00 GBP, the same month's rate both ways
+release	UNKNOWN STEP	2026-10-04T04:38:35.9614092Z ok  100 EUR -> 114.06 USD, crossed through the GBP base
+release	UNKNOWN STEP	2026-10-04T04:38:35.9614496Z ok  a same-currency amount needs no rate and no date
+release	UNKNOWN STEP	2026-10-04T04:38:35.9615038Z ok  2026-05-14 refuses (a month the feed does not publish): no fx rate published for 2026-05-14: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
+release	UNKNOWN STEP	2026-10-04T04:38:35.9615791Z ok  2027-01-31 refuses (a month the feed has not reached): no fx rate published for 2027-01-31: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
+release	UNKNOWN STEP	2026-10-04T04:38:35.9617539Z ok  an unquoted currency refuses: the fx feed for 2026-08 quotes no rate for XYZ (it quotes AED, ALL, AMD, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BHD, BIF, BMD, BND, BOB, BRL, BSD, BTN, BWP, BYN, BZD, CAD, CDF, CHF, CLP, CNY, COP, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, GBP, GEL, GHS, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KRW, KWD, KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MYR, MZN, NGN, NIO, NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SLE, SOS, SRD, SVC, SZL, THB, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, UYU, UZS, VES, VND, VUV, WST, XAF, XCD, XOF, XPF, YER, ZAR, ZMW, ZWG); ADR-0020, refusing
+release	UNKNOWN STEP	2026-10-04T04:38:35.9619369Z ok  converters/fx.py selfcheck: 7 cases
+release	UNKNOWN STEP	2026-10-04T04:38:35.9790524Z ok  1000 GBP -> 1336.7 USD on 2026-08-14, at the published HMRC rate
+release	UNKNOWN STEP	2026-10-04T04:38:35.9957995Z ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14: the fx feed publishes 2026-08 (ADR-0020, a missing instrument refuses)
+release	UNKNOWN STEP	2026-10-04T04:38:35.9958405Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.9958411Z 
+release	UNKNOWN STEP	2026-10-04T04:38:35.9958646Z == the threat register publishes its own magnitudes, and ships the converter that reads them ==
+release	UNKNOWN STEP	2026-10-04T04:38:36.0167874Z ok  12 (version, institution) scenarios; 6 price a magnitude the PUBLISHER published, 6 price the frozen table and say so by name
+release	UNKNOWN STEP	2026-10-04T04:38:36.0169052Z ok  every magnitude in major 3 is the number the platform's own table held, so the move re-homes it and does not re-price it
+release	UNKNOWN STEP	2026-10-04T04:38:36.0170184Z ok  a magnitude with no basis refuses, naming the institution and where its basis goes
+release	UNKNOWN STEP	2026-10-04T04:38:36.0171107Z ok  the converter imports only the standard library, so the hub's portability replay can run it in a directory holding nothing but itself and the payload
+release	UNKNOWN STEP	2026-10-04T04:38:36.0172551Z ok  major 4: 3 institutions carry the `scheduled-agent-misuses-write-credential` row; each prices only with the subscriber's own magnitude and says so, refuses with none, and every headline scenario is major 3's
+release	UNKNOWN STEP	2026-10-04T04:38:36.0338477Z ok  threat-register/v3/feed.json institutions.driftwood: lm (1000, 4000, 9000) GBP, lef (2, 4, 9), both with a dated basis
+release	UNKNOWN STEP	2026-10-04T04:38:36.0339258Z ok  threat-register/v3/feed.json institutions.tuppence: lm (5000, 25000, 90000) GBP, lef (4, 9, 20), both with a dated basis
+release	UNKNOWN STEP	2026-10-04T04:38:36.0340081Z ok  threat-register/v3/feed.json institutions.ludlow: lm (20000, 100000, 400000) GBP, lef (1, 2, 5), both with a dated basis
+release	UNKNOWN STEP	2026-10-04T04:38:36.0340725Z ok  threat-register/v4/feed.json institutions.driftwood: lm (1000, 4000, 9000) GBP, lef (2, 4, 9), both with a dated basis
+release	UNKNOWN STEP	2026-10-04T04:38:36.0341538Z ok  threat-register/v4/feed.json institutions.driftwood.threats.scheduled-agent-misuses-write-credential: lef (8.4186e-05, 8.4186e-05, 0.00029465) events/yr with a published basis; magnitude subscriber
+release	UNKNOWN STEP	2026-10-04T04:38:36.0342340Z ok  threat-register/v4/feed.json institutions.tuppence: lm (5000, 25000, 90000) GBP, lef (4, 9, 20), both with a dated basis
+release	UNKNOWN STEP	2026-10-04T04:38:36.0343147Z ok  threat-register/v4/feed.json institutions.tuppence.threats.scheduled-agent-misuses-write-credential: lef (8.4186e-05, 8.4186e-05, 0.00029465) events/yr with a published basis; magnitude subscriber
+release	UNKNOWN STEP	2026-10-04T04:38:36.0343967Z ok  threat-register/v4/feed.json institutions.ludlow: lm (20000, 100000, 400000) GBP, lef (1, 2, 5), both with a dated basis
+release	UNKNOWN STEP	2026-10-04T04:38:36.0344735Z ok  threat-register/v4/feed.json institutions.ludlow.threats.scheduled-agent-misuses-write-credential: lef (8.4186e-05, 8.4186e-05, 0.00029465) events/yr with a published basis; magnitude subscriber
+release	UNKNOWN STEP	2026-10-04T04:38:36.0345565Z ok  6 institution(s) in major 3 and above publish their own loss magnitude, each with a basis carrying a kind, a statement and a date
+release	UNKNOWN STEP	2026-10-04T04:38:36.0364979Z PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed; the bump ladder holds; publishes[] names only real paths; a twin scenario validates against the 2.0.0 forward-intel payload schema; fx prices a date it publishes and refuses one it does not; and the threat register publishes its own loss magnitudes with a dated basis on each and ships the converter that reads them.
+release	UNKNOWN STEP	2026-10-04T04:38:36.0405803Z ##[group]Run ./verify-market-and-news.sh
+release	UNKNOWN STEP	2026-10-04T04:38:36.0406227Z ^[[36;1m./verify-market-and-news.sh^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:36.0443345Z shell: /usr/bin/bash -e {0}
+release	UNKNOWN STEP	2026-10-04T04:38:36.0443630Z env:
+release	UNKNOWN STEP	2026-10-04T04:38:36.0443893Z   TAG: fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:36.0444124Z   GITSIGN_VERSION: 0.17.1
+release	UNKNOWN STEP	2026-10-04T04:38:36.0444475Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	UNKNOWN STEP	2026-10-04T04:38:36.0444888Z   PLATFORM_TAG: v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:36.0445163Z   PLATFORM_COMMIT: 533dccb0a823001b396fd60ab08014bf75065a37
+release	UNKNOWN STEP	2026-10-04T04:38:36.0445782Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	UNKNOWN STEP	2026-10-04T04:38:36.0446378Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	UNKNOWN STEP	2026-10-04T04:38:36.0446690Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:36.0529171Z == market-moves: a series, and nothing shaped like a probability ==
+release	UNKNOWN STEP	2026-10-04T04:38:36.0689682Z ok  3 markets, 9 dated readings, every price_level in [0,1]
+release	UNKNOWN STEP	2026-10-04T04:38:36.0690858Z ok  no probability-shaped and no moves[] field in the payload schema: a consumer derives the move (twin/market_signals.py), the publisher never asserts one
+release	UNKNOWN STEP	2026-10-04T04:38:36.0691624Z ok  the payload names its own versioned selection rule: market-moves/rule.yaml@1
+release	UNKNOWN STEP	2026-10-04T04:38:36.0721563Z 
+release	UNKNOWN STEP	2026-10-04T04:38:36.0722170Z == market-moves: the selection is mechanical -- the rule admits and refuses by name ==
+release	UNKNOWN STEP	2026-10-04T04:38:36.1009231Z market-moves: rule.yaml@1 admits 3 of 7 markets; refused 0x11ee80 (min_liquidity), 0x44c1a5 (categories), 0x63b7de (min_horizon_days), 0x8cf209 (max_horizon_days)
+release	UNKNOWN STEP	2026-10-04T04:38:36.1011165Z ok  one refusal per rule field: liquidity floor, category list, and both horizon bounds
+release	UNKNOWN STEP	2026-10-04T04:38:36.1011691Z 
+release	UNKNOWN STEP	2026-10-04T04:38:36.1011968Z == the feed's OWN threshold is what opens a PR (D2), through the real clock ==
+release	UNKNOWN STEP	2026-10-04T04:38:36.1450410Z ok  the committed corpus computes none
+release	UNKNOWN STEP	2026-10-04T04:38:36.1703506Z ok  the moved corpus computes patch
+release	UNKNOWN STEP	2026-10-04T04:38:36.2296608Z ok  a sub-threshold reading proposes nothing; a move of at least the declared threshold does
+release	UNKNOWN STEP	2026-10-04T04:38:36.2296945Z 
+release	UNKNOWN STEP	2026-10-04T04:38:36.2297182Z == the observation branch path: every run writes a line, and it carries the reading ==
+release	UNKNOWN STEP	2026-10-04T04:38:36.2297767Z ok  observations/market-moves.jsonl <- {"price_levels": {"0x2b1974": 0.2, "0x7f3c9a": 0.46, "0x9ad402": 0.63}, "venue": "polymarket"}
+release	UNKNOWN STEP	2026-10-04T04:38:36.2298434Z ok  observations/news.jsonl <- {"events": 4, "newest": "platform-implementations-1-1-1-tagged", "newest_date": "2026-08-25"}
+release	UNKNOWN STEP	2026-10-04T04:38:36.2334320Z ok  the clock's cage lets it write only: observations
+release	UNKNOWN STEP	2026-10-04T04:38:36.2343482Z ok  both feeds are on the daily clock's matrix
+release	UNKNOWN STEP	2026-10-04T04:38:36.2343747Z 
+release	UNKNOWN STEP	2026-10-04T04:38:36.2344009Z == news: the minimal payload, admitted only with a provenance URL ==
+release	UNKNOWN STEP	2026-10-04T04:38:36.2576531Z news: rule.yaml@1 admits 4 of 5 pool entries; refused an-unsourced-statement (requires_provenance_url)
+release	UNKNOWN STEP	2026-10-04T04:38:36.2698631Z ok  4 events, each with exactly id, date, source, statement and a provenance url -- no steep, no severity, no relevance
+release	UNKNOWN STEP	2026-10-04T04:38:36.2722748Z 
+release	UNKNOWN STEP	2026-10-04T04:38:36.2723107Z == news: the threshold fires on a new event and not on a re-read ==
+release	UNKNOWN STEP	2026-10-04T04:38:36.3114246Z ok  the committed pool computes none
+release	UNKNOWN STEP	2026-10-04T04:38:36.3362668Z ok  the moved pool computes minor
+release	UNKNOWN STEP	2026-10-04T04:38:36.3374151Z 
+release	UNKNOWN STEP	2026-10-04T04:38:36.3374346Z == niobium is a SCENARIO and is absent from this feed (ticket 23 answer 1) ==
+release	UNKNOWN STEP	2026-10-04T04:38:36.3571567Z ok  13 published payloads and the news pool carry no niobium anywhere in their data: it is a SCENARIO in the adopter's twin library (ticket 29), not an observation
+release	UNKNOWN STEP	2026-10-04T04:38:36.3596458Z 
+release	UNKNOWN STEP	2026-10-04T04:38:36.3597359Z == no clock in this repository invokes a model (ADR-0024) ==
+release	UNKNOWN STEP	2026-10-04T04:38:36.3626621Z scheduled workflows: .github/workflows/fetch.yml
+release	UNKNOWN STEP	2026-10-04T04:38:36.3752007Z ok  no fetch adapter names a model endpoint or key
+release	UNKNOWN STEP	2026-10-04T04:38:36.3752477Z ok  no scheduled workflow calls a model or invokes classify-and-judge: the clock gathers,
+release	UNKNOWN STEP	2026-10-04T04:38:36.3753062Z ok  and reasoning is a skill a human runs (the skill is marked disable-model-invocation)
+release	UNKNOWN STEP	2026-10-04T04:38:36.3753318Z 
+release	UNKNOWN STEP	2026-10-04T04:38:36.3754167Z PASS: market-moves publishes a dated series from one mechanical rule over one venue with no probability-shaped field, and its own threshold is what opens a PR; news carries the five decided fields and admits nothing without a provenance URL; sub-threshold readings land on the observation branch carrying the reading; niobium is absent from the feed; no clock here invokes a model.
+release	UNKNOWN STEP	2026-10-04T04:38:36.3800734Z ##[group]Run set -euo pipefail
+release	UNKNOWN STEP	2026-10-04T04:38:36.3801012Z ^[[36;1mset -euo pipefail^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:36.3801328Z ^[[36;1m# actions/checkout's second fetch flattens the annotated tag object^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:36.3801725Z ^[[36;1m# gitsign needs -- re-fetch the real tag ref before verifying it.^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:36.3802129Z ^[[36;1mgit fetch origin "+refs/tags/${TAG}:refs/tags/${TAG}" --force^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:36.3802458Z ^[[36;1mgitsign verify-tag "${TAG}" \^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:36.3802784Z ^[[36;1m  --certificate-identity-regexp="${EXPECTED_IDENTITY_REGEXP}" \^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:36.3803138Z ^[[36;1m  --certificate-oidc-issuer="${EXPECTED_ISSUER}"^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:36.3840050Z shell: /usr/bin/bash -e {0}
+release	UNKNOWN STEP	2026-10-04T04:38:36.3840349Z env:
+release	UNKNOWN STEP	2026-10-04T04:38:36.3840569Z   TAG: fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:36.3840790Z   GITSIGN_VERSION: 0.17.1
+release	UNKNOWN STEP	2026-10-04T04:38:36.3841147Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	UNKNOWN STEP	2026-10-04T04:38:36.3841578Z   PLATFORM_TAG: v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:36.3842240Z   PLATFORM_COMMIT: 533dccb0a823001b396fd60ab08014bf75065a37
+release	UNKNOWN STEP	2026-10-04T04:38:36.3842868Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	UNKNOWN STEP	2026-10-04T04:38:36.3843462Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	UNKNOWN STEP	2026-10-04T04:38:36.3843805Z   GITSIGN_REKOR_MODE: offline
+release	UNKNOWN STEP	2026-10-04T04:38:36.3844034Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:37.7338234Z tlog index: 3075758700
+release	UNKNOWN STEP	2026-10-04T04:38:37.7338894Z gitsign: Signature made using certificate ID 0xdf454bc36a5db523dcea65205d4abeff2aca52b3 | CN=sigstore-intermediate,O=sigstore.dev
+release	UNKNOWN STEP	2026-10-04T04:38:37.7340097Z gitsign: Good signature from [https://github.com/policy-as-versioned-feeds/feeds/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+release	UNKNOWN STEP	2026-10-04T04:38:37.7340940Z Validated Git signature: true
+release	UNKNOWN STEP	2026-10-04T04:38:37.7341278Z Validated Rekor entry: true
+release	UNKNOWN STEP	2026-10-04T04:38:37.7341635Z Validated Certificate claims: true
+release	UNKNOWN STEP	2026-10-04T04:38:37.7403056Z ##[group]Run set -euo pipefail
+release	UNKNOWN STEP	2026-10-04T04:38:37.7403423Z ^[[36;1mset -euo pipefail^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7403699Z ^[[36;1mresolved=$(git rev-parse "${TAG}^{commit}")^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7403976Z ^[[36;1m{^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7404345Z ^[[36;1m  git tag -l --format='%(contents)' "${TAG}" | sed '/^-----BEGIN SIGNED MESSAGE-----$/,$d'^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7404725Z ^[[36;1m  echo "---"^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7405230Z ^[[36;1m  echo "Verified gitsign signature (identity regexp: ${EXPECTED_IDENTITY_REGEXP}, issuer: ${EXPECTED_ISSUER}). Resolved commit: ${resolved}."^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7405711Z ^[[36;1m} > release-notes.md^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7405952Z ^[[36;1mgh release create "${TAG}" \^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7406253Z ^[[36;1m  --title "${TAG}" \^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7406511Z ^[[36;1m  --notes-file release-notes.md^[[0m
+release	UNKNOWN STEP	2026-10-04T04:38:37.7443193Z shell: /usr/bin/bash -e {0}
+release	UNKNOWN STEP	2026-10-04T04:38:37.7443503Z env:
+release	UNKNOWN STEP	2026-10-04T04:38:37.7443790Z   TAG: fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:37.7444114Z   GITSIGN_VERSION: 0.17.1
+release	UNKNOWN STEP	2026-10-04T04:38:37.7444491Z   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+release	UNKNOWN STEP	2026-10-04T04:38:37.7444839Z   PLATFORM_TAG: v2.0.1
+release	UNKNOWN STEP	2026-10-04T04:38:37.7445135Z   PLATFORM_COMMIT: 533dccb0a823001b396fd60ab08014bf75065a37
+release	UNKNOWN STEP	2026-10-04T04:38:37.7445753Z   EXPECTED_IDENTITY_REGEXP: ^https://github\.com/policy-as-versioned-feeds/feeds/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+release	UNKNOWN STEP	2026-10-04T04:38:37.7446453Z   EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+release	UNKNOWN STEP	2026-10-04T04:38:37.7448625Z   GH_TOKEN: ***
+release	UNKNOWN STEP	2026-10-04T04:38:37.7448865Z ##[endgroup]
+release	UNKNOWN STEP	2026-10-04T04:38:38.8106344Z https://github.com/policy-as-versioned-feeds/feeds/releases/tag/fx/v1.1.0
+release	UNKNOWN STEP	2026-10-04T04:38:38.8234516Z Post job cleanup.
+release	UNKNOWN STEP	2026-10-04T04:38:38.8882404Z [command]/usr/bin/git version
+release	UNKNOWN STEP	2026-10-04T04:38:38.8911649Z git version 2.55.0
+release	UNKNOWN STEP	2026-10-04T04:38:38.8938688Z Temporarily overriding HOME='/home/runner/work/_temp/1cc8a3cc-e156-49e1-a649-e450f253d9b5' before making global git config changes
+release	UNKNOWN STEP	2026-10-04T04:38:38.8940074Z Adding repository directory to the temporary git global config as a safe directory
+release	UNKNOWN STEP	2026-10-04T04:38:38.8941169Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/feeds/feeds/.platform
+release	UNKNOWN STEP	2026-10-04T04:38:38.8969187Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+release	UNKNOWN STEP	2026-10-04T04:38:38.8992954Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+release	UNKNOWN STEP	2026-10-04T04:38:38.9171921Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+release	UNKNOWN STEP	2026-10-04T04:38:38.9182364Z http.https://github.com/.extraheader
+release	UNKNOWN STEP	2026-10-04T04:38:38.9190947Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+release	UNKNOWN STEP	2026-10-04T04:38:38.9214586Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+release	UNKNOWN STEP	2026-10-04T04:38:38.9387262Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+release	UNKNOWN STEP	2026-10-04T04:38:38.9409608Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+release	UNKNOWN STEP	2026-10-04T04:38:38.9713195Z Post job cleanup.
+release	UNKNOWN STEP	2026-10-04T04:38:39.0320884Z [command]/usr/bin/git version
+release	UNKNOWN STEP	2026-10-04T04:38:39.0351569Z git version 2.55.0
+release	UNKNOWN STEP	2026-10-04T04:38:39.0406387Z Temporarily overriding HOME='/home/runner/work/_temp/8f835f53-3e35-41c1-85c7-d55cf0f24923' before making global git config changes
+release	UNKNOWN STEP	2026-10-04T04:38:39.0407043Z Adding repository directory to the temporary git global config as a safe directory
+release	UNKNOWN STEP	2026-10-04T04:38:39.0420826Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/feeds/feeds
+release	UNKNOWN STEP	2026-10-04T04:38:39.0475641Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+release	UNKNOWN STEP	2026-10-04T04:38:39.0486294Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+release	UNKNOWN STEP	2026-10-04T04:38:39.0647397Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+release	UNKNOWN STEP	2026-10-04T04:38:39.0662983Z http.https://github.com/.extraheader
+release	UNKNOWN STEP	2026-10-04T04:38:39.0671354Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+release	UNKNOWN STEP	2026-10-04T04:38:39.0697626Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+release	UNKNOWN STEP	2026-10-04T04:38:39.0864593Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+release	UNKNOWN STEP	2026-10-04T04:38:39.0891340Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+release	UNKNOWN STEP	2026-10-04T04:38:39.1155692Z Cleaning up orphan processes
+release	UNKNOWN STEP	2026-10-04T04:38:39.1384757Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

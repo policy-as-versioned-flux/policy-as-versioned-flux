@@ -1,0 +1,88 @@
+{
+  "driftwood": {
+    "platform": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/platform",
+      "head": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform"
+    },
+    "platform-tools": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/platform-tools",
+      "head": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform"
+    },
+    "nist": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/nist",
+      "head": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/nist"
+    },
+    "ico": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/ico",
+      "head": "9d09222117dde1257e5b43401caa43342f47bae3",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/ico"
+    },
+    "feeds": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/feeds",
+      "head": "69c89b0732a0c9e4e6013d2656d755c5d916a815",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/feeds"
+    },
+    "insurer": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/driftwood-estate/insurer",
+      "head": "632db22c92003b048795cea1f5d5bf6e08dcf386",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/insurer"
+    }
+  },
+  "tuppence": {
+    "platform": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/platform",
+      "head": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform"
+    },
+    "platform-tools": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/platform-tools",
+      "head": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform"
+    },
+    "nist": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/nist",
+      "head": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/nist"
+    },
+    "ico": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/ico",
+      "head": "9d09222117dde1257e5b43401caa43342f47bae3",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/ico"
+    },
+    "feeds": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/tuppence-estate/feeds",
+      "head": "69c89b0732a0c9e4e6013d2656d755c5d916a815",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/feeds"
+    }
+  },
+  "ludlow": {
+    "platform": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/platform",
+      "head": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform"
+    },
+    "platform-tools": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/platform-tools",
+      "head": "557c1538fe022c784ea4ffb345c92d2e4b11fe71",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/platform"
+    },
+    "nist": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/nist",
+      "head": "33a05df1f5241bca6ffbc1c69a70075cdb7a5819",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/nist"
+    },
+    "ico": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/ico",
+      "head": "9d09222117dde1257e5b43401caa43342f47bae3",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/ico"
+    },
+    "feeds": {
+      "dir": "/private/tmp/pavf-adopter-stage2-20261004-IEvZk7/ludlow-estate/feeds",
+      "head": "69c89b0732a0c9e4e6013d2656d755c5d916a815",
+      "origin": "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.estate-clone/feeds"
+    }
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "driftwood": {
+    "checkout_and_pin": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "header_feeds": [
+      {
+        "party": "feeds",
+        "name": "threat-register",
+        "version": "v4",
+        "source_last_edit_sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "publisher_observation": null,
+        "header_record_keys": [
+          "party",
+          "name",
+          "version",
+          "path",
+          "sha",
+          "files"
+        ]
+      },
+      {
+        "party": "feeds",
+        "name": "cve",
+        "version": "v3",
+        "source_last_edit_sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "publisher_observation": null,
+        "header_record_keys": [
+          "party",
+          "name",
+          "version",
+          "path",
+          "sha",
+          "files"
+        ]
+      }
+    ],
+    "document_publisher_observations": [
+      {
+        "schema": 1,
+        "party": "feeds",
+        "name": "threat-register",
+        "version": "v4",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "threat-register/v4.0.0",
+          "detail": "tag threat-register/v4.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form threat-register/vN.x.y with N > 4 on the feeds checkout, so the pinned v4 is the newest published major"
+        }
+      },
+      {
+        "schema": 1,
+        "party": "feeds",
+        "name": "cve",
+        "version": "v3",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "cve/v3.0.0",
+          "detail": "tag cve/v3.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form cve/vN.x.y with N > 3 on the feeds checkout, so the pinned v3 is the newest published major"
+        }
+      }
+    ]
+  },
+  "tuppence": {
+    "checkout_and_pin": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "header_feeds": [
+      {
+        "party": "feeds",
+        "name": "threat-register",
+        "version": "v4",
+        "source_last_edit_sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "publisher_observation": null,
+        "header_record_keys": [
+          "party",
+          "name",
+          "version",
+          "path",
+          "sha",
+          "files"
+        ]
+      },
+      {
+        "party": "feeds",
+        "name": "cve",
+        "version": "v3",
+        "source_last_edit_sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "publisher_observation": null,
+        "header_record_keys": [
+          "party",
+          "name",
+          "version",
+          "path",
+          "sha",
+          "files"
+        ]
+      }
+    ],
+    "document_publisher_observations": [
+      {
+        "schema": 1,
+        "party": "feeds",
+        "name": "threat-register",
+        "version": "v4",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "threat-register/v4.0.0",
+          "detail": "tag threat-register/v4.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form threat-register/vN.x.y with N > 4 on the feeds checkout, so the pinned v4 is the newest published major"
+        }
+      },
+      {
+        "schema": 1,
+        "party": "feeds",
+        "name": "cve",
+        "version": "v3",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "cve/v3.0.0",
+          "detail": "tag cve/v3.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form cve/vN.x.y with N > 3 on the feeds checkout, so the pinned v3 is the newest published major"
+        }
+      }
+    ]
+  },
+  "ludlow": {
+    "checkout_and_pin": "974e73514e0d8d4cad2e6906acf51d1cc27028b3",
+    "header_feeds": [
+      {
+        "party": "feeds",
+        "name": "threat-register",
+        "version": "v4",
+        "source_last_edit_sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "publisher_observation": null,
+        "header_record_keys": [
+          "party",
+          "name",
+          "version",
+          "path",
+          "sha",
+          "files"
+        ]
+      },
+      {
+        "party": "feeds",
+        "name": "cve",
+        "version": "v3",
+        "source_last_edit_sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "publisher_observation": null,
+        "header_record_keys": [
+          "party",
+          "name",
+          "version",
+          "path",
+          "sha",
+          "files"
+        ]
+      },
+      {
+        "party": "feeds",
+        "name": "eol",
+        "version": "v2",
+        "source_last_edit_sha": "330fbf06872c2ec2c8637863b624cd902d5534ca",
+        "publisher_observation": null,
+        "header_record_keys": [
+          "party",
+          "name",
+          "version",
+          "path",
+          "sha",
+          "files"
+        ]
+      }
+    ],
+    "document_publisher_observations": [
+      {
+        "schema": 1,
+        "party": "feeds",
+        "name": "threat-register",
+        "version": "v4",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "threat-register/v4.0.0",
+          "detail": "tag threat-register/v4.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form threat-register/vN.x.y with N > 4 on the feeds checkout, so the pinned v4 is the newest published major"
+        }
+      },
+      {
+        "schema": 1,
+        "party": "feeds",
+        "name": "cve",
+        "version": "v3",
+        "sha": "37dfe4a2de50f1a1fd7aeb6348d819373188e0e6",
+        "pin_signature": {
+          "state": "signed",
+          "tag": "cve/v3.0.0",
+          "detail": "tag cve/v3.0.0 on the feeds checkout carries a signature block"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form cve/vN.x.y with N > 3 on the feeds checkout, so the pinned v3 is the newest published major"
+        }
+      },
+      {
+        "schema": 1,
+        "party": "feeds",
+        "name": "eol",
+        "version": "v2",
+        "sha": "330fbf06872c2ec2c8637863b624cd902d5534ca",
+        "pin_signature": {
+          "state": "untagged",
+          "tag": null,
+          "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 6 tag(s) of its own"
+        },
+        "newer": null,
+        "superseded": {
+          "state": "current",
+          "detail": "no signed tag of the form eol/vN.x.y with N > 2 on the feeds checkout, so the pinned v2 is the newest published major"
+        }
+      }
+    ]
+  }
+}
