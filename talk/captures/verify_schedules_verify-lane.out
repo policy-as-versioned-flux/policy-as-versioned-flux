@@ -30,7 +30,7 @@ PASS: tuppence@main: 58 commit(s) by a scheduled identity on the first-parent hi
 NOTE: tuppence@main: 32 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
 INFO: hub: scheduled identities ['truth@users.noreply.github.com'], lane ['talk/truth.log', 'drift/samples.jsonl', 'talk/captures', 'observations'], refs main fetched now; observations absent on origin
 PASS: hub@main: 102 commit(s) by a scheduled identity on the first-parent history, every one inside the lane ['talk/truth.log', 'drift/samples.jsonl', 'talk/captures', 'observations'] and none a merge
-NOTE: hub@main: 85 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
+NOTE: hub@main: 86 merge(s) made through GitHub by pavc-other-hand, the reviewed second hand (ticket 88, owner-instructed) -- a human's act by the owner's instruction, not graded
 PASS: platform@main: compose/comparison_history.py OBSERVATION_PATHS equals ADR-0024's list here
 PASS: every commit a scheduled identity has landed on an observation ref touched only
 PASS: the observation lane, and none of them is a merge

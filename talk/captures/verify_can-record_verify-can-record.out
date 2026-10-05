@@ -7,7 +7,7 @@
   --   TRUTH 2026-09-05T01:20Z run=88: committed on origin/ticket-64-the-twin-is-three-adopters and its line is in the default branch's log (commit 2545d1a was rescued, or the branch merged with it)
   --   TRUTH 2026-09-04T20:35Z run=84: committed on origin/ticket-62-and-77-pins-are-checked-for-content and its line is in the default branch's log (commit fd0722f was rescued, or the branch merged with it)
   --   TRUTH 2026-09-04T16:34Z run=76: committed on origin/ticket-56-and-85-the-clocks-are-graded and its line is in the default branch's log (commit 7335de8 was rescued, or the branch merged with it)
-  ok   no clock line is stranded off the default branch, among the 158 other ref(s) this checkout carries (a branch already deleted cannot be looked at from here)
+  ok   no clock line is stranded off the default branch, among the 159 other ref(s) this checkout carries (a branch already deleted cannot be looked at from here)
 [1;36m==>[0m 2. truth.yml still has the shape ticket 100 decided
   ok   the guard runs before the gate, the record step and the cage both consult it, and the one push is HEAD:${GITHUB_REF_NAME} with no force anywhere
 [1;36m==>[0m 3. the workflow's own shell, over two throwaway repositories, in six states
