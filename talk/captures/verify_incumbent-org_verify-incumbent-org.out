@@ -12,7 +12,7 @@ PASS: reports: forge names new owner policy-as-versioned-ludlow
 LIMIT: c2p-collector: archive waits for ['verify/oscal-lane/verify-oscal-lane.sh']
 LIMIT: datastore: archive waits for ['verify/cloud-plane/verify-cloud-plane.sh']
 LIMIT: cloud: archive waits for ['verify/cloud-plane/verify-cloud-plane.sh']
-LIMIT: governance-agent: archive waits for ['cage-lane']
-LIMIT: policy: archive waits for ['cage-lane']
-LIMIT: fleet: archive waits for ['cage-lane']
+LIMIT: governance-agent: row passes; archive has not been performed
+LIMIT: policy: row passes; archive has not been performed
+LIMIT: fleet: row passes; archive has not been performed
 PASS: anonymous OCI manifest read ghcr.io/policy-as-versioned-flux/readiness-collector:v1.0.0: HTTP 200
