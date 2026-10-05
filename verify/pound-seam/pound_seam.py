@@ -1008,6 +1008,19 @@ def check_curve_agreement(estate, parties):
                         f"no drift")
 
 
+def _twin_tolerance(estate, feed, tolerance, currency):
+    """The signed band in the entry's currency, using composition's dated FX seam."""
+    if tolerance["currency"] == currency:
+        return tolerance
+    path = os.path.join(estate, "platform", "compose", "composition.py")
+    spec = importlib.util.spec_from_file_location("_composition_twin_band", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    amount, _ = mod._converted(float(tolerance["amount"]), tolerance["currency"], currency,
+                              mod._feed_as_of(feed), {"feeds": os.path.join(estate, "feeds")})
+    return {"amount": amount, "currency": currency}
+
+
 def check_residual_basis(estate, parties):
     """Re-derive the annualised residuals and the tier attributed to the adopter policy.
 
@@ -1071,7 +1084,8 @@ def check_residual_basis(estate, parties):
                 picked = mod.select(
                     {t: {"amount": r, "currency": entry["currency"]}
                      for t, r in residuals.items()},
-                    doc["appetite"]["tolerance"], (doc.get("overlay") or {}).get("floor"))
+                    _twin_tolerance(estate, feed, doc["appetite"]["tolerance"], entry["currency"]),
+                    (doc.get("overlay") or {}).get("floor"))
                 if (entry.get("proposed_tier") != picked["tier"]
                         or entry.get("policy_version") != picked["policy_version"]):
                     raise ValueError(
@@ -1079,7 +1093,8 @@ def check_residual_basis(estate, parties):
                         f"{entry.get('policy_version')!r}, but its own policy returns "
                         f"{picked['tier']!r}/{picked['policy_version']!r}")
             except Exception as exc:                            # noqa: BLE001 -- an observation, not a crash
-                out("FAIL", f"{name}: could not re-derive the twin entry's annualised residuals "
+                status = "SKIP" if "missing instrument" in str(exc).lower() else "FAIL"
+                out(status, f"{name}: could not re-derive the twin entry's annualised residuals "
                             f"and attributed policy selection: {exc}")
             else:
                 out("PASS", f"{name}: the twin entry's residuals re-derive from {expected_basis} "

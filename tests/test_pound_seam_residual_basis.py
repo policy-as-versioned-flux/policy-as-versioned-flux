@@ -58,12 +58,15 @@ def _estate(tmp_path: Path, *, amount: float = 13_435_900.928034885,
 
 
 def _grade(estate: Path, entry: dict[str, Any], *,
-           floor: str | None = None) -> subprocess.CompletedProcess[str]:
+           floor: str | None = None,
+           tolerance: dict[str, Any] | None = None) -> subprocess.CompletedProcess[str]:
     path = estate / "ludlow/composed/evidence.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"prices": [entry]}))
     party = {"publishes": [{"name": "forward-intel", "path": "twin/forward-intel"}],
              "appetite": {"tolerance": {"amount": 5000, "currency": "GBP"}}}
+    if tolerance is not None:
+        party["appetite"] = {"tolerance": tolerance}
     if floor is not None:
         party["overlay"] = {"floor": floor}
     # A subprocess keeps platform imports isolated from other estate-oriented tests.
@@ -129,12 +132,29 @@ def test_selection_replay_honours_signed_floor(tmp_path: Path, floor: str):
     assert f"recorded rung {floor!r}" in result.stdout
 
 
-def test_policy_refuses_currency_different_from_signed_band(tmp_path: Path):
-    estate, entry = _estate(tmp_path, amount=1000, impact=1000)
-    entry["currency"] = "USD"
-    result = _grade(estate, entry)
-    assert result.returncode == 1, result.stdout + result.stderr
-    assert "FAIL:" in result.stdout
+@pytest.mark.parametrize("recorded, date, expected", [
+    ("restricted", "2025-12-15T00:00:00Z", 0),
+    ("baseline", "2025-12-15T00:00:00Z", 1),
+    ("restricted", "2024-12-15T00:00:00Z", 3),
+])
+def test_signed_fx_appetite_conversion(tmp_path: Path, recorded: str, date: str, expected: int):
+    # 5000 USD is less than this 4900 GBP baseline residual at the real dated rate.
+    # The correct converted band selects restricted; using 5000 as GBP selects baseline.
+    estate, entry = _estate(tmp_path, amount=7000, impact=1000)
+    (estate / "feeds").symlink_to(ROOT / ".estate-clone/feeds", target_is_directory=True)
+    path = estate / "ludlow/twin/forward-intel/v1/feed.json"
+    feed = json.loads(path.read_text())
+    feed["published_at"] = date
+    path.write_text(json.dumps(feed))
+    entry["proposed_tier"] = recorded
+    result = _grade(estate, entry, tolerance={"amount": 5000, "currency": "USD"})
+    assert result.returncode == expected, result.stdout + result.stderr
+    if expected == 0:
+        assert "recorded rung 'restricted'" in result.stdout
+    elif expected == 3:
+        assert "SKIP:" in result.stdout and "missing instrument" in result.stdout
+    else:
+        assert "FAIL:" in result.stdout
 
 
 @pytest.mark.parametrize("invalid", ["negative", "infinite", "boolean", "numeric-string"])
