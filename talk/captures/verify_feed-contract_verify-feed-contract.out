@@ -93,7 +93,7 @@ PASS: driftwood pins feeds/feed/threat-register@v4: tag threat-register/v4.0.0 o
 PASS: driftwood pins feeds/feed/cve@v3: tag cve/v3.0.0 on feeds, and its tree carries the cve this pin is used for
 PASS: driftwood pins insurer/feed/quote-driftwood@v1: tag v1.0.0 on insurer, and its tree carries the quote-driftwood this pin is used for
 PASS: ico pins nist/controls@1.1.0: tag v1.1.0 on nist, and its tree carries the sp-800-53 this pin is used for
-FAIL: insurer pins platform/implementations@3.3.0: the tree of v3.3.0 has no implementations/cloud for the implementations this pin names, and platform's branch does not carry it either
+PASS: insurer pins platform/implementations@5.0.0: tag v5.0.0 on platform, and its tree carries the cloud this pin is used for
 PASS: insurer pins driftwood/feed/exposure@v2.0.0: tag v2.0.0 on driftwood, and its tree carries the exposure this pin is used for
 PASS: insurer pins tuppence/feed/exposure@v2.0.0: tag v2.0.0 on tuppence, and its tree carries the exposure this pin is used for
 PASS: insurer pins ludlow/feed/exposure@v2.0.0: tag v2.0.0 on ludlow, and its tree carries the exposure this pin is used for
@@ -108,4 +108,4 @@ PASS: tuppence pins nist/controls@1.1.0: tag v1.1.0 on nist, and its tree carrie
 PASS: tuppence pins ico/feed/penalty-schema@v3: tag v3.0.0 on ico, and its tree carries the penalty-schema this pin is used for
 PASS: tuppence pins feeds/feed/threat-register@v4: tag threat-register/v4.0.0 on feeds, and its tree carries the threat-register this pin is used for
 PASS: tuppence pins feeds/feed/cve@v3: tag cve/v3.0.0 on feeds, and its tree carries the cve this pin is used for
-FAIL: 1 feed-contract check(s) observed false
+SKIP: ludlow pins feeds/feed/eol@v2: waiting for tag eol/v2.0.0 on feeds (cut by cut-release.yml after merge)
