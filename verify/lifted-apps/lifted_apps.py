@@ -463,6 +463,57 @@ def pattern_matches(pattern: str, target: str) -> bool:
     return fnmatch.fnmatchcase(target, pattern) or fnmatch.fnmatchcase(target, pattern.lstrip("./"))
 
 
+def scheduled_renovate_enables_repository(lift: Lift, adopter_dir: Path) -> bool:
+    """Read the estate's unconditional, pinned self-hosted invocation.
+
+    Driftwood disables the hosted bot to keep it from fighting the self-hosted
+    runner. Renovate's global `force` overrides repository settings. Only the
+    deployed enabled-only override is understood here; another force shape or
+    a conditional/shell-wrapped invocation cannot establish enablement.
+    This reads a declared bump mechanism, not a successful observed bump.
+    """
+    try:
+        workflow = yaml.safe_load((adopter_dir / ".github/workflows/renovate-run.yml").read_text())
+    except (OSError, yaml.YAMLError):
+        return False
+    if not isinstance(workflow, dict):
+        return False
+    # PyYAML's YAML 1.1 loader reads an unquoted `on` key as True.
+    events = workflow.get("on", workflow.get(True))
+    if not isinstance(events, dict) or not events.get("schedule"):
+        return False
+    jobs = workflow.get("jobs")
+    if not isinstance(jobs, dict):
+        return False
+    for job in jobs.values():
+        if not isinstance(job, dict) or "if" in job:
+            continue
+        steps = job.get("steps", [])
+        if not isinstance(steps, list):
+            continue
+        for step in steps:
+            if not isinstance(step, dict) or "if" in step:
+                continue
+            command = step.get("run")
+            if not isinstance(command, str) or not re.fullmatch(
+                    r"npx[ \t]+--yes[ \t]+renovate@\d+\.\d+\.\d+", command.strip()):
+                continue
+            env: dict = {}
+            for scope in (workflow, job, step):
+                if isinstance(scope.get("env"), dict):
+                    env.update(scope["env"])
+            if env.get("RENOVATE_PLATFORM") != "github" or env.get("RENOVATE_REPOSITORIES") \
+                    != f"policy-as-versioned-{lift.adopter}/{lift.adopter}":
+                continue
+            try:
+                force = json.loads(env.get("RENOVATE_FORCE", ""))
+            except (TypeError, ValueError):
+                continue
+            if isinstance(force, dict) and set(force) == {"enabled"} and force["enabled"] is True:
+                return True
+    return False
+
+
 def grade_renovate(lift: Lift, adopter_dir: Path) -> list[str]:
     bad: list[str] = []
     path = adopter_dir / "renovate.json"
@@ -470,7 +521,7 @@ def grade_renovate(lift: Lift, adopter_dir: Path) -> list[str]:
         return [f"{lift.adopter} has no renovate.json, so nothing bumps {lift.app}'s stack"]
     cfg = json.loads(path.read_text())
     if lift.source_repository:
-        if cfg.get("enabled") is False:
+        if cfg.get("enabled") is False and not scheduled_renovate_enables_repository(lift, adopter_dir):
             return [f"{lift.adopter}/renovate.json disables Renovate, so no image digest is bumped"]
         managers = cfg.get("enabledManagers")
         native = (managers is None or "kubernetes" in managers) and \
