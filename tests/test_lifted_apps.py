@@ -375,6 +375,71 @@ def test_a_served_file_the_kustomization_does_not_list_fails(tmp_path):
     assert "not listed in gitops/apps/kustomization.yaml" in report.text()
 
 
+def _self_hosted_image_bump(tmp_path):
+    """The deployed pattern: hosted bot off, scheduled image manager forced on."""
+    lift = lifted_apps.load_register(REGISTER)[1]
+    (tmp_path / lift.served).parent.mkdir(parents=True)
+    (tmp_path / lift.served).write_text(f"image: {lift.image}\n")
+    config = {"enabled": False, "enabledManagers": ["custom.regex"], "customManagers": [{
+        "customType": "regex", "datasourceTemplate": "docker",
+        "managerFilePatterns": ["/^gitops/apps/.*\\.yaml$/"],
+        "matchStrings": [r"(?<depName>ghcr.io/[^:\s]+):(?<currentValue>v[\d.]+)@(?<currentDigest>sha256:[a-f0-9]+)"],
+    }]}
+    (tmp_path / "renovate.json").write_text(json.dumps(config))
+    workflow = {
+        "on": {"schedule": [{"cron": "11 6 * * *"}]},
+        "jobs": {"renovate": {"runs-on": "ubuntu-latest", "steps": [{
+            "env": {"RENOVATE_FORCE": '{"enabled": true}', "RENOVATE_PLATFORM": "github",
+                    "RENOVATE_REPOSITORIES": "policy-as-versioned-driftwood/driftwood"},
+            "run": "npx --yes renovate@44.37.1",
+        }]}},
+    }
+    path = tmp_path / ".github/workflows/renovate-run.yml"
+    path.parent.mkdir(parents=True)
+    path.write_text(yaml.safe_dump(workflow))
+    return lift, config, workflow, path
+
+
+def test_scheduled_runner_force_enables_transferred_image_manager(tmp_path):
+    lift, _, _, _ = _self_hosted_image_bump(tmp_path)
+    assert lifted_apps.grade_renovate(lift, tmp_path) == []
+
+
+@pytest.mark.parametrize("mutation", [
+    "no_schedule", "wrong_repository", "comment_only", "force_other_step", "disabled_job",
+    "disabled_step", "force_false", "force_string", "malformed_force", "manager_disabled", "split_command",
+])
+def test_disabled_hosted_bot_needs_a_real_enabled_scheduled_image_runner(tmp_path, mutation):
+    lift, config, workflow, path = _self_hosted_image_bump(tmp_path)
+    job = workflow["jobs"]["renovate"]
+    step = job["steps"][0]
+    if mutation == "no_schedule":
+        workflow["on"] = {"workflow_dispatch": {}}
+    elif mutation == "wrong_repository":
+        step["env"]["RENOVATE_REPOSITORIES"] = "policy-as-versioned-tuppence/tuppence"
+    elif mutation == "comment_only":
+        step["run"] = "# npx --yes renovate@44.37.1"
+    elif mutation == "split_command":
+        step["run"] = "npx\n--yes renovate@44.37.1"
+    elif mutation == "force_other_step":
+        job["steps"].append({"run": "echo unrelated", "env": step.pop("env")})
+    elif mutation == "disabled_job":
+        job["if"] = False
+    elif mutation == "disabled_step":
+        step["if"] = False
+    elif mutation == "force_false":
+        step["env"]["RENOVATE_FORCE"] = '{"enabled": false}'
+    elif mutation == "force_string":
+        step["env"]["RENOVATE_FORCE"] = '{"enabled": "true"}'
+    elif mutation == "malformed_force":
+        step["env"]["RENOVATE_FORCE"] = '{"enabled":'
+    elif mutation == "manager_disabled":
+        config["customManagers"][0]["enabled"] = False
+        (tmp_path / "renovate.json").write_text(json.dumps(config))
+    path.write_text(yaml.safe_dump(workflow))
+    assert lifted_apps.grade_renovate(lift, tmp_path)
+
+
 # --------------------------------------------------------------------------- 3. the path is read
 
 def test_a_flux_path_that_is_not_the_directory_the_check_reads_fails_by_name(tmp_path):
