@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-10-05T09:27Z run=382 hub=b5b25af9 enact=development units=[driftwood=bb69957@main feeds=8c84a66@fx/v2.0.0 ico=abcb3a8@main insurer=5d1a7cd@main ludlow=9f76b2a@main nist=f83126f@main platform=f0e7ec6@main tuppence=e522c9c@main] pass=107 [observed=39 self=54 simulated=4 meta=10] fail=3 skip=25 [never=10 waits=15] excluded=8 total=143 ceiling=124
+# TRUTH 2026-10-05T13:17Z run=383 hub=b5b25af9 enact=development units=[driftwood=bb69957@main feeds=8c84a66@fx/v2.0.0 ico=abcb3a8@main insurer=5d1a7cd@main ludlow=9f76b2a@main nist=f83126f@main platform=f0e7ec6@main tuppence=e522c9c@main] pass=107 [observed=39 self=54 simulated=4 meta=10] fail=3 skip=25 [never=10 waits=15] excluded=8 total=143 ceiling=124
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      acceptance record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -129,7 +129,7 @@ verify/refusal-by-another-name/verify-refusal-by-another-name.sh	PASS	PASS: ever
 verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Renovate raised threat-register v1 -> v2, Chris Nesbitt-Smith merged it, and party.yaml and composed/ moved together -- step 2 happened for
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
-verify/schedules/verify-schedules.sh	FAIL	FAIL: 4 schedule/cage check(s) observed false: driftwood/propose-tier.yml feeds/fetch.yml insurer/fetch.yml platform/fetch.yml
+verify/schedules/verify-schedules.sh	FAIL	FAIL: 2 schedule/cage check(s) observed false: feeds/fetch.yml insurer/fetch.yml
 verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=bb69957 ludlow=9f76b2a tuppence=e522c9c]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
 verify/served-workloads/verify-served-workloads.sh	SKIP	SKIP: no scheduled workload sample has landed for the registered instrument
 verify/supersede/verify-supersede.sh	PASS	PASS: every adopter feed pin at its served commit is either at the newest major its publisher's real remote carries a tag for, or priced as behind by a supersed
