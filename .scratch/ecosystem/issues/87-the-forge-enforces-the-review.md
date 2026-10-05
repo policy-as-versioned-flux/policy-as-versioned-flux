@@ -333,3 +333,18 @@ the owner creates a push identity a ruleset can let through.
 on eight of the nine orgs (driftwood, tuppence, ludlow, flux, platform, feeds, ico, insurer). Only
 the nist installation lacks it. Ticket 30 also decided (ADR-0031) that the push identity this
 ticket waits on serves writer jobs only: the twin code runs in a read-only job and never holds it.
+
+## Hub delivery after review enforcement, 2026-10-05 (delegated, ADR-0025)
+
+Official ruleset history records required review added to 23950610 on October 4 at
+13:26:23.172Z; saved deployment receipts describe completing review protection.
+The declaration now reflects that live one-review/no-bypass rule. The old direct-push
+clock compromise above is historical. Run 386 proves its hub transport must change:
+GH013 refuses its original signed observation, even with main up to date.
+
+The hub now proposes a pending observation PR and uses the existing separate App
+reviewer for ordinary delivery, with the exact original clock signature preserved,
+no bypass and no declaration writes. Main remains reviewed and citable; pending is
+not recorded. ADR-0024's October 5 amendment records the bounded change. Other clock
+and release writers require independent diagnosis; this hub repair neither removes
+their review rule nor claims that their delivery now succeeds.

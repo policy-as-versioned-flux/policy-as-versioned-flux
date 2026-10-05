@@ -189,7 +189,7 @@ def test_the_committed_declarations_are_what_the_check_demands(fr):
     assert fr.REVIEW_RULES <= types("main-is-reviewed")
     assert fr.REVIEW_RULES | {"creation"} <= types("release-branches-are-reviewed")
     assert fr.TAG_RULES <= types("release-tags-hold")
-    assert fr.FLOOR_RULES <= types("main-keeps-its-history")
+    assert fr.REVIEW_RULES <= types("main-keeps-its-history")
     assert all(x["bypass_actors"] == [] for x in decl.values())
 
 
