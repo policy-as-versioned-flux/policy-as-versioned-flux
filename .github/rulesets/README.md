@@ -66,13 +66,17 @@ delivery stays pending for a human; no ambient mode override reopens it.
 The existing App private key is an environment secret named `PAVC_OTHER_HAND_PRIVATE_KEY`
 in `truth-delivery`, restricted to the current default branch (`main` at deployment). A
 read-only validation step runs before the step that reads it. The minted token is scoped
-to this hub repository, contents and PR writes, and Actions reads; it has no bypass or
-administration authority. GitHub grants those writes across this hub, so the trusted
+to this hub repository and contents/PR writes. A separate read-only job token reads
+official metadata, including the exact Actions attempt; the existing App has no Actions
+grant. The writer has no bypass or administration authority. GitHub grants its writes
+across this hub, so the trusted
 controller enforces the observation paths and exact PR; the token has no path-specific
 permission. The key itself still belongs to the existing multi-org App.
 No repository secret, gate credential, pending checkout or new identity is introduced.
 If the default branch is renamed, update the environment's allowed branch as well.
 
-The workflow may be dispatched with a completed run id and exact attempt to retry a failed delivery. It
+The workflow may be dispatched with a completed run id and exact attempt to retry a failed delivery.
+Before either mutation it refreshes default-branch authority. Any source change since the
+trusted checkout leaves delivery pending for retry; stale mode records cannot authorize it. It
 refuses a changed head or conflict and never reports recorded until the exact clock object
 and line are on main. Pending refs retain the conservation check's failure until delivery.

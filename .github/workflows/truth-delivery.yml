@@ -69,6 +69,7 @@ jobs:
       - name: review and deliver with the separate identity
         env:
           PAVC_OTHER_HAND_PRIVATE_KEY: ${{ secrets.PAVC_OTHER_HAND_PRIVATE_KEY }}
+          TRUTH_READ_TOKEN: ${{ github.token }}
           TRUTH_RUN_ID: ${{ github.event.workflow_run.id || inputs.run_id }}
           TRUTH_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt || inputs.attempt }}
         run: |
@@ -94,7 +95,7 @@ jobs:
               installation = installation_for_org(jwt, "policy-as-versioned-flux")
               scoped = _http("POST", f"/app/installations/{installation}/access_tokens", jwt, {
                   "repositories": ["policy-as-versioned-flux"],
-                  "permissions": {"contents": "write", "pull_requests": "write", "actions": "read"},
+                  "permissions": {"contents": "write", "pull_requests": "write"},
               })
               os.environ["GH_TOKEN"] = str(scoped["token"])
               # Mask before any subprocess receives the token; never persist it.

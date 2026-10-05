@@ -451,6 +451,9 @@ a GitHub Verified merge badge is not substituted for the gitsign check.
 
 The existing App key is confined to a default-branch-restricted reviewer environment,
 absent from gate and branch jobs. Read-only validation precedes credential use; its
-installation token is narrowed to this hub and the required permissions. No new
-identity is created. A conflict, changed head, failed verification or missing record
+installation token is narrowed to this hub and contents/PR writes; a separate read-only
+job token reads official metadata. The existing App has no Actions grant. Before
+either mutation, a changed default-branch source invalidates the trusted checkout and
+leaves delivery pending for retry. No new identity is created. A conflict, changed head,
+failed verification or missing record
 stays pending and red. Only verified main ancestry and exact line permit RECORDED.

@@ -51,13 +51,20 @@ def sha(value: Any) -> str:
 
 
 def github_api(method: str, path: str, body: dict[str, Any] | None = None) -> Any:
-    """Capture subprocess output without exposing tokens, headers or error bodies."""
+    """Keep read-only Actions facts separate from the existing App's write rights."""
     command = ["gh", "api", "--method", method, path]
     if body is not None:
         command.extend(["--input", "-"])
+    env = {k: v for k, v in os.environ.items()
+           if k not in {"GH_TOKEN", "GITHUB_TOKEN", "TRUTH_READ_TOKEN"}}
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if method == "GET" and path.lstrip("/") != "installation":
+        token = os.environ.get("TRUTH_READ_TOKEN") or token
+    if token:
+        env["GH_TOKEN"] = token
     try:
         result = subprocess.run(command, input=None if body is None else json.dumps(body),
-                                text=True, capture_output=True, timeout=60)
+                                text=True, capture_output=True, timeout=60, env=env)
         require(result.returncode == 0, f"GitHub API {method} failed; delivery remains pending")
         return json.loads(result.stdout)
     except (OSError, subprocess.TimeoutExpired, json.JSONDecodeError) as error:
@@ -68,7 +75,7 @@ def git(root: Path, *args: str, check: bool = True) -> str:
     # Fetches of this public repository need no reviewer credential. Neither the
     # App token nor a pending object's configuration is handed to Git children.
     env = {k: v for k, v in os.environ.items()
-           if k not in {"GH_TOKEN", "GITHUB_TOKEN", "GIT_ASKPASS", "SSH_ASKPASS"}}
+           if k not in {"GH_TOKEN", "GITHUB_TOKEN", "TRUTH_READ_TOKEN", "GIT_ASKPASS", "SSH_ASKPASS"}}
     env["GIT_TERMINAL_PROMPT"] = "0"
     try:
         result = subprocess.run(["git", "-c", "credential.helper=", "-c", "core.hooksPath=" + os.devnull,
@@ -93,6 +100,16 @@ def window(root: Path, today: dt.date) -> None:
             "recorded development window is invalid or expired; observation remains pending")
 
 
+def authority(root: Path, default: str, today: dt.date | None) -> None:
+    """A moved default tip needs a fresh trusted checkout, never pending code execution."""
+    git(root, "check-ref-format", f"refs/heads/{default}")
+    git(root, "fetch", "--no-tags", "origin", f"refs/heads/{default}:refs/remotes/origin/{default}")
+    require(git(root, "rev-parse", "HEAD").strip()
+            == git(root, "rev-parse", f"refs/remotes/origin/{default}").strip(),
+            "trusted checkout is behind current default authority; retry pending delivery from a fresh checkout")
+    window(root, today or dt.datetime.now(dt.timezone.utc).date())
+
+
 def verify_signature(root: Path, head: str, run: dict[str, Any], default: str) -> None:
     command = ["gitsign", "verify", head,
                f"--certificate-identity=https://github.com/{REPOSITORY}/{WORKFLOW}@refs/heads/{default}",
@@ -102,7 +119,8 @@ def verify_signature(root: Path, head: str, run: dict[str, Any], default: str) -
                f"--certificate-github-workflow-ref=refs/heads/{default}",
                f"--certificate-github-workflow-trigger={run['event']}"]
     try:
-        env = {k: v for k, v in os.environ.items() if k not in {"GH_TOKEN", "GITHUB_TOKEN"}}
+        env = {k: v for k, v in os.environ.items()
+               if k not in {"GH_TOKEN", "GITHUB_TOKEN", "TRUTH_READ_TOKEN"}}
         result = subprocess.run(command, cwd=root, capture_output=True, timeout=120, env=env)
         require(result.returncode == 0, "original observation signature or certificate claims failed")
     except (OSError, subprocess.TimeoutExpired) as error:
@@ -209,11 +227,10 @@ def recorded(root: Path, pr: dict[str, Any], head: str, line: str, default: str)
 
 def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier = verify_signature,
             today: dt.date | None = None, check_only: bool = False, attempt: int = 1) -> str:
-    now = today or dt.datetime.now(dt.timezone.utc).date()
     positive(run_id, "run id")
     positive(attempt, "run attempt")
-    window(root, now)
     run, default, branch = facts(api, run_id, attempt)
+    authority(root, default, today)
     query = urlencode({"state": "all", "head": REPOSITORY.split("/")[0] + ":" + branch,
                        "base": default, "per_page": 100})
     prs = api("GET", f"repos/{REPOSITORY}/pulls?{query}", None)
@@ -232,19 +249,20 @@ def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier 
     if fresh.get("merged") is True:
         return recorded(root, fresh, head, line, default)
     if check_only:
+        authority(root, default, today)
         return f"VERIFIED original observation {head}; PR #{pr['number']} remains pending review"
     installation = api("GET", "installation", None)
     require(installation.get("app_id") == APP_ID, "review credential is not the existing other-hand App")
-    window(root, today or dt.datetime.now(dt.timezone.utc).date())
     fresh = api("GET", endpoint, None)
     validate_pr(fresh, default, branch, head)
+    authority(root, default, today)
     review = api("POST", endpoint + "/reviews", {"commit_id": head, "event": "APPROVE",
         "body": "Verified original signed TRUTH observation and protected delivery."})
     require(review.get("state") == "APPROVED" and review.get("commit_id") == head,
             "other-hand review did not approve the original observation head")
     fresh = api("GET", endpoint, None)
     validate_pr(fresh, default, branch, head)
-    window(root, today or dt.datetime.now(dt.timezone.utc).date())
+    authority(root, default, today)
     merged = api("PUT", endpoint + "/merge", {"sha": head, "merge_method": "merge"})
     require(merged.get("merged") is True, "ordinary merge was refused; original observation remains pending")
     fresh = api("GET", endpoint, None)

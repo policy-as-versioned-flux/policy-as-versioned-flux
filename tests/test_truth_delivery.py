@@ -164,6 +164,9 @@ def test_protected_delivery_retains_original_observation_on_red_clock(delivery, 
     assert api.run["conclusion"] == "failure"
     count = len([c for c in api.calls if c[0] != "GET"])
     git(remote, "update-ref", "-d", "refs/heads/observations/truth/100-2")
+    # A later controller invocation starts from a fresh trusted default checkout.
+    git(root, "fetch", "origin", "main")
+    git(root, "merge", "--ff-only", "origin/main")
     assert invoke(delivery, estate).startswith("RECORDED")
     assert len([c for c in api.calls if c[0] != "GET"]) == count
 
@@ -331,3 +334,71 @@ def test_official_attempt_must_match_the_completed_event(delivery, estate):
         delivery.deliver(estate[0], 100, attempt=1, api=estate[2],
                          verify=lambda *args: None, today=TODAY)
     assert all(call[0] == "GET" for call in estate[2].calls)
+
+
+def advance_reviewed_authority(estate):
+    """Move the actual fixture remote's main; leave the controller checkout untouched."""
+    root, remote, _, _, _ = estate
+    update = root.parent / "reviewed-authority-update"
+    subprocess.run(["git", "clone", "-q", str(remote), str(update)], check=True, capture_output=True)
+    git(update, "config", "commit.gpgsign", "false")
+    git(update, "config", "core.hooksPath", os.devnull)
+    git(update, "config", "user.name", "fixture source reviewer")
+    git(update, "config", "user.email", "source-reviewer@example.invalid")
+    (update / "twin/ENACT_MODE").write_text("operations\n")
+    record = update / "twin/ENACT_MODE.why"
+    record.write_text(record.read_text().replace("mode: development", "mode: operations"))
+    git(update, "add", "twin/ENACT_MODE", "twin/ENACT_MODE.why")
+    git(update, "commit", "-qm", "Reviewed authority changed to operations")
+    (remote / "reviewed-head").write_text(git(update, "rev-parse", "HEAD"))
+    git(update, "push", "-q", "origin", "main")
+
+
+def test_remote_authority_changes_after_metadata_prevent_approval(delivery, estate):
+    api = estate[2]
+    def changed(method, path, body=None):
+        value = api(method, path, body)
+        if path == "installation":
+            advance_reviewed_authority(estate)
+        return value
+    with pytest.raises(delivery.Refusal, match="trusted checkout"):
+        delivery.deliver(estate[0], 100, attempt=2, api=changed,
+                         verify=lambda *args: None, today=TODAY)
+    assert not api.approved
+    assert not any(call[0] == "PUT" for call in api.calls)
+
+
+def test_remote_authority_changes_after_approval_prevent_merge(delivery, estate):
+    api = estate[2]
+    def changed(method, path, body=None):
+        value = api(method, path, body)
+        if path.endswith("/reviews"):
+            advance_reviewed_authority(estate)
+        return value
+    with pytest.raises(delivery.Refusal, match="trusted checkout"):
+        delivery.deliver(estate[0], 100, attempt=2, api=changed,
+                         verify=lambda *args: None, today=TODAY)
+    assert api.approved
+    assert not any(call[0] == "PUT" for call in api.calls)
+
+
+@pytest.mark.parametrize("method,path,expected", [
+    ("GET", f"repos/{REPO}/actions/runs/100/attempts/2", "fixture-reader"),
+    ("GET", f"repos/{REPO}/pulls/4", "fixture-reader"),
+    ("GET", "installation", "fixture-app"),
+    ("POST", f"repos/{REPO}/pulls/4/reviews", "fixture-app"),
+    ("PUT", f"repos/{REPO}/pulls/4/merge", "fixture-app"),
+])
+def test_api_transport_isolates_reader_and_writer_tokens(delivery, monkeypatch, method, path, expected):
+    monkeypatch.setenv("GH_TOKEN", "fixture-app")
+    monkeypatch.setenv("TRUTH_READ_TOKEN", "fixture-reader")
+    monkeypatch.setenv("GITHUB_TOKEN", "fixture-ambient")
+    seen = []
+    def inspect(command, **kwargs):
+        seen.append(kwargs.get("env", {}))
+        return subprocess.CompletedProcess(command, 0, stdout="{}")
+    monkeypatch.setattr(delivery.subprocess, "run", inspect)
+    assert delivery.github_api(method, path, None) == {}
+    assert seen[0].get("GH_TOKEN") == expected
+    assert "TRUTH_READ_TOKEN" not in seen[0] and "GITHUB_TOKEN" not in seen[0]
+    assert set(seen[0].values()) & {"fixture-app", "fixture-reader", "fixture-ambient"} == {expected}
