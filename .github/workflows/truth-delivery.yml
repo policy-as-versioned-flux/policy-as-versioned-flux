@@ -1,0 +1,109 @@
+name: truth delivery
+
+# A separate, trusted reviewer. The clock proposes; this workflow preserves its
+# original signed commit through ordinary App review and a merge commit.
+on:
+  workflow_run:
+    workflows: [truth]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Completed default-branch TRUTH run to deliver or retry'
+        required: true
+        type: string
+      attempt:
+        description: 'Exact completed run attempt to preserve'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+# Each run retains its own pending opportunity. A repository-wide group would
+# silently cancel all but the newest queued delivery (ticket 104).
+concurrency:
+  group: truth-delivery-${{ github.event.workflow_run.id || inputs.run_id }}-${{ github.event.workflow_run.run_attempt || inputs.attempt }}
+  cancel-in-progress: false
+
+jobs:
+  review:
+    if: >-
+      github.ref_name == github.event.repository.default_branch &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.head_repository.full_name == github.repository &&
+        github.event.workflow_run.head_branch == github.event.repository.default_branch))
+    runs-on: ubuntu-latest
+    # The existing App key is available only in this main-restricted environment.
+    # No pending ref, artifact or other estate checkout is executed in this job.
+    environment: truth-delivery
+    env:
+      GITSIGN_VERSION: 0.17.1
+      GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install 'pyyaml==6.0.3'
+      - name: install the signature verifier with its recorded checksum
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64" -o /tmp/gitsign
+          echo "${GITSIGN_SHA256}  /tmp/gitsign" | sha256sum -c -
+          sudo install /tmp/gitsign /usr/local/bin/gitsign
+      - name: verify pending delivery without the writer credential
+        # Validation below is repeated after this read-only preflight; neither
+        # a stale result nor a workflow_run branch name is authority to merge.
+        if: ${{ success() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TRUTH_RUN_ID: ${{ github.event.workflow_run.id || inputs.run_id }}
+          TRUTH_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt || inputs.attempt }}
+        run: python3 talk/truth_delivery.py --run-id "$TRUTH_RUN_ID" --attempt "$TRUTH_RUN_ATTEMPT" --check-only
+      - name: review and deliver with the separate identity
+        env:
+          PAVC_OTHER_HAND_PRIVATE_KEY: ${{ secrets.PAVC_OTHER_HAND_PRIVATE_KEY }}
+          TRUTH_RUN_ID: ${{ github.event.workflow_run.id || inputs.run_id }}
+          TRUTH_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt || inputs.attempt }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PYREVIEW'
+          import os
+          import subprocess
+          import tempfile
+          from pathlib import Path
+          from twin.other_hand import APP_ID, _http, app_jwt, installation_for_org
+
+          raw_key = os.environ.pop("PAVC_OTHER_HAND_PRIVATE_KEY")
+          if not raw_key:
+              raise SystemExit("TRUTH delivery is pending: reviewer environment has no App key")
+          key_file = None
+          try:
+              with tempfile.NamedTemporaryFile(mode="w", dir=os.environ["RUNNER_TEMP"], delete=False) as stream:
+                  key_file = Path(stream.name)
+                  stream.write(raw_key)
+              del raw_key
+              jwt = app_jwt(APP_ID, key_file)
+              print("::add-mask::" + jwt, flush=True)
+              installation = installation_for_org(jwt, "policy-as-versioned-flux")
+              scoped = _http("POST", f"/app/installations/{installation}/access_tokens", jwt, {
+                  "repositories": ["policy-as-versioned-flux"],
+                  "permissions": {"contents": "write", "pull_requests": "write", "actions": "read"},
+              })
+              os.environ["GH_TOKEN"] = str(scoped["token"])
+              # Mask before any subprocess receives the token; never persist it.
+              print("::add-mask::" + os.environ["GH_TOKEN"], flush=True)
+              del jwt
+          finally:
+              if key_file is not None:
+                  key_file.unlink(missing_ok=True)
+          result = subprocess.run(["python3", "talk/truth_delivery.py", "--run-id", os.environ["TRUTH_RUN_ID"],
+                                   "--attempt", os.environ["TRUTH_RUN_ATTEMPT"]])
+          raise SystemExit(result.returncode)
+          PYREVIEW

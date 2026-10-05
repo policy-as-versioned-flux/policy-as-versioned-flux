@@ -1,6 +1,6 @@
 """Ecosystem ticket 100: a branch run says what it can record, before it measures.
 
-Two seams, and this file is the pure one.
+Pure provenance checks and the protected-default Git delivery seam.
 
 `verify/can-record/can_record.py` holds three questions that are decidable from data:
 
@@ -12,11 +12,11 @@ Two seams, and this file is the pure one.
 3. **the extraction** -- can the fixture lift a step's own shell out of the workflow, and does it
    say out loud what it changed to run it off the runner.
 
-What is NOT here: whether the guard's verdict is TRUE of git. No amount of reading the YAML
-settles that. `verify/can-record/verify-can-record.sh` answers it by running the workflow's own
-shell over two throwaway repositories and comparing the guard's verdict with what the push
-actually does to the remote ref, in every case including the one that reproduces run 98's
-`! [rejected] (non-fast-forward)`.
+Reading YAML cannot settle whether delivery works. These tests and
+`verify/can-record/verify-can-record.sh` call the same actual-shell fixture: the default remote
+ref refuses direct writes; the clock can only open a pending PR; a separate exact-head review
+model makes a normal merge retaining its clock commit. Synthetic fixture signing and GitHub
+authorization limits are named rather than inferred from a green Git test.
 """
 from __future__ import annotations
 
@@ -79,6 +79,55 @@ def _repo(tmp_path: Path) -> Path:
 
 def test_the_committed_workflow_carries_the_shape() -> None:
     assert cr.shape_faults(_doc(), _text()) == []
+
+
+def test_protected_default_delivery_is_pending_until_review_then_preserves_clock_commit() -> None:
+    result = cr.delivery_fixture(WORKFLOW)
+    assert result.cage_rc == 0, result.shell_output
+    assert result.can_prepare == "yes" and result.pending_pr
+    assert result.default_unchanged_until_review
+    assert result.recorded_after_review and result.original_commit_preserved
+    assert "PENDING" in result.shell_output
+
+
+@pytest.mark.parametrize("case", ["main-behind", "renamed-default"])
+def test_protected_delivery_handles_current_default_and_its_name(case: str) -> None:
+    result = cr.delivery_fixture(WORKFLOW, case)
+    assert result.cage_rc == 0, result.shell_output
+    assert result.pending_pr and result.default_unchanged_until_review
+    assert result.recorded_after_review and result.original_commit_preserved
+
+
+def test_feature_measurement_commits_and_delivers_nothing() -> None:
+    result = cr.delivery_fixture(WORKFLOW, "feature")
+    assert result.can_prepare == "no" and result.cage_rc == 0, result.shell_output
+    assert not result.pending_pr and not result.observation_commit
+    assert result.default_unchanged_until_review and not result.recorded_after_review
+
+
+@pytest.mark.parametrize("case", ["forged-feature", "declaration"])
+def test_cage_rejects_nondefault_or_outside_lane_before_commit(case: str) -> None:
+    result = cr.delivery_fixture(WORKFLOW, case)
+    assert result.cage_rc != 0, result.shell_output
+    assert not result.pending_pr and not result.observation_commit
+    assert result.default_unchanged_until_review and not result.recorded_after_review
+
+
+@pytest.mark.parametrize("case", ["pr-refused", "delivery-collision"])
+def test_failed_delivery_cannot_claim_a_record_or_move_default(case: str) -> None:
+    result = cr.delivery_fixture(WORKFLOW, case)
+    assert result.cage_rc != 0, result.shell_output
+    assert not result.pending_pr and result.observation_commit
+    assert result.default_unchanged_until_review and not result.recorded_after_review
+    assert "PENDING observation delivery" not in result.shell_output
+
+
+@pytest.mark.parametrize("case, signal", [("shallow", "shallow"), ("empty-default", "default_branch")])
+def test_guard_refuses_when_it_cannot_identify_a_citable_measurement(case: str, signal: str) -> None:
+    result = cr.delivery_fixture(WORKFLOW, case)
+    assert result.cage_rc != 0 and result.can_prepare == "unknown", result.shell_output
+    assert signal in result.shell_output
+    assert not result.pending_pr and not result.observation_commit
 
 
 def test_a_gate_checkout_that_is_shallow_cannot_answer_the_question() -> None:
@@ -145,15 +194,15 @@ def test_a_cage_that_commits_before_it_consults_the_guard_is_a_fault() -> None:
 
 
 def test_a_force_push_anywhere_in_the_workflow_is_a_fault() -> None:
-    text = _text().replace('push origin HEAD:"${GITHUB_REF_NAME}"',
-                           'push --force origin HEAD:"${GITHUB_REF_NAME}"')
+    text = _text().replace('push origin HEAD:"${DELIVERY_BRANCH}"',
+                           'push --force origin HEAD:"${DELIVERY_BRANCH}"')
     faults = cr.shape_faults(_doc(), text)
     assert any("force" in f for f in faults), faults
 
 
 def test_a_plus_refspec_is_a_force_push_by_another_name() -> None:
-    text = _text().replace('push origin HEAD:"${GITHUB_REF_NAME}"',
-                           'push origin +HEAD:"${GITHUB_REF_NAME}"')
+    text = _text().replace('push origin HEAD:"${DELIVERY_BRANCH}"',
+                           'push origin +HEAD:"${DELIVERY_BRANCH}"')
     faults = cr.shape_faults(_doc(), text)
     assert any("force" in f for f in faults), faults
 
@@ -162,9 +211,48 @@ def test_losing_the_one_allowed_refspec_is_a_fault() -> None:
     doc = _doc()
     for step in doc["jobs"]["gate"]["steps"]:
         if cr.CAGE_STEP in str(step.get("name", "")):
-            step["run"] = step["run"].replace('HEAD:"${GITHUB_REF_NAME}"', "HEAD:main")
+            step["run"] = step["run"].replace('HEAD:"${DELIVERY_BRANCH}"', "HEAD:main")
     faults = cr.shape_faults(doc, _text())
     assert any("refspec" in f for f in faults), faults
+
+
+@pytest.mark.parametrize("before, after, signal", [
+    ('observations/truth/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}', 'observations/truth/latest', "unique"),
+    ('--base "${DEFAULT_BRANCH}"', '--base main', "pending observation PR"),
+    ('--head "${DELIVERY_BRANCH}"', '--head main', "pending observation PR"),
+    ('"${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}"', '"${GITHUB_REF_NAME}" != "main"', "non-default ref"),
+])
+def test_delivery_shape_cannot_lose_its_bound_ref_or_default_check(before, after, signal) -> None:
+    doc = _doc()
+    for step in doc["jobs"]["gate"]["steps"]:
+        if cr.CAGE_STEP in str(step.get("name", "")):
+            step["run"] = step["run"].replace(before, after)
+    assert any(signal in fault for fault in cr.shape_faults(doc, _text()))
+
+
+def test_clock_may_not_merge_its_own_pr() -> None:
+    doc = _doc()
+    for step in doc["jobs"]["gate"]["steps"]:
+        if cr.CAGE_STEP in str(step.get("name", "")):
+            step["run"] += '\ngh pr merge --merge\n'
+    assert any("own observation PR" in fault for fault in cr.shape_faults(doc, _text()))
+
+
+def test_clock_cannot_receive_the_independent_review_credential() -> None:
+    doc = _doc()
+    for step in doc["jobs"]["gate"]["steps"]:
+        if cr.CAGE_STEP in str(step.get("name", "")):
+            step["env"]["GH_TOKEN"] = "${{ secrets.REVIEW_TOKEN }}"
+    assert any("credential" in fault for fault in cr.shape_faults(doc, _text()))
+
+
+def test_clock_cannot_move_review_into_another_step_or_job_environment() -> None:
+    doc = _doc()
+    doc["jobs"]["gate"]["env"] = {"GH_TOKEN": "${{ secrets.REVIEW_TOKEN }}"}
+    doc["jobs"]["gate"]["steps"].append({"name": "approve myself", "run": "gh pr review --approve"})
+    faults = cr.shape_faults(doc, _text())
+    assert any("job environment" in fault for fault in faults)
+    assert any("another step" in fault for fault in faults)
 
 
 # -- 2. the record: who wrote each line of talk/truth.log ------------------------------------------
@@ -275,7 +363,7 @@ def test_stranded_entries_reads_the_refs_this_checkout_carries() -> None:
 def test_a_named_step_is_lifted_whole() -> None:
     shell = cr.step_shell(_doc(), "gate", cr.CAGE_STEP)
     assert "git reset -q" in shell
-    assert 'push origin HEAD:"${GITHUB_REF_NAME}"' in shell
+    assert 'push origin HEAD:"${DELIVERY_BRANCH}"' in shell
 
 
 def test_an_unknown_step_name_raises_rather_than_returning_empty_shell() -> None:
@@ -297,7 +385,7 @@ def test_every_substitution_the_fixture_makes_is_declared() -> None:
 
 def test_the_substitutions_leave_the_push_line_alone() -> None:
     shell, _ = cr.portable(cr.step_shell(_doc(), "gate", cr.CAGE_STEP))
-    assert 'push origin HEAD:"${GITHUB_REF_NAME}"' in shell
+    assert 'push origin HEAD:"${DELIVERY_BRANCH}"' in shell
 
 
 # -- 4. a legitimate repair grades clean; a hand-authored line still does not ---------------------
