@@ -1,6 +1,7 @@
-PASS: the sweep step under `bash -e` on a fresh copy exits 0 and writes moved=false, swept_at=2026-10-04T11:19:17Z
-FAIL: the sweep step under `bash -e` on a stale feed exits 0 and writes moved=false, swept_at=2026-10-04T11:19:17Z -- wanted exit 0 and moved=true; step said: ok  twin/forward-intel/v2/feed.json is byte-identical to a fresh render of the overlay | ok  twin/signals.yaml: every pin on party.yaml resolves to its row at the pinned version
-PASS: the sweep step under `bash -e` on a stale signal lookup exits 0 and writes moved=true, swept_at=2026-10-04T11:19:18Z
+PASS: the sweep step under `bash -e` on a fresh copy exits 0 and writes moved=false, swept_at=2026-10-05T17:43:07Z
+PASS: the sweep step under `bash -e` on a stale feed exits 0 and writes moved=true, swept_at=2026-10-05T17:43:07Z
+PASS: the sweep step under `bash -e` on a stale signal lookup exits 0 and writes moved=true, swept_at=2026-10-05T17:43:08Z
+PASS: the sweep step under `bash -e` on a stale retained v1 feed exits 0 and writes moved=false, swept_at=2026-10-05T17:43:09Z
 SKIP: the moved path has not fired live yet: observations/twin-sweep.jsonl carries no line with "moved": true (the step is proven offline above; the live firing is the half only the clock can supply, once the overlay or a pin moves under it)
-TOTAL: 2 pass, 1 fail, 1 could-not-look
-FAIL: 1 twin-sweep moved-path check(s) observed false
+TOTAL: 4 pass, 0 fail, 1 could-not-look
+SKIP: the moved path has not fired live yet: observations/twin-sweep.jsonl carries no line with "moved": true (the step is proven offline above; the live firing is the half only the clock can supply, once the overlay or a pin moves under it)
