@@ -33,6 +33,9 @@ What it observes, per adopter, on `.estate-clone/<adopter>/composed/evidence.jso
      selection-policy/VERSION (falling back to driftwood's, the estate's published package);
   8. the curve hash the estate recorded equals the one the adopter's OWN selection-policy
      package computes over the curve its own published feed carries;
+  8b. the twin entry names the platform reduction table, its annualised residuals re-derive
+      from that table and its own amount, and its tier/version re-derive through its OWN policy;
+      per-shock cost minima may differ and are reported without selecting a tier;
   9. the adopter's OWN selection-policy package and platform/graded/cage.py pick the SAME rung
      over the same residuals — at each band boundary, and with every rung tried as a floor;
  10. the FX bridge resolves a published rate through the fx publisher's OWN converter, and
@@ -1006,21 +1009,14 @@ def check_curve_agreement(estate, parties):
 
 
 def check_residual_basis(estate, parties):
-    """WHOSE reduction set priced the twin entry, and do the two disagree about the rung?
+    """Re-derive the annualised residuals and the tier attributed to the adopter policy.
 
-    The residuals on a `source: twin` entry are `ale * (1 - reduce)` off `platform/graded/cage.py`,
-    a table that flags itself as calibration knobs evidenced by nothing. The adopter publishes its
-    OWN graded response curve, and driftwood's is materially different -- mode reductions of
-    0.05/0.30/0.65/0.90 against the table's 0.30/0.70/0.92/0.98. The rung came out the same, but
-    the sentence the entry carried about WHY was only true of a table the adopter did not author.
-
-    Two things, both observations:
-      1. the entry NAMES the reduction set that priced it (`residual_basis`);
-      2. the table and the adopter's own published curve still agree about which rung is cheapest.
-         That is what the selection actually turns on, and it is checkable from the published
-         payload -- the per-rung reduction is not, because the curve publishes one figure per rung
-         (`net_cost_of_risk = impact * (1 - reduction) + cost`) and two unknowns behind it.
-         When they stop agreeing, this goes red instead of the divergence staying silent.
+    ADR-0021 gives the twin a per-shock trade-off curve and gives the estate
+    annualisation. The policy selects the loosest residual within appetite, not
+    the cheapest net_cost_of_risk. The two reduction sets may differ: the entry
+    must name the platform table it used, reproduce that table's residuals, and
+    record the tier and version its own policy actually returns. Per-shock cost
+    minima are reported separately; neither is a selection rule.
     """
     sys.path.insert(0, os.path.join(estate, "platform", "graded"))
     try:
@@ -1029,6 +1025,7 @@ def check_residual_basis(estate, parties):
         out("SKIP", f"platform/graded/cage.py could not be imported ({exc}), so the reduction set "
                     f"the twin entries were priced with cannot be read")
         return
+    expected_basis = f"platform-cage-tiers@{cage.TABLE_VERSION}"
     for name, doc in sorted(parties.items()):
         feed = _forward_intel_feed(estate, name, doc)
         ev = os.path.join(estate, name, "composed", "evidence.json")
@@ -1044,11 +1041,51 @@ def check_residual_basis(estate, parties):
             continue
         if not twins:
             continue                     # check 3 already graded the missing twin edge
-        unnamed = [e for e in twins if not e.get("residual_basis")]
-        out("FAIL" if unnamed else "PASS",
+        wrong_basis = [e.get("residual_basis") for e in twins
+                       if e.get("residual_basis") != expected_basis]
+        out("FAIL" if wrong_basis else "PASS",
             f"{name}: the twin entry names the reduction set its residuals came from"
-            + (" -- it does not, so a reader attributes them to the adopter's own published curve"
-               if unnamed else f" ({twins[0]['residual_basis']})"))
+            + (f" -- expected {expected_basis}, got {wrong_basis!r}"
+               if wrong_basis else f" ({expected_basis})"))
+
+        for entry in twins:
+            try:
+                amount = amount_of(entry)
+                residuals = entry.get("residuals")
+                if amount is None or not math.isfinite(amount) or amount < 0:
+                    raise ValueError("no finite non-negative annualised amount on the twin entry")
+                if not isinstance(residuals, dict):
+                    raise ValueError("no residual mapping on the twin entry")
+                if any(not isinstance(r, (int, float)) or isinstance(r, bool)
+                       or not math.isfinite(r) or r < 0 for r in residuals.values()):
+                    raise ValueError("residuals must be finite non-negative numbers")
+                if set(residuals) != set(cage.ORDER) or any(
+                        not close(float(residuals[t]), cage.caged_residual(amount, t))
+                        for t in cage.ORDER):
+                    raise ValueError(f"residuals do not re-derive from {expected_basis} and "
+                                     f"the entry's annualised amount {amount}")
+                pkg = os.path.join(estate, name, POLICY_PACKAGE, "selection_policy.py")
+                spec = importlib.util.spec_from_file_location(f"_sp_basis_{name}", pkg)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                picked = mod.select(
+                    {t: {"amount": r, "currency": entry["currency"]}
+                     for t, r in residuals.items()},
+                    doc["appetite"]["tolerance"], (doc.get("overlay") or {}).get("floor"))
+                if (entry.get("proposed_tier") != picked["tier"]
+                        or entry.get("policy_version") != picked["policy_version"]):
+                    raise ValueError(
+                        f"recorded tier/version {entry.get('proposed_tier')!r}/"
+                        f"{entry.get('policy_version')!r}, but its own policy returns "
+                        f"{picked['tier']!r}/{picked['policy_version']!r}")
+            except Exception as exc:                            # noqa: BLE001 -- an observation, not a crash
+                out("FAIL", f"{name}: could not re-derive the twin entry's annualised residuals "
+                            f"and attributed policy selection: {exc}")
+            else:
+                out("PASS", f"{name}: the twin entry's residuals re-derive from {expected_basis} "
+                            f"and its annualised amount; its own policy {picked['policy_version']} "
+                            f"selects the recorded rung {picked['tier']!r} against its signed "
+                            f"appetite and floor")
 
         curve = {str(c.get("account")): c.get("net_cost_of_risk") for c in payload.get("curve") or []}
         lm = payload.get("lm") or []
@@ -1066,15 +1103,10 @@ def check_residual_basis(estate, parties):
         cheapest_table = min(table, key=lambda t: table[t])
         cheapest_curve = min(curve, key=lambda t: float(curve[t]))
         spread = max(abs(float(curve[t]) - table[t]) for t in table)
-        out("FAIL" if cheapest_table != cheapest_curve else "PASS",
-            f"{name}: platform's tier table and {name}'s own graded curve still pick the same "
-            f"rung as cheapest on the same shock ({cheapest_table}); they differ by up to "
-            f"{spread:,.0f} on the rungs themselves, which is why the entry names which set "
-            f"priced it"
-            + ("" if cheapest_table == cheapest_curve else
-               f" -- the table says {cheapest_table} and the adopter's own evidence says "
-               f"{cheapest_curve}, so the tier the entry attributes to the curve is not the tier "
-               f"the curve would pick"))
+        out("PASS", f"{name}: per-shock cost minima are {cheapest_table!r} under the platform "
+                    f"table and {cheapest_curve!r} under its own graded curve, differing by up "
+                    f"to {spread:,.0f} on the rungs; neither per-shock minimum selects the twin "
+                    f"entry's annualised tier, whose residual basis and policy are checked above")
 
 
 def check_engine_agreement(estate, parties):
