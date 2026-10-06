@@ -1,10 +1,10 @@
-note: driftwood: committed trust root sha256 6494e21ea73f, committed 2026-09-09 (25 days ago); newest log key starts 2025-09-23 (376 days ago); pins platform v5.0.0
-note: driftwood:   tlog https://rekor.sigstore.dev key c0d23d6ad406973f PKIX_ECDSA_P256_SHA_256: current since 2021-01-12 (2090 days)
-note: driftwood:   tlog https://log2025-1.rekor.sigstore.dev key cf1199155bddd051 PKIX_ED25519: current since 2025-09-23 (376 days)
-note: driftwood:   ctlog https://ctfe.sigstore.dev/test key 086092f02852ff68 PKIX_ECDSA_P256_SHA_256: retired 2022-10-31 (1433 days ago)
-note: driftwood:   ctlog https://ctfe.sigstore.dev/2022 key dd3d306ac6c71132 PKIX_ECDSA_P256_SHA_256: current since 2022-10-20 (1445 days)
-note: driftwood:   ca https://fulcio.sigstore.dev: retired 2022-12-31 (1372 days ago)
-note: driftwood:   ca https://fulcio.sigstore.dev: current since 2022-04-13 (1634 days)
+note: driftwood: committed trust root sha256 6494e21ea73f, committed 2026-09-09 (27 days ago); newest log key starts 2025-09-23 (378 days ago); pins platform v5.0.0
+note: driftwood:   tlog https://rekor.sigstore.dev key c0d23d6ad406973f PKIX_ECDSA_P256_SHA_256: current since 2021-01-12 (2093 days)
+note: driftwood:   tlog https://log2025-1.rekor.sigstore.dev key cf1199155bddd051 PKIX_ED25519: current since 2025-09-23 (378 days)
+note: driftwood:   ctlog https://ctfe.sigstore.dev/test key 086092f02852ff68 PKIX_ECDSA_P256_SHA_256: retired 2022-10-31 (1435 days ago)
+note: driftwood:   ctlog https://ctfe.sigstore.dev/2022 key dd3d306ac6c71132 PKIX_ECDSA_P256_SHA_256: current since 2022-10-20 (1447 days)
+note: driftwood:   ca https://fulcio.sigstore.dev: retired 2022-12-31 (1374 days ago)
+note: driftwood:   ca https://fulcio.sigstore.dev: current since 2022-04-13 (1636 days)
 ok: driftwood: policy 2.0.0 names ctlog dd3d306ac6c71132 at 2026-08-25T16:28:09+00:00; the committed root carries it (https://ctfe.sigstore.dev/2022), inside its window
 ok: driftwood: policy 2.0.0 names tlog c0d23d6ad406973f at 2026-08-25T16:28:10+00:00; the committed root carries it (https://rekor.sigstore.dev), inside its window
 ok: driftwood: policy 2.0.1 names ctlog dd3d306ac6c71132 at 2026-08-25T16:31:21+00:00; the committed root carries it (https://ctfe.sigstore.dev/2022), inside its window
@@ -19,13 +19,13 @@ ok: driftwood: policy 6.0.0 names ctlog dd3d306ac6c71132 at 2026-10-04T03:20:39+
 ok: driftwood: policy 6.0.0 names tlog c0d23d6ad406973f at 2026-10-04T03:20:40+00:00; the committed root carries it (https://rekor.sigstore.dev), inside its window
 ok: driftwood: policy 7.0.0 names ctlog dd3d306ac6c71132 at 2026-10-04T07:20:36+00:00; the committed root carries it (https://ctfe.sigstore.dev/2022), inside its window
 ok: driftwood: policy 7.0.0 names tlog c0d23d6ad406973f at 2026-10-04T07:20:37+00:00; the committed root carries it (https://rekor.sigstore.dev), inside its window
-note: ludlow: committed trust root sha256 6494e21ea73f, committed 2026-08-24 (41 days ago); newest log key starts 2025-09-23 (376 days ago); pins platform v5.0.0
-note: ludlow:   tlog https://rekor.sigstore.dev key c0d23d6ad406973f PKIX_ECDSA_P256_SHA_256: current since 2021-01-12 (2090 days)
-note: ludlow:   tlog https://log2025-1.rekor.sigstore.dev key cf1199155bddd051 PKIX_ED25519: current since 2025-09-23 (376 days)
-note: ludlow:   ctlog https://ctfe.sigstore.dev/test key 086092f02852ff68 PKIX_ECDSA_P256_SHA_256: retired 2022-10-31 (1433 days ago)
-note: ludlow:   ctlog https://ctfe.sigstore.dev/2022 key dd3d306ac6c71132 PKIX_ECDSA_P256_SHA_256: current since 2022-10-20 (1445 days)
-note: ludlow:   ca https://fulcio.sigstore.dev: retired 2022-12-31 (1372 days ago)
-note: ludlow:   ca https://fulcio.sigstore.dev: current since 2022-04-13 (1634 days)
+note: ludlow: committed trust root sha256 6494e21ea73f, committed 2026-08-24 (43 days ago); newest log key starts 2025-09-23 (378 days ago); pins platform v5.0.0
+note: ludlow:   tlog https://rekor.sigstore.dev key c0d23d6ad406973f PKIX_ECDSA_P256_SHA_256: current since 2021-01-12 (2093 days)
+note: ludlow:   tlog https://log2025-1.rekor.sigstore.dev key cf1199155bddd051 PKIX_ED25519: current since 2025-09-23 (378 days)
+note: ludlow:   ctlog https://ctfe.sigstore.dev/test key 086092f02852ff68 PKIX_ECDSA_P256_SHA_256: retired 2022-10-31 (1435 days ago)
+note: ludlow:   ctlog https://ctfe.sigstore.dev/2022 key dd3d306ac6c71132 PKIX_ECDSA_P256_SHA_256: current since 2022-10-20 (1447 days)
+note: ludlow:   ca https://fulcio.sigstore.dev: retired 2022-12-31 (1374 days ago)
+note: ludlow:   ca https://fulcio.sigstore.dev: current since 2022-04-13 (1636 days)
 ok: ludlow: policy 2.0.0 names ctlog dd3d306ac6c71132 at 2026-08-25T16:28:09+00:00; the committed root carries it (https://ctfe.sigstore.dev/2022), inside its window
 ok: ludlow: policy 2.0.0 names tlog c0d23d6ad406973f at 2026-08-25T16:28:10+00:00; the committed root carries it (https://rekor.sigstore.dev), inside its window
 ok: ludlow: policy 2.0.1 names ctlog dd3d306ac6c71132 at 2026-08-25T16:31:21+00:00; the committed root carries it (https://ctfe.sigstore.dev/2022), inside its window
@@ -40,13 +40,13 @@ ok: ludlow: policy 6.0.0 names ctlog dd3d306ac6c71132 at 2026-10-04T03:20:39+00:
 ok: ludlow: policy 6.0.0 names tlog c0d23d6ad406973f at 2026-10-04T03:20:40+00:00; the committed root carries it (https://rekor.sigstore.dev), inside its window
 ok: ludlow: policy 7.0.0 names ctlog dd3d306ac6c71132 at 2026-10-04T07:20:36+00:00; the committed root carries it (https://ctfe.sigstore.dev/2022), inside its window
 ok: ludlow: policy 7.0.0 names tlog c0d23d6ad406973f at 2026-10-04T07:20:37+00:00; the committed root carries it (https://rekor.sigstore.dev), inside its window
-note: tuppence: committed trust root sha256 6494e21ea73f, committed 2026-09-09 (25 days ago); newest log key starts 2025-09-23 (376 days ago); pins platform v5.0.0
-note: tuppence:   tlog https://rekor.sigstore.dev key c0d23d6ad406973f PKIX_ECDSA_P256_SHA_256: current since 2021-01-12 (2090 days)
-note: tuppence:   tlog https://log2025-1.rekor.sigstore.dev key cf1199155bddd051 PKIX_ED25519: current since 2025-09-23 (376 days)
-note: tuppence:   ctlog https://ctfe.sigstore.dev/test key 086092f02852ff68 PKIX_ECDSA_P256_SHA_256: retired 2022-10-31 (1433 days ago)
-note: tuppence:   ctlog https://ctfe.sigstore.dev/2022 key dd3d306ac6c71132 PKIX_ECDSA_P256_SHA_256: current since 2022-10-20 (1445 days)
-note: tuppence:   ca https://fulcio.sigstore.dev: retired 2022-12-31 (1372 days ago)
-note: tuppence:   ca https://fulcio.sigstore.dev: current since 2022-04-13 (1634 days)
+note: tuppence: committed trust root sha256 6494e21ea73f, committed 2026-09-09 (27 days ago); newest log key starts 2025-09-23 (378 days ago); pins platform v5.0.0
+note: tuppence:   tlog https://rekor.sigstore.dev key c0d23d6ad406973f PKIX_ECDSA_P256_SHA_256: current since 2021-01-12 (2093 days)
+note: tuppence:   tlog https://log2025-1.rekor.sigstore.dev key cf1199155bddd051 PKIX_ED25519: current since 2025-09-23 (378 days)
+note: tuppence:   ctlog https://ctfe.sigstore.dev/test key 086092f02852ff68 PKIX_ECDSA_P256_SHA_256: retired 2022-10-31 (1435 days ago)
+note: tuppence:   ctlog https://ctfe.sigstore.dev/2022 key dd3d306ac6c71132 PKIX_ECDSA_P256_SHA_256: current since 2022-10-20 (1447 days)
+note: tuppence:   ca https://fulcio.sigstore.dev: retired 2022-12-31 (1374 days ago)
+note: tuppence:   ca https://fulcio.sigstore.dev: current since 2022-04-13 (1636 days)
 ok: tuppence: policy 2.0.0 names ctlog dd3d306ac6c71132 at 2026-08-25T16:28:09+00:00; the committed root carries it (https://ctfe.sigstore.dev/2022), inside its window
 ok: tuppence: policy 2.0.0 names tlog c0d23d6ad406973f at 2026-08-25T16:28:10+00:00; the committed root carries it (https://rekor.sigstore.dev), inside its window
 ok: tuppence: policy 2.0.1 names ctlog dd3d306ac6c71132 at 2026-08-25T16:31:21+00:00; the committed root carries it (https://ctfe.sigstore.dev/2022), inside its window
