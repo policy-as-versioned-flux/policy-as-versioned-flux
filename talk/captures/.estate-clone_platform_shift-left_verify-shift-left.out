@@ -1139,20 +1139,20 @@ shift-left: fixtures/workload-flip.yaml would be denied somewhere in its support
 
 == no declared engine: every line is an unsupported pairing, and the check could not look ==
 fixtures/workload-compliant.yaml: targets 5.0.0, checking supported window ['5.0.0', '6.0.0']
-UNSUPPORTED PAIRING @ v5.0.0: no engine is declared (--engine-declaration /tmp/tmp.nP8gY9W6fP/absent.yaml carries no gitops/engine/kyverno.yaml); not run, so neither a compile error nor a pass
-UNSUPPORTED PAIRING @ v6.0.0: no engine is declared (--engine-declaration /tmp/tmp.nP8gY9W6fP/absent.yaml carries no gitops/engine/kyverno.yaml); not run, so neither a compile error nor a pass
+UNSUPPORTED PAIRING @ v5.0.0: no engine is declared (--engine-declaration /tmp/tmp.Cfj8zorRa8/absent.yaml carries no gitops/engine/kyverno.yaml); not run, so neither a compile error nor a pass
+UNSUPPORTED PAIRING @ v6.0.0: no engine is declared (--engine-declaration /tmp/tmp.Cfj8zorRa8/absent.yaml carries no gitops/engine/kyverno.yaml); not run, so neither a compile error nor a pass
 
 shift-left: COULD NOT LOOK -- fixtures/workload-compliant.yaml belongs to no declared engine, so no line in its window ['5.0.0', '6.0.0'] was run (hub ADR-0033 point 7)
 ok  no declaration (exit 3)
 
 == a declaration that does not read refuses by name ==
 fixtures/workload-compliant.yaml: targets 5.0.0, checking supported window ['5.0.0', '6.0.0']
-COULD NOT LOOK: gitops/engine/kyverno.yaml must carry exactly the keys ['cli', 'engine', 'install', 'schema', 'version'], not ['engine', 'schema', 'version'] (--engine-declaration /tmp/tmp.nP8gY9W6fP/bad.yaml); no line runs on an engine nobody can read
+COULD NOT LOOK: gitops/engine/kyverno.yaml must carry exactly the keys ['cli', 'engine', 'install', 'schema', 'version'], not ['engine', 'schema', 'version'] (--engine-declaration /tmp/tmp.Cfj8zorRa8/bad.yaml); no line runs on an engine nobody can read
 ok  a malformed declaration (exit 3)
 
 == the served target does not support the declared engine (1.19.1): named, not run, could not look ==
 fixtures/workload-compliant.yaml: targets 5.0.0, checking supported window ['5.0.0', '6.0.0']
-declared engine: kyverno 1.19.1 (read from /tmp/tmp.nP8gY9W6fP/decl-1.19.1.yaml, --engine-declaration /tmp/tmp.nP8gY9W6fP/decl-1.19.1.yaml)
+declared engine: kyverno 1.19.1 (read from /tmp/tmp.Cfj8zorRa8/decl-1.19.1.yaml, --engine-declaration /tmp/tmp.Cfj8zorRa8/decl-1.19.1.yaml)
 UNSUPPORTED PAIRING @ v5.0.0: kyverno 1.19.1 is not a supported engine of v5.0.0 (tested_engines ['1.18.2']); not run, so neither a compile error nor a pass
 UNSUPPORTED PAIRING @ v6.0.0: kyverno 1.19.1 is not a supported engine of v6.0.0 (tested_engines ['1.18.2']); not run, so neither a compile error nor a pass
 
@@ -1815,14 +1815,14 @@ ok  a neighbour with no tested_engines (exit 0)
 
 == a CLI that reports another version than the declared engine could not look ==
 fixtures/workload-compliant.yaml: targets 5.0.0, checking supported window ['4.0.0', '5.0.0']
-declared engine: kyverno 1.19.1 (read from /tmp/tmp.nP8gY9W6fP/decl-1.19.1.yaml, --engine-declaration /tmp/tmp.nP8gY9W6fP/decl-1.19.1.yaml)
+declared engine: kyverno 1.19.1 (read from /tmp/tmp.Cfj8zorRa8/decl-1.19.1.yaml, --engine-declaration /tmp/tmp.Cfj8zorRa8/decl-1.19.1.yaml)
 UNSUPPORTED PAIRING @ v4.0.0: kyverno 1.19.1 is not a supported engine of v4.0.0 (tested_engines ['1.18.2']); not run, so neither a compile error nor a pass
 COULD NOT LOOK: the kyverno CLI on PATH reports 1.18.2, and the declared engine is 1.19.1; a line run on another engine would measure a pairing nobody declared
 ok  a CLI of another version (exit 3)
 
 == an adopter's own repository declares the engine, and the check finds it with no flag ==
-/tmp/tmp.nP8gY9W6fP/adopter/deploy/pod.yaml: targets 5.0.0, checking supported window ['5.0.0', '6.0.0']
-declared engine: kyverno 1.18.2 (read from /tmp/tmp.nP8gY9W6fP/adopter/gitops/engine/kyverno.yaml, the top of adopter, the repository /tmp/tmp.nP8gY9W6fP/adopter/deploy/pod.yaml belongs to)
+/tmp/tmp.Cfj8zorRa8/adopter/deploy/pod.yaml: targets 5.0.0, checking supported window ['5.0.0', '6.0.0']
+declared engine: kyverno 1.18.2 (read from /tmp/tmp.Cfj8zorRa8/adopter/gitops/engine/kyverno.yaml, the top of adopter, the repository /tmp/tmp.Cfj8zorRa8/adopter/deploy/pod.yaml belongs to)
 --- kyverno apply @ v5.0.0 ---
 Applying 5 policy rule(s) to 1 resource(s)...
 
@@ -2464,13 +2464,13 @@ Generate:
 Generation completed successfully.
 pass: 7, fail: 0, warn: 0, error: 0, skip: 0
 
-shift-left: /tmp/tmp.nP8gY9W6fP/adopter/deploy/pod.yaml is compliant on kyverno 1.18.2 across the line(s) of its window that support it ['5.0.0', '6.0.0']
+shift-left: /tmp/tmp.Cfj8zorRa8/adopter/deploy/pod.yaml is compliant on kyverno 1.18.2 across the line(s) of its window that support it ['5.0.0', '6.0.0']
 ok  the declaration of the resource's own repository (exit 0)
-/tmp/tmp.nP8gY9W6fP/adopter/deploy/pod.yaml: targets 5.0.0, checking supported window ['5.0.0', '6.0.0']
-UNSUPPORTED PAIRING @ v5.0.0: no engine is declared (the top of adopter, the repository /tmp/tmp.nP8gY9W6fP/adopter/deploy/pod.yaml belongs to carries no gitops/engine/kyverno.yaml); not run, so neither a compile error nor a pass
-UNSUPPORTED PAIRING @ v6.0.0: no engine is declared (the top of adopter, the repository /tmp/tmp.nP8gY9W6fP/adopter/deploy/pod.yaml belongs to carries no gitops/engine/kyverno.yaml); not run, so neither a compile error nor a pass
+/tmp/tmp.Cfj8zorRa8/adopter/deploy/pod.yaml: targets 5.0.0, checking supported window ['5.0.0', '6.0.0']
+UNSUPPORTED PAIRING @ v5.0.0: no engine is declared (the top of adopter, the repository /tmp/tmp.Cfj8zorRa8/adopter/deploy/pod.yaml belongs to carries no gitops/engine/kyverno.yaml); not run, so neither a compile error nor a pass
+UNSUPPORTED PAIRING @ v6.0.0: no engine is declared (the top of adopter, the repository /tmp/tmp.Cfj8zorRa8/adopter/deploy/pod.yaml belongs to carries no gitops/engine/kyverno.yaml); not run, so neither a compile error nor a pass
 
-shift-left: COULD NOT LOOK -- /tmp/tmp.nP8gY9W6fP/adopter/deploy/pod.yaml belongs to no declared engine, so no line in its window ['5.0.0', '6.0.0'] was run (hub ADR-0033 point 7)
+shift-left: COULD NOT LOOK -- /tmp/tmp.Cfj8zorRa8/adopter/deploy/pod.yaml belongs to no declared engine, so no line in its window ['5.0.0', '6.0.0'] was run (hub ADR-0033 point 7)
 ok  a repository that declares no engine (exit 3)
 
 shift-left: all offline proofs passed
