@@ -1,1 +1,9 @@
-SKIP: no hub interpreter for the workload lane
+==> driftwood: served_apps.py
+ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
+SKIP: the newest workload sample is older than the 48h freshness bound
+==> tuppence: served_apps.py
+ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
+SKIP: no scheduled workload sample has landed for the registered instrument
+==> ludlow: served_apps.py
+ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
+SKIP: no scheduled workload sample has landed for the registered instrument
