@@ -1,9 +1,8 @@
 E2E step 6 provenance
-  BAD  FAIL: insurer pins platform/implementations@3.3.0: the tree of v3.3.0 has no implementations/cloud for the implementations this pin names, and platform's branch does not carry it either
-  ok   108 published artefacts resolve to a tag on the publisher's real remote; 1 honestly queued for cut-release.yml
+  ok   109 published artefacts resolve to a tag on the publisher's real remote; 1 honestly queued for cut-release.yml
   ok   8 release workflows pin an anchored, own-repo identity regexp at the Actions OIDC issuer
-  ok   driftwood/exposure newest tag v4.0.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   driftwood/forward-intel newest tag v4.0.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   driftwood/exposure newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   driftwood/forward-intel newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   feeds/cve newest tag cve/v3.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   feeds/eol has no tag yet: looked for 'eol/vX.Y.Z' and 'vX.Y.Z' among 7 real tags -- queued for cut-release.yml
   ok   feeds/fx newest tag fx/v2.0.0: real cert subject matches the anchored regexp, Rekor entry validated
@@ -14,8 +13,8 @@ E2E step 6 provenance
   ok   insurer/quote-driftwood newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   insurer/quote-ludlow newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   insurer/quote-tuppence newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   ludlow/exposure newest tag v4.0.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   ludlow/forward-intel newest tag v4.0.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   ludlow/exposure newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   ludlow/forward-intel newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   nist/sp-800-53 newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/cloud newest tag v5.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/currency-controller newest tag v5.0.0: real cert subject matches the anchored regexp, Rekor entry validated
@@ -23,4 +22,4 @@ E2E step 6 provenance
   ok   platform/policy newest tag policy/v7.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/exposure newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/forward-intel newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
-FAIL: 1 provenance claim(s) are false (see BAD lines above)
+PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 21 lines the 8 release-shipping units declare in their own party.yaml publishes[], 18 newest tags matched a real Fulcio cert subject with its Rekor entry validated and 3 lines have no tag of their own shape yet

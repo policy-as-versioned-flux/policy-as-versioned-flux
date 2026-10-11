@@ -1,12 +1,6 @@
 [1;36m==>[0m 1. lint_claims.py's own asserts (the lint itself resolves correctly)
-Traceback (most recent call last):
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/oscal/lint_claims.py", line 226, in <module>
-    raise SystemExit(main(sys.argv))
-                     ^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/oscal/lint_claims.py", line 220, in main
-    selfcheck()
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/oscal/lint_claims.py", line 175, in selfcheck
-    assert dangling == KNOWN_DANGLING, f"dangling claims changed: {dangling}"
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: dangling claims changed: {('cm-6', 'policy-version-orphan-cage'), ('cm-6', 'governed-namespace-unclaimed-report'), ('ac-4', 'cage-netpol-bottom-rung')}
-FAIL: lint_claims.py --selfcheck
+OK: every control claim resolves to a shipped policy and a catalogued control id
+selfcheck ok: 0 known dangling claim(s), all other claims resolve, unknown-id fixture fails as required
+[1;36m==>[0m 2. the real check against component-definition.json
+OK: every control claim resolves to a shipped policy and a catalogued control id
+[1;36m==>[0m PASS: every control claim resolves
