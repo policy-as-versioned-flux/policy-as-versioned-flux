@@ -7,11 +7,14 @@ PASS: driftwood: the estate and driftwood's own selection-policy package agree o
 PASS: ludlow: the estate and ludlow's own selection-policy package agree on the curve hash (sha256:a190720b68ce) — one curve, two implementations, no drift
 PASS: tuppence: the estate and tuppence's own selection-policy package agree on the curve hash (sha256:b5dd65073f16) — one curve, two implementations, no drift
 PASS: driftwood: the twin entry names the reduction set its residuals came from (platform-cage-tiers@1.0.0)
-PASS: driftwood: platform's tier table and driftwood's own graded curve still pick the same rung as cheapest on the same shock (baseline); they differ by up to 80,180 on the rungs themselves, which is why the entry names which set priced it
+PASS: driftwood: the twin entry's residuals re-derive from platform-cage-tiers@1.0.0 and its annualised amount; its own policy 1.1.0 selects the recorded rung 'baseline' against its signed appetite and floor
+PASS: driftwood: per-shock cost minima are 'baseline' under the platform table and 'baseline' under its own graded curve, differing by up to 80,180 on the rungs; neither per-shock minimum selects the twin entry's annualised tier, whose residual basis and policy are checked above
 PASS: ludlow: the twin entry names the reduction set its residuals came from (platform-cage-tiers@1.0.0)
-FAIL: ludlow: platform's tier table and ludlow's own graded curve still pick the same rung as cheapest on the same shock (isolated); they differ by up to 4,808,914 on the rungs themselves, which is why the entry names which set priced it -- the table says isolated and the adopter's own evidence says baseline, so the tier the entry attributes to the curve is not the tier the curve would pick
+PASS: ludlow: the twin entry's residuals re-derive from platform-cage-tiers@1.0.0 and its annualised amount; its own policy 1.1.0 selects the recorded rung 'isolated' against its signed appetite and floor
+PASS: ludlow: per-shock cost minima are 'isolated' under the platform table and 'baseline' under its own graded curve, differing by up to 4,808,914 on the rungs; neither per-shock minimum selects the twin entry's annualised tier, whose residual basis and policy are checked above
 PASS: tuppence: the twin entry names the reduction set its residuals came from (platform-cage-tiers@1.0.0)
-FAIL: tuppence: platform's tier table and tuppence's own graded curve still pick the same rung as cheapest on the same shock (isolated); they differ by up to 7,796,346 on the rungs themselves, which is why the entry names which set priced it -- the table says isolated and the adopter's own evidence says baseline, so the tier the entry attributes to the curve is not the tier the curve would pick
+PASS: tuppence: the twin entry's residuals re-derive from platform-cage-tiers@1.0.0 and its annualised amount; its own policy 1.1.0 selects the recorded rung 'isolated' against its signed appetite and floor
+PASS: tuppence: per-shock cost minima are 'isolated' under the platform table and 'baseline' under its own graded curve, differing by up to 7,796,346 on the rungs; neither per-shock minimum selects the twin entry's annualised tier, whose residual basis and policy are checked above
 PASS: driftwood: platform/graded/cage.py and driftwood's own selection-policy package pick the same rung in all 60 cases, band boundaries and every rung tried as a floor (it declares None)
 PASS: ludlow: platform/graded/cage.py and ludlow's own selection-policy package pick the same rung in all 60 cases, band boundaries and every rung tried as a floor (it declares None)
 PASS: platform selects no tier through a selection-policy package and its evidence attributes none, so there is no second engine to drift from (named absence, not a silent skip)
@@ -49,4 +52,4 @@ PASS: tuppence prices[5] agent-cage: the platform prices the twin agent's cage u
 PASS: tuppence regime entry (penalty-schema): 4 priced hole(s) sum to its total 17,907,950.70 GBP; the open lines price it at 17,907,950.70
 PASS: tuppence: every list of amounts in the document is one perspective in one currency
 PASS: tuppence: selection policy 1.1.0 matches tuppence/selection-policy/VERSION
-FAIL: 2 £-seam check(s) observed false
+SKIP: driftwood prices[3] (feeds/cve feed) could not be priced, and says why: No scanned CVE is in the pinned KEV feed; 334 scanned CVE(s) outside it are named absences carrying no amount.
