@@ -48,7 +48,8 @@ class FixtureAPI:
                    "head": {"sha": head, "ref": "observations/truth/100-2",
                             "repo": {"full_name": REPO}},
                    "base": {"ref": "main", "repo": {"full_name": REPO}}}
-        self.installation = {"app_id": 4819564}
+        self.identity = {"data": {"viewer": {"login": "pavc-other-hand[bot]", "databaseId": 324560547}}}
+        self.review_user = {"login": "pavc-other-hand[bot]", "id": 324560547, "type": "Bot"}
         self.calls, self.approved = [], False
         self.mutate_on_read = None
         self.merge_refused = False
@@ -56,7 +57,10 @@ class FixtureAPI:
     def __call__(self, method, path, body=None):
         self.calls.append((method, path, copy.deepcopy(body)))
         if path == "installation":
-            return self.installation
+            raise AssertionError("GET /installation returns HTTP404 on the real GitHub API")
+        if path == "graphql":
+            assert method == "POST" and body == {"query": "query { viewer { login databaseId } }"}
+            return self.identity
         if path == f"repos/{REPO}":
             return self.repo
         if path.endswith("/actions/runs/100"):
@@ -79,7 +83,7 @@ class FixtureAPI:
                             "body": "Verified original signed TRUTH observation and protected delivery."}
             self.approved = True
             (self.remote / "reviewed-head").write_text(body["commit_id"])
-            return {"state": "APPROVED", "commit_id": body["commit_id"]}
+            return {"state": "APPROVED", "commit_id": body["commit_id"], "user": self.review_user}
         if path.endswith("/pulls/4/merge"):
             assert self.approved
             assert body == {"sha": self.pr["head"]["sha"], "merge_method": "merge"}
@@ -245,11 +249,25 @@ def test_signature_claims_bind_actual_run_and_failure_stops_review(delivery, est
     assert not api.approved
 
 
-def test_wrong_installation_refuses_mutation(delivery, estate):
-    estate[2].installation["app_id"] = 123
+@pytest.mark.parametrize("identity", [
+    {"data": {"viewer": {"login": "other-app[bot]", "databaseId": 324560547}}},
+    {"data": {"viewer": {"login": "pavc-other-hand[bot]", "databaseId": 123}}},
+    {"data": {"viewer": None}},
+    {"data": None, "errors": [{"message": "Identity unavailable"}]},
+])
+def test_wrong_reviewer_identity_refuses_mutation(delivery, estate, identity):
+    estate[2].identity = identity
     with pytest.raises(delivery.Refusal, match="App"):
         invoke(delivery, estate)
     assert not estate[2].approved
+
+
+def test_review_receipt_from_another_actor_never_merges(delivery, estate):
+    estate[2].review_user = {"login": "another[bot]", "id": 123, "type": "Bot"}
+    with pytest.raises(delivery.Refusal, match="review"):
+        invoke(delivery, estate)
+    assert estate[2].approved
+    assert not any(call[0] == "PUT" for call in estate[2].calls)
 
 
 def test_conflict_preserves_pending_record_without_recorded_claim(delivery, estate):
@@ -269,9 +287,9 @@ def test_expired_window_and_ambient_override_do_not_merge(delivery, estate, monk
 
 
 def test_read_only_preflight_needs_no_app_credential(delivery, estate):
-    estate[2].installation["app_id"] = 0
+    estate[2].identity = {"data": None}
     assert invoke(delivery, estate, check_only=True).startswith("VERIFIED")
-    assert all(call[0] == "GET" and call[1] != "installation" for call in estate[2].calls)
+    assert all(call[0] == "GET" for call in estate[2].calls)
     assert not estate[2].pr["merged"]
 
 
@@ -358,7 +376,7 @@ def test_remote_authority_changes_after_metadata_prevent_approval(delivery, esta
     api = estate[2]
     def changed(method, path, body=None):
         value = api(method, path, body)
-        if path == "installation":
+        if path == "graphql":
             advance_reviewed_authority(estate)
         return value
     with pytest.raises(delivery.Refusal, match="trusted checkout"):
@@ -385,7 +403,7 @@ def test_remote_authority_changes_after_approval_prevent_merge(delivery, estate)
 @pytest.mark.parametrize("method,path,expected", [
     ("GET", f"repos/{REPO}/actions/runs/100/attempts/2", "fixture-reader"),
     ("GET", f"repos/{REPO}/pulls/4", "fixture-reader"),
-    ("GET", "installation", "fixture-app"),
+    ("POST", "graphql", "fixture-app"),
     ("POST", f"repos/{REPO}/pulls/4/reviews", "fixture-app"),
     ("PUT", f"repos/{REPO}/pulls/4/merge", "fixture-app"),
 ])
