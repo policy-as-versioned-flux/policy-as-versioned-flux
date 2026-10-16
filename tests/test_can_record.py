@@ -96,6 +96,19 @@ def test_protected_delivery_handles_current_default_and_its_name(case: str) -> N
     assert result.cage_rc == 0, result.shell_output
     assert result.pending_pr and result.default_unchanged_until_review
     assert result.recorded_after_review and result.original_commit_preserved
+    assert result.source_parent_preserved and result.durable_original_preserved
+
+
+@pytest.mark.parametrize("case", ["log-overlap", "capture-overlap"])
+def test_overlapping_main_updates_cannot_destroy_the_original_pending_observation(case: str) -> None:
+    result = cr.delivery_fixture(WORKFLOW, case)
+    assert result.cage_rc == 0, result.shell_output
+    assert result.pending_pr and result.default_unchanged_until_review
+    assert result.source_parent_preserved and result.durable_original_preserved
+    assert result.review_merge_attempted and result.review_merge_conflict, result.shell_output
+    assert result.missing_line_stays_red
+    assert not result.recorded_after_review and not result.original_commit_preserved
+    assert "PENDING" in result.shell_output and "NOT recorded" in result.shell_output
 
 
 def test_feature_measurement_commits_and_delivers_nothing() -> None:
@@ -253,6 +266,19 @@ def test_clock_cannot_move_review_into_another_step_or_job_environment() -> None
     faults = cr.shape_faults(doc, _text())
     assert any("job environment" in fault for fault in faults)
     assert any("another step" in fault for fault in faults)
+
+
+@pytest.mark.parametrize("integration", [
+    'git pull --rebase --autostash origin "${DEFAULT_BRANCH}"',
+    'git rebase "origin/${DEFAULT_BRANCH}"',
+    'git merge "origin/${DEFAULT_BRANCH}"',
+    'git cherry-pick "origin/${DEFAULT_BRANCH}"',
+    'git -c commit.gpgsign=true rebase "origin/${DEFAULT_BRANCH}"',
+])
+def test_producer_cannot_rewrite_or_integrate_the_original_observation(integration: str) -> None:
+    doc = _doc()
+    doc["jobs"]["gate"]["steps"].append({"name": "integrate before publishing", "run": integration})
+    assert any("original observation" in fault for fault in cr.shape_faults(doc, _text()))
 
 
 # -- 2. the record: who wrote each line of talk/truth.log ------------------------------------------

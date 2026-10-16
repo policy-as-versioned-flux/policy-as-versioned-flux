@@ -2,13 +2,15 @@
 # Grade the clock's provenance, workflow shape, and protected-default delivery mechanism.
 # The real guard, record and cage shell run over disposable Git remotes whose default branch
 # rejects every direct push. A fixture gh opens a pending PR only; a separate exact-head review
-# model makes a normal two-parent merge preserving the clock commit. Feature runs record nothing;
+# model attempts a normal two-parent merge preserving the original clock commit and source parent.
+# Log/capture overlap produces a real merge conflict while the durable ref/PR and main stay intact;
+# the missing citable line remains red until recovery. Feature runs record nothing;
 # forged eligibility, declarations, PR refusal, delivery collision, shallow history and missing
 # default-branch identity each have explicit refusal cases.
 #
 # Fixture limits are printed: commits are unsigned and the token is synthetic. This grades the
 # Git mechanism and exact workflow shell, never genuine signing or GitHub authorization. Fixture
-# TRUTH lines are dated 1970 with hub=0000000 and remain only in deleted temporary repositories.
+# TRUTH lines are dated 1970, name their synthetic source commit, and remain in disposable repos.
 # FAIL, rather than could-not-look, when repository-local provenance or mechanism cannot be read.
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -38,24 +40,24 @@ fi
 
 say "1b. no citable TRUTH line is stranded on a branch that merged without it"
 "$PY" "$HERE/can_record.py" stranded "$ROOT" \
-  || note "a clock line that measured a tree the default branch has never reached that branch's log (above); the repair is a cherry-pick of the clock's own commit, author preserved, as the integrator did for run 101 on 2026-09-05 -- not a line typed by hand"
+  || note "a clock line that measured a tree on the default branch has not reached that branch's log (above); pending delivery is not exempt. Recover the clock's own original commit through reviewed integration, preserving its identity, signature and exact line; never type a replacement observation"
 
 # ---------------------------------------------------------------- 2. the shape
 say "2. truth.yml still has the shape ticket 100 decided"
 if "$PY" "$HERE/can_record.py" shape "$WORKFLOW"; then
-  ok "the guard runs before measurement; the cage proposes its exact run/attempt observation ref through a pending PR, never a direct default-branch push or self-merge"
+  ok "the guard runs before measurement; the cage publishes its original source-parent object on the exact run/attempt pending ref without producer integration, direct default-branch push or self-merge"
 else
   note "truth.yml no longer has the shape (above)"
 fi
 
 # ---------------------------------------------------------------- 3. the mechanism
-say "3. actual workflow shell: protected-default delivery waits for separate review"
+say "3. actual workflow shell: durable original publication precedes separate review and conflicts stay pending"
 "$PY" "$HERE/can_record.py" delivery "$WORKFLOW" \
   || note "the actual guard, record or cage violated protected-default delivery (above)"
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: recorded TRUTH lines retain clock provenance; default-branch measurements propose unique observation PRs, pending delivery does not claim recording, and a separately reviewed normal merge preserves the original clock commit; branch and unsafe delivery cases refuse as named"
+  echo "PASS: recorded TRUTH lines retain clock provenance; default-branch measurements durably publish their original source-parent commit before separate review; a normal merge preserves it, while real log/capture conflicts retain the exact pending ref and missing-line failure without claiming recording; branch and unsafe delivery cases refuse as named"
   exit 0
 fi
 echo "FAIL: $bad fault(s) -- the clock's recording provenance or protected-default delivery does not hold"
