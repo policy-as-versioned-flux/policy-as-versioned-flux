@@ -96,6 +96,19 @@ def test_protected_delivery_handles_current_default_and_its_name(case: str) -> N
     assert result.cage_rc == 0, result.shell_output
     assert result.pending_pr and result.default_unchanged_until_review
     assert result.recorded_after_review and result.original_commit_preserved
+    assert result.source_parent_preserved and result.durable_original_preserved
+
+
+@pytest.mark.parametrize("case", ["log-overlap", "capture-overlap"])
+def test_overlapping_main_updates_cannot_destroy_the_original_pending_observation(case: str) -> None:
+    result = cr.delivery_fixture(WORKFLOW, case)
+    assert result.cage_rc == 0, result.shell_output
+    assert result.pending_pr and result.default_unchanged_until_review
+    assert result.source_parent_preserved and result.durable_original_preserved
+    assert result.review_merge_attempted and result.review_merge_conflict, result.shell_output
+    assert result.missing_line_stays_red
+    assert not result.recorded_after_review and not result.original_commit_preserved
+    assert "PENDING" in result.shell_output and "NOT recorded" in result.shell_output
 
 
 def test_feature_measurement_commits_and_delivers_nothing() -> None:
@@ -113,7 +126,8 @@ def test_cage_rejects_nondefault_or_outside_lane_before_commit(case: str) -> Non
     assert result.default_unchanged_until_review and not result.recorded_after_review
 
 
-@pytest.mark.parametrize("case", ["pr-refused", "delivery-collision"])
+@pytest.mark.parametrize("case", ["pr-refused", "delivery-collision",
+                                  "ancestor-collision", "publication-race"])
 def test_failed_delivery_cannot_claim_a_record_or_move_default(case: str) -> None:
     result = cr.delivery_fixture(WORKFLOW, case)
     assert result.cage_rc != 0, result.shell_output
@@ -193,25 +207,48 @@ def test_a_cage_that_commits_before_it_consults_the_guard_is_a_fault() -> None:
     assert any(cr.CAGE_STEP in f for f in faults), faults
 
 
-def test_a_force_push_anywhere_in_the_workflow_is_a_fault() -> None:
-    text = _text().replace('push origin HEAD:"${DELIVERY_BRANCH}"',
-                           'push --force origin HEAD:"${DELIVERY_BRANCH}"')
-    faults = cr.shape_faults(_doc(), text)
+@pytest.mark.parametrize("lease", [
+    "--force", "-f", "--force-with-lease", "--force-if-includes", "--no-force-with-lease",
+    '--force-with-lease="refs/heads/${DELIVERY_BRANCH}"',
+    '--force-with-lease="refs/heads/${DELIVERY_BRANCH}:deadbeef"',
+    '--force-with-lease="refs/heads/main:"',
+    '--force-with-lease="refs/heads/${OTHER_BRANCH}:"',
+])
+def test_every_lease_except_the_explicit_empty_delivery_ref_is_refused(lease: str) -> None:
+    text = _text().replace('--force-with-lease="refs/heads/${DELIVERY_BRANCH}:"', lease)
+    faults = cr.shape_faults(yaml.safe_load(text), text)
     assert any("force" in f for f in faults), faults
 
 
 def test_a_plus_refspec_is_a_force_push_by_another_name() -> None:
-    text = _text().replace('push origin HEAD:"${DELIVERY_BRANCH}"',
-                           'push origin +HEAD:"${DELIVERY_BRANCH}"')
-    faults = cr.shape_faults(_doc(), text)
+    text = _text().replace('"HEAD:refs/heads/${DELIVERY_BRANCH}"',
+                           '"+HEAD:refs/heads/${DELIVERY_BRANCH}"')
+    faults = cr.shape_faults(yaml.safe_load(text), text)
     assert any("force" in f for f in faults), faults
+
+
+@pytest.mark.parametrize("suffix", [
+    ' HEAD:refs/heads/main', ' --force', ' --no-force-with-lease',
+    ' --force-with-lease="refs/heads/main:"',
+])
+def test_create_only_publication_cannot_gain_an_extra_refspec_or_override(suffix: str) -> None:
+    text = _text().replace('"HEAD:refs/heads/${DELIVERY_BRANCH}"',
+                           '"HEAD:refs/heads/${DELIVERY_BRANCH}"' + suffix)
+    faults = cr.shape_faults(yaml.safe_load(text), text)
+    assert any("refspec" in f for f in faults), faults
+
+
+def test_ordinary_nonforce_push_cannot_fast_forward_an_occupied_delivery_ref() -> None:
+    text = _text().replace('--force-with-lease="refs/heads/${DELIVERY_BRANCH}:" ', '')
+    faults = cr.shape_faults(yaml.safe_load(text), text)
+    assert any("create-only" in f for f in faults), faults
 
 
 def test_losing_the_one_allowed_refspec_is_a_fault() -> None:
     doc = _doc()
     for step in doc["jobs"]["gate"]["steps"]:
         if cr.CAGE_STEP in str(step.get("name", "")):
-            step["run"] = step["run"].replace('HEAD:"${DELIVERY_BRANCH}"', "HEAD:main")
+            step["run"] = step["run"].replace('"HEAD:refs/heads/${DELIVERY_BRANCH}"', "HEAD:main")
     faults = cr.shape_faults(doc, _text())
     assert any("refspec" in f for f in faults), faults
 
@@ -253,6 +290,19 @@ def test_clock_cannot_move_review_into_another_step_or_job_environment() -> None
     faults = cr.shape_faults(doc, _text())
     assert any("job environment" in fault for fault in faults)
     assert any("another step" in fault for fault in faults)
+
+
+@pytest.mark.parametrize("integration", [
+    'git pull --rebase --autostash origin "${DEFAULT_BRANCH}"',
+    'git rebase "origin/${DEFAULT_BRANCH}"',
+    'git merge "origin/${DEFAULT_BRANCH}"',
+    'git cherry-pick "origin/${DEFAULT_BRANCH}"',
+    'git -c commit.gpgsign=true rebase "origin/${DEFAULT_BRANCH}"',
+])
+def test_producer_cannot_rewrite_or_integrate_the_original_observation(integration: str) -> None:
+    doc = _doc()
+    doc["jobs"]["gate"]["steps"].append({"name": "integrate before publishing", "run": integration})
+    assert any("original observation" in fault for fault in cr.shape_faults(doc, _text()))
 
 
 # -- 2. the record: who wrote each line of talk/truth.log ------------------------------------------
@@ -363,7 +413,8 @@ def test_stranded_entries_reads_the_refs_this_checkout_carries() -> None:
 def test_a_named_step_is_lifted_whole() -> None:
     shell = cr.step_shell(_doc(), "gate", cr.CAGE_STEP)
     assert "git reset -q" in shell
-    assert 'push origin HEAD:"${DELIVERY_BRANCH}"' in shell
+    assert 'push --force-with-lease="refs/heads/${DELIVERY_BRANCH}:"' in shell
+    assert 'origin "HEAD:refs/heads/${DELIVERY_BRANCH}"' in shell
 
 
 def test_an_unknown_step_name_raises_rather_than_returning_empty_shell() -> None:
@@ -385,7 +436,8 @@ def test_every_substitution_the_fixture_makes_is_declared() -> None:
 
 def test_the_substitutions_leave_the_push_line_alone() -> None:
     shell, _ = cr.portable(cr.step_shell(_doc(), "gate", cr.CAGE_STEP))
-    assert 'push origin HEAD:"${DELIVERY_BRANCH}"' in shell
+    assert 'push --force-with-lease="refs/heads/${DELIVERY_BRANCH}:"' in shell
+    assert 'origin "HEAD:refs/heads/${DELIVERY_BRANCH}"' in shell
 
 
 # -- 4. a legitimate repair grades clean; a hand-authored line still does not ---------------------

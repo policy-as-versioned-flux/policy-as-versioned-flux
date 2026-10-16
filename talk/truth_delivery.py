@@ -25,6 +25,10 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = "policy-as-versioned-flux/policy-as-versioned-flux"
 APP_ID = 4819564
+# The bot user is a separate GitHub object from App 4819564. Both its public
+# user record and a narrow installation-token viewer query bind this identity.
+APP_BOT_LOGIN = "pavc-other-hand[bot]"
+APP_BOT_USER_ID = 324560547
 WORKFLOW = ".github/workflows/truth.yml"
 Api = Callable[[str, str, dict[str, Any] | None], Any]
 Verifier = Callable[[Path, str, dict[str, Any], str], None]
@@ -58,14 +62,14 @@ def github_api(method: str, path: str, body: dict[str, Any] | None = None) -> An
     env = {k: v for k, v in os.environ.items()
            if k not in {"GH_TOKEN", "GITHUB_TOKEN", "TRUTH_READ_TOKEN"}}
     token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
-    if method == "GET" and path.lstrip("/") != "installation":
+    if method == "GET":
         token = os.environ.get("TRUTH_READ_TOKEN") or token
     if token:
         env["GH_TOKEN"] = token
     try:
         result = subprocess.run(command, input=None if body is None else json.dumps(body),
                                 text=True, capture_output=True, timeout=60, env=env)
-        require(result.returncode == 0, f"GitHub API {method} failed; delivery remains pending")
+        require(result.returncode == 0, f"GitHub API {method} {path} failed; delivery remains pending")
         return json.loads(result.stdout)
     except (OSError, subprocess.TimeoutExpired, json.JSONDecodeError) as error:
         raise Refusal("GitHub API cannot provide valid delivery facts; delivery remains pending") from error
@@ -251,14 +255,26 @@ def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier 
     if check_only:
         authority(root, default, today)
         return f"VERIFIED original observation {head}; PR #{pr['number']} remains pending review"
-    installation = api("GET", "installation", None)
-    require(installation.get("app_id") == APP_ID, "review credential is not the existing other-hand App")
+    # Installation tokens cannot GET /app, and GET /installation is not an
+    # identity endpoint. The authenticated viewer query uses the writer token;
+    # repository and Actions reads continue to use the separate read-only token.
+    identity = api("POST", "graphql", {"query": "query { viewer { login databaseId } }"})
+    reason = f"review credential does not establish the existing other-hand App {APP_ID}"
+    require(isinstance(identity, dict) and not identity.get("errors"), reason)
+    data = identity.get("data")
+    require(isinstance(data, dict), reason)
+    viewer = data.get("viewer")
+    require(isinstance(viewer, dict) and viewer.get("login") == APP_BOT_LOGIN
+            and viewer.get("databaseId") == APP_BOT_USER_ID, reason)
     fresh = api("GET", endpoint, None)
     validate_pr(fresh, default, branch, head)
     authority(root, default, today)
     review = api("POST", endpoint + "/reviews", {"commit_id": head, "event": "APPROVE",
         "body": "Verified original signed TRUTH observation and protected delivery."})
-    require(review.get("state") == "APPROVED" and review.get("commit_id") == head,
+    reviewer = review.get("user")
+    require(review.get("state") == "APPROVED" and review.get("commit_id") == head
+            and isinstance(reviewer, dict) and reviewer.get("login") == APP_BOT_LOGIN
+            and reviewer.get("id") == APP_BOT_USER_ID,
             "other-hand review did not approve the original observation head")
     fresh = api("GET", endpoint, None)
     validate_pr(fresh, default, branch, head)
