@@ -344,3 +344,26 @@ Main-only citation, branch rename safety, the cage, and missing-line conservatio
 remain; a pending ref is not exempted from missing-line failures. See the October 5
 amendment to ADR-0024 and `.github/rulesets/README.md` for credential isolation and
 human delivery after expiry. No genuine grade is authored by this repair.
+
+## Durable publication amendment, 2026-10-17 (delegated, ADR-0025)
+
+The pending-PR route still signed and then rebased before publishing. Fresh actual-shell
+regressions reproduce two losses: a concurrent log append or capture replacement makes
+the producer stop at a rebase conflict before any durable ref/PR exists. A concurrent
+unrelated declaration update makes the old rebase succeed but rewrites the original
+clock object. The renamed-default control continues to work.
+
+Publish the first signed observation object on its unchanged measured-source parent to
+`observations/truth/<run-id>-<attempt>` before integration. The producer now performs no
+pull, rebase, merge or cherry-pick. It keeps the run's own signing identity, observation
+lane, unique non-force ref, default-branch-only eligibility, and clock-only credential.
+The separate reviewer grades the lane against that original parent and verifies parent
+ancestry on current main, rather than demanding equality with its current tip.
+
+The shared actual-shell fixture now attempts a real separate normal Git merge. Same-log
+and same-capture conflicts retain the original commit and parent, exact pending ref and
+PR, and unchanged main. They remain pending, explicitly NOT recorded; the strict
+missing-line detector stays red for their citable observation. An unrelated main update
+merges normally without rewriting the clock object or its source parent. No synthetic
+fixture establishes a genuine signature or GitHub authorization, and this amendment
+neither authors missing historical lines nor waives their failures in `verify-can-record`.

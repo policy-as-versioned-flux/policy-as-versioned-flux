@@ -152,7 +152,7 @@ def shape_faults(doc: dict, text: str) -> list[str]:
         if str(with_.get("fetch-depth")) != "0":
             faults.append(
                 "the gate's checkout does not set fetch-depth: 0 -- a shallow checkout cannot "
-                "tell whether `git pull --rebase origin main` will replay this ref's commits, so "
+                "check the source ancestry or the provenance of recorded lines, so "
                 "the guard would be guessing")
 
     i_guard = _index_of(steps, GUARD_STEP)
@@ -242,20 +242,11 @@ def shape_faults(doc: dict, text: str) -> list[str]:
                           if not line.strip().startswith("#"))
         if re.search(r"\bgh\s+pr\s+(merge|review)\b", shell) and step is not steps[i_cage]:
             faults.append("the clock reviews or merges its own observation PR in another step")
-
-    # F2: the cage must rebase onto the branch it was TOLD is default, never a literal. The
-    # guard takes the name from the event so a rename cannot silently stop the clock, and this
-    # half kept a hardcoded `main` -- so on a rename the guard says can=yes, the commit is made,
-    # the pull fails and the push never runs. Loudly lost is still lost. Its own scan, because
-    # the push scan below only visits lines carrying `git ... push` and a pull carries neither.
-    for line in re.sub(r"\\\n\s*", " ", text).splitlines():
-        if line.strip().startswith("#"):
-            continue
-        if re.search(r"\bgit\b[^\n]*\bpull\b[^\n]*\brebase\b[^\n]*\borigin\s+[\"']?(main|master)\b",
-                     line):
-            faults.append("the cage rebases onto a literal branch name rather than the default "
-                          "branch it was given, so a rename stops the clock after the commit is "
-                          "already made: " + line.strip())
+        shell = re.sub(r"\\\n\s*", " ", shell)
+        if re.search(r"(?m)^\s*(?:(?:if|then|!|exec|command)\s+)?git\b[^\n;]*?"
+                     r"\b(?:pull|rebase|merge|cherry-pick)(?=\s|$)", shell):
+            faults.append("the producer integrates or rewrites the original observation; "
+                          "publish its unchanged source-parent object before separate review")
 
     # Continuations first: the one real push in this workflow is written `git -c http.extraheader=
     # ... \` then `push origin HEAD:...` on the next line, so a per-line scan would read the push
@@ -526,23 +517,30 @@ class DeliveryResult(NamedTuple):
     original_commit_preserved: bool
     shell_output: str
     substitutions: list[str]
+    source_parent_preserved: bool = False
+    durable_original_preserved: bool = False
+    review_merge_attempted: bool = False
+    review_merge_conflict: bool = False
+    missing_line_stays_red: bool = False
 
 
 def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryResult:
     """Run the real guard, record and cage against a protected disposable default branch.
 
     `gh` only models opening a pending PR. It cannot merge. A separate reviewer phase pins the
-    exact observation head, then makes a normal two-parent Git merge. The bare server accepts
-    a default-branch update only when it is that reviewed merge. This grades delivery and
+    exact original observation head and source-parent ancestry, then attempts a normal
+    two-parent Git merge. Overlapping log/capture updates must produce a real content conflict,
+    leaving main and the durable pending ref/PR unchanged. The bare server accepts a
+    default-branch update only when it is that reviewed merge. This grades delivery and
     provenance, not GitHub authorization or signatures: fixture commits are unsigned, and the
     only auth value is `not-a-token`. Every workflow-shell substitution is returned to callers.
     """
-    known = {"protected-main", "main-behind", "renamed-default", "feature", "forged-feature",
+    known = {"protected-main", "main-behind", "log-overlap", "capture-overlap",
+             "renamed-default", "feature", "forged-feature",
              "declaration", "pr-refused", "delivery-collision", "shallow", "empty-default"}
     if case not in known:
         raise ValueError(f"unknown delivery fixture case {case!r}")
     doc = yaml.safe_load(Path(workflow).read_text())
-    synthetic = "TRUTH 1970-01-01T00:00Z run=7 hub=0000000 pass=0 fail=0 synthetic=diagnostic-only"
     with tempfile.TemporaryDirectory(prefix="can-record-delivery-") as transient:
         root = Path(transient)
         env = {"PATH": os.environ["PATH"], "GIT_CONFIG_GLOBAL": str(root / "gitconfig"),
@@ -566,16 +564,26 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
         (work / "talk").mkdir()
         original_log = "TRUTH 1970-01-01T00:00Z run=0 hub=0000000 synthetic=diagnostic-only\n"
         (work / "talk/truth.log").write_text(original_log)
+        (work / "talk/captures").mkdir()
+        (work / "talk/captures/gate.txt").write_text("synthetic source capture\n")
         (work / "README.md").write_text("synthetic fixture\n")
         command(["git", "add", "-A"], work)
         command(["git", "commit", "-qm", "synthetic base"], work)
         command(["git", "push", "-q", "origin", default], work)
-        if case in {"main-behind", "delivery-collision"}:
+        source_parent = command(["git", "rev-parse", "HEAD"], work).stdout.strip()
+        synthetic = (f"TRUTH 1970-01-01T00:00Z run=7 hub={source_parent[:7]} "
+                     "pass=0 fail=0 synthetic=diagnostic-only")
+        if case in {"main-behind", "log-overlap", "capture-overlap", "delivery-collision"}:
             other = root / "other"
             command(["git", "clone", "-q", str(remote), str(other)], root)
             (other / "README.md").write_text("synthetic other writer\n")
+            if case == "log-overlap":
+                (other / "talk/truth.log").write_text(original_log +
+                    "TRUTH 1970-01-01T00:00Z run=6 synthetic=diagnostic-only\n")
+            if case == "capture-overlap":
+                (other / "talk/captures/gate.txt").write_text("synthetic concurrent capture\n")
             command(["git", "commit", "-qam", "synthetic other writer"], other)
-            target = default if case == "main-behind" else "observations/truth/112-1"
+            target = "observations/truth/112-1" if case == "delivery-collision" else default
             command(["git", "push", "-q", "origin", f"HEAD:{target}"], other)
         ref = default
         if case in {"feature", "forged-feature"}:
@@ -645,7 +653,6 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
         collision_head = None
         if case == "delivery-collision":
             collision_head = command(["git", "rev-parse", "refs/heads/observations/truth/112-1"], remote).stdout.strip()
-        start = command(["git", "rev-parse", "HEAD"], work).stdout.strip()
         guard = subprocess.run(["bash", *step_shell_flags(doc, "gate", GUARD_STEP), str(root / "guard.sh")],
                                cwd=work, env=step_env, capture_output=True, text=True)
         outputs.append(guard.stdout + guard.stderr)
@@ -667,6 +674,8 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
         if case == "declaration":
             (work / "declaration.yaml").write_text("synthetic: forbidden\n")
             command(["git", "add", "declaration.yaml"], work)
+        if case == "capture-overlap":
+            (work / "talk/captures/gate.txt").write_text("synthetic measured capture\n")
         cage = subprocess.run(["bash", *step_shell_flags(doc, "gate", CAGE_STEP), str(root / "cage.sh")],
                               cwd=work, env=step_env, capture_output=True, text=True)
         outputs.append(cage.stdout + cage.stderr)
@@ -676,32 +685,72 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
             if delivery_head != collision_head:
                 raise RuntimeError("the clock overwrote an existing observation delivery branch")
         head = command(["git", "rev-parse", "HEAD"], work).stdout.strip()
+        # Reflog retains the first clock object even when the old producer rebases or stops
+        # on a conflict. Do not substitute the rewritten tip for the original observation.
+        original = ""
+        for candidate in reversed(command(["git", "reflog", "--format=%H"], work).stdout.splitlines()):
+            subject = command(["git", "show", "-s", "--format=%s", candidate], work).stdout.strip()
+            if subject == "truth: record run 7 [skip ci]":
+                original = candidate
+                break
         recorded = preserved = False
+        source_preserved = durable = attempted = conflict = missing_red = False
+        if original:
+            source_preserved = (head == original and
+                command(["git", "show", "-s", "--format=%P", original], work).stdout.strip() == source_parent)
         if pr.exists():
+            pending_bytes = pr.read_bytes()
             pending = json.loads(pr.read_text())
             if head != pending["head_sha"] or current != before:
                 raise RuntimeError("pending delivery moved default or changed its head")
             identity = command(["git", "show", "-s", "--format=%ae%n%s%n%P", head], remote).stdout.splitlines()
-            if identity != [CLOCK_EMAIL, "truth: record run 7 [skip ci]", current]:
+            parent = command(["git", "rev-parse", f"{head}^"], remote).stdout.strip()
+            if identity != [CLOCK_EMAIL, "truth: record run 7 [skip ci]", parent]:
                 raise RuntimeError("the pending delivery is not the clock's one observation commit")
-            paths = command(["git", "diff", "--name-only", current, head], remote).stdout.splitlines()
-            if paths != ["talk/truth.log"]:
+            if command(["git", "merge-base", "--is-ancestor", parent, current], remote,
+                       check=False).returncode:
+                raise RuntimeError("the pending source parent is not on current default history")
+            paths = command(["git", "diff", "--name-only", parent, head], remote).stdout.splitlines()
+            expected_paths = (["talk/captures/gate.txt"] if case == "capture-overlap" else []) + ["talk/truth.log"]
+            if paths != expected_paths:
                 raise RuntimeError("delivery fixture observed a declaration in the PR")
             proposed = command(["git", "show", f"{head}:talk/truth.log"], remote).stdout
             if proposed != original_log + synthetic + "\n":
                 raise RuntimeError("delivery fixture changed prior observations or its exact TRUTH line")
             reviewer = root / "reviewer"
             command(["git", "clone", "-q", str(remote), str(reviewer)], root)
+            faults, _ = stranded_faults(stranded_entries(reviewer)[0])
+            missing_red = len(faults) == 1 and "run=7" in faults[0]
             approval.write_text(head + "\n")
-            command(["git", "merge", "--no-ff", "-qm", "synthetic reviewed observation merge", head], reviewer)
-            command(["git", "push", "-q", "origin", default], reviewer)
+            attempted = True
+            merge = command(["git", "merge", "--no-ff", "-qm", "synthetic reviewed observation merge", head],
+                            reviewer, check=False)
+            outputs.append(merge.stdout + merge.stderr)
+            if merge.returncode:
+                unresolved = command(["git", "diff", "--name-only", "--diff-filter=U"], reviewer).stdout.splitlines()
+                expected_conflict = "talk/captures/gate.txt" if case == "capture-overlap" else "talk/truth.log"
+                conflict = (case in {"log-overlap", "capture-overlap"} and
+                            "CONFLICT" in merge.stdout + merge.stderr and unresolved == [expected_conflict])
+                if not conflict:
+                    raise RuntimeError("separate synthetic review failed without the expected content conflict")
+                if command(["git", "rev-parse", "HEAD"], reviewer).stdout.strip() != before:
+                    raise RuntimeError("a conflicting review moved default")
+            else:
+                command(["git", "push", "-q", "origin", default], reviewer)
+            pending_head = command(["git", "rev-parse", "refs/heads/observations/truth/112-1"], remote).stdout.strip()
+            durable = pending_head == original and pr.read_bytes() == pending_bytes
             landed = command(["git", "show", f"refs/heads/{default}:talk/truth.log"], remote).stdout
             recorded = landed.splitlines().count(synthetic) == 1
-            preserved = command(["git", "merge-base", "--is-ancestor", head, f"refs/heads/{default}"], remote,
+            preserved = command(["git", "merge-base", "--is-ancestor", original, f"refs/heads/{default}"], remote,
                                 check=False).returncode == 0
+            if conflict:
+                after = command(["git", "rev-parse", f"refs/heads/{default}"], remote).stdout.strip()
+                if after != before or recorded or preserved or pending_head != head:
+                    raise RuntimeError("a conflicting review changed the original ref, main or its record")
         return DeliveryResult(case, step_env["CAN_RECORD"], cage.returncode, pr.exists(),
-                              current == before, "" if head == start else head, recorded, preserved,
-                              "".join(outputs), substitutions)
+                              current == before, original, recorded, preserved,
+                              "".join(outputs), substitutions, source_preserved, durable, attempted,
+                              conflict, missing_red)
 
 
 # -- selfcheck ----------------------------------------------------------------------------------
@@ -779,7 +828,8 @@ def main(argv: list[str]) -> int:
         return selfcheck()
     if cmd == "delivery":
         failed = 0
-        for case in ("protected-main", "main-behind", "renamed-default", "feature",
+        for case in ("protected-main", "main-behind", "log-overlap", "capture-overlap",
+                     "renamed-default", "feature",
                      "forged-feature", "declaration", "pr-refused", "delivery-collision",
                      "shallow", "empty-default"):
             result = delivery_fixture(Path(argv[2]), case)
@@ -791,7 +841,16 @@ def main(argv: list[str]) -> int:
             if positive:
                 passed = passed and result.cage_rc == 0 and result.pending_pr
                 passed = passed and result.recorded_after_review and result.original_commit_preserved
+                passed = passed and result.source_parent_preserved and result.durable_original_preserved
+                passed = passed and result.missing_line_stays_red
                 passed = passed and "PENDING" in result.shell_output
+            elif case in {"log-overlap", "capture-overlap"}:
+                passed = passed and result.cage_rc == 0 and result.pending_pr
+                passed = passed and result.source_parent_preserved and result.durable_original_preserved
+                passed = passed and result.review_merge_attempted and result.review_merge_conflict
+                passed = passed and result.missing_line_stays_red
+                passed = passed and not result.recorded_after_review and not result.original_commit_preserved
+                passed = passed and "PENDING" in result.shell_output and "NOT recorded" in result.shell_output
             elif case == "feature":
                 passed = passed and result.can_prepare == "no" and result.cage_rc == 0
                 passed = passed and not result.pending_pr and not result.observation_commit
@@ -804,7 +863,11 @@ def main(argv: list[str]) -> int:
                   f"cage={result.cage_rc} pending={result.pending_pr} "
                   f"default-unchanged-until-review={result.default_unchanged_until_review} "
                   f"recorded-after-review={result.recorded_after_review} "
-                  f"original-commit-preserved={result.original_commit_preserved}")
+                  f"original-commit-preserved={result.original_commit_preserved} "
+                  f"source-parent-preserved={result.source_parent_preserved} "
+                  f"durable-original-preserved={result.durable_original_preserved} "
+                  f"review-content-conflict={result.review_merge_conflict} "
+                  f"missing-line-stays-red={result.missing_line_stays_red}")
             if not passed:
                 failed += 1
                 print(result.shell_output)

@@ -457,3 +457,32 @@ either mutation, a changed default-branch source invalidates the trusted checkou
 leaves delivery pending for retry. No new identity is created. A conflict, changed head,
 failed verification or missing record
 stays pending and red. Only verified main ancestry and exact line permit RECORDED.
+
+## Amendment, 2026-10-17: publish the original observation before integration
+
+Delegated under ADR-0025. The October 5 delivery route still rebased after signing and
+before pushing the pending ref. A concurrent observation that appends the same log or
+replaces the same capture can conflict there, leaving the only original signed object
+on an ephemeral runner. An unrelated change can instead make that rebase succeed while
+rewriting the original object. Neither outcome preserves the promised original record.
+
+The producer now signs once on the source parent it measured and immediately publishes
+that exact object to its unique run-id/attempt ref before opening the pending PR. It
+does not pull, rebase, merge or cherry-pick. Default-branch renames still bind the PR's
+base through event metadata. A refused PR creation leaves the published object available
+for recovery; an occupied delivery ref is never overwritten or force-pushed.
+
+The reviewer checks the lane against the original parent, which must be an ancestor of
+current default history; the measured source must be an ancestor of that parent. It
+does not require that parent to equal the current tip. A normal merge may preserve the
+original object despite an unrelated main update. A content conflict leaves the exact
+original ref and PR pending for reviewed records recovery. It never permits rewriting
+the observation or treating pending as recorded. The existing strict missing-line
+check remains red for a missing citable line until recovery actually reaches main.
+
+The actual producer shell is exercised against protected disposable Git remotes with
+overlapping log appends, overlapping capture replacements, and an unrelated declaration
+update. Separate review attempts a real normal merge: conflicts leave main and the
+exact pending ref/PR unchanged, while the unrelated update merges with the original
+commit and source parent retained. These are explicitly unsigned synthetic fixtures,
+not claims of genuine gitsign validity or live GitHub authorization.
