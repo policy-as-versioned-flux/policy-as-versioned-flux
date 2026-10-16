@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The clock says whether it can record, before it measures (eco-system ticket 100).
+"""The clock says whether it may prepare delivery before it measures (ticket 100).
 
 `.github/workflows/truth.yml` runs on every push that touches the gate, on every branch. Until
 this ticket it wrote its TRUTH line, committed it, ran `git pull --rebase --autostash origin main`
@@ -10,16 +10,19 @@ is refused non-fast-forward. The line was produced, committed and thrown away, a
 so: run 98 on `ticket-89-deny-is-not-a-rung` printed `Rebasing (12/12)`, `Successfully rebased`
 and then `! [rejected] (non-fast-forward)` with nobody pushing and the remote tip unmoved.
 
-This module holds the three questions that are decidable from data. It deliberately answers none
-of the questions that are only decidable by running git: whether the guard's verdict is TRUE is
-graded by `verify-can-record.sh`, which runs the workflow's own shell over two throwaway
-repositories and compares the verdict with what the push does to the remote ref.
+Protected default branches now require a PR. CAN_RECORD remains the compatibility variable for
+default-branch eligibility; it does not promise immediate recording. The actual workflow shell
+proposes a unique observation PR, and a separate review makes a normal merge preserving the clock
+commit. This module grades shape and provenance, and runs the disposable protected-Git mechanism
+used by both pytest and `verify-can-record.sh`. Pending delivery remains unrecorded; stranded
+observations retain the strict existing grade until their original commit reaches default.
 
     can_record.py shape <workflow.yml>     grade the workflow's shape; print each fault
     can_record.py log <root>               grade talk/truth.log against its own git blame
     can_record.py step <workflow.yml> <job> <name fragment>
                                            print that step's shell, made portable, with every
                                            substitution printed on stderr as `note: a -> b`
+    can_record.py delivery <workflow.yml>   run the real shell over protected Git delivery cases
     can_record.py selfcheck                the pure functions grade planted data as documented
 
 Exit 0 clean, 1 with faults. There is no could-not-look: everything it reads is in this
@@ -27,9 +30,12 @@ repository, so a reason it cannot look is a red, not a shrug.
 """
 from __future__ import annotations
 
+import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import NamedTuple
 
@@ -196,9 +202,46 @@ def shape_faults(doc: dict, text: str) -> list[str]:
         elif "git commit" in cage and cage.index("CAN_RECORD") > cage.index("git commit"):
             faults.append(f"the {CAGE_STEP} reads CAN_RECORD only after `git commit` -- the "
                           "commit this ticket exists to stop is already made")
-        if 'push origin HEAD:"${GITHUB_REF_NAME}"' not in cage:
-            faults.append("the cage no longer pushes the one refspec it is allowed to push, "
-                          'push origin HEAD:"${GITHUB_REF_NAME}"')
+        executable = "\n".join(line for line in cage.splitlines()
+                               if not line.strip().startswith("#"))
+        executable = re.sub(r"\\\n\s*", " ", executable)
+        assignment = 'DELIVERY_BRANCH="observations/truth/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"'
+        if assignment not in executable:
+            faults.append("the cage's delivery branch is not the unique run-id/attempt "
+                          "observations/truth ref")
+        if 'push origin HEAD:"${DELIVERY_BRANCH}"' not in executable:
+            faults.append("the cage no longer pushes the one observation delivery refspec "
+                          'HEAD:"${DELIVERY_BRANCH}"')
+        default_check = '"${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}"'
+        if default_check not in executable:
+            faults.append("the cage does not independently refuse a non-default ref before "
+                          "committing, so a forged CAN_RECORD=yes can deliver branch changes")
+        elif "git commit" in executable and executable.index(default_check) > executable.index("git commit"):
+            faults.append("the cage's independent default-ref check runs after committing")
+        for required in ('gh pr create', '--repo "${GITHUB_REPOSITORY}"',
+                         '--base "${DEFAULT_BRANCH}"', '--head "${DELIVERY_BRANCH}"',
+                         '--body-file "$RUNNER_TEMP/truth-delivery-body.md"'):
+            if required not in executable:
+                faults.append(f"the cage's pending observation PR does not bind {required}")
+        if "PENDING" not in executable:
+            faults.append("the cage does not report pending delivery separately from recording")
+        if re.search(r"\bgh\s+pr\s+(merge|review)\b", executable):
+            faults.append("the clock reviews or merges its own observation PR")
+        if str((steps[i_cage].get("env") or {}).get("GH_TOKEN", "")) != "${{ github.token }}":
+            faults.append("the clock's cage uses a credential other than its own github.token")
+
+    job_env = ((doc.get("jobs") or {}).get("gate") or {}).get("env") or {}
+    if any("secrets." in str(value) for value in job_env.values()):
+        faults.append("the clock job receives a secret credential in its job environment")
+    for step in steps:
+        values = list((step.get("env") or {}).values()) + list((step.get("with") or {}).values())
+        if any("secrets." in str(value) for value in values):
+            faults.append("the clock job receives a secret credential; the independent review "
+                          "credential must not be exposed to the measuring job")
+        shell = "\n".join(line for line in str(step.get("run") or "").splitlines()
+                          if not line.strip().startswith("#"))
+        if re.search(r"\bgh\s+pr\s+(merge|review)\b", shell) and step is not steps[i_cage]:
+            faults.append("the clock reviews or merges its own observation PR in another step")
 
     # F2: the cage must rebase onto the branch it was TOLD is default, never a literal. The
     # guard takes the name from the event so a rename cannot silently stop the clock, and this
@@ -226,6 +269,9 @@ def shape_faults(doc: dict, text: str) -> list[str]:
         if "--force" in line or "-f " in line or re.search(r"""push[^\n]*\s["']?\+\S+:""", line):
             faults.append(f"the workflow can force push, which would rewrite a builder's branch "
                           f"to land an observation: {line.strip()}")
+        if re.match(r"\s*(?:if\s+|then\s+)?git\b", line) and 'push origin HEAD:"${DELIVERY_BRANCH}"' not in line:
+            faults.append(f"the clock can push a ref other than its unique observation "
+                          f"delivery branch: {line.strip()}")
     return faults
 
 
@@ -468,6 +514,196 @@ def portable(shell: str) -> tuple[str, list[str]]:
     return shell, notes
 
 
+class DeliveryResult(NamedTuple):
+    """What the actual workflow shell did in an explicitly synthetic Git fixture."""
+    case: str
+    can_prepare: str
+    cage_rc: int
+    pending_pr: bool
+    default_unchanged_until_review: bool
+    observation_commit: str
+    recorded_after_review: bool
+    original_commit_preserved: bool
+    shell_output: str
+    substitutions: list[str]
+
+
+def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryResult:
+    """Run the real guard, record and cage against a protected disposable default branch.
+
+    `gh` only models opening a pending PR. It cannot merge. A separate reviewer phase pins the
+    exact observation head, then makes a normal two-parent Git merge. The bare server accepts
+    a default-branch update only when it is that reviewed merge. This grades delivery and
+    provenance, not GitHub authorization or signatures: fixture commits are unsigned, and the
+    only auth value is `not-a-token`. Every workflow-shell substitution is returned to callers.
+    """
+    known = {"protected-main", "main-behind", "renamed-default", "feature", "forged-feature",
+             "declaration", "pr-refused", "delivery-collision", "shallow", "empty-default"}
+    if case not in known:
+        raise ValueError(f"unknown delivery fixture case {case!r}")
+    doc = yaml.safe_load(Path(workflow).read_text())
+    synthetic = "TRUTH 1970-01-01T00:00Z run=7 hub=0000000 pass=0 fail=0 synthetic=diagnostic-only"
+    with tempfile.TemporaryDirectory(prefix="can-record-delivery-") as transient:
+        root = Path(transient)
+        env = {"PATH": os.environ["PATH"], "GIT_CONFIG_GLOBAL": str(root / "gitconfig"),
+               "GIT_CONFIG_NOSYSTEM": "1", "GIT_TERMINAL_PROMPT": "0"}
+        (root / "gitconfig").write_text(
+            "[user]\n name = fixture\n email = fixture@example.invalid\n"
+            "[commit]\n gpgsign = false\n[advice]\n detachedHead = false\n")
+
+        def command(args: list[str], cwd: Path, *, check: bool = True,
+                    extra: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
+            result = subprocess.run(args, cwd=cwd, env=dict(env, **(extra or {})),
+                                    capture_output=True, text=True)
+            if check and result.returncode:
+                raise RuntimeError(f"synthetic fixture command failed: {args[0]}: {result.stderr}")
+            return result
+
+        default = "trunk" if case == "renamed-default" else "main"
+        remote, work = root / "remote.git", root / "work"
+        command(["git", "init", "-q", "--bare", "-b", default, str(remote)], root)
+        command(["git", "clone", "-q", str(remote), str(work)], root)
+        (work / "talk").mkdir()
+        original_log = "TRUTH 1970-01-01T00:00Z run=0 hub=0000000 synthetic=diagnostic-only\n"
+        (work / "talk/truth.log").write_text(original_log)
+        (work / "README.md").write_text("synthetic fixture\n")
+        command(["git", "add", "-A"], work)
+        command(["git", "commit", "-qm", "synthetic base"], work)
+        command(["git", "push", "-q", "origin", default], work)
+        if case in {"main-behind", "delivery-collision"}:
+            other = root / "other"
+            command(["git", "clone", "-q", str(remote), str(other)], root)
+            (other / "README.md").write_text("synthetic other writer\n")
+            command(["git", "commit", "-qam", "synthetic other writer"], other)
+            target = default if case == "main-behind" else "observations/truth/112-1"
+            command(["git", "push", "-q", "origin", f"HEAD:{target}"], other)
+        ref = default
+        if case in {"feature", "forged-feature"}:
+            ref = "feature"
+            command(["git", "checkout", "-qb", ref], work)
+            command(["git", "push", "-q", "origin", ref], work)
+        if case == "shallow":
+            shallow = root / "shallow-work"
+            command(["git", "clone", "-q", "--depth", "1", remote.as_uri(), str(shallow)], root)
+            work = shallow
+
+        # The clock cannot write default directly. The separate review model can publish only
+        # a normal merge whose first parent is current default and second is the pinned head.
+        approval = root / "reviewed-head"
+        hook = remote / "hooks/pre-receive"
+        hook.write_text(
+            "#!/bin/sh\nwhile read old new ref; do\n"
+            f" if [ \"$ref\" = 'refs/heads/{default}' ]; then\n"
+            f"  approved=$(cat '{approval}' 2>/dev/null || true)\n"
+            "  parents=$(git show -s --format=%P \"$new\")\n"
+            "  [ -n \"$approved\" ] && [ \"$parents\" = \"$old $approved\" ] && continue\n"
+            "  echo 'GH013: Changes must be made through a pull request.' >&2\n"
+            "  exit 1\n fi\ndone\n")
+        hook.chmod(0o755)
+        pr = root / "pending-pr.json"
+        binaries = root / "bin"
+        binaries.mkdir()
+        gh = binaries / "gh"
+        gh.write_text(f"#!{sys.executable}\n" +
+            "import json, os, pathlib, subprocess, sys\n"
+            "args=sys.argv[1:]\n"
+            "if args[:2] != ['pr','create']: raise SystemExit('fixture gh only opens PRs')\n"
+            "if os.environ.get('FIXTURE_PR_REFUSED') == 'yes': raise SystemExit('synthetic PR create refusal')\n"
+            "options=dict(zip(args[2::2],args[3::2]))\n"
+            "assert options['--repo']=='fixture/example'\n"
+            "assert options['--base']==os.environ['FIXTURE_DEFAULT']\n"
+            "assert options['--head']=='observations/truth/112-1'\n"
+            "assert options['--title']=='truth: record run 7'\n"
+            "assert pathlib.Path(options['--body-file']).is_file()\n"
+            "sha=subprocess.check_output(['git','--git-dir',os.environ['FIXTURE_REMOTE'],"
+            "'rev-parse','refs/heads/'+options['--head']],text=True).strip()\n"
+            "pathlib.Path(os.environ['FIXTURE_PR']).write_text(json.dumps(dict(options,head_sha=sha)))\n"
+            "print('https://example.invalid/fixture/pull/1')\n")
+        gh.chmod(0o755)
+        runner = root / "runner"
+        runner.mkdir()
+        (runner / "gate.out").write_text("synthetic diagnostic gate\n" + synthetic + "\n")
+        github_env, summary = root / "github-env", root / "summary"
+        github_env.touch(); summary.touch()
+        step_env = dict(env, PATH=str(binaries) + os.pathsep + env["PATH"],
+                        GITHUB_REF_NAME=ref, DEFAULT_BRANCH="" if case == "empty-default" else default,
+                        GITHUB_ENV=str(github_env),
+                        RUNNER_TEMP=str(runner), GITHUB_STEP_SUMMARY=str(summary),
+                        GITHUB_RUN_NUMBER="7", GITHUB_RUN_ID="112", GITHUB_RUN_ATTEMPT="1",
+                        GITHUB_REPOSITORY="fixture/example", GH_TOKEN="not-a-token",
+                        OBSERVATION_LANE="talk/truth.log drift/samples.jsonl talk/captures observations",
+                        FIXTURE_REMOTE=str(remote), FIXTURE_PR=str(pr), FIXTURE_DEFAULT=default,
+                        FIXTURE_PR_REFUSED="yes" if case == "pr-refused" else "no")
+        substitutions: list[str] = []
+        outputs: list[str] = []
+        for name, fragment in (("guard", GUARD_STEP), ("record", RECORD_STEP), ("cage", CAGE_STEP)):
+            shell, notes = portable(step_shell(doc, "gate", fragment))
+            substitutions.extend(notes)
+            script = root / f"{name}.sh"
+            script.write_text(shell)
+        before = command(["git", "rev-parse", f"refs/heads/{default}"], remote).stdout.strip()
+        collision_head = None
+        if case == "delivery-collision":
+            collision_head = command(["git", "rev-parse", "refs/heads/observations/truth/112-1"], remote).stdout.strip()
+        start = command(["git", "rev-parse", "HEAD"], work).stdout.strip()
+        guard = subprocess.run(["bash", *step_shell_flags(doc, "gate", GUARD_STEP), str(root / "guard.sh")],
+                               cwd=work, env=step_env, capture_output=True, text=True)
+        outputs.append(guard.stdout + guard.stderr)
+        if guard.returncode:
+            if case in {"shallow", "empty-default"}:
+                return DeliveryResult(case, "unknown", guard.returncode, False, True, "", False,
+                                      False, "".join(outputs), substitutions)
+            raise RuntimeError("synthetic guard unexpectedly refused: " + outputs[-1])
+        for line in github_env.read_text().splitlines():
+            key, value = line.split("=", 1)
+            step_env[key] = value
+        if case == "forged-feature":
+            step_env["CAN_RECORD"] = "yes"
+        record = subprocess.run(["bash", *step_shell_flags(doc, "gate", RECORD_STEP), str(root / "record.sh")],
+                                cwd=work, env=step_env, capture_output=True, text=True)
+        outputs.append(record.stdout + record.stderr)
+        if record.returncode:
+            raise RuntimeError("synthetic record unexpectedly refused: " + outputs[-1])
+        if case == "declaration":
+            (work / "declaration.yaml").write_text("synthetic: forbidden\n")
+            command(["git", "add", "declaration.yaml"], work)
+        cage = subprocess.run(["bash", *step_shell_flags(doc, "gate", CAGE_STEP), str(root / "cage.sh")],
+                              cwd=work, env=step_env, capture_output=True, text=True)
+        outputs.append(cage.stdout + cage.stderr)
+        current = command(["git", "rev-parse", f"refs/heads/{default}"], remote).stdout.strip()
+        if collision_head is not None:
+            delivery_head = command(["git", "rev-parse", "refs/heads/observations/truth/112-1"], remote).stdout.strip()
+            if delivery_head != collision_head:
+                raise RuntimeError("the clock overwrote an existing observation delivery branch")
+        head = command(["git", "rev-parse", "HEAD"], work).stdout.strip()
+        recorded = preserved = False
+        if pr.exists():
+            pending = json.loads(pr.read_text())
+            if head != pending["head_sha"] or current != before:
+                raise RuntimeError("pending delivery moved default or changed its head")
+            identity = command(["git", "show", "-s", "--format=%ae%n%s%n%P", head], remote).stdout.splitlines()
+            if identity != [CLOCK_EMAIL, "truth: record run 7 [skip ci]", current]:
+                raise RuntimeError("the pending delivery is not the clock's one observation commit")
+            paths = command(["git", "diff", "--name-only", current, head], remote).stdout.splitlines()
+            if paths != ["talk/truth.log"]:
+                raise RuntimeError("delivery fixture observed a declaration in the PR")
+            proposed = command(["git", "show", f"{head}:talk/truth.log"], remote).stdout
+            if proposed != original_log + synthetic + "\n":
+                raise RuntimeError("delivery fixture changed prior observations or its exact TRUTH line")
+            reviewer = root / "reviewer"
+            command(["git", "clone", "-q", str(remote), str(reviewer)], root)
+            approval.write_text(head + "\n")
+            command(["git", "merge", "--no-ff", "-qm", "synthetic reviewed observation merge", head], reviewer)
+            command(["git", "push", "-q", "origin", default], reviewer)
+            landed = command(["git", "show", f"refs/heads/{default}:talk/truth.log"], remote).stdout
+            recorded = landed.splitlines().count(synthetic) == 1
+            preserved = command(["git", "merge-base", "--is-ancestor", head, f"refs/heads/{default}"], remote,
+                                check=False).returncode == 0
+        return DeliveryResult(case, step_env["CAN_RECORD"], cage.returncode, pr.exists(),
+                              current == before, "" if head == start else head, recorded, preserved,
+                              "".join(outputs), substitutions)
+
+
 # -- selfcheck ----------------------------------------------------------------------------------
 
 def selfcheck() -> int:
@@ -541,6 +777,40 @@ def main(argv: list[str]) -> int:
     cmd = argv[1]
     if cmd == "selfcheck":
         return selfcheck()
+    if cmd == "delivery":
+        failed = 0
+        for case in ("protected-main", "main-behind", "renamed-default", "feature",
+                     "forged-feature", "declaration", "pr-refused", "delivery-collision",
+                     "shallow", "empty-default"):
+            result = delivery_fixture(Path(argv[2]), case)
+            for substitution in sorted(set(result.substitutions)):
+                print(f"  ({case}) note: {substitution}")
+            positive = case in {"protected-main", "main-behind", "renamed-default"}
+            safe_refusal = case in {"forged-feature", "declaration", "shallow", "empty-default"}
+            passed = result.default_unchanged_until_review
+            if positive:
+                passed = passed and result.cage_rc == 0 and result.pending_pr
+                passed = passed and result.recorded_after_review and result.original_commit_preserved
+                passed = passed and "PENDING" in result.shell_output
+            elif case == "feature":
+                passed = passed and result.can_prepare == "no" and result.cage_rc == 0
+                passed = passed and not result.pending_pr and not result.observation_commit
+            elif safe_refusal:
+                passed = passed and result.cage_rc != 0 and not result.pending_pr and not result.observation_commit
+            else:
+                passed = passed and result.cage_rc != 0 and not result.pending_pr and bool(result.observation_commit)
+                passed = passed and not result.recorded_after_review
+            print(f"  {'ok' if passed else '!!'}   {case}: prepare={result.can_prepare} "
+                  f"cage={result.cage_rc} pending={result.pending_pr} "
+                  f"default-unchanged-until-review={result.default_unchanged_until_review} "
+                  f"recorded-after-review={result.recorded_after_review} "
+                  f"original-commit-preserved={result.original_commit_preserved}")
+            if not passed:
+                failed += 1
+                print(result.shell_output)
+        print("  --   fixture limits: unsigned synthetic commits and offline gh PR creation; "
+              "separate review model merges normally. No genuine signature or GitHub authorization is graded.")
+        return 1 if failed else 0
     if cmd == "shape":
         path = Path(argv[2])
         doc = yaml.safe_load(path.read_text(encoding="utf-8"))

@@ -2,16 +2,17 @@ name: truth
 
 # The truth surface on a clock (GAPS 2.1). talk/verify-all.sh discovers every verify*.sh in
 # the unit repos and the hub, runs each, and prints one TRUTH line with the date, the run
-# number and every commit it read. That line is appended to talk/truth.log and committed, so
-# the only citable number lives in git with its date. A red run still records its line.
+# number and every commit it read. A default-branch measurement prepares a signed observation
+# PR; the separate reviewer records it on main. Pending is not recorded. A red run still
+# proposes its line; the only citable number lives on main with its date.
 #
 # This is the estate's ORIGINAL observation lane, and ticket 28 / ADR-0024 caged it. The commit
 # is now gitsign-signed with this run's own Actions identity -- the same keyless
 # OIDC -> Fulcio -> Rekor chain every cut-release.yml uses for tags -- and the `observation cage`
 # step stages only the paths in OBSERVATION_LANE below, failing the run if the gate left anything
-# else in the tree. A verify script that writes a declaration can no longer push it to main by
-# riding this workflow's `contents: write`. The server-side half is
-# .github/rulesets/observation-lane.json in each unit repo, which the owner applies with `gh api`.
+# else in the tree. Public repositories cannot enforce lane paths with a push ruleset
+# (ADR-0023). The independent reviewer checks this lane again and preserves the original
+# signature through the required reviewed merge; the clock never pushes main or merges.
 #
 # TWO JOBS, on purpose (ticket 56, 2026-09-04). `clocks` holds a read-scoped credential and runs
 # no third-party code; `gate` runs the eight orgs' scripts and holds none. The first hands the
@@ -39,6 +40,7 @@ on:
 permissions:
   contents: write
   id-token: write
+  pull-requests: write
 
 # The observation lane, declared once as data so the cage step and
 # verify/schedules/verify-schedules.sh read the SAME list (ADR-0024, D1). These are the only
@@ -269,7 +271,7 @@ jobs:
           echo "CAN_RECORD=${can}" >> "$GITHUB_ENV"
           echo "CANNOT_REASON=${why}" >> "$GITHUB_ENV"
           if [ "${can}" = yes ]; then
-            echo "THIS RUN CAN RECORD. Its TRUTH line will be appended to talk/truth.log, committed and pushed to ${GITHUB_REF_NAME}. Why: ${why} (HEAD=${base}; this verdict read no remote)."
+            echo "THIS RUN CAN PREPARE DELIVERY. Its TRUTH line will be appended locally and signed for a pending PR. Only the separate reviewer can record it on ${DEFAULT_BRANCH}; pending is NOT recorded. Why: ${why} (HEAD=${base}; this verdict read no remote)."
           else
             echo "THIS RUN CANNOT RECORD ITS TRUTH LINE, and will not pretend to. It still runs the whole gate and still prints its TRUTH line below for a reader to quote; it appends nothing to talk/truth.log, makes no commit, and pushes nothing to your branch. Why: ${why} (origin/${DEFAULT_BRANCH}=${base})."
           fi
@@ -503,6 +505,10 @@ jobs:
             git reset -q
             exit 0
           fi
+          if [ -z "${DEFAULT_BRANCH:-}" ] || [ "${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}" ]; then
+            echo "::error::only a default-branch measurement may propose observation delivery"
+            exit 1
+          fi
           if git diff --cached --quiet; then
             echo "ok  nothing to observe, and nothing declared"; exit 0
           fi
@@ -526,16 +532,27 @@ jobs:
           # reach it (see persist-credentials above).
           # No --force, ever, and no `+` refspec (ticket 100): a clock that rewrote a builder's
           # branch to land its own observation would be worse than one that records nothing.
-          # If the push is refused here, origin/main or origin/<ref> moved between the guard step
-          # and this one -- a race the guard cannot close -- and the run says so and goes red
-          # rather than reporting a line it did not record.
+          # Main requires a reviewed PR (2026-10-04). Keep this run's original signed
+          # object on a unique delivery ref, never a builder's branch. A pending PR is
+          # NOT the citable record. truth-delivery.yml reviews it separately after this
+          # run completes; that workflow never checks out or executes this pending ref.
+          DELIVERY_BRANCH="observations/truth/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${GH_TOKEN}" | base64 -w0)" \
-            push origin HEAD:"${GITHUB_REF_NAME}" || {
-              echo "::error::this run said it could record and the push was refused: origin/main"\
-                   "or origin/${GITHUB_REF_NAME} moved after the guard looked. The TRUTH line"\
-                   "above was NOT recorded."
+            push origin HEAD:"${DELIVERY_BRANCH}" || {
+              echo "::error::the observation delivery push was refused; see the forge's"\
+                   "reason above. The TRUTH line is NOT recorded."
               exit 1
             }
+          {
+            echo "Original signed observation for TRUTH run ${GITHUB_RUN_NUMBER}."
+            echo "Source run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Observation commit: $(git rev-parse HEAD)"
+            echo "Pending review: this line is NOT recorded until this exact commit reaches ${DEFAULT_BRANCH}."
+          } > "$RUNNER_TEMP/truth-delivery-body.md"
+          gh pr create --repo "${GITHUB_REPOSITORY}" --base "${DEFAULT_BRANCH}" \
+            --head "${DELIVERY_BRANCH}" --title "truth: record run ${GITHUB_RUN_NUMBER}" \
+            --body-file "$RUNNER_TEMP/truth-delivery-body.md"
+          echo "PENDING observation delivery on ${DELIVERY_BRANCH}; TRUTH is NOT recorded yet."
       # --- a fall is a blocking event (NORTH-STAR §5, ticket 59) --------------------------------
       # §5's last bullet is two sentences and only the first was ever built. "The number and its
       # date are recorded on every run" has been true since GAPS 2.1. "A fall is a blocking

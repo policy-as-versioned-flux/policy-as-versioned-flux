@@ -325,3 +325,22 @@ by construction off the first-parent chain. So about one recorded line in four c
 run that merged cleanly, not one in six. Every one measured a tree that later reached main, so
 nothing about the estate's state is lost — but the record's density changed on 2026-09-05, and a
 reader comparing run numbers to first-parent history should know why.
+
+## Delivery amendment, 2026-10-05 (delegated, ADR-0025)
+
+The October 4 required-PR rule closes the forge review gap but conflicts with this
+ticket's former direct-main push. Genuine main run 386 created signed a09dc5a8 from
+76cadafb and received GH013 with main up to date. Its line is absent from main.
+The protected-remote replay reaches that exact failure; removing only required review
+lets the line land. A ref race and denied write produce different rejection signals.
+
+Retain the review rule. A default-branch measurement may prepare delivery in a unique
+`observations/truth/<run-id>-<attempt>` PR, never in a builder's branch. This is pending,
+not recorded. Non-default measurements still make no commit. The separate trusted
+reviewer validates the original gitsign object, actual run and source, lane and exact
+head, then the existing App reviews and ordinarily merges it during the valid recorded
+development window. Its signature and byte-identical line survive the merge.
+Main-only citation, branch rename safety, the cage, and missing-line conservation
+remain; a pending ref is not exempted from missing-line failures. See the October 5
+amendment to ADR-0024 and `.github/rulesets/README.md` for credential isolation and
+human delivery after expiry. No genuine grade is authored by this repair.

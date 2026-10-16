@@ -426,3 +426,34 @@ truth surface rather than read off the lane five hours later.
   **What this does not change**: nothing about the lane, D1 or D2, and nothing about point 3's
   split between the job that holds a credential and the job that grades. A clock still appends
   only observations.
+
+## Amendment, 2026-10-05: the hub clock proposes delivery; the other hand reviews
+
+Delegated under ADR-0025. Required review was added to hub main on October 4 while
+truth.yml retained a GITHUB_TOKEN direct push. Main run 386 signed its observation and
+received GH013 with main up to date. Removing the review rule would reopen the gap it
+closed; making the reviewer a bypass writer would collapse two identities.
+
+Default-branch measurements therefore prepare an original gitsign observation commit
+and a unique pending PR. Builder branch runs still print only and commit nothing.
+This amends the hub's direct landing mechanism, not the meaning of a recorded observation:
+main's log remains the only citable record, and pending is explicitly NOT recorded.
+The existing strict missing-line detector continues to fail until delivery.
+
+A separate, non-scheduled trusted reviewer verifies the actual main run and attempt,
+the observation commit's identity/issuer/source claims, lane-only tree changes, one
+unaltered appended TRUTH line, and a stable PR head. It executes only reviewed default
+code. During the valid owner-recorded development window, the existing other-hand App
+reviews that exact head and normally merges it without squash/rebase or bypass. After
+the window expires, or in another declared mode, it leaves the proposal for a human.
+A scheduled job still never merges. The original run-signed object and bytes survive;
+a GitHub Verified merge badge is not substituted for the gitsign check.
+
+The existing App key is confined to a default-branch-restricted reviewer environment,
+absent from gate and branch jobs. Read-only validation precedes credential use; its
+installation token is narrowed to this hub and contents/PR writes; a separate read-only
+job token reads official metadata. The existing App has no Actions grant. Before
+either mutation, a changed default-branch source invalidates the trusted checkout and
+leaves delivery pending for retry. No new identity is created. A conflict, changed head,
+failed verification or missing record
+stays pending and red. Only verified main ancestry and exact line permit RECORDED.
