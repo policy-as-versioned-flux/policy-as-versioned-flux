@@ -28,6 +28,45 @@ c/verify-c.sh | simulation | waits: declares one version   # borderline: the mat
 d/verify-d.sh | meta | -
 """
 
+POUND_SEAM = "verify/pound-seam/verify-pound-seam.sh"
+# Exact final native output from genuine main TRUTH run 400 (2026-10-16). The checker
+# exited 3 after 45 passes and nine skips; this remains an absence, never a passing price.
+KEV_ABSENCE = (
+    "SKIP: driftwood prices[3] (feeds/cve feed) could not be priced, and says why: "
+    "No scanned CVE is in the pinned KEV feed; 334 scanned CVE(s) outside it are named "
+    "absences carrying no amount.")
+
+
+def test_real_kev_intersection_absence_is_a_declared_wait_without_a_pass() -> None:
+    manifest = Path(__file__).resolve().parent.parent / "talk" / "verify-manifest.txt"
+    entries = tm.load_manifest(str(manifest))
+    ok, why = tm.judge(entries, POUND_SEAM, KEV_ABSENCE)
+    assert ok, why
+    assert why == "declared waits"
+    summary = tm.summarise(entries, [(POUND_SEAM, "SKIP" if ok else "FAIL", KEV_ABSENCE)])
+    assert (summary.passed, summary.failed, summary.skipped, summary.ceiling) == (0, 0, 1, 1)
+
+
+@pytest.mark.parametrize("reason", [
+    "SKIP: arbitrary unpriceable price",
+    KEV_ABSENCE.replace("No scanned CVE is in the pinned KEV feed", "missing inventory instrument"),
+    KEV_ABSENCE.replace("feeds/cve feed", "feeds/another feed"),
+    KEV_ABSENCE.replace("carrying no amount.", "carrying an invented zero amount."),
+    KEV_ABSENCE + " Missing instrument: scan unavailable.",
+])
+def test_kev_registration_does_not_admit_other_absences_or_invented_amounts(reason: str) -> None:
+    manifest = Path(__file__).resolve().parent.parent / "talk" / "verify-manifest.txt"
+    entries = tm.load_manifest(str(manifest))
+    ok, why = tm.judge(entries, POUND_SEAM, reason)
+    assert not ok and "does not match" in why
+
+
+def test_a_real_pound_seam_failure_stays_failed_even_if_it_mentions_the_registered_absence() -> None:
+    manifest = Path(__file__).resolve().parent.parent / "talk" / "verify-manifest.txt"
+    entries = tm.load_manifest(str(manifest))
+    summary = tm.summarise(entries, [(POUND_SEAM, "FAIL", "FAIL: invalid price; " + KEV_ABSENCE)])
+    assert (summary.passed, summary.failed, summary.skipped) == (0, 1, 0)
+
 
 def test_a_good_manifest_parses_with_class_kind_and_pattern_keeping_alternation() -> None:
     entries, problems = tm.parse_manifest(GOOD)
