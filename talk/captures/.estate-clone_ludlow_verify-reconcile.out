@@ -1,3 +1,3 @@
 [1;36m==>[0m 0. the five-fact sample: the composed set in force, from signed sources (graded first, cluster-free)
-   SKIP: the newest five-fact sample is 69h old (2026-10-03T14:19:26Z), older than the 48h freshness bound -- the scheduled sampler has stopped, and a stale sample is not an observation of the cluster now
-SKIP: no local kind cluster 'ludlow' to observe here, and the lane sample cannot stand in: the newest five-fact sample is 69h old (2026-10-03T14:19:26Z), older than the 48h freshness bound -- the scheduled sampler has stopped, and a stale sample is not an observation of the cluster now
+   SKIP: the newest five-fact sample is 93h old (2026-10-03T14:19:26Z), older than the 48h freshness bound -- the scheduled sampler has stopped, and a stale sample is not an observation of the cluster now
+SKIP: no local kind cluster 'ludlow' to observe here, and the lane sample cannot stand in: the newest five-fact sample is 93h old (2026-10-03T14:19:26Z), older than the 48h freshness bound -- the scheduled sampler has stopped, and a stale sample is not an observation of the cluster now
