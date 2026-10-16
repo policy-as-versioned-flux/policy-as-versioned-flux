@@ -48,6 +48,11 @@ GATE_STEP = "the gate"
 RECORD_STEP = "record the TRUTH line"
 CAGE_STEP = "observation cage"
 
+# Git's explicit empty expectation means the full destination ref MUST NOT EXIST.
+# No bare force, implicit lease, nonempty expectation or other refspec is permitted.
+_CREATE_ONLY_PUSH = ('push --force-with-lease="refs/heads/${DELIVERY_BRANCH}:" '
+                     'origin "HEAD:refs/heads/${DELIVERY_BRANCH}"')
+
 # The clock's own identity, set by the cage step itself.
 CLOCK_EMAIL = "truth@users.noreply.github.com"
 
@@ -133,12 +138,11 @@ def step_shell_flags(doc: dict, job: str, fragment: str) -> list[str]:
 def shape_faults(doc: dict, text: str) -> list[str]:
     """The workflow still has the shape ticket 100 decided, or the reasons it does not.
 
-    `text` is the raw YAML, read for the two things a parsed document flattens away -- but read
-    line by line with comment lines skipped, so a force push written in a COMMENT is not a fault
-    (the docstring claimed otherwise until 2026-09-05; the code has always skipped them, and the
-    code is right: a comment describing what the cage must never do is not the cage doing it).
-    The two things are: a force
-    push written anywhere at all, including in a comment or a step this checker does not name."""
+    `text` is the raw YAML, scanned with continuations joined and comment lines skipped.
+    Every push must use the exact full delivery ref and explicit empty expected value:
+    creating an absent ref is allowed; updating any occupied ref is not. Comments describing
+    prohibited force pushes are not executable commands and are ignored here.
+    """
     faults: list[str] = []
     steps = _steps(doc, "gate")
     if not steps:
@@ -209,9 +213,9 @@ def shape_faults(doc: dict, text: str) -> list[str]:
         if assignment not in executable:
             faults.append("the cage's delivery branch is not the unique run-id/attempt "
                           "observations/truth ref")
-        if 'push origin HEAD:"${DELIVERY_BRANCH}"' not in executable:
-            faults.append("the cage no longer pushes the one observation delivery refspec "
-                          'HEAD:"${DELIVERY_BRANCH}"')
+        if executable.count(_CREATE_ONLY_PUSH) != 1:
+            faults.append("the cage no longer uses exactly one create-only observation delivery "
+                          "refspec with an explicit empty expectation for its full destination ref")
         default_check = '"${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}"'
         if default_check not in executable:
             faults.append("the cage does not independently refuse a non-default ref before "
@@ -248,21 +252,23 @@ def shape_faults(doc: dict, text: str) -> list[str]:
             faults.append("the producer integrates or rewrites the original observation; "
                           "publish its unchanged source-parent object before separate review")
 
-    # Continuations first: the one real push in this workflow is written `git -c http.extraheader=
-    # ... \` then `push origin HEAD:...` on the next line, so a per-line scan would read the push
-    # and the `git` as two different statements and see neither.
+    # A single canonical push is the only permitted publication operation. Strip just that
+    # explicit empty lease before scanning for force options: a second lease, force override,
+    # or extra refspec must still fail rather than inheriting its create-only exception.
     for line in re.sub(r"\\\n\s*", " ", text).splitlines():
         if line.strip().startswith("#") or not re.search(r"\bgit\b.*\bpush\b", line):
             continue
-        # An optional quote between the whitespace and the `+`: `git push origin "+HEAD:main"`
-        # and `'+HEAD:${GITHUB_REF_NAME}'` both slipped through, because the old pattern needed
-        # whitespace IMMEDIATELY before the plus and a quote intervenes (review F5).
-        if "--force" in line or "-f " in line or re.search(r"""push[^\n]*\s["']?\+\S+:""", line):
-            faults.append(f"the workflow can force push, which would rewrite a builder's branch "
-                          f"to land an observation: {line.strip()}")
-        if re.match(r"\s*(?:if\s+|then\s+)?git\b", line) and 'push origin HEAD:"${DELIVERY_BRANCH}"' not in line:
-            faults.append(f"the clock can push a ref other than its unique observation "
-                          f"delivery branch: {line.strip()}")
+        remainder = line.replace(_CREATE_ONLY_PUSH, "", 1)
+        if ("--force" in remainder or "--no-force" in remainder
+                or re.search(r"(?:^|\s)-f(?=\s|$)", remainder)
+                or re.search(r"""push[^\n]*\s["']?\+\S+:""", line)):
+            faults.append(f"the workflow can force push or override create-only publication, "
+                          f"which could rewrite an occupied ref: {line.strip()}")
+        is_command = re.match(r"\s*(?:(?:if|then|!|exec|command)\s+)?git\b", line)
+        if is_command and not re.search(r"\b" + re.escape(_CREATE_ONLY_PUSH)
+                                        + r"\s*(?:\|\|\s*\{)?\s*$", line):
+            faults.append(f"the clock can push a refspec other than its one create-only "
+                          f"observation delivery branch: {line.strip()}")
     return faults
 
 
@@ -537,7 +543,8 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
     """
     known = {"protected-main", "main-behind", "log-overlap", "capture-overlap",
              "renamed-default", "feature", "forged-feature",
-             "declaration", "pr-refused", "delivery-collision", "shallow", "empty-default"}
+             "declaration", "pr-refused", "delivery-collision", "ancestor-collision",
+             "publication-race", "shallow", "empty-default"}
     if case not in known:
         raise ValueError(f"unknown delivery fixture case {case!r}")
     doc = yaml.safe_load(Path(workflow).read_text())
@@ -585,6 +592,20 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
             command(["git", "commit", "-qam", "synthetic other writer"], other)
             target = "observations/truth/112-1" if case == "delivery-collision" else default
             command(["git", "push", "-q", "origin", f"HEAD:{target}"], other)
+        if case == "ancestor-collision":
+            # An ordinary non-force push would fast-forward this occupied ref.
+            command(["git", "update-ref", "refs/heads/observations/truth/112-1", source_parent], remote)
+        race_marker = root / "publication-race-created"
+        if case == "publication-race":
+            # Git calls pre-push after reading the remote advertisement. Create the
+            # destination only then, before receive-pack's atomic ref transaction.
+            race_hook = work / ".git/hooks/pre-push"
+            race_hook.write_text(f"#!{sys.executable}\n" +
+                "import pathlib, subprocess\n" +
+                f"subprocess.run(['git', '--git-dir', {str(remote)!r}, 'update-ref', "
+                f"'refs/heads/observations/truth/112-1', {source_parent!r}, {'0' * 40!r}], check=True)\n" +
+                f"pathlib.Path({str(race_marker)!r}).write_text('created after advertisement\\n')\n")
+            race_hook.chmod(0o755)
         ref = default
         if case in {"feature", "forged-feature"}:
             ref = "feature"
@@ -651,7 +672,7 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
             script.write_text(shell)
         before = command(["git", "rev-parse", f"refs/heads/{default}"], remote).stdout.strip()
         collision_head = None
-        if case == "delivery-collision":
+        if case in {"delivery-collision", "ancestor-collision"}:
             collision_head = command(["git", "rev-parse", "refs/heads/observations/truth/112-1"], remote).stdout.strip()
         guard = subprocess.run(["bash", *step_shell_flags(doc, "gate", GUARD_STEP), str(root / "guard.sh")],
                                cwd=work, env=step_env, capture_output=True, text=True)
@@ -680,6 +701,10 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
                               cwd=work, env=step_env, capture_output=True, text=True)
         outputs.append(cage.stdout + cage.stderr)
         current = command(["git", "rev-parse", f"refs/heads/{default}"], remote).stdout.strip()
+        if case == "publication-race":
+            if not race_marker.exists():
+                raise RuntimeError("synthetic publication race did not reach the Git pre-push seam")
+            collision_head = source_parent
         if collision_head is not None:
             delivery_head = command(["git", "rev-parse", "refs/heads/observations/truth/112-1"], remote).stdout.strip()
             if delivery_head != collision_head:
@@ -831,7 +856,7 @@ def main(argv: list[str]) -> int:
         for case in ("protected-main", "main-behind", "log-overlap", "capture-overlap",
                      "renamed-default", "feature",
                      "forged-feature", "declaration", "pr-refused", "delivery-collision",
-                     "shallow", "empty-default"):
+                     "ancestor-collision", "publication-race", "shallow", "empty-default"):
             result = delivery_fixture(Path(argv[2]), case)
             for substitution in sorted(set(result.substitutions)):
                 print(f"  ({case}) note: {substitution}")

@@ -5,7 +5,9 @@
 # model attempts a normal two-parent merge preserving the original clock commit and source parent.
 # Log/capture overlap produces a real merge conflict while the durable ref/PR and main stay intact;
 # the missing citable line remains red until recovery. Feature runs record nothing;
-# forged eligibility, declarations, PR refusal, delivery collision, shallow history and missing
+# Occupied ancestor/divergent refs and refs created after Git's remote advertisement cannot
+# be updated: publication uses a full-ref, explicit-empty-expectation creation compare-and-swap.
+# Forged eligibility, declarations, PR refusal, shallow history and missing
 # default-branch identity each have explicit refusal cases.
 #
 # Fixture limits are printed: commits are unsigned and the token is synthetic. This grades the
@@ -45,19 +47,19 @@ say "1b. no citable TRUTH line is stranded on a branch that merged without it"
 # ---------------------------------------------------------------- 2. the shape
 say "2. truth.yml still has the shape ticket 100 decided"
 if "$PY" "$HERE/can_record.py" shape "$WORKFLOW"; then
-  ok "the guard runs before measurement; the cage publishes its original source-parent object on the exact run/attempt pending ref without producer integration, direct default-branch push or self-merge"
+  ok "the guard runs before measurement; the cage publishes its original source-parent object on the exact run/attempt pending ref through create-only publication without producer integration, direct default-branch push or self-merge"
 else
   note "truth.yml no longer has the shape (above)"
 fi
 
 # ---------------------------------------------------------------- 3. the mechanism
-say "3. actual workflow shell: durable original publication precedes separate review and conflicts stay pending"
+say "3. actual workflow shell: create-only original publication precedes separate review and conflicts stay pending"
 "$PY" "$HERE/can_record.py" delivery "$WORKFLOW" \
   || note "the actual guard, record or cage violated protected-default delivery (above)"
 
 echo
 if [ "$bad" -eq 0 ]; then
-  echo "PASS: recorded TRUTH lines retain clock provenance; default-branch measurements durably publish their original source-parent commit before separate review; a normal merge preserves it, while real log/capture conflicts retain the exact pending ref and missing-line failure without claiming recording; branch and unsafe delivery cases refuse as named"
+  echo "PASS: recorded TRUTH lines retain clock provenance; default-branch measurements create their unique ref only when absent and durably publish the original source-parent commit before separate review; a normal merge preserves it, while real log/capture conflicts retain the exact pending ref and missing-line failure without claiming recording; branch and unsafe delivery cases refuse as named"
   exit 0
 fi
 echo "FAIL: $bad fault(s) -- the clock's recording provenance or protected-default delivery does not hold"

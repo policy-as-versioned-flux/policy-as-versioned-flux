@@ -470,7 +470,14 @@ The producer now signs once on the source parent it measured and immediately pub
 that exact object to its unique run-id/attempt ref before opening the pending PR. It
 does not pull, rebase, merge or cherry-pick. Default-branch renames still bind the PR's
 base through event metadata. A refused PR creation leaves the published object available
-for recovery; an occupied delivery ref is never overwritten or force-pushed.
+for recovery; an occupied delivery ref is never overwritten or force-pushed. Publication
+uses Git's explicit full-ref empty-expectation lease: despite the option name
+`--force-with-lease`, the empty expected value requires the destination not to exist.
+This is create-only compare-and-swap, not a force update. No bare force, implicit or
+nonempty lease, additional refspec, or `+` refspec is permitted. See the
+[Git push contract](https://git-scm.com/docs/git-push). Occupied ancestor and divergent
+refs are both refused; a ref created after Git's advertisement is retained by the
+receive-pack ref transaction rather than overwritten.
 
 The reviewer checks the lane against the original parent, which must be an ancestor of
 current default history; the measured source must be an ancestor of that parent. It
