@@ -523,8 +523,10 @@ jobs:
           git commit -m "truth: record run ${GITHUB_RUN_NUMBER} [skip ci]"
           # The credential is handed to THIS command only; nothing the gate ran could
           # reach it (see persist-credentials above).
-          # No --force, ever, and no `+` refspec (ticket 100): a clock that rewrote a builder's
-          # branch to land its own observation would be worse than one that records nothing.
+          # Never update an existing ref, use bare --force, or use a `+` refspec (ticket 100).
+          # The explicit full-ref lease below has an EMPTY expected value: Git requires that
+          # ref not exist. Despite the option's name, this is create-only compare-and-swap,
+          # never permission to replace or fast-forward an occupied observation ref.
           # Main requires a reviewed PR (2026-10-04). Keep this run's original signed
           # object on a unique delivery ref, never a builder's branch. A pending PR is
           # NOT the citable record. truth-delivery.yml reviews it separately after this
@@ -533,7 +535,7 @@ jobs:
           # leaves the original source parent intact, even when review finds a conflict.
           DELIVERY_BRANCH="observations/truth/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${GH_TOKEN}" | base64 -w0)" \
-            push origin HEAD:"${DELIVERY_BRANCH}" || {
+            push --force-with-lease="refs/heads/${DELIVERY_BRANCH}:" origin "HEAD:refs/heads/${DELIVERY_BRANCH}" || {
               echo "::error::the observation delivery push was refused; see the forge's"\
                    "reason above. The TRUTH line is NOT recorded."
               exit 1
