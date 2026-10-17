@@ -9,7 +9,10 @@ accuracy. No threshold, widening target or compiler price effect is supplied her
 `.estate-clone`, chooses its highest `publisher-reliability/v<semver>` tag, requires
 that annotated tag on served main's first-parent history, and verifies its Git
 signature, Rekor inclusion and exact cut-release certificate identity offline.
-Catalogue `v*` tags do not qualify. It exports the immutable verified tag object,
+Catalogue `v*` tags do not qualify. The object is captured before history checks
+and copied into a private regular Git repository with its own temporary ref, so
+the verifier and exporter select the same object even if the source ref moves.
+It exports that immutable verified tag object,
 runs that source's native provenance/recomputation checker on the committed
 `publisher-reliability/v1/feed.json`, and preserves its binary-only claim boundary.
 The mutable checkout is not report evidence. The caller does not fetch or sign.

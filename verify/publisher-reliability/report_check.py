@@ -78,7 +78,7 @@ def load_report(path: Path) -> dict:
     return report
 
 
-def newest_tag(repo: Path) -> str:
+def newest_tag(repo: Path) -> tuple[str, str]:
     origin = git(repo, "remote", "get-url", "origin").rstrip("/").removesuffix(".git")
     if origin != ORIGIN:
         raise Rejected("publisher report requires the canonical NIST origin")
@@ -91,13 +91,37 @@ def newest_tag(repo: Path) -> str:
     if not candidates:
         raise Unmeasured(NO_TAG)
     tag = max(candidates)[1]
-    if git(repo, "cat-file", "-t", "refs/tags/" + tag) != "tag":
+    tag_object = git(repo, "rev-parse", "refs/tags/" + tag)
+    if git(repo, "cat-file", "-t", tag_object) != "tag":
         raise Rejected("publisher report tag must be annotated and signed")
-    commit = git(repo, "rev-parse", "refs/tags/" + tag + "^{commit}")
+    headers = git(repo, "cat-file", "tag", tag_object).partition("\n\n")[0].splitlines()
+    if [line.removeprefix("tag ") for line in headers if line.startswith("tag ")] != [tag]:
+        raise Rejected("signed tag name differs from the namespaced report reference")
+    commit = git(repo, "rev-parse", tag_object + "^{commit}")
     served = git(repo, "rev-parse", "refs/remotes/origin/main^{commit}")
     if commit not in git(repo, "rev-list", "--first-parent", served).splitlines():
         raise Rejected("publisher report tag is not on served NIST main's first-parent history")
-    return tag
+    return tag, tag_object
+
+
+def copy_tag(repo: Path, tag: str, tag_object: str, destination: Path) -> None:
+    """Freeze the exact object in a regular private repo before name-only gitsign.
+
+    gitsign0.17.1 resolves refs/tags/<argument>, not a raw object ID. A private
+    object store and ref let it authenticate precisely the object later exported,
+    independent of concurrent changes to the publisher checkout. No source ref,
+    alternate, hardlink, public remote or signature is created here.
+    """
+    git(destination, "init", "--quiet")
+    packed = subprocess.run(["git", "-C", str(repo), "pack-objects", "--revs", "--stdout"],
+                            input=(tag_object + "\n").encode(), capture_output=True, timeout=30)
+    if packed.returncode:
+        raise Rejected("cannot copy captured publisher tag objects")
+    unpacked = subprocess.run(["git", "-C", str(destination), "unpack-objects", "--strict"],
+                              input=packed.stdout, capture_output=True, timeout=30)
+    if unpacked.returncode:
+        raise Rejected("captured publisher Git objects did not validate")
+    git(destination, "update-ref", "refs/tags/" + tag, tag_object)
 
 
 def verify_tag(repo: Path, tag: str) -> None:
@@ -171,14 +195,14 @@ def observe(estate: Path) -> tuple[int, str]:
     repo = estate.resolve() / "nist"
     if not repo.is_dir():
         raise Unmeasured("publisher reliability instrument missing: NIST source checkout")
-    tag = newest_tag(repo)
-    tag_object = git(repo, "rev-parse", "refs/tags/" + tag)
-    verify_tag(repo, tag)
-    if git(repo, "rev-parse", "refs/tags/" + tag) != tag_object:
-        raise Rejected("publisher report tag changed during signature verification")
+    tag, tag_object = newest_tag(repo)
     with tempfile.TemporaryDirectory(prefix="publisher-report-") as directory:
         snapshot = Path(directory)
-        export(repo, tag_object, snapshot)
+        copy_tag(repo, tag, tag_object, snapshot)
+        verify_tag(snapshot, tag)
+        if git(snapshot, "rev-parse", "refs/tags/" + tag) != tag_object:
+            raise Rejected("publisher report tag changed during signature verification")
+        export(snapshot, tag_object, snapshot)
         feed = snapshot / "publisher-reliability/v1/feed.json"
         report = load_report(feed)
         checker = snapshot / "publisher-reliability/report.py"

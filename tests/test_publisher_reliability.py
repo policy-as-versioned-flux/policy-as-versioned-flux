@@ -101,6 +101,13 @@ class PublisherReportConsumer(unittest.TestCase):
         git(self.repo, 'tag', TAG)
         self.verdict(self.invoke(), 1, 'annotated and signed')
 
+    def test_catalogue_tag_object_cannot_be_aliased_as_report_publication(self) -> None:
+        self.publish()
+        git(self.repo, 'tag', '--no-sign', '-a', 'v1.0.0', '-m', 'Synthetic catalogue tag')
+        catalogue_object = git(self.repo, 'rev-parse', 'refs/tags/v1.0.0')
+        git(self.repo, 'update-ref', 'refs/tags/' + TAG, catalogue_object)
+        self.verdict(self.invoke(self.verifier()), 1, 'signed tag name differs')
+
     def test_tag_must_be_on_served_first_parent_history(self) -> None:
         first = git(self.repo, 'rev-parse', 'HEAD')
         self.publish()
@@ -150,8 +157,52 @@ class PublisherReportConsumer(unittest.TestCase):
 
     def test_tag_movement_during_verification_rejected(self) -> None:
         self.publish()
-        extra = f"subprocess.run(['git','update-ref','refs/tags/{TAG}','HEAD'], check=True)\n"
+        commit = git(self.repo, 'rev-parse', 'HEAD')
+        extra = f"subprocess.run(['git','update-ref','refs/tags/{TAG}',{commit!r}], check=True)\n"
         self.verdict(self.invoke(self.verifier(extra=extra)), 1, 'tag changed during signature verification')
+
+    def test_verified_object_is_exact_despite_public_tag_change_and_restore(self) -> None:
+        marker = self.base / 'native-A-ran'
+        self.publish(checker=f'from pathlib import Path\nPath({str(marker)!r}).touch()\n')
+        captured = git(self.repo, 'rev-parse', 'refs/tags/' + TAG)
+        (self.repo / 'publisher-reliability/report.py').write_text('raise SystemExit(99)\n')
+        self.commit()
+        git(self.repo, 'tag', '--no-sign', '-a', 'replacement', '-m', 'Different unsigned fixture tree')
+        replacement = git(self.repo, 'rev-parse', 'refs/tags/replacement')
+        log = self.base / 'verified-object.json'
+        extra = (f"subprocess.run(['git','-C',{str(self.repo)!r},'update-ref','refs/tags/{TAG}',{replacement!r}], check=True)\n"
+                 f"resolved = subprocess.check_output(['git','rev-parse','refs/tags/{TAG}'], text=True).strip()\n"
+                 f"pathlib.Path({str(log)!r}).write_text(json.dumps({{'actual':resolved,'captured':{captured!r}}}))\n"
+                 f"subprocess.run(['git','-C',{str(self.repo)!r},'update-ref','refs/tags/{TAG}',{captured!r}], check=True)\n")
+        self.verdict(self.invoke(self.verifier(extra=extra)), 3, 'has n=0')
+        objects = json.loads(log.read_text())
+        self.assertEqual(objects['actual'], objects['captured'],
+                         'verification and execution selected different tag objects')
+        self.assertTrue(marker.is_file(), 'the captured native checker was not exercised')
+
+    def test_selection_captures_object_before_first_parent_check(self) -> None:
+        self.publish()
+        served = git(self.repo, 'rev-parse', 'HEAD')
+        value = copy.deepcopy(EMPTY)
+        value['payload'].update(status='measured', counts={'submitted': 1, 'eligible': 1, 'unscoreable': 0},
+                                losses={'lower_is_better': True, 'brier': 0.16, 'log_loss': 0.51})
+        (self.repo / 'publisher-reliability/v1/feed.json').write_text(json.dumps(value))
+        self.commit()
+        git(self.repo, 'tag', '--no-sign', '-a', 'off-main', '-m', 'Off-main synthetic report')
+        replacement = git(self.repo, 'rev-parse', 'refs/tags/off-main')
+        git(self.repo, 'update-ref', 'refs/remotes/origin/main', served)
+        env = self.verifier()
+        executable = shutil.which('git')
+        assert executable is not None
+        proxy = self.base / 'bin/git'
+        proxy.write_text(f'#!{sys.executable}\nimport subprocess, sys\n'
+                         f'result = subprocess.run([{executable!r},*sys.argv[1:]], capture_output=True)\n'
+                         "if 'rev-list' in sys.argv and '--first-parent' in sys.argv:\n"
+                         f" subprocess.run([{executable!r},'-C',{str(self.repo)!r},'update-ref','refs/tags/{TAG}',{replacement!r}], check=True)\n"
+                         'sys.stdout.buffer.write(result.stdout)\nsys.stderr.buffer.write(result.stderr)\n'
+                         'raise SystemExit(result.returncode)\n')
+        proxy.chmod(0o755)
+        self.verdict(self.invoke(env), 3, 'has n=0')
 
     def test_price_claim_cannot_come_from_binary_report(self) -> None:
         for field in ('publisher_price_accuracy', 'price_eligible'):
