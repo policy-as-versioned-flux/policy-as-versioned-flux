@@ -50,6 +50,8 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 # Git/CLI instruments before observing the estate. These fixtures establish no world outcome.
 command -v git >/dev/null 2>&1 \
   || { echo "SKIP: git is not installed; the served gate contract cannot plant its local subject"; exit 3; }
+source "$ROOT/verify/lib-observation.sh"
+selfcheck_absent "$ROOT/verify/fold-agreement/verify-fold-agreement.sh" git
 "$PY" -m unittest discover -s "$ROOT/tests" -p test_served_gate_context.py \
   || { echo "FAIL: the served gate compiler/cold caller contract no longer holds"; exit 1; }
 
