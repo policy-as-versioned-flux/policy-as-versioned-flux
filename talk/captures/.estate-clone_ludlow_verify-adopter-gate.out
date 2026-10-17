@@ -1,8 +1,24 @@
 .
 ----------------------------------------------------------------------
-Ran 1 test in 0.036s
+Ran 1 test in 0.030s
 
 OK
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.096s
+
+OK
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.418s
+
+OK
+REFUSE: composed bump is major -- ['5.0.0', '6.0.0'] -- not every major it brings is accepted -- retired 5.0.0, 6.0.0: a retirement is a forced major, and an acceptance record accepts a version the window carries, so none can admit it
+REFUSE: policy 9.0.0: no committed evidence/bundle at computed-semver/evidence/9.0.0.json[.bundle] for commit HEAD
+REFUSE: platform's data was malformed in a way this gate did not specifically anticipate (JSONDecodeError: Expecting value: line 1 column 1 (char 0)) -- refusing rather than crashing
+REFUSE: verified compiler retirement does not match the computed major removal
+REFUSE: verified compiler refused the exact consumer retirement
+REFUSE: gitops/platform/platform-pin.yaml not found at missing-native-fixture-ref
 
 == Part A: ADOPTER_GATE_IDENTITY_REGEXP, pure and offline ==
 pattern: ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
@@ -29,7 +45,7 @@ REFUSE: composed bump is major -- ['2.0.0'] -- not every major it brings is acce
 OK: retirement of 2.0.0 correctly refused the pull request check, comment names it
 
 B2. resolved-commit mismatch -> refuse (ADR-0001's pin made load-bearing, bug #2)
-REFUSE: platform tag 'v1.0.0' resolves to '3aefe59a481cbaba1debeea4465aca249e9e8509', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
+REFUSE: platform tag 'v1.0.0' resolves to 'e3de7a5f6d76071693dbe171feef3413b72c1f4c', but platform-pin.yaml pins commit 'cccccccccccccccccccccccccccccccccccccccc' -- refusing (ADR-0001's pin is load-bearing, not decorative)
 OK: a pin naming the wrong commit for a real tag is refused, real git rev-parse caught it
 
 B3. composed weaker than the publisher's tag (unchanged array, major tag jump) -> informational, exit 0, never lowers
@@ -39,11 +55,11 @@ OK: composed=none against declared=major (v0.1.0 -> v1.0.0) passes, prints infor
 
 == Part C: a bundle this gate cannot read, and a missing one -- refused by name, before cosign ==
 -- a CHANGED version whose evidence file exists but whose bundle is not a real Sigstore bundle --
-REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit 3854ec0b91bc549efc85c941cadaded1c9d7925c) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
+REFUSE: policy 3.0.0: the committed bundle at computed-semver/evidence/3.0.0.json.bundle (commit 0c5e188dd8e746688166af98100da7ea849ce856) is neither a legacy cosign bundle (base64Signature/cert) nor a new-format Sigstore bundle (mediaType/verificationMaterial), so this gate cannot verify it against the pinned trust root -- refusing rather than handing cosign no trust root and letting it fetch a live one
 OK: a bundle whose shape this gate cannot read is refused by name, and no cosign call is made without pinned trust material
 
 -- a CHANGED version with no committed evidence file at all --
-REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit ff4cba6fe293a2564bdcc6719f897b862077fa2d
+REFUSE: policy 3.0.0: no committed evidence/bundle at computed-semver/evidence/3.0.0.json[.bundle] for commit 41d472e9af009c787f672c4461dc839f625b4040
 OK: a changed version with no committed evidence file is refused before cosign is even invoked
 
 == Part D: splice_body via the REAL CLI, with backslash-bearing evidence -- the exact re.sub() hazard ==
@@ -93,8 +109,8 @@ OK: without the committed trust material the identical bytes cannot be verified 
 
 -- E6: the pin is load-bearing -- a wrong, corrupt, retired or absent trust root REFUSES, cold and warm --
 OK: E6[genuine] -- the copied gate with the real committed root ACCEPTS, cold (exit 0); the copy mechanism is sound
-OK: E6[absent-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.xe5ZoJLaTo/ga
-OK: E6[absent-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.xe5ZoJLaTo/ga
+OK: E6[absent-root,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.CAvCYtRFIQ/ga
+OK: E6[absent-root,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: no committed Sigstore trust root at /tmp/tmp.CAvCYtRFIQ/ga
 OK: E6[wrong-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
 OK: E6[wrong-rekor-key,warm] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: failed to verify log inclusion: not enough verified log entries from transparency log: 0 < 1)
 OK: E6[corrupt-rekor-key,cold] -- REFUSED, exit 1, on the trust material and not the network: REFUSE: policy 2.0.0: cosign verify-blob refused the evidence signature (Flag -- :: error during command execution: setting trusted material: loading trusted root: failed to parse public key for tlog: https://rekor.sigstore.dev asn1: 
@@ -111,11 +127,11 @@ OK: E6[ct-window-closed,warm] -- REFUSED, exit 1, on the trust material and not 
 the rollout: base f299fd1475cd, head c017bb701ee4 (platform v3.3.0)
 PASS: declared=major composed=major, admitted by the exact reviewed acceptance decisions -- 5.0.0 is a major, accepted for ludlow by chrisns (owner); recorded by the integrator on the owner's instruction of 2026-09-23 on 2026-09-23 (accepted-majors/platform-5.0.0.yaml at c017bb701ee4)
 OK: J[accepted] -- the real rollout composes major (5.0.0 added), and the gate admits it on accepted-majors/platform-5.0.0.yaml at c017bb701ee4
-REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at fa8515a2d43c accepts it for ludlow
+REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at 4967a4c6e10e accepts it for ludlow
 OK: J[removed] -- the same rollout with its record removed REFUSES, exit 1, naming 5.0.0
-REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at 7d91b00301aa accepts it for ludlow
+REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at ac59d21102ff accepts it for ludlow
 OK: J[other-version] -- the same rollout with its record naming 5.0.1 REFUSES, exit 1, naming 5.0.0
-REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at ce09fb3fe09e accepts it for ludlow; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for tuppence, not for ludlow
+REFUSE: composed bump is major -- ['5.0.0'] -- not every major it brings is accepted -- 5.0.0 is a major, and no accepted-majors/ record at 694f696d6cf4 accepts it for ludlow; records that name it and do not count: accepted-majors/platform-5.0.0.yaml accepts 5.0.0 for tuppence, not for ludlow
 OK: J[other-party] -- the same rollout with its record naming tuppence REFUSES, exit 1, naming 5.0.0
 
 PASS: verify-adopter-gate.sh -- identity regexp (match/reject/rename-breaks-it), resolved-commit refusal,
