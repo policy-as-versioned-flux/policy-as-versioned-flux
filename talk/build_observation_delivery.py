@@ -17,6 +17,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = {
     'observation_delivery.py': 'talk/observation_delivery.py',
+    'delivery_truth_integration.py': 'talk/truth_integration.py',
     'delivery_enact_record.py': 'verify/enact-record/enact_record.py',
     'delivery_other_hand.py': 'twin/other_hand.py',
 }

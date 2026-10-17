@@ -30,6 +30,7 @@ BUNDLE_SHA = "abcdef0123456789" * 4
 ORGS = ("driftwood", "tuppence", "ludlow")
 SOURCES = {
     "observation_delivery.py": "talk/observation_delivery.py",
+    "delivery_truth_integration.py": "talk/truth_integration.py",
     "delivery_enact_record.py": "verify/enact-record/enact_record.py",
     "delivery_other_hand.py": "twin/other_hand.py",
 }
@@ -147,11 +148,12 @@ def test_zip_application_imports_exact_bundled_helpers_without_checkout(tmp_path
 import datetime as dt, json, pathlib, sys
 sys.path.insert(0, sys.argv[1])
 import observation_delivery as controller
+import delivery_truth_integration as integration
 import delivery_other_hand as mint
 import delivery_enact_record as enact
 root = pathlib.Path(sys.argv[2])
 controller.window(root, dt.date(2026, 10, 17))
-print(json.dumps([controller.__file__, enact.__file__, mint.__file__]))
+print(json.dumps([controller.__file__, integration.__file__, enact.__file__, mint.__file__]))
 """
     authority = tmp_path / "authority"
     (authority / "twin").mkdir(parents=True)

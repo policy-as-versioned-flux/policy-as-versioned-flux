@@ -29,7 +29,44 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  prepare:
+    if: >-
+      github.ref_name == github.event.repository.default_branch &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.head_repository.full_name == github.repository &&
+        github.event.workflow_run.head_branch == github.event.repository.default_branch))
+    runs-on: ubuntu-latest
+    # No App environment or key: the bot proposes; the other hand reviews.
+    permissions:
+      contents: write
+      actions: read
+      pull-requests: write
+    env:
+      GITSIGN_VERSION: 0.17.1
+      GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install 'pyyaml==6.0.3'
+      - name: install the signature verifier with its recorded checksum
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64" -o /tmp/gitsign
+          echo "${GITSIGN_SHA256}  /tmp/gitsign" | sha256sum -c -
+          sudo install /tmp/gitsign /usr/local/bin/gitsign
+      - name: prepare separate delivery integration when the original conflicts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TRUTH_RUN_ID: ${{ github.event.workflow_run.id || inputs.run_id }}
+          TRUTH_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt || inputs.attempt }}
+        run: python3 talk/truth_delivery.py --run-id "$TRUTH_RUN_ID" --attempt "$TRUTH_RUN_ATTEMPT" --prepare-integration
   review:
+    needs: prepare
     if: >-
       github.ref_name == github.event.repository.default_branch &&
       (github.event_name == 'workflow_dispatch' ||
@@ -65,7 +102,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TRUTH_RUN_ID: ${{ github.event.workflow_run.id || inputs.run_id }}
           TRUTH_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt || inputs.attempt }}
-        run: python3 talk/truth_delivery.py --run-id "$TRUTH_RUN_ID" --attempt "$TRUTH_RUN_ATTEMPT" --check-only
+        run: python3 talk/truth_delivery.py --run-id "$TRUTH_RUN_ID" --attempt "$TRUTH_RUN_ATTEMPT" --check-only --review-integration
       - name: review and deliver with the separate identity
         env:
           PAVC_OTHER_HAND_PRIVATE_KEY: ${{ secrets.PAVC_OTHER_HAND_PRIVATE_KEY }}
@@ -105,6 +142,6 @@ jobs:
               if key_file is not None:
                   key_file.unlink(missing_ok=True)
           result = subprocess.run(["python3", "talk/truth_delivery.py", "--run-id", os.environ["TRUTH_RUN_ID"],
-                                   "--attempt", os.environ["TRUTH_RUN_ATTEMPT"]])
+                                   "--attempt", os.environ["TRUTH_RUN_ATTEMPT"], "--review-integration"])
           raise SystemExit(result.returncode)
           PYREVIEW

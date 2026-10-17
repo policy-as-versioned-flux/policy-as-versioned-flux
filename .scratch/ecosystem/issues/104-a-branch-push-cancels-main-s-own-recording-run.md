@@ -146,3 +146,20 @@ missing-workflow findings retain their own work; ticket 104's queue isolation an
 - [104 — A branch push cancels main's own recording run](issues/104-a-branch-push-cancels-main-s-own-recording-run.md) — CHARTED, not built. `truth.yml`'s concurrency group is `truth-${{ github.event_name }}`, so every push on every branch shares one lane and GitHub cancels all but the running and the newest queued run: 8 of the newest 22 `main` push runs were cancelled (136, 130, 127, 125, 119, 112, 48, 42) and none of those run numbers is in `talk/truth.log` — eight lost citable observations. Ticket 56's per-event group protected the scheduled lane; ticket 100 then made branch runs pure measurement that still occupies main's lane. Key the group on event AND ref, and teach `verify/schedules/` to read a cancelled default-branch run as a lost recording, which it cannot today.
 
 Map line: `- [104 — A branch push cancels main's own recording run](issues/104-a-branch-push-cancels-main-s-own-recording-run.md) — resolved, event-and-ref queues are proven by overlapping real main/branch push gates, and recorded run 242 captures LOST RECORDING count=19 across 242 retained runs. Historical cancellations have unknown cause and are reported without replay; same-ref pending runs can still displace each other.`
+
+
+## Follow-up, 2026-10-17: a completed clock can still conflict at protected delivery
+
+TRUTH418/39004223783/1 durably published original5a464ef55791773185104c6d67d12cacb4156c42
+from measured6beeb50e. Independent controller39007567774 verified it and the other hand
+approved that exact original inPR194; its ordinary merge then failed. A native merge-tree
+against controllerbasea3e5 conflicts only on log/captures. All47original changed paths are
+regular allowed observation blobs. The HTTP response was discarded, so the exact server
+response is not recovered by this diagnosis. Its100/11/25/8 result is unchanged and unrecorded.
+
+The dated ADR0024 amendment delegates separate immutable, unsigned delivery integration
+preparation without the App key, followed by independent raw-signature/tree/current-base
+validation and matching-head ordinary App review/merge. Raw original/ref/source ancestry
+stay unchanged. Earlier queue isolation and its completion stand; this additional completed
+observation delivery defect requires its own live outcome. No fresh dispatch can substitute
+for the existing signed418 or turn its failed measurement green.

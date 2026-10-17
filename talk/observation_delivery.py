@@ -24,6 +24,11 @@ from urllib.parse import urlencode
 
 import yaml
 
+try:
+    import delivery_truth_integration as truth_integration
+except ImportError:
+    from talk import truth_integration
+
 ROOT = Path(__file__).resolve().parents[1]
 HUB_URL = "https://github.com/policy-as-versioned-flux/policy-as-versioned-flux.git"
 REPOSITORY = "policy-as-versioned-flux/policy-as-versioned-flux"
@@ -174,7 +179,8 @@ def authority(root: Path, default: str, today: dt.date | None) -> None:
     window(root, today or dt.datetime.now(dt.timezone.utc).date())
 
 
-def verify_signature(root: Path, head: str, run: dict[str, Any], default: str, *, profile: Profile = TRUTH) -> None:
+def verify_signature(root: Path, head: str, run: dict[str, Any], default: str, *, profile: Profile = TRUTH,
+                     require_name: bool = False) -> None:
     command = ["gitsign", "verify", head,
                f"--certificate-identity=https://github.com/{profile.repository}/{profile.workflow}@refs/heads/{default}",
                "--certificate-oidc-issuer=https://token.actions.githubusercontent.com",
@@ -182,6 +188,8 @@ def verify_signature(root: Path, head: str, run: dict[str, Any], default: str, *
                f"--certificate-github-workflow-repository={profile.repository}",
                f"--certificate-github-workflow-ref=refs/heads/{default}",
                f"--certificate-github-workflow-trigger={run['event']}"]
+    if require_name:
+        command.append(f'--certificate-github-workflow-name={profile.clock}')
     try:
         env = {k: v for k, v in os.environ.items()
                if k not in {"GH_TOKEN", "GITHUB_TOKEN", "TRUTH_READ_TOKEN", "PAVC_OTHER_HAND_PRIVATE_KEY"}}
@@ -311,10 +319,20 @@ def recorded(root: Path, pr: dict[str, Any], head: str, line: Evidence, default:
     return f"RECORDED original observation {head} through PR #{pr['number']} on {default}"
 
 
-def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier | None = None,
-            today: dt.date | None = None, check_only: bool = False, attempt: int = 1,
-            repository: str = REPOSITORY, workflow: str = WORKFLOW, authority_root: Path | None = None) -> str:
-    profile = select_profile(repository, workflow)
+@dataclass
+class Pending:
+    run: dict[str, Any]
+    default: str
+    branch: str
+    pr: dict[str, Any]
+    original: str
+    line: Evidence
+    guard: Callable[[], None]
+
+
+def pending(root: Path, run_id: int, attempt: int, profile: Profile, api: Api,
+            verify: Verifier | None, today: dt.date | None, authority_root: Path | None = None,
+            require_name: bool = False) -> Pending:
     positive(run_id, "run id")
     positive(attempt, "run attempt")
     run, default, branch = facts(api, run_id, attempt, profile=profile)
@@ -333,13 +351,154 @@ def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier 
     head = validate_pr(pr, default, branch, profile=profile)
     line = observation(root, head, run, default, branch, already_merged=pr.get("merged") is True, profile=profile)
     if verify is None:
-        verify_signature(root, head, run, default, profile=profile)
+        verify_signature(root, head, run, default, profile=profile, require_name=require_name)
     else:
         verify(root, head, run, default)
+    return Pending(run, default, branch, pr, head, line, guard)
+
+
+def integration_pr(api: Api, branch: str, default: str) -> dict[str, Any] | None:
+    query = urlencode({'state': 'all', 'head': REPOSITORY.split('/')[0] + ':' + branch,
+                       'base': default, 'per_page': 100})
+    rows = api('GET', f'repos/{REPOSITORY}/pulls?{query}', None)
+    require(isinstance(rows, list) and len(rows) <= 1, 'expected at most one exact integration PR')
+    if not rows:
+        return None
+    row = mapping(rows[0], 'integration PR')
+    return mapping(api('GET', f'repos/{REPOSITORY}/pulls/{positive(row.get("number"), "PR number")}', None),
+                   'integration PR')
+
+
+def publish_integration(root: Path, branch: str, head: str) -> None:
+    """The no-App preparation job may create exactly one absent integration ref."""
+    import base64
+
+    env = {key: value for key, value in os.environ.items()
+           if key not in {'GH_TOKEN', 'GITHUB_TOKEN', 'TRUTH_READ_TOKEN', 'PAVC_OTHER_HAND_PRIVATE_KEY',
+                          'GIT_ASKPASS', 'SSH_ASKPASS'} and not key.startswith('GIT_CONFIG_')}
+    token = os.environ.get('GH_TOKEN') or os.environ.get('GITHUB_TOKEN')
+    if token:
+        encoded = base64.b64encode(('x-access-token:' + token).encode()).decode()
+        env.update(GIT_CONFIG_COUNT='1', GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',
+                   GIT_CONFIG_VALUE_0='AUTHORIZATION: basic ' + encoded)
+    ref = 'refs/heads/' + branch
+    try:
+        result = subprocess.run(['git', '-c', 'credential.helper=', '-c', 'core.hooksPath=' + os.devnull,
+                                 '-c', 'protocol.ext.allow=never', '-C', str(root), 'push',
+                                 '--force-with-lease=' + ref + ':', 'origin', head + ':' + ref],
+                                capture_output=True, env=env, timeout=60)
+        require(result.returncode == 0, 'create-only integration publication refused; original remains pending')
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise Refusal('integration publication instrument unavailable; original remains pending') from error
+
+
+def already_integrated(root: Path, item: Pending) -> str | None:
+    if not truth_integration.ancestor(root, item.original, 'refs/remotes/origin/' + item.default):
+        return None
+    assert isinstance(item.line, str)
+    log = git(root, 'show', f'refs/remotes/origin/{item.default}:talk/truth.log')
+    require(log.splitlines(keepends=True).count(item.line) == 1,
+            'default branch does not conserve the exact original TRUTH line once')
+    return f'RECORDED original observation {item.original} on {item.default}'
+
+
+def prepare_truth(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier | None = None,
+                  today: dt.date | None = None, attempt: int = 1) -> str:
+    item = pending(root, run_id, attempt, TRUTH, api, verify, today, require_name=True)
+    item.guard()
+    if item.pr.get('merged') is True:
+        return recorded(root, item.pr, item.original, item.line, item.default)
+    recorded_line = already_integrated(root, item)
+    if recorded_line:
+        return recorded_line
+    base = git(root, 'rev-parse', 'HEAD').strip()
+    assert isinstance(item.line, str)
+    truth_integration.log(root, base, item.original, item.line)
+    if truth_integration.mergeable(root, base, item.original):
+        return f'READY original observation {item.original}; ordinary review remains pending'
+    assert isinstance(item.line, str)
+    plan = truth_integration.plan(root, base, item.original, item.line, run_id, attempt)
+    matches = api('GET', f'repos/{REPOSITORY}/git/matching-refs/heads/{plan.branch}', None)
+    require(isinstance(matches, list) and len(matches) <= 1, 'integration ref instrument is ambiguous')
+    if matches:
+        match = mapping(matches[0], 'integration ref')
+        require(match.get('ref') == 'refs/heads/' + plan.branch, 'integration ref name changed')
+        head = sha(mapping(match.get('object'), 'integration ref object').get('sha'))
+        git(root, 'fetch', '--no-tags', 'origin', 'refs/heads/' + plan.branch)
+        plan.validate(root, head)
+    else:
+        head = plan.commit(root)
+        item.guard()
+        fresh = api('GET', f'repos/{REPOSITORY}/pulls/{item.pr["number"]}', None)
+        validate_pr(fresh, item.default, item.branch, item.original)
+        git(root, 'fetch', '--no-tags', 'origin', 'refs/heads/' + item.branch)
+        require(git(root, 'rev-parse', 'FETCH_HEAD').strip() == item.original, 'raw observation ref changed')
+        publish_integration(root, plan.branch, head)
+    item.guard()
+    pr = integration_pr(api, plan.branch, item.default)
+    if pr is None:
+        pr = mapping(api('POST', f'repos/{REPOSITORY}/pulls', {
+            'head': plan.branch, 'base': item.default,
+            'title': f'Integrate original TRUTH run {item.run["run_number"]}',
+            'body': ('Delivery integration only; not a new measurement.\n\n'
+                     f'Original signed observation: {item.original}\n'
+                     f'Official run/attempt: {run_id}/{attempt}\nBase: {base}\nExpected tree: {plan.tree}\n'
+                     'Preserves the exact signed row and capture blobs through separate App review.\n'),
+        }), 'created integration PR')
+    validate_pr(pr, item.default, plan.branch, head)
+    require(pr.get('merged') is not True, 'integration already merged; retry from fresh default authority')
+    return f'PREPARED unsigned delivery integration {head}; PR #{pr["number"]} remains pending separate review'
+
+
+def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier | None = None,
+            today: dt.date | None = None, check_only: bool = False, attempt: int = 1,
+            repository: str = REPOSITORY, workflow: str = WORKFLOW, authority_root: Path | None = None,
+            review_integration: bool = False) -> str:
+    profile = select_profile(repository, workflow)
+    require(not review_integration or profile == TRUTH, 'integration review is restricted to the TRUTH profile')
+    item = pending(root, run_id, attempt, profile, api, verify, today, authority_root,
+                   require_name=review_integration)
+    run, default, branch, pr, head, line, guard = (item.run, item.default, item.branch, item.pr,
+                                                item.original, item.line, item.guard)
+    original = head
+    plan = None
+    if review_integration and not pr.get('merged'):
+        recorded_line = already_integrated(root, item)
+        if recorded_line:
+            guard()
+            return recorded_line
+        base = git(root, 'rev-parse', 'HEAD').strip()
+        assert isinstance(line, str)
+        truth_integration.log(root, base, original, line)
+        integration_branch = f'integrations/truth/{run_id}-{attempt}/{base}'
+        candidate = integration_pr(api, integration_branch, default)
+        require(candidate is not None or truth_integration.mergeable(root, base, original),
+                'current default needs fresh integration preparation; original remains pending')
+        if candidate is not None:
+            assert isinstance(line, str)
+            plan = truth_integration.plan(root, base, original, line, run_id, attempt)
+            head = validate_pr(candidate, default, integration_branch)
+            git(root, 'fetch', '--no-tags', 'origin', 'refs/heads/' + integration_branch)
+            require(git(root, 'rev-parse', 'FETCH_HEAD').strip() == head, 'integration ref head changed')
+            plan.validate(root, head)
+            original_guard = guard
+
+            def integration_guard() -> None:
+                original_guard()
+                raw_pr = api('GET', f'repos/{REPOSITORY}/pulls/{item.pr["number"]}', None)
+                validate_pr(raw_pr, default, item.branch, original)
+                git(root, 'fetch', '--no-tags', 'origin', 'refs/heads/' + item.branch)
+                require(git(root, 'rev-parse', 'FETCH_HEAD').strip() == original, 'raw observation ref changed')
+                assert plan is not None
+                plan.validate(root, head)
+
+            guard = integration_guard
+            pr, branch = candidate, integration_branch
+    endpoint = f'repos/{profile.repository}/pulls/{pr["number"]}'
     fresh = api("GET", endpoint, None)
     validate_pr(fresh, default, branch, head, profile=profile)
     if fresh.get("merged") is True:
-        return recorded(root, fresh, head, line, default)
+        return recorded(root, fresh, original, line, default)
     if check_only:
         guard()
         return f"VERIFIED original observation {head}; PR #{pr['number']} remains pending review"
@@ -373,7 +532,12 @@ def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier 
     fresh = api("GET", endpoint, None)
     validate_pr(fresh, default, branch, head, profile=profile)
     require(fresh.get("merge_commit_sha") == merged.get("sha"), "PR merge receipt changed; verify pending delivery")
-    return recorded(root, fresh, head, line, default)
+    if plan is not None:
+        git(root, 'fetch', '--no-tags', 'origin', f'refs/heads/{default}:refs/remotes/origin/{default}')
+        require(git(root, 'show', '-s', '--format=%P', merged['sha']).split() == [plan.base, head]
+                and git(root, 'rev-parse', str(merged['sha']) + '^{tree}').strip() == plan.tree,
+                'ordinary merge did not conserve the reviewed integration tree and parents')
+    return recorded(root, fresh, original, line, default)
 
 
 def appended(before: str, after: str) -> str:
@@ -639,10 +803,19 @@ def main() -> int:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--check-only", action="store_true")
     mode.add_argument("--mint", action="store_true")
+    mode.add_argument('--prepare-integration', action='store_true')
+    parser.add_argument('--review-integration', action='store_true')
     args = parser.parse_args()
     try:
         options = dict(repository=args.repository, workflow=args.workflow, attempt=args.attempt,
                        authority_root=args.authority_root)
+        if args.prepare_integration:
+            require(select_profile(args.repository, args.workflow) == TRUTH and not args.review_integration,
+                    'integration preparation is restricted to the separate TRUTH preparation job')
+            print(prepare_truth(args.root, args.run_id, attempt=args.attempt))
+            return 0
+        if args.review_integration:
+            options['review_integration'] = True
         if args.mint:
             preflight = deliver(args.root, args.run_id, check_only=True, **options)
             if preflight.startswith("RECORDED"):
