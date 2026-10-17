@@ -119,7 +119,10 @@ def admission(routes: list[dict], source_pin: dict, package: Path) -> None:
         resource = doc['kind'].removesuffix('Policy').lower() + 'policies.policies.kyverno.io'
         live = run('get', resource, doc['metadata']['name'], '-o', 'json')
         assert declared_equal(doc['spec'], live['spec']), 'live cloud body differs from the signed composed member'
-        assert any(c['type'] == 'Ready' and c['status'] == 'True' for c in live['status']['conditions'])
+        status = live.get('status')
+        condition_status = status.get('conditionStatus') if isinstance(status, dict) else None
+        if not isinstance(condition_status, dict) or condition_status.get('ready') is not True:
+            raise ValueError(f'live cloud policy {resource}/{doc["metadata"]["name"]} is not ready')
     names = ['instances.rds.aws.m.upbound.io', 'bucketserversideencryptionconfigurations.s3.aws.m.upbound.io']
     for name in names:
         crd = run('get', 'crd', name, '-o', 'json')
