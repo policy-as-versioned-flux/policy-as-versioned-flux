@@ -10,10 +10,13 @@ import argparse
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+from observation_contract import observation_steps
 
 LADDER = ('baseline', 'restricted', 'quarantine', 'isolated')
 INERT = ('actions/checkout', 'actions/upload-artifact', 'actions/download-artifact')
@@ -22,7 +25,7 @@ PROGRAM = re.compile(r'(?m)^\s*(?:python3?|bash|sh|node|npx)\s+|\./\S+\.py')
 HUB = 'policy-as-versioned-flux/policy-as-versioned-flux'
 
 
-def grade(files: dict[str, str]) -> list[str]:
+def grade(files: dict[str, str], organization: str | None = None) -> list[str]:
     errors = []
     try:
         workflow = yaml.safe_load(files['.github/workflows/twin-sweep.yml'])
@@ -49,8 +52,9 @@ def grade(files: dict[str, str]) -> list[str]:
         tag = pin.get('twin_tag')
         if not isinstance(tag, str) or not tag.startswith('twin/v'):
             errors.append('tag_cut declares no signed twin tag')
+    transports = observation_steps(workflow, organization)
     for job_name, job in jobs.items():
-        for step in job.get('steps', []):
+        for step_index, step in enumerate(job.get('steps', [])):
             uses = str(step.get('uses', ''))
             if uses and not re.search(r'@[0-9a-f]{40}$', uses):
                 errors.append(job_name + ' action is not pinned by commit: ' + uses)
@@ -67,7 +71,7 @@ def grade(files: dict[str, str]) -> list[str]:
                 errors.append(job_name + ' download carries no checksum comparison')
             if job_name == 'write' and ('gh pr create' in shell or 'git checkout -b' in shell):
                 condition = str(step.get('if', ''))
-                if "steps.cage.outputs.rung == 'baseline'" not in condition or "steps.cage.outputs.rung == 'restricted'" not in condition:
+                if step_index not in transports and ("steps.cage.outputs.rung == 'baseline'" not in condition or "steps.cage.outputs.rung == 'restricted'" not in condition):
                     errors.append('proposal step runs outside baseline/restricted')
     requirements = files.get('.github/requirements/twin-sweep.txt', '')
     if 'pyyaml==' not in requirements.lower() or not re.search(r'--hash=sha256:[0-9a-f]{64}', requirements):
@@ -121,6 +125,7 @@ def selfcheck(root: Path) -> None:
         planted['.github/workflows/twin-sweep.yml'] = planted['.github/workflows/twin-sweep.yml'].replace(old, new)
         assert grade(planted), old
     print('PASS: twin cage selfcheck -- five loosened workflows fail')
+    subprocess.run([sys.executable, str(root / 'tests/test_twin_cage.py')], check=True)
 
 
 def main() -> int:
@@ -133,7 +138,7 @@ def main() -> int:
         return 0
     failures = 0
     for org in ('driftwood', 'tuppence', 'ludlow'):
-        faults = grade(served(args.estate / org))
+        faults = grade(served(args.estate / org), org)
         if faults:
             for fault in faults:
                 print('FAIL: ' + org + ' served twin cage: ' + fault)
