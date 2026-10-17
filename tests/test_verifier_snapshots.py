@@ -44,6 +44,8 @@ class VerifierSnapshots(unittest.TestCase):
         self.repo = self.root / "estate" / "fixture"
         self.repo.mkdir(parents=True)
         git(self.repo, "init", "-q")
+        git(self.repo, "remote", "add", "origin",
+            "https://github.com/policy-as-versioned-fixture/fixture.git")
         (self.repo / "apps.yaml").write_text("served digest\n")
         git(self.repo, "add", ".")
         git(self.repo, "commit", "-qm", "Served apps fixture")
@@ -69,6 +71,8 @@ class VerifierSnapshots(unittest.TestCase):
     def assert_snapshot(self, directory):
         self.assertEqual(git(directory, "rev-parse", "--show-toplevel"), str(directory.resolve()))
         self.assertEqual(git(directory, "rev-parse", "HEAD"), self.head)
+        self.assertEqual(git(directory, "remote", "get-url", "origin"),
+                         git(self.repo, "remote", "get-url", "origin"))
         self.assertEqual(git(directory, "rev-parse", "apps/v1.0.0^{commit}"), self.served)
         self.assertEqual(git(directory, "show", "apps/v1.0.0:apps.yaml"), "served digest")
         self.assertEqual(git(directory, "rev-parse", "refs/remotes/origin/main"), self.remote_main)
@@ -86,6 +90,18 @@ class VerifierSnapshots(unittest.TestCase):
         estate.root, estate.work = self.repo.parent, self.root / "work"
         copied = estate.adopter_copy("fixture", "forward")
         self.assert_snapshot(copied)
+        self.assertEqual((self.repo / "apps.yaml").read_text(), "uncommitted bytes must stay out\n")
+
+    def test_a_source_without_origin_does_not_gain_an_identity(self):
+        snapshot = load("snapshot_without_origin", "verify/_snapshot.py")
+        git(self.repo, "remote", "remove", "origin")
+        dest = self.root / "without-origin"
+        snapshot.committed_repository(self.repo, dest)
+        self.assertEqual(git(dest, "rev-parse", "HEAD"), self.head)
+        self.assertEqual(git(dest, "show", "apps/v1.0.0:apps.yaml"), "served digest")
+        origin = subprocess.run(["git", "-C", str(dest), "remote", "get-url", "origin"],
+                                capture_output=True, text=True)
+        self.assertNotEqual(origin.returncode, 0)
         self.assertEqual((self.repo / "apps.yaml").read_text(), "uncommitted bytes must stay out\n")
 
     def test_reprice_probe_preserves_context_before_calling_the_composer(self):
