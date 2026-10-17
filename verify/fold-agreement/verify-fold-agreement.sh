@@ -46,6 +46,13 @@ ESTATE="${PAVC_ESTATE_CLONE:-$ROOT/.estate-clone}"
 "$PY" "$HERE/fold_agreement.py" --selfcheck >/dev/null \
   || { echo "FAIL: fold_agreement.py --selfcheck -- the planted rules no longer grade as written"; exit 1; }
 
+# Exercise the served compiler role, committed runtime and actual cold caller on unsigned local
+# Git/CLI instruments before observing the estate. These fixtures establish no world outcome.
+command -v git >/dev/null 2>&1 \
+  || { echo "SKIP: git is not installed; the served gate contract cannot plant its local subject"; exit 3; }
+"$PY" -m unittest discover -s "$ROOT/tests" -p test_served_gate_context.py \
+  || { echo "FAIL: the served gate compiler/cold caller contract no longer holds"; exit 1; }
+
 # 2>&1 into the tee: a grader that stops before it grades anything says WHY on stderr, and a
 # red whose reason reached only the terminal is a red nobody can act on. Measured during
 # ticket 101's review: a failed planting printed "FAIL: ... without grading a single

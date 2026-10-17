@@ -71,6 +71,7 @@ import sys
 import tempfile
 from collections import Counter
 from pathlib import Path
+from typing import NamedTuple
 
 import yaml
 
@@ -294,6 +295,7 @@ def grade(cases: dict[str, dict[str, dict | None]]) -> tuple[str, list[tuple[str
 # The role each flag of the served operation plays, so that a planted value can be put where the
 # workflow puts a real one. A flag with no role here and a templated value stops the run.
 PLATFORM_DIR_FLAGS = {"--platform-dir"}
+COMPILER_TOOLS_DIR_FLAGS = {"--retirement-tools-dir"}
 ADOPTER_DIR_FLAGS = {"--adopter-dir", "--ludlow-dir"}
 BASE_REF_FLAGS = {"--base-ref", "--composed-base-ref", "--old-ref"}
 HEAD_REF_FLAGS = {"--head-ref", "--composed-head-ref", "--new-ref"}
@@ -303,7 +305,8 @@ OUT_JSON_FLAGS = {"--out"}
 OUT_MARKDOWN_FLAGS = {"--markdown-out", "--out-comment"}
 IDENTITY_FLAGS = {"--identity-regexp"}
 ISSUER_FLAGS = {"--issuer"}
-VALUE_FLAGS = (PLATFORM_DIR_FLAGS | ADOPTER_DIR_FLAGS | BASE_REF_FLAGS | HEAD_REF_FLAGS
+VALUE_FLAGS = (PLATFORM_DIR_FLAGS | COMPILER_TOOLS_DIR_FLAGS | ADOPTER_DIR_FLAGS
+               | BASE_REF_FLAGS | HEAD_REF_FLAGS
                | NEW_PIN_FLAGS | OLD_PIN_FLAGS | OUT_JSON_FLAGS | OUT_MARKDOWN_FLAGS
                | IDENTITY_FLAGS | ISSUER_FLAGS)
 
@@ -384,7 +387,7 @@ def _commit(repo: Path, message: str) -> str:
     return sha
 
 
-def _write_state(repo: Path, window: list[str], tag: str, commit: str) -> None:
+def _write_state(repo: Path, window: list[str], tag: str, commit: str, party: str = "") -> None:
     (repo / "gitops" / "platform").mkdir(parents=True, exist_ok=True)
     (repo / "gitops" / "platform" / "platform-pin.yaml").write_text(
         PIN_TEMPLATE.format(tag=tag, commit=commit))
@@ -392,17 +395,36 @@ def _write_state(repo: Path, window: list[str], tag: str, commit: str) -> None:
     members = [{"name": f"policy-v{v}", "version": v} for v in window]
     members.append({"name": "policy-version-orphan-guard"})  # machinery, no version
     (repo / "composed" / "evidence.json").write_text(json.dumps({"members": members}, indent=2))
+    if party:
+        # Preserve the served party's complete role/baseline/overlay context; only its
+        # implementation version follows this planted pin. No retirement decision is copied.
+        path = repo / "party.yaml"
+        subject = yaml.safe_load(path.read_text())
+        if subject.get("party") != party:
+            raise ValueError("the served party identity differs from the planted adopter")
+        parents = [edge for edge in subject.get("inherits", [])
+                   if edge.get("party") == "platform" and edge.get("kind") == "implementations"]
+        if len(parents) != 1:
+            raise ValueError("the served party must name one platform implementation parent")
+        parents[0]["version"] = tag.removeprefix("v")
+        path.write_text(yaml.safe_dump(subject))
 
 
 def plant(adopter_repo: Path, case: tuple, tag_commits: dict[str, str],
-          party: str = "") -> dict[str, str]:
+          party: str = "", *, context: GateContext | None = None) -> dict[str, str]:
     base_window, head_window, base_tag, head_tag = case[0], case[1], case[2], case[3]
     record_version = case[6] if len(case) > 6 else None
     adopter_repo.mkdir(parents=True, exist_ok=True)
     _git(adopter_repo, "init", "-q", "-b", "main")
-    _write_state(adopter_repo, base_window, base_tag, tag_commits[base_tag])
+    if context is not None:
+        for name, content in context.runtime_files.items():
+            path = adopter_repo / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+    runtime_party = party if context is not None and context.compiler_tools_dir is not None else ""
+    _write_state(adopter_repo, base_window, base_tag, tag_commits[base_tag], runtime_party)
     base_sha = _commit(adopter_repo, "base")
-    _write_state(adopter_repo, head_window, head_tag, tag_commits[head_tag])
+    _write_state(adopter_repo, head_window, head_tag, tag_commits[head_tag], runtime_party)
     if record_version is not None:
         # Ticket 132: the record lands with the pull request that adds the major, as the real
         # v3.3.0 rollout's did, so it is in the head's tree and not the base's.
@@ -445,9 +467,89 @@ def identity_constants(unit_dir: Path, script: Path) -> tuple[str, str] | None:
     return (regexp, issuer) if regexp and issuer else None
 
 
+class GateContext(NamedTuple):
+    """The served operation and its independently prepared workflow prerequisites.
+
+    Preparation happens before planting and before a cold evidence-verification probe. The gate
+    still runs the adopter's unchanged script and, on retirement, its unchanged tools verifier.
+    """
+    script: Path
+    tokens: list[str]
+    identity: tuple[str, str]
+    compiler_tools_dir: Path | None
+    runtime_files: dict[str, bytes]
+
+
+def _gate_context(unit: str, unit_dir: Path) -> tuple[GateContext | None, str]:
+    script = next((unit_dir / ".github" / "scripts" / b for b in GATE_BASENAMES
+                   if (unit_dir / ".github" / "scripts" / b).is_file()), None)
+    workflow = unit_dir / ".github" / "workflows" / "shift-left.yml"
+    if script is None:
+        return None, f"{unit} carries no adopter gate script at .github/scripts/{GATE_BASENAMES[0]}"
+    if not workflow.is_file():
+        return None, f"{unit} carries no .github/workflows/shift-left.yml to read the gate's own operation from"
+    tokens = gate_argv(workflow.read_text(), script.name)
+    identity = identity_constants(unit_dir, script)
+    if identity is None:
+        return None, (f"{unit} holds no identity constant this grader could find, in its "
+                      f"shift-left.yml env or in {script.name}, so its gate cannot be run "
+                      f"identity-pinned the way its own CI runs it")
+    return GateContext(script, tokens, identity, None, {}), ""
+
+
+def prepare_gate_context(unit: str, unit_dir: Path, platform_src: Path,
+                         workdir: Path) -> tuple[GateContext | None, str]:
+    """Reproduce the served workflow's pinned compiler checkout/check before running its gate.
+
+    Missing or refusing dependencies are a could-not-look, never a gate refusal. This is separate
+    from the old policy checkout: the actual adopter runner remains the authority for exact
+    tag/SHA, clean tree, release identity and issuer, with no verification/cache bypass.
+    """
+    context, reason = _gate_context(unit, unit_dir)
+    if context is None or not COMPILER_TOOLS_DIR_FLAGS.intersection(context.tokens):
+        return context, reason
+    files = (".github/platform-tools-pin.yaml", ".github/scripts/platform-tools.py",
+             ".github/scripts/read-pins.py", ".gitignore", "party.yaml")
+    missing = next((name for name in files if not (unit_dir / name).is_file()), None)
+    if missing:
+        return None, f"{unit}'s compiler dependency needs its served {missing}, which is absent"
+    runtime_files = {name: (unit_dir / name).read_bytes() for name in files}
+    try:
+        pin = next(doc for doc in yaml.safe_load_all(runtime_files[files[0]])
+                   if isinstance(doc, dict) and doc.get("kind") == "GitRepository")
+        tag, commit = pin["spec"]["ref"]["tag"], pin["spec"]["ref"]["commit"]
+        if pin["spec"]["url"] != "https://github.com/policy-as-versioned-platform/platform" \
+                or not isinstance(tag, str) or not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag) \
+                or not isinstance(commit, str) or not re.fullmatch(r"[a-f0-9]{40}", commit):
+            raise ValueError("compiler pin must name platform's exact release tag and commit")
+        workdir.mkdir(parents=True, exist_ok=True)
+        tools = (workdir / "platform-tools").resolve()
+        subprocess.run(["git", "clone", "--local", "--quiet", str(platform_src), str(tools)],
+                       check=True, capture_output=True, text=True)
+        checked = _git(tools, "checkout", "--quiet", "--detach", tag)
+        if checked.returncode != 0:
+            raise ValueError(checked.stderr.strip() or f"compiler tag {tag} could not be checked out")
+        runtime = workdir / "runtime"
+        for name, content in runtime_files.items():
+            path = runtime / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+        checked = subprocess.run([context.tokens[0], str(runtime / ".github/scripts/platform-tools.py"),
+                                  "--adopter-dir", str(runtime), "--tools-dir", str(tools), "check"],
+                                 capture_output=True, text=True)
+        if checked.returncode != 0:
+            return None, (f"{unit}'s compiler dependency check exited {checked.returncode}: "
+                          f"{(checked.stdout + checked.stderr).strip()[-500:]}")
+        return context._replace(compiler_tools_dir=tools, runtime_files=runtime_files), ""
+    except (OSError, ValueError, KeyError, TypeError, StopIteration, yaml.YAMLError,
+            subprocess.CalledProcessError) as exc:
+        detail = (exc.stderr or str(exc)) if isinstance(exc, subprocess.CalledProcessError) else str(exc)
+        return None, f"{unit}'s compiler dependency could not be prepared: {detail}"
+
+
 def build_mapping(tokens: list[str], script: Path, planted: dict, platform_dir: Path,
                    adopter_repo: Path, out_json: Path, out_markdown: Path,
-                   identity: tuple[str, str]) -> dict[str, str]:
+                   identity: tuple[str, str], *, compiler_tools_dir: Path | None = None) -> dict[str, str]:
     """Map the served operation's own value tokens onto the planted case, by the ROLE of the flag
     that introduces them. Positional arguments (driftwood's `compose <platform> <old> <new>`) are
     mapped by position after the subcommand."""
@@ -479,6 +581,10 @@ def build_mapping(tokens: list[str], script: Path, planted: dict, platform_dir: 
                 value = tokens[i + 1]
                 if token in PLATFORM_DIR_FLAGS:
                     claim(value, str(platform_dir), token)
+                elif token in COMPILER_TOOLS_DIR_FLAGS:
+                    if compiler_tools_dir is None:
+                        raise Unresolved(f"{token} requires an independently prepared compiler checkout")
+                    claim(value, str(compiler_tools_dir), token)
                 elif token in ADOPTER_DIR_FLAGS:
                     claim(value, str(adopter_repo), token)
                 elif token in BASE_REF_FLAGS:
@@ -519,23 +625,15 @@ def build_mapping(tokens: list[str], script: Path, planted: dict, platform_dir: 
 
 
 def run_gate(unit: str, unit_dir: Path, planted: dict, platform_dir: Path, adopter_repo: Path,
-             workdir: Path) -> tuple[dict | None, str]:
+             workdir: Path, *, context: GateContext | None = None) -> tuple[dict | None, str]:
     """Run this adopter's REAL gate, through its own workflow's own flags. Returns (None, reason)
     when the gate could not be run at all: its answer is then unknown, and unknown is never read as
     agreement."""
-    script = next((unit_dir / ".github" / "scripts" / b for b in GATE_BASENAMES
-                   if (unit_dir / ".github" / "scripts" / b).is_file()), None)
-    workflow = unit_dir / ".github" / "workflows" / "shift-left.yml"
-    if script is None:
-        return None, f"{unit} carries no adopter gate script at .github/scripts/{GATE_BASENAMES[0]}"
-    if not workflow.is_file():
-        return None, f"{unit} carries no .github/workflows/shift-left.yml to read the gate's own operation from"
-    tokens = gate_argv(workflow.read_text(), script.name)
-    identity = identity_constants(unit_dir, script)
-    if identity is None:
-        return None, (f"{unit} holds no identity constant this grader could find, in its "
-                       f"shift-left.yml env or in {script.name}, so its gate cannot be run "
-                       f"identity-pinned the way its own CI runs it")
+    if context is None:
+        context, reason = _gate_context(unit, unit_dir)
+        if context is None:
+            return None, reason
+    script, tokens, identity = context.script, context.tokens, context.identity
     out_json = workdir / "summary.json"
     out_markdown = workdir / "comment.md"
     # The pull request BASE's copy of the pin, which two of the three workflows hand the gate as a
@@ -543,7 +641,7 @@ def run_gate(unit: str, unit_dir: Path, planted: dict, platform_dir: Path, adopt
     (workdir / "old-platform-pin.yaml").write_text(
         _git(adopter_repo, "show", f"{planted['base_sha']}:gitops/platform/platform-pin.yaml").stdout)
     mapping = build_mapping(tokens, script, planted, platform_dir, adopter_repo, out_json,
-                             out_markdown, identity)
+                             out_markdown, identity, compiler_tools_dir=context.compiler_tools_dir)
     argv = resolve_argv(tokens, mapping)
     try:
         proc = subprocess.run(argv, capture_output=True, text=True, cwd=str(workdir))
@@ -612,17 +710,32 @@ def run(estate: Path) -> tuple[str, list[tuple[str, str]]]:
         lines.append(("ok", f"platform checked out at {head_tag} ({tag_commits[head_tag][:12]}), "
                              f"the tag every planted pin names as the head"))
 
+        contexts: dict[str, tuple[GateContext | None, str]] = {}
+        for unit in units:
+            try:
+                contexts[unit] = prepare_gate_context(unit, estate / unit, platform_src,
+                                                      root / "dependencies" / unit)
+            except (NoGateStep, Unresolved) as exc:
+                lines.append(("FAIL", f"{unit}: this grader could not reproduce the operation "
+                                      f"its own shift-left.yml runs -- {type(exc).__name__}: {exc}"))
+                contexts[unit] = None, str(exc)
+
         for name, case in CASES.items():
             cases[name] = {}
             for unit in units:
                 workdir = root / name / unit
                 workdir.mkdir(parents=True)
                 adopter_repo = workdir / "repo"
-                planted = plant(adopter_repo, case, tag_commits, party=unit)
+                context, reason = contexts[unit]
+                if context is None:
+                    cases[name][unit] = None
+                    lines.append(("SKIP", f"case {name!r}: {reason}"))
+                    continue
+                planted = plant(adopter_repo, case, tag_commits, party=unit, context=context)
                 _git(platform_dir, "checkout", "--quiet", head_tag)
                 try:
                     result, reason = run_gate(unit, estate / unit, planted, platform_dir,
-                                               adopter_repo, workdir)
+                                               adopter_repo, workdir, context=context)
                 except (NoGateStep, Unresolved) as exc:
                     lines.append(("FAIL", f"{unit}: this grader could not reproduce the operation "
                                            f"its own shift-left.yml runs -- {type(exc).__name__}: "
