@@ -120,3 +120,28 @@ with no provider controller, ProviderConfig or AWS credential. The native checke
 live signed-source delivery, exact vendor schemas, the conserved incumbent claims, and server
 dry-run mutation. Its ordinary signed TRUTH recording is the citable observation. Local clusters
 stay off; setup and offline replay never stand in for actual admission.
+
+## Native readiness and clock continuity, 2026-10-17 (ticket151)
+
+Delegated under ADR0025 after hosted TRUTH414: preparation succeeded, but its native cloud
+capture recorded `FAIL: cloud plane: 'conditions'`. The capture contains no returned object or
+traceback, so it does not identify the faulting hosted resource. The checksum-pinned Kyverno
+1.18.2 install schema and an earlier genuine ready policy capture establish a separate source
+defect: ValidatingPolicy and MutatingPolicy use `status.conditionStatus.ready`, a Boolean;
+their nested conditions need not contain a `Ready` condition. The native reader must require
+literal `true` there and fail closed by policy resource/name for missing, false or malformed
+status. Flux source/route conditions, CRD establishment, signed body equality, source identity
+and server dry-run assertions retain their existing checks.
+
+The existing hosted substrate also runs on every citable default-branch clock, using the
+already computed `CAN_RECORD` verdict. The dispatch input additionally selects a nondefault
+preview; it does not disable an ordinary default-branch observation. Cleanup uses the same
+selector under `always()`. Hosted-only refusal, checksum-pinned preflight, unique run/attempt
+and no-provider/no-credential scope remain unchanged. The existing private current-grade
+handoff and incumbent-last ordering already work and need no second implementation.
+
+Registered local caller proofs exercise native policy status and the actual workflow guard
+and selectors. They are self-proofs, not admission observations. Actual414failure is preserved;
+only a subsequent genuine ordinary default clock can establish whether admission succeeds.
+Source delivery alone does not establish cloud/datastore archive eligibility, and no future
+PASS or archive result is asserted here.
