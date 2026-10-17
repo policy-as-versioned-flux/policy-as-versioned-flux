@@ -64,6 +64,11 @@ selfcheck() {
   "$PY" "$HERE/verify-resource-probe.py" || return 1
 }
 
+if [ "${1:-}" != --inventory ] && ! command -v tee >/dev/null 2>&1; then
+  echo "SKIP: output capture unavailable: tee is not on PATH"
+  exit 3
+fi
+
 case "${1:-}" in
   --selfcheck)
     say "0. the graders can fail"
@@ -104,10 +109,6 @@ say "3. every mutating policy, and which surface it is on"
 "$PY" "$HERE/refusal_scan.py" --root "$ROOT" --inventory | sed 's/^/  /'
 
 say "4. legs A, C and D over the served surface"
-command -v tee >/dev/null 2>&1 || {
-  echo "SKIP: output capture unavailable: tee is not on PATH"
-  exit 3
-}
 leg_logs="$(mktemp -d)" || {
   echo "SKIP: output capture unavailable: cannot create the native-leg log directory"
   exit 3

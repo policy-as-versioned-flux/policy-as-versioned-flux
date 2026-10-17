@@ -295,6 +295,38 @@ raise SystemExit(code)
         self.assertIn('tee', last)
         self.assertIn('output capture unavailable', last)
 
+    def test_real_outer_entry_checks_collector_before_native_selfchecks(self):
+        marker = 'PAVC_OUTER_COLLECTOR_ABSENCE_TEST'
+        if os.environ.get(marker) == '1':
+            self.skipTest('nested boundary probe; only its self-referential test is excluded')
+        wrapper = Path(__file__).with_name('verify-refusal-by-another-name.sh')
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for name in ('dirname', 'sed', 'mktemp', 'rm', 'kyverno'):
+                executable = shutil.which(name)
+                self.assertIsNotNone(executable, name)
+                (directory / name).symlink_to(executable)
+            (directory / 'python3').symlink_to(sys.executable)
+            env = dict(os.environ, PATH=temporary, PYTHON=sys.executable,
+                       **{marker: '1'})
+            for mode in ([], ['--selfcheck']):
+                with self.subTest(mode=mode):
+                    result = subprocess.run(['/bin/bash', str(wrapper), *mode], env=env,
+                                            capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+                    last = result.stdout.strip().splitlines()[-1]
+                    self.assertTrue(last.startswith('SKIP:'), last)
+                    self.assertIn('tee', last)
+            absent = subprocess.run(['/bin/bash', str(wrapper), '--inventory'], env=env,
+                                    capture_output=True, text=True)
+            collector = shutil.which('tee')
+            self.assertIsNotNone(collector, 'installed collector is needed for the inventory control')
+            (directory / 'tee').symlink_to(collector)
+            installed = subprocess.run(['/bin/bash', str(wrapper), '--inventory'], env=env,
+                                       capture_output=True, text=True)
+            self.assertEqual((absent.returncode, absent.stdout, absent.stderr),
+                             (installed.returncode, installed.stdout, installed.stderr))
+
 
 if __name__ == '__main__':
     unittest.main()
