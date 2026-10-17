@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-10-17T08:20Z run=428 hub=a0f20e69 enact=development units=[driftwood=49a67d5@main feeds=8b2af55@eol/v2.0.0 ico=abcb3a8@main insurer=ff40f72@main ludlow=e33b029@main nist=f83126f@main platform=7bc2cf9@main tuppence=728f2e4@main] pass=104 [observed=36 self=55 simulated=4 meta=9] fail=7 skip=27 [never=10 waits=17] excluded=8 total=146 ceiling=127
+# TRUTH 2026-10-17T10:22Z run=429 hub=1432850e enact=development units=[driftwood=49a67d5@main feeds=8b2af55@eol/v2.0.0 ico=abcb3a8@main insurer=ff40f72@main ludlow=e33b029@main nist=f83126f@main platform=7bc2cf9@main tuppence=728f2e4@main] pass=105 [observed=36 self=55 simulated=4 meta=10] fail=6 skip=27 [never=10 waits=17] excluded=8 total=146 ceiling=127
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      acceptance record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -93,7 +93,7 @@ verify/cloud-plane/verify-cloud-plane.sh	FAIL	FAIL: cloud plane: 'posture.acme.i
 verify/cve-inventory/verify-cve-inventory.sh	PASS	PASS: ludlow served CVE line prices its digest-matched inventory intersection
 verify/demo/verify-demo.sh	PASS	PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck
 verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh	SKIP	SKIP: 12 served copies of a declared Deny are still in the estate, each awaiting a named tag: posture-trust-boundary (12 copies) awaits ticket 84's next declare
-verify/derived-status/verify-derived-status.sh	FAIL	FAIL: 1 fault(s) -- a ticket's Status: is typed rather than derived (ticket 59), or a ticket number names more than one file (ticket 117)
+verify/derived-status/verify-derived-status.sh	PASS	PASS: every ticket number in .scratch/ecosystem/issues/ names exactly one file, every ticket carries one Status: line from the tracker's own vocabulary with not
 verify/disclaimer/verify-disclaimer.sh	PASS	PASS: all eight parties say they are a demonstration on their signed artefact and their README, the two regulators carry the long form, nist attributes NIST's p
 verify/e2e/verify-e2e-step1-regulator-publishes.sh	PASS	PASS: ico's newest penalty-schema envelope validates and its tag is on the real remote
 verify/e2e/verify-e2e-step2-renovate-pins-and-reprices.sh	PASS	PASS: a SYNTHETIC pin bump (penalty-schema v3 -> v4, made here on a throwaway copy of driftwood, not driftwood's own merged history) re-prices driftwood's price
@@ -132,7 +132,7 @@ verify/refusal-by-another-name/verify-refusal-by-another-name.sh	SKIP	SKIP: muta
 verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Renovate raised threat-register v1 -> v2, Chris Nesbitt-Smith merged it, and party.yaml and composed/ moved together -- step 2 happened for
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
-verify/schedules/verify-schedules.sh	FAIL	FAIL: 7 schedule/cage check(s) observed false: driftwood/propose-tier.yml driftwood/twin-sweep.yml insurer/fetch.yml ludlow/propose-tier.yml ludlow/twin-sweep.y
+verify/schedules/verify-schedules.sh	FAIL	FAIL: 7 schedule/cage check(s) observed false: driftwood/propose-tier.yml driftwood/twin-sweep.yml feeds/fetch.yml ludlow/propose-tier.yml ludlow/twin-sweep.yml
 verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=49a67d5 ludlow=e33b029 tuppence=728f2e4]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
 verify/served-workloads/verify-served-workloads.sh	FAIL	SKIP: a workload lane run started by hand cannot establish a cited pass
 verify/supersede/verify-supersede.sh	PASS	PASS: every adopter feed pin at its served commit is either at the newest major its publisher's real remote carries a tag for, or priced as behind by a supersed
