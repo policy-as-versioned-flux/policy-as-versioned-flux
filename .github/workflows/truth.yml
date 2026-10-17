@@ -29,7 +29,7 @@ on:
   workflow_dispatch:
     inputs:
       cloud_admission:
-        description: 'Observe published cloud delivery at admission on an ephemeral hosted KinD cluster'
+        description: 'Opt in a nondefault preview to hosted cloud admission; default-branch clocks observe it automatically'
         type: boolean
         default: false
   push:
@@ -415,8 +415,8 @@ jobs:
             fi
             rm -f "$dest/cli.tgz"
           done <"$rows"
-      - name: prepare the opt-in hosted cloud admission substrate
-        if: github.event_name == 'workflow_dispatch' && inputs.cloud_admission
+      - name: prepare hosted cloud admission for a citable clock or opt-in preview
+        if: env.CAN_RECORD == 'yes' || (github.event_name == 'workflow_dispatch' && inputs.cloud_admission)
         continue-on-error: true
         timeout-minutes: 20
         run: bash verify/cloud-plane/hosted-admission.sh
@@ -626,8 +626,8 @@ jobs:
             echo "::error::THE NUMBER FELL, and no committed reason accepts it. NORTH-STAR section 5: a fall is a blocking event. This run is not a green run and no document may cite it as one. Either fix what fell, or commit a line to talk/verify-falls.txt saying run=${GITHUB_RUN_NUMBER} and why the fall is accepted."
             exit 1
           fi
-      - name: delete the opt-in hosted cloud admission cluster
-        if: always() && github.event_name == 'workflow_dispatch' && inputs.cloud_admission
+      - name: delete the hosted cloud admission cluster
+        if: always() && (env.CAN_RECORD == 'yes' || (github.event_name == 'workflow_dispatch' && inputs.cloud_admission))
         run: |
           if command -v kind >/dev/null; then
             kind delete cluster --name "cloud-tuppence-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"

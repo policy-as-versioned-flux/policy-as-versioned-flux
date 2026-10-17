@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# An opt-in hosted substrate for the ordinary native TRUTH cloud observation.
+# Hosted substrate for citable TRUTH clocks and opt-in nondefault previews.
 # No provider controller, ProviderConfig, cloud credential or AWS resource.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
