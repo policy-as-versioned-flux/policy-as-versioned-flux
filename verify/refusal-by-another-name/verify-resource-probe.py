@@ -2,6 +2,9 @@
 """Native resource-probe regressions; authored CRD mappings are not provider-schema proofs."""
 from pathlib import Path
 import shutil
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -133,6 +136,92 @@ class NativeResourceProbe(unittest.TestCase):
         no_mapping = rp._apply(self.binary, self.policy, resource, self.root / 'unmapped-output', values)
         self.assertFalse(no_mapping.applied)
         self.assertIn('failed to map gvk to gvr', no_mapping.text.lower())
+
+
+class WrapperVerdict(unittest.TestCase):
+    """Actual shell aggregation; independent leg results are explicitly fixture data."""
+
+    def run_wrapper(self, static, functional, *, actual_missing_crd=False):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            relative = 'adopter/composed/cloud/v1.0.0/mutation.yaml'
+            policy = root / '.estate-clone' / relative
+            policy.parent.mkdir(parents=True)
+            policy.write_text(yaml.safe_dump({
+                'apiVersion': 'policies.kyverno.io/v1', 'kind': 'MutatingPolicy',
+                'metadata': {'name': 'missing-crd-fixture'},
+                'spec': {'matchConstraints': {'resourceRules': [{
+                    'apiGroups': ['s3.aws.m.upbound.io'], 'apiVersions': ['v1beta1'],
+                    'operations': ['CREATE', 'UPDATE'],
+                    'resources': ['bucketserversideencryptionconfigurations']}]},
+                    'mutations': []}}))
+            wrapper = root / 'verify/refusal-by-another-name/verify-refusal-by-another-name.sh'
+            wrapper.parent.mkdir(parents=True)
+            wrapper.write_bytes(Path(__file__).with_name(wrapper.name).read_bytes())
+            instrument = root / 'python-instrument'
+            instrument.write_text('#!' + sys.executable + '\n' + r'''
+import importlib.util, json, os
+from pathlib import Path
+import sys
+from unittest.mock import patch
+import yaml
+target = Path(sys.argv[1]).name
+if target == 'refusal_probe.py' and '--root' in sys.argv:
+    if os.environ.get('ACTUAL_MISSING_CRD') == '1':
+        spec = importlib.util.spec_from_file_location('actual_missing_crd', os.environ['PROBE_SOURCE'])
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+        root = Path(os.environ['ISOLATED_ROOT'])
+        relative = 'adopter/composed/cloud/v1.0.0/mutation.yaml'
+        doc = yaml.safe_load((root/'.estate-clone'/relative).read_text())
+        with patch.object(module, 'collect', return_value=[(doc, relative)]):
+            raise SystemExit(module.main(['--root', str(root)]))
+    code, text = json.loads(os.environ['FUNCTIONAL_RESULT'])
+elif target == 'refusal_scan.py' and '--register' in sys.argv:
+    code, text = json.loads(os.environ['STATIC_RESULT'])
+else:
+    raise SystemExit(0)
+print(text)
+raise SystemExit(code)
+''')
+            instrument.chmod(0o755)
+            import json
+            env = dict(os.environ, PYTHON=str(instrument), STATIC_RESULT=json.dumps(static),
+                       FUNCTIONAL_RESULT=json.dumps(functional), ISOLATED_ROOT=str(root),
+                       PROBE_SOURCE=str(Path(rp.__file__).resolve()),
+                       ACTUAL_MISSING_CRD='1' if actual_missing_crd else '0')
+            return subprocess.run(['/bin/bash', str(wrapper)], env=env, capture_output=True, text=True)
+
+    def test_actual_wrapper_preserves_skip_causes_and_failure_precedence(self):
+        observed = (0, 'PASS: fixture observed')
+        static_skip = (3, '  ?? static fixture: cloud UPDATE mutability unknown\nSKIP: static missing instrument')
+        functional_skip = (3, '  ?? functional fixture: missing served CRD\nSKIP: functional missing instrument')
+        cases = [
+            (static_skip, observed, 3, ['cloud UPDATE mutability unknown']),
+            (observed, functional_skip, 3, ['missing served CRD']),
+            (static_skip, functional_skip, 3, ['cloud UPDATE mutability unknown', 'missing served CRD']),
+            (observed, (0, 'SKIP: fixture false-green missing CRD'), 3, ['false-green missing CRD']),
+            ((1, 'FAIL: fixture real mutation defect'), functional_skip, 1, ['real mutation defect']),
+            (static_skip, (1, 'FAIL: fixture changed second output'), 1, ['changed second output']),
+            (observed, observed, 0, []),
+        ]
+        for static, functional, code, reasons in cases:
+            with self.subTest(static=static[0], functional=functional[0], code=code):
+                result = self.run_wrapper(static, functional)
+                self.assertEqual(result.returncode, code, result.stdout + result.stderr)
+                last = result.stdout.strip().splitlines()[-1]
+                self.assertTrue(last.startswith({0: 'PASS:', 1: 'FAIL:', 3: 'SKIP:'}[code]), last)
+                for reason in reasons:
+                    self.assertIn(reason, last)
+
+    def test_real_production_missing_CRD_cause_reaches_consumed_line(self):
+        result = self.run_wrapper((0, 'PASS: explicit static fixture'), (0, ''), actual_missing_crd=True)
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        last = result.stdout.strip().splitlines()[-1]
+        self.assertTrue(last.startswith('SKIP:'), last)
+        self.assertIn('missing native resource instrument', last)
+        self.assertIn('expected one served CRD', last)
 
 
 if __name__ == '__main__':
