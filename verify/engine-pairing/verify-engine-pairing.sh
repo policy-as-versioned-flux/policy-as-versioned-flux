@@ -5,7 +5,7 @@
 #   planted  a copy of driftwood declaring its own engine, an engine the composed line does not
 #            list, the same with a planted claim of a weighted control (so the price is a number
 #            that moves), no declaration, and a declaration that does not read;
-#   forward  each real adopter's committed tree composed now against the served platform tree;
+#   forward  the served compiler against each adopter's committed accepted implementation parent;
 #   served   each real adopter's committed composed/ against the platform commit it pins.
 # Every expected figure (the bodies, the claims, the tested engines, the hole prices) is derived
 # here, never read from the delta it grades. See engine_pairing.py.

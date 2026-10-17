@@ -118,3 +118,25 @@ widens what it grades.
 - On 2026-09-26 only point 1's field and a grader for one engine and two families exist. The
   grader requires `tested_engines.kyverno == [running version]`, so a second engine reads
   could-not-look. Points 2 to 7 wait on eco-system tickets 146 to 150.
+
+## Delegated clarification, 2026-10-17: compiler maintenance preserves accepted policy inputs
+
+Under ADR-0025, the engine-pairing check's forward experiment now runs the served upstream
+compiler against each adopter's committed, exact implementation parent. Its tag/SHA pair and
+observed repository identity must resolve locally; unavailable or mismatched inputs are named
+missing instruments, never a fallback to the upstream implementation tree. Policy and machinery
+claims and supported engines are independently read from that same accepted parent. The
+adopter's declared engine and all retirement, policy acceptance and signature checks stay intact.
+
+This replaces the check's earlier forward experiment in which both tools and implementation
+parent moved to upstream. The adopter's September10 independent compiler-tools decision permits
+software maintenance without accepting a policy window. A genuine consumer retirement binds an
+exact parent (ADR-0038); the earlier two-pin experiment correctly refused Ludlow's changed
+parent. That recorded failure remains a failure. A tools compatibility experiment cannot supply
+the separate decision required to change policy, nor can it manufacture a future release or
+successful adoption.
+
+The planted experiment continues to exercise upstream policy with explicitly synthetic mutations;
+the served experiment continues to grade committed artefacts against their own pinned parent.
+Unsupported pairings remain priced with the independently derived claims and weights. No
+historical grade, declaration, acceptance, immutable policy, observation or price is rewritten.
