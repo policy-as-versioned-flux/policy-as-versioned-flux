@@ -1,0 +1,10 @@
+  ok   selfcheck: with git unreachable this script exits 3 and its last line is SKIP:
+test_actual_guard_and_prepare_cleanup_select_default_clocks_and_opt_in_previews (__main__.CloudClockSelection.test_actual_guard_and_prepare_cleanup_select_default_clocks_and_opt_in_previews) ... ok
+test_absent_false_malformed_and_flat_policy_status_fail_closed_by_name (__main__.CloudReadiness.test_absent_false_malformed_and_flat_policy_status_fail_closed_by_name) ... ok
+test_native_ready_both_policy_kinds_reach_the_unchanged_crd_gate (__main__.CloudReadiness.test_native_ready_both_policy_kinds_reach_the_unchanged_crd_gate) ... ok
+test_ready_status_does_not_accept_a_different_signed_body (__main__.CloudReadiness.test_ready_status_does_not_accept_a_different_signed_body) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.103s
+
+OK

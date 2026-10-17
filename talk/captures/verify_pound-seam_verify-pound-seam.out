@@ -28,7 +28,7 @@ PASS: tuppence serves a total of 102,869,480.25 GBP that says what it is -- an o
 PASS: driftwood: the twin-agent rung 'baseline' is what driftwood's own selection-policy package picks over the line's residuals and its signed band (floor None), and platform's tier fold gives the Namespace 'isolated' with the line and without it
 PASS: ludlow: the twin-agent rung 'baseline' is what ludlow's own selection-policy package picks over the line's residuals and its signed band (floor None), and platform's tier fold gives the Namespace 'isolated' with the line and without it
 PASS: tuppence: the twin-agent rung 'baseline' is what tuppence's own selection-policy package picks over the line's residuals and its signed band (floor None), and platform's tier fold gives the Namespace 'isolated' with the line and without it
-SKIP: driftwood prices[3] (feeds/cve feed) could not be priced, and says why: No scanned CVE is in the pinned KEV feed; 334 scanned CVE(s) outside it are named absences carrying no amount.
+SKIP: driftwood prices[3] (feeds/cve feed) could not be priced, and says why: No scanned CVE is in the pinned KEV feed; 388 scanned CVE(s) outside it are named absences carrying no amount.
 SKIP: driftwood prices[8] (feeds/threat-register switching) could not be priced, and says why: missing instrument: twin/forward-intel/v2/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at
 SKIP: driftwood prices[9] (feeds/cve switching) could not be priced, and says why: missing instrument: twin/forward-intel/v2/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at
 PASS: driftwood: one twin edge, policy 1.1.0, curve sha256:b324e, tail bounded-pert, perspective driftwood in GBP
@@ -36,7 +36,7 @@ PASS: driftwood prices[6] agent-cage: the platform prices the twin agent's cage 
 PASS: driftwood regime entry (penalty-schema): 4 priced hole(s) sum to its total 1,787,177.08 GBP; the open lines price it at 1,787,177.08
 PASS: driftwood: every list of amounts in the document is one perspective in one currency
 PASS: driftwood: selection policy 1.1.0 matches driftwood/selection-policy/VERSION
-SKIP: ludlow prices[3] (feeds/cve feed) could not be priced, and says why: No scanned CVE is in the pinned KEV feed; 109 scanned CVE(s) outside it are named absences carrying no amount.
+SKIP: ludlow prices[3] (feeds/cve feed) could not be priced, and says why: No scanned CVE is in the pinned KEV feed; 110 scanned CVE(s) outside it are named absences carrying no amount.
 SKIP: ludlow prices[8] (feeds/threat-register switching) could not be priced, and says why: missing instrument: twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at
 SKIP: ludlow prices[9] (feeds/cve switching) could not be priced, and says why: missing instrument: twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at
 SKIP: ludlow prices[10] (feeds/eol switching) could not be priced, and says why: missing instrument: twin/forward-intel/v1/feed.json supplies no lef and its derived_from names 0 subscribed feeds that price one (none); a borrowed frequency has to be named, not guessed at
@@ -52,4 +52,4 @@ PASS: tuppence prices[5] agent-cage: the platform prices the twin agent's cage u
 PASS: tuppence regime entry (penalty-schema): 4 priced hole(s) sum to its total 17,907,950.70 GBP; the open lines price it at 17,907,950.70
 PASS: tuppence: every list of amounts in the document is one perspective in one currency
 PASS: tuppence: selection policy 1.1.0 matches tuppence/selection-policy/VERSION
-SKIP: driftwood prices[3] (feeds/cve feed) could not be priced, and says why: No scanned CVE is in the pinned KEV feed; 334 scanned CVE(s) outside it are named absences carrying no amount.
+SKIP: driftwood prices[3] (feeds/cve feed) could not be priced, and says why: No scanned CVE is in the pinned KEV feed; 388 scanned CVE(s) outside it are named absences carrying no amount.
