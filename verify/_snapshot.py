@@ -22,6 +22,15 @@ def committed_repository(repo: Path, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", "--no-checkout",
                     str(repo), str(dest)], check=True)
+    # Local clone otherwise replaces the repository identity with a filesystem
+    # path. Retirement verification must see the same observed publisher URL.
+    origin = subprocess.run(["git", "-C", str(repo), "remote", "get-url", "origin"],
+                            capture_output=True, text=True)
+    if origin.returncode == 0:
+        subprocess.run(["git", "-C", str(dest), "remote", "set-url", "origin",
+                        origin.stdout.strip()], check=True)
+    else:
+        subprocess.run(["git", "-C", str(dest), "remote", "remove", "origin"], check=True)
     refs = source("for-each-ref", "--format=%(refname) %(objectname) %(symref)",
                   "refs/remotes/origin/")
     rows = [row.split() for row in refs.splitlines()]

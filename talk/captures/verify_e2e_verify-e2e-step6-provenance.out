@@ -1,26 +1,25 @@
 E2E step 6 provenance
-  ok   109 published artefacts resolve to a tag on the publisher's real remote; 0 honestly queued for cut-release.yml
-  ??   SKIP: ludlow pins feeds/feed/eol@v2: tag eol/v2.0.0 exists on feeds's remote, but this checkout of feeds does not carry the tag object, so its tree could not be looked at
+  ok   110 published artefacts resolve to a tag on the publisher's real remote; 0 honestly queued for cut-release.yml
   ok   8 release workflows pin an anchored, own-repo identity regexp at the Actions OIDC issuer
   ok   driftwood/exposure newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   driftwood/forward-intel newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   feeds/cve newest tag cve/v3.0.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   feeds/eol has no tag yet: looked for 'eol/vX.Y.Z' and 'vX.Y.Z' among 7 real tags -- queued for cut-release.yml
+  ok   feeds/eol newest tag eol/v2.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   feeds/fx newest tag fx/v2.0.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   feeds/market-moves has no tag yet: looked for 'market-moves/vX.Y.Z' and 'vX.Y.Z' among 7 real tags -- queued for cut-release.yml
-  ok   feeds/news has no tag yet: looked for 'news/vX.Y.Z' and 'vX.Y.Z' among 7 real tags -- queued for cut-release.yml
+  ok   feeds/market-moves has no tag yet: looked for 'market-moves/vX.Y.Z' and 'vX.Y.Z' among 8 real tags -- queued for cut-release.yml
+  ok   feeds/news has no tag yet: looked for 'news/vX.Y.Z' and 'vX.Y.Z' among 8 real tags -- queued for cut-release.yml
   ok   feeds/threat-register newest tag threat-register/v4.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   ico/penalty-schema newest tag v4.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   insurer/quote-driftwood newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   insurer/quote-ludlow newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   insurer/quote-tuppence newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   ludlow/exposure newest tag v5.0.1: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   ludlow/forward-intel newest tag v5.0.1: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   ludlow/exposure newest tag v5.1.1: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   ludlow/forward-intel newest tag v5.1.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   nist/sp-800-53 newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/cloud newest tag v5.1.1: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/currency-controller newest tag v5.1.1: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/identity-substrate newest tag v5.1.1: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/cloud newest tag v5.2.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/currency-controller newest tag v5.2.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/identity-substrate newest tag v5.2.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/policy newest tag policy/v7.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/exposure newest tag v4.1.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/forward-intel newest tag v4.1.1: real cert subject matches the anchored regexp, Rekor entry validated
-SKIP: the offline provenance holds, but part of step 6 could not be looked at: ludlow pins feeds/feed/eol@v2: tag eol/v2.0.0 exists on feeds's remote, but this checkout of feeds does not carry the tag object, so its tree could not be looked at
+PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 21 lines the 8 release-shipping units declare in their own party.yaml publishes[], 19 newest tags matched a real Fulcio cert subject with its Rekor entry validated and 2 lines have no tag of their own shape yet

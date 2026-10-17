@@ -102,10 +102,10 @@ PASS: ludlow pins nist/controls@1.1.0: tag v1.1.0 on nist, and its tree carries 
 PASS: ludlow pins ico/feed/penalty-schema@v3: tag v3.0.0 on ico, and its tree carries the penalty-schema this pin is used for
 PASS: ludlow pins feeds/feed/threat-register@v4: tag threat-register/v4.0.0 on feeds, and its tree carries the threat-register this pin is used for
 PASS: ludlow pins feeds/feed/cve@v3: tag cve/v3.0.0 on feeds, and its tree carries the cve this pin is used for
-SKIP: ludlow pins feeds/feed/eol@v2: tag eol/v2.0.0 exists on feeds's remote, but this checkout of feeds does not carry the tag object, so its tree could not be looked at
+PASS: ludlow pins feeds/feed/eol@v2: tag eol/v2.0.0 on feeds, and its tree carries the eol this pin is used for
 PASS: tuppence pins platform/implementations@5.0.0: tag v5.0.0 on platform, and its tree carries the cloud this pin is used for
 PASS: tuppence pins nist/controls@1.1.0: tag v1.1.0 on nist, and its tree carries the sp-800-53 this pin is used for
 PASS: tuppence pins ico/feed/penalty-schema@v3: tag v3.0.0 on ico, and its tree carries the penalty-schema this pin is used for
 PASS: tuppence pins feeds/feed/threat-register@v4: tag threat-register/v4.0.0 on feeds, and its tree carries the threat-register this pin is used for
 PASS: tuppence pins feeds/feed/cve@v3: tag cve/v3.0.0 on feeds, and its tree carries the cve this pin is used for
-SKIP: ludlow pins feeds/feed/eol@v2: tag eol/v2.0.0 exists on feeds's remote, but this checkout of feeds does not carry the tag object, so its tree could not be looked at
+PASS: every published feed is one envelope, and every subscription names a tag that exists on the publisher's real remote (existence, not signature -- step 6 checks the signature)
