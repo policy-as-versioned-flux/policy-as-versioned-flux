@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the immutable reviewer from one implementation and its two trusted helpers.
+"""Build the immutable reviewer from one implementation and its three trusted helpers.
 
 ZIP_STORED, fixed timestamps/modes and sorted members make identical source bytes
 produce identical bundles across Python versions. No dependency or network lookup

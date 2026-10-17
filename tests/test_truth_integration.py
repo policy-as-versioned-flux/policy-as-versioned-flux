@@ -66,7 +66,7 @@ class IntegrationAPI(FixtureAPI):
 
 
 @pytest.fixture
-def conflict(tmp_path, monkeypatch):
+def conflict(tmp_path, monkeypatch, request):
     root, remote = tmp_path / 'trusted', tmp_path / 'protected.git'
     root.mkdir()
     git(root, 'init', '-q', '-b', 'main')
@@ -76,6 +76,7 @@ def conflict(tmp_path, monkeypatch):
     for path, data in {
         '.github/workflows/truth.yml': 'env:\n  OBSERVATION_LANE: "talk/truth.log talk/captures"\n',
         'talk/truth.log': 'TRUTH historical prefix\n', 'talk/captures/gate.out': 'old capture\n',
+        'talk/captures/inherited.out': 'signed inherited capture\n',
         'policy.yaml': 'must remain current\n', 'twin/ENACT_MODE': 'development\n',
         'owner.md': '2026-09-24, owner: "agree".\n',
         'twin/ENACT_MODE.why': "mode: development\nuntil: '2026-10-22'\nsaid:\n  - on: '2026-09-24'\n    by: owner\n    words: agree\n    where: owner.md\n",
@@ -94,8 +95,13 @@ def conflict(tmp_path, monkeypatch):
     original = git(root, 'rev-parse', 'HEAD')
     git(root, 'push', '-q', 'origin', 'HEAD:observations/truth/100-2')
     git(root, 'switch', '-q', 'main')
-    (root / 'talk/truth.log').write_text('TRUTH historical prefix\nTRUTH concurrent run416\n')
-    (root / 'talk/captures/gate.out').write_text('newer concurrent capture\n')
+    kind = getattr(request, 'param', 'conflict')
+    (root / 'talk/truth.log').write_text('TRUTH historical prefix\n' +
+                                       ('' if kind.startswith('clean-') else 'TRUTH concurrent run416\n'))
+    (root / 'talk/captures/gate.out').write_text('old capture\n' if kind.startswith('clean-')
+                                               else 'newer concurrent capture\n')
+    if kind == 'clean-mixed':
+        (root / 'talk/captures/inherited.out').write_text('concurrent later capture\n')
     (root / 'talk/captures/new-only.out').write_text('preserve this base-only file\n')
     (root / 'policy.yaml').write_text('current reviewed declaration\n')
     git(root, 'add', '.'); git(root, 'commit', '-qm', 'concurrent reviewed record and declaration')
@@ -165,7 +171,8 @@ def plant_ref(root, remote, ref, head):
     git(remote, 'update-ref', ref, head)
 
 
-def test_preparation_reuses_exact_candidate_and_recording_is_idempotent(conflict):
+@pytest.mark.parametrize('raw_marked_merged', [False, True])
+def test_preparation_reuses_exact_candidate_and_recording_is_idempotent(conflict, raw_marked_merged):
     root, remote, api, raw, base, _ = conflict
     assert prepare(conflict).startswith('PREPARED')
     refs = git(remote, 'for-each-ref', '--format=%(refname) %(objectname)')
@@ -174,6 +181,8 @@ def test_preparation_reuses_exact_candidate_and_recording_is_idempotent(conflict
     assert not api.reviewed
     assert len([p for p in api.prs if p != 4]) == 1
     assert invoke(conflict, review_integration=True).startswith('RECORDED')
+    if raw_marked_merged:
+        api.prs[4].update(merged=True, state='closed', merge_commit_sha=api.prs[5]['merge_commit_sha'])
     refresh(conflict)
     writes = len([c for c in api.calls if c[0] != 'GET'])
     assert prepare(conflict).startswith('RECORDED')
@@ -256,7 +265,8 @@ def test_default_races_cannot_review_or_merge_a_stale_integration(conflict, when
     assert git(remote, 'rev-parse', 'observations/truth/100-2') == raw
 
 
-def test_default_race_after_last_guard_never_claims_an_unexpected_merge_recorded(conflict):
+@pytest.mark.parametrize('raw_marked_merged', [False, True])
+def test_default_race_after_last_guard_never_claims_an_unexpected_merge_recorded(conflict, raw_marked_merged):
     root, remote, api, raw, base, _ = conflict
     prepare(conflict)
     def race(method, path, body):
@@ -271,6 +281,14 @@ def test_default_race_after_last_guard_never_claims_an_unexpected_merge_recorded
     assert git(remote, 'show', '-s', '--format=%P', 'main').split()[0] != base
     assert git(remote, 'merge-base', '--is-ancestor', raw, 'main') == ''
     assert git(remote, 'rev-parse', 'observations/truth/100-2') == raw
+    refresh(conflict)
+    api.on_call = None
+    if raw_marked_merged:
+        api.prs[4].update(merged=True, state='closed', merge_commit_sha=api.prs[5]['merge_commit_sha'])
+    with pytest.raises(controller.Refusal, match='merge did not conserve'):
+        prepare(conflict)
+    with pytest.raises(controller.Refusal, match='merge did not conserve'):
+        invoke(conflict, review_integration=True)
 
 
 @pytest.mark.parametrize('plant', ['duplicate', 'rewrite'])
@@ -354,3 +372,55 @@ def test_integration_verifier_pins_the_real_workflow_name_as_seventh_claim(confl
         f'--certificate-github-workflow-repository={REPO}',
         '--certificate-github-workflow-ref=refs/heads/main',
         '--certificate-github-workflow-trigger=push', '--certificate-github-workflow-name=truth']
+
+
+@pytest.mark.parametrize('conflict', ['clean-identical', 'clean-mixed'], indirect=True)
+def test_clean_fastpath_requires_the_complete_signed_capture_snapshot(conflict):
+    root, remote, api, raw, base, line = conflict
+    assert controller.truth_integration.mergeable(root, base, raw)
+    expected = controller.truth_integration.plan(root, base, raw, line, 100, 2)
+    identical = git(root, 'rev-parse', raw + ':talk/captures/inherited.out') == git(root, 'rev-parse', base + ':talk/captures/inherited.out')
+    assert prepare(conflict).startswith('READY' if identical else 'PREPARED')
+    assert invoke(conflict, review_integration=True).startswith('RECORDED')
+    assert git(remote, 'rev-parse', 'main^{tree}') == expected.tree
+    assert git(remote, 'rev-parse', 'main:talk/captures/inherited.out') == git(root, 'rev-parse', raw + ':talk/captures/inherited.out')
+    assert len(api.prs) == (1 if identical else 2)
+    refresh(conflict)
+    # A genuine later default update must not invalidate the historical receipt.
+    (root / 'talk/captures/inherited.out').write_text('legitimate later snapshot\n')
+    git(root, 'add', 'talk/captures/inherited.out'); git(root, 'commit', '-qm', 'later reviewed capture snapshot')
+    plant_ref(root, remote, 'refs/heads/main', git(root, 'rev-parse', 'HEAD'))
+    assert prepare(conflict).startswith('RECORDED')
+    assert invoke(conflict, review_integration=True).startswith('RECORDED')
+
+
+@pytest.mark.parametrize('conflict', ['clean-mixed'], indirect=True)
+def test_legacy_raw_merged_metadata_cannot_hide_a_mixed_historical_capture(conflict):
+    _, _, api, _, _, _ = conflict
+    # The unchanged legacy call reproduces the actual pre-fix mixed snapshot.
+    assert invoke(conflict).startswith('RECORDED')
+    assert api.prs[4]['merged']
+    refresh(conflict)
+    with pytest.raises(controller.Refusal, match='merge did not conserve'):
+        prepare(conflict)
+    with pytest.raises(controller.Refusal, match='merge did not conserve'):
+        invoke(conflict, review_integration=True)
+
+
+def test_custom_header_cannot_impersonate_the_actual_delivery_author(conflict):
+    root, remote, api, _, _, _ = conflict
+    prepare(conflict)
+    pr = api.prs[5]
+    data = subprocess.run(['git', '-C', str(root), 'cat-file', 'commit', pr['head']['sha']],
+                          check=True, capture_output=True).stdout
+    headers, message = data.split(b'\n\n', 1)
+    headers = headers.replace(b'author observation delivery <observation-delivery@users.noreply.github.com>',
+                              b'author truth surface <truth@users.noreply.github.com>')
+    headers += b'\nx-author author observation delivery <observation-delivery@users.noreply.github.com>'
+    changed = subprocess.run(['git', '-C', str(root), 'hash-object', '-t', 'commit', '-w', '--stdin'],
+                             input=headers + b'\n\n' + message, check=True, capture_output=True).stdout.decode().strip()
+    plant_ref(root, remote, 'refs/heads/' + pr['head']['ref'], changed)
+    pr['head']['sha'] = changed
+    with pytest.raises(ValueError, match='non-measurement'):
+        invoke(conflict, review_integration=True)
+    assert not api.reviewed

@@ -40,10 +40,14 @@ def git(root: Path, *args: str, data: bytes | None = None, index: str | None = N
     return result.stdout
 
 
-def mergeable(root: Path, base: str, original: str) -> bool:
+def merged_tree(root: Path, base: str, original: str) -> str | None:
     result = run(root, 'merge-tree', '--write-tree', base, original)
     require(result.returncode in (0, 1), 'Git cannot establish whether the original merges cleanly')
-    return result.returncode == 0
+    return result.stdout.decode().splitlines()[0] if result.returncode == 0 else None
+
+
+def mergeable(root: Path, base: str, original: str) -> bool:
+    return merged_tree(root, base, original) is not None
 
 
 def ancestor(root: Path, original: str, base: str) -> bool:
@@ -78,7 +82,10 @@ class Integration:
         headers = raw.split(b'\n\n', 1)[0]
         require(b'\ngpgsig ' not in headers and b'\ngpgsig-sha256 ' not in headers,
                 'integration must be explicitly unsigned, never a replacement clock signature')
-        require(b'author observation delivery <observation-delivery@users.noreply.github.com>' in headers,
+        for field in (b'author ', b'committer '):
+            values = [row for row in headers.split(b'\n') if row.startswith(field)]
+            require(len(values) == 1 and values[0].startswith(
+                field + b'observation delivery <observation-delivery@users.noreply.github.com> '),
                 'integration is not marked as non-measurement delivery')
 
     def commit(self, root: Path) -> str:

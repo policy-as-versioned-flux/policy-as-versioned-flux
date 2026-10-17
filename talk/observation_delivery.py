@@ -349,7 +349,8 @@ def pending(root: Path, run_id: int, attempt: int, profile: Profile, api: Api,
     # Read the authoritative detail before judging either pending or idempotent delivery.
     pr = api("GET", endpoint, None)
     head = validate_pr(pr, default, branch, profile=profile)
-    line = observation(root, head, run, default, branch, already_merged=pr.get("merged") is True, profile=profile)
+    line = observation(root, head, run, default, branch,
+                       already_merged=pr.get("merged") is True and not require_name, profile=profile)
     if verify is None:
         verify_signature(root, head, run, default, profile=profile, require_name=require_name)
     else:
@@ -392,13 +393,58 @@ def publish_integration(root: Path, branch: str, head: str) -> None:
         raise Refusal('integration publication instrument unavailable; original remains pending') from error
 
 
-def already_integrated(root: Path, item: Pending) -> str | None:
+def validate_integration_merge(root: Path, merged: str, plan: truth_integration.Integration, head: str) -> None:
+    require(git(root, 'show', '-s', '--format=%P', merged).split() == [plan.base, head]
+            and git(root, 'rev-parse', merged + '^{tree}').strip() == plan.tree,
+            'ordinary merge did not conserve the reviewed integration tree and parents')
+
+
+def already_integrated(root: Path, item: Pending, api: Api) -> str | None:
     if not truth_integration.ancestor(root, item.original, 'refs/remotes/origin/' + item.default):
         return None
     assert isinstance(item.line, str)
     log = git(root, 'show', f'refs/remotes/origin/{item.default}:talk/truth.log')
     require(log.splitlines(keepends=True).count(item.line) == 1,
             'default branch does not conserve the exact original TRUTH line once')
+    # An earlier PUT can succeed against an unexpected base after the last guard.
+    # Ancestry/one row alone must not erase that strict failure on the next retry.
+    prefix = f'integrations/truth/{item.run["id"]}-{item.run["run_attempt"]}/'
+    refs = api('GET', f'repos/{REPOSITORY}/git/matching-refs/heads/{prefix}', None)
+    require(isinstance(refs, list), 'recorded integration ref instrument is invalid')
+    if not refs:
+        # Clean original PRs retain their direct path, but its historical merge
+        # must conserve the full signed capture snapshot, not a mixed Git merge.
+        require(item.pr.get('merged') is True, 'recorded integration has no immutable delivery ref receipt')
+        merged = sha(item.pr.get('merge_commit_sha'))
+        parents = git(root, 'rev-list', '--parents', '-n', '1', merged).split()
+        require(len(parents) == 3 and parents[2] == item.original,
+                'direct original merge did not conserve the original parent')
+        direct = truth_integration.plan(root, parents[1], item.original, item.line,
+                                        item.run['id'], item.run['run_attempt'])
+        git(root, 'merge-base', '--is-ancestor', merged, 'refs/remotes/origin/' + item.default)
+        validate_integration_merge(root, merged, direct, item.original)
+        return f'RECORDED original observation {item.original} on {item.default}'
+    verified = False
+    for row in refs:
+        ref = mapping(row, 'integration ref')
+        name = ref.get('ref')
+        require(isinstance(name, str) and name.startswith('refs/heads/' + prefix), 'integration ref changed')
+        assert isinstance(name, str)
+        base = sha(name.removeprefix('refs/heads/' + prefix))
+        branch = name.removeprefix('refs/heads/')
+        head = sha(mapping(ref.get('object'), 'integration object').get('sha'))
+        pr = integration_pr(api, branch, item.default)
+        if pr is None or pr.get('merged') is not True:
+            continue
+        validate_pr(pr, item.default, branch, head)
+        plan = truth_integration.plan(root, base, item.original, item.line,
+                                      item.run['id'], item.run['run_attempt'])
+        plan.validate(root, head)
+        merged = sha(pr.get('merge_commit_sha'))
+        git(root, 'merge-base', '--is-ancestor', merged, 'refs/remotes/origin/' + item.default)
+        validate_integration_merge(root, merged, plan, head)
+        verified = True
+    require(verified, 'original ancestry has no verified ordinary integration merge receipt')
     return f'RECORDED original observation {item.original} on {item.default}'
 
 
@@ -406,18 +452,15 @@ def prepare_truth(root: Path, run_id: int, *, api: Api = github_api, verify: Ver
                   today: dt.date | None = None, attempt: int = 1) -> str:
     item = pending(root, run_id, attempt, TRUTH, api, verify, today, require_name=True)
     item.guard()
-    if item.pr.get('merged') is True:
-        return recorded(root, item.pr, item.original, item.line, item.default)
-    recorded_line = already_integrated(root, item)
+    recorded_line = already_integrated(root, item, api)
     if recorded_line:
         return recorded_line
+    require(item.pr.get('merged') is not True, 'merged observation needs fresh default authority validation')
     base = git(root, 'rev-parse', 'HEAD').strip()
     assert isinstance(item.line, str)
-    truth_integration.log(root, base, item.original, item.line)
-    if truth_integration.mergeable(root, base, item.original):
-        return f'READY original observation {item.original}; ordinary review remains pending'
-    assert isinstance(item.line, str)
     plan = truth_integration.plan(root, base, item.original, item.line, run_id, attempt)
+    if truth_integration.merged_tree(root, base, item.original) == plan.tree:
+        return f'READY original observation {item.original}; ordinary review remains pending'
     matches = api('GET', f'repos/{REPOSITORY}/git/matching-refs/heads/{plan.branch}', None)
     require(isinstance(matches, list) and len(matches) <= 1, 'integration ref instrument is ambiguous')
     if matches:
@@ -462,21 +505,20 @@ def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier 
                                                 item.original, item.line, item.guard)
     original = head
     plan = None
-    if review_integration and not pr.get('merged'):
-        recorded_line = already_integrated(root, item)
+    if review_integration:
+        recorded_line = already_integrated(root, item, api)
         if recorded_line:
             guard()
             return recorded_line
         base = git(root, 'rev-parse', 'HEAD').strip()
         assert isinstance(line, str)
-        truth_integration.log(root, base, original, line)
+        plan = truth_integration.plan(root, base, original, line, run_id, attempt)
         integration_branch = f'integrations/truth/{run_id}-{attempt}/{base}'
         candidate = integration_pr(api, integration_branch, default)
-        require(candidate is not None or truth_integration.mergeable(root, base, original),
+        require(candidate is not None or truth_integration.merged_tree(root, base, original) == plan.tree,
                 'current default needs fresh integration preparation; original remains pending')
         if candidate is not None:
             assert isinstance(line, str)
-            plan = truth_integration.plan(root, base, original, line, run_id, attempt)
             head = validate_pr(candidate, default, integration_branch)
             git(root, 'fetch', '--no-tags', 'origin', 'refs/heads/' + integration_branch)
             require(git(root, 'rev-parse', 'FETCH_HEAD').strip() == head, 'integration ref head changed')
@@ -498,10 +540,11 @@ def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier 
     fresh = api("GET", endpoint, None)
     validate_pr(fresh, default, branch, head, profile=profile)
     if fresh.get("merged") is True:
+        require(not review_integration, 'PR merged after validation; retry from fresh default authority')
         return recorded(root, fresh, original, line, default)
     if check_only:
         guard()
-        return f"VERIFIED original observation {head}; PR #{pr['number']} remains pending review"
+        return f"VERIFIED original observation {original}; PR #{pr['number']} remains pending review"
     # Installation tokens cannot GET /app, and GET /installation is not an
     # identity endpoint. The authenticated viewer query uses the writer token;
     # repository and Actions reads continue to use the separate read-only token.
@@ -534,9 +577,7 @@ def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier 
     require(fresh.get("merge_commit_sha") == merged.get("sha"), "PR merge receipt changed; verify pending delivery")
     if plan is not None:
         git(root, 'fetch', '--no-tags', 'origin', f'refs/heads/{default}:refs/remotes/origin/{default}')
-        require(git(root, 'show', '-s', '--format=%P', merged['sha']).split() == [plan.base, head]
-                and git(root, 'rev-parse', str(merged['sha']) + '^{tree}').strip() == plan.tree,
-                'ordinary merge did not conserve the reviewed integration tree and parents')
+        validate_integration_merge(root, sha(merged['sha']), plan, head)
     return recorded(root, fresh, original, line, default)
 
 

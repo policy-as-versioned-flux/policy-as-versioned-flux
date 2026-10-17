@@ -522,3 +522,12 @@ metadata identifies delivery rather than the clock. Root implementation packet:
 `.scratch/ecosystem/research/resume-2026-10-17/ongoing-truth/run418/integration-controller/`.
 Actual protected/default delivery of418 remains pending until the revised trusted workflow
 is reviewed, published and observed; native fixture signing/API adapters are synthetic.
+
+
+The direct path is safe only when native Git's merged tree equals the deterministic
+complete signed-capture plan; a clean but mixed snapshot uses the same separate
+integration. A retry validates historical merged parents/tree, including when GitHub
+reports the raw PR as merged, rather than treating ancestry or merged metadata alone
+as a receipt. Historical proof does not freeze later legitimate capture updates.
+Integration author and committer headers identify unsigned delivery explicitly;
+custom-header text cannot substitute for those fields or for the raw signature.
