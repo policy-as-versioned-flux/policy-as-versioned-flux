@@ -61,7 +61,13 @@ say() { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
 selfcheck() {
   "$PY" "$HERE/refusal_scan.py" --selfcheck || return 1
   "$PY" "$HERE/refusal_probe.py" --selfcheck || return 1
+  "$PY" "$HERE/verify-resource-probe.py" || return 1
 }
+
+if [ "${1:-}" != --inventory ] && ! command -v tee >/dev/null 2>&1; then
+  echo "SKIP: output capture unavailable: tee is not on PATH"
+  exit 3
+fi
 
 case "${1:-}" in
   --selfcheck)
@@ -103,21 +109,66 @@ say "3. every mutating policy, and which surface it is on"
 "$PY" "$HERE/refusal_scan.py" --root "$ROOT" --inventory | sed 's/^/  /'
 
 say "4. legs A, C and D over the served surface"
-"$PY" "$HERE/refusal_scan.py" --root "$ROOT" --register "$HERE/register.yaml"
-static=$?
+leg_logs="$(mktemp -d)" || {
+  echo "SKIP: output capture unavailable: cannot create the native-leg log directory"
+  exit 3
+}
+trap 'rm -rf "$leg_logs"' EXIT
+"$PY" "$HERE/refusal_scan.py" --root "$ROOT" --register "$HERE/register.yaml" | tee "$leg_logs/static"
+static_pipeline=("${PIPESTATUS[@]}")
+static=${static_pipeline[0]}
+static_capture=${static_pipeline[1]}
 
 say "5. leg B: every UPDATE-scoped mutation applied to its own output, on every rung it reaches"
 # Only UPDATE-scoped mutations are probed: a CREATE-only mutation never meets its own output,
 # because the object it writes does not exist until it has written it.
-"$PY" "$HERE/refusal_probe.py" --root "$ROOT"
-functional=$?
+"$PY" "$HERE/refusal_probe.py" --root "$ROOT" | tee "$leg_logs/functional"
+functional_pipeline=("${PIPESTATUS[@]}")
+functional=${functional_pipeline[0]}
+functional_capture=${functional_pipeline[1]}
 
-if [ "$static" != 0 ] && [ "$static" != 3 ]; then exit "$static"; fi
-if [ "$functional" != 0 ] && [ "$functional" != 3 ]; then exit "$functional"; fi
-if [ "$static" = 3 ] || [ "$functional" = 3 ]; then
-  # The could-not-look has to be the LAST line, because that is the line the manifest judges --
-  # and step 5 ran after step 4 and printed over it.
-  echo "SKIP: this scan could not look at something it found, named in step 4 -- a reference name it could not resolve to a literal offline, a mutating policy on a path it cannot place (so nothing here knows whether anything delivers it), or a resource whose mutability it does not tabulate. None of the three is a pass"
+# Keep the actual cause on the LAST line the manifest consumes, including functional
+# instruments absent from step4's static model. The earlier output remains visible.
+leg_messages() {
+  local row messages="" marker="$2"
+  [ -r "$1" ] || return 0
+  while IFS= read -r row; do
+    row="${row#"${row%%[![:space:]]*}"}"
+    if [[ "$row" == "$marker"* || ( "$marker" == SKIP: && "$row" == '??'* ) ]]; then
+      messages="${messages:+$messages; }$row"
+    fi
+  done < "$1"
+  printf '%s' "$messages"
+}
+capture_problem() {
+  if [ "$2" != 0 ] || [ ! -r "$3" ] || [ ! -s "$3" ]; then
+    printf '%s output capture unavailable (collector exit %s; expected a readable nonempty log)' "$1" "$2"
+  fi
+}
+capture_reason="$(capture_problem step4 "$static_capture" "$leg_logs/static")"
+functional_capture_reason="$(capture_problem step5 "$functional_capture" "$leg_logs/functional")"
+if [ -n "$functional_capture_reason" ]; then
+  capture_reason="${capture_reason:+$capture_reason; }$functional_capture_reason"
+fi
+if [ "$static" != 0 ] && [ "$static" != 3 ]; then
+  echo "FAIL: static mutation leg exited $static -- $(leg_messages "$leg_logs/static" FAIL:)${capture_reason:+; $capture_reason}"
+  exit "$static"
+fi
+if [ "$functional" != 0 ] && [ "$functional" != 3 ]; then
+  echo "FAIL: functional mutation leg exited $functional -- $(leg_messages "$leg_logs/functional" FAIL:)${capture_reason:+; $capture_reason}"
+  exit "$functional"
+fi
+static_reason="$(leg_messages "$leg_logs/static" SKIP:)"
+functional_reason="$(leg_messages "$leg_logs/functional" SKIP:)"
+if [ "$static" = 3 ] || [ "$functional" = 3 ] || [ -n "$static_reason$functional_reason$capture_reason" ]; then
+  reasons="$capture_reason"
+  if [ "$static" = 3 ] || [ -n "$static_reason" ]; then
+    reasons="${reasons:+$reasons; }step4: ${static_reason:-exited3 without naming the missing instrument}"
+  fi
+  if [ "$functional" = 3 ] || [ -n "$functional_reason" ]; then
+    reasons="${reasons:+$reasons; }step5: ${functional_reason:-exited3 without naming the missing instrument}"
+  fi
+  echo "SKIP: mutation checks could not look -- $reasons"
   exit 3
 fi
 echo "PASS: every mutation the estate SERVES was graded four ways -- every name written into a reference field is one its own release ships, every priority trio is whole, every UPDATE-scoped mutation was EXECUTED against its own output on every rung it reaches and came back identical, and every write a running pod forbids is recorded in register.yaml with a reason, a remediation and the leg that bounds it. The one live refusal (ticket 89 S3: a served-version claim added to a bottom-rung pod) is reported with its remediation rather than called a defect, and the row is graded in both directions so it cannot outlive the code. The four instances the estate has produced were replayed against its own bodies and every one went red. The authoring tree, the pruned version directories and the renderers' fixture directory were named and NOT graded, because a file on disk is not a policy on a cluster."

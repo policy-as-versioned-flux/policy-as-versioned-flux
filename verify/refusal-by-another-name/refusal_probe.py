@@ -25,7 +25,11 @@ policy it matches NOTHING -- not even a skip. So:
     (kyverno/kyverno#13605), and any `oldObject` gate, which the CLI cannot populate. Every
     change is printed with the run.
   * and no probe may pass because nothing applied: a policy that matches none of the candidate
-    pods is a FAIL naming the policy, never a quiet skip.
+    resources is a FAIL naming the policy, never a quiet skip. Known cloud resources use their
+    own served CRD mapping; an unavailable resource instrument is a named could-not-look.
+
+Typed cloud replay measures mutation content only. It does not establish whether a provider
+resource allows those changes on UPDATE; refusal_scan's separate unknown mutability remains.
 
 Usage:
     refusal_probe.py --root DIR      # probe every UPDATE-scoped mutation on the served surface
@@ -36,6 +40,8 @@ from __future__ import annotations
 
 import argparse
 import copy
+from functools import lru_cache
+import hashlib
 import json
 import re
 import shutil
@@ -193,11 +199,99 @@ def _values(tier: str | None) -> dict:
             "metadata": {"name": "values"}, "namespaceSelector": sel}
 
 
+@dataclass
+class ResourceInstrument:
+    """A deliberately unsettled input and its own served CLI resource mapping."""
+
+    api_version: str
+    kind: str
+    crd: Path | None = None
+
+    def resource(self, claim: str | None) -> dict:
+        obj = _pod("probe", claim)
+        if self.kind == "Pod":
+            return obj
+        provider: dict = {"region": "eu-west-1"}
+        if self.kind == "Instance":
+            provider.update(engine="postgres", instanceClass="db.t3.micro", allocatedStorage=20,
+                            username="probe", publiclyAccessible=True, storageEncrypted=False,
+                            multiAz=False)
+        else:
+            provider.update(bucketRef={"name": "probe"}, rule=[{
+                "applyServerSideEncryptionByDefault": {"sseAlgorithm": "garbage"}}])
+        obj.update(apiVersion=self.api_version, kind=self.kind, spec={"forProvider": provider})
+        return obj
+
+    def describe(self) -> str:
+        if self.crd is None:
+            return f"{self.api_version} {self.kind} (built-in resource)"
+        return (f"{self.api_version} {self.kind}; served CRD {self.crd} "
+                f"sha256:{hashlib.sha256(self.crd.read_bytes()).hexdigest()}")
+
+
+def resource_instrument(doc: dict, source: Path) -> ResourceInstrument:
+    """Select only a known resource and its matching mapping beside this served policy.
+
+    These are offline probe objects, not provider observations or schema-validity claims.
+    Unknown/mixed resources and absent/ambiguous mappings are unavailable instruments.
+    """
+    rules = ((doc.get("spec") or {}).get("matchConstraints") or {}).get("resourceRules") or []
+    if (not isinstance(rules, list) or not all(isinstance(rule, dict) and all(
+            isinstance(rule.get(key), list) and all(isinstance(value, str) for value in rule[key])
+            for key in ("apiGroups", "apiVersions", "resources")) for rule in rules)):
+        raise ValueError("native resource match rules do not read")
+    targets = {(g, v, r) for rule in rules for g in rule.get("apiGroups", [])
+               for v in rule.get("apiVersions", []) for r in rule.get("resources", [])}
+    known = {("", "v1", "pods"): "Pod",
+             ("rds.aws.m.upbound.io", "v1beta1", "instances"): "Instance",
+             ("s3.aws.m.upbound.io", "v1beta1", "bucketserversideencryptionconfigurations"):
+                 "BucketServerSideEncryptionConfiguration"}
+    if len(targets) != 1 or next(iter(targets), None) not in known:
+        raise ValueError(f"no native resource instrument for match resources {sorted(targets)!r}")
+    group, version, plural = next(iter(targets))
+    kind = known[group, version, plural]
+    if kind == "Pod":
+        return ResourceInstrument("v1", kind)
+    # A delivered cloud policy's mapping must belong to the same adopter's composed tree.
+    composed = next((p for p in source.parents if p.name == "composed"), None)
+    if composed is None or not source.is_relative_to(composed / "cloud"):
+        raise ValueError(f"no served cloud CRD context for {source}")
+    matches = []
+    for file in sorted((composed / "cloud-crds").glob("*.yaml")):
+        for schema in rs.read_documents(file.read_text()):
+            spec = schema.get("spec") or {}
+            if not isinstance(spec, dict):
+                continue
+            names = spec.get("names") or {}
+            if not isinstance(names, dict):
+                continue
+            if (schema.get("kind") == "CustomResourceDefinition" and spec.get("group") == group
+                    and names.get("kind") == kind and names.get("plural") == plural
+                    and any(isinstance(v, dict) and v.get("name") == version and v.get("served") is True
+                            for v in spec.get("versions") or [])):
+                matches.append(file)
+    if len(matches) != 1:
+        raise ValueError(f"expected one served CRD for {group}/{version} {kind}, found {len(matches)} "
+                         f"in {composed / 'cloud-crds'}")
+    return ResourceInstrument(f"{group}/{version}", kind, matches[0])
+
+
+@lru_cache(maxsize=None)
+def _crd_flag(kyverno: str) -> str:
+    help_run = subprocess.run([kyverno, "apply", "--help"], capture_output=True, text=True, check=True)
+    for flag in ("--crd-paths", "--crd-path"):
+        if flag in help_run.stdout:
+            return flag
+    raise ValueError("native CLI has no CRD mapping flag")
+
+
 def _apply(kyverno: str, policy: Path, resource: Path, out: Path,
-           values: Path | None = None) -> Run:
+           values: Path | None = None, crd: Path | None = None) -> Run:
     cmd = [kyverno, "apply", str(policy), "--resource", str(resource), "-o", str(out)]
     if values is not None:
         cmd += ["--values-file", str(values)]
+    if crd is not None:
+        cmd += [_crd_flag(kyverno), str(crd)]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     text = proc.stdout + proc.stderr
     m = _COUNTS.search(text)
@@ -253,11 +347,17 @@ def assert_no_update_mode(kyverno: str) -> tuple[bool, str]:
                       f"PASS COUNT rather than the file's existence")
 
 
-def probe(kyverno: str, doc: dict, path: str) -> Probe:
+def probe(kyverno: str, doc: dict, path: str, source: Path | None = None) -> Probe:
     """Apply the mutation, then apply it to its own output, and require byte-identity."""
     declawed, changed = declaw(doc)
     name = (doc.get("metadata") or {}).get("name", "?")
     claims = _candidate_claims(doc, path)
+    try:
+        instrument = resource_instrument(doc, source or Path(path))
+        if instrument.crd is not None:
+            _crd_flag(kyverno)
+    except (ValueError, OSError, yaml.YAMLError, subprocess.CalledProcessError) as error:
+        return Probe(name, path, False, f"missing native resource instrument: {error}", status="skip")
     with tempfile.TemporaryDirectory() as tmp:
         t = Path(tmp)
         (t / "p.yaml").write_text(yaml.safe_dump(declawed))
@@ -265,24 +365,28 @@ def probe(kyverno: str, doc: dict, path: str) -> Probe:
         for claim in claims:
             for j, tier in enumerate(TIERS):
                 tag = f"{claims.index(claim)}-{j}"
-                (t / f"r{tag}.yaml").write_text(yaml.safe_dump(_pod("probe", claim)))
+                (t / f"r{tag}.yaml").write_text(yaml.safe_dump(instrument.resource(claim)))
                 (t / f"v{tag}.yaml").write_text(yaml.safe_dump(_values(tier)))
                 run = _apply(kyverno, t / "p.yaml", t / f"r{tag}.yaml", t / f"o{tag}",
-                             t / f"v{tag}.yaml")
+                             t / f"v{tag}.yaml", instrument.crd)
+                if run.rc or (run.counts and run.counts[3]):
+                    return Probe(name, path, False,
+                                 f"native apply failed for {instrument.kind} before idempotence could "
+                                 f"be compared (exit {run.rc}, counts {run.counts}): {run.text[-600:]}")
                 if run.applied and run.obj:
                     reached.append((claim, tier, run))
             if reached:
                 break
         if not reached:
             return Probe(name, path, False,
-                         "no candidate pod on any rung made this mutation apply at all (pass "
+                         f"no candidate {instrument.kind} on any rung made this mutation apply at all (pass "
                          "count 0 on every one), so nothing was measured -- a step that passes "
                          "because nothing applied is the defect this ticket exists to catch")
         # REVIEW, 2026-09-06 (F3b). A policy whose `mutations` are emptied still comes back
         # `pass: 2` from the CLI, and 'identical applied to its own output' is then true and
         # vacuous. The mutation must actually WRITE something to the pod it was handed, or this
         # leg passed on a policy that does nothing -- the same defect one level in.
-        wrote = any(_canonical(r.obj) != _canonical(_pod("probe", c))
+        wrote = any(_canonical(r.obj) != _canonical(instrument.resource(c))
                     for c, _, r in reached if r.obj)
         if not wrote:
             # Two different things, and conflating them was the review's R2. A body with no
@@ -297,9 +401,9 @@ def probe(kyverno: str, doc: dict, path: str) -> Probe:
                              "vacuously true: the leg measured a policy that writes nothing")
             return Probe(name, path, False,
                          f"this policy writes {len(rs.written_paths(doc))} field path(s) and yet "
-                         f"the probe pod came back unchanged on every rung, so this leg could "
+                         f"the probe {instrument.kind} came back unchanged on every rung, so this leg could "
                          f"not SHOW the write and its byte-identity proves nothing about it -- "
-                         f"the probe pod would need a value these paths actually change",
+                         f"the probe resource would need a value these paths actually change",
                          status="skip")
         for claim, tier, first in reached:
             assert first.obj is not None
@@ -307,7 +411,7 @@ def probe(kyverno: str, doc: dict, path: str) -> Probe:
             (t / f"once{tag}.yaml").write_text(_canonical(first.obj))
             (t / f"vv{tag}.yaml").write_text(yaml.safe_dump(_values(tier)))
             again = _apply(kyverno, t / "p.yaml", t / f"once{tag}.yaml", t / f"again{tag}",
-                           t / f"vv{tag}.yaml")
+                           t / f"vv{tag}.yaml", instrument.crd)
             where = f"claim={claim or 'none'} rung={tier or 'unlabelled'}"
             if not again.applied or again.obj is None:
                 said = [ln.strip() for ln in again.text.splitlines()
@@ -317,13 +421,13 @@ def probe(kyverno: str, doc: dict, path: str) -> Probe:
                              f"applied once at {where} and then FAILED on its own output "
                              f"(counts {again.counts}): {said[-1] if said else 'no verdict'} -- "
                              f"a mutation the engine cannot re-apply to an already-mutated "
-                             f"object is a refusal of every UPDATE to a running pod")
+                             f"object failed native content replay; live UPDATE admission was not measured")
             a, b = _canonical(first.obj), _canonical(again.obj)
             if a != b:
                 return Probe(name, path, False,
                              f"NOT identical on an already-mutated object at {where} -- the "
-                             f"second admission of a running pod rewrites it, and the API "
-                             f"server refuses that. First difference: {_first_difference(a, b)}")
+                             f"second application rewrites its own settled output; live UPDATE "
+                             f"admission was not measured. First difference: {_first_difference(a, b)}")
         note = "; ".join(changed) or "no change needed"
         rungs = ", ".join(sorted({t2 or "unlabelled" for _, t2, _ in reached}))
         # REVIEW, 2026-09-06 (F5). The sentence above used to name the rungs ATTEMPTED, not the
@@ -343,7 +447,7 @@ def probe(kyverno: str, doc: dict, path: str) -> Probe:
                      f"identical applied to its own output on every rung it reaches ({rungs}), "
                      f"which produced {distinct} distinct object(s)"
                      + ("" if _rung_dependent(doc) else " -- this body does not read the tier")
-                     + f"; throwaway copy: {note}")
+                     + f"; resource instrument: {instrument.describe()}; throwaway copy: {note}")
 
 
 def _rung_dependent(doc: dict) -> bool:
@@ -455,7 +559,9 @@ def main(argv: list[str]) -> int:
     print(f"  {'ok  ' if ok else 'FAIL'} {why}")
     if not ok:
         return 1
-    probes = [probe(kyverno, doc, path) for doc, path in collect(Path(args.root).resolve())]
+    root = Path(args.root).resolve()
+    probes = [probe(kyverno, doc, path, root / ".estate-clone" / path)
+              for doc, path in collect(root)]
     for p in probes:
         mark = "??  " if p.status == "skip" else ("ok  " if p.ok else "FAIL")
         print(f"  {mark} {p.policy} ({p.path}): {p.detail}")
@@ -465,14 +571,14 @@ def main(argv: list[str]) -> int:
         return 1
     bad = [p for p in probes if not p.ok and p.status != "skip"]
     if bad:
-        print(f"FAIL: {len(bad)} of {len(probes)} UPDATE-scoped mutations are not byte-identical "
-              f"on an already-mutated object")
+        print(f"FAIL: {len(bad)} of {len(probes)} UPDATE-scoped native mutation probes failed; "
+              f"the per-policy result names unmatched, empty, execution or second-output failures")
         return 1
     unseen = [p for p in probes if p.status == "skip"]
     if unseen:
         print(f"SKIP: this scan could not look at something it found -- {len(unseen)} of "
-              f"{len(probes)} UPDATE-scoped mutations declare writes the probe pod could not "
-              f"make visible, so their byte-identity proves nothing about those writes")
+              f"{len(probes)} UPDATE-scoped mutations had unavailable resource instruments or "
+              f"writes the probe could not make visible, so byte-identity proves nothing about them")
         return 3
     print(f"  {len(probes)} UPDATE-scoped mutations applied to their own output, byte for byte")
     return 0
