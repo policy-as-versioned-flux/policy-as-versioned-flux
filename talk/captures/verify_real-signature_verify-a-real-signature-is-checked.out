@@ -1,22 +1,20 @@
 ... driftwood
 ... ludlow
-Traceback (most recent call last):
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/real-signature/real_signature.py", line 691, in <module>
-    sys.exit(main(sys.argv[1:]))
-             ^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/real-signature/real_signature.py", line 671, in main
-    verdict, lines = run(Path(argv[0]))
-                     ^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/real-signature/real_signature.py", line 393, in run
-    return _observe(estate, fold, units, platform_src, lines, observations)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/real-signature/real_signature.py", line 488, in _observe
-    result, reason = fold.run_gate(unit, unit_dir, planted, platform_dir,
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/fold-agreement/fold_agreement.py", line 547, in run_gate
-    argv = resolve_argv(tokens, mapping)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/verify/fold-agreement/fold_agreement.py", line 167, in resolve_argv
-    raise Unresolved(
-fold_agreement.Unresolved: --retirement-tools-dir -- the served operation carries a long argument this grader has no role for, so it cannot plant a value for it; a planted case that is not the served operation grades nothing
-FAIL: real_signature.py exited 1 without grading a single adopter gate: fold_agreement.Unresolved: --retirement-tools-dir -- the served operation carries a long argument this grader has no role for, so it cannot plant a value for it; a planted case that is not the served operation grades nothing
+... tuppence
+ok: platform checked out at v2.0.1 (533dccb0a823); the served artefact is its own published evidence for policy 2.0.1
+ok: the same tag re-cut with one base64 character of policy 2.0.1's real signature changed (f3849c602aef) -- nothing else moved, so a gate that adopts it adopted an unverified signature
+ok: the same tag re-cut with ONE BYTE APPENDED to policy 2.0.1's evidence document (d24e752e0be6) -- it parses to the identical object and platform's own signature is untouched, so the only thing that can refuse it is the digest that signature covers
+note: driftwood: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed
+note: ludlow: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed
+note: tuppence: its own gate verifies platform's real published bundle with a cold TUF cache and every proxy pointed at a closed port -- exit 0, no network needed
+ok: driftwood: real cosign accepted platform's own published signature for policy 2.0.1, and the gate adopted
+ok: driftwood: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: failed to verify log inclusion: transparency log signature does not match
+ok: driftwood: the same evidence document with one byte appended -- it parses identically and every field the gate reads is unchanged -- was refused, naming the digest or the signature -- error during command execution: failed to verify log inclusion: transparency log hashedrekord entry digest f9dd3389d149a
+ok: ludlow: real cosign accepted platform's own published signature for policy 2.0.1, and the gate adopted
+ok: ludlow: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: failed to verify log inclusion: transparency log signature does not match)
+ok: ludlow: the same evidence document with one byte appended -- it parses identically and every field the gate reads is unchanged -- was refused, naming the digest or the signature -- error during command execution: failed to verify log inclusion: transparency log hashedrekord entry digest f9dd3389d149a
+ok: tuppence: real cosign accepted platform's own published signature for policy 2.0.1, and the gate adopted
+ok: tuppence: the same bundle with one signature byte changed was refused, naming the signature -- error during command execution: failed to verify log inclusion: transparency log signature does not match
+ok: tuppence: the same evidence document with one byte appended -- it parses identically and every field the gate reads is unchanged -- was refused, naming the digest or the signature -- error during command execution: failed to verify log inclusion: transparency log hashedrekord entry digest f9dd3389d149a
+SUMMARY: every adopter gate in this estate accepted platform's own published signature, refused the same evidence with one byte of that signature changed, and refused that untouched signature over an evidence document with one byte appended -- each through its own workflow's own invocation and its own identity constant
+PASS: every adopter gate in this estate accepted platform's own published signature, refused the same evidence with one byte of that signature changed, and refused that untouched signature over an evidence document with one byte appended -- each through its own workflow's own invocation and its own identity constant
