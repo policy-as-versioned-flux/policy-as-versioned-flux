@@ -514,7 +514,8 @@ inside the key's window.
 main push39002205601/attempt1) still grades
 `verify/fold-agreement/verify-fold-agreement.sh` and
 `verify/real-signature/verify-a-real-signature-is-checked.sh` FAIL. The fold
-reproduces no adopter gate because its caller cannot resolve the served
+cannot reproduce Ludlow's six gate invocations because its caller cannot resolve
+the served
 `--retirement-tools-dir` argument; the real-signature check likewise exits before
 grading a gate. These are caller/instrument failures, not an observed signature
 acceptance or a demonstration that trust material was fetched over the network.
