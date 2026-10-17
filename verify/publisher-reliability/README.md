@@ -20,7 +20,7 @@ The mutable checkout is not report evidence. The caller does not fetch or sign.
 Before the first signed report tag, or with an authentic report having no eligible
 independent pairs, the estate observation exits3/SKIP. A nonempty authenticated
 report can pass binary recomputation; its verdict still establishes no
-publisher-price accuracy. Invalid provenance, wrong identity, changed tag,
+publisher-price accuracy. Invalid provenance, wrong identity, changed private verification ref,
 recomputation failure and a false numeric empty result fail. Missing instruments
 exit3 with a distinct reason that the manifest deliberately does not declare.
 
