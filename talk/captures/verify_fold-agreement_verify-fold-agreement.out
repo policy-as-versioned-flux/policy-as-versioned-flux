@@ -1,26 +1,33 @@
+  ok   selfcheck: with git unreachable this script exits 3 and its last line is SKIP:
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.564s
+
+OK
 ok: platform checked out at v2.0.1 (533dccb0a823), the tag every planted pin names as the head
 ok: case 'standing' driftwood: exit 0, composed 'none' -- OK: composed bump is 'none'
-FAIL: ludlow: this grader could not reproduce the operation its own shift-left.yml runs -- Unresolved: --retirement-tools-dir -- the served operation carries a long argument this grader has no role for, so it cannot plant a value for it; a planted case that is not the served operation grades nothing
+ok: case 'standing' ludlow: exit 0, composed 'none' -- PASS: declared=none composed=none
 ok: case 'standing' tuppence: exit 0, composed 'none' -- PASS: composed bump 'none' does not exceed major; v2.0.1 may be adopted
 ok: case 'arrival' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major, and not every major it brings is accepted -- 4.0.0 is a major, and no accepted-majors/ 
-FAIL: ludlow: this grader could not reproduce the operation its own shift-left.yml runs -- Unresolved: --retirement-tools-dir -- the served operation carries a long argument this grader has no role for, so it cannot plant a value for it; a planted case that is not the served operation grades nothing
+ok: case 'arrival' ludlow: exit 1, composed 'major' -- REFUSE: composed bump is major -- ['4.0.0'] -- not every major it brings is accepted -- 4.0.0 is a major, and no accepte
 ok: case 'arrival' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1: not every major it brings is accepted -- 4.0.0 is a major, and
 ok: case 'quiet' driftwood: exit 0, composed 'none' -- OK: composed bump is 'none'
-FAIL: ludlow: this grader could not reproduce the operation its own shift-left.yml runs -- Unresolved: --retirement-tools-dir -- the served operation carries a long argument this grader has no role for, so it cannot plant a value for it; a planted case that is not the served operation grades nothing
+ok: case 'quiet' ludlow: exit 0, composed 'none' -- PASS: declared=patch composed=none
 ok: case 'quiet' tuppence: exit 0, composed 'none' -- PASS: composed bump 'none' does not exceed major; v2.0.1 may be adopted
 ok: case 'retirement' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major, and not every major it brings is accepted -- retired 2.0.1: a retirement is a forced ma
-FAIL: ludlow: this grader could not reproduce the operation its own shift-left.yml runs -- Unresolved: --retirement-tools-dir -- the served operation carries a long argument this grader has no role for, so it cannot plant a value for it; a planted case that is not the served operation grades nothing
+ok: case 'retirement' ludlow: exit 1, composed 'major' -- REFUSE: verified compiler refused the exact consumer retirement
 ok: case 'retirement' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1: not every major it brings is accepted -- retired 2.0.1: a reti
 ok: case 'accepted' driftwood: exit 0, composed 'major' -- OK: composed bump is 'major', admitted: every major this pull request adds is accepted by a record in accepted-majors/ (
-FAIL: ludlow: this grader could not reproduce the operation its own shift-left.yml runs -- Unresolved: --retirement-tools-dir -- the served operation carries a long argument this grader has no role for, so it cannot plant a value for it; a planted case that is not the served operation grades nothing
+ok: case 'accepted' ludlow: exit 0, composed 'major' -- PASS: declared=patch composed=major, admitted by the exact reviewed acceptance decisions -- 4.0.0 is a major, accepted f
 ok: case 'accepted' tuppence: exit 0, composed 'major' -- PASS: composed bump is major, admitted: every major this pull request adds is accepted by a record in accepted-majors/ (
 ok: case 'misaddressed' driftwood: exit 1, composed 'major' -- REFUSED: composed bump is major, and not every major it brings is accepted -- 4.0.0 is a major, and no accepted-majors/ 
-FAIL: ludlow: this grader could not reproduce the operation its own shift-left.yml runs -- Unresolved: --retirement-tools-dir -- the served operation carries a long argument this grader has no role for, so it cannot plant a value for it; a planted case that is not the served operation grades nothing
+ok: case 'misaddressed' ludlow: exit 1, composed 'major' -- REFUSE: composed bump is major -- ['4.0.0'] -- not every major it brings is accepted -- 4.0.0 is a major, and no accepte
 ok: case 'misaddressed' tuppence: exit 1, composed 'major' -- FAIL: composed bump is major -- refusing to adopt v2.0.1: not every major it brings is accepted -- 4.0.0 is a major, and
-SKIP: case 'accepted': ludlow's gate could not be run at all, so its answer is unknown and agreement cannot be claimed
-SKIP: case 'arrival': ludlow's gate could not be run at all, so its answer is unknown and agreement cannot be claimed
-SKIP: case 'misaddressed': ludlow's gate could not be run at all, so its answer is unknown and agreement cannot be claimed
-SKIP: case 'quiet': ludlow's gate could not be run at all, so its answer is unknown and agreement cannot be claimed
-SKIP: case 'retirement': ludlow's gate could not be run at all, so its answer is unknown and agreement cannot be claimed
-SKIP: case 'standing': ludlow's gate could not be run at all, so its answer is unknown and agreement cannot be claimed
-FAIL: 6 adopter gate invocation(s) could not be reproduced from the repository's own shift-left.yml, so no planted movement was graded against them -- a red about THIS GRADER needing to learn a new argument spelling, not about the estate diverging
+PASS: case 'accepted': 3 gates (driftwood, ludlow, tuppence) each answered adopt with composed bump 'major'
+PASS: case 'arrival': 3 gates (driftwood, ludlow, tuppence) each answered refuse with composed bump 'major'
+PASS: case 'misaddressed': 3 gates (driftwood, ludlow, tuppence) each answered refuse with composed bump 'major'
+PASS: case 'quiet': 3 gates (driftwood, ludlow, tuppence) each answered adopt with composed bump 'none'
+PASS: case 'retirement': 3 gates (driftwood, ludlow, tuppence) each answered refuse with composed bump 'major'
+PASS: case 'standing': 3 gates (driftwood, ludlow, tuppence) each answered adopt with composed bump 'none'
+SUMMARY: on 6 planted movements of a composed window (accepted, arrival, misaddressed, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- each run through the flag shape its own shift-left.yml uses, against platform's real signed evidence with real cosign -- returned the same verdict and the same composed bump, and each was the verdict ADR-0011's reading gives that movement
+PASS: on 6 planted movements of a composed window (accepted, arrival, misaddressed, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, ludlow, tuppence) -- each run through the flag shape its own shift-left.yml uses, against platform's real signed evidence with real cosign -- returned the same verdict and the same composed bump, and each was the verdict ADR-0011's reading gives that movement
