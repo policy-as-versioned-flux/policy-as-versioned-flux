@@ -279,6 +279,22 @@ raise SystemExit(code)
         self.assertIn('output capture unavailable', last)
         self.assertIn('cannot create', last)
 
+    def test_physically_absent_collector_is_named_skip(self):
+        observed = (0, 'PASS: explicit observed fixture')
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for name in ('dirname', 'sed', 'mktemp', 'rm', 'kyverno'):
+                executable = shutil.which(name)
+                self.assertIsNotNone(executable, name)
+                (directory / name).symlink_to(executable)
+            with patch.dict(os.environ, {'PATH': temporary}):
+                result = self.run_wrapper(observed, observed)
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        last = result.stdout.strip().splitlines()[-1]
+        self.assertTrue(last.startswith('SKIP:'), last)
+        self.assertIn('tee', last)
+        self.assertIn('output capture unavailable', last)
+
 
 if __name__ == '__main__':
     unittest.main()
