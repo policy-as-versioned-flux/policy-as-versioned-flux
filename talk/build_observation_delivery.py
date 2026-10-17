@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the immutable reviewer from one implementation and its two trusted helpers.
+"""Build the immutable reviewer from one implementation and its three trusted helpers.
 
 ZIP_STORED, fixed timestamps/modes and sorted members make identical source bytes
 produce identical bundles across Python versions. No dependency or network lookup
@@ -17,6 +17,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = {
     'observation_delivery.py': 'talk/observation_delivery.py',
+    'delivery_truth_integration.py': 'talk/truth_integration.py',
     'delivery_enact_record.py': 'verify/enact-record/enact_record.py',
     'delivery_other_hand.py': 'twin/other_hand.py',
 }

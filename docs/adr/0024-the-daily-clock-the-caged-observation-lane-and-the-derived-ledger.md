@@ -493,3 +493,41 @@ update. Separate review attempts a real normal merge: conflicts leave main and t
 exact pending ref/PR unchanged, while the unrelated update merges with the original
 commit and source parent retained. These are explicitly unsigned synthetic fixtures,
 not claims of genuine gitsign validity or live GitHub authorization.
+
+
+## Delegated amendment, 2026-10-17: separately reviewed delivery integration (ticket104)
+
+The original signed observation remains on its unique run/attempt ref with its measured
+source parent unchanged. TRUTH418 demonstrated that the later ordinary merge can conflict
+with another recorded log/capture update even after signature verification and exact-head
+other-hand approval. Its100PASS/11FAIL/25SKIP remains the measurement; pending delivery is
+not recording, and a preparation is not another measurement.
+
+Under ADR0023's observation/declaration distinction and ADR0025 delegation, a separate
+trusted default-source preparation job may create an explicitly unsigned delivery
+integration and PR as github-actions[bot]. It receives narrow repository writes and no App
+secret or OIDC signing permission. Its two parents are the current default and unchanged
+raw original. Its tree preserves every current TRUTH line, appends the exact original row
+once, overlays the complete signed capture blobs without deleting base-only captures, and
+preserves all declarations/outside entries. Unsupported lane changes and duplicates refuse.
+Only a distinct App reviewer may approve/merge: it independently verifies original claims,
+recomputes the candidate tree/parents and current default, then uses ordinary protected PR
+review/merge. Immutable base-bound integration refs never replace the raw ref; a default
+race remains pending for fresh preparation. Clean originals retain ordinary delivery; the
+six adopter clocks and their immutable reviewer pins are unchanged. This is delivery of
+an existing observation, never a second signature, invented measurement or grade waiver.
+
+The original producer may still neither integrate nor rewrite its own record. Integration
+metadata identifies delivery rather than the clock. Root implementation packet:
+`.scratch/ecosystem/research/resume-2026-10-17/ongoing-truth/run418/integration-controller/`.
+Actual protected/default delivery of418 remains pending until the revised trusted workflow
+is reviewed, published and observed; native fixture signing/API adapters are synthetic.
+
+
+The direct path is safe only when native Git's merged tree equals the deterministic
+complete signed-capture plan; a clean but mixed snapshot uses the same separate
+integration. A retry validates historical merged parents/tree, including when GitHub
+reports the raw PR as merged, rather than treating ancestry or merged metadata alone
+as a receipt. Historical proof does not freeze later legitimate capture updates.
+Integration author and committer headers identify unsigned delivery explicitly;
+custom-header text cannot substitute for those fields or for the raw signature.
