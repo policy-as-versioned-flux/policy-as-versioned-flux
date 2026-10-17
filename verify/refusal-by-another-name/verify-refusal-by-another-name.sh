@@ -104,21 +104,29 @@ say "3. every mutating policy, and which surface it is on"
 "$PY" "$HERE/refusal_scan.py" --root "$ROOT" --inventory | sed 's/^/  /'
 
 say "4. legs A, C and D over the served surface"
-leg_logs="$(mktemp -d)"
+leg_logs="$(mktemp -d)" || {
+  echo "SKIP: output capture unavailable: cannot create the native-leg log directory"
+  exit 3
+}
 trap 'rm -rf "$leg_logs"' EXIT
 "$PY" "$HERE/refusal_scan.py" --root "$ROOT" --register "$HERE/register.yaml" | tee "$leg_logs/static"
-static=${PIPESTATUS[0]}
+static_pipeline=("${PIPESTATUS[@]}")
+static=${static_pipeline[0]}
+static_capture=${static_pipeline[1]}
 
 say "5. leg B: every UPDATE-scoped mutation applied to its own output, on every rung it reaches"
 # Only UPDATE-scoped mutations are probed: a CREATE-only mutation never meets its own output,
 # because the object it writes does not exist until it has written it.
 "$PY" "$HERE/refusal_probe.py" --root "$ROOT" | tee "$leg_logs/functional"
-functional=${PIPESTATUS[0]}
+functional_pipeline=("${PIPESTATUS[@]}")
+functional=${functional_pipeline[0]}
+functional_capture=${functional_pipeline[1]}
 
 # Keep the actual cause on the LAST line the manifest consumes, including functional
 # instruments absent from step4's static model. The earlier output remains visible.
 leg_messages() {
   local row messages="" marker="$2"
+  [ -r "$1" ] || return 0
   while IFS= read -r row; do
     row="${row#"${row%%[![:space:]]*}"}"
     if [[ "$row" == "$marker"* || ( "$marker" == SKIP: && "$row" == '??'* ) ]]; then
@@ -127,20 +135,30 @@ leg_messages() {
   done < "$1"
   printf '%s' "$messages"
 }
+capture_problem() {
+  if [ "$2" != 0 ] || [ ! -r "$3" ] || [ ! -s "$3" ]; then
+    printf '%s output capture unavailable (collector exit %s; expected a readable nonempty log)' "$1" "$2"
+  fi
+}
+capture_reason="$(capture_problem step4 "$static_capture" "$leg_logs/static")"
+functional_capture_reason="$(capture_problem step5 "$functional_capture" "$leg_logs/functional")"
+if [ -n "$functional_capture_reason" ]; then
+  capture_reason="${capture_reason:+$capture_reason; }$functional_capture_reason"
+fi
 if [ "$static" != 0 ] && [ "$static" != 3 ]; then
-  echo "FAIL: static mutation leg exited $static -- $(leg_messages "$leg_logs/static" FAIL:)"
+  echo "FAIL: static mutation leg exited $static -- $(leg_messages "$leg_logs/static" FAIL:)${capture_reason:+; $capture_reason}"
   exit "$static"
 fi
 if [ "$functional" != 0 ] && [ "$functional" != 3 ]; then
-  echo "FAIL: functional mutation leg exited $functional -- $(leg_messages "$leg_logs/functional" FAIL:)"
+  echo "FAIL: functional mutation leg exited $functional -- $(leg_messages "$leg_logs/functional" FAIL:)${capture_reason:+; $capture_reason}"
   exit "$functional"
 fi
 static_reason="$(leg_messages "$leg_logs/static" SKIP:)"
 functional_reason="$(leg_messages "$leg_logs/functional" SKIP:)"
-if [ "$static" = 3 ] || [ "$functional" = 3 ] || [ -n "$static_reason$functional_reason" ]; then
-  reasons=""
+if [ "$static" = 3 ] || [ "$functional" = 3 ] || [ -n "$static_reason$functional_reason$capture_reason" ]; then
+  reasons="$capture_reason"
   if [ "$static" = 3 ] || [ -n "$static_reason" ]; then
-    reasons="step4: ${static_reason:-exited3 without naming the missing instrument}"
+    reasons="${reasons:+$reasons; }step4: ${static_reason:-exited3 without naming the missing instrument}"
   fi
   if [ "$functional" = 3 ] || [ -n "$functional_reason" ]; then
     reasons="${reasons:+$reasons; }step5: ${functional_reason:-exited3 without naming the missing instrument}"

@@ -141,7 +141,8 @@ class NativeResourceProbe(unittest.TestCase):
 class WrapperVerdict(unittest.TestCase):
     """Actual shell aggregation; independent leg results are explicitly fixture data."""
 
-    def run_wrapper(self, static, functional, *, actual_missing_crd=False):
+    def run_wrapper(self, static, functional, *, actual_missing_crd=False,
+                    collector=None):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             relative = 'adopter/composed/cloud/v1.0.0/mutation.yaml'
@@ -191,6 +192,12 @@ raise SystemExit(code)
                        FUNCTIONAL_RESULT=json.dumps(functional), ISOLATED_ROOT=str(root),
                        PROBE_SOURCE=str(Path(rp.__file__).resolve()),
                        ACTUAL_MISSING_CRD='1' if actual_missing_crd else '0')
+            if collector is not None:
+                binary = root / 'collector-bin/tee'
+                binary.parent.mkdir()
+                binary.write_text('#!/bin/sh\n' + collector)
+                binary.chmod(0o755)
+                env['PATH'] = str(binary.parent) + os.pathsep + env['PATH']
             return subprocess.run(['/bin/bash', str(wrapper)], env=env, capture_output=True, text=True)
 
     def test_actual_wrapper_preserves_skip_causes_and_failure_precedence(self):
@@ -222,6 +229,55 @@ raise SystemExit(code)
         self.assertTrue(last.startswith('SKIP:'), last)
         self.assertIn('missing native resource instrument', last)
         self.assertIn('expected one served CRD', last)
+
+    def test_failed_or_missing_capture_never_hides_emitted_skip(self):
+        observed = (0, 'PASS: explicit observed fixture')
+        emitted_skip = (0, 'SKIP: explicit producer missing served CRD')
+        collectors = {
+            'failed': '/bin/cat >/dev/null\nexit 1\n',
+            'missing': '/bin/cat >/dev/null\nexit 0\n',
+            'empty': '/bin/cat >"$1"\n: >"$1"\nexit 0\n',
+            'failed-with-output': '/bin/cat >"$1"\nexit 1\n',
+        }
+        for name, collector in collectors.items():
+            for static, functional in [(emitted_skip, observed),
+                                       (observed, emitted_skip)]:
+                with self.subTest(collector=name, static=static[1]):
+                    result = self.run_wrapper(static, functional, collector=collector)
+                    self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+                    last = result.stdout.strip().splitlines()[-1]
+                    self.assertTrue(last.startswith('SKIP:'), last)
+                    self.assertIn('output capture unavailable', last)
+                    self.assertNotIn('No such file', result.stderr)
+
+    def test_native_failure_precedes_capture_failure(self):
+        observed = (0, 'PASS: explicit observed fixture')
+        failed = (1, 'FAIL: explicit native mutation defect')
+        for static, functional, leg in [(failed, observed, 'static'),
+                                         (observed, failed, 'functional')]:
+            with self.subTest(leg=leg):
+                result = self.run_wrapper(static, functional,
+                                          collector='/bin/cat >/dev/null\nexit 1\n')
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                last = result.stdout.strip().splitlines()[-1]
+                self.assertTrue(last.startswith('FAIL:'), last)
+                self.assertIn(leg + ' mutation leg exited 1', last)
+                self.assertIn('output capture unavailable', last)
+                self.assertNotIn('No such file', result.stderr)
+
+    def test_unavailable_capture_directory_is_named_skip(self):
+        observed = (0, 'PASS: explicit observed fixture')
+        with tempfile.TemporaryDirectory() as temporary:
+            binary = Path(temporary) / 'mktemp'
+            binary.write_text('#!/bin/sh\nexit 1\n')
+            binary.chmod(0o755)
+            with patch.dict(os.environ, {'PATH': temporary + os.pathsep + os.environ['PATH']}):
+                result = self.run_wrapper(observed, observed)
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        last = result.stdout.strip().splitlines()[-1]
+        self.assertTrue(last.startswith('SKIP:'), last)
+        self.assertIn('output capture unavailable', last)
+        self.assertIn('cannot create', last)
 
 
 if __name__ == '__main__':
