@@ -90,6 +90,47 @@ def declared_equal(expected, observed) -> bool:
     return type(expected) is type(observed) and expected == observed
 
 
+def public_field(body, path: tuple[str, ...], types: tuple[type, ...]):
+    """Read a named field; callers select public scalars or project a list."""
+    for key in path:
+        if not isinstance(body, dict):
+            return {'type': type(body).__name__}
+        if key not in body:
+            return {'missing': True}
+        body = body[key]
+    return body if type(body) in types else {'type': type(body).__name__}
+
+
+def field_observation(body) -> dict:
+    """Never include whole metadata/provider objects in a captured diagnostic."""
+    result = {key: public_field(body, (key,), (str,)) for key in ('apiVersion', 'kind')}
+    result.update({key: public_field(body, ('metadata', key), (str,)) for key in ('name', 'namespace')})
+    result['labels'] = {key: public_field(body, ('metadata', 'labels', key), (str,))
+                        for key in (LABEL, 'posture.acme.io/tier', 'posture.acme.io/caged')}
+    result['mutation'] = {key: public_field(body, ('spec', 'forProvider', key), types)
+                          for key, types in (('publiclyAccessible', (bool,)), ('storageEncrypted', (bool,)),
+                                             ('multiAz', (bool,)), ('backupRetentionPeriod', (int,)))}
+    rules = public_field(body, ('spec', 'forProvider', 'rule'), (list,))
+    result['encryption'] = ([{'sseAlgorithm': public_field(rule, ('applyServerSideEncryptionByDefault', 'sseAlgorithm'), (str,)),
+                              'bucketKeyEnabled': public_field(rule, ('bucketKeyEnabled',), (bool,))}
+                             for rule in rules] if isinstance(rules, list) else rules)
+    return result
+
+
+def check_observed_fields(replay, before: dict, after: dict, case: dict, *, stage: str, revision: str) -> None:
+    """Add safe failure context without changing the signed checker or its inputs."""
+    try:
+        replay.check_fields(before, after, case)
+    except (KeyError, AssertionError):
+        expected = {key: public_field(case, ('expected', key), types)
+                    for key, types in (('tier', (str,)), ('multiAz', (bool,)),
+                                       ('backupRetentionPeriod', (int,)), ('sseAlgorithm', (str,)))}
+        print('cloud field context: ' + json.dumps({'stage': stage, 'source_revision': revision,
+              'before': field_observation(before), 'observed': field_observation(after),
+              'expected': expected}, sort_keys=True), file=sys.stderr)
+        raise
+
+
 def admission(routes: list[dict], source_pin: dict, package: Path) -> None:
     context = os.environ.get('CLOUD_PLANE_CONTEXT', 'kind-tuppence')
     if not context.startswith('kind-'):
@@ -157,9 +198,9 @@ def admission(routes: list[dict], source_pin: dict, package: Path) -> None:
                     'backupRetentionPeriod': max(row['backupRetentionPeriod'], provider.get('backupRetentionPeriod', 0)),
                     'sseAlgorithm': 'AES256'}
         case = {'name': before['metadata']['name'], 'kind': before['kind'], 'expected': expected}
-        replay.check_fields(before, live, case)
+        check_observed_fields(replay, before, live, case, stage='live get', revision=revision)
         after = run('apply', '--server-side', '--force-conflicts', '--dry-run=server', '-f', '-', '-o', 'json', data=yaml.safe_dump(before))
-        replay.check_fields(before, after, case)
+        check_observed_fields(replay, before, after, case, stage='UPDATE serverdryrun', revision=revision)
     for kind in ('Instance', 'BucketServerSideEncryptionConfiguration'):
         for claim in ('5.0.0', None, '99.0.0'):
             actual_tier = tier if claim == '5.0.0' else 'isolated'
@@ -171,7 +212,7 @@ def admission(routes: list[dict], source_pin: dict, package: Path) -> None:
             before = replay.resource(case)
             before['metadata']['namespace'] = 'tuppence'
             after = run('create', '--dry-run=server', '-f', '-', '-o', 'json', data=yaml.safe_dump(before))
-            replay.check_fields(before, after, case)
+            check_observed_fields(replay, before, after, case, stage='CREATE serverdryrun', revision=revision)
     print('LIMIT: server dry-run judged CR specs; no AWS resource or reconciliation was observed; isolated carries service dials, not a claim of AWS reach isolation')
 
 
