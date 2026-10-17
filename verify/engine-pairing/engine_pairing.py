@@ -41,9 +41,9 @@ What it grades:
      5. a declaration that does not read: the composition refuses as a missing instrument named
         `gitops/engine/kyverno.yaml`.
   B. FORWARD, each real adopter's committed tree composed now by the served composer against the
-     served platform tree: what the adopter's artefact will say once its tools pin and its
-     implementations pin move to a platform tag cut from this tree. Expected: no engine delta, and
-     the header records the engine its file declares.
+     adopter's committed exact implementation parent. This probes independent compiler maintenance,
+     not a policy-parent move or acceptance. Expected claims and support, including machinery, come
+     from that same accepted parent; the header records the engine its file declares.
   C. SERVED, each real adopter's committed `composed/HEADER.yaml` and `composed/evidence.json`: the
      header's `declared-engine` equals the adopter's file, and the engine deltas are exactly the
      pairings the platform tree at the adopter's pinned implementations commit does not support.
@@ -325,6 +325,30 @@ class Estate:
         committed_repository(self.root / name, dest)
         return dest
 
+    def accepted_platform(self, name: str, adopter: Path) -> Path:
+        """A disposable exact implementation parent; never change or infer an adopter's pin."""
+        pin = yaml.safe_load(_show(adopter, "HEAD", "gitops/platform/platform-pin.yaml") or "{}")
+        if not isinstance(pin, dict):
+            raise ValueError("implementation pin does not read")
+        spec = pin.get("spec")
+        ref = spec.get("ref") if isinstance(spec, dict) else None
+        tag, commit = (ref.get("tag"), ref.get("commit")) if isinstance(ref, dict) else (None, None)
+        if (not isinstance(tag, str) or not re.fullmatch(r"v\d+\.\d+\.\d+", tag)
+                or not isinstance(commit, str) or not re.fullmatch(r"[a-f0-9]{40}", commit)):
+            raise ValueError("implementation pin needs an exact tag and commit")
+        origin = _git(self.platform, "remote", "get-url", "origin")
+        url = spec.get("url") if isinstance(spec, dict) else None
+        if (origin.returncode or not isinstance(url, str) or not url
+                or origin.stdout.strip().removesuffix(".git") != url.removesuffix(".git")):
+            raise ValueError("implementation checkout's observed origin disagrees with its pin")
+        resolved = _git(self.platform, "rev-parse", "--verify", f"refs/tags/{tag}^{{commit}}")
+        if resolved.returncode or resolved.stdout.strip() != commit:
+            raise ValueError("implementation tag is absent or disagrees with its pinned commit")
+        dest = self.work / "parents" / name / "platform"
+        committed_repository(self.platform, dest)
+        subprocess.run(["git", "-C", str(dest), "checkout", "--quiet", "--detach", commit], check=True)
+        return dest
+
 
 def _support_at(platform: Path, ref: str | None, versions: list[str]) -> dict[str, list[str] | None]:
     """What each composed line and the machinery support, in the platform tree at `ref` (the
@@ -374,7 +398,7 @@ def unsupported_pairing_engines(table: Iterable[str], support: dict[str, list[st
 def planted_and_forward(estate: Estate) -> None:
     served = estate.scratch("served")
     where = f"platform {estate.commit}'s composer and tree"
-    # B. FORWARD: every real adopter, as it will compose once both its pins move to this tree.
+    # B. FORWARD: compiler maintenance against each adopter's accepted policy parent (ADR-0033).
     for name in ADOPTERS:
         if not (estate.root / name).is_dir():
             out("SKIP", f"{name}: no clone in the estate, so its forward composition could not be looked at")
@@ -382,17 +406,25 @@ def planted_and_forward(estate: Estate) -> None:
         copy_dir = estate.adopter_copy(name, "forward")
         party = yaml.safe_load((copy_dir / "party.yaml").read_text())
         engine = declared_version((copy_dir / ENGINE_FILE).read_text() if (copy_dir / ENGINE_FILE).exists() else None)
-        rc, doc, header, rendered = compose(estate.platform, copy_dir, served, estate.work / f"fwd-{name}")
+        try:
+            parent = estate.accepted_platform(name, copy_dir)
+        except (OSError, ValueError, yaml.YAMLError, subprocess.CalledProcessError) as error:
+            out("SKIP", f"{name} (forward): missing instrument: {error}")
+            continue
+        accepted = _git(parent, "rev-parse", "HEAD").stdout.strip()
+        forward_where = f"platform {estate.commit}'s composer, accepted implementation {accepted[:12]}"
+        forward_estate = estate.scratch(f"forward-{name}", platform=parent)
+        rc, doc, header, rendered = compose(estate.platform, copy_dir, forward_estate, estate.work / f"fwd-{name}")
         if rc != 0 or doc.get("outcome") != "composed":
-            out("FAIL", f"{name} (forward, {where}): the composition did not compose: "
+            out("FAIL", f"{name} (forward, {forward_where}): the composition did not compose: "
                         f"{doc.get('refusals') or doc.get('party_artefact_errors') or doc.get('stderr')}")
             continue
         if "engine" not in doc:
             out("FAIL", f"{name} (forward, {where}): the evidence carries no engine section, so the "
                         f"served composer predates ticket 148 and prices no pairing")
             continue
-        grade(f"{name} (forward: its committed tree composed by {where}, declaring {engine})", doc, header,
-              engine, _expect(estate.platform, engine, doc, header, rendered, _baseline_source(party)), name)
+        grade(f"{name} (forward: its committed tree composed by {forward_where}, declaring {engine})", doc, header,
+              engine, _expect(parent, engine, doc, header, rendered, _baseline_source(party)), name)
 
     # A. PLANTED, on a copy of driftwood.
     if not (estate.root / PLANTED).is_dir():

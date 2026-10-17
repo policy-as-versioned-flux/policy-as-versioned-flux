@@ -18,9 +18,11 @@ operation each adopter's compose-check runs) on copies of the adopters' committe
   entry's open amount must rise by exactly that hole; no declaration (`undeclared-engine` for the
   line and the machinery); and a malformed declaration (a `missing-instrument` refusal naming the
   file);
-- **forward**, each real adopter's committed tree composed now against the served platform tree:
-  what its artefact will say once its tools pin and its implementations pin move to a tag cut from
-  that tree;
+- **forward**, each real adopter's committed tree composed by the served upstream compiler while
+  retaining its committed exact implementation tag/SHA and observed parent repository identity.
+  Both policy and machinery claims/support come from that accepted parent. This tests compiler
+  maintenance independently of policy acceptance; it does not move the adopter's policy pin or
+  imply a compiler release, owner acceptance or completed adoption;
 - **served**, each real adopter's committed `composed/`: the header's `declared-engine` equals its
   file, and the engine deltas are exactly the pairings the platform tree at its pinned
   implementations commit does not support.
@@ -37,6 +39,12 @@ two claims are ac-6 (5.0.0's `require-nonroot`) and cm-6 (the machinery's
 
 The served case reads could-not-look until each adopter recomposes under a platform composer that
 carries ticket 148: an artefact composed before it carries no `declared-engine`.
+
+Delegated clarification,2026-10-17 (ADR-0033 appendix): the earlier forward case moved both pins.
+Its Ludlow retirement-parent refusal remains recorded and correct for that experiment. The new
+case retains the exact accepted implementation parent rather than weakening retirement or
+signature validation. A missing/mismatched local parent or observed origin is a named missing
+instrument. Planted and served cases retain their original inputs and grading.
 
 ```sh
 ./verify-engine-pairing.sh               # the estate in .estate-clone/ (or PAVC_ESTATE_CLONE)
