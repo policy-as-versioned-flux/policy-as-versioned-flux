@@ -50,6 +50,7 @@ candidates point at one place, the earliest by (round, key) is credited and the 
 from __future__ import annotations
 
 import ast
+import io
 import re
 import importlib.util
 import json
@@ -57,6 +58,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tarfile
 from pathlib import Path
 from types import ModuleType
 from typing import Any
@@ -196,14 +198,18 @@ def _trees(**override: Path) -> dict[str, Path]:
 def _tuppence(root: Path) -> Path:
     """A control-hole fixture with real source/inventory and no composed history yet.
 
-    Before inventory adoption, isolate the unrelated legacy CVE subscription;
-    its missing-instrument refusal is tested separately below.
+    Isolate the unrelated optional cloud subscription and, before inventory
+    adoption, the legacy CVE subscription. Their real refusal guards are
+    checked separately below.
     """
     work = root / "tuppence"
     work.mkdir(parents=True)
     src = ESTATE / "tuppence"
     shutil.copy(src / "party.yaml", work / "party.yaml")
     shutil.copytree(src / "gitops", work / "gitops")
+    # This fixture varies control holes, not the separately signed cloud parent.
+    # Keep its manifests, but do not select that unrelated optional subscription.
+    (work / "gitops/cloud/platform-cloud-pin.yaml").unlink(missing_ok=True)
     shutil.copytree(src / ".github", work / ".github")
     if (src / "inventory").is_dir():
         shutil.copytree(src / "inventory", work / "inventory")
@@ -249,6 +255,43 @@ def _record_header(comp: ModuleType, work: Path, rendered: dict[str, str]) -> No
         committed = subprocess.run(["git", "-C", str(work), "show", "HEAD:composed/HEADER.yaml"],
                                    check=True, capture_output=True).stdout
         assert committed == rendered["composed/HEADER.yaml"].encode("utf-8")
+
+
+@pytest.mark.parametrize("source_ref", ["v4.0.1", "HEAD"], ids=["before-cloud-pin", "current-cloud-pin"])
+def test_control_hole_fixture_isolates_the_optional_cloud_subscription(tmp_path, monkeypatch, source_ref):
+    """Real old/new adopter sources stay intact while this fixture selects its scope."""
+    source = tmp_path / "source-estate" / "tuppence"
+    source.mkdir(parents=True)
+    archive = subprocess.run(["git", "-C", str(ESTATE / "tuppence"), "archive", source_ref,
+                              "party.yaml", "gitops", ".github", "inventory"],
+                             check=True, capture_output=True).stdout
+    with tarfile.open(fileobj=io.BytesIO(archive)) as tree:
+        tree.extractall(source, filter="data")
+    monkeypatch.setattr(sys.modules[__name__], "ESTATE", source.parent)
+    work = _tuppence(tmp_path / "fixture")
+    assert not (work / "gitops/cloud/platform-cloud-pin.yaml").exists()
+    for path in source.rglob("*"):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(source)
+        if str(relative) not in {"gitops/cloud/platform-cloud-pin.yaml",
+                                 "gitops/flux-system/gotk-sync.yaml"}:
+            assert (work / relative).read_bytes() == path.read_bytes(), relative
+
+
+def test_an_optional_cloud_subscription_keeps_its_real_source_binding_guard(tmp_path):
+    """Restoring a mismatched cloud pin still reaches the genuine production refusal."""
+    comp = _composition()
+    work = _tuppence(tmp_path)
+    pin = work / "gitops/cloud/platform-cloud-pin.yaml"
+    document = yaml.safe_load((ESTATE / "tuppence" / pin.relative_to(work)).read_text())
+    document["spec"]["ref"]["commit"] = "0" * 40
+    pin.parent.mkdir(parents=True, exist_ok=True)
+    pin.write_text(yaml.safe_dump(document, sort_keys=False))
+    evidence, rendered = comp.compose(work, _trees())
+    assert evidence["outcome"] == "refused" and rendered == {}
+    assert evidence["party_artefact_errors"] == [
+        "missing instrument: cloud package: cloud package tag and commit disagree"]
 
 
 @pytest.mark.parametrize("writer_ref", ["v5.0.0", "HEAD"], ids=["published-write-only", "current-auto-commit"])
