@@ -1,10 +1,16 @@
   ok   selfcheck: with git unreachable this script exits 3 and its last line is SKIP:
 test_actual_guard_and_prepare_cleanup_select_default_clocks_and_opt_in_previews (__main__.CloudClockSelection.test_actual_guard_and_prepare_cleanup_select_default_clocks_and_opt_in_previews) ... ok
+test_actual_live_field_failure_keeps_keyerror_and_reports_safe_context (__main__.CloudFieldObservation.test_actual_live_field_failure_keeps_keyerror_and_reports_safe_context) ... ok
+test_actual_main_retains_the_original_failure_line_and_exit_one (__main__.CloudFieldObservation.test_actual_main_retains_the_original_failure_line_and_exit_one) ... ok
+test_actual_update_and_create_field_failures_name_their_distinct_stages (__main__.CloudFieldObservation.test_actual_update_and_create_field_failures_name_their_distinct_stages) ... ok
+test_immutable_field_assertion_and_malformed_scalar_remain_failures (__main__.CloudFieldObservation.test_immutable_field_assertion_and_malformed_scalar_remain_failures) ... ok
+test_s3_failure_reports_only_public_encryption_fields (__main__.CloudFieldObservation.test_s3_failure_reports_only_public_encryption_fields) ... ok
+test_unchanged_positive_checker_observations_emit_no_failure_context (__main__.CloudFieldObservation.test_unchanged_positive_checker_observations_emit_no_failure_context) ... ok
 test_absent_false_malformed_and_flat_policy_status_fail_closed_by_name (__main__.CloudReadiness.test_absent_false_malformed_and_flat_policy_status_fail_closed_by_name) ... ok
 test_native_ready_both_policy_kinds_reach_the_unchanged_crd_gate (__main__.CloudReadiness.test_native_ready_both_policy_kinds_reach_the_unchanged_crd_gate) ... ok
 test_ready_status_does_not_accept_a_different_signed_body (__main__.CloudReadiness.test_ready_status_does_not_accept_a_different_signed_body) ... ok
 
 ----------------------------------------------------------------------
-Ran 4 tests in 0.103s
+Ran 10 tests in 0.171s
 
 OK
