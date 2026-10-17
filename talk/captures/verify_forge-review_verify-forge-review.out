@@ -8,10 +8,10 @@ pin: insurer cut-release.yml ^https://github\.com/policy-as-versioned-insurer/in
 pin: ludlow propose-tier.yml ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/propose-tier\.yml@refs/heads/main$ (first read in .github/workflows/propose-tier.yml)
 pin: ludlow cut-release.yml ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
 pin: nist cut-release.yml ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in gitops/flux-system/gotk-sync-nist.yaml)
-pin: platform cloud-release.yml ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cloud-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/cloud-release.yml)
+pin: platform cloud-release.yml ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cloud-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in verify/cloud-plane/cloud_plane.py)
 pin: platform cut-release.yml ^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
+pin: tuppence cut-release.yml ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in verify/cloud-plane/cloud_plane.py)
 pin: tuppence propose-tier.yml ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/propose-tier\.yml@refs/heads/main$ (first read in .github/workflows/propose-tier.yml)
-pin: tuppence cut-release.yml ^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$ (first read in .github/workflows/release.yml)
 PASS: driftwood: 3 active ruleset(s) on policy-as-versioned-driftwood/driftwood; 6 pinned branch(es) reviewed; 7 tag(s) held; bypass lists not shown to this token, so not graded
 PASS: feeds: 3 active ruleset(s) on policy-as-versioned-feeds/feeds; 6 pinned branch(es) reviewed; 7 tag(s) held; bypass lists not shown to this token, so not graded
 PASS: hub: 3 active ruleset(s) on policy-as-versioned-flux/policy-as-versioned-flux; 6 pinned branch(es) reviewed; 0 tag(s) held; bypass lists not shown to this token, so not graded
