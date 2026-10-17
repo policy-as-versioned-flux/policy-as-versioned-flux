@@ -1,1 +1,9 @@
-SKIP: no hub interpreter for the workload lane
+==> driftwood: oscal_lane.py
+ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not
+SKIP: the newest OSCAL observation is older than the 48h freshness bound
+==> tuppence: oscal_lane.py
+ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not
+SKIP: no scheduled OSCAL observation has landed on the lane
+==> ludlow: oscal_lane.py
+ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not
+SKIP: no scheduled OSCAL observation has landed on the lane
