@@ -4,10 +4,14 @@ from __future__ import annotations
 import ast
 import copy
 import importlib.util
+import io
+import json
+from contextlib import redirect_stderr, redirect_stdout
 import os
 from pathlib import Path
 import subprocess
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -148,6 +152,260 @@ class CloudClockSelection(unittest.TestCase):
             self.assertFalse(selected(cleanup['if'], 'schedule', False, can_record))
             self.assertTrue(selected(prepare['if'], 'workflow_dispatch', True, can_record))
             self.assertTrue(selected(cleanup['if'], 'workflow_dispatch', True, can_record))
+
+
+# Recorded immutable cloud package d314b8df0b19c42ea816c0a6ada41913b7940fbe.
+# Exact resource/check_fields function bytes; this is a local fixture, not a signature proof.
+RECORDED_CHECKER = '''import copy
+LABEL = 'policy-as-versioned.dev/policy-version'
+
+def resource(case: dict) -> dict:
+    kind = case['kind']
+    group = 'rds' if kind == 'Instance' else 's3'
+    md = {'name': case['name'], 'namespace': 'cloud-proof', 'labels': {'app.kubernetes.io/name': 'ledger'}}
+    if case.get('claim', '5.0.0') is not None:
+        md['labels'][LABEL] = case.get('claim', '5.0.0')
+    if 'workload_tier' in case:
+        md['labels']['posture.acme.io/tier'] = case['workload_tier']
+    provider = {'region': 'eu-west-1'}
+    if kind == 'Instance':
+        provider.update({'engine': 'postgres', 'instanceClass': 'db.t3.micro',
+                         'allocatedStorage': 20, 'username': 'ledger',
+                         'publiclyAccessible': True, 'storageEncrypted': False, 'multiAz': False})
+    provider.update(copy.deepcopy(case.get('provider', {})))
+    if kind != 'Instance' and not any(key in provider for key in ('bucket', 'bucketRef', 'bucketSelector')):
+        provider['bucketRef'] = {'name': 'ledger-data'}
+    return {'apiVersion': f'{group}.aws.m.upbound.io/v1beta1', 'kind': kind,
+            'metadata': md, 'spec': {'forProvider': provider}}
+
+
+def check_fields(before: dict, after: dict, case: dict) -> None:
+    expected = case['expected']
+    labels = after['metadata']['labels']
+    assert labels['posture.acme.io/tier'] == expected['tier'], case['name']
+    assert labels['posture.acme.io/caged'] == 'true', case['name']
+    for key, value in before['metadata'].get('labels', {}).items():
+        if key not in ('posture.acme.io/tier', 'posture.acme.io/caged'):
+            assert labels[key] == value, (case['name'], key)
+    fp = after['spec']['forProvider']
+    assert fp['region'] == before['spec']['forProvider']['region']
+    if case['kind'] == 'Instance':
+        assert fp['publiclyAccessible'] is False and fp['storageEncrypted'] is True
+        for key in ('multiAz', 'backupRetentionPeriod'):
+            assert fp[key] == expected[key], (case['name'], key, fp[key])
+        for key, value in before['spec']['forProvider'].items():
+            if key not in ('publiclyAccessible', 'storageEncrypted', 'multiAz', 'backupRetentionPeriod'):
+                assert fp[key] == value, (case['name'], key)
+    else:
+        for key, value in before['spec']['forProvider'].items():
+            if key != 'rule':
+                assert fp[key] == value, (case['name'], key)
+        for rule in fp['rule']:
+            assert rule['applyServerSideEncryptionByDefault']['sseAlgorithm'] == expected['sseAlgorithm']
+            if 'kmsMasterKeyId' in expected:
+                assert rule['applyServerSideEncryptionByDefault']['kmsMasterKeyId'] == expected['kmsMasterKeyId']
+            if 'bucketKeyEnabled' in expected:
+                assert rule['bucketKeyEnabled'] == expected['bucketKeyEnabled']
+'''
+
+
+class CloudFieldObservation(unittest.TestCase):
+    """Exercise the actual admission caller with local transport responses only."""
+
+    def observe(self, fault_stage=None, *, assertion=False, malformed=False, fault_kind=None, via_main=False):
+        prefix = 'policy-as-versioned.dev/'
+        names = ['crossplane-crds', 'cloud-policies', 'cloud-claims']
+        routes = [{'metadata': {'name': name}, 'spec': {'path': './fixture/' + name}} for name in names]
+        pin = {'metadata': {'annotations': {
+            prefix + 'gitsign-identity-regexp': cloud.TUPPENCE_IDENTITY,
+            prefix + 'gitsign-issuer': 'https://token.actions.githubusercontent.com',
+            prefix + 'gitsign-gates': ','.join('flux-system/' + name for name in names)}},
+            'spec': {'url': 'https://github.com/policy-as-versioned-tuppence/tuppence',
+                     'ref': {'tag': 'v1.0.0', 'commit': 'a' * 40}}}
+        source = copy.deepcopy(pin)
+        source['metadata']['annotations'][prefix + 'gitsign-verified'] = 'true'
+        revision = 'v1.0.0@sha1:' + 'a' * 40
+        ready = [{'type': 'Ready', 'status': 'True'}]
+        source['status'] = {'conditions': ready, 'artifact': {'revision': revision}}
+        policy = {'kind': 'MutatingPolicy', 'metadata': {'name': 'fixture-policy'}, 'spec': {'failurePolicy': 'Fail'}}
+        crd = {'spec': {'group': 'schema-fixture'}, 'status': {'conditions': [{'type': 'Established', 'status': 'True'}]}}
+        with tempfile.TemporaryDirectory(prefix='cloud-field-local-caller-') as directory:
+            work = Path(directory)
+            package = work / 'package'
+            package.mkdir()
+            (package / 'replay.py').write_text(RECORDED_CHECKER)
+            reader = cloud.module('recorded_cloud_fields', package / 'replay.py')
+            before = reader.resource({'name': 'fixture-rds', 'kind': 'Instance'})
+            before['metadata']['namespace'] = 'tuppence'
+            # Deliberately private fixture values must never enter the diagnostic.
+            before['metadata']['labels']['private.example/key'] = 'private-label-sentinel'
+            before['metadata']['annotations'] = {'private.example/key': 'private-annotation-sentinel'}
+            before['spec']['forProvider']['username'] = 'private-username-sentinel'
+            claims = [before]
+            (work / 'gitops/cloud').mkdir(parents=True)
+            (work / 'gitops/cloud/claims.yaml').write_text(yaml.safe_dump_all(claims))
+            (work / 'gitops/composed').mkdir()
+            (work / 'gitops/composed/composed-set.yaml').write_text(yaml.safe_dump({'kind': 'GitRepository', **pin}))
+            row = {'multiAz': True, 'backupRetentionPeriod': 35}
+            (package / 'crossplane-dials.yaml').write_text(yaml.safe_dump({'tiers': {'isolated': row}}))
+            files = {'fixture/cloud-policies/kustomization.yaml': {'resources': ['policy.yaml']},
+                     'fixture/cloud-policies/policy.yaml': policy,
+                     'fixture/cloud-claims/claims.yaml': claims}
+            for name in ['instances.rds.aws.m.upbound.io', 'bucketserversideencryptionconfigurations.s3.aws.m.upbound.io']:
+                files['fixture/crossplane-crds/' + name + '.yaml'] = crd
+
+            def pinned(command, **kwargs):
+                self.assertEqual(command[:4], ['git', '-C', str(work), 'show'])
+                ref, path = command[4].split(':', 1)
+                self.assertEqual(ref, 'a' * 40)
+                value = files[path]
+                return yaml.safe_dump_all(value) if isinstance(value, list) else yaml.safe_dump(value)
+
+            responses = []
+
+            def response(obj, stage):
+                after = copy.deepcopy(obj)
+                after['metadata']['labels'].update({'posture.acme.io/tier': 'isolated', 'posture.acme.io/caged': 'true'})
+                provider = after['spec']['forProvider']
+                if obj['kind'] == 'Instance':
+                    provider.update({'publiclyAccessible': False, 'storageEncrypted': True, **row})
+                else:
+                    provider['rule'] = [{'applyServerSideEncryptionByDefault': {
+                        'sseAlgorithm': 'AES256', 'kmsMasterKeyId': 'private-kms-sentinel'}, 'bucketKeyEnabled': True}]
+                if fault_stage == stage and (fault_kind is None or fault_kind == obj['kind']):
+                    if malformed:
+                        after['metadata']['labels']['posture.acme.io/tier'] = []
+                    elif assertion:
+                        after['metadata']['labels']['posture.acme.io/tier'] = 'baseline'
+                    else:
+                        del after['metadata']['labels']['posture.acme.io/tier']
+                responses.append(after)
+                return after
+
+            def transport(*args, data=None):
+                if args[:2] == ('get', 'gitrepository'):
+                    return source
+                if args[:2] == ('get', 'mutatingpolicies.policies.kyverno.io'):
+                    return {**copy.deepcopy(policy), 'status': copy.deepcopy(READY)}
+                if args[:2] == ('get', 'crd'):
+                    return copy.deepcopy(crd)
+                if args[:2] == ('get', 'kustomization'):
+                    return {'status': {'conditions': ready, 'lastAppliedRevision': revision,
+                                       'inventory': {'entries': [{'id': 'local-fixture'}]}}}
+                if args[:2] == ('get', 'namespace'):
+                    return {'metadata': {'labels': {prefix + 'governed': 'true', 'posture.acme.io/tier': 'isolated'}}}
+                if args[:2] == ('get', 'Instance'):
+                    return response(before, 'live get')
+                self.assertIn(args[0], ('apply', 'create'))
+                self.assertIn('--dry-run=server', args)
+                return response(yaml.safe_load(data), 'UPDATE serverdryrun' if args[0] == 'apply' else 'CREATE serverdryrun')
+
+            self.reader_calls = []
+            self.reader_exception = None
+            load_module = cloud.module
+
+            def loading(name, path):
+                if name == 'cloud_trigger':
+                    return SimpleNamespace(find=lambda root: {'record_commit': 'local-fixture'})
+                loaded = load_module(name, path)
+                if name == 'cloud_replay':
+                    original_checker = loaded.check_fields
+
+                    def checking(before, after, case):
+                        inputs = (before, after, case)
+                        snapshot = copy.deepcopy(inputs)
+                        self.reader_calls.append(inputs)
+                        self.assertIs(after, responses[-1], 'delegate must receive the exact observed response')
+                        try:
+                            original_checker(*inputs)
+                        except (KeyError, AssertionError) as exc:
+                            self.reader_exception = exc
+                            raise
+                        finally:
+                            self.assertEqual(inputs, snapshot, 'diagnostics must not change checker inputs')
+
+                    loaded.check_fields = checking
+                return loaded
+
+            output = io.StringIO()
+            stdout = io.StringIO()
+            with patch.object(cloud, 'module', side_effect=loading), patch.object(cloud, 'TUPPENCE', work), patch.object(cloud, 'run', side_effect=transport), \
+                 patch.object(cloud.subprocess, 'check_output', side_effect=pinned), \
+                 patch.dict(os.environ, {'CLOUD_PLANE_CONTEXT': 'kind-local-fixture-never-contacted'}), \
+                 patch.object(cloud, 'declarations', return_value=({}, routes)), \
+                 patch.object(cloud, 'cloud_parent', return_value=({}, package)), \
+                 patch.object(cloud.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)), \
+                 patch.object(cloud.sys, 'argv', ['cloud_plane.py']), \
+                 redirect_stderr(output), redirect_stdout(stdout):
+                try:
+                    if via_main:
+                        self.main_exit = cloud.main()
+                    else:
+                        cloud.admission(routes, pin, package)
+                finally:
+                    self.context_output = output.getvalue()
+                    self.main_output = stdout.getvalue()
+
+    def test_actual_live_field_failure_keeps_keyerror_and_reports_safe_context(self):
+        with self.assertRaisesRegex(KeyError, 'posture.acme.io/tier') as caught:
+            self.observe('live get')
+        self.assertIs(caught.exception, self.reader_exception)
+        self.assertIn('cloud field context: ', self.context_output,
+                      'actual admission field failure lacks the required observation context')
+        context = json.loads(self.context_output.split('cloud field context: ', 1)[1])
+        self.assertEqual(context['stage'], 'live get')
+        self.assertEqual(context['source_revision'], 'v1.0.0@sha1:' + 'a' * 40)
+        self.assertEqual(context['observed']['labels']['posture.acme.io/tier'], {'missing': True})
+        self.assertEqual(context['before']['name'], 'fixture-rds')
+        self.assertEqual(context['observed']['namespace'], 'tuppence')
+        self.assertEqual(context['expected']['tier'], 'isolated')
+        self.assertNotIn('private-', self.context_output)
+
+
+    def test_actual_update_and_create_field_failures_name_their_distinct_stages(self):
+        for stage in ('UPDATE serverdryrun', 'CREATE serverdryrun'):
+            with self.subTest(stage=stage):
+                with self.assertRaisesRegex(KeyError, 'posture.acme.io/tier') as caught:
+                    self.observe(stage)
+                self.assertIs(caught.exception, self.reader_exception)
+                context = json.loads(self.context_output.split('cloud field context: ', 1)[1])
+                self.assertEqual(context['stage'], stage)
+                self.assertEqual(context['source_revision'], 'v1.0.0@sha1:' + 'a' * 40)
+                self.assertEqual(context['observed']['labels']['posture.acme.io/tier'], {'missing': True})
+                self.assertEqual(context['observed']['mutation']['backupRetentionPeriod'], 35)
+
+    def test_immutable_field_assertion_and_malformed_scalar_remain_failures(self):
+        for malformed in (False, True):
+            with self.subTest(malformed=malformed), self.assertRaisesRegex(AssertionError, 'fixture-rds') as caught:
+                self.observe('live get', assertion=True, malformed=malformed)
+            self.assertIs(caught.exception, self.reader_exception)
+            context = json.loads(self.context_output.split('cloud field context: ', 1)[1])
+            value = {'type': 'list'} if malformed else 'baseline'
+            self.assertEqual(context['observed']['labels']['posture.acme.io/tier'], value)
+            self.assertEqual(context['expected']['tier'], 'isolated')
+
+    def test_s3_failure_reports_only_public_encryption_fields(self):
+        with self.assertRaisesRegex(KeyError, 'posture.acme.io/tier'):
+            self.observe('CREATE serverdryrun', fault_kind='BucketServerSideEncryptionConfiguration')
+        context = json.loads(self.context_output.split('cloud field context: ', 1)[1])
+        self.assertEqual(context['observed']['kind'], 'BucketServerSideEncryptionConfiguration')
+        self.assertEqual(context['observed']['encryption'], [{'sseAlgorithm': 'AES256', 'bucketKeyEnabled': True}])
+        for forbidden in ('private-', 'username', 'kmsMasterKeyId', 'bucketRef', 'annotations', 'managedFields'):
+            self.assertNotIn(forbidden, self.context_output)
+
+    def test_unchanged_positive_checker_observations_emit_no_failure_context(self):
+        self.observe()
+        self.assertEqual(self.context_output, '')
+        self.assertEqual(len(self.reader_calls), 8)  # one incumbent GET/UPDATE and six CREATE probes
+        self.assertEqual({before['kind'] for before, _, _ in self.reader_calls},
+                         {'Instance', 'BucketServerSideEncryptionConfiguration'})
+
+
+    def test_actual_main_retains_the_original_failure_line_and_exit_one(self):
+        self.observe('live get', via_main=True)
+        self.assertEqual(self.main_exit, 1)
+        self.assertEqual(self.main_output, "FAIL: cloud plane: 'posture.acme.io/tier'\n")
+        self.assertIn('cloud field context: ', self.context_output)
 
 
 if __name__ == '__main__':
