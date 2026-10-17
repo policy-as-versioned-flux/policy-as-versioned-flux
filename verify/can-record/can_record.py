@@ -33,6 +33,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -528,6 +529,7 @@ class DeliveryResult(NamedTuple):
     review_merge_attempted: bool = False
     review_merge_conflict: bool = False
     missing_line_stays_red: bool = False
+    signing_mode: str = ""
 
 
 def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryResult:
@@ -632,6 +634,24 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
         pr = root / "pending-pr.json"
         binaries = root / "bin"
         binaries.mkdir()
+        # Inspect effective Git configuration at the actual workflow commit call.
+        # Signing remains explicitly substituted by portable(); this is mode
+        # selection evidence, never certificate issuance or a fabricated log proof.
+        real_git = shutil.which("git")
+        if real_git is None:
+            raise RuntimeError("the signing-mode fixture requires Git")
+        mode_file = root / "signing-mode"
+        git_probe = binaries / "git"
+        git_probe.write_text(f"#!{sys.executable}\n" +
+            "import os, pathlib, subprocess, sys\n" +
+            f"real_git={real_git!r}\n" +
+            "args=sys.argv[1:]\n"
+            "if 'commit' in args:\n"
+            " prefix=args[:args.index('commit')]\n"
+            " result=subprocess.run([real_git,*prefix,'config','--get','gitsign.rekorMode'],capture_output=True,text=True)\n" +
+            f" pathlib.Path({str(mode_file)!r}).write_text(result.stdout.strip() or '<unset>')\n" +
+            "os.execv(real_git,[real_git,*args])\n")
+        git_probe.chmod(0o755)
         gh = binaries / "gh"
         gh.write_text(f"#!{sys.executable}\n" +
             "import json, os, pathlib, subprocess, sys\n"
@@ -775,7 +795,7 @@ def delivery_fixture(workflow: Path, case: str = "protected-main") -> DeliveryRe
         return DeliveryResult(case, step_env["CAN_RECORD"], cage.returncode, pr.exists(),
                               current == before, original, recorded, preserved,
                               "".join(outputs), substitutions, source_preserved, durable, attempted,
-                              conflict, missing_red)
+                              conflict, missing_red, mode_file.read_text() if mode_file.exists() else "")
 
 
 # -- selfcheck ----------------------------------------------------------------------------------
@@ -884,6 +904,8 @@ def main(argv: list[str]) -> int:
             else:
                 passed = passed and result.cage_rc != 0 and not result.pending_pr and bool(result.observation_commit)
                 passed = passed and not result.recorded_after_review
+            if result.observation_commit:
+                passed = passed and result.signing_mode == "offline"
             print(f"  {'ok' if passed else '!!'}   {case}: prepare={result.can_prepare} "
                   f"cage={result.cage_rc} pending={result.pending_pr} "
                   f"default-unchanged-until-review={result.default_unchanged_until_review} "
@@ -892,7 +914,8 @@ def main(argv: list[str]) -> int:
                   f"source-parent-preserved={result.source_parent_preserved} "
                   f"durable-original-preserved={result.durable_original_preserved} "
                   f"review-content-conflict={result.review_merge_conflict} "
-                  f"missing-line-stays-red={result.missing_line_stays_red}")
+                  f"missing-line-stays-red={result.missing_line_stays_red} "
+                  f"signer-mode={result.signing_mode or 'not-invoked'}")
             if not passed:
                 failed += 1
                 print(result.shell_output)

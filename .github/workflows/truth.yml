@@ -530,6 +530,8 @@ jobs:
           git config user.email "truth@users.noreply.github.com"
           git config gpg.format x509
           git config gpg.x509.program gitsign
+          # Embed the signed log proof; publication must not rely on its search index.
+          git config gitsign.rekorMode offline
           git config commit.gpgsign true
           git commit -m "truth: record run ${GITHUB_RUN_NUMBER} [skip ci]"
           # The credential is handed to THIS command only; nothing the gate ran could

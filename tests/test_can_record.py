@@ -24,6 +24,7 @@ import copy
 import importlib.util
 import os
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -79,6 +80,29 @@ def _repo(tmp_path: Path) -> Path:
 
 def test_the_committed_workflow_carries_the_shape() -> None:
     assert cr.shape_faults(_doc(), _text()) == []
+
+
+def test_actual_clock_commit_selects_embedded_rekor_proof() -> None:
+    result = cr.delivery_fixture(WORKFLOW)
+    assert result.signing_mode == "offline", result.shell_output
+
+
+@pytest.mark.parametrize("mode", ["missing", "online"])
+def test_native_delivery_rejects_a_clock_without_embedded_proof_mode(tmp_path: Path, mode: str) -> None:
+    doc = _doc()
+    step = next(step for step in doc["jobs"]["gate"]["steps"]
+                if cr.CAGE_STEP in step.get("name", ""))
+    selected = "git config gitsign.rekorMode offline"
+    assert selected in step["run"]
+    step["run"] = step["run"].replace(selected, "" if mode == "missing" else
+                                    "git config gitsign.rekorMode online")
+    workflow = tmp_path / "truth.yml"
+    workflow.write_text(yaml.safe_dump(doc, sort_keys=False))
+    result = subprocess.run([sys.executable, str(ROOT / "verify/can-record/can_record.py"),
+                             "delivery", str(workflow)], capture_output=True, text=True)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "!!   protected-main" in result.stdout
+    assert "signer-mode=" + ("<unset>" if mode == "missing" else "online") in result.stdout
 
 
 def test_protected_default_delivery_is_pending_until_review_then_preserves_clock_commit() -> None:
