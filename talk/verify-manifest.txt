@@ -211,6 +211,8 @@ verify/unreviewed-major/verify-unreviewed-major-in-window.sh | estate-observatio
 
 # Resume, 2026-10-03: owner-decided mode record and incumbent migration.
 verify/enact-record/verify-enact-record.sh | self-proof | -
+verify/publisher-reliability/verify-publisher-reliability.sh | estate-observation | waits: ^SKIP: publisher reliability waits for NIST's signed publisher-reliability/v<semver> report tag$|^SKIP: publisher reliability waits for eligible independent forecast/outcome pairs; signed publisher-reliability/v[0-9]+\.[0-9]+\.[0-9]+ has n=0, publisher-price accuracy remains unmeasured$   # ticket46: namespaced signed NIST report only; binary calibration never asserts publisher-price quality, and zero eligible pairs never pass. Missing instruments, bad provenance and a failed native recomputation remain undeclared/red.
+verify/publisher-reliability/verify-publisher-reliability-contract.sh | self-proof | -   # ticket46: real consumer CLI over labelled synthetic Git/report/verifier fixtures; no genuine signature or world-outcome claim.
 verify/cloud-plane/verify-cloud-plane.sh | estate-observation | waits: cloud plane waits for a citable e2e step 4 PASS|cloud plane waits for tuppence's signed composed tag to carry all cloud delivery paths
 verify/cloud-plane/verify-cloud-plane-contract.sh | self-proof | waits: cloud contract self-proof needs (Python 3|PyYAML|git)
 .estate-clone/platform/implementations/cloud/verify-cloud-package.sh | self-proof | -
