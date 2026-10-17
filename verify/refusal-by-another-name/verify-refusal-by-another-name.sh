@@ -61,6 +61,7 @@ say() { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
 selfcheck() {
   "$PY" "$HERE/refusal_scan.py" --selfcheck || return 1
   "$PY" "$HERE/refusal_probe.py" --selfcheck || return 1
+  "$PY" "$HERE/verify-resource-probe.py" || return 1
 }
 
 case "${1:-}" in
