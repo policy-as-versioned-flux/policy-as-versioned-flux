@@ -212,6 +212,7 @@ verify/unreviewed-major/verify-unreviewed-major-in-window.sh | estate-observatio
 # Resume, 2026-10-03: owner-decided mode record and incumbent migration.
 verify/enact-record/verify-enact-record.sh | self-proof | -
 verify/cloud-plane/verify-cloud-plane.sh | estate-observation | waits: cloud plane waits for a citable e2e step 4 PASS|cloud plane waits for tuppence's signed composed tag to carry all cloud delivery paths
+verify/cloud-plane/verify-cloud-plane-contract.sh | self-proof | waits: cloud contract self-proof needs (Python 3|PyYAML|git)
 .estate-clone/platform/implementations/cloud/verify-cloud-package.sh | self-proof | -
 verify/incumbent-org/verify-incumbent-org.sh | estate-observation | waits: no INCUMBENT_FACTS file from the credentialled clocks job|incumbent forge observations are older than the 48h freshness bound|anonymous OCI manifest observation missing|served incumbent images
 verify/served-workloads/verify-served-workloads.sh | estate-observation | waits: no scheduled workload sample has landed|no scheduled OSCAL observation has landed|no committed workload registration has reached origin/main|no PolicyReport existed on the lane cluster before teardown   # ticket 155: each adopter grades its own signed scheduled app and OSCAL observations; runner capacity and allocation are recorded; a failed observation without an actual cage risk is a fall, never a declared wait
