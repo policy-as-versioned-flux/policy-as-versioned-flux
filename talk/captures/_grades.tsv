@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-10-17T06:22Z run=420 hub=323b76ce enact=development units=[driftwood=5c5e4de@main feeds=8b2af55@eol/v2.0.0 ico=abcb3a8@main insurer=ff40f72@main ludlow=ee5a26f@main nist=f83126f@main platform=b0efbd6@main tuppence=58ae02b@main] pass=102 [observed=36 self=54 simulated=4 meta=8] fail=9 skip=25 [never=10 waits=15] excluded=8 total=144 ceiling=125
+# TRUTH 2026-10-17T05:47Z run=418 hub=6beeb50e enact=development units=[driftwood=5c5e4de@main feeds=8b2af55@eol/v2.0.0 ico=abcb3a8@main insurer=ff40f72@main ludlow=1d4bdc0@main nist=f83126f@main platform=7b0a6e5@v5.2.0 tuppence=58ae02b@main] pass=100 [observed=34 self=54 simulated=4 meta=8] fail=11 skip=25 [never=10 waits=15] excluded=8 total=144 ceiling=125
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      acceptance record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -20,7 +20,7 @@
 .estate-clone/insurer/verify-insurer-quote.sh	SKIP	SKIP: 5 of 19 checks could not be looked at (reasons above)
 .estate-clone/ludlow/twin/verify-twin-scenarios.sh	PASS	PASS: ludlow carries its six standing scenarios, four committed classes in all three places, and no fine amount in the twin
 .estate-clone/ludlow/verify-adopter-gate.sh	PASS	      credential). Verifying what platform already signed is not, and is proved above.
-.estate-clone/ludlow/verify-cage-probe.sh	PASS	PASS: the served documents at v5.1.1 (the tag gitops/composed/composed-set.yaml pins) and at HEAD ee5a26f, run offline through kyverno 1.19.1 (the engine gitops
+.estate-clone/ludlow/verify-cage-probe.sh	PASS	PASS: the served documents at v5.1.1 (the tag gitops/composed/composed-set.yaml pins) and at HEAD 1d4bdc0, run offline through kyverno 1.19.1 (the engine gitops
 .estate-clone/ludlow/verify-certificate-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only policy-as-versioned-ludlow/ludlow's propose-tier.yml on main; the release and proposal identities do not ov
 .estate-clone/ludlow/verify-reconcile.sh	SKIP	SKIP: no local kind cluster 'ludlow' to observe here, and the lane sample cannot stand in: a lane run started by hand or without an attributable event cannot es
 .estate-clone/ludlow/verify-twin-overlay.sh	PASS	PASS: ludlow's twin overlay loads, is labelled, prices every rung it declares and emits its feed
@@ -29,9 +29,9 @@
 .estate-clone/nist/scripts/verify-cert-identity-regexp.sh	PASS	OK: EXPECTED_IDENTITY_REGEXP anchors org/repo/workflow and allows only main + release/<major>.<minor>.x
 .estate-clone/platform/access/verify-access.sh	EXCLUDED	
 .estate-clone/platform/break-glass/verify-break-glass.sh	PASS	verify-break-glass: done (offline; rides on the access plane — see ../access/verify-access.sh for the live IAP checks)
-.estate-clone/platform/compose/verify-composition.sh	PASS	[1;36m==>[0m PASS: the composition seam holds
+.estate-clone/platform/compose/verify-composition.sh	FAIL	FAIL: composition.py --selfcheck
 .estate-clone/platform/compose/verify-fresh.sh	PASS	PASS: verify-fresh.sh grades render-at-ref against the page served at the same ref: a fresh render passes, a hand-edited page fails, an artefact that moved unde
-.estate-clone/platform/computed-semver/verify-cage-engine.sh	PASS	PASS: engine cells -- passed; 6 cell(s): 6 passed; graded platform commit b0efbd6fce3cdc5286372f8e0f11885580c4788b: policy 5.0.0 from refs/tags/policy/v5.0.0 at
+.estate-clone/platform/computed-semver/verify-cage-engine.sh	PASS	PASS: engine cells -- passed; 6 cell(s): 6 passed; graded platform commit 7b0a6e51cdc8f525fa906efc81be0e43ae36290a: policy 5.0.0 from refs/tags/policy/v5.0.0 at
 .estate-clone/platform/computed-semver/verify-comparison-window.sh	PASS	selfcheck ok: a prerelease sorts below its own release and above the version beneath it (ticket 43's degraded publish); window_below filters and sorts ascending
 .estate-clone/platform/computed-semver/verify-corpus-generator.sh	PASS	PASS: corpus generator selfcheck ok, spine regenerates byte-identical, sample entry is a real Pod
 .estate-clone/platform/computed-semver/verify-coverage.sh	PASS	PASS: coverage selfcheck ok, wired correctly through the gate seam
@@ -108,7 +108,7 @@ verify/estate-engines/verify-estate-engines.sh	PASS	PASS: all 5 of the estate's 
 verify/every-green/verify-every-green.sh	PASS	PASS: none of the 144 discovered verify scripts prints the SKIP verdict token and then reaches exit 0; the prose-worded could-not-look is not graded here (see t
 verify/feed-contract/verify-feed-contract.sh	PASS	PASS: every published feed is one envelope, and every subscription names a tag that exists on the publisher's real remote (existence, not signature -- step 6 ch
 verify/feed-contract/verify-untagged-pin-is-priced.sh	PASS	PASS: every adopter feed pin resolves to a tag that verifies under its publisher's own identity pins, or is priced as a hole under the adopter's own perspective
-verify/fold-agreement/verify-fold-agreement.sh	PASS	PASS: on 6 planted movements of a composed window (accepted, arrival, misaddressed, quiet, retirement, standing), the 3 adopter gates that answered (driftwood, 
+verify/fold-agreement/verify-fold-agreement.sh	FAIL	FAIL: 1 planted movement(s) were answered differently by two adopter gates, or answered differently from ADR-0011's own reading
 verify/forge-review/verify-forge-review.sh	PASS	PASS: every branch an estate identity pin admits is protected by a reviewed-PR ruleset on the forge, all 9 repositories forge_review.py holds as the estate carr
 verify/handbook/verify-handbook-is-a-compose-time-render.sh	PASS	PASS: 6 served ref(s) across 3 adopter(s) (driftwood@origin/main, driftwood@v4.0.1, ludlow@origin/main, ludlow@v5.1.1, tuppence@origin/main, tuppence@v4.1.1) ea
 verify/lifted-apps/verify-lifted-apps.sh	PASS	PASS: 4 lifted applications are listed by their adopter's gitops/apps/kustomization.yaml at the checked-out tree, on the path that adopter's own gotk-sync.yaml 
@@ -131,7 +131,7 @@ verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Reno
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
 verify/schedules/verify-schedules.sh	FAIL	FAIL: 7 schedule/cage check(s) observed false: driftwood/propose-tier.yml driftwood/twin-sweep.yml insurer/fetch.yml ludlow/propose-tier.yml ludlow/twin-sweep.y
-verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=49a67d5 ludlow=e33b029 tuppence=728f2e4]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
+verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=5c5e4de ludlow=ee5a26f tuppence=58ae02b]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
 verify/served-workloads/verify-served-workloads.sh	FAIL	SKIP: a workload lane run started by hand cannot establish a cited pass
 verify/supersede/verify-supersede.sh	PASS	PASS: every adopter feed pin at its served commit is either at the newest major its publisher's real remote carries a tag for, or priced as behind by a supersed
 verify/tier-binding/verify-tier-binding.sh	PASS	PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform
