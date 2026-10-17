@@ -190,6 +190,12 @@ that a rewritten entry cites stay as the record of the decision at the time.
   policy version applies to it. The original's signature elegance: **one string** served as both
   the dependency pin *and* the engine's workload selector.
 
+- **Consumer retirement** (added 2026-10-17, ticket 150) — An adopter's explicit reviewed
+  removal of exact versions from its own composed window, while its publisher continues to
+  serve them. The decision binds the implementation parent, the retained window, a genuine
+  scheduled baseline and the measured engine transition. It applies to every workload of that
+  adopter. _Avoid_: an exemption, an implicit engine filter, publisher retirement.
+
 - **Supported engine** (added 2026-09-25, widened 2026-09-26, ticket 71) — An exact engine
   version, such as Kyverno `1.18.2`, on which every body that a published policy line serves
   compiles and its fixtures pass. A line supports exactly the engines it passed on. No range is

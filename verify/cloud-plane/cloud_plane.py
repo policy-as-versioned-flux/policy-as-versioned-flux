@@ -10,12 +10,14 @@ from __future__ import annotations
 import argparse
 import copy
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
 import re
 import subprocess
 import sys
+import tarfile
 import tempfile
 import yaml
 
@@ -24,6 +26,8 @@ PLATFORM = ROOT / '.estate-clone/platform'
 TUPPENCE = ROOT / '.estate-clone/tuppence'
 PACKAGE = PLATFORM / 'implementations/cloud'
 LABEL = 'policy-as-versioned.dev/policy-version'
+CLOUD_IDENTITY = r'^https://github\.com/policy-as-versioned-platform/platform/\.github/workflows/cloud-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$'
+TUPPENCE_IDENTITY = r'^https://github\.com/policy-as-versioned-tuppence/tuppence/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$'
 
 
 def module(name: str, path: Path):
@@ -86,12 +90,13 @@ def declared_equal(expected, observed) -> bool:
     return type(expected) is type(observed) and expected == observed
 
 
-def admission(routes: list[dict], source_pin: dict) -> None:
+def admission(routes: list[dict], source_pin: dict, package: Path) -> None:
     context = os.environ.get('CLOUD_PLANE_CONTEXT', 'kind-tuppence')
     if not context.startswith('kind-'):
         raise ValueError('cloud proof is KinD-only')
     source = run('get', 'gitrepository', 'tuppence-composed', '-n', 'flux-system', '-o', 'json')
     assert any(c['type'] == 'Ready' and c['status'] == 'True' for c in source['status']['conditions'])
+    assert source['spec']['url'] == source_pin['spec']['url'], 'live cloud source URL differs from its publisher declaration'
     assert source['spec']['ref'] == source_pin['spec']['ref'], 'live cloud source differs from its immutable declaration'
     assert not source['spec'].get('verify'), 'a second OpenPGP/SSH signer is not the gitsign proof'
     annotations = source['metadata'].get('annotations', {})
@@ -119,19 +124,39 @@ def admission(routes: list[dict], source_pin: dict) -> None:
     for name in names:
         crd = run('get', 'crd', name, '-o', 'json')
         assert any(c['type'] == 'Established' and c['status'] == 'True' for c in crd['status']['conditions'])
+        expected = yaml.safe_load(pinned(routes[0]['spec']['path'].removeprefix('./') + '/' + name + '.yaml'))
+        assert declared_equal(expected['spec'], crd['spec']), 'live cloud CRD differs from its signed vendor schema'
     for route in routes:
         live = run('get', 'kustomization', route['metadata']['name'], '-n', 'flux-system', '-o', 'json')
         assert any(c['type'] == 'Ready' and c['status'] == 'True' for c in live['status']['conditions'])
         assert live['status']['lastAppliedRevision'] == revision, 'cloud route has not applied the pinned source revision'
         assert live['status'].get('inventory', {}).get('entries'), 'cloud route has no Flux inventory'
+    workload_path = routes[2]['spec']['path'].removeprefix('./') + '/claims.yaml'
+    workload = [doc for doc in yaml.safe_load_all(pinned(workload_path)) if doc]
+    declared_workload = [doc for doc in yaml.safe_load_all((TUPPENCE / 'gitops/cloud/claims.yaml').read_text()) if doc]
+    assert workload == declared_workload, 'signed cloud workload differs from the current declared incumbent lift'
     namespace = run('get', 'namespace', 'tuppence', '-o', 'json')
     labels = namespace['metadata']['labels']
     assert labels.get('policy-as-versioned.dev/governed') == 'true'
     tier = labels.get('posture.acme.io/tier', 'isolated')
-    table = yaml.safe_load((PACKAGE / 'crossplane-dials.yaml').read_text())['tiers']
+    table = yaml.safe_load((package / 'crossplane-dials.yaml').read_text())['tiers']
     tier = tier if tier in table else 'isolated'
-    sys.path.insert(0, str(PACKAGE))
-    replay = module('cloud_replay', PACKAGE / 'replay.py')
+    sys.path.insert(0, str(package))
+    replay = module('cloud_replay', package / 'replay.py')
+    # The actual three lifted resources are observed as well as the bottom-rung
+    # probes below. An UPDATE dry-run can judge names that Flux already created.
+    for before in workload:
+        live = run('get', before['kind'], before['metadata']['name'], '-n', 'tuppence', '-o', 'json')
+        assert declared_equal(before['metadata']['labels'], live['metadata']['labels'])
+        provider = before['spec']['forProvider']
+        row = table[tier]
+        expected = {'tier': tier, 'multiAz': row['multiAz'] or provider.get('multiAz', False),
+                    'backupRetentionPeriod': max(row['backupRetentionPeriod'], provider.get('backupRetentionPeriod', 0)),
+                    'sseAlgorithm': 'AES256'}
+        case = {'name': before['metadata']['name'], 'kind': before['kind'], 'expected': expected}
+        replay.check_fields(before, live, case)
+        after = run('apply', '--server-side', '--force-conflicts', '--dry-run=server', '-f', '-', '-o', 'json', data=yaml.safe_dump(before))
+        replay.check_fields(before, after, case)
     for kind in ('Instance', 'BucketServerSideEncryptionConfiguration'):
         for claim in ('5.0.0', None, '99.0.0'):
             actual_tier = tier if claim == '5.0.0' else 'isolated'
@@ -145,6 +170,49 @@ def admission(routes: list[dict], source_pin: dict) -> None:
             after = run('create', '--dry-run=server', '-f', '-', '-o', 'json', data=yaml.safe_dump(before))
             replay.check_fields(before, after, case)
     print('LIMIT: server dry-run judged CR specs; no AWS resource or reconciliation was observed; isolated carries service dials, not a claim of AWS reach isolation')
+
+
+def verify_tag(repository: Path, tag: str, commit: str, identity: str) -> None:
+    resolved = subprocess.check_output(['git', '-C', str(repository), 'rev-parse', tag + '^{commit}'], text=True).strip()
+    if resolved != commit:
+        raise ValueError('cloud proof tag and immutable commit disagree')
+    verified = subprocess.run(['gitsign', 'verify-tag', tag,
+                               '--certificate-identity-regexp=' + identity,
+                               '--certificate-oidc-issuer=https://token.actions.githubusercontent.com'],
+                              cwd=repository, env=dict(os.environ, GITSIGN_REKOR_MODE='offline'),
+                              capture_output=True, text=True, timeout=30)
+    if verified.returncode:
+        raise ValueError('cloud proof tag failed identity-pinned offline signature verification')
+
+
+def cloud_parent(source: dict, destination: Path) -> tuple[dict, Path]:
+    """Use the source package the signed composed artefact actually names."""
+    pin = source['spec']['ref']
+    if source['spec']['url'].removesuffix('.git').rstrip('/') != 'https://github.com/policy-as-versioned-tuppence/tuppence':
+        raise ValueError('cloud composed source URL names a different publisher')
+    if not re.fullmatch(r'v\d+\.\d+\.\d+', pin['tag']) or not re.fullmatch(r'[0-9a-f]{40}', pin['commit']):
+        raise ValueError('cloud composed source requires an exact tag and full commit')
+    annotations = source['metadata']['annotations']
+    if annotations['policy-as-versioned.dev/gitsign-identity-regexp'] != TUPPENCE_IDENTITY or annotations['policy-as-versioned.dev/gitsign-issuer'] != 'https://token.actions.githubusercontent.com':
+        raise ValueError('cloud source declares a different signer')
+    gates = set(annotations['policy-as-versioned.dev/gitsign-gates'].split(','))
+    if not {'flux-system/crossplane-crds', 'flux-system/cloud-policies', 'flux-system/cloud-claims'} <= gates:
+        raise ValueError('cloud routes are absent from the composed source signature gates')
+    verify_tag(TUPPENCE, pin['tag'], pin['commit'], TUPPENCE_IDENTITY)
+    raw = subprocess.check_output(['git', '-C', str(TUPPENCE), 'show', pin['commit'] + ':composed/CLOUD-PARENT.json'], text=True)
+    parent = json.loads(raw)
+    if (parent.get('party'), parent.get('kind'), parent.get('name'), parent.get('path')) != ('platform', 'implementations', 'cloud', 'implementations/cloud'):
+        raise ValueError('cloud parent receipt names a different package')
+    if not re.fullmatch(r'cloud/v\d+\.\d+\.\d+', parent['tag']) or not re.fullmatch(r'[0-9a-f]{40}', parent['sha']) or parent.get('signature_identity') != CLOUD_IDENTITY:
+        raise ValueError('cloud parent receipt has no exact signed source')
+    verify_tag(PLATFORM, parent['tag'], parent['sha'], CLOUD_IDENTITY)
+    archive = subprocess.check_output(['git', '-C', str(PLATFORM), 'archive', parent['sha'], 'implementations/cloud'])
+    with tarfile.open(fileobj=io.BytesIO(archive)) as tree:
+        tree.extractall(destination, filter='data')
+    package = destination / 'implementations/cloud'
+    if (package / 'VERSION').read_text().strip() != parent['tag'].removeprefix('cloud/v'):
+        raise ValueError('cloud package VERSION disagrees with its tag')
+    return parent, package
 
 
 def selfcheck() -> None:
@@ -185,6 +253,7 @@ def selfcheck() -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--selfcheck', action='store_true')
+    parser.add_argument('--preflight', action='store_true', help='Check signed delivery prerequisites without contacting a cluster')
     args = parser.parse_args()
     try:
         if args.selfcheck:
@@ -203,7 +272,12 @@ def main() -> int:
             if result.returncode:
                 print('SKIP: cloud plane waits for tuppence\'s signed composed tag to carry all cloud delivery paths')
                 return 3
-        admission(routes, source)
+        with tempfile.TemporaryDirectory(prefix='cloud-proof-source-') as tmp:
+            parent, package = cloud_parent(source, Path(tmp))
+            if args.preflight:
+                print(f'PASS: cloud admission prerequisites are signed and published at {parent["sha"]}; no cluster observation claimed')
+                return 0
+            admission(routes, source, package)
         print(f'PASS: cloud claims admitted on KinD from tuppence composed delivery after signed e2e4 trigger {trigger["record_commit"]}')
         return 0
     except (AssertionError, ValueError, OSError, KeyError, subprocess.SubprocessError) as exc:

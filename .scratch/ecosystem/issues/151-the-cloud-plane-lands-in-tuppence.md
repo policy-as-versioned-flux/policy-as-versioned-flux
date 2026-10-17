@@ -58,3 +58,42 @@ register rows already name the admission check and remain ineligible while it sk
 
 This local validation is not citable estate truth. The ticket remains claimed pending the
 modern citable e2e4 PASS, actual signed package/composed publication and KinD admission grade.
+
+## Recovery and delivery repair, 2026-10-17
+
+The unchanged signed original for run388, `087a09a7bac32fbdd20433b7e7d3c95d960d371a`,
+is now ancestral to public hub main and its exact TRUTH line is recorded there. The actual
+trigger reader exposed an implementation fault: the pinned gitsign0.17.1 command for a commit
+is `verify`, not `verify-commit`. Correcting that command lets the real identity-pinned offline
+reader accept run388's observed step4PASS. This is a recovered original, not a new historical
+measurement or a fixture trigger.
+The automatic lookup also needs full Git history: default path simplification hides genuine
+side-parent clocks when a recovery merge retains a later capture tree. A real normal-merge
+regression first reproduced the false missing-trigger wait; traversing all parents finds the
+unchanged qualifying original.
+
+The real Upbound v2.6.0 RDS/S3 CRDs are pinned to upstream commit
+`857b535dd0eb9b8242ad9d7c4e54aaa3e4616d60` and their original SHA256 values. Their field
+shapes match the prepared CEL; replay now uses these genuine documents. Datastore's original
+commit `988e414eb01c7f768bdd9fc75a0d7e068745a9b3` contains three claims. Tuppence's replacement
+ledger seeds were not a faithful lift: the repair conserves all three resource names, specs,
+selectors and other labels, changing only namespace and the policy claim. The original file,
+Git blob and SHA256 are retained with that workload.
+
+Delegated under ADR0025: an optional cloud-package adapter goes through the ordinary composer
+seam. A separately identity-verified cloud tag supplies the complete cloud tree, vendor schemas,
+workload and receipts. This is necessary because the genuine `verify()` gate correctly rejects
+cloud YAML appended after composition. No cloud pin preserves existing behavior; the separate
+compiler pin can move without accepting a Pod policy major or moving Tuppence's engine1.18.2.
+The compiler release is versioned from its actual interface change; the existing policy bump
+oracle explicitly handles only `policy/v*` tags and does not compute compiler SemVer.
+
+The cloud grader binds expected dials to the exact signed cloud parent in the composed artefact,
+checks the live vendor CRD bodies and all three incumbent resources, and keeps AWS reconciliation
+outside its proof. An opt-in TRUTH dispatch can provision only an ephemeral GitHub-hosted KinD
+substrate before running this native checker. Its guard refuses local and self-hosted execution.
+Only an actual subsequent native PASS and ordinary signed recording establish admission.
+
+These source repairs do not close the ticket. Signed cloud/compiler releases, Tuppence's real
+cloud/composed pins and signature gates, genuine hosted admission, and incumbent-register checks
+still have to complete in that order. No future tag SHA, admission result, grade or price is filled in.

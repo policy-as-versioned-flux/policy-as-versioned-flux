@@ -27,6 +27,11 @@ on:
   schedule:
     - cron: '47 5 * * *'
   workflow_dispatch:
+    inputs:
+      cloud_admission:
+        description: 'Observe published cloud delivery at admission on an ephemeral hosted KinD cluster'
+        type: boolean
+        default: false
   push:
     # Ticket 59 review, F5. The four `talk/` files the gate's own arithmetic and its
     # comparison live in were missing: a push changing only talk/truth_manifest.py,
@@ -410,6 +415,12 @@ jobs:
             fi
             rm -f "$dest/cli.tgz"
           done <"$rows"
+      - name: prepare the opt-in hosted cloud admission substrate
+        if: github.event_name == 'workflow_dispatch' && inputs.cloud_admission
+        continue-on-error: true
+        timeout-minutes: 20
+        run: bash verify/cloud-plane/hosted-admission.sh
+
       - name: the gate
         id: gate
         continue-on-error: true
@@ -613,6 +624,13 @@ jobs:
             echo "::error::THE NUMBER FELL, and no committed reason accepts it. NORTH-STAR section 5: a fall is a blocking event. This run is not a green run and no document may cite it as one. Either fix what fell, or commit a line to talk/verify-falls.txt saying run=${GITHUB_RUN_NUMBER} and why the fall is accepted."
             exit 1
           fi
+      - name: delete the opt-in hosted cloud admission cluster
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.cloud_admission
+        run: |
+          if command -v kind >/dev/null; then
+            kind delete cluster --name "cloud-tuppence-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          fi
+
       - name: fail if the gate failed
         if: ${{ !cancelled() && steps.gate.outcome == 'failure' }}
         run: exit 1
