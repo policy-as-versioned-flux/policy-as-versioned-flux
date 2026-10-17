@@ -301,7 +301,7 @@ def offline_note(unit: str, exit_code: int | None, output: str) -> str:
 
 
 def offline_exit(fold, unit: str, unit_dir: Path, planted: dict, platform_dir: Path,
-                 adopter_repo: Path, workdir: Path) -> tuple[int | None, str]:
+                 adopter_repo: Path, workdir: Path, *, context=None) -> tuple[int | None, str]:
     """The number this check reports and does not grade: what THIS adopter's OWN gate, invoked
     exactly the way its own workflow invokes it, does against platform's real published evidence
     with a cold TUF cache and every proxy pointed at a closed port.
@@ -322,7 +322,8 @@ def offline_exit(fold, unit: str, unit_dir: Path, planted: dict, platform_dir: P
     restore = {k: os.environ.get(k) for k in cold}
     os.environ.update(cold)
     try:
-        result, _ = fold.run_gate(unit, unit_dir, planted, platform_dir, adopter_repo, workdir)
+        result, _ = fold.run_gate(unit, unit_dir, planted, platform_dir, adopter_repo, workdir,
+                                  context=context)
     finally:
         for key, was in restore.items():
             if was is None:
@@ -471,6 +472,15 @@ def _observe(estate: Path, fold, units: list[str], platform_src: Path,
             print(f"... {unit}", file=sys.stderr, flush=True)
             unit_dir = estate / unit
             obs: dict = {"version": version, "reason": ""}
+            # The workflow verifies its independent compiler in an earlier step. Reproduce that
+            # step once, outside the cold HOME/TUF/proxies used to measure evidence verification.
+            context, reason = fold.prepare_gate_context(unit, unit_dir, platform_src,
+                                                        root / "dependencies" / unit)
+            if context is None:
+                observations[unit] = {**obs, "accept": None, "refuse": None, "artefact": None,
+                                      "reason": reason}
+                lines.append(("note", offline_note(unit, None, "")))
+                continue
             halves = [("accept", clean, tag_commits), ("refuse", corrupt, corrupt_tags)]
             if artefact_tags is not None:
                 halves.append(("artefact", changed, artefact_tags))
@@ -480,13 +490,14 @@ def _observe(estate: Path, fold, units: list[str], platform_src: Path,
                 workdir = root / f"{unit}-{half}"
                 workdir.mkdir(parents=True, exist_ok=True)
                 planted = fold.plant(workdir / "adopter", ([STANDING], [STANDING, version],
-                                                            BASE_TAG, HEAD_TAG), tags)
+                                                            BASE_TAG, HEAD_TAG), tags,
+                                     party=unit, context=context)
                 unplanted = _planted_or_none(planted)
                 if unplanted is not None:
                     obs[half], obs["reason"] = None, unplanted
                     continue
                 result, reason = fold.run_gate(unit, unit_dir, planted, platform_dir,
-                                               workdir / "adopter", workdir)
+                                               workdir / "adopter", workdir, context=context)
                 obs[half] = result
                 if result is None:
                     obs["reason"] = reason
@@ -495,10 +506,11 @@ def _observe(estate: Path, fold, units: list[str], platform_src: Path,
             cold_dir = root / f"{unit}-cold"
             cold_dir.mkdir(parents=True, exist_ok=True)
             cold_planted = fold.plant(cold_dir / "adopter", ([STANDING], [STANDING, version],
-                                                             BASE_TAG, HEAD_TAG), tag_commits)
+                                                             BASE_TAG, HEAD_TAG), tag_commits,
+                                      party=unit, context=context)
             cold, cold_output = ((None, "") if _planted_or_none(cold_planted) is not None
                                  else offline_exit(fold, unit, unit_dir, cold_planted, clean,
-                                                   cold_dir / "adopter", cold_dir))
+                                                   cold_dir / "adopter", cold_dir, context=context))
             lines.append(("note", offline_note(unit, cold, cold_output)))
 
     verdict, graded = grade(observations)
