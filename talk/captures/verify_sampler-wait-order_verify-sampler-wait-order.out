@@ -1,8 +1,8 @@
 0. the grader can fail
   ok   selfcheck: round 4 passes; round 3, round 2, a late derivation, an unused derivation, one named only in a comment, a duplicate and a missing wait fail; no clone skips
 1. each adopter's drift-sample.yml waits for kyverno and flux-operator, applies, then waits for what that apply created -- the ResourceSet, the Kustomizations it names, and only then the rest
-  ok   driftwood: kyverno wait@233 flux-operator wait@234 composed apply@235 ResourceSet waits@255 composed names derived@296 Kustomization waits@327 five-fact sample@342 +derived-names-waited
-  ok   tuppence: kyverno wait@235 flux-operator wait@236 composed apply@237 ResourceSet waits@257 composed names derived@298 Kustomization waits@329 five-fact sample@344 +derived-names-waited
-  ok   ludlow: kyverno wait@234 flux-operator wait@235 composed apply@236 ResourceSet waits@256 composed names derived@297 Kustomization waits@328 five-fact sample@343 +derived-names-waited
+  ok   driftwood: kyverno wait@237 flux-operator wait@238 composed apply@239 ResourceSet waits@259 composed names derived@300 Kustomization waits@331 five-fact sample@346 +derived-names-waited
+  ok   tuppence: kyverno wait@239 flux-operator wait@240 composed apply@241 ResourceSet waits@261 composed names derived@302 Kustomization waits@333 five-fact sample@348 +derived-names-waited
+  ok   ludlow: kyverno wait@238 flux-operator wait@239 composed apply@240 ResourceSet waits@260 composed names derived@301 Kustomization waits@332 five-fact sample@347 +derived-names-waited
 
 PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it names -- and wait for those names -- before enumerating anything (round 4 order)
