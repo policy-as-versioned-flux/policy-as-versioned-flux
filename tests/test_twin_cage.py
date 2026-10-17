@@ -180,6 +180,18 @@ class TwinObservationTransport(unittest.TestCase):
         self.assertIn('twin job holds capabilities beyond contents: read',
                       grade(workflow, files, 'tuppence'))
 
+    def test_program_metadata_preserves_scalar_types(self) -> None:
+        for organization in ('driftwood', 'tuppence', 'ludlow'):
+            for wrong_depth in (False, 0.0):
+                with self.subTest(organization=organization, wrong_depth=wrong_depth):
+                    workflow, files = fixture(organization)
+                    checkout = next(s for s in workflow['jobs']['write']['steps']
+                                    if str(s.get('uses', '')).startswith('actions/checkout@'))
+                    self.assertIs(type(checkout['with']['fetch-depth']), int)
+                    checkout['with']['fetch-depth'] = wrong_depth
+                    self.assertIn('proposal step runs outside baseline/restricted',
+                                  grade(workflow, files, organization))
+
 
 if __name__ == '__main__':
     unittest.main()

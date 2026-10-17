@@ -9,6 +9,7 @@ and source path must match. No actor/capability or sandbox claim follows.
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -60,9 +61,13 @@ def observation_steps(workflow: dict[str, Any], organization: str | None) -> fro
     try:
         expected = render_writer(organization)
         actual = workflow['jobs']['write']
-        if (workflow.get('env', {}) != expected['environment']
-                or workflow.get('defaults', {}) != expected['defaults']
-                or _program(actual) != _program(expected['writer'])):
+        actual_contract = {'environment': workflow.get('env', {}),
+                           'defaults': workflow.get('defaults', {}),
+                           'writer': _program(actual)}
+        expected['writer'] = _program(expected['writer'])
+        # JSON preserves scalar types: Python dict equality would call False,
+        # integer0 and float0.0 interchangeable executable input values.
+        if json.dumps(actual_contract, sort_keys=True) != json.dumps(expected, sort_keys=True):
             return frozenset()
         tail = (ROOT / 'talk/observation-delivery-producer.sh').read_text()
         return frozenset(index for index, step in enumerate(actual['steps'])
