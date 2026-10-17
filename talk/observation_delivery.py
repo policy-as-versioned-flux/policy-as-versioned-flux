@@ -411,19 +411,6 @@ def already_integrated(root: Path, item: Pending, api: Api) -> str | None:
     prefix = f'integrations/truth/{item.run["id"]}-{item.run["run_attempt"]}/'
     refs = api('GET', f'repos/{REPOSITORY}/git/matching-refs/heads/{prefix}', None)
     require(isinstance(refs, list), 'recorded integration ref instrument is invalid')
-    if not refs:
-        # Clean original PRs retain their direct path, but its historical merge
-        # must conserve the full signed capture snapshot, not a mixed Git merge.
-        require(item.pr.get('merged') is True, 'recorded integration has no immutable delivery ref receipt')
-        merged = sha(item.pr.get('merge_commit_sha'))
-        parents = git(root, 'rev-list', '--parents', '-n', '1', merged).split()
-        require(len(parents) == 3 and parents[2] == item.original,
-                'direct original merge did not conserve the original parent')
-        direct = truth_integration.plan(root, parents[1], item.original, item.line,
-                                        item.run['id'], item.run['run_attempt'])
-        git(root, 'merge-base', '--is-ancestor', merged, 'refs/remotes/origin/' + item.default)
-        validate_integration_merge(root, merged, direct, item.original)
-        return f'RECORDED original observation {item.original} on {item.default}'
     verified = False
     for row in refs:
         ref = mapping(row, 'integration ref')
@@ -444,7 +431,19 @@ def already_integrated(root: Path, item: Pending, api: Api) -> str | None:
         git(root, 'merge-base', '--is-ancestor', merged, 'refs/remotes/origin/' + item.default)
         validate_integration_merge(root, merged, plan, head)
         verified = True
-    require(verified, 'original ancestry has no verified ordinary integration merge receipt')
+    if not verified:
+        # Clean original PRs retain their direct path, but its historical merge
+        # must conserve the full signed capture snapshot, not a mixed Git merge.
+        require(item.pr.get('merged') is True, 'recorded integration has no immutable delivery ref receipt')
+        merged = sha(item.pr.get('merge_commit_sha'))
+        parents = git(root, 'rev-list', '--parents', '-n', '1', merged).split()
+        require(len(parents) == 3 and parents[2] == item.original,
+                'direct original merge did not conserve the original parent')
+        direct = truth_integration.plan(root, parents[1], item.original, item.line,
+                                        item.run['id'], item.run['run_attempt'])
+        git(root, 'merge-base', '--is-ancestor', merged, 'refs/remotes/origin/' + item.default)
+        validate_integration_merge(root, merged, direct, item.original)
+        return f'RECORDED original observation {item.original} on {item.default}'
     return f'RECORDED original observation {item.original} on {item.default}'
 
 

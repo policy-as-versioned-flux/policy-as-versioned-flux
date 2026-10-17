@@ -424,3 +424,26 @@ def test_custom_header_cannot_impersonate_the_actual_delivery_author(conflict):
     with pytest.raises(ValueError, match='non-measurement'):
         invoke(conflict, review_integration=True)
     assert not api.reviewed
+
+
+@pytest.mark.parametrize('conflict', ['clean-mixed'], indirect=True)
+def test_stale_unmerged_candidate_cannot_poison_a_valid_direct_merge_receipt(conflict):
+    root, remote, api, raw, _, _ = conflict
+    assert prepare(conflict).startswith('PREPARED')
+    stale = copy.deepcopy(api.prs[5])
+    (root / 'talk/captures/inherited.out').write_text('signed inherited capture\n')
+    git(root, 'add', 'talk/captures/inherited.out'); git(root, 'commit', '-qm', 'restore capture on newer reviewed base')
+    new_base = git(root, 'rev-parse', 'HEAD')
+    plant_ref(root, remote, 'refs/heads/main', new_base)
+    assert prepare(conflict).startswith('READY')
+    assert invoke(conflict, review_integration=True).startswith('RECORDED')
+    assert api.prs[4]['merged'] and not api.prs[5]['merged']
+    assert git(remote, 'show', '-s', '--format=%P', 'main').split() == [new_base, raw]
+    assert git(remote, 'rev-parse', 'main:talk/captures/inherited.out') == git(root, 'rev-parse', raw + ':talk/captures/inherited.out')
+    refresh(conflict)
+    writes = len([c for c in api.calls if c[0] != 'GET'])
+    assert prepare(conflict).startswith('RECORDED')
+    assert invoke(conflict, review_integration=True).startswith('RECORDED')
+    assert len([c for c in api.calls if c[0] != 'GET']) == writes
+    assert api.prs[5] == stale
+    assert git(remote, 'rev-parse', 'refs/heads/' + stale['head']['ref']) == stale['head']['sha']
