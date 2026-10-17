@@ -7,6 +7,7 @@
   --   TRUTH 2026-09-05T01:20Z run=88: committed on origin/ticket-64-the-twin-is-three-adopters and its line is in the default branch's log (commit 2545d1a was rescued, or the branch merged with it)
   --   TRUTH 2026-09-04T20:35Z run=84: committed on origin/ticket-62-and-77-pins-are-checked-for-content and its line is in the default branch's log (commit fd0722f was rescued, or the branch merged with it)
   --   TRUTH 2026-09-04T16:34Z run=76: committed on origin/ticket-56-and-85-the-clocks-are-graded and its line is in the default branch's log (commit 7335de8 was rescued, or the branch merged with it)
+  !! TRUTH 2026-10-16T10:32Z run=400: afe7b85 on origin/observations/truth/38884971647-1 measured a tree that IS on the default branch, so the observation was citable, and its line never reached that branch's talk/truth.log -- the record lost a number it had
   !! TRUTH 2026-10-15T10:56Z run=399: ffe8162 on origin/observations/truth/38719279864-1 measured a tree that IS on the default branch, so the observation was citable, and its line never reached that branch's talk/truth.log -- the record lost a number it had
   !! TRUTH 2026-10-14T11:13Z run=398: e74308d on origin/observations/truth/38550774545-1 measured a tree that IS on the default branch, so the observation was citable, and its line never reached that branch's talk/truth.log -- the record lost a number it had
   !! TRUTH 2026-10-13T13:37Z run=397: dc4f153 on origin/observations/truth/38401102555-1 measured a tree that IS on the default branch, so the observation was citable, and its line never reached that branch's talk/truth.log -- the record lost a number it had
@@ -22,40 +23,52 @@
   !! TRUTH 2026-10-05T13:17Z run=383: 09a229d on origin/recover-truth-records-20261005 measured a tree that IS on the default branch, so the observation was citable, and its line never reached that branch's talk/truth.log -- the record lost a number it had
   !! TRUTH 2026-10-05T09:27Z run=382: b17438e on origin/recover-truth-records-20261005 measured a tree that IS on the default branch, so the observation was citable, and its line never reached that branch's talk/truth.log -- the record lost a number it had
   !! TRUTH 2026-10-04T17:14Z run=379: 261d130 on origin/recover-truth-records-20261005 measured a tree that IS on the default branch, so the observation was citable, and its line never reached that branch's talk/truth.log -- the record lost a number it had
-  !! a clock line that measured a tree the default branch has never reached that branch's log (above); the repair is a cherry-pick of the clock's own commit, author preserved, as the integrator did for run 101 on 2026-09-05 -- not a line typed by hand
+  !! a clock line that measured a tree on the default branch has not reached that branch's log (above); pending delivery is not exempt. Recover the clock's own original commit through reviewed integration, preserving its identity, signature and exact line; never type a replacement observation
 [1;36m==>[0m 2. truth.yml still has the shape ticket 100 decided
-  ok   the guard runs before measurement; the cage proposes its exact run/attempt observation ref through a pending PR, never a direct default-branch push or self-merge
-[1;36m==>[0m 3. actual workflow shell: protected-default delivery waits for separate review
+  ok   the guard runs before measurement; the cage publishes its original source-parent object on the exact run/attempt pending ref through create-only publication without producer integration, direct default-branch push or self-merge
+[1;36m==>[0m 3. actual workflow shell: create-only original publication precedes separate review and conflicts stay pending
   (protected-main) note: base64 -w0 -> base64 | tr -d '\n'
   (protected-main) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   protected-main: prepare=yes cage=0 pending=True default-unchanged-until-review=True recorded-after-review=True original-commit-preserved=True
+  ok   protected-main: prepare=yes cage=0 pending=True default-unchanged-until-review=True recorded-after-review=True original-commit-preserved=True source-parent-preserved=True durable-original-preserved=True review-content-conflict=False missing-line-stays-red=True
   (main-behind) note: base64 -w0 -> base64 | tr -d '\n'
   (main-behind) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   main-behind: prepare=yes cage=0 pending=True default-unchanged-until-review=True recorded-after-review=True original-commit-preserved=True
+  ok   main-behind: prepare=yes cage=0 pending=True default-unchanged-until-review=True recorded-after-review=True original-commit-preserved=True source-parent-preserved=True durable-original-preserved=True review-content-conflict=False missing-line-stays-red=True
+  (log-overlap) note: base64 -w0 -> base64 | tr -d '\n'
+  (log-overlap) note: git config commit.gpgsign true -> git config commit.gpgsign false
+  ok   log-overlap: prepare=yes cage=0 pending=True default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=True durable-original-preserved=True review-content-conflict=True missing-line-stays-red=True
+  (capture-overlap) note: base64 -w0 -> base64 | tr -d '\n'
+  (capture-overlap) note: git config commit.gpgsign true -> git config commit.gpgsign false
+  ok   capture-overlap: prepare=yes cage=0 pending=True default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=True durable-original-preserved=True review-content-conflict=True missing-line-stays-red=True
   (renamed-default) note: base64 -w0 -> base64 | tr -d '\n'
   (renamed-default) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   renamed-default: prepare=yes cage=0 pending=True default-unchanged-until-review=True recorded-after-review=True original-commit-preserved=True
+  ok   renamed-default: prepare=yes cage=0 pending=True default-unchanged-until-review=True recorded-after-review=True original-commit-preserved=True source-parent-preserved=True durable-original-preserved=True review-content-conflict=False missing-line-stays-red=True
   (feature) note: base64 -w0 -> base64 | tr -d '\n'
   (feature) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   feature: prepare=no cage=0 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False
+  ok   feature: prepare=no cage=0 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=False durable-original-preserved=False review-content-conflict=False missing-line-stays-red=False
   (forged-feature) note: base64 -w0 -> base64 | tr -d '\n'
   (forged-feature) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   forged-feature: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False
+  ok   forged-feature: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=False durable-original-preserved=False review-content-conflict=False missing-line-stays-red=False
   (declaration) note: base64 -w0 -> base64 | tr -d '\n'
   (declaration) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   declaration: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False
+  ok   declaration: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=False durable-original-preserved=False review-content-conflict=False missing-line-stays-red=False
   (pr-refused) note: base64 -w0 -> base64 | tr -d '\n'
   (pr-refused) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   pr-refused: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False
+  ok   pr-refused: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=True durable-original-preserved=False review-content-conflict=False missing-line-stays-red=False
   (delivery-collision) note: base64 -w0 -> base64 | tr -d '\n'
   (delivery-collision) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   delivery-collision: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False
+  ok   delivery-collision: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=True durable-original-preserved=False review-content-conflict=False missing-line-stays-red=False
+  (ancestor-collision) note: base64 -w0 -> base64 | tr -d '\n'
+  (ancestor-collision) note: git config commit.gpgsign true -> git config commit.gpgsign false
+  ok   ancestor-collision: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=True durable-original-preserved=False review-content-conflict=False missing-line-stays-red=False
+  (publication-race) note: base64 -w0 -> base64 | tr -d '\n'
+  (publication-race) note: git config commit.gpgsign true -> git config commit.gpgsign false
+  ok   publication-race: prepare=yes cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=True durable-original-preserved=False review-content-conflict=False missing-line-stays-red=False
   (shallow) note: base64 -w0 -> base64 | tr -d '\n'
   (shallow) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   shallow: prepare=unknown cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False
+  ok   shallow: prepare=unknown cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=False durable-original-preserved=False review-content-conflict=False missing-line-stays-red=False
   (empty-default) note: base64 -w0 -> base64 | tr -d '\n'
   (empty-default) note: git config commit.gpgsign true -> git config commit.gpgsign false
-  ok   empty-default: prepare=unknown cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False
+  ok   empty-default: prepare=unknown cage=1 pending=False default-unchanged-until-review=True recorded-after-review=False original-commit-preserved=False source-parent-preserved=False durable-original-preserved=False review-content-conflict=False missing-line-stays-red=False
   --   fixture limits: unsigned synthetic commits and offline gh PR creation; separate review model merges normally. No genuine signature or GitHub authorization is graded.
 
 FAIL: 1 fault(s) -- the clock's recording provenance or protected-default delivery does not hold
