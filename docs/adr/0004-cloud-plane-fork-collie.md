@@ -103,3 +103,20 @@ Crossplane CR takes on the ladder. "After the Pod slice runs end to end once" is
 fact 7 is re-registered (eco-system ticket 152) and fact 2 is observed true on driftwood's own
 composed source, which no sample had recorded by 2026-09-25. Delegated under
 [ADR-0025](0025-the-assistant-decides-architecture-and-records-it.md).
+
+## Delivery note, 2026-10-17 (ticket151)
+
+Delegated under ADR0025: cloud is a separately signed platform package, consumed through an
+optional pin in the ordinary composition seam. Its renderer and exact vendor schemas come
+from that verified tag; an independent compiler release reproduces every resulting cloud path.
+Appending cloud YAML outside the composer would fail the existing byte-for-byte release gate.
+The new compiler pin is independent of the accepted Pod policy parent and engine declaration.
+Absent a cloud pin, the existing policy window and composition stay unchanged.
+
+The admission proof may use an opt-in TRUTH dispatch on an ephemeral GitHub-hosted KinD cluster.
+It first verifies the real recorded step4 trigger and both signed cloud/composed sources; only
+then does it create a substrate. It installs CRDs and the existing engine/Flux source verifier,
+with no provider controller, ProviderConfig or AWS credential. The native checker verifies
+live signed-source delivery, exact vendor schemas, the conserved incumbent claims, and server
+dry-run mutation. Its ordinary signed TRUTH recording is the citable observation. Local clusters
+stay off; setup and offline replay never stand in for actual admission.
