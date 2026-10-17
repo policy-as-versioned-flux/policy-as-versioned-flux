@@ -428,3 +428,24 @@ the signature changed -- which names the old ludlow defect on both halves when p
 > material is still one committed, reviewed file per institution, still read with a cold TUF cache
 > and no egress, and still refuses by name when it goes stale. Everything else here stands, including
 > Waits item 1, which is the owner's and still open.
+
+
+## Recorded regression follow-up
+
+**Follow-up, 2026-10-17.** The genuine recorded run416 (`hub=3c57c68b`, automatic
+main push39002205601/attempt1) still grades
+`verify/fold-agreement/verify-fold-agreement.sh` and
+`verify/real-signature/verify-a-real-signature-is-checked.sh` FAIL. The fold
+reproduces no adopter gate because its caller cannot resolve the served
+`--retirement-tools-dir` argument; the real-signature check likewise exits before
+grading a gate. These are caller/instrument failures, not an observed signature
+acceptance or a demonstration that trust material was fetched over the network.
+The original failures, signatures and captures remain unchanged in observation
+`a8032db5872f89fd174c564ee84f51a4ed91a04c`, normally recorded by PR191 at
+`0a63603953039bc58ef74bc55ce0bf5ba984a903`. The published caller repair PR189
+(`6beeb50e24eaac22e084a8a5148222cd69d6c38d`) prepares the independent compiler
+context and retains all refusal/trust checks. Its local native proofs do not
+replace the failed recorded grades: a later genuine recorded run must measure
+the repaired callers. This ticket therefore still derives `regressed` from the
+recorded table; this dated paragraph acknowledges that state without changing
+the old Answer, Status, trust roots or the measurement.
