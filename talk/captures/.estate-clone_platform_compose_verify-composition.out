@@ -1,31 +1,37 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 13.876s
+Ran 11 tests in 13.722s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 11.091s
+Ran 9 tests in 10.737s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .............................
 ----------------------------------------------------------------------
-Ran 29 tests in 32.499s
+Ran 29 tests in 31.574s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 2.015s
+Ran 16 tests in 2.151s
 
 OK
 [1;36m==>[0m 0d. an unsupported engine pairing is priced, never refused (ticket 148, hub ADR-0033 point 3)
 .............
 ----------------------------------------------------------------------
 Ran 13 tests in 3.369s
+
+OK
+[1;36m==>[0m 0e. quote validity uses composed input dates and conserves contract costs (ticket 37)
+........
+----------------------------------------------------------------------
+Ran 8 tests in 3.862s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)
@@ -5134,6 +5140,13 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       ],
       "valid_from": "2026-08-28",
       "valid_until": "2027-08-28",
+      "quote_validity": {
+        "schema": 1,
+        "as_of": "2026-10-03",
+        "state": "within-window",
+        "retention": "not-assessed",
+        "basis": "The examined composition date is inside the quote's inclusive validity window; retention is not assessed by dates alone. Conditions, priced_against matching and claim payability are not assessed here; no transfer credit or retained-loss amount is calculated. The contractual premium is unchanged."
+      },
       "priced_against": [
         {
           "party": "platform",
@@ -5710,8 +5723,7 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       }
     ]
   }
-}fatal: not a git repository (or any of the parent directories): .git
-
+}
 OK cmd_compose: against the real estate, exits 0 -- platform's two formerly-dangling claims are fixed, and the real driftwood's first pull request composes and writes for real
 {
   "outcome": "refused",
@@ -5735,14 +5747,72 @@ OK check_diamonds: two edges to ico/penalty-schema at two versions refuse, namin
 OK rule-conflict: two implementations publishers on one key with different content refuse, naming both sources and both contents, never merged; the two-publisher limit prints closed at two
 OK restatement-of-non-validating: restating cage-tier (a MutatingPolicy) refuses
 OK restatement accepted: Audit -> Deny is stricter, and the rendered file carries the restated Deny
+OK cages[]: a weaker restatement is caged against each party's own appetite band, the rendered file keeps the inherited Deny, and the same declared inability prices three parties to the prototype's table: {'driftwood': 'baseline', 'tuppence': 'baseline', 'ludlow': 'quarantine'}
+OK no tier and no tier floor appears anywhere in what composition itself writes -- only the proposer (ADR-0015) ever turns one, later, in its own PR
+OK refusals[]: needs_composition is present on every entry (split-diamond, rule-conflict, restatement-of-non-validating)
+OK _catalog_ids/_baseline_ids: SMALL resolves by name, exact-string, and the nested enhancement aa-1.1 is found by walking; an unpublished name resolves None
+OK unknown-control-id: an upper-case id and a prefixed id both refuse as hard failures (needs_composition False), and are never counted as a hole
+OK compute_holes: a first composition (nothing committed yet) records every hole and refuses on none
+OK compute_holes: a second composition with one new hole composes and prints it as a priced delta (aa-3, added via overlay.controls, no claim yet) -- no refusal; with no regime feed pinned the amount is a named absence, not a zero
+OK resolve_claims: an adopter-added control is a priced new hole when unfilled (above), and an adopter claim in its own component-definition -- against its own overlay.add member -- fills it in the same run, so it is never even a hole
+OK compute_holes: a second composition with a hole filled (aa-1.1, by an adopter claim added since the last signed artefact) marks it closed
+OK removed_controls: TINY drops aa-1.1 and aa-2 from SMALL's selected set, and the narrowing composes: two removed-control deltas and one baseline-narrowing delta, each a named absence because no pinned weight names a fixture control
+OK baseline_widening_delta: SMALL -> BIG composes and prints one widening delta (1 control added, 0 of them named by a pinned weight, so no amount) beside the new hole it opens; nothing refuses, and a removal does not also fire
+OK split_withdrawn: the regulator drops aa-2 from its catalogue and from SMALL; the adopter changed nothing, and aa-2 prints one withdrawn-control delta naming fixture-nist's bump, never a removed-control in the adopter's name
+OK split_withdrawn: the regulator keeps aa-1.1 defined and drops it from SMALL; the last header's overlay-controls is empty, so aa-1.1 left with the regulator's baseline
+OK split_withdrawn: a last header with no overlay-controls cannot tell a same-name baseline drop from an overlay removal, so aa-1.1 stays the adopter's removal
+OK split_withdrawn: in one run the adopter drops aa-3 from its overlay and the regulator drops aa-1.1 from SMALL; aa-3 is the adopter's removed-control and aa-1.1 the regulator's withdrawn-control
+OK _defines: aa-3 is in fixture-nist's catalogue under status: withdrawn; an overlay naming it and a claim on it each refuse unknown-control-id, and neither selects it
+OK split_withdrawn: a header from before ticket 126 selected aa-3 while already withdrawn; the adopter drops it with no bump, and aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK split_withdrawn: a header from before ticket 126 selected aa-3 while already withdrawn; the adopter drops it with a real bump, and aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK split_withdrawn: a header from before ticket 126 with no overlay-controls selected aa-3 while already withdrawn; the adopter drops it with no bump, and aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK split_withdrawn: a header from before ticket 126 with no overlay-controls selected aa-3 while already withdrawn; the adopter drops it with a real bump, and aa-3 is the adopter's removed-control, never a withdrawal naming a bump that did not take it
+OK split_withdrawn: a last header with no overlay-controls and no withdrawn-selectable books aa-2 as the regulator's when the catalogue drops it, and as the adopter's removal for one run when the catalogue keeps it under status: withdrawn
+OK split_withdrawn: the adopter's overlay selected aa-3 under the new rule, and the regulator then marks it withdrawn; keeping it refuses unknown-control-id, and dropping it prints the regulator's withdrawn-control
+OK resolve_claims: an adopter claim against fixture-platform's own member-a refuses (ADR-0017) -- 'fixture-adopter14 claims aa-2 is evidenced by "member-a", which fixture-platform ships, not fixture-adopter14' -- and still counts as coverage (a claim exists), orthogonal to the claim's own validity
+OK resolve_claims: the real platform component-definition's two formerly-dangling claims (ac-6, cm-6) are fixed -- zero dangling-claim refusals against the real estate
+OK HEADER.yaml: 'holes' and 'selected-controls' live only in the advisory header -- stripping it leaves every file the engine reads unchanged -- and the handbook, which the engine never reads, states both counts (287 selected, 284 holes)
+OK ungoverned_namespaces: a Namespace with no institution label, declared or only named by a workload, is ungoverned and priced; the platform's infra substrate is not
+OK compute_ungoverned: a first composition (nothing committed yet) records a pre-existing ungoverned namespace, priced, and refuses on none
+OK compute_ungoverned: a recorded ungoverned namespace records and does not refuse
+OK compute_ungoverned: a namespace that gains the label prints as closed, and as a closed-ungoverned-namespace delta
+OK compute_ungoverned: a new ungoverned namespace (absent from the last signed artefact) composes and is priced as its workload share (1 of 4 institution workloads = 0.25) with the two things it cannot yet read named as limits
+OK leak check: the ungoverned namespace's name planted in a member's matchConditions expression, hyphen-joined into that condition's name and into an annotation, and policy-as-versioned.dev/governed planted as its objectSelector key and in a matchConditions message, are each red by name -- policy-as-versioned.dev/governed is a key at spec/matchConstraints/objectSelector/matchLabels, not under namespaceSelector/matchLabels; policy-as-versioned.dev/governed is in the value at spec/matchConditions/0/message, which is neither a validations message nor a namespaceSelector matchExpressions key
+OK HEADER.yaml: carries the recorded ungoverned namespaces, and stripping it leaves every other rendered file unchanged -- nothing composition renders reads either namespace set
+OK ungoverned_price/_ramp: workload share x the EOL feed's own ramp from since, bounded at the whole uncaged residual; no since or no as_of ramps nothing (1.0)
+OK ungoverned[]: the real tuppence-reset prices at 85176471.91 GBP -- 3 of 4 institution workloads (share 0.75) x ramp 1.1068 from since 2026-08-25 (the first signed tag naming it) as of 2026-10-03, of a 102605320.94 residual
+OK ungoverned[] (eco-system ticket 122): a renamed ungoverned Namespace keeps the ramp its workloads carried (since 2024-09-01, ramp 3.0), the old name closes as left-repo and not as governed, a copy beside the original starts its own ramp, and a governed shadow of the old name does not drop the carried age
+OK ungoverned[] (eco-system ticket 139): a since later than as_of holds the ramp at its start (1.0), keeps as_of the newest signed input, and names both dates in a limit
+OK (source, id): a control added from a second controls parent is a hole keyed on its own source; the header encodes `source:id` only off the baseline's catalogue and round-trips as recorded
+OK (source, id): a bare id resolves against the baseline's catalogue only (bare cc-1 is unknown there), and fixture-nist2:aa-2 is a different control from aa-2
+OK resolve_claims: a claim resolves on (source, id) through its source href -- cc-1 under fixture-nist2's href fills fixture-nist2:cc-1; the same id under fixture-nist's href is unknown there and fills nothing
+OK bespoke: an adopter pinning itself as a controls parent adds fixture-adopter14:zz-1 as a hole priced by its own signed scenario (21359.70 GBP), the self-pin resolving to the adopter's own tree
+OK bespoke: the same control with no signed scenario refuses as a missing instrument naming zz-1 -- the one hole-shaped refusal that remains (ADR-0020)
+OK bespoke: a bespoke control the adopter's own claim covers is no hole, so it needs no scenario and nothing refuses
+OK _header_controls_source: with the self-pin listed first in inherits[], an unchanged tree re-composes clean -- bare header ids decode to the first controls parent that is not the adopter, as compose() keys them, so nothing refuses as removed and nothing prints as a new hole
+OK bespoke: an appetite band in USD cannot price a bespoke hole reported in GBP -- no rate is taken on this path, so it refuses as a missing instrument naming both currencies rather than relabelling the residual
+OK deltas[]: driftwood MODERATE -> HIGH composes and prints one widening delta -- 83 controls added, 0 of them named by ico's pinned weights (amount none), each added control a new-hole delta beside it; the regime entry's holes[] carry status
+OK prices[]: an ico penalty-schema bump (v1 -> v2) moves the uncaged uk-gdpr/lower-tier exposure through ico's own converter; on driftwood's real band both versions land on isolated, the bottom rung, so the document prints no tier change and it travels as a label; no rendered POLICY file changes -- a byte comparison proves it, the only file that does move is the adopter's own vendored copy of the payload that moved -- and the handbook states the new amount GBP 1,787,177.08, which the page before the bump did not carry
+OK prices[]: a threat-register bump (v1 -> v2) moves tuppence's exposure through the feeds module; on the real band both versions land on isolated, no tier change; no rendered POLICY file changes, and the handbook states the new amount GBP 326,139.13
+OK prices[]: a fixture ico band (v1->v2) that crosses driftwood's real GBP40,000 tolerance prints a proposed tier through compose() (isolated -> quarantine, changed=True), marked as a label; no rendered POLICY file changes and the handbook names the proposed tier `quarantine`, which it did not before the bump
+OK prices[]: one `switching` entry per feed edge, each measured by re-composing with that publisher's edges dropped -- ico's costs its whole regime line, the threat publisher's is not a number at all because driftwood's own twin borrows that feed's LEF and stops pricing without it, and the insurer's moves the exposure by nothing and names the premium it would lose instead of folding it in
+OK composed/feeds/: every priced payload, the publisher's own party artefact and the converter that priced it are vendored under the adopter's own signature, digested into a PROVENANCE.json the header names, with the converter's real source party recorded and a quote feed's absent converter named rather than faked
+OK portability: with ico's clone ABSENT, driftwood re-derives every price it signed, and every one of the 53 files it RENDERS comes back byte-identical -- 15 of them the vendored tree itself, the rest the composed policy set and composed/HEADER.yaml with its parent SHAs. composed/evidence.json is not among them: it is written from the document rather than rendered, and its prices are the comparison just above. The substitution prints as an open limit, and a tampered vendored payload refuses against the digest its own tag signed
+OK composed/feeds/: each vendored copy records the exact command that priced it and the digest of what that command returned -- and replaying it against the vendored payload alone, in a bare directory, reproduces the digest for penalty-schema, threat-register, cve
+OK prices[]: no entry carries the absolute path of the machine that composed it -- the twin's own refusal travels into the signed artefact naming `twin/forward-intel/v1/feed.json`, which reads the same on every runner
+OK switching: an edge signed AFTER every pinned envelope moves the composition's as-of to that day (its own life 0 months, its siblings' measured up to it), a --as-of EARLIER than a signed since refuses naming both dates rather than reporting the window's absolute size; each current pin's window is arithmetic over its own signed since and the composition's signed as-of
+OK switching: a feed edge carrying no `since` refuses as a missing instrument naming the edge -- a pin's life is a window between two signed dates, never a default
+OK supersede: tuppence's threat-register@v1 sits behind the feeds publisher's real signed threat-register/v4.0.0 (cut 2026-10-03), behind since threat-register/v2.0.0 was cut 2026-09-01; the line prices 19513.36 GBP at the composition's own as-of 2026-10-03 (ramp 1.0877 on a 222574.31 base), 222574.31 a year past that day under --as-of, and 0.00 with both dates the day before it; one supersede row per feed line observed behind (feeds/threat-register, ico/penalty-schema); never summed into the exposure
+OK supersede: the same pin at the newest readable major is still behind a signed major this checkout cannot read (priced from the tags, marked unreadable), or else prints no line and says `current`; no tag at all is `unobserved`; an unsigned or lightweight tag ahead publishes nothing and is named rather than counted; a signed major ahead whose directory the checkout does not carry is named and the line prices against the newest readable one, behind since the OLDEST signed major ahead was cut; with no readable major ahead at all the line still prices, from the signed tags alone
+OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with a hole of the whole line, 241549.84 GBP, naming the tag that does not exist (no signed tag cve/v2.x.y (or v2.x.y)); the explicit declared synthetic inventory intersects the legacy feed, and the vendored record names the real invocation ['cve', '--inventory-json', '{"images":[{"database_date":"2026-01-01T00:00:00Z","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","image":"example.invalid/declared-fixture@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","scanner_version":"declared synthetic fixture, not Trivy observation","vulnerabilities":[{"fixed_version":"","id":"CVE-2024-1234-envoy","installed_version":"fixture","package":"fixture","severity":"HIGH"},{"fixed_version":"","id":"CVE-2023-4567-curl","installed_version":"fixture","package":"fixture","severity":"HIGH"},{"fixed_version":"","id":"CVE-2023-9999-openssl","installed_version":"fixture","package":"fixture","severity":"HIGH"},{"fixed_version":"","id":"CVE-2024-8888-istiod","installed_version":"fixture","package":"fixture","severity":"HIGH"}]}],"schema_version":"1.0.0"}']
 Traceback (most recent call last):
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 9558, in <module>
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 9645, in <module>
     sys.exit(main(sys.argv))
              ^^^^^^^^^^^^^^
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 6097, in main
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 6151, in main
     selfcheck()
-  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 7624, in selfcheck
-    assert document["outcome"] == "composed", document
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: {'outcome': 'refused', 'party_artefact_errors': ["missing instrument: cloud package: Command '['git', '-C', '/tmp/tmp8r8pg656/platform-historical-deny', 'rev-parse', 'cloud/v1.0.0^{commit}']' returned non-zero exit status 128."], 'parents': [], 'members': [], 'refusals': [], 'restatements': [], 'cages': [], 'holes': [], 'ungoverned': [], 'prices': [], 'deltas': [], 'limits': [], 'vendored': []}
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/platform/compose/composition.py", line 9429, in selfcheck
+    assert eol["pin_signature"]["state"] == "untagged" and eol["hole"]["status"] == "new", eol
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'source': 'feeds', 'kind': 'feed', 'perspective': 'ludlow', 'currency': 'GBP', 'amount': 787227.8274739302, 'per_customer': {'amount': 0.017404223281613243, 'currency': 'GBP'}, 'name': 'eol', 'old_version': 'v2', 'new_version': 'v2', 'old_price': 787227.8274739302, 'new_price': 787227.8274739302, 'old_tier': 'isolated', 'proposed_tier': 'isolated', 'changed': False, 'lef': [7.232876712328767, 18.082191780821915, 36.16438356164383], 'lef_basis': "eol_date=2024-02-21, as_of=2026-10-03, ramp=3.62x. Source: endoflife.date/istio. headline entry istio-1.18 of 4 (largest mode-product entry, mode lef x mode lm -- an ordinal proxy, not fair.py's PERT expectation; ticket 75 Q4); not priced by this line: kyverno-1.10, ubuntu-20.04, python-3.9.", 'proposed_as': 'label', 'holes': [], 'total': None, 'pin_signature': {'state': 'signed', 'tag': 'eol/v2.0.0', 'detail': 'tag eol/v2.0.0 on the feeds checkout carries a signature block'}, 'hole': None, 'publisher_observation_scope': "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.", 'superseded': {'state': 'current', 'detail': 'no signed tag of the form eol/vN.x.y with N > 2 on the feeds checkout, so the pinned v2 is the newest published major'}}
 FAIL: composition.py --selfcheck

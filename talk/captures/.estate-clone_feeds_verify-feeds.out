@@ -1,3 +1,9 @@
+== release signing caller: embedded proof requested, signer refuses ==
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.023s
+
+OK
 == envelope schema: /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/feeds/../platform/feeds/schema.json ==
 ok  cve/v1/feed.json -> envelope + cve/payload.schema.json
 ok  cve/v2/feed.json -> envelope + cve/payload.schema.json
