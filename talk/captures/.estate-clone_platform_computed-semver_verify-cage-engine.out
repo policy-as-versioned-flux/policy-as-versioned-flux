@@ -2,14 +2,14 @@
 selfcheck ok: dial_table parses the real cage-tier.yaml; UNCAGED sits at the top of the permissiveness lattice, every real tier below it, tighter tiers below looser ones; a dial tightening classifies major and names the moved corpus entries and the dial CEL expression (never an enumerated dial list); a widen-only change is patch; no change is none; one field regressing while another improves is still major (spec-level, not dial-level); priorityClass ranks on the ACTUAL assigned PriorityClass's real value, so a tier's pc field repointed at a different PriorityClass registers as major even with every other dial untouched (cs-21 regression guard); cage-tier added/removed fall out of the same per-pod comparison with no special case; the major detail is one sentence with no viability language; Track 1 reuses rederive_bumps.classify_policy unchanged; classify_repo reproduces the three known-good bumps; a whole-body release whose only movement is a policy removal computes patch; cs-16: a self-scoped pair (real render-version-tree.py bodies, real generated corpus, real kyverno apply) differing ONLY in the version literal classifies 'none', never the old spurious 'major' the vacuous self-scope match used to produce, and a real narrowing bundled with the same version bump still classifies 'major' -- the fix removes the artifact without suppressing real movement; ticket 09 item 2: the real v3.0.0 -> v4.0.0 cage release computes major against the real committed corpus and names both real reasons (the tier source moved to namespaceObject, so a governed Namespace with no tier falls closed to isolated and a forged pod label is clobbered; and the cage became tighten-only), and a body that starts writing false over a workload's own true -- invisible to a dial-table comparison, proven identical first -- classifies major as a loosening
 .......................
 ----------------------------------------------------------------------
-Ran 23 tests in 6.601s
+Ran 23 tests in 10.500s
 
 OK
 {
   "schema": 2,
   "scope": "every-served-body-v1",
   "outcome": "passed",
-  "graded_commit": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb",
+  "graded_commit": "d314b8df0b19c42ea816c0a6ada41913b7940fbe",
   "engines": [
     {
       "name": "kyverno",
@@ -41,7 +41,7 @@ OK
       "tag_commit": "5b88f1d0bb33274e3348db93645d972c893b3c2c",
       "policy_tree": "a8468fb3e156f91f826750dd543ba6e1bfa99439",
       "policy_sha256": "6b61be47ded40234f73366ecaf9855c3dd58bb62b24f355a2fb04d91d3b2b9b5",
-      "fixtures_commit": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb",
+      "fixtures_commit": "d314b8df0b19c42ea816c0a6ada41913b7940fbe",
       "fixtures_sha256": "a4381c7927f738b750fe6e952270f8943cccc89a6f05b40746d04f90de58f9b1",
       "api_versions": [
         "kustomize.config.k8s.io/v1beta1",
@@ -93,7 +93,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "0368b1a4664a17396ae1e8bdb9e35f9c210cb6c8fc4f445bbf496f4570140980",
+                  "output_sha256": "6c7a89e73bd38e3e6a019d29b4a9f0fa88ec359955a1c4a6cda6c02482567a1d",
                   "diagnostic": null
                 }
               ]
@@ -121,7 +121,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "1b97b4d3314519f87d42bf7a3742468cde011dbcaff43a6438ffc787928c07ec",
+                  "output_sha256": "fb9aafb1cf5fecd4b1d7020b0236da661ab868f30040d5eab563190e10c9643f",
                   "diagnostic": null
                 }
               ]
@@ -149,7 +149,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "83dc2e60b03a8b83e18b1855edd9cffa06d5be715bc7b82734d36db83d90c437",
+                  "output_sha256": "96d240901d6bf0b6716669ff948fa3003df208196c6c18cc6cac2230bd4c4294",
                   "diagnostic": null
                 }
               ]
@@ -177,7 +177,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "63ca944ef91093c771cf08d790c4e44311f1904f219e90fa5c6e142fdb6e0593",
+                  "output_sha256": "8c8fd613e4b8dd86982795197f0f2c7275242039498458fece02783b38c83d80",
                   "diagnostic": null
                 }
               ]
@@ -205,7 +205,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "ad4002f509f9871e7f7f34a6ec069e29f3037a88158244e51ce1afedf31ed276",
+                  "output_sha256": "a6f1719ba6eeb2e280fb0c1c5c559e9e38efe5d550e51cfd172424e1e33f11e4",
                   "diagnostic": null
                 }
               ]
@@ -229,7 +229,7 @@ OK
       "tag_commit": "59ec7ce39bcd658c2454b23ce1cc26082e737fdd",
       "policy_tree": "3e0cf747eeecba8947a6f9f67b417dbd23137376",
       "policy_sha256": "9b3029c0936d976f220c050b45a9fa2c7b8353b32658cac82b9115d297325e98",
-      "fixtures_commit": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb",
+      "fixtures_commit": "d314b8df0b19c42ea816c0a6ada41913b7940fbe",
       "fixtures_sha256": "eeb287724d230a0451207af27cfdbd2ba66d4dfa52738031e1a3a8e6d9b4d754",
       "api_versions": [
         "kustomize.config.k8s.io/v1beta1",
@@ -280,7 +280,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "3cbc8dab5ff1cb97faa341a783697e91f391a9f7b9f59fb63849806d09b672e5",
+                  "output_sha256": "e7a1a44390816e3b91329750d184f447567b20c66370b2c19c8a82a4f0bcc06f",
                   "diagnostic": null,
                   "generation": {
                     "family": "cage-netpol",
@@ -339,7 +339,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "223288a8cf2bac6eb693ac08a4f5b4a6131ddbb914875f3131cc831aae41614c",
+                  "output_sha256": "f140a59e79492807312c7d69c16a33b2c76daac10aa1816b7b308f3161c8349f",
                   "diagnostic": null
                 }
               ]
@@ -367,7 +367,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "928d9eb870eeabbd2a7b75dc52288977c63283ad2cf253e72bbc2ac9aa7b8d53",
+                  "output_sha256": "018d591ae4fe5e9f9065a8a571460add45ef2bdca2a434d47df9ec198a638527",
                   "diagnostic": null
                 }
               ]
@@ -395,7 +395,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "ff131d6f484014d457e39be8a6cee006eea81dc6a2ca0975eb40b6f85956e855",
+                  "output_sha256": "2160bce99580c1f20d3af494ce8b820f81984729792f93c0b3eab5e237cb7efa",
                   "diagnostic": null
                 }
               ]
@@ -423,7 +423,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "eef8489c1a9006aba0e1a5038b09f212469fc63e211fb494de2453e7f3a41634",
+                  "output_sha256": "742a360e67316b957b0b7e2fa50059674d494dfa86274933f4f37ee2f011f43b",
                   "diagnostic": null
                 }
               ]
@@ -448,7 +448,7 @@ OK
       "tag_commit": "703eff6aee959843c4160aa54fd03413f62858cc",
       "policy_tree": "9af2c788bf22701a89de763104b18f98d387a1f1",
       "policy_sha256": "3c7235345943706ee47858221143d50aa24bd64a57264258e00684c043746117",
-      "fixtures_commit": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb",
+      "fixtures_commit": "d314b8df0b19c42ea816c0a6ada41913b7940fbe",
       "fixtures_sha256": "ecd69d6c2d75caa648b0dc79ea94596a8abe2946747729b1bf87107e833f3563",
       "api_versions": [
         "kustomize.config.k8s.io/v1beta1",
@@ -497,7 +497,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "5c224325aedfe21ef78b4ba4293dee9ff0f374004a3726d11b47be3a29124248",
+                  "output_sha256": "0cf7ab77ed39560242eec64830ebcd57216d777b3f74c6a01665a21fbc64b2f9",
                   "diagnostic": null,
                   "generation": {
                     "family": "cage-netpol",
@@ -556,7 +556,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "a3e4f938588c3bd1fa3273b6409e477376a1aa48540f95f4e17c18c503166c3d",
+                  "output_sha256": "7e141367eb6932961d868758c6ff661c37431834808578a9852d328c9efe6c44",
                   "diagnostic": null
                 }
               ]
@@ -584,7 +584,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "6a3a10f3dad5fa1d624f3bab3475a65bc71f60fbf756a583480c8e95bc5622cb",
+                  "output_sha256": "0650b6a25263f56d9d4ea078025cad99c4378c4a4086bce7f87099f9596d15f4",
                   "diagnostic": null
                 }
               ]
@@ -612,7 +612,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "f09f5318bc176c85aa5bfe57d50fc640cfd842a3e7d840806b1ac2622368a353",
+                  "output_sha256": "28b55d050f5f7fb5033c63832397ae2b2ed900c0630d974b31171b5e77a3199f",
                   "diagnostic": null
                 }
               ]
@@ -647,7 +647,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "c4aad820219c1cf43cefdba8841d20e1fd639a3da062edb7cad9a3a8c127c70a",
+                  "output_sha256": "331ee33b3b71450e9303b44aa5b6e38d00b1e1d8728cd397a3c97781c0a63bcb",
                   "diagnostic": null,
                   "generation": {
                     "family": "cage-netpol",
@@ -706,7 +706,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "6ef8eee4310f22fd73dce5cff151ee617d4fd2ac018d4429b3717b3b89de0d7d",
+                  "output_sha256": "8864fdd92db5fb8b3ad632138d55875d41dfa926b60ca7fe59a77c7bca19dced",
                   "diagnostic": null
                 }
               ]
@@ -734,7 +734,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "8d2661a323557603cc98fcb378042e346a6335532e2331c457cfb7a6d8e7bb94",
+                  "output_sha256": "73539d69a9beb2cfa019ee6e129ebb784e406859fab9b7ef1d66de3afdc12d8b",
                   "diagnostic": null
                 }
               ]
@@ -762,7 +762,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "2885fbe764a2bb36161f21014002ceea8a3bbd9a7fa8ed87096ca3be862aa3af",
+                  "output_sha256": "a48efa350f55d1a2b3a9ac6857a30da83a61e94049209c0ae080b436bd5978f1",
                   "diagnostic": null
                 }
               ]
@@ -781,7 +781,7 @@ OK
         "1.19.1"
       ],
       "state": "graded commit",
-      "ref": "f0e7ec6f6ba89932ef66f68c51710d36746da8cb",
+      "ref": "d314b8df0b19c42ea816c0a6ada41913b7940fbe",
       "members": [
         {
           "member": "policy-version-orphan-guard",
@@ -904,7 +904,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "2563eff78ce50bc0aac1f8e81f551b5e94b9f0befa1c0383e9713d7b4e716ed0",
+                  "output_sha256": "e28e3193cf5eca4287fe5403a3f24787735078e0fe5363850b854ce1da31c26b",
                   "diagnostic": null
                 }
               ]
@@ -933,7 +933,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "7a82fe76b274fad74b91966ae9cb2c1a1c17c7ba6e79a690d0b275546c2146e6",
+                  "output_sha256": "f7f35560573c279b623936df65350760ce3a7bb50b8b0e57e9cee704e4f65b9c",
                   "diagnostic": null
                 }
               ]
@@ -962,7 +962,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "84685bfeab2b4ab49af04da654f74298ef6d6da1a7eba5ec9af1e6cdd0200e29",
+                  "output_sha256": "c9f089f4b73256fd67c3d76cafb447f1329bef3c63d353bf5be842131e957153",
                   "diagnostic": null
                 }
               ]
@@ -990,7 +990,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "0dfae3471d1f2605dd5a3e6ed4429f76bb688b1327f5fe3db27d0c6ac9bb0d31",
+                  "output_sha256": "74909b26dcc2fa0f6fcfd7f8de68faa09a3668766369feaf66cbf5de9623f648",
                   "diagnostic": null
                 }
               ]
@@ -1018,7 +1018,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "92fd7780170535863eb45d0a0a1da89ae091d241069123ff2f5c2caacb62c73c",
+                  "output_sha256": "f35fabd772e56eedafe69d2dd1a8506c4cd924b57b7560e27170c42973cebaa9",
                   "diagnostic": null
                 }
               ]
@@ -1046,7 +1046,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "928804d70777f628d88730b252d08be2ab657cc91af39fb794d312ab6aba2f34",
+                  "output_sha256": "d44b0984c884c1ff00e29299a5e8751c3c663341f2c9766dcf4deffa1c7b2264",
                   "diagnostic": null
                 }
               ]
@@ -1119,7 +1119,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "8a180547e3a3086dfe80692c96595707228829cdb1103a538d942fbb7c073485",
+                  "output_sha256": "4d5b7d3b3df7e9b7649a8ef20adcfd82ce181564fae25d2c15d5afca2360fcfd",
                   "diagnostic": null
                 }
               ]
@@ -1148,7 +1148,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "1521d8da138633a37809eb9511bf75c2861ee4a7a1192463f66a750fb9ac8193",
+                  "output_sha256": "65dab14aa5a962ef6a4943f6df774a9e42440ca8ad76f3d18879bf1edf6431db",
                   "diagnostic": null
                 }
               ]
@@ -1177,7 +1177,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "64371ac029c06aee3d05195b3f7b490e48185583b7c64d6670bdbac022c97e3c",
+                  "output_sha256": "460d565101910f1c0be758c5e545319a4a8a38e70d359fc853635748724e2953",
                   "diagnostic": null
                 }
               ]
@@ -1205,7 +1205,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "fe7f8a47e44f3d329cdedc1a2c1e30d5ecfe9b986c6bdc126705062bcf76cef7",
+                  "output_sha256": "0fbacffdc031eb937cf66e9e85281279885a34068d7537f7698da5efe45ee6b8",
                   "diagnostic": null
                 }
               ]
@@ -1233,7 +1233,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "450d45a951765d2b45c69c46385ff3b77cbf4231ae358a6639f068a125d38019",
+                  "output_sha256": "b0a94eb52ec1a14d08c167e5d9bf40b726ee4510542cf7731ac0e4d51f4c0204",
                   "diagnostic": null
                 }
               ]
@@ -1261,7 +1261,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "c5ab381687c4bf7651029232aa1eb4b55f4decc6f985c436d40a4be83d1a06fa",
+                  "output_sha256": "05827f2c29b648991626911596cc7cbc96a86141779f652c25954ec0754aff67",
                   "diagnostic": null
                 }
               ]
@@ -1305,4 +1305,4 @@ policy 5.0.0  passed          -               passed
 policy 6.0.0  passed          -               passed
 policy 7.0.0  passed          passed          passed
 machinery     passed          passed          passed
-PASS: engine cells -- passed; 6 cell(s): 6 passed; graded platform commit f0e7ec6f6ba89932ef66f68c51710d36746da8cb: policy 5.0.0 from refs/tags/policy/v5.0.0 at 5b88f1d0bb33274e3348db93645d972c893b3c2c, policy 6.0.0 from refs/tags/policy/v6.0.0 at 59ec7ce39bcd658c2454b23ce1cc26082e737fdd, policy 7.0.0 from refs/tags/policy/v7.0.0 at 703eff6aee959843c4160aa54fd03413f62858cc, machinery rendered by compose/composition.py at the graded commit; each body read by git archive at that ref and run by the kyverno binaries above
+PASS: engine cells -- passed; 6 cell(s): 6 passed; graded platform commit d314b8df0b19c42ea816c0a6ada41913b7940fbe: policy 5.0.0 from refs/tags/policy/v5.0.0 at 5b88f1d0bb33274e3348db93645d972c893b3c2c, policy 6.0.0 from refs/tags/policy/v6.0.0 at 59ec7ce39bcd658c2454b23ce1cc26082e737fdd, policy 7.0.0 from refs/tags/policy/v7.0.0 at 703eff6aee959843c4160aa54fd03413f62858cc, machinery rendered by compose/composition.py at the graded commit; each body read by git archive at that ref and run by the kyverno binaries above
