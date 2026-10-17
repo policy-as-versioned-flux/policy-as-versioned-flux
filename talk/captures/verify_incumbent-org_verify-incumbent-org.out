@@ -4,7 +4,7 @@ PASS: apps: archived and its current prerequisite passes
 PASS: readiness-collector: archived and its current prerequisite passes
 PASS: pr-gate-action: archived and its current prerequisite passes
 PASS: renovate-config: archived and its current prerequisite passes
-LIMIT: handbook-generator: row passes; archive has not been performed
+PASS: handbook-generator: archived and its current prerequisite passes
 PASS: ledger: forge names new owner policy-as-versioned-tuppence
 PASS: storefront: forge names new owner policy-as-versioned-driftwood
 PASS: api: forge names new owner policy-as-versioned-driftwood

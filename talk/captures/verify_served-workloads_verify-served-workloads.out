@@ -1,9 +1,9 @@
 ==> driftwood: served_apps.py
 ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
-SKIP: the newest workload sample is older than the 48h freshness bound
+SKIP: a workload lane run started by hand cannot establish a cited pass
 ==> tuppence: served_apps.py
 ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
-SKIP: no scheduled workload sample has landed for the registered instrument
+SKIP: a workload lane run started by hand cannot establish a cited pass
 ==> ludlow: served_apps.py
 ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
-SKIP: no scheduled workload sample has landed for the registered instrument
+SKIP: a workload lane run started by hand cannot establish a cited pass
