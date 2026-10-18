@@ -1,0 +1,220 @@
+# Reviewed source program, extracted without behavior changes from actual published driftwood425 input.
+# Render only a registered organization and the canonical observation transport tail.
+environment:
+  DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+  OBSERVATION_CLOCK: twin-sweep
+  OBSERVATION_LANE: observations/twin-sweep.jsonl
+  PROPOSAL_PATHS: twin/forward-intel/v2/feed.json twin/signals.yaml
+  GITSIGN_VERSION: 0.17.1
+  GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+defaults: {}
+writer:
+  if: needs.twin.outputs.agent_rung != 'isolated' && github.ref_name == github.event.repository.default_branch
+  needs: twin
+  runs-on: ubuntu-latest
+  permissions:
+    contents: write
+    pull-requests: write
+    id-token: write
+  steps:
+  - name: take the handoff from the twin job (this run's artifact, nothing else)
+    uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+    with:
+      name: twin-sweep-handoff
+      path: ${{ runner.temp }}/handoff
+  - name: checkout @ORGANIZATION@, the only checkout this job has
+    uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+    with:
+      fetch-depth: 0
+  - name: read the platform-priced twin-agent rung (missing price falls closed)
+    id: cage
+    env:
+      EXPECTED_RUNG: ${{ needs.twin.outputs.agent_rung }}
+    run: |
+      set -euo pipefail
+      rung="$(jq -er '[.prices[]? | select(.kind == "agent-cage" and .subject == "twin-agent")] | if length == 1 then .[0].proposed_tier else null end' composed/evidence.json 2>/dev/null || true)"
+      case "${rung}" in baseline|restricted|quarantine|isolated) ;; *) rung=isolated ;; esac
+      if [ "${rung}" != "${EXPECTED_RUNG}" ]; then echo "::error::the writer checkout and twin job disagree on the priced rung"; exit 1; fi
+      echo "rung=${rung}" >> "$GITHUB_OUTPUT"
+      echo "twin-agent rung: ${rung}; a missing or malformed priced declaration permits no writer"
+  - name: validate the handoff -- every path and every shape, before anything is written
+    id: handoff
+    env:
+      HANDOFF: ${{ runner.temp }}/handoff
+    run: |
+      set -euo pipefail
+      fail() { echo "::error::the handoff is refused: $*"; exit 1; }
+      allowed=" observation.jsonl"
+      for path in ${PROPOSAL_PATHS}; do allowed="${allowed} proposal/${path}"; done
+      allowed="${allowed} "
+      while IFS= read -r f; do
+        case "${allowed}" in
+          *" ${f} "*) ;;
+          *) fail "${f} is neither the observation nor a proposal path" ;;
+        esac
+      done < <(cd "${HANDOFF}" && find . -type f | sed 's|^\./||' | LC_ALL=C sort)
+      obs="${HANDOFF}/observation.jsonl"
+      [ -f "${obs}" ] || fail "no observation.jsonl"
+      [ -s "${obs}" ] || fail "observation.jsonl is empty"
+      [ "$(tail -c1 "${obs}" | wc -l | tr -d ' ')" = 1 ] || fail "observation.jsonl lacks its final newline"
+      lines="$(wc -l < "${obs}" | tr -d ' ')"
+      [ "${lines}" = 1 ] || fail "observation.jsonl carries ${lines} line(s), not exactly one"
+      jq -e 'type == "object"' "${obs}" >/dev/null || fail "the observation is not one JSON object"
+      keys="$(jq -r 'keys | join(" ")' "${obs}")"
+      [ "${keys}" = "adopter_ref feed moved org proposal run swept_at twin_ref" ] || fail "the observation carries the keys [${keys}]"
+      jq -e --arg run "${GITHUB_RUN_ID}" '.run == $run' "${obs}" >/dev/null || fail "the observation names run $(jq -r .run "${obs}") and this is run ${GITHUB_RUN_ID}"
+      jq -e '.org == "@ORGANIZATION@" and .feed == "forward-intel"' "${obs}" >/dev/null || fail "the observation is not @ORGANIZATION@'s forward-intel line"
+      jq -e '.swept_at | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")' "${obs}" >/dev/null || fail "swept_at is not a UTC timestamp"
+      jq -e '.moved | type == "boolean"' "${obs}" >/dev/null || fail "moved is not a boolean"
+      jq -e '.adopter_ref | test("^[0-9a-f]{40}$")' "${obs}" >/dev/null || fail "adopter_ref is not a full commit"
+      adopter_ref="$(jq -r .adopter_ref "${obs}")"
+      git cat-file -e "${adopter_ref}^{commit}" 2>/dev/null || fail "adopter_ref ${adopter_ref} is not a commit this repository has"
+      pin="$(sed -n 's/^hub_commit:[[:space:]]*\([0-9a-f]\{40\}\)[[:space:]]*$/\1/p' twin/PIN.yaml)"
+      [[ "${pin}" =~ ^[0-9a-f]{40}$ ]] || fail "twin/PIN.yaml in this checkout carries no hub_commit"
+      jq -e --arg want "policy-as-versioned-flux@${pin}" '.twin_ref == $want' "${obs}" >/dev/null || fail "twin_ref $(jq -r .twin_ref "${obs}") is not the pinned policy-as-versioned-flux@${pin}"
+      moved="$(jq -r .moved "${obs}")"
+      proposal="$(jq -r .proposal "${obs}")"
+      swept_at="$(jq -r .swept_at "${obs}")"
+      if [ "${moved}" = "true" ]; then
+        [ "${proposal}" = "twin/forward-intel-${swept_at%%T*}" ] || fail "moved is true and proposal is '${proposal}', not the sweep's own branch name"
+        for path in ${PROPOSAL_PATHS}; do
+          [ -f "${HANDOFF}/proposal/${path}" ] || fail "moved is true and the handoff carries no proposal/${path}"
+          [ -s "${HANDOFF}/proposal/${path}" ] || fail "proposal/${path} is empty"
+          [ "$(tr -d '\000' < "${HANDOFF}/proposal/${path}" | wc -c)" = "$(wc -c < "${HANDOFF}/proposal/${path}")" ] || fail "proposal/${path} is not text"
+        done
+        jq -e 'type == "object"' "${HANDOFF}/proposal/twin/forward-intel/v2/feed.json" >/dev/null || fail "the proposed feed is not one JSON object"
+      else
+        [ -z "${proposal}" ] || fail "moved is false and proposal is '${proposal}'"
+        [ ! -e "${HANDOFF}/proposal" ] || fail "moved is false and the handoff carries a proposal"
+      fi
+      echo "moved=${moved}" >> "$GITHUB_OUTPUT"
+      echo "proposal=${proposal}" >> "$GITHUB_OUTPUT"
+      echo "ok  the handoff is one observation line for run ${GITHUB_RUN_ID}$( [ "${moved}" = true ] && echo " and a proposal on ${proposal}" )"
+  - name: install pinned gitsign (binary + checksum, outside the checkout, no marketplace
+      action)
+    run: |
+      set -euo pipefail
+      curl -fsSL -o "${RUNNER_TEMP}/gitsign" "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"
+      echo "${GITSIGN_SHA256}  ${RUNNER_TEMP}/gitsign" | sha256sum -c -
+      mkdir -p "${RUNNER_TEMP}/gitsign-bin"
+      install -m 755 "${RUNNER_TEMP}/gitsign" "${RUNNER_TEMP}/gitsign-bin/gitsign"
+      rm -f "${RUNNER_TEMP}/gitsign"
+      echo "${RUNNER_TEMP}/gitsign-bin" >> "$GITHUB_PATH"
+  - name: propose the moved scenario as a pull request (a feed is a declaration)
+    id: propose
+    if: steps.handoff.outputs.moved == 'true' && (steps.cage.outputs.rung == 'baseline'
+      || steps.cage.outputs.rung == 'restricted')
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: ${{ steps.handoff.outputs.proposal }}
+      HANDOFF: ${{ runner.temp }}/handoff
+    run: |
+      set -euo pipefail
+      branch="${BRANCH}"
+      if git ls-remote --exit-code --heads origin "${branch}" >/dev/null 2>&1; then
+        echo "${branch} already open -- nothing to propose"; exit 0
+      fi
+      git checkout -b "${branch}"
+      for path in ${PROPOSAL_PATHS}; do
+        cp -- "${HANDOFF}/proposal/${path}" "${path}"
+      done
+      for path in ${PROPOSAL_PATHS}; do git add -- "${path}"; done
+      if git diff --cached --quiet; then
+        echo "the proposed render is byte-identical to ${GITHUB_REF_NAME} -- nothing to propose"
+        git checkout -q "${GITHUB_REF_NAME}"
+        exit 0
+      fi
+      git -c gpg.format=x509 -c gpg.x509.program=gitsign \
+        -c user.name="@ORGANIZATION@ twin agent" \
+        -c user.email="twin-agent@policy-as-versioned-@ORGANIZATION@.invalid" \
+        commit -S -m "twin: the forward-intel scenario moved on the daily sweep"
+      git push origin "${branch}"
+      gh pr create --base "${DEFAULT_BRANCH}" --head "${branch}" \
+        --title "twin: forward-intel re-rendered by the daily sweep" \
+        --body "$(printf '%s\n' \
+          "The daily sweep re-rendered @ORGANIZATION@'s forward-intel feed from @ORGANIZATION@'s own overlay and the bytes moved (and, if a pin had moved under it, re-derived twin/signals.yaml)." \
+          "" \
+          "A published feed is a **declaration**, so the clock proposes it and never commits it (ADR-0024, D1)." \
+          "Merging publishes nothing: dispatch \`cut-release.yml\` to sign the tag." \
+          "" \
+          "The render was made by the read-only twin job at the hub commit twin/PIN.yaml pins and handed to the writer as an artifact (eco-system ticket 143)." \
+          "" \
+          "There is no recommended action in this payload and there never will be (ADR-0021): the twin emits a scenario, the estate selects the tier.")"
+      # Back to the default branch, clean: the proposal is committed on its
+      # own branch, so what is left here is main as checked out. The observe
+      # step below appends this sweep's line there, and the cage pushes it.
+      git checkout -q "${GITHUB_REF_NAME}"
+  - name: observe -- append the one validated line, and only ever append
+    env:
+      HANDOFF: ${{ runner.temp }}/handoff
+    run: |
+      set -euo pipefail
+      mkdir -p observations
+      if [ -s observations/twin-sweep.jsonl ] && [ "$(tail -c1 observations/twin-sweep.jsonl | wc -l | tr -d ' ')" != 1 ]; then
+        echo "::error::observations/twin-sweep.jsonl lacks a final newline; refusing to repair history"
+        exit 1
+      fi
+      cat "${HANDOFF}/observation.jsonl" >> observations/twin-sweep.jsonl
+  - name: the observation cage -- a clock appends observations, never a declaration
+    if: always()
+    env:
+      GH_TOKEN: ${{ github.token }}
+    run: |
+      set -euo pipefail
+      # A failed declaration proposal may leave HEAD on its own branch.
+      # Sign an observation only from the checked-out default; the pending
+      # ref must never contain that proposal's feed or lookup declarations.
+      [ -n "${DEFAULT_BRANCH}" ] || { echo '::error::repository default branch is unknown'; exit 1; }
+      if [ "${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}" ]; then
+        echo "ok  ${GITHUB_REF_NAME} is not default ${DEFAULT_BRANCH}; no observation delivery is prepared"
+        exit 0
+      fi
+      head="$(git rev-parse --abbrev-ref HEAD)"
+      if [ "${head}" != "${GITHUB_REF_NAME}" ]; then
+        echo "ok  HEAD is ${head}, not ${GITHUB_REF_NAME} -- this run proposed a declaration on its own branch, so the cage commits nothing"
+        exit 0
+      fi
+      # `git reset` FIRST: the cage builds the index and nothing else. The old
+      # guard filtered `git status --porcelain` with `grep -v '^[AMD] '`, which
+      # strips exactly the staged-and-clean entries -- so a declaration any
+      # earlier step had left in the index was committed and pushed while this
+      # step printed "this clock declared nothing" (review, 2026-08-28).
+      git reset -q
+      for path in ${OBSERVATION_LANE}; do
+        # -f: talk/captures/ is gitignored for local runs; the clock is the one
+        # caller allowed to commit it.
+        if [ -e "${path}" ]; then git add -Af -- "${path}"; fi
+      done
+      # The STAGED set, judged against the same OBSERVATION_LANE list, never a
+      # second regex that could drift from it.
+      bad=""
+      for f in $(git diff --cached --name-only); do
+        ok=0
+        for path in ${OBSERVATION_LANE}; do
+          case "${f}" in "${path}"|"${path}"/*) ok=1 ;; esac
+        done
+        [ "${ok}" = 1 ] || bad="${bad} ${f}"
+      done
+      if [ -n "${bad}" ]; then
+        echo "::error::this clock staged a declaration outside the observation lane"
+        echo "${bad}"
+        exit 1
+      fi
+      outside="$(git status --porcelain --untracked-files=all | grep -v '^[AMD] ' || true)"
+      if [ -n "${outside}" ]; then
+        echo "::error::the scheduled twin sweep left a change outside the observation lane"
+        echo "${outside}"
+        exit 1
+      fi
+      if git diff --cached --quiet; then
+        echo "ok  nothing to observe, and nothing declared"; exit 0
+      fi
+      # Sign the measured original once; publish it before any integration.
+      git config user.name "@ORGANIZATION@ twin sweep"
+      git config user.email "twin-sweep@policy-as-versioned-@ORGANIZATION@.invalid"
+      git config gpg.format x509
+      git config gpg.x509.program gitsign
+      git config commit.gpgsign true
+      # Embed the signed Rekor proof; discovery must not depend on its search index.
+      git -c gitsign.rekorMode=offline commit -m "twin sweep: observe the forward-intel scenario [skip ci]"
+      @OBSERVATION_TRANSPORT@

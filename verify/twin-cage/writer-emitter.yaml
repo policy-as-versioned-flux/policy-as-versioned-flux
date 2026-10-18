@@ -1,0 +1,152 @@
+# Reviewed source program, extracted without behavior changes from actual published tuppence425 input.
+# Render only a registered organization and the canonical observation transport tail.
+environment:
+  DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+  OBSERVATION_CLOCK: twin-sweep
+  OBSERVATION_LANE: observations/twin-sweep.jsonl
+defaults: {}
+writer:
+  if: needs.twin.outputs.agent_rung != 'isolated' && github.ref_name == github.event.repository.default_branch
+  needs: twin
+  runs-on: ubuntu-latest
+  permissions:
+    contents: write
+    pull-requests: write
+    id-token: write
+  steps:
+  - name: take the handoff from the twin job (this run's artifact, nothing else)
+    uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+    with:
+      name: twin-sweep-handoff
+      path: ${{ runner.temp }}/handoff
+  - name: checkout @ORGANIZATION@, the only checkout this job has
+    uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+    with:
+      ref: ${{ github.event.repository.default_branch }}
+      fetch-depth: 0
+  - name: read the platform-priced twin-agent rung (missing price falls closed)
+    id: cage
+    env:
+      EXPECTED_RUNG: ${{ needs.twin.outputs.agent_rung }}
+    run: |
+      set -euo pipefail
+      rung="$(jq -er '[.prices[]? | select(.kind == "agent-cage" and .subject == "twin-agent")] | if length == 1 then .[0].proposed_tier else null end' composed/evidence.json 2>/dev/null || true)"
+      case "${rung}" in baseline|restricted|quarantine|isolated) ;; *) rung=isolated ;; esac
+      if [ "${rung}" != "${EXPECTED_RUNG}" ]; then echo "::error::the writer checkout and twin job disagree on the priced rung"; exit 1; fi
+      echo "rung=${rung}" >> "$GITHUB_OUTPUT"
+      echo "twin-agent rung: ${rung}; a missing or malformed priced declaration permits no writer"
+  - name: validate the handoff -- every path and every shape, before anything is written
+    id: handoff
+    env:
+      HANDOFF: ${{ runner.temp }}/handoff
+    run: |
+      set -euo pipefail
+      fail() { echo "::error::the handoff is refused: $*"; exit 1; }
+      while IFS= read -r f; do
+        [ "${f}" = "observation.jsonl" ] || fail "${f} is not the observation, and this clock hands over nothing else"
+      done < <(cd "${HANDOFF}" && find . -type f | sed 's|^\./||' | LC_ALL=C sort)
+      obs="${HANDOFF}/observation.jsonl"
+      [ -f "${obs}" ] || fail "no observation.jsonl"
+      [ -s "${obs}" ] || fail "observation.jsonl is empty"
+      [ "$(tail -c1 "${obs}" | wc -l | tr -d ' ')" = 1 ] || fail "observation.jsonl lacks its final newline"
+      lines="$(wc -l < "${obs}" | tr -d ' ')"
+      [ "${lines}" = 1 ] || fail "observation.jsonl carries ${lines} line(s), not exactly one"
+      jq -e 'type == "object"' "${obs}" >/dev/null || fail "the observation is not one JSON object"
+      keys="$(jq -r 'keys | join(" ")' "${obs}")"
+      [ "${keys}" = "adopter_ref detail emitter_exit feed hub_ref moved org run status swept_at twin_pin" ] || fail "the observation carries the keys [${keys}]"
+      jq -e --arg run "${GITHUB_RUN_ID}" '.run == $run' "${obs}" >/dev/null || fail "the observation names run $(jq -r .run "${obs}") and this is run ${GITHUB_RUN_ID}"
+      jq -e '.org == "@ORGANIZATION@" and .feed == "forward-intel"' "${obs}" >/dev/null || fail "the observation is not @ORGANIZATION@'s forward-intel line"
+      jq -e '.swept_at | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")' "${obs}" >/dev/null || fail "swept_at is not a UTC timestamp"
+      jq -e '.status | IN("unchanged", "review_required", "could_not_look", "could_not_render")' "${obs}" >/dev/null || fail "status $(jq -r .status "${obs}") is not a state this clock records"
+      jq -e '.emitter_exit | IN(0, 1, 3)' "${obs}" >/dev/null || fail "emitter_exit $(jq -c .emitter_exit "${obs}") is not one of the emitter's exits"
+      jq -e '(.moved | type) | IN("boolean", "null")' "${obs}" >/dev/null || fail "moved is neither a boolean nor null"
+      jq -e '.detail | type == "string"' "${obs}" >/dev/null || fail "detail is not text"
+      jq -e '.adopter_ref | test("^[0-9a-f]{40}$")' "${obs}" >/dev/null || fail "adopter_ref is not a full commit"
+      adopter_ref="$(jq -r .adopter_ref "${obs}")"
+      git cat-file -e "${adopter_ref}^{commit}" 2>/dev/null || fail "adopter_ref ${adopter_ref} is not a commit this repository has"
+      pin="$(sed -n 's/^hub_commit:[[:space:]]*\([0-9a-f]\{40\}\)[[:space:]]*$/\1/p' twin/PIN.yaml)"
+      [[ "${pin}" =~ ^[0-9a-f]{40}$ ]] || fail "twin/PIN.yaml in this checkout carries no hub_commit"
+      jq -e --arg pin "${pin}" '.hub_ref == $pin and .twin_pin.hub_commit == $pin' "${obs}" >/dev/null || fail "hub_ref $(jq -r .hub_ref "${obs}") is not the pinned policy-as-versioned-flux@${pin}"
+      echo "emitter_exit=$(jq -r .emitter_exit "${obs}")" >> "$GITHUB_OUTPUT"
+      echo "ok  the handoff is one $(jq -r .status "${obs}") observation line for run ${GITHUB_RUN_ID}"
+  - name: Install pinned observation signer outside the checkout
+    id: install
+    run: |
+      set -euo pipefail
+      version="$(sed -n 's/^[[:space:]]*GITSIGN_VERSION:[[:space:]]*//p' .github/actions/install-gitsign/action.yml)"
+      digest="$(sed -n 's/^[[:space:]]*GITSIGN_SHA256:[[:space:]]*//p' .github/actions/install-gitsign/action.yml)"
+      [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::no single GITSIGN_VERSION in the shared action"; exit 1; }
+      [[ "${digest}" =~ ^[0-9a-f]{64}$ ]] || { echo "::error::no single GITSIGN_SHA256 in the shared action"; exit 1; }
+      curl -fsSL -o "${RUNNER_TEMP}/gitsign" "https://github.com/sigstore/gitsign/releases/download/v${version}/gitsign_${version}_linux_amd64"
+      printf '%s  %s\n' "${digest}" "${RUNNER_TEMP}/gitsign" | sha256sum -c -
+      mkdir -p "${RUNNER_TEMP}/gitsign-bin"
+      install -m 755 "${RUNNER_TEMP}/gitsign" "${RUNNER_TEMP}/gitsign-bin/gitsign"
+      rm -f "${RUNNER_TEMP}/gitsign"
+      echo "${RUNNER_TEMP}/gitsign-bin" >> "$GITHUB_PATH"
+  - name: Append the one validated observation line, and only ever append
+    id: observe
+    env:
+      HANDOFF: ${{ runner.temp }}/handoff
+    run: |
+      set -euo pipefail
+      mkdir -p observations
+      if [ -s observations/twin-sweep.jsonl ] && [ "$(tail -c1 observations/twin-sweep.jsonl | wc -l | tr -d ' ')" != 1 ]; then
+        echo "::error::observations/twin-sweep.jsonl lacks a final newline; refusing to repair history"
+        exit 1
+      fi
+      cat "${HANDOFF}/observation.jsonl" >> observations/twin-sweep.jsonl
+      echo "prepared=true" >> "$GITHUB_OUTPUT"
+  - name: the observation cage -- no declaration may leave the checkout
+    if: always()
+    run: |
+      set -euo pipefail
+      [ -n "${DEFAULT_BRANCH}" ] || { echo '::error::repository default branch is unknown'; exit 1; }
+      if [ "${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}" ]; then
+        echo "ok  ${GITHUB_REF_NAME} is not default ${DEFAULT_BRANCH}; no observation delivery is prepared"
+        exit 0
+      fi
+      head="$(git rev-parse --abbrev-ref HEAD)"
+      if [ "$head" != "$GITHUB_REF_NAME" ] || [ "$head" != "$DEFAULT_BRANCH" ]; then
+        echo "::error::the observation must stay on the checked-out default branch"
+        exit 1
+      fi
+      git reset -q
+      for path in ${OBSERVATION_LANE}; do
+        if [ -e "$path" ]; then git add -Af -- "$path"; fi
+      done
+      for file in $(git diff --cached --name-only); do
+        if [ "$file" != "$OBSERVATION_LANE" ]; then
+          echo "::error::staged a declaration outside the observation lane"
+          exit 1
+        fi
+      done
+      outside="$(git status --porcelain --untracked-files=all | grep -v '^[AMD] ' || true)"
+      if [ -n "$outside" ]; then
+        echo "::error::the sweep changed something outside its observation lane"
+        echo "$outside"
+        exit 1
+      fi
+  - name: Sign and propose observation delivery before reporting the result
+    id: sign
+    if: success() && steps.observe.outputs.prepared == 'true'
+    env:
+      GH_TOKEN: ${{ github.token }}
+    run: |
+      set -euo pipefail
+      # Embed the signed Rekor proof; discovery must not depend on its search index.
+      git -c gpg.format=x509 -c gpg.x509.program=gitsign \
+        -c gitsign.rekorMode=offline \
+        -c user.name="@ORGANIZATION@ twin sweep" \
+        -c user.email="twin-sweep@policy-as-versioned-@ORGANIZATION@.invalid" \
+        commit -S -m "twin sweep: record the emitter observation [skip ci]"
+      @OBSERVATION_TRANSPORT@
+  - name: Preserve the observed could-not-look or review-required result
+    id: result
+    if: always() && steps.observe.outputs.prepared == 'true'
+    env:
+      HANDOFF: ${{ runner.temp }}/handoff
+    run: |
+      set -euo pipefail
+      jq -r '"\(.status): \(.detail)"' "${HANDOFF}/observation.jsonl"
+      code="$(jq -r .emitter_exit "${HANDOFF}/observation.jsonl")"
+      case "${code}" in 0|1|3) exit "${code}" ;; *) exit 1 ;; esac
