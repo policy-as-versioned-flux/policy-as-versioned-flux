@@ -15,8 +15,9 @@ WHAT IS GRADED, AND AGAINST WHAT.
                         the tag alone would freeze this check on the first tag ever cut and
                         never look at the branch again.
   The operation         `render()` from the copy of `compose/handbook.py` that PLATFORM SERVES
-                        at the tag the adopter's SERVED pin names, read with `git show` at the
-                        graded ref; platform's `origin/main` otherwise, and the run says which.
+                        at the compiler tag declared at the graded ref, binding its declared
+                        commit and publisher source. Only refs without that declaration use
+                        the historical policy-pin/platform origin/main selection, named below.
                         The grader carries no renderer of its own: a hub copy would grade the
                         hub's idea of the render, not the estate's.
   The comparison        bytes. `git show <ref>:composed/HANDBOOK.md` against the re-render.
@@ -70,6 +71,7 @@ import importlib.util
 import json
 import os
 import random
+import re
 import shutil
 import subprocess
 import sys
@@ -80,6 +82,8 @@ from typing import Any
 RENDERER = "compose/handbook.py"
 PAGE = "composed/HANDBOOK.md"
 PIN = "gitops/platform/platform-pin.yaml"
+COMPILER_PIN = ".github/platform-tools-pin.yaml"
+PLATFORM_URL = "https://github.com/policy-as-versioned-platform/platform"
 PLATFORM = "platform"
 SERVED_BRANCH = "origin/main"
 
@@ -151,8 +155,7 @@ def adopters(estate: Path) -> list[Path]:
 
 
 def pinned_platform_tag(adopter: Path, ref: str) -> str | None:
-    """The platform tag the pin file SERVED at `ref` names. Read out of `git show`, not a
-    working copy, so the count of pins carrying the renderer is about what is served."""
+    """Historical accepted-policy pin, used only when the graded ref has no compiler pin."""
     try:
         import yaml
         text = show(adopter, ref, PIN)
@@ -194,7 +197,7 @@ def served_refs(adopter: Path, override: str | None) -> tuple[list[tuple[str, st
 
 
 def renderer_ref(platform: Path, pinned: str | None) -> tuple[str | None, str, bool]:
-    """The ref of PLATFORM to take the renderer from, why, and whether it is the adopter's pin.
+    """Legacy selection for refs without a compiler declaration, and truthful pin attribution.
 
     The pin first, because that is what the adopter actually runs. Platform's served branch is
     the only fallback (review F-08), named as such, so this check keeps grading while the pin
@@ -212,6 +215,51 @@ def renderer_ref(platform: Path, pinned: str | None) -> tuple[str | None, str, b
             f"; the pinned tag {pinned} does not carry {RENDERER}" if pinned else "")
         return SERVED_BRANCH, why, False
     return None, f"neither the pinned tag nor platform {SERVED_BRANCH} carries {RENDERER}", False
+
+
+def served_renderer(adopter: Path, platform: Path, ref: str) -> tuple[str | None, str, bool]:
+    """Bind this page's compiler tag/SHA/source; only an absent declaration permits fallback.
+
+    This is source binding, not signature authentication. The native signature verifier owns
+    the latter; structural tag enumeration elsewhere in this grader grants no trust credit.
+    """
+    rc, entry = git(adopter, "ls-tree", ref, "--", COMPILER_PIN)
+    if rc:
+        raise FileNotFoundError(f"cannot inspect the compiler declaration at {ref}")
+    if not entry.strip():
+        return renderer_ref(platform, pinned_platform_tag(adopter, ref))
+    import yaml
+    try:
+        declaration = yaml.safe_load(show(adopter, ref, COMPILER_PIN))
+    except yaml.YAMLError as exc:
+        raise ValueError("invalid compiler declaration: unreadable YAML") from exc
+    if not isinstance(declaration, dict):
+        raise ValueError("invalid compiler declaration: expected a GitRepository record")
+    spec = declaration.get("spec")
+    reference = spec.get("ref") if isinstance(spec, dict) else None
+    if (declaration.get("apiVersion") != "source.toolkit.fluxcd.io/v1"
+            or declaration.get("kind") != "GitRepository"
+            or not isinstance(spec, dict) or not isinstance(reference, dict)):
+        raise ValueError("invalid compiler declaration: expected a GitRepository with spec.ref")
+    tag, commit = reference.get("tag"), reference.get("commit")
+    if (not isinstance(tag, str) or not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag)
+            or not isinstance(commit, str) or not re.fullmatch(r"[a-f0-9]{40}", commit)):
+        raise ValueError("invalid compiler declaration: an exact release tag and 40-character SHA are required")
+    url = spec.get("url")
+    if not isinstance(url, str):
+        raise ValueError("invalid compiler declaration: publisher URL must be a string")
+    if url not in {PLATFORM_URL, PLATFORM_URL + ".git"}:
+        raise ValueError("invalid compiler publisher: declaration does not name the platform")
+    rc, origin = git(platform, "remote", "get-url", "origin")
+    if rc or origin.strip() not in {PLATFORM_URL, PLATFORM_URL + ".git"}:
+        raise ValueError("invalid compiler publisher: checkout origin does not name the platform")
+    tag_ref = f"refs/tags/{tag}"
+    rc, target = git(platform, "rev-parse", "--verify", f"{tag_ref}^{{commit}}")
+    if rc:
+        raise FileNotFoundError(f"declared compiler tag {tag} is unavailable")
+    if target.strip() != commit:
+        raise ValueError(f"compiler tag/commit mismatch for {tag}")
+    return tag_ref, f"the compiler tag declared at {ref} ({tag}@{commit})", True
 
 
 def _exec(path: Path, name: str) -> Any:
@@ -373,8 +421,16 @@ def grade_ref(adopter: Path, platform: Path, ref: str, why_ref: str, tag_graded:
               work: Path) -> dict:
     """One adopter at one ref, one verdict. `state` is one of pass / fail / skip."""
     name = adopter.name
-    pinned = pinned_platform_tag(adopter, ref)
-    rref, why_renderer, on_pin = renderer_ref(platform, pinned)
+    try:
+        rref, why_renderer, on_pin = served_renderer(adopter, platform, ref)
+    except ValueError as exc:
+        return {"name": name, "ref": ref, "tag_graded": tag_graded, "on_pin": False,
+                "why_ref": why_ref, "why_renderer": f"invalid {COMPILER_PIN}",
+                "renderer_ref": None, "state": "fail",
+                "line": f"{name}@{ref}: {COMPILER_PIN}: {exc}"}
+    except FileNotFoundError as exc:
+        return {"name": name, "ref": ref, "tag_graded": tag_graded, "on_pin": False,
+                "state": "skip", "line": f"{name}@{ref}: {COMPILER_PIN}: {exc}"}
     common = {"name": name, "ref": ref, "why_ref": why_ref, "renderer_ref": rref,
               "why_renderer": why_renderer, "on_pin": on_pin, "tag_graded": tag_graded}
     if rref is None:

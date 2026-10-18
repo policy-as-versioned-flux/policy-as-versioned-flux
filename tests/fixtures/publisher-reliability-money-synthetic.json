@@ -1,0 +1,249 @@
+{
+  "schema": "publisher-reliability/price-report-set-v1",
+  "scorer": "nist",
+  "cutoff": "2021-03-01T00:00:00Z",
+  "tool": {
+    "source_files": [
+      {
+        "path": "publisher-reliability/price_accuracy.py",
+        "git_blob": "9999999999999999999999999999999999999999"
+      }
+    ],
+    "generator_engine": {
+      "party": "platform",
+      "tag": "v5.4.0",
+      "commit": "5d45baa5923191dfd0e9cfb2cfaeae6906a41fce",
+      "path": "fair/fair.py",
+      "git_blob": "1e73bd8f6603ff1798268206cd1bcc6f0842975b"
+    }
+  },
+  "inputs": {
+    "schema": "publisher-reliability/price-input-set-v1",
+    "cohorts": [
+      {
+        "schema": "publisher-reliability/price-inputs-v1",
+        "profile": {
+          "party": "ico",
+          "tag": "synthetic-ico-2/v1.0.0",
+          "commit": "2222222222222222222222222222222222222222",
+          "path": "price-accuracy/profile.json",
+          "git_blob": "2222222222222222222222222222222222222222"
+        },
+        "target": {
+          "party": "ico",
+          "tag": "synthetic-ico-1/v1.0.0",
+          "commit": "1111111111111111111111111111111111111111",
+          "path": "penalty-schema/v9/feed.json",
+          "git_blob": "1111111111111111111111111111111111111111"
+        },
+        "cases": [
+          {
+            "case_id": "synthetic-case-1",
+            "forecast": {
+              "party": "ico",
+              "tag": "synthetic-forecasts/v1.0.0",
+              "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "path": "price-accuracy/synthetic-case-1-forecast.json",
+              "git_blob": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "resolution": {
+              "party": "feeds",
+              "tag": "synthetic-outcomes/v1.0.0",
+              "commit": "cccccccccccccccccccccccccccccccccccccccc",
+              "path": "price-outcomes/synthetic-case-1.json",
+              "git_blob": "cccccccccccccccccccccccccccccccccccccccc"
+            }
+          },
+          {
+            "case_id": "synthetic-case-2",
+            "forecast": {
+              "party": "ico",
+              "tag": "synthetic-forecasts/v1.0.0",
+              "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "path": "price-accuracy/synthetic-case-2-forecast.json",
+              "git_blob": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "resolution": {
+              "party": "feeds",
+              "tag": "synthetic-outcomes/v1.0.0",
+              "commit": "cccccccccccccccccccccccccccccccccccccccc",
+              "path": "price-outcomes/synthetic-case-2.json",
+              "git_blob": "dddddddddddddddddddddddddddddddddddddddd"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "reports": [
+    {
+      "schema": "publisher-reliability/price-report-v1",
+      "scorer": "nist",
+      "cutoff": "2021-03-01T00:00:00Z",
+      "profile": {
+        "party": "ico",
+        "tag": "synthetic-ico-2/v1.0.0",
+        "commit": "2222222222222222222222222222222222222222",
+        "path": "price-accuracy/profile.json",
+        "git_blob": "2222222222222222222222222222222222222222"
+      },
+      "target": {
+        "party": "ico",
+        "tag": "synthetic-ico-1/v1.0.0",
+        "commit": "1111111111111111111111111111111111111111",
+        "path": "penalty-schema/v9/feed.json",
+        "git_blob": "1111111111111111111111111111111111111111"
+      },
+      "unit": {
+        "currency": "GBP",
+        "basis": "synthetic nominal GBP; no FX"
+      },
+      "criterion": "money-empirical-crps/v1",
+      "score_direction": "higher-is-better",
+      "cohort": {
+        "party": "ico",
+        "tag": "synthetic-ico-2/v1.0.0",
+        "commit": "2222222222222222222222222222222222222222",
+        "path": "price-accuracy/cases.json",
+        "git_blob": "3333333333333333333333333333333333333333"
+      },
+      "status": "measured",
+      "counts": {
+        "registered_cases": 2,
+        "eligible": 2,
+        "unscoreable": 0
+      },
+      "loss": {
+        "numerator": "11",
+        "denominator": "1"
+      },
+      "score": {
+        "numerator": "-11",
+        "denominator": "1"
+      },
+      "cases": [
+        {
+          "case_id": "synthetic-case-1",
+          "forecast": {
+            "party": "ico",
+            "tag": "synthetic-forecasts/v1.0.0",
+            "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "path": "price-accuracy/synthetic-case-1-forecast.json",
+            "git_blob": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "resolution": {
+            "party": "feeds",
+            "tag": "synthetic-outcomes/v1.0.0",
+            "commit": "cccccccccccccccccccccccccccccccccccccccc",
+            "path": "price-outcomes/synthetic-case-1.json",
+            "git_blob": "cccccccccccccccccccccccccccccccccccccccc"
+          },
+          "state": "eligible",
+          "reason": null,
+          "loss": {
+            "numerator": "10",
+            "denominator": "1"
+          }
+        },
+        {
+          "case_id": "synthetic-case-2",
+          "forecast": {
+            "party": "ico",
+            "tag": "synthetic-forecasts/v1.0.0",
+            "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "path": "price-accuracy/synthetic-case-2-forecast.json",
+            "git_blob": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "resolution": {
+            "party": "feeds",
+            "tag": "synthetic-outcomes/v1.0.0",
+            "commit": "cccccccccccccccccccccccccccccccccccccccc",
+            "path": "price-outcomes/synthetic-case-2.json",
+            "git_blob": "dddddddddddddddddddddddddddddddddddddddd"
+          },
+          "state": "eligible",
+          "reason": null,
+          "loss": {
+            "numerator": "12",
+            "denominator": "1"
+          }
+        }
+      ],
+      "tool": {
+        "source_files": [
+          {
+            "path": "publisher-reliability/price_accuracy.py",
+            "git_blob": "9999999999999999999999999999999999999999"
+          }
+        ],
+        "generator_engine": {
+          "party": "platform",
+          "tag": "v5.4.0",
+          "commit": "5d45baa5923191dfd0e9cfb2cfaeae6906a41fce",
+          "path": "fair/fair.py",
+          "git_blob": "1e73bd8f6603ff1798268206cd1bcc6f0842975b"
+        }
+      },
+      "inputs": {
+        "schema": "publisher-reliability/price-inputs-v1",
+        "profile": {
+          "party": "ico",
+          "tag": "synthetic-ico-2/v1.0.0",
+          "commit": "2222222222222222222222222222222222222222",
+          "path": "price-accuracy/profile.json",
+          "git_blob": "2222222222222222222222222222222222222222"
+        },
+        "target": {
+          "party": "ico",
+          "tag": "synthetic-ico-1/v1.0.0",
+          "commit": "1111111111111111111111111111111111111111",
+          "path": "penalty-schema/v9/feed.json",
+          "git_blob": "1111111111111111111111111111111111111111"
+        },
+        "cases": [
+          {
+            "case_id": "synthetic-case-1",
+            "forecast": {
+              "party": "ico",
+              "tag": "synthetic-forecasts/v1.0.0",
+              "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "path": "price-accuracy/synthetic-case-1-forecast.json",
+              "git_blob": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "resolution": {
+              "party": "feeds",
+              "tag": "synthetic-outcomes/v1.0.0",
+              "commit": "cccccccccccccccccccccccccccccccccccccccc",
+              "path": "price-outcomes/synthetic-case-1.json",
+              "git_blob": "cccccccccccccccccccccccccccccccccccccccc"
+            }
+          },
+          {
+            "case_id": "synthetic-case-2",
+            "forecast": {
+              "party": "ico",
+              "tag": "synthetic-forecasts/v1.0.0",
+              "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "path": "price-accuracy/synthetic-case-2-forecast.json",
+              "git_blob": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            },
+            "resolution": {
+              "party": "feeds",
+              "tag": "synthetic-outcomes/v1.0.0",
+              "commit": "cccccccccccccccccccccccccccccccccccccccc",
+              "path": "price-outcomes/synthetic-case-2.json",
+              "git_blob": "dddddddddddddddddddddddddddddddddddddddd"
+            }
+          }
+        ]
+      },
+      "claim_scope": {
+        "measure": "declared-annual-monetary-empirical-CDF-error",
+        "population": "exact-registered-cohort-only",
+        "calibration_guarantee": false,
+        "binary_report_relabelled": false
+      }
+    }
+  ],
+  "reason": null
+}

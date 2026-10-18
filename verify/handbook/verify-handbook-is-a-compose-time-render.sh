@@ -13,8 +13,11 @@
 #                    carrying a handbook when one exists (both graded, both printed; review
 #                    F-10). Never a local branch and never a working tree (review F-08).
 #   operation        render() from the copy of compose/handbook.py that PLATFORM SERVES at the
-#                    tag the adopter's SERVED pin names (read with git show at the graded ref),
-#                    falling back to platform's origin/main and saying so. This check carries no
+#                    compiler tag/SHA the graded ref declares in .github/platform-tools-pin.yaml.
+#                    Only an absent compiler pin uses the historical policy-pin/origin-main
+#                    fallback, explicitly named; a bad compiler never borrows that fallback.
+#                    The compiler's canonical publisher origin is bound, not authenticated.
+#                    This check carries no
 #                    renderer of its own: a hub copy would grade the hub's idea of the render
 #                    instead of the estate's.
 #   comparison       bytes, against `git show <ref>:composed/HANDBOOK.md`.
@@ -76,6 +79,11 @@ SELF_LOG="$(mktemp)"
 trap 'rm -f "$SERVED_RENDERER" "$SELF_LOG" "${LOG:-}"' EXIT
 "$PY" "$HERE/handbook_check.py" --selfcheck "$SERVED_RENDERER" >"$SELF_LOG" 2>&1 \
   || { echo "FAIL: handbook_check.py --selfcheck with the renderer platform serves at $found -- the planted rules no longer grade as written, so nothing this run says about the estate can be trusted: $( (grep -E '^      FAIL: ' "$SELF_LOG" || grep -E '^FAIL' "$SELF_LOG") | head -1 | sed 's/^ *//')"; exit 1; }
+
+# Public CLI regressions use real temporary Git stores and literal pages; fixture tags do not
+# authenticate publishers. Keep this inside the existing row rather than adding a new grade.
+"$PY" "$ROOT/tests/test_handbook_compiler_pin.py" >"$SELF_LOG" 2>&1 \
+  || { echo "FAIL: handbook compiler CLI regressions: $(tail -1 "$SELF_LOG")"; exit 1; }
 
 LOG="$(mktemp)"
 "$PY" "$HERE/handbook_check.py" "$ESTATE" | tee "$LOG"; rc=${PIPESTATUS[0]}
