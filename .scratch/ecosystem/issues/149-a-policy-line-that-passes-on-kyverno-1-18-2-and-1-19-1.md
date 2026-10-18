@@ -1,7 +1,7 @@
 # 149 — A policy line that passes on Kyverno 1.18.2 and 1.19.1
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: 146, and the owner's authorisation for the signed policy tag
 
 ## Question
@@ -97,3 +97,38 @@ The compatibility candidate uses v1 policy APIs, string-typed tier output and a 
 The owner delegated the implementing decisions on 2026-10-03: "you tell me, you control them all, you don't need me to answer". This is recorded as delegated, not as an invented institution signature.
 
 **Full-window correction, 2026-10-03.** The actual publisher retains both 5 and 6 when grading the compatibility candidate. That complete supported window computes a major bump and would quarantine a declared 6.0.1 patch. The final candidate therefore declares **7.0.0**; its publisher dry run passes cleanly as major and all six declared engine cells pass. The security-only intermediate remains 6.0.0, with four passing cells. All three adopters have explicitly delegated major-7 acceptance records. Frozen 5 and 6 bodies are unchanged. The old 6.0.1 receipts above are historical measurements, not a release target. Signed delivery is tracked in the dated implementation status and platform delivery records.
+
+## Answer
+
+**2026-10-18, authentic final line reconciled.** The delivered compatibility line is **7.0.0**.
+The [immutable declared array](https://github.com/policy-as-versioned-platform/platform/blob/b91bdbb7413aed4edf578114635d20172e45fd35/distribution/versions.yaml)
+records `policy/v7.0.0`, its evidence commit `393a40f707f2b23a3a174696a0c84a8473297ca9`,
+and `tested_engines: [1.18.2, 1.19.1]`. The genuine signed tag targets
+[703eff6aee959843c4160aa54fd03413f62858cc](https://github.com/policy-as-versioned-platform/platform/commit/703eff6aee959843c4160aa54fd03413f62858cc),
+after the evidence commit; those two fields have different intended meanings. The original
+[cut 37185354470](https://github.com/policy-as-versioned-platform/platform/actions/runs/37185354470)
+and [policy release 37187107091](https://github.com/policy-as-versioned-platform/platform/actions/runs/37187107091)
+completed with genuine signatures and claims. Frozen 5.0.0 and 6.0.0 remain unchanged and
+served. Historical 6.0.1 was a rejected full-window patch proposal, not the release target.
+
+The final source contains the string-typed tier, retires `posture-trust-boundary` from the new
+line, uses `policies.kyverno.io/v1` for its four remaining bodies, and compares generated
+netpol documents while retaining the old fixture format. The full-window computation and
+publisher proof establish the major bump; the dated delegated major-7 acceptance records and
+actual owner-authorized cut are delivered. This ticket does not move an adopter onto the line.
+
+The [recorded TRUTH run 432 grade table](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/b0911618e238abfd719ef95171869fc41d8688a8/talk/captures/_grades.tsv)
+gives `.estate-clone/platform/computed-semver/verify-cage-engine.sh` PASS at platform
+`b91bdbb7413aed4edf578114635d20172e45fd35`: all six declared cells passed. They include the
+original required three: 5.0.0 on 1.18.2 and 7.0.0 on both 1.18.2 and 1.19.1. The same recorded
+table gives `.estate-clone/platform/distribution/verify-coexistence.sh` **SKIP**, with the
+offline proof holding and the local-kind live tail unobserved, and
+`verify/refusal-by-another-name/verify-refusal-by-another-name.sh` **SKIP**, because its mutation
+checks could not look. These are the requested nonred observations with explicit scope limits;
+neither complete wrapper is claimed PASS. Coexistence belongs to ticket 63, the refusal check
+to ticket 98, and the shared engine-cell check to tickets 76/146; these rows are evidence of
+compatibility, not a transfer of check ownership to ticket 149.
+
+Ticket 146 is resolved and the signed cut is complete. This closes the original declared-line
+and required-cell conditions. It does not establish admission on a live named cluster, resolve
+ticket 148's current required-check failure, or erase ticket 150's formal 148 dependency.

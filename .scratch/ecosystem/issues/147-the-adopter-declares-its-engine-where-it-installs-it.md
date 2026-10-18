@@ -1,7 +1,7 @@
 # 147 — The adopter declares its engine where it installs it
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: 146 (the engine table)
 
 ## Question
@@ -249,3 +249,37 @@ cluster. The selfcheck gained five plants, the three above plus an exported `CTX
 `clone-estate.sh` line: "PASS: selfcheck: 22 planted estates grade as planted". Over the
 branch-head estate the check still reads PASS on all its assertions.
 
+## Answer
+
+**2026-10-18, recorded delivery reconciled.** The declaration, header and scheduled-install
+conditions are delivered on all three public mains. The scheduled sources below each read
+`gitops/engine/kyverno.yaml`, download and checksum its declared install, and apply it
+server-side. The official runs are successful `schedule` attempt 1, not dispatched substitutes.
+Their signed original observations are recorded unchanged:
+
+| Adopter | Scheduled source and engine | Genuine scheduled run | Recorded original |
+|---|---|---|---|
+| Driftwood | [d8012f4](https://github.com/policy-as-versioned-driftwood/driftwood/tree/d8012f4dd1fd3a288ae928216f1f4f2398a244d4), 1.18.2 | [39122015854/1](https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/39122015854/attempts/1) | [5326bc3](https://github.com/policy-as-versioned-driftwood/driftwood/commit/5326bc3ebd422bd28135e210126c2d0ce5391f72), PR #72 |
+| Tuppence | [b5c00d9](https://github.com/policy-as-versioned-tuppence/tuppence/tree/b5c00d9cbe24caff496b9af3177980b35b29d4eb), 1.18.2 | [39031806150/1](https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/39031806150/attempts/1) | [d55010a](https://github.com/policy-as-versioned-tuppence/tuppence/commit/d55010ae52b65a3037563764c284a61c140f67ae), PR #74 |
+| Ludlow | [34f0774](https://github.com/policy-as-versioned-ludlow/ludlow/tree/34f077499b129005703aa0ed3d46ad9471a59868), 1.19.1 | [39034542013/1](https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/39034542013/attempts/1) | [ea3e831](https://github.com/policy-as-versioned-ludlow/ludlow/commit/ea3e831de6531b10c9f519fa5a34286db17e4f87), PR #76 |
+
+At the immutable public snapshots [Driftwood 611c29e](https://github.com/policy-as-versioned-driftwood/driftwood/tree/611c29e0b1f43f30ce1d564f302f4d8f7571d670),
+[Tuppence d3deb17](https://github.com/policy-as-versioned-tuppence/tuppence/tree/d3deb1743061dbd0a4681eb2efbab5f320040467)
+and [Ludlow 8aaeea1](https://github.com/policy-as-versioned-ludlow/ludlow/tree/8aaeea11c430b61824b20c226493bf6e41c2194e),
+each committed header's `declared-engine` agrees with its declaration and composed engine
+evidence. The existing signed composition/replay deliveries provide the freshness basis; this
+record correction did not rerun a complete recompose. Their non-hidden non-observation sources
+are unchanged from the scheduled sources. Tuppence's separately delivered caller-pin update is
+hidden. Driftwood and Tuppence retain 1.18.2. Ludlow's 1.19.1 is ticket 150's separately
+authorized successor, not a change to this ticket's original all-1.18.2 stage.
+
+The [recorded TRUTH run 432 grade table](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/b0911618e238abfd719ef95171869fc41d8688a8/talk/captures/_grades.tsv)
+gives `verify/adopter-engines/verify-adopter-engines.sh` PASS: all five assertions hold. This is
+ticket 147's check. Its static shared-cluster and declaration assertions, the 22 planted estates
+and refusal controls documented above establish the requested code behavior. `talk/up.sh`
+installs the owner declaration on `kind-driftwood` and installs no engine on `kind-tuppence` or
+`kind-ludlow`. No fresh named-cluster live install is claimed. The current declared-engine CLI
+and probe integration is delivered; each adopter probe also passes in that recorded table.
+Ticket 146 is resolved. Ticket 148's current required-check failure and ticket 150's formal
+148 dependency remain separate and open; resolving this delivered prerequisite does not make
+them or the estate generally green.
