@@ -7,4 +7,4 @@ PY="$ROOT/.venv/bin/python"
 [ -n "$PY" ] || { echo 'SKIP: publisher reliability contract needs Python 3'; exit 3; }
 command -v git >/dev/null 2>&1 || { echo 'SKIP: publisher reliability contract needs git'; exit 3; }
 "$PY" "$ROOT/tests/test_publisher_reliability.py"
-echo 'PASS: synthetic consumer fixtures preserve signed-tag routing, native recomputation, the empty-state wait and binary-only claim scope; no genuine signature or forecast outcome was measured'
+echo 'PASS: synthetic consumer fixtures preserve signed-tag routing, native recomputation, genuine population waits and separate binary/monetary claim scopes; no genuine signature or forecast outcome was measured'

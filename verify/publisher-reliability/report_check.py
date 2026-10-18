@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Observe NIST's signed binary report without asserting publisher-price quality.
+"""Observe NIST's signed binary or monetary report without pooling their claims.
 
 Only a namespaced, identity-verified annotated tag supplies executable report
 code. Mutable checkout files and bare catalogue tags are never report evidence.
@@ -167,6 +167,8 @@ def grade(report: dict, tag: str) -> tuple[int, str]:
             "feed", "publisher-reliability", "nist", tag.rsplit("/v", 1)[1]):
         raise Rejected("signed report envelope does not match its NIST report tag")
     payload = report.get("payload")
+    if tag.rsplit('/v', 1)[1].split('.')[0] == '2':
+        return grade_money(report, tag)
     if not isinstance(payload, dict) or payload.get("schema") != "publisher-reliability/report-v1":
         raise Rejected("unknown publisher report schema")
     if payload.get("claim_scope") != CLAIM or any(type(payload["claim_scope"][key]) is not bool for key in CLAIM):
@@ -191,6 +193,54 @@ def grade(report: dict, tag: str) -> tuple[int, str]:
                "publisher-price accuracy and price eligibility are not established")
 
 
+def grade_money(report: dict, tag: str) -> tuple[int, str]:
+    """Retain the native-recomputed report's cohort boundaries and empty state."""
+    payload = report.get('payload')
+    fields = {'schema', 'scorer', 'cutoff', 'tool', 'inputs', 'reports', 'reason'}
+    if (not isinstance(payload, dict) or set(payload) != fields
+            or payload.get('schema') != 'publisher-reliability/price-report-set-v1'
+            or payload.get('scorer') != 'nist'
+            or payload.get('cutoff') != report.get('published_at')):
+        raise Rejected('unknown or inconsistent monetary report set')
+    if payload['reports'] == []:
+        if (payload['inputs'] != {'schema': 'publisher-reliability/price-input-set-v1', 'cohorts': []}
+                or payload['reason'] != 'no declared monetary cohorts; no publisher-price accuracy measurement'):
+            raise Rejected('empty monetary report cannot invent a population or claim')
+        return 3, (f'publisher reliability signed {tag} has no declared monetary cohorts; '
+                   'publisher-price accuracy remains unmeasured')
+    rows, inputs = payload['reports'], payload['inputs']
+    if (not isinstance(rows, list) or not isinstance(inputs, dict)
+            or set(inputs) != {'schema', 'cohorts'}
+            or inputs['schema'] != 'publisher-reliability/price-input-set-v1'
+            or not isinstance(inputs['cohorts'], list)
+            or len(inputs['cohorts']) != len(rows) or payload['reason'] is not None):
+        raise Rejected('monetary report must retain each declared cohort separately')
+    measured = 0
+    for row in rows:
+        if (not isinstance(row, dict) or row.get('schema') != 'publisher-reliability/price-report-v1'
+                or row.get('scorer') != 'nist' or row.get('cutoff') != payload['cutoff']
+                or row.get('criterion') != 'money-empirical-crps/v1'
+                or row.get('score_direction') != 'higher-is-better'):
+            raise Rejected('monetary cohort has incompatible identity, measure or cutoff')
+        counts = row.get('counts')
+        if (not isinstance(counts, dict) or set(counts) != {'registered_cases', 'eligible', 'unscoreable'}
+                or any(type(v) is not int or v < 0 for v in counts.values())
+                or counts['registered_cases'] != counts['eligible'] + counts['unscoreable']):
+            raise Rejected('monetary cohort counts do not conserve registered cases')
+        if counts['eligible'] == 0:
+            if row.get('status') != 'unmeasured' or row.get('score') is not None or row.get('loss') is not None:
+                raise Rejected('empty monetary cohort must remain unmeasured with null loss and score')
+        else:
+            if row.get('status') != 'measured' or not isinstance(row.get('score'), dict) or not isinstance(row.get('loss'), dict):
+                raise Rejected('eligible monetary cohort must retain its exact measured loss and score')
+            measured += 1
+    if not measured:
+        return 3, (f'publisher reliability signed {tag} has no eligible monetary forecast/resolution pairs; '
+                   'publisher-price accuracy remains unmeasured')
+    return 0, (f'signed NIST monetary diagnostic {tag} recomputes for {len(rows)} separate monetary cohorts '
+               f'({measured} measured); no pooled score or automatic adopter acceptance')
+
+
 def observe(estate: Path) -> tuple[int, str]:
     repo = estate.resolve() / "nist"
     if not repo.is_dir():
@@ -203,9 +253,13 @@ def observe(estate: Path) -> tuple[int, str]:
         if git(snapshot, "rev-parse", "refs/tags/" + tag) != tag_object:
             raise Rejected("publisher report tag changed during signature verification")
         export(snapshot, tag_object, snapshot)
-        feed = snapshot / "publisher-reliability/v1/feed.json"
+        major = tag.rsplit('/v', 1)[1].split('.')[0]
+        if major not in {'1', '2'}:
+            raise Rejected('unsupported publisher report major: ' + major)
+        feed = snapshot / f"publisher-reliability/v{major}/feed.json"
         report = load_report(feed)
-        checker = snapshot / "publisher-reliability/report.py"
+        checker = snapshot / ('publisher-reliability/price_report.py' if major == '2'
+                              else 'publisher-reliability/report.py')
         if not checker.is_file():
             raise Rejected("signed report has no native provenance/recomputation checker")
         checked = command([sys.executable, str(checker), "check", "--root", str(snapshot),

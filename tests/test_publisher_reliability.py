@@ -76,6 +76,18 @@ class PublisherReportConsumer(unittest.TestCase):
         script.chmod(0o755)
         return {**os.environ, 'PATH': str(directory) + os.pathsep + os.environ.get('PATH', '')}
 
+    def publish_money(self, payload: dict, checker: str = 'raise SystemExit(0)\n') -> None:
+        # Synthetic routing checker only; whole SDK/compose proof is separate.
+        feed = self.repo / 'publisher-reliability/v2/feed.json'
+        feed.parent.mkdir(parents=True, exist_ok=True)
+        feed.write_text(json.dumps({'kind': 'feed', 'name': 'publisher-reliability',
+            'version': '2.0.0', 'published_by': 'nist', 'published_at': payload['cutoff'],
+            'payload_schema': 'publisher-reliability/price-payload.schema.json', 'payload': payload}))
+        (feed.parents[1] / 'price_report.py').write_text(checker)
+        self.commit()
+        git(self.repo, 'tag', '--no-sign', '-a', 'publisher-reliability/v2.0.0',
+            '-m', 'Unsigned monetary routing fixture')
+
     def invoke(self, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
         return subprocess.run([sys.executable, str(READER), '--estate', str(self.repo.parent)],
                               text=True, capture_output=True, env=env, timeout=15)
@@ -140,6 +152,40 @@ class PublisherReportConsumer(unittest.TestCase):
         self.assertEqual(call, {'args': ['verify-tag', TAG,
                                         '--certificate-identity-regexp=' + IDENTITY,
                                         '--certificate-oidc-issuer=' + ISSUER], 'mode': 'offline'})
+
+    def test_monetary_major_selects_its_own_checker_and_keeps_no_cohort_unmeasured(self) -> None:
+        # Routing fixture only: this checker is not the whole SDK/compose proof.
+        self.publish()
+        value = {'kind': 'feed', 'name': 'publisher-reliability', 'version': '2.0.0',
+                 'published_by': 'nist', 'published_at': '2026-10-18T17:00:00Z',
+                 'payload': {'schema': 'publisher-reliability/price-report-set-v1',
+                             'scorer': 'nist', 'cutoff': '2026-10-18T17:00:00Z',
+                             'tool': {'source_files': [], 'generator_engine': {
+                                 'party': 'platform', 'tag': 'synthetic/v1.0.0',
+                                 'commit': '1' * 40, 'path': 'fair/fair.py', 'git_blob': '2' * 40}},
+                             'inputs': {'schema': 'publisher-reliability/price-input-set-v1',
+                                        'cohorts': []}, 'reports': [],
+                             'reason': 'no declared monetary cohorts; no publisher-price accuracy measurement'}}
+        feed = self.repo / 'publisher-reliability/v2/feed.json'
+        feed.parent.mkdir()
+        feed.write_text(json.dumps(value))
+        marker = self.base / 'monetary-checker-ran'
+        (feed.parents[1] / 'price_report.py').write_text(
+            f'from pathlib import Path\nPath({str(marker)!r}).touch()\n')
+        (feed.parents[1] / 'report.py').write_text('raise SystemExit(99)\n')
+        self.commit()
+        git(self.repo, 'tag', '--no-sign', '-a', 'publisher-reliability/v2.0.0',
+            '-m', 'Unsigned monetary routing fixture')
+        self.verdict(self.invoke(self.verifier()), 3, 'has no declared monetary cohorts')
+        self.assertTrue(marker.is_file(), 'selected immutable monetary checker did not run')
+
+    def test_monetary_cohorts_recompute_without_becoming_a_pooled_adopter_decision(self) -> None:
+        payload = json.loads((ROOT / 'tests/fixtures/publisher-reliability-money-synthetic.json').read_text())
+        self.publish_money(payload)
+        result = self.invoke(self.verifier())
+        self.verdict(result, 0, '1 separate monetary cohorts')
+        self.assertIn('no pooled score or automatic adopter acceptance',
+                      result.stdout)
 
     def test_mutable_checkout_is_ignored(self) -> None:
         self.publish()
@@ -246,6 +292,20 @@ class PublisherReportConsumer(unittest.TestCase):
                                          str(ROOT / 'talk/verify-manifest.txt'),
                                          'verify/publisher-reliability/verify-publisher-reliability.sh', line],
                                         text=True, capture_output=True, timeout=10)
+                self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+
+    def test_registered_monetary_wait_names_only_genuine_population_absence(self) -> None:
+        for message, expected in [
+            ('has no declared monetary cohorts; publisher-price accuracy remains unmeasured', 0),
+            ('has no eligible monetary forecast/resolution pairs; publisher-price accuracy remains unmeasured', 0),
+            ('has no declared monetary cohorts; publisher-price accuracy remains unmeasured; verifier missing', 1),
+        ]:
+            with self.subTest(message=message):
+                line = 'SKIP: publisher reliability signed publisher-reliability/v2.0.0 ' + message
+                result = subprocess.run([sys.executable, str(ROOT / 'talk/truth_manifest.py'), 'judge',
+                    str(ROOT / 'talk/verify-manifest.txt'),
+                    'verify/publisher-reliability/verify-publisher-reliability.sh', line],
+                    text=True, capture_output=True, timeout=10)
                 self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
 
     def test_actual_wrappers_name_absent_python_and_git(self) -> None:
