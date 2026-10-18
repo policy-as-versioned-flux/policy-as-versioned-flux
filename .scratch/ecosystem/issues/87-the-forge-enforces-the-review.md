@@ -1,7 +1,7 @@
 # 87 — The forge enforces the review
 
 Type: task (HITL)
-Status: open
+Status: resolved
 Blocked by: 88
 
 ## Question
@@ -348,3 +348,11 @@ no bypass and no declaration writes. Main remains reviewed and citable; pending 
 not recorded. ADR-0024's October 5 amendment records the bounded change. Other clock
 and release writers require independent diagnosis; this hub repair neither removes
 their review rule nor claims that their delivery now succeeds.
+
+## Answer
+
+**Delivery reconciled, 2026-10-18.** The selected binding branch of item 1 is delivered. The unchanged [recorded run 432 forge capture](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/d096cd2f0515a8aa2f9de1b671f5f227beba5478/talk/captures/verify_forge-review_verify-forge-review.out) names all nine repositories, each with three active rulesets and six reviewed pinned branches, and reports the release-tag protection and required floor PASS. This supersedes the historical four-red rollout state above; it is not a fresh all-nine API audit. The accepted second identity remains the GitHub App [pavc-other-hand, recorded by ticket 88](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/c349dfd461c2ec25ebccffff959d0c8969e44f55/.scratch/ecosystem/issues/88-the-second-identity.md).
+
+The [assertion implementation](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/c349dfd461c2ec25ebccffff959d0c8969e44f55/verify/forge-review/forge_review.py) derives the fixed nine repositories and effective protection for branches admitted by the served identity pins. The [scheduled workflow](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/c349dfd461c2ec25ebccffff959d0c8969e44f55/.github/workflows/truth.yml) collects the facts separately from the credential-free grading job. The registered `verify/forge-review/verify-forge-review.sh` has PASS in the original [run 432 grade table](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/d096cd2f0515a8aa2f9de1b671f5f227beba5478/talk/captures/_grades.tsv). The finite pattern/probe coverage and bypass lists unavailable to the collector remain the published ceilings; PASS does not claim those hidden lists were inspected.
+
+Item 2's nonbinding alternative was not selected. Item 3's original “or record why not” remains answered by the September 24 credential explanation and ticket 97's delegated accident alarm: the assistant can author and approve using credentials it holds, so the second identity is not malicious-agent separation. No new unreachable credential, price or authorization is invented. The original Question, decisions, failed rollout observations and corrections are preserved. No ruleset, token, mode, observation or grade changes in this reconciliation.
