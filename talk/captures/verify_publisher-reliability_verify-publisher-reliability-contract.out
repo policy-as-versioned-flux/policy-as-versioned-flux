@@ -1,6 +1,6 @@
 .....................
 ----------------------------------------------------------------------
-Ran 21 tests in 3.933s
+Ran 21 tests in 2.519s
 
 OK
 PASS: synthetic consumer fixtures preserve signed-tag routing, native recomputation, the empty-state wait and binary-only claim scope; no genuine signature or forecast outcome was measured
