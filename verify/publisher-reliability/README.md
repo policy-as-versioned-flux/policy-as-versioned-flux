@@ -48,6 +48,9 @@ bar is accepted, an insufficient sample supplies no score cause, and a degraded
 native release still widens when no case has resolved. It also verifies a saved
 composition using captured Git evidence without the original monetary clones,
 rejects altered evidence and rejects an unauthenticated native predecessor.
+Controlled local file edits also require the bar, appetite, comparison identity
+and current adopter's self-controls catalogue to use one captured declaration.
+The tier and its recorded source cannot come from different file versions.
 
 This source proof uses disposable histories, synthetic monetary declarations and
 an explicitly labelled external signature fixture. It grants no genuine
