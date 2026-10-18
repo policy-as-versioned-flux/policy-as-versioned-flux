@@ -40,3 +40,27 @@ run 34512281836 both passed. [Platform v3.1.0](https://github.com/policy-as-vers
 was published at 18:06:47Z from `332ab192e75cbeedbc072aba6a07726c070a5a61`.
 No policy definition or monetary threshold changed; publication does not close the other
 portions of this ticket or imply adoption by a compiler pin still naming v3.0.0.
+
+
+## Partial decision — drop the warn rung, 2026-10-18
+
+Under ADR-0025's delegated architecture authority, choose the original Question's **drop the
+word** alternative: Audit is a reported observation that moves no tier, not a selectable cage
+rung. The priced runtime choices remain baseline, restricted, quarantine and isolated; infra
+remains a platform role outside priced selection. An unpriced or no-cage warn rung would
+contradict the existing everything-is-caged model without adding a distinct enforcement
+envelope. The four priced rungs already express the runtime choices.
+
+This matches the published platform source
+`a27c83b9773e147feff55312b87da90155b8a268`: `graded/cage.py` blob
+`21361d41006b34c45b2a267d21fdaf2f23c1e888` defines `ORDER` as those four priced rungs,
+`TIERS` includes infra and `LADDER` is `ORDER + ["infra"]`. This is source inspection, not a new
+runtime or test result.
+FAIR's separate single-state input named `warn` retains its meaning; it is not a cage rung.
+
+Only this choice is decided. Status stays open for the claim-preserving de-posture tier move,
+legacy access retirement and authentic per-organisation break-glass/assurance bands, with the
+identity shelf retained. The delivered floor comparison remains counterfactual evidence, not
+an enacted Namespace move or completion of this ticket's talk/verify-all.sh criterion. The
+currency controller's separately accepted re-cage and retired-claim semantics are unchanged.
+No new price, threshold, grade, policy, release or runtime observation follows from this note.
