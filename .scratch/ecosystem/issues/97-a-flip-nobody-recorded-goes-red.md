@@ -1,7 +1,7 @@
 # 97 — A flip nobody recorded goes red
 
 Type: decision (HITL)
-Status: claimed
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -202,3 +202,11 @@ is red.
 The current instruction to implement everything resumes the build that the 2026-09-24 record-only instruction held. The agreed shape is unchanged. The words recorded for 2026-09-04 are "can we just always assume we're in development mode until further notice?". On 2026-09-24 the owner answered "agree" to the window and acknowledgement shape. These are the historical authorizations; no new authorization or expiry is inferred from this implementation.
 
 `verify/enact-record/verify-enact-record.sh` grades the durable mode against exact dated quotes outside example code fences, and the original development window ending 2026-10-22. A lapse changes the grade, never the guard. Ambient variables can only tighten the checked-in mode. The checker proves the six decided mutations plus a self-citing YAML example. Rollout and the first citable gate reading the check are still pending.
+
+## Answer
+
+**Delivery reconciled, 2026-10-18.** The nine delegated decisions above are implemented. The [mode record](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/c349dfd461c2ec25ebccffff959d0c8969e44f55/twin/ENACT_MODE.why) uses the decided sibling YAML and exact dated owner words, rather than inventing an authorizing commit. The [checker](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/c349dfd461c2ec25ebccffff959d0c8969e44f55/verify/enact-record/enact_record.py) compares the durable mode, quoted words, dates, authorship and bounded expiry. Its existing selfcheck proves an unrecorded tightening and all six decided mutations red, plus refusal of a self-citing YAML example. The unchanged [recorded run 432 capture](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/d096cd2f0515a8aa2f9de1b671f5f227beba5478/talk/captures/verify_enact-record_verify-enact-record.out) contains both the mutation proof and the actual record agreement. The registered `verify/enact-record/verify-enact-record.sh` is PASS in that run's [grade table](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/d096cd2f0515a8aa2f9de1b671f5f227beba5478/talk/captures/_grades.tsv).
+
+The [guard](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/c349dfd461c2ec25ebccffff959d0c8969e44f55/twin/enact_guard.py) takes only a stricter ambient mode and keeps the durable file fixed; both mode files are in the [truth workflow's push paths](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/c349dfd461c2ec25ebccffff959d0c8969e44f55/.github/workflows/truth.yml). Pure record validation on October 18 confirms the existing development declaration and acknowledgement agree. Its unchanged `until: 2026-10-22` means the grade lapses on October 22, not after that day. A lapse changes the check and derived status, never the guard. This resolution records delivery of the alarm, not perpetual validity of a development window.
+
+The accident-only limitation remains: an assistant able to write a false dated quote can defeat this alarm. No new quote, expiry, mode, owner permission or renewal follows from the standing AFK instruction or this record. No mode-flip fixture, guard runtime or new observation is run here; the original decisions and proofs remain intact.
