@@ -114,5 +114,6 @@ evidence, and its historical 6.0.1 candidate is not substituted for the final re
 The genuine hub TRUTH 430 original `e5c83d9694650e591777f2a746f28a4a31c37c2e` separately records
 the declared 1.19.1 CLI document probe passing for Ludlow's selected v5.1.1 composition and HEAD;
 scheduled facts 6/7 supply the separate running-cluster evidence. No new cluster or probe was
-started for this record. The ticket stays claimed while the retained SKIP emission differences
-remain unexplained; historical observations, grades, prices and dates are unchanged.
+started for this record. This amendment preserves the claimed status; completion will be assessed against the original
+Done conditions, dependencies and current recorded grades. The unresolved differences remain
+explicit limits. Historical observations, grades, prices and dates are unchanged.

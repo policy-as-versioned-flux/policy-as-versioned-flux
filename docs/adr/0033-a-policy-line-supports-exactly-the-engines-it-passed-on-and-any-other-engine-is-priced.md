@@ -129,6 +129,19 @@ missing instruments, never a fallback to the upstream implementation tree. Polic
 claims and supported engines are independently read from that same accepted parent. The
 adopter's declared engine and all retirement, policy acceptance and signature checks stay intact.
 
+This replaces the check's earlier forward experiment in which both tools and implementation
+parent moved to upstream. The adopter's September10 independent compiler-tools decision permits
+software maintenance without accepting a policy window. A genuine consumer retirement binds an
+exact parent (ADR-0038); the earlier two-pin experiment correctly refused Ludlow's changed
+parent. That recorded failure remains a failure. A tools compatibility experiment cannot supply
+the separate decision required to change policy, nor can it manufacture a future release or
+successful adoption.
+
+The planted experiment continues to exercise upstream policy with explicitly synthetic mutations;
+the served experiment continues to grade committed artefacts against their own pinned parent.
+Unsupported pairings remain priced with the independently derived claims and weights. No
+historical grade, declaration, acceptance, immutable policy, observation or price is rewritten.
+
 ## Confirmed 2026-10-18 from ticket 150's admission rehearsal
 
 The existing October 3 isolated upgrade rehearsal confirms point 3's fail-open possibility for
@@ -147,16 +160,3 @@ the final retained line is 7.0.0. Separately, genuine scheduled Ludlow observati
 limits are recorded in [ticket 150](../../.scratch/ecosystem/issues/150-one-adopter-runs-kyverno-1-19-1-on-a-live-cluster.md).
 That chronological comparison does not isolate the engine from simultaneous retirement,
 compiler, instrument and source changes, and this confirmation does not close the ticket.
-
-This replaces the check's earlier forward experiment in which both tools and implementation
-parent moved to upstream. The adopter's September10 independent compiler-tools decision permits
-software maintenance without accepting a policy window. A genuine consumer retirement binds an
-exact parent (ADR-0038); the earlier two-pin experiment correctly refused Ludlow's changed
-parent. That recorded failure remains a failure. A tools compatibility experiment cannot supply
-the separate decision required to change policy, nor can it manufacture a future release or
-successful adoption.
-
-The planted experiment continues to exercise upstream policy with explicitly synthetic mutations;
-the served experiment continues to grade committed artefacts against their own pinned parent.
-Unsupported pairings remain priced with the independently derived claims and weights. No
-historical grade, declaration, acceptance, immutable policy, observation or price is rewritten.
