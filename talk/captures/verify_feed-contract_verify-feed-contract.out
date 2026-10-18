@@ -68,7 +68,7 @@ PASS: insurer/quote/tuppence/v1/feed.json: payload vs quote/payload.schema.json
 PASS: insurer/quote/tuppence/v1/feed.json: bump.yaml bump=none
 PASS: insurer/quote/ludlow/v1/feed.json: envelope valid (feed/quote-ludlow 1.0.0)
 PASS: insurer/quote/ludlow/v1/feed.json: payload vs quote/payload.schema.json
-PASS: insurer/quote/ludlow/v1/feed.json: bump.yaml bump=none
+PASS: insurer/quote/ludlow/v1/feed.json: bump.yaml bump=patch
 PASS: ludlow/party.yaml vs party schema
 PASS: ludlow: publishes exposure as a section of composed/HEADER.yaml, signed by this party's own tag and not an envelope of its own
 PASS: ludlow/twin/forward-intel/v1/feed.json: envelope valid (feed/forward-intel 1.0.0)
@@ -79,6 +79,9 @@ PASS: nist: publishes controls at catalog
 PASS: nist/publisher-reliability/v1/feed.json: envelope valid (feed/publisher-reliability 1.0.0)
 PASS: nist/publisher-reliability/v1/feed.json: payload vs publisher-reliability/payload.schema.json
 PASS: nist/publisher-reliability/v1/feed.json: bump.yaml bump=major
+PASS: nist/publisher-reliability/v2/feed.json: envelope valid (feed/publisher-reliability 2.0.0)
+PASS: nist/publisher-reliability/v2/feed.json: payload vs publisher-reliability/price-payload.schema.json
+PASS: nist/publisher-reliability/v2/feed.json: bump.yaml bump=major
 PASS: platform/party.yaml vs party schema
 PASS: platform: publishes implementations at implementations/cloud
 PASS: platform: publishes implementations at distribution/policies

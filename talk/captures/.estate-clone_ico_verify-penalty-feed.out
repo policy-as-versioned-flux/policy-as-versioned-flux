@@ -81,6 +81,17 @@ ok  (b) a published frequency and its dated basis are read and carried
 ok  (f1) an example with a status and no source is refused by name
 ok  (f1) the scenario names what each priced figure rests on
 ok  (d) the sized triple never tops the statutory maximum max(cap, rate x turnover)
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.995s
+
+OK
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 2.628s
+
+OK
+{"synthetic_wrong_target": {"pre_sign": {"exit": 1, "stdout": "", "stderr": "REFUSED: publisher native release gate: ICO publishes only penalty-schema; another cage target cannot authorize this release\n"}, "direct_verify": {"exit": 1, "stdout": "", "stderr": "REFUSED: publisher native release gate: ICO publishes only penalty-schema; another cage target cannot authorize this release\n"}, "original_selected_gate": {"exit": 1, "stdout": "", "stderr": "FAIL: penalty-schema/bump.yaml declares 'patch' but the computed bump for the next release is 'major' (v3.0.0 -> v3.0.1; rule: 'fixture'). The gate has two declarations of one fact and no rule for choosing between them.\n"}}}
 ok  major 4 uk-gdpr/lower-tier prices lm (92000.0, 92000.0, 8700000.0) at lef (0, 2, 4), names Clearview's uncollected 7,552,800 as not priced, and carries its frequency's basis and its could-not-look
 ok  a frequency with no basis refuses, naming the violation type and where the basis goes
 ok  an example with no status beside one that has it refuses, naming the example

@@ -16,5 +16,5 @@ PASS: quote-ludlow: attachment 5,000.00 GBP equals ludlow's own signed appetite
 PASS: quote-ludlow: every exclusion names a regime ludlow actually prices (cve, eol, forward-intel, threat-register, uk-gdpr)
 PASS: quote-ludlow: all 5 exclusion/condition control id(s) exist in nist's published catalogue (NIST_SP-800-53_rev5.2.0_catalog.json)
 SKIP: quote-ludlow: no implied loss ratio -- the formula refuses over the signed inputs: missing instrument: ludlow's signed exposure carries no priced total -- an unpriced book supplies neither a layer nor a premium
-SKIP: quote-ludlow: priced against exposure sha256:b0808d7448a3 but ../ludlow/composed/HEADER.yaml now signs sha256:f7d7b54fc6b0 -- the insured re-signed its exposure and a re-quote PR is due (the clock opens one; a human merges it)
+SKIP: quote-ludlow: priced against exposure sha256:aa708ea54434 but ../ludlow/composed/HEADER.yaml now signs sha256:f7d7b54fc6b0 -- the insured re-signed its exposure and a re-quote PR is due (the clock opens one; a human merges it)
 SKIP: 5 of 19 checks could not be looked at (reasons above)

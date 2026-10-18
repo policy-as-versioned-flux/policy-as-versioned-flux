@@ -1,43 +1,61 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 13.986s
+Ran 11 tests in 7.345s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 10.877s
+Ran 9 tests in 6.113s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .............................
 ----------------------------------------------------------------------
-Ran 29 tests in 32.096s
+Ran 29 tests in 17.878s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 2.035s
+Ran 16 tests in 1.054s
 
 OK
 [1;36m==>[0m 0d. an unsupported engine pairing is priced, never refused (ticket 148, hub ADR-0033 point 3)
 .............
 ----------------------------------------------------------------------
-Ran 13 tests in 3.352s
+Ran 13 tests in 1.620s
 
 OK
 [1;36m==>[0m 0e. quote validity uses composed input dates and conserves contract costs (ticket 37)
 ........
 ----------------------------------------------------------------------
-Ran 8 tests in 3.954s
+Ran 8 tests in 2.207s
 
 OK
 [1;36m==>[0m 0f. quote conditions name counted implementation claims without granting cover (ticket 37)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 3.495s
+Ran 11 tests in 1.817s
+
+OK
+[1;36m==>[0m 0f1. quote conditions authenticate served evidence and consume modeled consequences
+.....................
+----------------------------------------------------------------------
+Ran 21 tests in 63.037s
+
+OK
+[1;36m==>[0m 0f2. monetary publisher quality preserves absent behavior and renders its exact evidence
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.311s
+
+OK
+[1;36m==>[0m 0g. consumer retirement keeps its exact authority checks with credential-free public reads
+...............................
+----------------------------------------------------------------------
+Ran 31 tests in 2.321s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)
@@ -5460,7 +5478,37 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
         "tag": "v1.0.0",
         "detail": "tag v1.0.0 on the insurer checkout carries a signature block"
       },
-      "hole": null
+      "hole": null,
+      "conditional_cost_view": {
+        "schema": 1,
+        "profile": "served-policy-conditions/v1",
+        "as_of": null,
+        "state": "unobserved",
+        "retention": "not-assessed",
+        "contract_premium": {
+          "amount": 113403.3,
+          "currency": "GBP"
+        },
+        "effective_premium": null,
+        "conditions": [
+          {
+            "source": "nist",
+            "id": "ac-6",
+            "state": "unobserved",
+            "required_cells": null,
+            "observed_cells": null
+          },
+          {
+            "source": "nist",
+            "id": "cm-6",
+            "state": "unobserved",
+            "required_cells": null,
+            "observed_cells": null
+          }
+        ],
+        "quote_basis": null,
+        "basis": "No authenticated observation selector was supplied; technical conditions and the effective conditional cost are unobserved. The booked contract premium is unchanged; this modeled view is not billing, legal payability or transfer."
+      }
     },
     {
       "source": "platform",
@@ -5759,7 +5807,7 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "published_at": "2026-08-28",
       "files": {
         "party.yaml": "5c07030a7a02883fdaf217e43fb5aefb423153f8e10817097c7a74094e3fff56",
-        "penalty-schema/to_fair_scenario.py": "4d313e86d2d139788b5e46d43d534f3ce64b6ec49b9da8f10dcc9ad8d7ca4d6f",
+        "penalty-schema/to_fair_scenario.py": "bb751e70cdb29e9d60d5c9049780ef057dd71a33bb92d84fa619eac8f3f80ea5",
         "penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda"
       },
       "publisher_observation": {
@@ -5807,7 +5855,7 @@ OK cmd_compose: writes the rendered files and the evidence document, exits 0 on 
       "published_at": "2026-09-26",
       "files": {
         "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
-        "threat-register/to_fair_scenario.py": "5b58162dd42404c0afc0ad3d063aeb4cd71a7076baca7ed7f7875e781d509d41",
+        "threat-register/to_fair_scenario.py": "b33bc82346af03d5d80964c81991602f5507575980ea7eb049630f73d8a928ee",
         "threat-register/v4/feed.json": "e88332226c882103e469b43770bd177ff10384500825236f2fcdaf11dda168fd"
       },
       "publisher_observation": {
@@ -10272,7 +10320,7 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
       "published_at": "2026-08-28",
       "files": {
         "party.yaml": "5c07030a7a02883fdaf217e43fb5aefb423153f8e10817097c7a74094e3fff56",
-        "penalty-schema/to_fair_scenario.py": "4d313e86d2d139788b5e46d43d534f3ce64b6ec49b9da8f10dcc9ad8d7ca4d6f",
+        "penalty-schema/to_fair_scenario.py": "bb751e70cdb29e9d60d5c9049780ef057dd71a33bb92d84fa619eac8f3f80ea5",
         "penalty-schema/v3/feed.json": "e23318cb9b580b5e9bde3621720197af08aaceb7510e27b3c20d10b6fe783cda"
       },
       "publisher_observation": {
@@ -10320,7 +10368,7 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
       "published_at": "2026-09-26",
       "files": {
         "party.yaml": "6d5211a16fe5bfbe6bd28fc0f4c876f9de8fca8a2a43d2750a4f855610ee0823",
-        "threat-register/to_fair_scenario.py": "5b58162dd42404c0afc0ad3d063aeb4cd71a7076baca7ed7f7875e781d509d41",
+        "threat-register/to_fair_scenario.py": "b33bc82346af03d5d80964c81991602f5507575980ea7eb049630f73d8a928ee",
         "threat-register/v4/feed.json": "e88332226c882103e469b43770bd177ff10384500825236f2fcdaf11dda168fd"
       },
       "publisher_observation": {
