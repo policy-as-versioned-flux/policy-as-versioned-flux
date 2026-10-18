@@ -1,5 +1,5 @@
 [1;36m==>[0m 0. the five-fact sample: the composed set in force, from signed sources (graded first, cluster-free)
-   five-fact sample 2026-10-17T10:49:10Z on cluster dsample-39026194433 (run 39026194433), 3 sources
+   five-fact sample 2026-10-18T11:10:56Z on cluster dsample-39122015854 (run 39122015854), 3 sources
      the cage facts (6, 7) ARE scored on this sample: registered by 1cd446f62a53 at 2026-10-04T11:57:45+01:00 on refs/remotes/origin/main, and the sample is later
      driftwood-composed   true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      driftwood-composed   true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v4.0.1 was verified at the source boundary against driftwood's own pinned identity ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$

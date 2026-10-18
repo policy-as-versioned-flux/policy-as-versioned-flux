@@ -1,5 +1,10 @@
+.............
+----------------------------------------------------------------------
+Ran 13 tests in 5.347s
+
+OK
 PASS: twin cage selfcheck -- five loosened workflows fail
-FAIL: driftwood served twin cage: proposal step runs outside baseline/restricted
-FAIL: tuppence served twin cage: proposal step runs outside baseline/restricted
-FAIL: ludlow served twin cage: proposal step runs outside baseline/restricted
+PASS: driftwood served twin workflow fits its priced rung dials
+PASS: tuppence served twin workflow fits its priced rung dials
+PASS: ludlow served twin workflow fits its priced rung dials
 LIMIT: local-clock sandbox is configured; its live resistance to a rebuilt child environment remains unmeasured (ticket 142 item 3)
