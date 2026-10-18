@@ -308,6 +308,20 @@ class PublisherReportConsumer(unittest.TestCase):
                     text=True, capture_output=True, timeout=10)
                 self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
 
+    def test_the_discovered_monetary_native_checker_is_registered_without_a_skip(self) -> None:
+        script = '.estate-clone/nist/scripts/verify-publisher-price-accuracy.sh'
+        discovered = self.base / 'discovered.txt'
+        discovered.write_text(script + '\n')
+        result = subprocess.run([sys.executable, str(ROOT / 'talk/truth_manifest.py'), 'check',
+            str(ROOT / 'talk/verify-manifest.txt'), '--scripts', str(discovered)],
+            cwd=ROOT, text=True, capture_output=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        result = subprocess.run([sys.executable, str(ROOT / 'talk/truth_manifest.py'), 'judge',
+            str(ROOT / 'talk/verify-manifest.txt'), script, 'SKIP: native monetary instrument missing'],
+            cwd=ROOT, text=True, capture_output=True, timeout=10)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('declares no skip', result.stdout)
+
     def test_actual_wrappers_name_absent_python_and_git(self) -> None:
         for name in ('verify-publisher-reliability.sh', 'verify-publisher-reliability-contract.sh'):
             with self.subTest(wrapper=name):

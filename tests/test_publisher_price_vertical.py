@@ -3,6 +3,9 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
+import copy
+import hashlib
+import inspect
 import os
 import json
 import yaml
@@ -11,6 +14,57 @@ from publisher_price_fixture import source_roots, signature_boundary, whole_fixt
 
 
 class PublisherPriceVertical(unittest.TestCase):
+    def test_the_consumed_policy_and_recorded_blob_use_the_same_captured_bytes(self):
+        actual = source_roots()
+        with tempfile.TemporaryDirectory(prefix='synthetic-policy-capture-') as temporary:
+            root = Path(temporary)
+            with patch.dict(os.environ, signature_boundary(root)):
+                fixture = whole_fixture(root, actual)
+                target = fixture['adopter'] / 'party.yaml'
+                accepted = copy.deepcopy(fixture['party'])
+                accepted['appetite']['publisher_reliability'][0]['bar'] = '-20'
+                original = yaml.safe_dump(accepted).encode()
+                changed = copy.deepcopy(accepted)
+                changed['appetite']['publisher_reliability'][0]['bar'] = '-10'
+                other = yaml.safe_dump(changed).encode()
+                target.write_bytes(original)
+                read_text = Path.read_text
+                read_bytes = Path.read_bytes
+
+                def concurrent_middle_read(read, path, caller, *args, **kwargs):
+                    if (path == target and caller.f_code.co_name == 'load_document'
+                            and caller.f_globals.get('__name__') == '_publisher_quality_party'):
+                        # A controlled actual temporary-file edit, restored
+                        # before the outer reader can observe a changed file.
+                        target.write_bytes(other)
+                        try:
+                            return read(path, *args, **kwargs)
+                        finally:
+                            target.write_bytes(original)
+                    return read(path, *args, **kwargs)
+
+                def concurrent_text(path, *args, **kwargs):
+                    return concurrent_middle_read(read_text, path, inspect.currentframe().f_back,
+                                                  *args, **kwargs)
+
+                def concurrent_bytes(path, *args, **kwargs):
+                    return concurrent_middle_read(read_bytes, path, inspect.currentframe().f_back,
+                                                  *args, **kwargs)
+
+                with patch.object(Path, 'read_text', concurrent_text), patch.object(
+                        Path, 'read_bytes', concurrent_bytes):
+                    document, _ = fixture['ct'].compose(fixture['adopter'], fixture['trees'])
+                self.assertEqual(document['outcome'], 'composed', document)
+                entry = next(p for p in document['prices'] if p.get('kind') == 'feed'
+                             and p.get('source') == 'feeds' and p.get('name') == 'threat-register')
+                effect = entry['publisher_reliability_effect']
+                self.assertEqual(target.read_bytes(), original)
+                self.assertEqual(effect['bar'], '-20')
+                self.assertEqual(effect['causes'], [])
+                self.assertEqual(entry['amount'], 10)
+                self.assertEqual(effect['policy_source']['git_blob'], hashlib.sha1(
+                    b'blob ' + str(len(original)).encode() + b'\0' + original).hexdigest())
+
     def test_a_worse_full_distribution_consumes_the_publishers_target_in_actual_composition(self):
         actual = source_roots()
         with tempfile.TemporaryDirectory(prefix='synthetic-price-vertical-') as temporary:

@@ -95,6 +95,7 @@
 .estate-clone/nist/scripts/verify-catalog.sh | self-proof | -
 .estate-clone/nist/scripts/verify-cert-identity-regexp.sh | self-proof | -
 .estate-clone/nist/scripts/verify-publisher-reliability.sh | self-proof | -   # ticket46: the publisher validates its own report and labelled native fixtures; a valid empty report is an unmeasured local self-proof, never an estate calibration result. Missing instruments remain undeclared/red.
+.estate-clone/nist/scripts/verify-publisher-price-accuracy.sh | self-proof | -   # ticket46: native monetary report reconstruction and labelled source fixtures; a valid empty report proves its representation only. No real monetary population, score or price credit; missing instruments remain undeclared/red.
 
 # --- platform ----------------------------------------------------------------------------
 .estate-clone/platform/access/verify-access.sh | estate-observation | never: kind cluster 'driftwood' is not listed   # identity plane, EXCLUDED by ticket 90 (see talk/verify-exclusions.txt); this line records what it would have measured, and is inert until the identity lane runs it
