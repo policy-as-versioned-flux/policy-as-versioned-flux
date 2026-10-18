@@ -646,6 +646,57 @@ def typed_readings(readings: Any, names: set[str], field: str) -> bool:
                     and isinstance(value.get("why"), str) for value in readings.values()))
 
 
+def validate_cloud_sources(root: Path, parent: str, sources: Any) -> None:
+    """Bind TU's existing six-field provenance to its measured source's exact pin.
+
+    The collector introduced this field when it began reading the selected cloud
+    composition. Historical rows omit it. A tag or current checkout must never
+    select the metadata against which an original observation is judged.
+    """
+    require(isinstance(sources, list), "cloud component sources must be a list")
+    documents = list(yaml.safe_load_all(git(root, "show", f"{parent}:gitops/composed/composed-set.yaml")))
+    matches = [doc for doc in documents if isinstance(doc, dict)
+               and doc.get("kind") == "GitRepository"
+               and isinstance(doc.get("metadata"), dict)
+               and doc["metadata"].get("name") == "tuppence-composed"]
+    require(len(matches) == 1, "cloud component sources have no unique selected composition")
+    spec = mapping(matches[0].get("spec"), "selected composition source")
+    require(spec.get("url") in ("https://github.com/policy-as-versioned-tuppence/tuppence",
+                                "https://github.com/policy-as-versioned-tuppence/tuppence.git"),
+            "cloud component sources name a foreign composition repository")
+    pin = mapping(spec.get("ref"), "selected composition pin")
+    commit = sha(pin.get("commit"))
+    tag = pin.get("tag")
+    require(isinstance(tag, str) and re.fullmatch(r"v\d+\.\d+\.\d+", tag) is not None,
+            "cloud component sources have no selected composition tag")
+    assert isinstance(tag, str)
+    header = mapping(yaml.safe_load(git(root, "show", f"{commit}:composed/HEADER.yaml")),
+                     "selected composition header")
+    expected: list[dict[str, str]] = []
+    if header.get("cloud-package"):
+        cloud = mapping(json.loads(git(root, "show", f"{commit}:composed/CLOUD-PARENT.json")),
+                        "cloud component parent")
+        require((cloud.get("party"), cloud.get("kind"), cloud.get("name"))
+                == ("platform", "implementations", "cloud"),
+                "cloud component parent names a different package")
+        version = cloud.get("version")
+        require(isinstance(version, str) and re.fullmatch(r"\d+\.\d+\.\d+", version) is not None
+                and cloud.get("tag") == "cloud/v" + version,
+                "cloud component parent has no package version and tag")
+        assert isinstance(version, str)
+        source = sha(cloud.get("sha"))
+        require(header["cloud-package"] == cloud,
+                "cloud component parent differs from its selected composition header")
+        path = f"composed/cloud/v{version}/component-definition.json"
+        component = mapping(json.loads(git(root, "show", f"{commit}:{path}")), "cloud component definition")
+        definition = mapping(component.get("component-definition"), "cloud component definition body")
+        metadata = mapping(definition.get("metadata"), "cloud component definition metadata")
+        require(metadata.get("version") == version, "cloud component definition version differs from its parent")
+        expected = [{"party": "platform", "name": "cloud", "tag": "cloud/v" + version,
+                     "sha": source, "composed_tag": tag, "component_definition": path}]
+    require(sources == expected, "cloud component sources differ from the immutable selected composition")
+
+
 def validate_payload(root: Path, parent: str, run: dict[str, Any], profile: Profile,
                      evidence: dict[str, tuple[str, str]]) -> None:
     series = {path: json_rows(suffix) for path, (_, suffix) in evidence.items()}
@@ -692,12 +743,16 @@ def validate_payload(root: Path, parent: str, run: dict[str, Any], profile: Prof
         lists = {"missing_risk_observations", "report_read_errors", "risk_validation_errors", "risks",
                  "unmapped_failed_results", "unmapped_served_policies"}
         counts = {"mapped_served_policy_count", "report_count", "served_policy_count"}
-        keys(row, metadata | lists | counts | {"assessment_results", "status", "why"})
+        # Only TU's existing collector emits this optional provenance extension.
+        optional = {"cloud_component_sources"} if profile.org == "tuppence" else set()
+        keys(row, metadata | lists | counts | {"assessment_results", "status", "why"}, optional)
         require(row.get("kind") == "flux.oscal-lane/v1" and isinstance(row.get("assessment_results"), dict)
                 and all(isinstance(row.get(key), list) for key in lists)
                 and all(type(row.get(key)) is int and row[key] >= 0 for key in counts)
                 and row.get("status") in ("observed", "could-not-look") and isinstance(row.get("why"), str),
                 "OSCAL observation schema is invalid")
+        if "cloud_component_sources" in row:
+            validate_cloud_sources(root, parent, row["cloud_component_sources"])
         return
     rows = series["observations/twin-sweep.jsonl"]
     require(len(rows) == 1, "twin observation must append exactly one row")
