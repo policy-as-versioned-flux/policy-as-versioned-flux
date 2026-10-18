@@ -1,5 +1,5 @@
 E2E step 6 provenance
-  ok   113 published artefacts resolve to a tag on the publisher's real remote; 0 honestly queued for cut-release.yml
+  ok   116 published artefacts resolve to a tag on the publisher's real remote; 0 honestly queued for cut-release.yml
   ok   8 release workflows pin an anchored, own-repo identity regexp at the Actions OIDC issuer
   ok   driftwood/exposure newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   driftwood/forward-intel newest tag v4.0.1: real cert subject matches the anchored regexp, Rekor entry validated
@@ -15,11 +15,11 @@ E2E step 6 provenance
   ok   insurer/quote-tuppence newest tag v1.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   ludlow/exposure newest tag v5.1.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   ludlow/forward-intel newest tag v5.1.1: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   nist/publisher-reliability newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   nist/publisher-reliability newest tag publisher-reliability/v2.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   nist/sp-800-53 newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/cloud newest tag v5.3.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/currency-controller newest tag v5.3.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/identity-substrate newest tag v5.3.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/cloud newest tag v5.5.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/currency-controller newest tag v5.5.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/identity-substrate newest tag v5.5.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/policy newest tag policy/v7.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/exposure newest tag v4.1.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/forward-intel newest tag v4.1.1: real cert subject matches the anchored regexp, Rekor entry validated

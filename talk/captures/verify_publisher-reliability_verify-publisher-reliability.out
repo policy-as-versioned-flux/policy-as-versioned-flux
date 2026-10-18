@@ -1,1 +1,1 @@
-SKIP: publisher reliability waits for eligible independent forecast/outcome pairs; signed publisher-reliability/v1.0.0 has n=0, publisher-price accuracy remains unmeasured
+SKIP: publisher reliability signed publisher-reliability/v2.0.0 has no declared monetary cohorts; publisher-price accuracy remains unmeasured

@@ -1,7 +1,7 @@
 == release signing caller: embedded proof requested, signer refuses ==
 .
 ----------------------------------------------------------------------
-Ran 1 test in 0.025s
+Ran 1 test in 0.018s
 
 OK
 == envelope schema: /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/feeds/../platform/feeds/schema.json ==
@@ -83,6 +83,16 @@ ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14:
 
 
 == the threat register publishes its own magnitudes, and ships the converter that reads them ==
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 1.897s
+
+OK
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.790s
+
+OK
 ok  12 (version, institution) scenarios; 6 price a magnitude the PUBLISHER published, 6 price the frozen table and say so by name
 ok  every magnitude in major 3 is the number the platform's own table held, so the move re-homes it and does not re-price it
 ok  a magnitude with no basis refuses, naming the institution and where its basis goes

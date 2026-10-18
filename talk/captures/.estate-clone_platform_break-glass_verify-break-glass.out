@@ -14,10 +14,16 @@ break-glass selfcheck: all asserts passed (read £1,868 T1 | write £53,469 T2 |
   ok   AC2: stale device on patient data -> DENY (proportional to the higher £)
   ok   AC2: unattested/unmanaged laptop -> DENY
   -- all offline invariants hold --
+== offline: alternate assurance-band input ==
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.784s
+
+OK
 == offline: independence from the legacy operation selector ==
 .
 ----------------------------------------------------------------------
-Ran 1 test in 4.218s
+Ran 1 test in 2.949s
 
 OK
 verify-break-glass: done (offline; rides on the access plane — see ../access/verify-access.sh for the live IAP checks)
