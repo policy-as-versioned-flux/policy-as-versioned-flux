@@ -1,7 +1,7 @@
 # 148 — Composition prices an unsupported pairing
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: 146, 147, and the owner's authorisation for a platform tools tag and the adopter tags
 
 ## Question
@@ -70,3 +70,13 @@ The hub check passes on its planted cases. The truth run after the recomposes re
 Composition prices unsupported and undeclared engine pairings as named holes, with the exact engine declaration in the composed header. Engine-pairing tests pass (13 assertions). The hub priced-hole vocabulary carries both new kinds. Publication and adopter recomposition remain pending.
 
 The owner delegated the implementing decisions on 2026-10-03: "you tell me, you control them all, you don't need me to answer". This is recorded as delegated, not as an invented institution signature.
+
+## Answer
+
+**2026-10-18, delivered pricing and original rollout reconciled.** The initial all-1.18.2 milestone is historical, not a requirement to undo ticket 150's authorized successor. Each adopter's signed v4.0.1 artefact records 1.18.2 without an engine delta; its final composed-set pointer precedes the source sampled by [TRUTH 379](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/261d130a9376417be52465bfee66fae7e00b8b02/talk/truth.log). Those sources are Driftwood `1194561829ff60f89cd3889ab8cf06a45d5e9dd0`, Tuppence `011942de87ba827b5bc2949da0057d862b6b69f6` and Ludlow `e7243d917c323364c0fb74d312f921d0d1ec1356`. The signed tools, pin moves, recomposes, own composed tags and composed-set moves are delivered.
+
+[Original run 37217452830/1](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/37217452830/attempts/1), source `002f2a3c2e3849af6453d4e484a6efa3e4953fc7`, recorded original `261d130a9376417be52465bfee66fae7e00b8b02`. Its [engine-pairing capture](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/261d130a9376417be52465bfee66fae7e00b8b02/talk/captures/verify_engine-pairing_verify-engine-pairing.out) passes all three served and forward compositions and all five planted controls, including the independently weighted hole. The tracked 377→379 transition has no fall under the classwise contract: observed 28→38, self 50→54, simulated 3→4, meta 7→9; fail 25→5; ceiling 124 and total 143 unchanged. The in-gate fall capture deferred that run's not-yet-written line; it is not a claimed post-record workflow verdict. Genuine historical signature verification now accepts the exact original, production-default identity/claims and Rekor proof. This is standalone historical authentication, not a current-schema full-delivery receipt or an engine-only causal experiment.
+
+Current [recorded TRUTH 435](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/79f5d3f95042463695471822fb20c3ffc7c1e2e8/talk/captures/_grades.tsv), original `2c3a651a9c4353401c26491b05d4236ba3d69b1f` delivered through PR216, gives `verify/engine-pairing/verify-engine-pairing.sh` PASS. Its full capture binds compiler `a27c83b` to accepted implementation `703eff6`, with no engine delta on Driftwood/Tuppence 1.18.2 or Ludlow 1.19.1. The declared-engine header, independently read support/claims, missing-declaration hole price, shift-left handling and v1 machinery support are delivered. The earlier recorded 432 reader failure remains historical; local repair proof is not substituted for 435.
+
+The wrapper's touching Git subjects yield no ticket owner. This named PASS is corroboration, not an invented owned PASS; the tracker consults ownership for red rows. Original 379 supplies the post-rollout no-fall condition, not an assertion about 435's transition. Producer 435 still concludes FAILURE with four other failing rows; no estate-wide green, new financial credit or changed historical observation is claimed. Tickets 146/147 and the owner delivery steps are complete. Ludlow's later move belongs to ticket 150.
