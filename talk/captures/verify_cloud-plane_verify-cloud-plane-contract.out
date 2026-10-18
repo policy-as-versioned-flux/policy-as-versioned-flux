@@ -11,6 +11,6 @@ test_native_ready_both_policy_kinds_reach_the_unchanged_crd_gate (__main__.Cloud
 test_ready_status_does_not_accept_a_different_signed_body (__main__.CloudReadiness.test_ready_status_does_not_accept_a_different_signed_body) ... ok
 
 ----------------------------------------------------------------------
-Ran 10 tests in 0.171s
+Ran 10 tests in 0.132s
 
 OK
