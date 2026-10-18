@@ -1,7 +1,7 @@
 # 141 — An adopter declares the grade it prices on
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -321,3 +321,41 @@ reds and nothing else. On the platform branch at `e291139` over `origin/main` 55
 fast-forward): `compose/handbook.py --selfcheck` 54 checks PASS; `party/party_artefact.py
 --selfcheck` selfcheck ok; `PAVC_ESTATE_CLONE=... compose/composition.py --selfcheck` selfcheck
 ok. Not run, per the brief: the full pytest suite and `talk/verify-all.sh`.
+
+## Answer
+
+**2026-10-18, delivered source, releases and adoption reconciled.** The declaration is built and
+published. The released [platform party schema](https://github.com/policy-as-versioned-platform/platform/blob/e8d1c95780354c8209cc8ee68176abfcd6ca674b/party/schema.json) admits only integer
+`appetite.pricing_threshold` 2 or 3; its validator reads that enum. Absent declarations retain
+both ladder defaults at 2, and grades 4/5 never admit an amount. `size.data_subjects` is optional;
+the other four size fields remain required and a present value is validated. A consumer needing
+an absent instrument still refuses by name.
+
+The [hub declaration reader](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/38b6c14c4fc9fb886e877c21a8fe706e48799145/twin/evidence.py), overlay/schema tie, admitting and pricing
+paths apply the signed declaration per perspective. [Synthetic-record checks](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/38b6c14c4fc9fb886e877c21a8fe706e48799145/twin/synthetic.py)
+cover propagation, admitting path and valuation; they cannot strengthen the grade that a price
+rests on. In the graded twin-price domain of implementation decision 6 above, the weakest grade
+passes through the forward-intel payload, composed twin price and handbook. This does not assign
+fabricated ladder grades to other ungraded feed prices. The original feature and refusal controls
+remain in [the committed feature tests](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/38b6c14c4fc9fb886e877c21a8fe706e48799145/tests/test_pricing_threshold.py).
+
+The genuine signed adopter v4.0.0 releases carry declaration 3: [driftwood](https://github.com/policy-as-versioned-driftwood/driftwood/blob/1cd446f62a531c0aeee7e50c0a59a11ac5d00d67/party.yaml),
+[tuppence](https://github.com/policy-as-versioned-tuppence/tuppence/blob/f575dc12de130c444d98a831de0ca21fd68b9c46/party.yaml)
+and [ludlow](https://github.com/policy-as-versioned-ludlow/ludlow/blob/c5f33cc8982fc9bfeb7fcc2068ea8de0dda63dae/party.yaml).
+Their later published compiler [5.3.1 release](https://github.com/policy-as-versioned-platform/platform/releases/tag/v5.3.1)
+adoptions preserve those declarations and grade-3 twin outputs: [DW](https://github.com/policy-as-versioned-driftwood/driftwood/blob/a5d8c5b935b43e4bc9674717de9e11afa6823d82/composed/evidence.json),
+[TU](https://github.com/policy-as-versioned-tuppence/tuppence/blob/297811777192081de76de1b6f5904e5de5f9268f/composed/evidence.json),
+[LU](https://github.com/policy-as-versioned-ludlow/ludlow/blob/73580335bfab5b19e2bb84e40039208e07601fe1/composed/evidence.json).
+The old release/adoption wait is therefore historical. The named gate is
+`verify/twin-evals/verify-twin-evals.sh`; its latest recorded result is acknowledged separately
+below rather than replaced by a source-test result.
+
+## Recorded check acknowledgement
+
+**Follow-up, 2026-10-18.** `verify/twin-evals/verify-twin-evals.sh` is still FAIL in genuine
+[recorded run 432](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/d096cd2f0515a8aa2f9de1b671f5f227beba5478/talk/captures/verify_twin-evals_verify-twin-evals.out): its feed-version lookup leg 16
+has no `publisher-reliability` row in `STEEP_BY_FEED`, the sole observed-false leg in that capture.
+The recorded red is preserved and acknowledged, not waived. [PR211](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/211)
+delivered the reviewed source correction at [38b6c14c](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/commit/38b6c14c4fc9fb886e877c21a8fe706e48799145);
+no subsequent recorded PASS is claimed. The original grades and capture remain unchanged; the
+recorded harness metrics remain explicitly unmeasured.

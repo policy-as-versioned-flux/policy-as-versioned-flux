@@ -76,3 +76,20 @@ Consequences for this ticket, each **delegated** (ADR-0025):
 Published comparison inputs and explicit pricing grades are prepared for the three adopters. Currency conversion uses the authentic August 2026 HMRC payload, with the filing date and conversion month recorded separately. The valuation tests pass. Signed publication, recomposition and scheduled twin observations remain pending.
 
 The owner delegated the implementing decisions on 2026-10-03: "you tell me, you control them all, you don't need me to answer". This is recorded as delegated, not as an invented institution signature.
+
+## Delivered core and remaining response evidence, 2026-10-18
+
+The old publication/recomposition wait above is historical. The original fixed comparable sizes,
+shares, native currencies and source dates, single replacement cash-flow edges, selection-policy
+packages, declaration 3 and forward-intel publishing contracts reached genuine signed v4.0.0
+releases and the later published compiler 5.3.1 compositions linked in ticket 141's Answer.
+[DW's published edge](https://github.com/policy-as-versioned-driftwood/driftwood/blob/a5d8c5b935b43e4bc9674717de9e11afa6823d82/twin/orgs/driftwood/edges/cart-pii-loss-cuts-checkout-revenue.yaml)
+is grade 3 with its DSG/Currys comparable anchor; TU/LU retain the fixed Starling/Elevance filing
+facts recorded above. No figure, date, currency, threshold or price is changed by this record.
+
+**2026-10-18, literal item 1 remains unreconciled.** The nonexistent DW postmortems/drill were
+withdrawn, and its [response options](https://github.com/policy-as-versioned-driftwood/driftwood/tree/a5d8c5b935b43e4bc9674717de9e11afa6823d82/twin/orgs/driftwood/responses)
+remain grade 5 with no new mitigation credit. That is a safer, honest deviation from the original
+request for grade 3 or a real source; it is not literal completion of that request. No response is
+promoted to grade 3 by this note. The ticket remains claimed pending explicit reconciliation of
+that deviation or genuine supporting evidence, without adding a new completion condition.

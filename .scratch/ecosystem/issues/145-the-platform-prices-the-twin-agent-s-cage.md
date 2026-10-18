@@ -1,7 +1,7 @@
 # 145 — The platform prices the twin agent's cage
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -423,3 +423,42 @@ now naming v4.0.0's `PRICE_KINDS`; `verify/misuse/verify-misuse.sh` PASS and
 `verify/tier-binding/verify-tier-binding.sh` PASS. The ticket-only push of f7f78c35 matched no truth
 path and triggered no truth run. Platform PR #46 (head 0f46233) and feeds PR #9 (head b1d9459b,
 unchanged) report no pull-request checks in their repositories.
+
+## Answer
+
+**2026-10-18, delivered pricing feature reconciled.** The separate
+[platform twin-agent table](https://github.com/policy-as-versioned-platform/platform/blob/e8d1c95780354c8209cc8ee68176abfcd6ca674b/graded/cage.py) is published in genuine tools releases,
+including [v5.3.1](https://github.com/policy-as-versioned-platform/platform/releases/tag/v5.3.1)
+now adopted by all three parties. Its four rungs derive reductions from the four named misuse
+closures and served reach, with zero cash run cost excluded from selection. Model claims remain
+grade 5 and cannot price. The published [threat-register v4 row](https://github.com/policy-as-versioned-feeds/feeds/blob/974e73514e0d8d4cad2e6906acf51d1cc27028b3/threat-register/v4/feed.json)
+is the frequency input; the signed [threat-register/v4.0.0](https://github.com/policy-as-versioned-feeds/feeds/releases/tag/threat-register/v4.0.0)
+release supplies that contract.
+
+The [composer](https://github.com/policy-as-versioned-platform/platform/blob/e8d1c95780354c8209cc8ee68176abfcd6ca674b/compose/composition.py) emits `kind: agent-cage`, `source: platform`,
+`subject: twin-agent`, derives the gap between the selected and loosest pod residuals over the
+registered detection interval, and carries reach, closures, residuals and frequency/amount basis.
+The subject-aware [tier fold](https://github.com/policy-as-versioned-platform/platform/blob/e8d1c95780354c8209cc8ee68176abfcd6ca674b/wargamer/wargamer.py) leaves that line out of the Namespace
+fold; the pound seam and handbook know the kind. Actual published [DW](https://github.com/policy-as-versioned-driftwood/driftwood/blob/a5d8c5b935b43e4bc9674717de9e11afa6823d82/composed/evidence.json),
+[TU](https://github.com/policy-as-versioned-tuppence/tuppence/blob/297811777192081de76de1b6f5904e5de5f9268f/composed/evidence.json)
+and [LU](https://github.com/policy-as-versioned-ludlow/ludlow/blob/73580335bfab5b19e2bb84e40039208e07601fe1/composed/evidence.json)
+compositions carry the line. This retains the source's schedule-delay, detection-versus-repair
+and published-frequency limits; no new measured loss or live actor capability is asserted.
+
+The adopter's own selection policy selects the rung. The existing reviewed round-2 decision above
+uses the [bounded recompose proposal route](https://github.com/policy-as-versioned-platform/platform/blob/e8d1c95780354c8209cc8ee68176abfcd6ca674b/wargamer/tier_pr.py): the next reviewed
+recompose PR carries a changed agent rung, rather than an independent second branch or a Namespace
+edit. Current genuine lines show no changed agent rung; this record invents no human merge of
+one and does not import ticket 74's separate real-crossing completion condition. The twin does
+not select or price its own cage.
+
+Genuine [run 432's pound-seam capture](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/d096cd2f0515a8aa2f9de1b671f5f227beba5478/talk/captures/verify_pound-seam_verify-pound-seam.out), named by
+`verify/pound-seam/verify-pound-seam.sh`, records PASS for each party's agent-cage line and for
+each selection/Namespace-fold comparison. Its overall grade remains SKIP because of separately
+named lawful CVE and switching missing instruments. `verify/tier-binding/verify-tier-binding.sh`
+and `verify/misuse/verify-misuse.sh` are PASS in the [unchanged recorded grade table](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/d096cd2f0515a8aa2f9de1b671f5f227beba5478/talk/captures/_grades.tsv).
+That misuse capture still includes four old waits on this ticket. This same record update replaces
+only those waits with the delivered platform/table/reach, all three composed-line and register
+anchors. All four misuse mechanisms remain; source-anchor validation is not a fresh recorded
+world result or proof that an actor obeys the cage. Ticket 142's separate live lane is not resolved
+or exercised here.
