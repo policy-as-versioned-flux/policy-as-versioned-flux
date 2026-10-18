@@ -59,6 +59,9 @@ STEEP_BY_FEED: dict[str, str] = {
     "eol": "technological",
     "cve": "technological",
     "threat-register": "technological",
+    # A pinned binary-forecast diagnostic is a software/instrument publication, not a price
+    # accuracy result. Its publication remains a grade-5 contestable signal even when unmeasured.
+    "publisher-reliability": "technological",
     # Exchange rates and market prices are the economy talking.
     "fx": "economic",
     "market-moves": "economic",
