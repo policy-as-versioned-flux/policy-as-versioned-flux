@@ -1,7 +1,7 @@
 # 143 — The twin sweep splits into a read-only twin job and a writer
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: 145
 
 ## Question
@@ -137,3 +137,57 @@ as the served ref; hub at 9c3b1f22):
   live proof: on driftwood a green run with a new observation line whose `twin_ref` names the
   pinned commit; on tuppence and ludlow a red run whose recorded line is `could_not_look` at the
   pinned commit, as today.
+
+
+## Answer
+
+**2026-10-18, delivered record reconciled.** The five Question items are served in all three
+adopters. Each twin checks out hub commit `5bc47331a536476f3580542be794908f5053f816`
+from its own `twin/PIN.yaml` and checks the resulting HEAD; its declared twin version is 0.1.0.
+The twin job has read-only contents permission. The inline-shell writer has no hub checkout or
+twin code, validates the artifact's paths and the whole observation against its own pin, then
+appends that observation unchanged. Action commits, pip requirements and the gitsign download
+are hash-pinned. Both jobs read the adopter's selected, priced agent-cage rung: baseline and
+restricted allow the existing proposal route, quarantine appends observations only, and isolated
+writes nothing. Driftwood proposes only when the render moved; tuppence and ludlow remain the
+observation-only instruments described above. Their classifier distinguishes a genuine changed
+render from a refused directory or loader traceback, recording the latter as
+`could_not_render`, `moved: null`, without a proposal. Ticket 145's selected-rung dependency is
+resolved; no later parser/emitter incompatibility was found at these served pins.
+
+The first scheduled runs after the split were on 2026-10-04, all on main, attempt 1, with both
+`twin` and `write` jobs successful. Their actual checkout, validated handoff, single appended
+ledger line and original observation commit agree:
+
+- [Driftwood run 37204534128](https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/37204534128),
+  source `a1707bb7d13447edaeba85f26c3240cd8884a415`, original
+  [2e04b9803a57cd0d61afa3ef2deeca74f749d969](https://github.com/policy-as-versioned-driftwood/driftwood/commit/2e04b9803a57cd0d61afa3ef2deeca74f749d969).
+- [Tuppence run 37204848859](https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/37204848859),
+  source `55bf5aa14d80f6cee4c524394d08b244b1461846`, original
+  [7b3b0bd7aeb0895a0557a0cb8de6b17bdaba91f2](https://github.com/policy-as-versioned-tuppence/tuppence/commit/7b3b0bd7aeb0895a0557a0cb8de6b17bdaba91f2).
+- [Ludlow run 37205184454](https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/37205184454),
+  source `179e4e0d8e754044b07a65933754244352e28ec5`, original
+  [035c9b991c5e2d69134737db7967437a62d6f288](https://github.com/policy-as-versioned-ludlow/ludlow/commit/035c9b991c5e2d69134737db7967437a62d6f288).
+
+All three observations name the same pinned hub commit above and report an unchanged render,
+`moved: false`; tuppence and ludlow record emitter exit 0. The September 26 final paragraph is
+retained as its then-current expectation: those adopters could not look at that time. Their
+later successful first scheduled renders fulfill the pinned handoff behavior; reproducing the
+old red outcome with changed inputs would discard the actual observation. Official schedule
+metadata, both jobs' runtime logs, split/source ancestry, exact ledger-prefix-plus-one-append
+proofs and original raw commits are frozen in the October 18 ticket143 contract audit. Each
+original signature was separately verified with the genuine production-default gitsign
+certificate claims and Rekor, including its repository, workflow, main ref, source and schedule
+trigger. That authentication is of the original commit, not a current-schema full historical
+delivery receipt.
+
+Recorded [TRUTH run 435](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/actions/runs/39169162198)
+grades `verify/twin-cage/verify-twin-cage.sh` PASS for the three served workflows and their priced
+rungs. This is the current check supporting this record, not an invented owned-PASS claim.
+Run 435 remains FAILURE with its other four failing rows; the schedules row still fails for
+feeds/fetch. This ticket's reconciliation does not dispose of that failure or change a grade.
+The live moved path remains unobserved and its separate capture remains SKIP. The future signed
+`twin/v0.1.0` tag is still absent, so its replacement of the commit pin remains conditional.
+Ticket 142's local live environment resistance is stopped and unmeasured, as the current
+capture's LIMIT states. Neither a moved event, a new tag nor a live actor probe is manufactured
+to close this delivered split-and-handoff task.
