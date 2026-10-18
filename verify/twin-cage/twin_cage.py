@@ -22,6 +22,7 @@ LADDER = ('baseline', 'restricted', 'quarantine', 'isolated')
 INERT = ('actions/checkout', 'actions/upload-artifact', 'actions/download-artifact')
 HEX = re.compile(r'^[0-9a-f]{40}$')
 PROGRAM = re.compile(r'(?m)^\s*(?:python3?|bash|sh|node|npx)\s+|\./\S+\.py')
+PROPOSAL_COMMAND = re.compile(r'gh\s+pr\s+create|git\s+checkout\s+-b')
 HUB = 'policy-as-versioned-flux/policy-as-versioned-flux'
 
 
@@ -69,7 +70,8 @@ def grade(files: dict[str, str], organization: str | None = None) -> list[str]:
                 errors.append('twin package download is not hash-pinned')
             if ('curl ' in shell or 'wget ' in shell) and not ('sha256sum' in shell or 'shasum' in shell):
                 errors.append(job_name + ' download carries no checksum comparison')
-            if job_name == 'write' and ('gh pr create' in shell or 'git checkout -b' in shell):
+            # Proposal detection folds continuations; trusted programs stay byte-exact.
+            if job_name == 'write' and PROPOSAL_COMMAND.search(re.sub(r'\\\r?\n', '', shell)):
                 condition = str(step.get('if', ''))
                 if step_index not in transports and ("steps.cage.outputs.rung == 'baseline'" not in condition or "steps.cage.outputs.rung == 'restricted'" not in condition):
                     errors.append('proposal step runs outside baseline/restricted')

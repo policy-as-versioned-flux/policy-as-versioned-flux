@@ -57,6 +57,39 @@ class TwinObservationTransport(unittest.TestCase):
                 workflow, files = fixture(organization)
                 self.assertEqual(grade(workflow, files, organization), [])
 
+    def test_proposal_command_whitespace_does_not_bypass_rung_guards(self) -> None:
+        for organization in ('driftwood', 'tuppence', 'ludlow'):
+            for command in ('gh  pr create', 'gh\tpr create', 'gh pr\tcreate',
+                            'gh \\\n  pr create'):
+                with self.subTest(organization=organization, command=command):
+                    workflow, files = fixture(organization)
+                    publisher = next(s for s in workflow['jobs']['write']['steps']
+                                     if 'DELIVERY_BRANCH=' in s.get('run', ''))
+                    self.assertEqual(publisher['run'].count('gh pr create'), 1)
+                    publisher['run'] = publisher['run'].replace('gh pr create', command)
+                    self.assertIn('proposal step runs outside baseline/restricted',
+                                  grade(workflow, files, organization))
+
+    def test_unknown_proposal_whitespace_still_requires_both_rung_guards(self) -> None:
+        guards = ("", "steps.cage.outputs.rung == 'baseline'",
+                  "steps.cage.outputs.rung == 'restricted'",
+                  "steps.cage.outputs.rung == 'baseline' || steps.cage.outputs.rung == 'restricted'")
+        commands = ('gh  pr create', 'gh\tpr create', 'gh \\\n  pr create',
+                    'git  checkout -b proposal', 'git\tcheckout \\\n  -b proposal')
+        for organization in ('driftwood', 'tuppence', 'ludlow'):
+            for command in commands:
+                for condition in guards:
+                    with self.subTest(organization=organization, command=command, condition=condition):
+                        workflow, files = fixture(organization)
+                        writer = workflow['jobs']['write']
+                        cage_step = next(s for s in writer['steps'] if s.get('id') == 'cage')
+                        writer['steps'] = [cage_step, {'run': command, 'if': condition}]
+                        faults = grade(workflow, files, organization)
+                        if condition == guards[-1]:
+                            self.assertEqual(faults, [])
+                        else:
+                            self.assertIn('proposal step runs outside baseline/restricted', faults)
+
     def test_labels_do_not_choose_the_program_class(self) -> None:
         for organization in ('driftwood', 'tuppence', 'ludlow'):
             with self.subTest(organization=organization):
