@@ -1,7 +1,7 @@
 # 159 — A tier label on an ungoverned namespace steers the cage
 
 Type: task (AFK)
-Status: claimed
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -36,3 +36,9 @@ The current signed5.0.0 body and adopter artefacts remain unchanged. Signed rele
 acceptance, adoption and the served-body truth check remain outstanding.
 
 Evidence and durable platform diff: [engine report](../patches/resume-2026-10-03/engine-report.md).
+
+## Answer
+
+**Delivery reconciled, 2026-10-18.** Delegated option(a), already recorded above under ADR-0025, is built and delivered in signed [policy 7.0.0](https://github.com/policy-as-versioned-platform/platform/releases/tag/policy/v7.0.0). The [new platform body](https://github.com/policy-as-versioned-platform/platform/blob/2f9c6b2ea1757e4a1053b60a4e1766c5f14de4c3/graded/policies/cage-tier.yaml) reads a Namespace tier only when `policy-as-versioned.dev/governed` equals `"true"`; an ungoverned baseline label falls to isolated for a claiming pod. The [ungoverned-baseline corpus case](https://github.com/policy-as-versioned-platform/platform/blob/2f9c6b2ea1757e4a1053b60a4e1766c5f14de4c3/graded/tests/cage-tier/kyverno-test.yaml) and [Namespace values](https://github.com/policy-as-versioned-platform/platform/blob/2f9c6b2ea1757e4a1053b60a4e1766c5f14de4c3/graded/tests/cage-tier/values.yaml) grade that distinction. Existing computed-semver, signature and authorized adoption receipts are retained; 6.0.1 was an earlier candidate, not the final adopted release. No option(b) doctrine change is made.
+
+The selected 7.0.0 bodies are served by [Driftwood](https://github.com/policy-as-versioned-driftwood/driftwood/blob/5a1b9a1ae85f88dfe91a71aca8eeb308349097ff/composed/policies/v7.0.0/cage-tier.yaml), [Tuppence](https://github.com/policy-as-versioned-tuppence/tuppence/blob/e7e2969cd50ab3e88fa11afe61d5bee5d1db30d4/composed/policies/v7.0.0/cage-tier.yaml) and [Ludlow](https://github.com/policy-as-versioned-ludlow/ludlow/blob/e65acc95bd107e0ba2864b2ca2f23b51714dc4c1/composed/policies/v7.0.0/cage-tier.yaml). The existing registered checks `.estate-clone/driftwood/verify-cage-probe.sh`, `.estate-clone/tuppence/verify-cage-probe.sh`, `.estate-clone/ludlow/verify-cage-probe.sh` and `.estate-clone/platform/computed-semver/verify-cage-engine.sh` all have PASS in the unchanged [recorded run 432 table](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/d096cd2f0515a8aa2f9de1b671f5f227beba5478/talk/captures/_grades.tsv). The actual 7.0.0 body corpus already passed for all three adopters. This is the requested served-body rule proof, not a new claim about a Namespace created at runtime or live actor enforcement. Frozen historical bodies and observations remain intact.
