@@ -57,9 +57,10 @@ widens what it grades.
      missing behaviour, not a missing instrument. The gate can read everything the price needs: the
      line's claims and their hole prices. Only the engine is unknown, and the price already assumes
      the worst engine.
-   - The worst case is that a body does not load. Whether a body that does not compile fails open
-     or refuses at admission is not measured. Ticket 150 measures it. If admission refuses, this
-     point reopens, because a refusal is not a hole (ticket 98).
+   - The worst case is that a body does not load. At this decision's date, whether a body that
+     does not compile fails open or refuses at admission was not measured. Ticket 150 measures
+     it. If admission refuses, this point reopens, because a refusal is not a hole (ticket 98).
+     The October 18 confirmation below records the measured answer for one exact pairing.
    CONTEXT.md: **Unsupported pairing**.
 4. **One grader run grades every cell, before and after the cut.** A cell is one line on one
    engine. The caller supplies one binary for each engine. A listed cell with no binary reads
@@ -140,3 +141,22 @@ The planted experiment continues to exercise upstream policy with explicitly syn
 the served experiment continues to grade committed artefacts against their own pinned parent.
 Unsupported pairings remain priced with the independently derived claims and weights. No
 historical grade, declaration, acceptance, immutable policy, observation or price is rewritten.
+
+## Confirmed 2026-10-18 from ticket 150's admission rehearsal
+
+The existing October 3 isolated upgrade rehearsal confirms point 3's fail-open possibility for
+frozen cage-tier 5.0.0 on Kyverno 1.19.1. The same policy UID and spec first caged a pod on
+1.18.2. After the engine upgrade, a server dry-run Pod CREATE in the governed baseline namespace
+was admitted without its cage mutations: no tier, PriorityClass or container runAsNonRoot. The
+[original measurement](../../.scratch/ecosystem/research/resume-2026-10-03/engine-150-admission/upgrade/measurement.json)
+and adjacent raw policy/pod records remain unchanged. The throwaway cluster was deleted. This is
+the bounded admission answer required by ticket 150, not a scheduled workload observation or a
+claim about every unsupported pairing. It grants no additional engine support and changes no
+hole price. A future measured refusal still reopens point 3 for that case.
+
+The historical 6.0.1 rehearsal candidate is not the released correction selected by the estate;
+the final retained line is 7.0.0. Separately, genuine scheduled Ludlow observations now cover the
+1.18.2 baseline and the declared 1.19.1 deployment. Their comparison and remaining report-emission
+limits are recorded in [ticket 150](../../.scratch/ecosystem/issues/150-one-adopter-runs-kyverno-1-19-1-on-a-live-cluster.md).
+That chronological comparison does not isolate the engine from simultaneous retirement,
+compiler, instrument and source changes, and this confirmation does not close the ticket.

@@ -70,3 +70,50 @@ the reason for each difference. A dispatched run does not count. The admission q
 Ludlow is selected because it does not share the cluster that serves tuppence. The isolated upgrade rehearsal retained the frozen 5.0.0 policy UID and spec: admission caged the pod on 1.18.2, then admitted it uncaged after upgrading to 1.19.1. Candidate 6.0.1 admitted and caged it while preserving pod runAsNonRoot. The raw measurement and cleanup records are in research/resume-2026-10-03/engine-150-admission/upgrade/. Both isolated clusters were deleted. This is rehearsal evidence. A scheduled 1.18.2 PolicyReport capture must precede Ludlow’s actual engine move, followed by the scheduled 1.19.1 comparison; neither is fabricated.
 
 The owner delegated the implementing decisions on 2026-10-03: "you tell me, you control them all, you don't need me to answer". This is recorded as delegated, not as an invented institution signature.
+
+## Comments
+
+### 2026-10-18: genuine scheduled comparison and bounded ADR confirmation
+
+The scheduled baseline is [run 38911688433, attempt 1](https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/38911688433),
+source `9f76b2af169e76030538f0816db54e30f817b220`, original signed observation
+[`f7449340dee254cba43ad5a829ab01403df9a97d`](https://github.com/policy-as-versioned-ludlow/ludlow/commit/f7449340dee254cba43ad5a829ab01403df9a97d),
+on declared Kyverno 1.18.2. Its protected-main write failed after measurement; the original was
+subsequently recovered unchanged. The first scheduled 1.19.1 comparison is
+[run 39034542013, attempt 1](https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/39034542013),
+source `34f077499b129005703aa0ed3d46ad9471a59868`, original signed observation
+[`ea3e831de6531b10c9f519fa5a34286db17e4f87`](https://github.com/policy-as-versioned-ludlow/ludlow/commit/ea3e831de6531b10c9f519fa5a34286db17e4f87),
+delivered through ordinary PR76. Official installation logs bind each exact declared engine and
+checksum. Production signature/ancestry readers accept both originals; their three observation
+files conserve the exact source prefixes and appended bytes on current Ludlow main.
+
+All seven boolean facts remain true for all three source rows: 21 true values per run from one
+cluster, not three independent cluster experiments. Reports remains Running on policy 7.0.0
+with the same image and apps inputs; the reference also remains Running. Ludlow's explicit
+retirement of 5/6 was delivered on 1.18.2 before its engine move. The retained eight version 7
+bodies are byte-identical; 18 version 5/6 bodies are removed. Both samples read 42 PolicyReports
+and map nine policies. All 12 non-SKIP outcomes (10 pass, two fail) and all eleven core price/tier
+projections are equal. No unsupported-engine delta is present. Driftwood and Tuppence retain
+their own 1.18.2 declarations.
+
+Normalized OSCAL observations change from 468 to 136. Of the 332 removed SKIPs, 252 belong to the
+retired 5/6 lines. The other 80 are 40 each from retained require-nonroot 7 and orphan-guard;
+their cause remains **unmeasured**, because raw PolicyReport result bodies were not retained.
+The same two missing risk joins remain: `42ca452a-8b23-50d0-8b67-3fa61c65e221` and
+`6a834573-26b8-51b6-83a9-1c40cda91ab9`. Neither is replaced with a fabricated risk or zero price.
+Fresh cluster resource identities and an 8 Ki runner memory difference are also retained; the
+memory difference has no measured cause. Separate CVE absence-set churn and genuine EOL feed
+publication change price provenance metadata without changing the eleven core monetary/tier
+projections. Retirement, machinery, compiler, instrument and source changes accompany the
+engine upgrade, so this is a chronological comparison, not an engine-only causal experiment.
+
+[ADR-0033 point 3](../../../docs/adr/0033-a-policy-line-supports-exactly-the-engines-it-passed-on-and-any-other-engine-is-priced.md)
+is now confirmed for the bounded fail-open possibility measured in the unchanged October 3
+isolated server-dry-run rehearsal. That rehearsal is reasoning evidence, not scheduled Done
+evidence, and its historical 6.0.1 candidate is not substituted for the final retained 7.0.0 line.
+The genuine hub TRUTH 430 original `e5c83d9694650e591777f2a746f28a4a31c37c2e` separately records
+the declared 1.19.1 CLI document probe passing for Ludlow's selected v5.1.1 composition and HEAD;
+scheduled facts 6/7 supply the separate running-cluster evidence. No new cluster or probe was
+started for this record. This amendment preserves the claimed status; completion will be assessed against the original
+Done conditions, dependencies and current recorded grades. The unresolved differences remain
+explicit limits. Historical observations, grades, prices and dates are unchanged.
