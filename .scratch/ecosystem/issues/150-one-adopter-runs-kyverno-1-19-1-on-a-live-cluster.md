@@ -1,7 +1,7 @@
 # 150 — One adopter runs Kyverno 1.19.1 on a live cluster
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: 147, 148, 149, and owner steps: the adopter-gate retirement, the adopter's signed composed tag and composed-set move, and a platform tools tag that carries the 149 line
 
 ## Question
@@ -117,3 +117,13 @@ scheduled facts 6/7 supply the separate running-cluster evidence. No new cluster
 started for this record. This amendment preserves the claimed status; completion will be assessed against the original
 Done conditions, dependencies and current recorded grades. The unresolved differences remain
 explicit limits. Historical observations, grades, prices and dates are unchanged.
+
+## Answer
+
+**2026-10-18, scheduled migration and admission answer reconciled.** Ludlow was chosen because it does not share the cluster serving Tuppence. The authorized retirement of 5/6 on 1.18.2, signed composed delivery and pointer preceded the engine move; the selected workload and composed set retain only final compatible line 7.0.0. Ticket 148's original stage is now reconciled above; tickets 147/149 and the recorded owner steps are delivered. This resolves the tracker dependency now, without rewriting earlier claimed statuses or migration history.
+
+The genuine scheduled comparison is [38911688433/1](https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/38911688433/attempts/1), source `9f76b2af169e76030538f0816db54e30f817b220`, original `f7449340dee254cba43ad5a829ab01403df9a97d`, on declared 1.18.2, followed by the first scheduled [39034542013/1](https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/39034542013/attempts/1), source `34f077499b129005703aa0ed3d46ad9471a59868`, original `ea3e831de6531b10c9f519fa5a34286db17e4f87`, on declared 1.19.1. Official install logs bind the exact declaration/checksums. These are schedules, not dispatched substitutes. All seven facts on all three source rows remain true, and all eleven core price/tier projections are equal, without an engine delta.
+
+The October 18 comparison above records item 6's PolicyReports and the bounded admission answer: the unchanged October 3 isolated 5.0.0/1.19.1 server-dry-run admitted an uncaged pod, confirming ADR-0033 point 3's fail-open possibility for that exact pairing. The deleted throwaway-cluster rehearsal is reasoning, not scheduled Done evidence; historical 6.0.1 is not substituted for released 7.0.0. The eight retained version-7 bodies stay exact. Both schedules carry 42 PolicyReports and equal twelve non-SKIP outcomes. The 80 retained-policy SKIPs that cease to appear, 8 Ki runner memory difference and two missing risk joins remain explicitly unresolved. The comparison does not isolate engine causality. Driftwood and Tuppence remain on their own 1.18.2 declarations.
+
+Recorded 435 gives `.estate-clone/ludlow/verify-cage-probe.sh` and `verify/engine-pairing/verify-engine-pairing.sh` PASS, corroborating the declared 1.19.1 CLI and supported composed inputs. Neither wrapper's touching Git subjects establishes ticket ownership, so neither is claimed as an owned PASS for this ticket. Scheduled facts 6/7 provide the separate running-cluster evidence. The original Done requires matching seven-fact values or explanations for changed facts, the PolicyReport comparison and the recorded admission/ADR answer; it does not require a new engine-only cause for every ancillary raw difference. Producer 435's four other failures and all unmeasured financial/cohort limits remain. No new cluster, probe, observation, price, engine or policy release was created by this record reconciliation.
