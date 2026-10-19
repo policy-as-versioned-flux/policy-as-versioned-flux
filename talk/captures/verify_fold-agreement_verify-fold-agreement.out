@@ -1,7 +1,7 @@
   ok   selfcheck: with git unreachable this script exits 3 and its last line is SKIP:
 ....
 ----------------------------------------------------------------------
-Ran 4 tests in 0.300s
+Ran 4 tests in 0.450s
 
 OK
 ok: platform checked out at v2.0.1 (533dccb0a823), the tag every planted pin names as the head
