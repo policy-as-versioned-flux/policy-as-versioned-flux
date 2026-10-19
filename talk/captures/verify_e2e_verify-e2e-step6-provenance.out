@@ -17,9 +17,9 @@ E2E step 6 provenance
   ok   ludlow/forward-intel newest tag v5.1.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   nist/publisher-reliability newest tag publisher-reliability/v2.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   nist/sp-800-53 newest tag v1.1.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/cloud newest tag v5.5.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/currency-controller newest tag v5.5.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   platform/identity-substrate newest tag v5.5.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/cloud newest tag v5.6.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/currency-controller newest tag v5.6.0: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   platform/identity-substrate newest tag v5.6.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/policy newest tag policy/v7.0.0: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/exposure newest tag v4.1.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   tuppence/forward-intel newest tag v4.1.1: real cert subject matches the anchored regexp, Rekor entry validated
