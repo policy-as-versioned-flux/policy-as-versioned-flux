@@ -112,3 +112,53 @@ Ticket 27 remains open for legacy access retirement rollout completion and authe
 per-organisation break-glass/assurance bands. The tools-v6 rollout is not recorded here as
 complete. The identity shelf remains; this delivery enacts no movement and invents no
 financial inputs.
+
+
+## Delivery — legacy access retirement, 2026-10-21, after tools-v6 rollout
+
+The preceding rollout-pending paragraph records the earlier stage of this delivery. That
+retirement rollout is now complete. [Platform PR67](https://github.com/policy-as-versioned-platform/platform/pull/67)
+landed source `8c1880f273323ab5da9f6c0853c68f1b3fecfc67`. The old `access/access.py` path
+is migration guidance only: every invocation reports retirement and exits 3. `OP_TIER` and
+the static operation decisions are removed; stale executable callers use the existing
+priced break-glass offline fixture where needed, without activating actor integration. The
+existing priced decision AST, calibration and deployment YAML bodies remain unchanged.
+
+The public CLI regression first observed the old `read --oidc` return `ALLOW`/0, then the
+retired guard return 3. The existing registered offline break-glass wrapper passed in
+9.137 seconds, and scoped typing passed for its three changed source files. These are
+self-proofs, not live authentication or access evidence. The normal signed
+[tools v6.0.0 release](https://github.com/policy-as-versioned-platform/platform/releases/tag/v6.0.0)
+(public Release 419755255; annotated tag `b0bf017023ac0f13404f10910fc2cb396c3cb7cb`)
+targets that source. Six genuine serial public CLI compose calls at the same inputs proved
+all 155 generated files and complete JSON types/documents equal between tools v5.6 and v6;
+all eleven input vectors were conserved. No financial date was overridden or new financial
+observation inferred.
+
+The actual one-file tools-pin rollout merged normally as
+[Driftwood PR86](https://github.com/policy-as-versioned-driftwood/driftwood/pull/86)
+(`ff13e733a9f749fdad8e94e36b02ce93aa856619`),
+[Tuppence PR90](https://github.com/policy-as-versioned-tuppence/tuppence/pull/90)
+(`ed6c39c1dbc36c0b2b32672c52423cf3b91fb236`) and
+[Ludlow PR91](https://github.com/policy-as-versioned-ludlow/ludlow/pull/91)
+(`c8c4259f695ba1282db5f148e22be79a0d2d1191`). Their original CI runs
+39631644523, 39631656646 and 39631672691 passed both `compose-check` and `shift-left`,
+with actual pinned-parent no-drift verdicts. Independent public conservation verified all
+658 source entries, 655 entries outside the pins, thirteen entire clock histories with full
+blame, 233 current raw originals including all 215 earlier ones, and 27 old adopter tags.
+
+The natural closed-PR runs
+[Driftwood 39633426608](https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/39633426608),
+[Tuppence 39633460753](https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/39633460753)
+and [Ludlow 39633494210](https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/39633494210)
+checked out those actual merges and verified tools v6.0.0 at `8c1880f`. Every step passed.
+Each tier proposer held at `isolated` and returned `[]`; no new tier move or comparison
+report was observed. The separate inventory leg verified existing `retune-*-served-images`
+branches against their own workflow identity; that is not a new tier proposal. These
+closed-PR results are not ticket 161 scheduled receipts or a new recorded TRUTH grade.
+
+The original claim-preserving tier-move implementation/report and source-only legacy access
+retirement rollout portions are delivered. Ticket 27 remains open only for authentic
+per-organisation break-glass/assurance bands. Actor integration remains explicitly shelved,
+not an additional unmet criterion. Ticket 74 retains its own genuine crossing and human
+merge requirement; no live enactment or genuine actor assurance is claimed here.
