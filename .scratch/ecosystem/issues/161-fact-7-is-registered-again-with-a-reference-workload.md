@@ -1,7 +1,7 @@
 # 161 — Fact 7 is registered again with a reference workload
 
 Type: task (AFK)
-Status: claimed
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -47,3 +47,35 @@ This ticket blocks ticket 151, and the fleet, policy and governance-agent row of
 ## Answer
 
 **Local implementation, 2026-10-03.** Recovered the interrupted reference-workload implementation onto all three adopter mains after ticket 147. The declaration files stay intact. Facts 6/7 use the newest committed cage-section registration; old samples remain could-not-look. The reference is unclaimed and its Namespace declares no rung; bottom checks use live priorities and selecting NetworkPolicies; three post-registration nulls become a fall. Each served-document probe is wired after the declared CLI install, with the pinned tag fetched by shift-left. The hub has three self-proof manifest rows, reference terminology in narration/deck, and the existing platform-body test docstring. Local selfchecks pass. The public ludlow probe passes on the checksum-verified 1.18.2 CLI at v3.0.0 and HEAD. Rollout, recomposition and the first post-registration scheduled behavior sample remain required; this ticket is not resolved.
+
+**Resolved, 2026-10-21.** The first actual scheduled drift samples after the October 18
+main registration cutoffs now answer facts 6 and 7. They are not manual runs or the
+closed-PR proposer triggers:
+
+| Adopter | First scheduled run / sample UTC | Immutable original / recording PR | Facts 6 / 7 |
+| --- | --- | --- | --- |
+| Driftwood | [39259206859](https://github.com/policy-as-versioned-driftwood/driftwood/actions/runs/39259206859) / 2026-10-19T13:22:03Z | [329d0075](https://github.com/policy-as-versioned-driftwood/driftwood/commit/329d0075ce223b91d275d9245ece55bb45c62657) / [80](https://github.com/policy-as-versioned-driftwood/driftwood/pull/80) | TRUE / TRUE |
+| Tuppence | [39280093793](https://github.com/policy-as-versioned-tuppence/tuppence/actions/runs/39280093793) / 2026-10-19T15:45:46Z | [8c36c284](https://github.com/policy-as-versioned-tuppence/tuppence/commit/8c36c2848532a6818beddaccac83ebf28786b004) / [85](https://github.com/policy-as-versioned-tuppence/tuppence/pull/85) | TRUE / TRUE |
+| Ludlow | [39285381693](https://github.com/policy-as-versioned-ludlow/ludlow/actions/runs/39285381693) / 2026-10-19T16:28:56Z | [21f085b2](https://github.com/policy-as-versioned-ludlow/ludlow/commit/21f085b2498c75519352565845770b0af06c67d1) / [85](https://github.com/policy-as-versioned-ludlow/ludlow/pull/85) | TRUE / TRUE |
+
+Each run is event `schedule`, attempt 1, with its actual checkout bound to the official
+source. Its window is byte-identical to the October 18 registration and the current window.
+The signed original remains on its unique observation ref, is an ancestor of current main,
+and contributes its exact three source-chain rows once. The adopter's own composed row is
+the behavior sample; the platform/NIST rows are not additional independent trials.
+Native Sigstore authentication of each original against its exact drift-sample identity,
+issuer, source, repository, ref and schedule claims passed. This standalone signature check
+is separate from the recorded PR/ancestry proof, not a newly executed historical delivery CLI.
+
+The three `.estate-clone/<adopter>/verify-cage-probe.sh` manifest rows remain `self-proof`
+with skip `-`. All three pass in the actual recorded
+[TRUTH436](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/947e3677305c58822a74ed00d086f69d65a48a4c/talk/captures/_grades.tsv),
+[437](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/36e3b43ad48f02c136a96ff01109d56c0a680042/talk/captures/_grades.tsv) and
+[438](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/10d31bc6bd35ef7d1589a32274a3e3f56136e186/talk/captures/_grades.tsv) captures;
+the probes run `five-facts.py selfcheck` before checking the declared engine and served
+documents. Those are document proofs, distinct from the scheduled behavior observations.
+
+Tuppence's own sample remains FAIL because fact 5 observed one of 41 rendered objects
+outside Flux inventory. Its facts 6/7 are measured TRUE, so that separate failure does not
+prevent this ticket's literal Done criterion. No old sample, grade, cutoff or signed object
+is rewritten. The run, original and recorded-table links above bind these distinct criteria.

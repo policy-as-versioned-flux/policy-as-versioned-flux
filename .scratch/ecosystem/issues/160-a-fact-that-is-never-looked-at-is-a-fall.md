@@ -1,7 +1,7 @@
 # 160 — A fact that is never looked at is a fall
 
 Type: task (AFK)
-Status: claimed
+Status: resolved
 Blocked by: 161
 
 ## Question
@@ -25,3 +25,23 @@ On tuppence, fact 2 changes between null and true (ticket 157). A single null be
 **Software delivery reconciled, 2026-10-18; dependency remains open.** The published [Driftwood](https://github.com/policy-as-versioned-driftwood/driftwood/blob/5a1b9a1ae85f88dfe91a71aca8eeb308349097ff/drift/five-facts.py), [Tuppence](https://github.com/policy-as-versioned-tuppence/tuppence/blob/e7e2969cd50ab3e88fa11afe61d5bee5d1db30d4/drift/five-facts.py) and [Ludlow](https://github.com/policy-as-versioned-ludlow/ludlow/blob/e65acc95bd107e0ba2864b2ca2f23b51714dc4c1/drift/five-facts.py) graders implement the three-newest-timestamp rule separately for each source and each fact 1–5. Three null or absent values FAIL; a true or observed false interrupts the streak; a single null between trues remains could-not-look. The existing selfcheck exercises three-null FAIL, true interruption and three-missing FAIL. The registered `.estate-clone/driftwood/verify-cage-probe.sh`, `.estate-clone/tuppence/verify-cage-probe.sh` and `.estate-clone/ludlow/verify-cage-probe.sh` invoke that selfcheck and all have PASS in the unchanged [recorded run 432 table](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/d096cd2f0515a8aa2f9de1b671f5f227beba5478/talk/captures/_grades.tsv). No new check or test run is claimed here.
 
 The original registration for facts 1–5 is unchanged. The honest October 18 current re-registration in [Driftwood](https://github.com/policy-as-versioned-driftwood/driftwood/commit/5a1b9a1ae85f88dfe91a71aca8eeb308349097ff), [Tuppence](https://github.com/policy-as-versioned-tuppence/tuppence/commit/e7e2969cd50ab3e88fa11afe61d5bee5d1db30d4) and [Ludlow](https://github.com/policy-as-versioned-ludlow/ludlow/commit/e65acc95bd107e0ba2864b2ca2f23b51714dc4c1) moves only the cage facts 6/7 section boundary. Ticket 161 still needs genuine scheduled observations after those main landings; older samples cannot answer the new registration. This ticket therefore stays claimed with its original `Blocked by: 161` intact. Tuppence's preserved scheduled fact 5 FALSE (one of 41 rendered objects missing from Flux inventory) is a measured failure, not a null or a reason to suppress a fall. No sample, original, grade, registration cutoff or first-new-schedule result is rewritten or invented.
+
+**Resolved, 2026-10-21.** Ticket 161's first genuine post-registration schedules now satisfy
+its literal criteria. The delivered facts 1–5 rule was also checked against this ticket's
+own Done criterion: `grade` delegates to `_score`, which calls
+`_source_facts_stay_unmeasured` separately for each source and every fact 1–5 over the three
+newest distinct sample timestamps. Missing sources or facts count as unmeasured; an observed
+TRUE or FALSE interrupts the null streak. Three nulls produce a named FAIL, without moving
+the original facts 1–5 registration.
+
+The existing public selfcheck has actual branches for two-null could-not-look, three-null
+FAIL naming the fact/reason, TRUE interruption and three missing facts becoming FAIL.
+The registered `.estate-clone/driftwood/verify-cage-probe.sh`,
+`.estate-clone/tuppence/verify-cage-probe.sh` and
+`.estate-clone/ludlow/verify-cage-probe.sh` each execute that selfcheck and all pass in the
+unchanged recorded TRUTH436–438 captures. No new selfcheck or grader run is claimed by this
+reconciliation. Tuppence's observed fact 5 FALSE remains a measured failure, not a null to
+excuse or suppress. The `Blocked by: 161` declaration remains as dependency history; that
+ticket is now resolved. [Ticket 161's record](161-fact-7-is-registered-again-with-a-reference-workload.md#answer)
+links the exact first-scheduled originals and unchanged recorded probe tables; the published
+grader links above carry the rule and selfcheck branches.
