@@ -1,7 +1,7 @@
 # 144 — The twins price on published comparable evidence
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: 141
 
 ## Question
@@ -93,3 +93,15 @@ remain grade 5 with no new mitigation credit. That is a safer, honest deviation 
 request for grade 3 or a real source; it is not literal completion of that request. No response is
 promoted to grade 3 by this note. The ticket remains claimed pending explicit reconciliation of
 that deviation or genuine supporting evidence, without adding a new completion condition.
+
+## Answer — delegated specification reconciliation, 2026-10-21
+
+**The original grade 3 or real-source response criterion was not met.** The October 18 noncompletion note above remains accurate history. Under [ADR-0025](../../../docs/adr/0025-the-assistant-decides-architecture-and-records-it.md), the assistant now makes this explicit, narrow delegated amendment: accept Driftwood's four existing `run-the-checkout-at-{baseline,restricted,quarantine,isolated}` response claims as unsupported grade 5 model assertions, with **no mitigation credit**. This supersedes only the rung-response grade/source target in original item 1 and [ticket 30 decision6](30-the-twin-s-cage-spec-and-price-per-adopter.md); it does not claim that grade 3 or a real quantitative source was obtained.
+
+Reason: the published responses already withdraw the nonexistent incident postmortems and break-glass drill, expose their unmeasured calibration and prevent mitigation credit. Retaining that visible, unsupported trade-off is preferable to manufacturing evidence or silently promoting a grade. A qualitative mechanism is not quantitative support for the component/reduction/basis tuple. No mitigation credit means unsupported effectiveness, not an observation of zero effect.
+
+All existing numerical reductions and cost tuples retain their values and data types. Their quantitative support remains absent; they are unmeasured assertions, not measured zeros. Existing admitted-option cost moments remain reported by `twin/options.py` and `twin/pricing.py`. This record neither removes that reporting nor authenticates the cost assumptions. It supplies no new price, threshold, date, currency, signature, institution authority, study, enactment or observed outcome.
+
+ADR-0032 remains in force: only grades 2/3 are admitted for pricing, each price shows its weakest evidence, and synthetic records never raise a grade. The separate grade 3 DSG/Currys comparable cash-flow edge and the three adopters' signed grade declarations remain unchanged. Any later stronger response claim needs claim-compatible evidence and ordinary review.
+
+The other original criteria were separately delivered as the October 18 record above and ticket 141's Answer already establish: fixed comparable sizes/shares/currencies/source dates and derived valuations; one replacement cash-flow edge; selection-policy packages; explicit grade 3 declarations and forward-intel publishing contracts; genuine signed v4 releases and later compiler compositions. No figure is retuned to force a crossing. This completion is by the newly reviewed specification reconciliation plus those actual delivered criteria, not new empirical fulfillment of the superseded response target.

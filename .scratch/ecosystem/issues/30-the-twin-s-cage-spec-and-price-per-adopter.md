@@ -309,3 +309,9 @@ Graduated: 141 (an adopter declares the grade it prices on), 142 (the twin cage 
 schedule checker's blind spots, carrying this ticket's definition of done), 143 (the sweep split),
 144 (the twins price on published comparable evidence), 145 (the platform prices the twin agent's
 cage).
+
+## Narrow delegated amendment — response target, 2026-10-21
+
+The original decision 6 remains above as history. Under ADR-0025, the assistant now supersedes only its clause requiring Driftwood's rung responses to drop to grade 3 or cite a real source, as recorded in [ticket 144's dated reconciliation](144-the-twins-price-on-published-comparable-evidence.md). The original response criterion was not met. The four existing grade 5 response assertions are accepted as explicitly unsupported options with no mitigation credit; no nonexistent incident/drill is restored and no new evidence or grade 3 claim is supplied.
+
+The reason and scope are in144's Answer. Unsupported numerical reductions and cost tuples remain unchanged and unmeasured, not observed zeros. Existing option-cost reporting is retained without validating its assumptions. All other decision 6 terms remain: estate default 2, signed grade 3 declaration, visible weakest grade, no synthetic upgrade and the separate comparable cash-flow anchors. ADR-0032, the fixed sizing rules, all money/identity/authorisation reservations, and every other decision here remain unchanged.
