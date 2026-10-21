@@ -101,7 +101,14 @@ selected v5.6.0 and succeeded. Each held because the strictest priced tier and t
 declaration were already `isolated`, returning `[]`; no new tier move or comparison report
 was observed. These are closed-PR runs, not ticket 161 scheduled receipts.
 
-This supplies the move-specific price-evidence slice and its registered self-proof, not the
-whole ticket. Status remains open for the remaining de-posture questions, legacy access
-retirement completion and authentic per-organisation break-glass/assurance bands. The
-identity shelf remains; this delivery enacts no movement and invents no financial inputs.
+The existing supported-claim, tighten-only governed Namespace route changes the tier while
+keeping the still-supported claim. Together with this move-specific price evidence and its
+registered self-proof, it fulfils original ticket 27's de-posture-as-tier-move implementation
+and report subslice. No second command, automatic loosening or observed move is required for
+that subslice: ADR-0022 deliberately defers loosening. Ticket 74's real crossing, clock-opened
+proposal and human merge remain its own criterion.
+
+Ticket 27 remains open for legacy access retirement rollout completion and authentic
+per-organisation break-glass/assurance bands. The tools-v6 rollout is not recorded here as
+complete. The identity shelf remains; this delivery enacts no movement and invents no
+financial inputs.
