@@ -1,7 +1,7 @@
-PASS: the sweep step under `bash -e` on a fresh copy exits 0 and writes moved=false, swept_at=2026-10-21T10:41:08Z
-PASS: the sweep step under `bash -e` on a stale feed exits 0 and writes moved=true, swept_at=2026-10-21T10:41:08Z
-PASS: the sweep step under `bash -e` on a stale signal lookup exits 0 and writes moved=true, swept_at=2026-10-21T10:41:09Z
-PASS: the sweep step under `bash -e` on a stale retained v1 feed exits 0 and writes moved=false, swept_at=2026-10-21T10:41:09Z
+FAIL: the sweep step under `bash -e` on a fresh copy exits 0 and writes moved=true, swept_at=2026-10-22T00:27:58Z -- wanted exit 0 and moved=false; step said:   twin/forward-intel/v2/feed.json is byte-identical to a fresh render of the overlay | FAIL: twin/signals.yaml is not what party.yaml's pins derive: insurer/feed/quote-driftwood: v1 -> v2, at 2026-10-22
+PASS: the sweep step under `bash -e` on a stale feed exits 0 and writes moved=true, swept_at=2026-10-22T00:27:58Z
+FAIL: the sweep step under `bash -e` on a stale signal lookup exits 1 and writes nothing -- wanted exit 0 and moved=true; step said: twood pin.version: expected exactly one match for '(version:\\s*[\'\\"]?)v1([\'\\"]?\\s*\\})', found 0 | ::error::the sweep could not render the overlay or derive the lookup (feed exit 0, lookup exit 2)
+FAIL: the sweep step under `bash -e` on a stale retained v1 feed exits 0 and writes moved=true, swept_at=2026-10-22T00:27:59Z -- wanted exit 0 and moved=false; step said:   twin/forward-intel/v2/feed.json is byte-identical to a fresh render of the overlay | FAIL: twin/signals.yaml is not what party.yaml's pins derive: insurer/feed/quote-driftwood: v1 -> v2, at 2026-10-22
 SKIP: the moved path has not fired live yet: observations/twin-sweep.jsonl carries no line with "moved": true (the step is proven offline above; the live firing is the half only the clock can supply, once the overlay or a pin moves under it)
-TOTAL: 4 pass, 0 fail, 1 could-not-look
-SKIP: the moved path has not fired live yet: observations/twin-sweep.jsonl carries no line with "moved": true (the step is proven offline above; the live firing is the half only the clock can supply, once the overlay or a pin moves under it)
+TOTAL: 1 pass, 3 fail, 1 could-not-look
+FAIL: 3 twin-sweep moved-path check(s) observed false
