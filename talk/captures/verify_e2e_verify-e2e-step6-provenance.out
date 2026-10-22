@@ -21,6 +21,6 @@ E2E step 6 provenance
   ok   platform/currency-controller newest tag v6.2.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/identity-substrate newest tag v6.2.1: real cert subject matches the anchored regexp, Rekor entry validated
   ok   platform/policy newest tag policy/v7.0.0: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   tuppence/exposure newest tag v4.1.1: real cert subject matches the anchored regexp, Rekor entry validated
-  ok   tuppence/forward-intel newest tag v4.1.1: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   tuppence/exposure newest tag v4.1.2: real cert subject matches the anchored regexp, Rekor entry validated
+  ok   tuppence/forward-intel newest tag v4.1.2: real cert subject matches the anchored regexp, Rekor entry validated
 PASS: every artefact the slice publishes reaches a signed tag or is honestly queued; of the 22 lines the 8 release-shipping units declare in their own party.yaml publishes[], 20 newest tags matched a real Fulcio cert subject with its Rekor entry validated and 2 lines have no tag of their own shape yet
