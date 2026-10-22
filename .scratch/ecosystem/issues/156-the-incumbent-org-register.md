@@ -57,3 +57,41 @@ Recorded TRUTH 438's existing incumbent-register capture also reports handbook-g
 **2026-10-22: grade observable contradictions in the archive sequence.** The register grader now enforces ADR-0036 decisions 3 and 4 across rows: an observed live readiness-collector alongside a newly archived dropped/lifted repository fails “readiness first”; an observed archived fleet, policy or governance-agent member alongside an observed live member fails “together”; any observed archived final member while an earlier dropped/lifted repository remains live fails “last”. The already archived pre-migration `apps` repository is excluded from “readiness first”; the retained hub and transferred applications are not archive requirements. Missing or failed forge observations retain their unknown/SKIP behavior, and eligible but unacted rows retain their LIMITs. Current flags cannot prove the historical order of completed actions or make three archive writes atomic; the operator still owns the ordered, grouped procedure.
 
 The first, last and partial-final contradictions returned success before their respective guards were added. Permanent offline tests failed before each repair; all 39 focused tests, the named offline selfcheck and targeted two-file type checking pass locally. The original and corrected graders produce byte-identical output and status for the unchanged saved run 441 forge facts and grade table with each cage-prerequisite value. This is a saved-input source comparison, not a new cage proof or recorded TRUTH result. No repository was archived, no prerequisite was granted, and ticket 156 remains claimed with its existing pending archives and completion conditions.
+
+
+**Archive log, 2026-10-22: datastore and cloud.** Citable TRUTH450's native cloud-admission
+PASS satisfies ticket151's prerequisite, and its original incumbent-register capture reports
+both rows as eligible unacted LIMITs. The unchanged signed original
+`cdf629a9ddbb0ec6f785c5b5b13547bcd9b61962` was normally recorded by PR246 as hub main
+`70431b9059bfc411fff8a1f0dc6edb3ca088068c` before either archive. The owner authorised eligible
+archives under ADR-0036; the authenticated owner login was `chrisns`. Immediately before each
+write, the operator checked the citable prerequisite, current public refs and full source tree,
+fresh complete forge facts and the applicable anonymous image pull. Each API write set only
+`archived: true`; it did not edit source, refs, branches or workflows.
+
+| repository | actual archive request started (UTC) | post-action verification completed (UTC) | unchanged main |
+|---|---|---|---|
+| `policy-as-versioned-flux/datastore` | 2026-10-22T23:31:09.855415Z | 2026-10-22T23:31:23.565372Z | `988e414eb01c7f768bdd9fc75a0d7e068745a9b3` |
+| `policy-as-versioned-flux/cloud` | 2026-10-22T23:31:25.807923Z | 2026-10-22T23:31:39.523086Z | `30060d27a56e659fc0568734ff9a63ba5c211188` |
+
+Both immediate post-action GETs report archived, both registered rows pass, and all public refs
+and complete source trees match the pre-action snapshots. The subsequent independent canonical
+clone/API audit, observed at 2026-10-22T23:35:16.656658Z, additionally conserves both complete raw
+commit histories: two refs, two commits and all ten source blobs, 7,217,462 bytes. All other
+14 forge records are unchanged. Its fresh registered check exits0, with13PASS/4LIMIT, using the
+same citable prerequisite grades. No applicable incumbent estate image is served from either
+newly archived repository. The permanent readiness probe remains anonymous HTTP200, digest
+`sha256:8c5d78146351822a31935cf5e7cfc54bb855d7a1300bdb56ff0311b9d84786cd`.
+
+Retained receipts, relative to the workspace root:
+`.scratch/ecosystem/research/resume-active-20261022T2203/datastore-cloud-actual-archives/COMPLETE.json`
+and `.scratch/ecosystem/research/resume-active-20261022T2203/datastore-cloud-public-conservation/PROOF.json`,
+each with its adjacent manifest. An earlier read-only preflight stopped on differing ref-listing
+formats before any archive write; its original packet and exact-format correction are retained.
+The corrected complete ref maps match before and after the actual actions.
+
+These are bounded post-action forge/registry measurements, **not a new TRUTH run**. Original450
+and its115PASS/3FAIL/23SKIP/8EXCLUDED vector and eligible-LIMIT capture remain unchanged. Ticket156
+stays claimed: c2p-collector still needs its workload-OSCAL prerequisite; governance-agent, policy
+and fleet remain live and must be archived last, together, after the earlier rows and their
+recorded prerequisites pass. No remaining archive or whole-ticket completion is claimed.

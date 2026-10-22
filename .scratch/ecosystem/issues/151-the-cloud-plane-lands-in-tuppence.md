@@ -1,7 +1,7 @@
 # 151 — The cloud plane lands in tuppence
 
 Type: task (AFK)
-Status: claimed
+Status: resolved
 Blocked by: 157, 161
 
 ## Question
@@ -97,3 +97,50 @@ Only an actual subsequent native PASS and ordinary signed recording establish ad
 These source repairs do not close the ticket. Signed cloud/compiler releases, Tuppence's real
 cloud/composed pins and signature gates, genuine hosted admission, and incumbent-register checks
 still have to complete in that order. No future tag SHA, admission result, grade or price is filled in.
+
+## Answer
+
+Completed 2026-10-22. The separate platform `cloud/v1.0.1` package is published from
+`995a281ae9778bafa3a2f1f8600254f8f3e7eabb`, signed tag
+`29b5d45605a0f7d9c1307dba1e47e5d9da6ae18e` (release 420670233).
+It owns the RDS/S3 controls, mutations, cloud dial table and signed OSCAL claims.
+Tuppence's signed `v4.1.2` composed artefact is published from
+`988095af0ef2de7832f915e4a524c62498795af3`, tag
+`5294fd4325509f46e6623391de31236ff9c7a738` (release 420748155).
+Its ordinary final-pointer delivery selects that artefact and `./composed/cloud/v1.0.1`;
+current Tuppence main `836c1a12da127d9dfda0fd32bf87d87b3e6e0824` preserves those selections.
+The three incumbent datastore resources retain their names, specs, selectors and unrelated
+labels, with only the namespace and composed-policy claim adapted for Tuppence. The separate
+cloud publication has not moved the Pod policy major or the served Kyverno engine.
+
+Citable TRUTH **450**, original run **39864789462/1**, grades
+`verify/cloud-plane/verify-cloud-plane.sh` **PASS** after its genuine hosted KinD admission
+measurement. The observed gate binds source readiness and pins, signature identities, vendor
+CRD bodies, all three incumbent resources, route readiness/inventory and CREATE/UPDATE probes
+to the signed cloud parent. The hosted preparation, live admission and signed recording were
+actually completed; local replay alone is not the evidence. The grader's OSCAL document revision
+is independent of the package's SemVer, repaired through ordinary PR245 before this run.
+
+The unchanged signed original is `cdf629a9ddbb0ec6f785c5b5b13547bcd9b61962`, with its seven
+native gitsign identity claims verified. Automatic protected recording PR246 merged normally as
+`70431b9059bfc411fff8a1f0dc6edb3ca088068c`, whose tree is exactly the original tree. All 152
+previous TRUTH rows are an unchanged prefix of the resulting 153-row record. This run has
+**115 PASS / 3 FAIL / 23 SKIP / 8 EXCLUDED**, not a whole-estate green result. Its remaining reds
+concern Tuppence's reconcile inventory, workload OSCAL joins and a scheduled feed fetch.
+
+`verify/incumbent-org/verify-incumbent-org.sh` passes on that citable run. Both datastore/cloud
+rows were eligible unacted LIMITs after the cloud PASS. Fresh prerequisite, forge, source/ref and
+anonymous image checks preceded the actual owner-authorised archives: datastore at
+**2026-10-22T23:31:09.855415Z**, then cloud at **2026-10-22T23:31:25.807923Z**. Both post-action
+rows pass; their full source trees, all public refs and raw commit histories are unchanged.
+The independent conservation audit also confirms the other 14 forge records are unchanged and
+the permanent readiness image remains anonymously pullable with its original digest. Ticket
+[156](156-the-incumbent-org-register.md) carries the full action log and its remaining archives.
+These bounded post-action checks do not replace run450's original LIMIT capture or create TRUTH.
+
+Evidence retained under `.scratch/ecosystem/research/resume-active-20261022T2203/`:
+`frontier-audit/main-originals/recorded-main/CONSERVATION.json`,
+`cloud151-actual-eligibility/ASSESSMENT.json`, `datastore-cloud-actual-archives/COMPLETE.json`,
+and `datastore-cloud-public-conservation/PROOF.json`. This completes ticket151's admission and
+archive conditions within ADR-0004's KinD proof. It claims no AWS provider reconciliation,
+credential provisioning, deployed AWS resource, or separate workload-OSCAL completion.
