@@ -955,4 +955,4 @@ See `docs/adr/` for the hard-to-reverse decisions and their rationale.
 ## Mode record and development window (2026-10-03, ticket 97)
 
 - **Mode record** — Ordered, dated acknowledgements of the durable enactment mode, carrying the owner's exact words and their source. It records authorization and cannot independently authenticate those words.
-- **Development window** — An owner-acknowledged interval of permissive enactment lasting at most 28 days. Expiry is a failure of the authorization record and does not silently change the enactment mode.
+- **Development window** — An owner-acknowledged interval of permissive enactment lasting at most 28 days by default. An explicit finite owner renewal may extend it through the acknowledgement's calendar year when the newest entry and its cited dated owner paragraph name the same endpoint (2026-10-22, ticket 97). Expiry is exclusive, is a failure of the authorization record, and does not silently change the enactment mode.
