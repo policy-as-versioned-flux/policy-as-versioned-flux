@@ -1,10 +1,11 @@
-...............
+......................
 ----------------------------------------------------------------------
-Ran 15 tests in 5.966s
+Ran 22 tests in 8.164s
 
 OK
 PASS: twin cage selfcheck -- five loosened workflows fail
 PASS: driftwood served twin workflow fits its priced rung dials
 PASS: tuppence served twin workflow fits its priced rung dials
 PASS: ludlow served twin workflow fits its priced rung dials
-LIMIT: local-clock sandbox is configured; its live resistance to a rebuilt child environment remains unmeasured (ticket 142 item 3)
+PASS: local-clock sandbox: macOS Claude Code 2.1.308 on 2026-10-22 blocked three tested rebuilt-environment routes and outside-directory Read
+LIMIT: dated source-bound measurement; other routes, hosts and native versions are not established; no fresh live test was run
