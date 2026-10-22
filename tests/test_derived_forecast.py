@@ -53,6 +53,12 @@ FIXTURE = HUB / "verify" / "twin-evals" / "derived_forecast_fixture.py"
 STUB = HUB / "verify" / "local-clock" / "stub-claude.sh"
 
 
+@pytest.fixture(autouse=True)
+def _isolated_clock(local_clock_hub: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sys.modules[__name__], "CLOCK", local_clock_hub / "talk/local-clock.sh")
+    monkeypatch.setattr(sys.modules[__name__], "STUB", local_clock_hub / "verify/local-clock/stub-claude.sh")
+
+
 def _load(path: Path, name: str):
     spec = importlib.util.spec_from_file_location(name, path)
     assert spec and spec.loader, path
