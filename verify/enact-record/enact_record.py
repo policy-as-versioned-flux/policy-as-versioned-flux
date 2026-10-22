@@ -49,10 +49,19 @@ def grade(mode: str, record: dict, root: Path, today: dt.date) -> list[str]:
         # An example YAML record is not evidence for its own quoted authorization.
         prose = re.sub(r"(?ms)^```.*?^```[^\n]*\n?", "", path.read_text())
         words = entry.get("words")
-        if not isinstance(words, str) or not words or not any(
-            str(date) in paragraph and words in re.findall(r'["“](.*?)["”]', paragraph, re.S)
-            for paragraph in re.split(r"\n\s*\n", prose)):
+        quoted = [paragraph for paragraph in re.split(r"\n\s*\n", prose)
+                  if isinstance(words, str) and words and str(date) in paragraph
+                  and words in re.findall(r'["“](.*?)["”]', paragraph, re.S)]
+        if not quoted:
             failures.append(f"acknowledgement on {date} has no exact dated quote in {relative}")
+        if "until" in entry:
+            try:
+                endpoint = dt.date.fromisoformat(str(entry["until"]))
+                if not any(str(endpoint) in re.findall(r"\b\d{4}-\d{2}-\d{2}\b", paragraph)
+                           for paragraph in quoted):
+                    failures.append(f"acknowledgement on {date} has no explicit endpoint in its quoted paragraph")
+            except ValueError:
+                failures.append(f"acknowledgement on {date} has no valid until date")
     if dates != sorted(dates):
         failures.append("acknowledgements are not ordered oldest first")
     if mode != "operations" and entries[-1].get("by") != "owner":
@@ -60,7 +69,15 @@ def grade(mode: str, record: dict, root: Path, today: dt.date) -> list[str]:
     if mode == "development":
         try:
             until = dt.date.fromisoformat(str(record.get("until", "")))
-            if not dates or until > max(dates) + dt.timedelta(days=28) or until < max(dates):
+            if "until" in entries[-1]:
+                # An explicit owner renewal supersedes the default 28-day window,
+                # bounded by the end of the acknowledgement's calendar year.
+                acknowledged_until = dt.date.fromisoformat(str(entries[-1]["until"]))
+                if until != acknowledged_until:
+                    failures.append("development expiry differs from the newest owner's explicit endpoint")
+                if not dates or until > dt.date(max(dates).year + 1, 1, 1) or until < max(dates):
+                    failures.append("explicit development window exceeds year end or ends before its acknowledgement")
+            elif not dates or until > max(dates) + dt.timedelta(days=28) or until < max(dates):
                 failures.append("development window exceeds 28 days or ends before its acknowledgement")
             if today >= until:
                 failures.append(f"development window lapsed on {until}; guard continues, grade is red")
