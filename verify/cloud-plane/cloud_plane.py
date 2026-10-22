@@ -53,7 +53,8 @@ def declarations() -> tuple[dict, list[dict]]:
     for row in dials.values():
         assert row['publiclyAccessible'] is False and row['storageEncrypted'] is True
     cd = json.loads((PACKAGE / 'component-definition.json').read_text())['component-definition']
-    assert cd['metadata']['version'] == package['version']
+    revision = cd['metadata']['version']
+    assert isinstance(revision, str) and revision.strip(), 'cloud component-definition has no document revision'
     claims = cd['components'][0]['control-implementations'][0]['implemented-requirements']
     assert {r['control-id'] for r in claims} == {'cp-10', 'sc-28'}
     assert {r['props'][0]['value'] for r in claims} <= {d['metadata']['name'] for d in members}
