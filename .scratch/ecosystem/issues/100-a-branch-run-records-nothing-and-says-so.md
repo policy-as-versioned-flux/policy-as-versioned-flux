@@ -382,3 +382,7 @@ The shared fixture now retains both ancestor and divergent occupied refs, plus a
 created in the pre-push hook after Git has read its remote advertisement. The actual
 remote ref transaction refuses that race and leaves main and the competing ref intact.
 These remain unsigned synthetic checks; no missing genuine line is authored or waived.
+
+## Follow-up
+
+**2026-10-22, recorded red acknowledged.** `verify/can-record/verify-can-record.sh` is FAIL in recorded TRUTH 448. Its measured default-branch snapshot lacks original run 446's line while retaining its pending integration ref, so the missing-line detector correctly reports one fault. This ticket owns that detector; the protected original-observation delivery route described above owns recovery. The protected log now contains original 446 through its ordinary controller and original 448 through PR 242, preserving both original observations. Those deliveries do not rewrite either measurement's red, exempt pending records or establish a new live PASS. This dated acknowledgement records the regression required by ticket 59; it does not waive the detector or accept a fall in the TRUTH number.
