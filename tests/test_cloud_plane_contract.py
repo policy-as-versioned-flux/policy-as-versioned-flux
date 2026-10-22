@@ -408,5 +408,89 @@ class CloudFieldObservation(unittest.TestCase):
         self.assertIn('cloud field context: ', self.context_output)
 
 
+class CloudDocumentRevision(unittest.TestCase):
+    """Both CLI modes admit a publisher's independent OSCAL document revision."""
+
+    def declaration_tree(self, root, revision='1.0.0', *, missing_revision=False):
+        platform = root / 'platform'
+        package = platform / 'implementations/cloud'
+        tuppence = root / 'tuppence'
+        def write(path, value):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(yaml.safe_dump(value, sort_keys=False))
+        members = [('validate-rds', 'ValidatingPolicy'), ('validate-s3', 'ValidatingPolicy'),
+                   ('mutate-rds', 'MutatingPolicy'), ('mutate-s3', 'MutatingPolicy')]
+        write(platform / 'party.yaml', {'publishes': [{'kind': 'implementations', 'path': 'implementations/cloud'}]})
+        write(package / 'package.yaml', {'version': '1.0.1', 'members': [name + '.yaml' for name, _ in members]})
+        (package / 'VERSION').write_text('1.0.1\n')
+        for name, kind in members:
+            write(package / (name + '.yaml'), {'kind': kind, 'metadata': {'name': name}, 'spec': {'validationActions': ['Audit']}})
+        # Labelled synthetic dials satisfy the existing declaration contract.
+        dials = {tier: {'backupRetentionPeriod': index, 'publiclyAccessible': False, 'storageEncrypted': True}
+                 for index, tier in enumerate(('baseline', 'restricted', 'quarantine', 'isolated'), 1)}
+        write(package / 'crossplane-dials.yaml', {'tiers': dials})
+        component = {'component-definition': {'metadata': {'version': revision}, 'components': [{
+            'control-implementations': [{'implemented-requirements': [
+                {'control-id': 'cp-10', 'props': [{'value': 'validate-rds'}]},
+                {'control-id': 'sc-28', 'props': [{'value': 'validate-s3'}]}]}]}]}}
+        if missing_revision:
+            del component['component-definition']['metadata']['version']
+        (package / 'component-definition.json').write_text(json.dumps(component))
+        claims = [{'kind': kind, 'metadata': {'namespace': 'tuppence', 'labels': {cloud.LABEL: '5.0.0'}}, 'spec': {}}
+                  for kind in ('Instance', 'BucketServerSideEncryptionConfiguration')]
+        claim_path = tuppence / 'gitops/cloud/claims.yaml'
+        claim_path.parent.mkdir(parents=True, exist_ok=True)
+        claim_path.write_text(yaml.safe_dump_all(claims))
+        write(tuppence / 'gitops/composed/composed-set.yaml', {'kind': 'ResourceSet', 'spec': {'inputs': [{'versions': [{'version': '5.0.0'}]}]}})
+        routes = [{'metadata': {'name': name}, 'spec': {'sourceRef': {'kind': 'GitRepository', 'name': 'tuppence-composed'}}}
+                  for name in ('crossplane-crds', 'cloud-policies', 'cloud-claims')]
+        routes[1]['spec']['dependsOn'] = [{'name': 'crossplane-crds'}]
+        routes[2]['spec'].update(dependsOn=[{'name': 'cloud-policies'}], wait=False)
+        (tuppence / 'gitops/cloud/cloud-delivery.yaml').write_text(yaml.safe_dump_all(routes))
+        return platform, package, tuppence
+
+    def invoke(self, revision, arguments, *, missing_revision=False):
+        with tempfile.TemporaryDirectory(prefix='cloud-document-revision-') as tmp:
+            platform, package, tuppence = self.declaration_tree(Path(tmp), revision, missing_revision=missing_revision)
+            output = io.StringIO()
+            # A genuine absent trigger remains a declared wait. The source and
+            # substrate boundaries must not be touched by this declaration test.
+            with patch.object(cloud, 'PLATFORM', platform), patch.object(cloud, 'PACKAGE', package), \
+                 patch.object(cloud, 'TUPPENCE', tuppence), \
+                 patch.object(cloud, 'module', return_value=SimpleNamespace(find=lambda root: None)), \
+                 patch.object(cloud, 'run', side_effect=AssertionError('no native calls permitted')), \
+                 patch.object(cloud, 'verify_tag', side_effect=AssertionError('no signature calls permitted')), \
+                 patch.object(cloud.sys, 'argv', ['cloud_plane.py', *arguments]), redirect_stdout(output):
+                result = cloud.main()
+            return result, output.getvalue()
+
+    def test_package_patch_does_not_require_an_oscal_document_revision_bump(self):
+        for arguments in ([], ['--preflight']):
+            with self.subTest(arguments=arguments):
+                result, output = self.invoke('1.0.0', arguments)
+                self.assertEqual(result, 3, output)
+                self.assertIn('SKIP: cloud plane waits for a citable e2e step 4 PASS', output)
+
+    def test_non_semver_publisher_document_revision_is_accepted(self):
+        for arguments in ([], ['--preflight']):
+            with self.subTest(arguments=arguments):
+                result, output = self.invoke('publisher-revision-2026-10', arguments)
+                self.assertEqual(result, 3, output)
+                self.assertTrue(output.startswith('SKIP:'), output)
+
+    def test_missing_or_malformed_document_revision_refuses_in_both_modes(self):
+        for arguments in ([], ['--preflight']):
+            for revision in (None, False, True, 0, 1, 1.0, [], {}, '', ' \t\n'):
+                with self.subTest(arguments=arguments, revision=revision):
+                    result, output = self.invoke(revision, arguments)
+                    self.assertEqual(result, 1, output)
+                    self.assertIn('FAIL: cloud plane:', output)
+                    self.assertNotIn('SKIP:', output)
+            with self.subTest(arguments=arguments, missing=True):
+                result, output = self.invoke(None, arguments, missing_revision=True)
+                self.assertEqual(result, 1, output)
+                self.assertIn('FAIL: cloud plane:', output)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
