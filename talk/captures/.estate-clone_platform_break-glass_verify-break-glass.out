@@ -1,3 +1,4 @@
+  ok   selfcheck: with python3 unreachable this script exits 3 and its last line is SKIP:
 == offline: decision-engine asserts ==
 break-glass selfcheck: all asserts passed (read £1,868 T1 | write £53,469 T2 | export £534,694 T3-cage | patient £2,409,490 T3-deny)
 == offline: structural invariants ==
@@ -17,13 +18,19 @@ break-glass selfcheck: all asserts passed (read £1,868 T1 | write £53,469 T2 |
 == offline: alternate assurance-band input ==
 .....
 ----------------------------------------------------------------------
-Ran 5 tests in 0.802s
+Ran 5 tests in 1.426s
 
 OK
 == offline: independence from the legacy operation selector ==
-.
+...
 ----------------------------------------------------------------------
-Ran 1 test in 3.173s
+Ran 3 tests in 15.235s
+
+OK
+== offline: explicit party assurance policies and shared input validation ==
+................
+----------------------------------------------------------------------
+Ran 16 tests in 4.236s
 
 OK
 verify-break-glass: done (offline; rides on the access plane — see ../access/verify-access.sh for the live IAP checks)

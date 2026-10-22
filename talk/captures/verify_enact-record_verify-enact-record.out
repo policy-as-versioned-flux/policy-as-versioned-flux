@@ -1,3 +1,2 @@
 PASS: unrecorded flip, lapsed or overlong window, moved date, assistant loosening, missing quote and self-citing example all read false
-PASS: ENACT_MODE agrees with exact dated owner words and its development window is current
-LIMIT: the assistant can write a false dated quote; this catches accidents, not malicious authorization
+FAIL: development window lapsed on 2026-10-22; guard continues, grade is red
