@@ -691,7 +691,11 @@ def validate_cloud_sources(root: Path, parent: str, sources: Any) -> None:
         component = mapping(json.loads(git(root, "show", f"{commit}:{path}")), "cloud component definition")
         definition = mapping(component.get("component-definition"), "cloud component definition body")
         metadata = mapping(definition.get("metadata"), "cloud component definition metadata")
-        require(metadata.get("version") == version, "cloud component definition version differs from its parent")
+        # The mapping document has its own content revision, independent of the
+        # cloud package. Its exact selected commit/path still binds provenance.
+        document_version = metadata.get("version")
+        require(isinstance(document_version, str) and bool(document_version.strip()),
+                "cloud component definition has no nonblank document version")
         expected = [{"party": "platform", "name": "cloud", "tag": "cloud/v" + version,
                      "sha": source, "composed_tag": tag, "component_definition": path}]
     require(sources == expected, "cloud component sources differ from the immutable selected composition")

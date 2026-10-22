@@ -62,6 +62,68 @@ def evidence(root):
     return rows
 
 
+def prospective_cloud_1_0_1(genuine_objects, monkeypatch):
+    """Labelled read adapter, not rewritten signed objects or a live observation.
+
+    The component bytes in the genuine fixture are also the exact published
+    cloud1.0.1 mapping. Only the prospective package/header/path view changes.
+    """
+    root = genuine_objects
+    original_git = delivery.git
+    old_parent = json.loads(original_git(root, 'show', COMPOSITION + ':composed/CLOUD-PARENT.json'))
+    component = original_git(root, 'show', COMPOSITION + ':composed/cloud/v1.0.0/component-definition.json')
+    assert hashlib.sha256(component.encode()).hexdigest() == 'cd47fc4a876cf884e8be5931c06366e88b240dcdaf7274ffcac49fb688e3c619'
+    cloud = dict(old_parent, version='1.0.1', tag='cloud/v1.0.1',
+                 sha='995a281ae9778bafa3a2f1f8600254f8f3e7eabb')
+    path = 'composed/cloud/v1.0.1/component-definition.json'
+    view = {COMPOSITION + ':composed/CLOUD-PARENT.json': json.dumps(cloud),
+            COMPOSITION + ':composed/HEADER.yaml': json.dumps({'cloud-package': cloud}),
+            COMPOSITION + ':' + path: component}
+
+    def read(repo, *args):
+        if repo == root and len(args) == 2 and args[0] == 'show' and args[1] in view:
+            return view[args[1]]
+        return original_git(repo, *args)
+
+    monkeypatch.setattr(delivery, 'git', read)
+    sources = [{'party': 'platform', 'name': 'cloud', 'tag': 'cloud/v1.0.1',
+                'sha': cloud['sha'], 'composed_tag': 'v4.1.1', 'component_definition': path}]
+    return sources, view, COMPOSITION + ':' + path
+
+
+def test_published_cloud_mapping_version_is_independent_of_package(genuine_objects, monkeypatch):
+    sources, _, _ = prospective_cloud_1_0_1(genuine_objects, monkeypatch)
+    delivery.validate_cloud_sources(genuine_objects, PARENT, sources)
+
+
+@pytest.mark.parametrize('version', ['mapping-revision-A', '1.0.0'])
+def test_document_content_revision_need_not_be_package_semver(genuine_objects, monkeypatch, version):
+    sources, view, path = prospective_cloud_1_0_1(genuine_objects, monkeypatch)
+    component = json.loads(view[path])
+    component['component-definition']['metadata']['version'] = version
+    view[path] = json.dumps(component)
+    delivery.validate_cloud_sources(genuine_objects, PARENT, sources)
+
+
+@pytest.mark.parametrize('version', [None, False, 0, [], {}, '', ' \t\n'])
+def test_malformed_document_revision_remains_refused(genuine_objects, monkeypatch, version):
+    sources, view, path = prospective_cloud_1_0_1(genuine_objects, monkeypatch)
+    component = json.loads(view[path])
+    component['component-definition']['metadata']['version'] = version
+    view[path] = json.dumps(component)
+    with pytest.raises(delivery.Refusal, match='nonblank document version'):
+        delivery.validate_cloud_sources(genuine_objects, PARENT, sources)
+
+
+def test_missing_document_revision_remains_refused(genuine_objects, monkeypatch):
+    sources, view, path = prospective_cloud_1_0_1(genuine_objects, monkeypatch)
+    component = json.loads(view[path])
+    del component['component-definition']['metadata']['version']
+    view[path] = json.dumps(component)
+    with pytest.raises(delivery.Refusal, match='nonblank document version'):
+        delivery.validate_cloud_sources(genuine_objects, PARENT, sources)
+
+
 def test_genuine_original_crosses_observation_without_rewriting_parent_or_blobs(genuine_objects, monkeypatch):
     root = genuine_objects
     before = git(root, 'cat-file', 'commit', ORIGINAL)
