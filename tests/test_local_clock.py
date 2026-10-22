@@ -51,6 +51,13 @@ HELPER = HUB / "verify" / "local-clock" / "local_clock.py"
 VALIDATOR = HUB / ".claude" / "skills" / "classify-and-judge" / "assets" / "validate_claim.py"
 
 
+@pytest.fixture(autouse=True)
+def _isolated_clock(local_clock_hub: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sys.modules[__name__], "CLOCK", local_clock_hub / "talk/local-clock.sh")
+    monkeypatch.setattr(sys.modules[__name__], "STUB", local_clock_hub / "verify/local-clock/stub-claude.sh")
+    monkeypatch.setattr(sys.modules[__name__], "STUB_GH", local_clock_hub / "verify/local-clock/stub-gh.sh")
+
+
 def _load(path: Path, name: str):
     spec = importlib.util.spec_from_file_location(name, path)
     assert spec and spec.loader, path
@@ -1033,3 +1040,76 @@ def test_a_trailer_with_space_before_the_colon_in_any_case_is_refused(tmp_path: 
     assert done.returncode == 1, done.stdout + done.stderr
     fail_lines = [l for l in done.stdout.splitlines() if l.startswith("fail ")]
     assert fail_lines and "trailer" in fail_lines[0] and "The Owner" in fail_lines[0], done.stdout
+
+
+@pytest.mark.parametrize("cache_in_runtime", [False, True], ids=["other-worker", "audited-runtime"])
+def test_parallel_bytecode_writes_are_isolated_but_audited_changes_are_refused(
+        tmp_path: Path, cache_in_runtime: bool) -> None:
+    """Run the existing body/signoff CLI case in a disposable pytest checkout.
+
+    A second process writes valid bytecode while the stub is running. The host checkout is
+    shared by pytest workers; the clock's private runtime must be independent of it, while
+    bytecode changes inside that runtime must still trip the unchanged production guard.
+    """
+    host = tmp_path / "pytest-checkout"
+    for name in ("twin", "talk", "verify", ".claude", "tests"):
+        shutil.copytree(HUB / name, host / name, symlinks=True)
+    for name in ("conftest.py", "pytest.ini"):
+        shutil.copy2(HUB / name, host / name)
+    stub = host / "verify/local-clock/stub-claude.sh"
+    actual_stub = stub.with_name("actual-stub-claude.sh")
+    stub.rename(actual_stub)
+    stub.write_text('''#!/usr/bin/env bash
+set -eu
+if [ "$LOCAL_CLOCK_STUB" = bodysig ]; then
+  cd "$(dirname "$0")/../.."
+  pwd >"$CLOCK_TEST_READY"
+  for n in {1..3000}; do
+    [ ! -e "$CLOCK_TEST_DONE" ] || break
+    sleep .01
+  done
+  [ -e "$CLOCK_TEST_DONE" ] || exit 98
+fi
+exec "$(dirname "$0")/actual-stub-claude.sh" "$@"
+''')
+    stub.chmod(0o755)
+    ready, done = tmp_path / "child-ready", tmp_path / "worker-done"
+    worker_code = '''from pathlib import Path
+import py_compile, sys, time
+ready, done, host = map(Path, sys.argv[1:4])
+deadline = time.monotonic() + 30
+while not ready.exists():
+    if time.monotonic() > deadline:
+        raise SystemExit("clock stub did not start")
+    time.sleep(.01)
+root = Path(ready.read_text().strip()) if sys.argv[4] == "runtime" else host
+source = root / "twin/corpus_size.py"
+cache = root / "twin/__pycache__/corpus_size.parallel.pyc"
+cache.parent.mkdir(exist_ok=True)
+py_compile.compile(str(source), cfile=str(cache), doraise=True)
+done.touch()
+'''
+    worker = subprocess.Popen([sys.executable, "-B", "-c", worker_code,
+                               str(ready), str(done), str(host),
+                               "runtime" if cache_in_runtime else "host"],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    try:
+        run = subprocess.run([
+            sys.executable, "-B", "-m", "pytest", "-q", "-n0", "-p", "no:cacheprovider",
+            "tests/test_local_clock.py::"
+            "test_a_trailer_naming_a_person_is_refused_and_a_gpgsig_word_in_the_body_is_not",
+        ], cwd=host, env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1",
+                         "CLOCK_TEST_READY": str(ready), "CLOCK_TEST_DONE": str(done)},
+                             capture_output=True, text=True, timeout=60)
+        worker_out, worker_err = worker.communicate(timeout=5)
+        assert worker.returncode == 0, worker_out + worker_err
+    finally:
+        if worker.poll() is None:
+            worker.kill()
+            worker.communicate()
+    output = run.stdout + run.stderr
+    if cache_in_runtime:
+        assert run.returncode == 1, output
+        assert "the child changed the hub's own twin package" in output, output
+    else:
+        assert run.returncode == 0, output

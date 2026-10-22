@@ -7,6 +7,7 @@ is the package.
 from __future__ import annotations
 
 import os
+import shutil
 from pathlib import Path
 from typing import Iterator
 
@@ -67,3 +68,17 @@ def caps() -> Capabilities:
 def scratch_repo(tmp_path: Path) -> Path:
     """A throwaway model repository for tests that dirty or move the tree."""
     return fixtures.build(tmp_path / "scratch-repo")
+
+
+@pytest.fixture()
+def local_clock_hub(tmp_path: Path) -> Path:
+    """Private working bytes for a clock that audits its own executable inputs.
+
+    Other pytest workers may import twin modules and create bytecode in the collection
+    checkout. The real clock still guards every file in this physical runtime copy.
+    """
+    source = Path(__file__).resolve().parent
+    hub = tmp_path / "clock-hub"
+    for name in ("twin", "talk", "verify", ".claude"):
+        shutil.copytree(source / name, hub / name, symlinks=True)
+    return hub
