@@ -1,0 +1,42 @@
+{
+  "schema": "native-local-clock-capability/v1",
+  "measured_on": "2026-10-22",
+  "environment": {
+    "os": "macOS",
+    "native_binary": "Claude Code 2.1.308"
+  },
+  "source_bindings": {
+    "talk/local-clock.sh": "c24abe44cb346826c1f08050e9f07de6add7a44b2aa5275c866934ae2a32382d",
+    "twin/enact_guard.py": "eb5799b78dd22510c4255c458e8adca8adbfd31dbcfe3c496d8940d773e20fc8"
+  },
+  "private_originals": {
+    ".scratch/ecosystem/research/resume-user-decisions-20261022/actor142-stream/claude-result.jsonl": {
+      "sha256": "e3fac4841bb15d932b58c8784892f74b757773c66cd1fae9145386cfd3f0f7f5",
+      "bytes": 9087
+    },
+    ".scratch/ecosystem/research/resume-user-decisions-20261022/actor142-probe-stream.py": {
+      "sha256": "ca6ee0f6890e92fa18b24df1a4ebcfc451680002f0cd982a5dc3b37c090c4234",
+      "bytes": 5113
+    },
+    ".scratch/ecosystem/research/resume-user-decisions-20261022/actor142-filetool/claude-result.jsonl": {
+      "sha256": "e72de71f6dd392b3edd0078f2880d17aab31d45914644d500e80cd0eca35cdfc",
+      "bytes": 8665
+    },
+    ".scratch/ecosystem/research/resume-user-decisions-20261022/actor142-probe-filetool.py": {
+      "sha256": "bdc33d2d07be4f269d9536c8bc6720358c4a9c9a03094db23b0be574fcb3d743",
+      "bytes": 5220
+    }
+  },
+  "files": {
+    "probe-stream.py": "ca6ee0f6890e92fa18b24df1a4ebcfc451680002f0cd982a5dc3b37c090c4234",
+    "bash-invocation.json": "8d0764fd1fda1802539fed4a28400b351b1f10290068511940af434fe53a1411",
+    "read-settings.json": "cb4a8e60313fc9ceedb82a9c1ea7d2641c3c8dcc2ed1595366e72a18e1ca6951",
+    "bash-settings.json": "a17071a794f10b50f2b77af8f861200735834e5a8ddcb9a9345f56f4c33fb956",
+    "read-invocation.json": "0a7784049c3977c92a30b07efb13818a717edc504c100e2c03e24771a4f989db",
+    "bash-tool-messages.jsonl": "41b0329c77d437514b3a9d93340c84bd408afab4538728e9a81225f091ded998",
+    "read-tool-messages.jsonl": "22b492b9a78dbae415e7627e81abc5857c4817e83bcbc2de90b42d963c24d4da",
+    "probe-filetool.py": "bdc33d2d07be4f269d9536c8bc6720358c4a9c9a03094db23b0be574fcb3d743",
+    "unsandboxed-control.json": "8d7ca5bd08956d344a0d81e7f31bb355e614610457f8359421408c5ef83bbf51"
+  },
+  "scope": "Dated actual tool outcomes for three rebuilt-environment Bash routes and restricted Read outside the working directory; no remote writes. Not a universal proof or a fresh test on other hosts/native versions."
+}

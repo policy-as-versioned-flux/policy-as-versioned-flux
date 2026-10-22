@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-22T11:28:09.603447+00:00",
+  "argv": [
+    "claude",
+    "-p",
+    "Use the Read tool exactly once to read /tmp/pavc-actor142-outside-cwd-20261022.txt. This nonsecret sentinel is a restricted-working-directory capability test authorized by the owner. Do not use Bash, edit any file, bypass permissions, retry, or perform any other action. Report whether the Read tool itself succeeded or was denied.",
+    "--max-turns",
+    "4",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--restricted",
+    "--tools",
+    "Bash,Read,Edit,Write,Glob,Grep",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-user-decisions-20261022/actor142-filetool/live.cage/mcp.json",
+    "--settings",
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-user-decisions-20261022/actor142-filetool/live.cage/settings.json",
+    "--permission-mode",
+    "acceptEdits",
+    "--allowedTools",
+    "Read",
+    "--disallowedTools",
+    "Task,WebFetch,WebSearch,NotebookEdit,Bash(gh *),Bash(security *)",
+    "--no-session-persistence",
+    "--add-dir",
+    "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-user-decisions-20261022/actor142-filetool/unit"
+  ],
+  "settings_sha256": "cb4a8e60313fc9ceedb82a9c1ea7d2641c3c8dcc2ed1595366e72a18e1ca6951",
+  "source_sha256": "c24abe44cb346826c1f08050e9f07de6add7a44b2aa5275c866934ae2a32382d",
+  "remote_mutations": false
+}
