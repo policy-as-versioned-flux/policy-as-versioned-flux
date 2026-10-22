@@ -1,7 +1,7 @@
 # 142 — The twin cage check, and the schedule checker's blind spots
 
 Type: task
-Status: claimed
+Status: resolved
 Blocked by: none
 
 ## Question
@@ -200,3 +200,9 @@ The owner explicitly resumed actor diagnostics on 2026-10-22. Native Claude Code
 The [dated packet](../../../verify/twin-cage/proofs/native-20261022/README.md) preserves exact relevant native tool messages, actual invocation/settings, unsandboxed controls, verbatim executed probe sources, and source/capture hash bindings. The registered twin-cage checker now validates that packet instead of unconditionally describing the live boundary as unmeasured. It retains every served-workflow fault and names the measured date, environment and routes in its PASS; its LIMIT excludes other routes, hosts, future native versions and any fresh live test. Hashes conserve the reviewed receipt rather than independently authenticate its author.
 
 This supplies the September 26 missing live sandbox measurement without asserting a universal escape proof or a completed ordinary local-clock step. Local receipt-admission and public CLI regressions pass, including missing/modified proof, source/guard/probe drift, broken controls, successful escape and extra tool actions. The registered wrapper also passes against the three independently cloned adopter `origin/main` refs read for this check. These are local source results; this paragraph does not claim publication, hosted CI, a new scheduled measurement or recorded TRUTH completion. The ticket remains claimed until ordinary reviewed delivery and its registered served result are observed.
+
+## Answer
+
+Resolved 2026-10-22. PR 236 delivered the source-bound native measurement and receipt checks through ordinary review. Citable TRUTH 448, whose original signed observation was preserved through PR 242 at `fb5fbf1cd6d6b2647f1b635337d79d764f003650`, records PASS for `verify/twin-cage/verify-twin-cage.sh`. The check grades the three served adopter refs and admits the dated native packet; this is the registered served result required by the preceding delivery condition.
+
+The missing sandbox measurement is therefore supplied within its stated boundary: native Claude Code 2.1.308 on macOS, the recorded cage and operations guard, the tested rebuilt-environment credential/transport routes, and the actual restricted Read control. The hosted check did not run a new live probe. Other routes, hosts, future native versions, a universal escape proof and completion of an ordinary model step remain outside this evidence. The earlier schedule-checker repairs remain as recorded in the September comments; unrelated clock failures remain visible and retain their existing owners. TRUTH 448 remains 112 PASS, 6 FAIL, 23 SKIP and 8 EXCLUDED overall; resolving this ticket changes no observation or grade.
