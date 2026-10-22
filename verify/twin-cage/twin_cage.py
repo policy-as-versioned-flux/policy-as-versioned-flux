@@ -2,7 +2,8 @@
 """Grade an adopter's served twin workflow against ADR-0031 (ticket 142).
 
 Reads origin/main with git show. Working-tree proposals are never served proof.
-The local child sandbox is a separate live measurement, named as a ceiling here.
+The local child sandbox requires a separate live measurement. Its unmeasured
+capability remains an unmet proof obligation even when the static workflows pass.
 """
 from __future__ import annotations
 
@@ -138,17 +139,16 @@ def main() -> int:
     if args.command == 'selfcheck':
         selfcheck(Path(__file__).resolve().parents[2])
         return 0
-    failures = 0
     for org in ('driftwood', 'tuppence', 'ludlow'):
         faults = grade(served(args.estate / org), org)
         if faults:
             for fault in faults:
                 print('FAIL: ' + org + ' served twin cage: ' + fault)
-            failures += 1
         else:
             print('PASS: ' + org + ' served twin workflow fits its priced rung dials')
     print('LIMIT: local-clock sandbox is configured; its live resistance to a rebuilt child environment remains unmeasured (ticket 142 item 3)')
-    return 1 if failures else 0
+    # Static workflow grades cannot discharge the unmeasured capability proof.
+    return 1
 
 
 if __name__ == '__main__':

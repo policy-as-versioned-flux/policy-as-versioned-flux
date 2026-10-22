@@ -8,8 +8,11 @@ from __future__ import annotations
 import importlib.util
 import copy
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
+import tempfile
 import unittest
 
 import yaml
@@ -48,6 +51,72 @@ def fixture(organization: str) -> tuple[dict, dict[str, str]]:
 
 def grade(workflow: dict, files: dict[str, str], organization: str | None) -> list[str]:
     return cage.grade({**files, WORKFLOW: yaml.safe_dump(workflow, sort_keys=False)}, organization)
+
+
+class TwinCageCLI(unittest.TestCase):
+    """Real CLI over synthetic origin/main; never a live capability experiment."""
+
+    def setUp(self) -> None:
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.estate = Path(directory.name)
+        self.environment = dict(os.environ, GIT_CONFIG_GLOBAL='/dev/null',
+                                GIT_CONFIG_NOSYSTEM='1', GIT_TERMINAL_PROMPT='0',
+                                PYTHONDONTWRITEBYTECODE='1')
+        for organization in ('driftwood', 'tuppence', 'ludlow'):
+            repo = self.estate / organization
+            repo.mkdir()
+            workflow, files = fixture(organization)
+            files[WORKFLOW] = yaml.safe_dump(workflow, sort_keys=False)
+            for path, content in files.items():
+                target = repo / path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(content)
+            self.git(organization, 'init', '-b', 'main')
+            self.publish(organization)
+
+    def git(self, organization: str, *arguments: str) -> str:
+        result = subprocess.run(
+            ['git', '-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgsign=false',
+             '-c', 'user.name=Static fixture', '-c', 'user.email=fixture@example.invalid',
+             '-C', str(self.estate / organization), *arguments],
+            env=self.environment, text=True, capture_output=True, check=True)
+        return result.stdout.strip()
+
+    def publish(self, organization: str) -> None:
+        self.git(organization, 'add', '.')
+        self.git(organization, 'commit', '-m', 'Labelled static served-workflow fixture')
+        self.git(organization, 'update-ref', 'refs/remotes/origin/main',
+                 self.git(organization, 'rev-parse', 'HEAD'))
+
+    def check(self) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [sys.executable, '-B', str(HERE / 'twin_cage.py'), 'check',
+             '--estate', str(self.estate)], env=self.environment, text=True, capture_output=True)
+
+    def test_static_workflows_do_not_prove_unmeasured_local_capability(self) -> None:
+        result = self.check()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(result.stdout.splitlines(), [
+            'PASS: driftwood served twin workflow fits its priced rung dials',
+            'PASS: tuppence served twin workflow fits its priced rung dials',
+            'PASS: ludlow served twin workflow fits its priced rung dials',
+            'LIMIT: local-clock sandbox is configured; its live resistance to a rebuilt child environment remains unmeasured (ticket 142 item 3)'])
+        self.assertEqual(result.stderr, '')
+
+    def test_served_workflow_fault_is_named_alongside_unmeasured_limit(self) -> None:
+        workflow, _ = fixture('driftwood')
+        workflow['jobs']['twin']['permissions'] = {'contents': 'write'}
+        (self.estate / 'driftwood' / WORKFLOW).write_text(yaml.safe_dump(workflow, sort_keys=False))
+        self.publish('driftwood')
+        result = self.check()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(result.stdout.splitlines(), [
+            'FAIL: driftwood served twin cage: twin job holds capabilities beyond contents: read',
+            'PASS: tuppence served twin workflow fits its priced rung dials',
+            'PASS: ludlow served twin workflow fits its priced rung dials',
+            'LIMIT: local-clock sandbox is configured; its live resistance to a rebuilt child environment remains unmeasured (ticket 142 item 3)'])
+        self.assertEqual(result.stderr, '')
 
 
 class TwinObservationTransport(unittest.TestCase):
