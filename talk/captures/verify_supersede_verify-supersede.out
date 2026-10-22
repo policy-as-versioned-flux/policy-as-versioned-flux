@@ -1,7 +1,7 @@
-PASS: driftwood pins ico/feed/penalty-schema@v3, behind v4 (v4.0.0 on ico's real remote): priced 112,616.64 GBP under driftwood's own perspective as of 2026-10-03 (ramp 1.0630 since 2026-09-10, the day v4.0.0 was cut, on the line's own 1,787,177.08)
+PASS: driftwood pins ico/feed/penalty-schema@v3, behind v4 (v4.0.0 on ico's real remote): priced 200,751.40 GBP under driftwood's own perspective as of 2026-10-21 (ramp 1.1123 since 2026-09-10, the day v4.0.0 was cut, on the line's own 1,787,177.08)
 PASS: driftwood pins feeds/feed/threat-register@v4: at the newest tagged major on feeds's real remote; nothing to price, said by name
 PASS: driftwood pins feeds/feed/cve@v3: at the newest tagged major on feeds's real remote; nothing to price, said by name
-PASS: driftwood pins insurer/feed/quote-driftwood@v1: at the newest tagged major on insurer's real remote; nothing to price, said by name
+PASS: driftwood pins insurer/feed/quote-driftwood@v2: at the newest tagged major on insurer's real remote; nothing to price, said by name
 PASS: ludlow pins ico/feed/penalty-schema@v3, behind v4 (v4.0.0 on ico's real remote): priced 193,562,815.46 GBP under ludlow's own perspective as of 2026-10-03 (ramp 1.0630 since 2026-09-10, the day v4.0.0 was cut, on the line's own 3,071,757,723.56)
 PASS: ludlow pins feeds/feed/threat-register@v4: at the newest tagged major on feeds's real remote; nothing to price, said by name
 PASS: ludlow pins feeds/feed/cve@v3: at the newest tagged major on feeds's real remote; nothing to price, said by name
