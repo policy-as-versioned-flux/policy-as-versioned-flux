@@ -464,7 +464,7 @@ class CloudDocumentRevision(unittest.TestCase):
                 result = cloud.main()
             return result, output.getvalue()
 
-    def test_package_patch_does_not_require_an_oscal_document_revision(self):
+    def test_package_patch_does_not_require_an_oscal_document_revision_bump(self):
         for arguments in ([], ['--preflight']):
             with self.subTest(arguments=arguments):
                 result, output = self.invoke('1.0.0', arguments)
