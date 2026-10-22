@@ -10,7 +10,6 @@
   ok   ADR-0026: ^Decided 2026-09-04 .*ADR-0025.*delegated
 2. ADR-0026 names the three superseded rules, the four reasons and the removal decision
   ok   ADR-0026: ADR-0013
-verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write error: Broken pipe
   ok   ADR-0026: ADR-0017
   ok   ADR-0026: ADR-0018.*point 3
   ok   ADR-0026: new-hole refusal|refuses on a \*\*new\*\* hole|new hole refus

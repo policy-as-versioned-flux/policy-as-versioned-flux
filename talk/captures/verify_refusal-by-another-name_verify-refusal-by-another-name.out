@@ -8,7 +8,7 @@ selfcheck ok: writes are read out of the CEL body, an unrecorded hazard fails, a
   ok   a defensive clobber that changes nothing on this pod: could-not-look, not a red -- this policy writes 1 field path(s) and yet the probe Pod came back unchanged on every rung, so this leg could not SHOW the write and its byte-identity proves nothing about it -- the probe resource would need a value these paths actually change
 .............
 ----------------------------------------------------------------------
-Ran 13 tests in 23.738s
+Ran 13 tests in 21.171s
 
 OK
 [1;36m==>[0m 1. what this scan cannot see (dated, because a disclosed limit goes stale like any other)

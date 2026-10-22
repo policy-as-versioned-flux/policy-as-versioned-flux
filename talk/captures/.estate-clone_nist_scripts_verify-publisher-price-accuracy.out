@@ -1,17 +1,17 @@
 PASS: monetary report fully reconstructed from its declared source population
 ...............
 ----------------------------------------------------------------------
-Ran 15 tests in 20.863s
+Ran 15 tests in 16.875s
 
 OK
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 1.478s
+Ran 10 tests in 1.184s
 
 OK
 ...
 ----------------------------------------------------------------------
-Ran 3 tests in 10.478s
+Ran 3 tests in 8.652s
 
 OK
 PASS: monetary SDK, release and bounded-generation controls hold; labelled fixtures are not world measurements
