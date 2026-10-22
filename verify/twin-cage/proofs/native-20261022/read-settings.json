@@ -1,0 +1,56 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/twin/enact_guard.py\""
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "deny": [
+      "Bash(gh *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(launchctl *)",
+      "Bash(python3 -c *)",
+      "Bash(python -c *)",
+      "Bash(python3 - *)",
+      "Bash(python *)",
+      "Bash(security *)",
+      "WebFetch",
+      "WebSearch",
+      "Task"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowedDomains": [],
+      "strictAllowlist": true
+    },
+    "filesystem": {
+      "allowWrite": [
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-user-decisions-20261022/actor142-filetool/unit",
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-user-decisions-20261022/actor142-filetool/unit",
+        "/Users/cns/httpdocs/controlplane/policy-as-versioned-flux/.scratch/ecosystem/research/resume-user-decisions-20261022/actor142-filetool"
+      ],
+      "denyRead": [
+        "~/.ssh",
+        "~/.git-credentials",
+        "~/.config/gh",
+        "~/.gitconfig"
+      ]
+    }
+  }
+}

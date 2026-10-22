@@ -2,8 +2,8 @@
 """Grade an adopter's served twin workflow against ADR-0031 (ticket 142).
 
 Reads origin/main with git show. Working-tree proposals are never served proof.
-The local child sandbox requires a separate live measurement. Its unmeasured
-capability remains an unmet proof obligation even when the static workflows pass.
+The local child sandbox has a separate dated native receipt. Its measured cases
+do not establish universal resistance or fresh capability on every host.
 """
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from typing import Any
 import yaml
 
 from observation_contract import observation_steps
+import local_clock_capability
 
 LADDER = ('baseline', 'restricted', 'quarantine', 'isolated')
 INERT = ('actions/checkout', 'actions/upload-artifact', 'actions/download-artifact')
@@ -139,16 +140,23 @@ def main() -> int:
     if args.command == 'selfcheck':
         selfcheck(Path(__file__).resolve().parents[2])
         return 0
+    failed = False
     for org in ('driftwood', 'tuppence', 'ludlow'):
         faults = grade(served(args.estate / org), org)
         if faults:
+            failed = True
             for fault in faults:
                 print('FAIL: ' + org + ' served twin cage: ' + fault)
         else:
             print('PASS: ' + org + ' served twin workflow fits its priced rung dials')
-    print('LIMIT: local-clock sandbox is configured; its live resistance to a rebuilt child environment remains unmeasured (ticket 142 item 3)')
-    # Static workflow grades cannot discharge the unmeasured capability proof.
-    return 1
+    capability_faults = local_clock_capability.check(Path(__file__).resolve().parents[2])
+    for fault in capability_faults:
+        print('FAIL: ' + fault)
+    if not capability_faults:
+        print('PASS: ' + local_clock_capability.PASS)
+    print('LIMIT: ' + local_clock_capability.LIMIT)
+    return int(failed or bool(capability_faults))
+
 
 
 if __name__ == '__main__':
