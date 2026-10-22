@@ -173,11 +173,19 @@ def grade(rows: list[dict], facts: dict, checks: dict[str, str], cage: bool,
     records = facts.get("repositories", {})
     if not isinstance(records, dict):
         return 1, ["FAIL: repository observations must be keyed records"]
-    # ADR-0036 decision 4: detect present-state contradictions, not historical order.
+    # ADR-0036 decisions 3/4: detect present-state contradictions, not historical order.
     archive_states = {name: record["archived"] for name, record in records.items()
                       if isinstance(record, dict) and not record.get("error")
                       and type(record.get("archived")) is bool
                       and record.get("full_name") == f"{ORG}/{name}"}
+    # Decision 3: apps was already archived before this migration; readiness goes first.
+    later_archived = sorted(row["name"] for row in rows
+                            if row["disposition"] in {"dropped", "lifted"}
+                            and row["name"] not in {"apps", "readiness-collector"}
+                            and archive_states.get(row["name"]) is True)
+    if archive_states.get("readiness-collector") is False and later_archived:
+        messages.append("FAIL: readiness-collector must be archived first: "
+                        f"still live while later repositories are archived {later_archived}")
     final_archived = sorted(name for name in FINAL_ARCHIVES if archive_states.get(name) is True)
     final_live = sorted(name for name in FINAL_ARCHIVES if archive_states.get(name) is False)
     if final_archived and final_live:
@@ -273,6 +281,13 @@ def selfcheck() -> None:
     assert any(m.startswith("LIMIT:") for m in grade(rows, planted, checks, True)[1])
     planted = copy.deepcopy(facts)
     planted["repositories"]["fleet"]["archived"] = False
+    assert grade(rows, planted, checks, True)[0] == 1
+    planted = copy.deepcopy(facts)
+    for row in rows:
+        if row["disposition"] in {"dropped", "lifted"} and row["name"] != "apps":
+            planted["repositories"][row["name"]]["archived"] = False
+    assert grade(rows, planted, checks, True)[0] == 0
+    planted["repositories"]["pr-gate-action"]["archived"] = True
     assert grade(rows, planted, checks, True)[0] == 1
     planted = copy.deepcopy(facts)
     planted["images"][0]["pullable"] = False

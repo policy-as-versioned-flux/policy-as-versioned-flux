@@ -1,4 +1,4 @@
-"""ADR-0036: current forge flags must not contradict the final archive group.
+"""ADR-0036: current forge flags must not contradict the archive sequence.
 
 The public seam is grade(), used by the credential-free incumbent register check.
 These are synthetic forge observations, not archive actions or historical-order proof.
@@ -33,6 +33,59 @@ def completed():
     }
     checks = {check: "PASS" for row in rows for check in row["checks"]}
     return rows, facts, checks
+
+
+@pytest.fixture
+def before_first(completed):
+    rows, facts, checks = completed
+    for row in rows:
+        if row["disposition"] in {"dropped", "lifted"} and row["name"] != "apps":
+            facts["repositories"][row["name"]]["archived"] = False
+    return rows, facts, checks
+
+
+@pytest.mark.parametrize("later", [
+    "pr-gate-action", "renovate-config", "handbook-generator", "c2p-collector",
+    "datastore", "cloud", "fleet", "policy", "governance-agent",
+])
+def test_readiness_collector_must_precede_new_archives(before_first, later) -> None:
+    rows, facts, checks = before_first
+    facts["repositories"][later]["archived"] = True
+    status, messages = incumbent.grade(rows, facts, checks, True)
+    assert status == 1
+    assert any(message.startswith("FAIL:") and "readiness-collector" in message
+               and "first" in message for message in messages)
+
+
+def test_historical_apps_archive_and_transfers_do_not_preempt_readiness(before_first) -> None:
+    rows, facts, checks = before_first
+    status, messages = incumbent.grade(rows, facts, checks, True)
+    assert status == 0
+    assert "PASS: apps: archived and its current prerequisite passes" in messages
+    assert "LIMIT: readiness-collector: row passes; archive has not been performed" in messages
+
+
+@pytest.mark.parametrize("later", [None, "pr-gate-action", "handbook-generator"])
+def test_readiness_can_be_archived_first_then_other_eligible_rows(before_first, later) -> None:
+    rows, facts, checks = before_first
+    facts["repositories"]["readiness-collector"]["archived"] = True
+    if later:
+        facts["repositories"][later]["archived"] = True
+    assert incumbent.grade(rows, facts, checks, True)[0] == 0
+
+
+@pytest.mark.parametrize("unavailable", ["missing", "error"])
+def test_unobserved_readiness_state_is_unknown_not_live(before_first, unavailable) -> None:
+    rows, facts, checks = before_first
+    facts["repositories"]["pr-gate-action"]["archived"] = True
+    if unavailable == "missing":
+        del facts["repositories"]["readiness-collector"]
+    else:
+        facts["repositories"]["readiness-collector"]["error"] = "forge unavailable"
+    status, messages = incumbent.grade(rows, facts, checks, True)
+    assert status == 3
+    assert any(message.startswith("SKIP: readiness-collector:") for message in messages)
+    assert not any(message.startswith("FAIL:") for message in messages)
 
 
 @pytest.mark.parametrize("live", [
