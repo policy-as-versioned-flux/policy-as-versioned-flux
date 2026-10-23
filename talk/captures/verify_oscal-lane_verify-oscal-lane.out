@@ -1,9 +1,10 @@
 ==> driftwood: oscal_lane.py
 ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not
-FAIL: 4 not-satisfied observations have no cage risk; 0 failed policy results have no control mapping; 0 carried risks failed decision/live-Pod validation: 42ca452a-8b23-50d0-8b67-3fa61c65e221, 66ff5dd8-f343-5074-957f-541c6efb0fe5, c2ee6df7-cc96-5d54-b8d5-f54044da769c, fdbe2f47-4741-5e32-a96e-9a4b53037149
+FAIL: 1 not-satisfied observations have no cage risk; 0 failed policy results have no control mapping; 0 carried risks failed decision/live-Pod validation: 42ca452a-8b23-50d0-8b67-3fa61c65e221
 ==> tuppence: oscal_lane.py
 ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not
 FAIL: 2 not-satisfied observations have no cage risk; 0 failed policy results have no control mapping; 0 carried risks failed decision/live-Pod validation: 42ca452a-8b23-50d0-8b67-3fa61c65e221, c71e4d36-6295-5466-8368-774631b485e8
 ==> ludlow: oscal_lane.py
 ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not
 FAIL: 2 not-satisfied observations have no cage risk; 0 failed policy results have no control mapping; 0 carried risks failed decision/live-Pod validation: 42ca452a-8b23-50d0-8b67-3fa61c65e221, 6a834573-26b8-51b6-83a9-1c40cda91ab9
+FAIL: workload lane aggregation contains a failed check or undeclared wait; see party outputs above
