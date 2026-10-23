@@ -1,7 +1,19 @@
+== CVE transport: bounded retries and permanent-failure refusal ==
+test_existing_retryable_http_statuses_still_recover (__main__.CVEFetchTransport.test_existing_retryable_http_statuses_still_recover) ... ok
+test_invalid_nvd_json_is_not_retried_or_accepted (__main__.CVEFetchTransport.test_invalid_nvd_json_is_not_retried_or_accepted) ... ok
+test_permanent_http_errors_are_not_retried (__main__.CVEFetchTransport.test_permanent_http_errors_are_not_retried) ... ok
+test_response_read_timeout_retries_then_returns_complete_response (__main__.CVEFetchTransport.test_response_read_timeout_retries_then_returns_complete_response) ... ok
+test_timeouts_exhaust_the_same_four_attempts_and_close_responses (__main__.CVEFetchTransport.test_timeouts_exhaust_the_same_four_attempts_and_close_responses) ... ok
+test_transient_http_and_timeouts_share_one_budget (__main__.CVEFetchTransport.test_transient_http_and_timeouts_share_one_budget) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.011s
+
+OK
 == release signing caller: embedded proof requested, signer refuses ==
 .
 ----------------------------------------------------------------------
-Ran 1 test in 0.023s
+Ran 1 test in 0.024s
 
 OK
 == envelope schema: /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/feeds/../platform/feeds/schema.json ==
@@ -31,6 +43,8 @@ ok  party.yaml publishes market-moves
 ok  party.yaml publishes market-moves/payload.schema.json
 ok  party.yaml publishes news
 ok  party.yaml publishes news/payload.schema.json
+ok  party.yaml publishes recovery-expense
+ok  party.yaml publishes recovery-expense/payload.schema.json
 ok  a twin scenario validates against /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/feeds/../platform/feeds/forward-intel.payload.schema.json
 ok  the same schema takes an lm triple as well as a lognormal-GPD severity spec
 ok  a 1.0.0-shaped payload fails on all three C10 keys: 'claim_scope'; 'derived_from'; 'register' -- which is why C10 is one major
@@ -85,12 +99,12 @@ ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14:
 == the threat register publishes its own magnitudes, and ships the converter that reads them ==
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 2.684s
+Ran 9 tests in 2.732s
 
 OK
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 1.259s
+Ran 10 tests in 1.242s
 
 OK
 ok  12 (version, institution) scenarios; 6 price a magnitude the PUBLISHER published, 6 price the frozen table and say so by name

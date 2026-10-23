@@ -19,12 +19,25 @@ ok  £ moved by £-7,861,681 on a version-only schema diff
 ale(uk-gdpr/lower-tier alone)               = £9039791
 ale(uk-gdpr/lower-tier + pci-dss, combined)  = £11006429
 ok  £ rose by £1,966,638 once a second regime can draw on the same breach -- fatter, not thinner
+test_existing_envelopes (__main__.FeedEnvelopeTests.test_existing_envelopes) ... ok
+test_financial_formula_invariant_is_preserved (__main__.FeedEnvelopeTests.test_financial_formula_invariant_is_preserved) ... ok
+test_malformed_versions_are_refused (__main__.FeedEnvelopeTests.test_malformed_versions_are_refused) ... ok
+test_migrated_regimes_are_preserved (__main__.FeedEnvelopeTests.test_migrated_regimes_are_preserved) ... ok
+test_patch_and_minor_versions_in_all_major_directories (__main__.FeedEnvelopeTests.test_patch_and_minor_versions_in_all_major_directories) ... ok
+test_payload_schema_requirements_are_preserved (__main__.FeedEnvelopeTests.test_payload_schema_requirements_are_preserved) ... ok
+test_publisher_identity_is_preserved (__main__.FeedEnvelopeTests.test_publisher_identity_is_preserved) ... ok
+test_wrong_directory_major_is_refused (__main__.FeedEnvelopeTests.test_wrong_directory_major_is_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.792s
+
+OK
 
 == 6. the four published feed envelopes match the one feed contract (ADR-0019) ==
 ok  penalty-schema/v1/feed.json  penalty-schema v1.0.0 by ico at 2026-07-31T16:22:39+01:00, payload validates against penalty-schema/payload.schema.v2.json
 ok  penalty-schema/v2/feed.json  penalty-schema v2.0.0 by ico at 2026-07-31T16:22:39+01:00, payload validates against penalty-schema/payload.schema.v2.json
 ok  penalty-schema/v3/feed.json  penalty-schema v3.0.0 by ico at 2026-08-28T10:00:00+01:00, payload validates against penalty-schema/payload.schema.json
-ok  penalty-schema/v4/feed.json  penalty-schema v4.0.0 by ico at 2026-09-09T12:00:00+01:00, payload validates against penalty-schema/payload.schema.v4.json
+ok  penalty-schema/v4/feed.json  penalty-schema v4.0.1 by ico at 2026-09-09T12:00:00+01:00, payload validates against penalty-schema/payload.schema.v4.json
 ok  v1 and v2 envelopes carry the schema/ regimes payloads unchanged
 ok  major 3 adds control_weights and leaves the regimes payload alone
 ok  major 4 corrects finality and adds frequency; no formula rate or cap moved with it
@@ -83,12 +96,12 @@ ok  (f1) the scenario names what each priced figure rests on
 ok  (d) the sized triple never tops the statutory maximum max(cap, rate x turnover)
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 1.563s
+Ran 10 tests in 1.594s
 
 OK
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 3.741s
+Ran 11 tests in 3.781s
 
 OK
 {"synthetic_wrong_target": {"pre_sign": {"exit": 1, "stdout": "", "stderr": "REFUSED: publisher native release gate: ICO publishes only penalty-schema; another cage target cannot authorize this release\n"}, "direct_verify": {"exit": 1, "stdout": "", "stderr": "REFUSED: publisher native release gate: ICO publishes only penalty-schema; another cage target cannot authorize this release\n"}, "original_selected_gate": {"exit": 1, "stdout": "", "stderr": "FAIL: penalty-schema/bump.yaml declares 'patch' but the computed bump for the next release is 'major' (v3.0.0 -> v3.0.1; rule: 'fixture'). The gate has two declarations of one fact and no rule for choosing between them.\n"}}}
