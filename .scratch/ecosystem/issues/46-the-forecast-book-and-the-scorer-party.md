@@ -116,3 +116,35 @@ The pilot software completed normal reviewed delivery in feeds [PR17](https://gi
 On the exact final platform tree `9ac2172a3a65d7ab1f3a90e2737f21297bca2c9f`, the full native selfcheck, all 193 composition tests and public handbook verifier passed with no participant source or Git changes. Two preceding real selfcheck refusals exposed disposable fixtures that omitted committed scenarios and asserted the former baseline despite the accepted isolated floor. Focused RED/GREEN controls preceded fixture corrections; production pricing and authority checks were preserved. Original failures remain retained. Frozen validation manifest `.scratch/ecosystem/research/adopt-three-owner-policies-20261023/calibration/platform/broader-validation-v3/EXECUTION-MANIFEST.json` has SHA256 `6daabc3b023f82ee89fe357c9a6408deeaf4680315e7c44e1972e3a2c0782ebb`. Software delivery supplies no genuine recovery model envelope, registration, release cage credit or annual outcome.
 
 Ticket 46 remains open. Genuine institution-year model parameters and source identities, pre-horizon signed registrations, independent complete annual outcomes and the publisher/adopter reliability declarations remain distinct from construction of the software. The owner choices are adopted; empirical evidence is still required. Historical observations and grades are preserved, and no primary TRUTH workflow was manually dispatched or rerun for this adoption. Tickets 27/46/74/155/156 retain their existing statuses; runtime risk joins and the remaining retirement dependencies require their own actual evidence.
+
+
+## Follow-up delivery and remaining pilot artifacts, 2026-10-23 UTC
+
+NIST [PR11](https://github.com/policy-as-versioned-nist/nist/pull/11) normally merged as
+`5436791036acbb1263eb3449472ee8e34f637335`. It refreshes the empty publisher-accuracy
+report's exact price_records source binding while retaining the historical cutoff,
+empty cohorts and unmeasured reason. Its original CI39950731195/1 passed all seven tests;
+the genuine registered native checker and independent public conservation passed within
+their recorded scopes. No monetary cohort or outcome was created by the repair.
+
+Hub [PR253](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/253)
+merged as `c2999b0f3c753949e88c18b290b65f649bb90616`. It handles typed nonadditive
+floor-change evidence, the accepted owner floor in the E2E fixture, exact party-lane
+aggregation and committed scenario fixtures. Actual source CI39955725950/1 retained
+3,384 PASS / 1 historical coverage FAIL / 24 SKIP / 243 subtests. The 13 fixture failures
+were repaired; the pre-registered Flux coverage finding was not weakened or made green.
+The original natural primary453/39957170536/1 then recorded normally through PR254 as
+`9e58542eef0c27cef6b2e919aa0dd0e59b71b9a6`: 112 PASS / 2 FAIL / 27 SKIP / 8 EXCLUDED,
+total149, ceiling130. Original signed observations, all failures and full prior log
+byte/blame history remain conserved. This is not a new pilot outcome or post-cleanup
+scheduled runtime proof.
+
+Accepted planning choices and software delivery do not finish the prospective pilot's
+artifacts. The publisher-owned institutional model/profile declarations, signed adopter
+shadow contexts and genuine pre-horizon immutable registrations remain to be delivered
+in their real dependency order. Normative unvalidated parameter choices are distinct
+from future actual expenses, invoices, independent completeness and final annual
+outcomes. The five overlapping workload contingencies are not summed or relabelled into
+the institutional model. At least three complete2027 cases remain required, with final
+annual outcomes unavailable before2028-01-01. Ticket46 stays open; this entry adds no
+monetary result, reliability credit or substituted outcome.

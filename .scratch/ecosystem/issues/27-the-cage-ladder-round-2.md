@@ -1,7 +1,7 @@
 # 27 — The cage ladder, round 2
 
 Type: grilling (HITL)
-Status: open
+Status: resolved
 Blocked by: 09
 
 ## Question
@@ -177,3 +177,45 @@ Six genuine tools6.1/6.2 public compose calls at the same inputs produced identi
 Natural closed-PR runs `39693913152/1`, `39693911549/1` and `39693912160/1` checked out those actual merges and verified tools6.2. Each held because both the strictest priced tier and declared Namespace tier were `isolated`, returning the full proposed list `[]` with zero artifacts. No tier move or comparison report was produced. They are not ticket161 scheduled receipts, ticket74's crossing/human merge, or a new TRUTH/financial observation.
 
 The optional party-band software and its required hosted validation route are delivered; authentic per-organisation cutoffs remain undeclared, so ticket27 stays open. The examples in its tests are labelled synthetic fixtures, not real financial or assurance facts. No actor integration is activated; the identity shelf and ticket74's separate criterion remain. Proofs, relative to the workspace root: `.scratch/ecosystem/research/resume-2026-10-18/ticket27-party-assurance-bands-20261021/RELEASE-AND-COMPATIBILITY-READY.json` and `.scratch/ecosystem/research/resume-2026-10-18/party-validator-compiler-route-20261021/ROOT-DELIVERY-COMPLETE.json`, with their separately bound source/native/replay/CI/public-conservation/natural-runtime receipts.
+
+
+## Answer
+
+**Owner adoption and source delivery, 2026-10-23.** The owner accepted all three
+recommendations, supplying the last open choice in this ticket. Explicit assurance bands
+are GBP/year: Driftwood 4,000 / 40,000 / 400,000; Tuppence 1,500 / 15,000 / 150,000; Ludlow
+500 / 5,000 / 50,000. Existing tolerances and strict comparison semantics are retained.
+These are adopted policy cutoffs, not empirically measured identity assurance.
+
+The actual declarations passed the verified compiler's party validation and genuine
+composition before ordinary reviewed source delivery: Driftwood
+[PR99](https://github.com/policy-as-versioned-driftwood/driftwood/pull/99), merge
+`52169217a08344960aa8947c31888a4ff1dd5612`; Tuppence
+[PR109](https://github.com/policy-as-versioned-tuppence/tuppence/pull/109), merge
+`6868c98de1c943ad7d7878a9e278c18c6bfd4790`; and Ludlow
+[PR101](https://github.com/policy-as-versioned-ludlow/ludlow/pull/101), merge
+`6f8d4e9bceeb17eec80595a792af8b2e3b1c7f12`. Their signed composition releases are
+[Driftwood v5.2.0](https://github.com/policy-as-versioned-driftwood/driftwood/releases/tag/v5.2.0),
+[Tuppence v4.3.0](https://github.com/policy-as-versioned-tuppence/tuppence/releases/tag/v4.3.0)
+and [Ludlow v5.3.0](https://github.com/policy-as-versioned-ludlow/ludlow/releases/tag/v5.3.0).
+Final pointer PRs DW100/TU110/LU102 select those exact releases without another B tag.
+Their original two-job CI runs 39939521777/1, 39935979869/1 and 39939251547/1 passed.
+Source, release, pointer and original observation histories are separately conserved.
+
+The registered `.estate-clone/platform/break-glass/verify-break-glass.sh` has PASS in
+recorded TRUTH453's exact committed grade table, and its capture retains the offline
+party-band CLI regressions. This is independent source/self-proof, not live actor evidence.
+There is a separate ownership limit: the actual platform Git subjects touching that
+check name no ticket in the existing ownership parser. The existing status derivation
+uses this named PASS and reports resolved; its ownership filter is applied to FAIL rows,
+so that result does not establish Git ownership. This record supplies no synthetic
+ownership or new check grade. The completion evidence is the owner's exact declaration
+and its real validated, signed and selected delivery, together with the previously
+delivered portions documented above.
+
+The original warn choice, claim-preserving tighten-only tier route and move-specific price
+evidence, and legacy access retirement rollout were already delivered in the preceding
+dated sections. With the authentic bands supplied, ticket27's original HITL/design/source
+scope is complete. Actor integration remains shelved. No live actor assurance, enacted
+tier movement, financial outcome, mitigation credit or whole-build completion is claimed;
+ticket74 keeps its separate real crossing and human-merge criterion.
