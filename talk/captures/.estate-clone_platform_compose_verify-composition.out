@@ -1,67 +1,67 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 13.209s
+Ran 11 tests in 14.455s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 10.544s
+Ran 9 tests in 10.948s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .............................
 ----------------------------------------------------------------------
-Ran 29 tests in 31.151s
+Ran 29 tests in 32.839s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 1.975s
+Ran 16 tests in 2.116s
 
 OK
 [1;36m==>[0m 0d. an unsupported engine pairing is priced, never refused (ticket 148, hub ADR-0033 point 3)
 .............
 ----------------------------------------------------------------------
-Ran 13 tests in 3.096s
+Ran 13 tests in 3.613s
 
 OK
 [1;36m==>[0m 0e. quote validity uses composed input dates and conserves contract costs (ticket 37)
 ........
 ----------------------------------------------------------------------
-Ran 8 tests in 3.791s
+Ran 8 tests in 3.999s
 
 OK
 [1;36m==>[0m 0f. quote conditions name counted implementation claims without granting cover (ticket 37)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 3.357s
+Ran 11 tests in 3.553s
 
 OK
 [1;36m==>[0m 0f1. quote conditions authenticate served evidence and consume modeled consequences
 .....................
 ----------------------------------------------------------------------
-Ran 21 tests in 105.555s
+Ran 21 tests in 109.453s
 
 OK
 [1;36m==>[0m 0f2. monetary publisher quality preserves absent behavior and renders its exact evidence
 ...
 ----------------------------------------------------------------------
-Ran 3 tests in 0.467s
+Ran 3 tests in 0.469s
 
 OK
 [1;36m==>[0m 0g. consumer retirement keeps its exact authority checks with credential-free public reads
 ...............................
 ----------------------------------------------------------------------
-Ran 31 tests in 3.462s
+Ran 31 tests in 3.346s
 
 OK
 [1;36m==>[0m 0h. explicit workload decisions compose and replay without changing policy enforcement
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 4.667s
+Ran 10 tests in 5.052s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)
@@ -10550,7 +10550,7 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
       "pin_signature": {
         "state": "untagged",
         "tag": null,
-        "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 8 tag(s) of its own"
+        "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 9 tag(s) of its own"
       },
       "hole": {
         "kind": "untagged-pin",
@@ -10562,7 +10562,7 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
         "status": "new",
         "amount": 985751.2839327094,
         "priced_by": "feeds eol@v2: the exposure the pin prices, read off a feed no signed tag carries",
-        "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 8 tag(s) of its own"
+        "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 9 tag(s) of its own"
       },
       "publisher_observation_scope": "Publisher tags were observed when this artefact was composed; the recorded observation is replayed offline and during verification. It does not establish the publisher's current newest major. A fresh composition with the publisher present refreshes it.",
       "superseded": {
@@ -10811,7 +10811,7 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
       "currency": "GBP",
       "amount": 985751.2839327094,
       "priced_by": "feeds eol@v2: the exposure the pin prices, read off a feed no signed tag carries",
-      "detail": "ludlow pins feeds/eol@v2 and no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 8 tag(s) of its own; 985751.28 GBP of exposure is booked against an unsigned feed"
+      "detail": "ludlow pins feeds/eol@v2 and no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 9 tag(s) of its own; 985751.28 GBP of exposure is booked against an unsigned feed"
     },
     {
       "kind": "unsupported-engine",
@@ -11154,7 +11154,7 @@ OK untagged cve pin: tuppence pinned at feeds/cve@v2 composes (no refusal) with 
         "pin_signature": {
           "state": "untagged",
           "tag": null,
-          "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 8 tag(s) of its own"
+          "detail": "no signed tag eol/v2.x.y (or v2.x.y) exists on the feeds parent's checkout, which carries 9 tag(s) of its own"
         },
         "newer": null,
         "superseded": {
