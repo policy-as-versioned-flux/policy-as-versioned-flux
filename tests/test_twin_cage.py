@@ -244,6 +244,7 @@ class TwinReleasePin(unittest.TestCase):
                               grade(workflow, files, 'tuppence'))
 
     def test_tag_cut_must_be_an_explicit_boolean(self) -> None:
+        state: object
         for state in ('true', 'false', 0, 1, None, [], {}):
             with self.subTest(state=state):
                 workflow, files = fixture('driftwood')
@@ -258,6 +259,7 @@ class TwinReleasePin(unittest.TestCase):
                       grade(workflow, files, 'driftwood'))
 
     def test_cut_pin_requires_a_semver_twin_tag(self) -> None:
+        tag: object
         for tag in (None, '', 1, [], {}, 'main', 'v0.1.0', 'twin/v',
                     'twin/vnot-a-version', 'twin/v0.1.0/other', 'twin/v0.1.0\n',
                     'twin/v01.1.0'):
