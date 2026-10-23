@@ -23,6 +23,7 @@ import local_clock_capability
 LADDER = ('baseline', 'restricted', 'quarantine', 'isolated')
 INERT = ('actions/checkout', 'actions/upload-artifact', 'actions/download-artifact')
 HEX = re.compile(r'^[0-9a-f]{40}$')
+TWIN_TAG = re.compile(r'twin/v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)')
 PROGRAM = re.compile(r'(?m)^\s*(?:python3?|bash|sh|node|npx)\s+|\./\S+\.py')
 PROPOSAL_COMMAND = re.compile(r'gh\s+pr\s+create|git\s+checkout\s+-b')
 HUB = 'policy-as-versioned-flux/policy-as-versioned-flux'
@@ -45,16 +46,23 @@ def grade(files: dict[str, str], organization: str | None = None) -> list[str]:
         errors.append('twin job holds capabilities beyond contents: read')
     if not HEX.fullmatch(str(pin.get('hub_commit', ''))):
         errors.append('twin/PIN.yaml names no full hub commit')
+    tag_cut = pin.get('tag_cut')
+    if type(tag_cut) is not bool:
+        errors.append('twin/PIN.yaml tag_cut is not an explicit boolean')
+    expected_ref = '${{ steps.pin.outputs.hub_commit }}'
+    checkout_error = 'hub checkout is not the commit the pin-reading step names'
+    if tag_cut is True:
+        tag = pin.get('twin_tag')
+        if not isinstance(tag, str) or not TWIN_TAG.fullmatch(tag):
+            errors.append('tag_cut declares no signed twin tag')
+        expected_ref = tag
+        checkout_error = 'hub checkout is not the release tag twin/PIN.yaml names'
     checkouts = [s for s in twin.get('steps', []) if s.get('with', {}).get('repository') == HUB]
-    if len(checkouts) != 1 or checkouts[0].get('with', {}).get('ref') != '${{ steps.pin.outputs.hub_commit }}':
-        errors.append('hub checkout is not the commit the pin-reading step names')
+    if len(checkouts) != 1 or checkouts[0].get('with', {}).get('ref') != expected_ref:
+        errors.append(checkout_error)
     reader: dict[str, Any] = next((s for s in twin.get('steps', []) if s.get('id') == 'pin'), {})
     if 'twin/PIN.yaml' not in str(reader.get('run', '')) or 'hub_commit=' not in str(reader.get('run', '')):
         errors.append('hub commit output is not read from twin/PIN.yaml')
-    if pin.get('tag_cut') is True:
-        tag = pin.get('twin_tag')
-        if not isinstance(tag, str) or not tag.startswith('twin/v'):
-            errors.append('tag_cut declares no signed twin tag')
     transports = observation_steps(workflow, organization)
     for job_name, job in jobs.items():
         for step_index, step in enumerate(job.get('steps', [])):
