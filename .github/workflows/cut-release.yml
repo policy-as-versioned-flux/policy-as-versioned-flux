@@ -1,0 +1,52 @@
+name: Cut the initial signed twin package
+
+# Tickets 29/64: manual publication, never a schedule or actor/model execution.
+# The repository is the package. No branch/evidence commit or separate signature.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Initial twin package version (only 0.1.0 is defined)
+        required: true
+        default: '0.1.0'
+      expected_commit:
+        description: Exact reviewed main commit, full lowercase SHA1
+        required: true
+      message:
+        description: What changed and why
+        required: true
+
+permissions:
+  contents: read
+concurrency:
+  group: twin-initial-release-cut
+  cancel-in-progress: false
+
+jobs:
+  cut:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      id-token: write
+      actions: write
+    env:
+      VERSION: ${{ inputs.version }}
+      EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+      MESSAGE: ${{ inputs.message }}
+      GITSIGN_REKOR_MODE: offline
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: install hash-pinned package-proof dependencies
+        run: python3 -m pip install --retries 0 --timeout 60 --require-hashes -r .github/requirements/twin-release.txt
+      - name: package release callsite proof
+        run: python3 -m pytest -q -n0 tests/test_twin_release.py
+      - uses: ./.github/actions/install-gitsign
+      - name: cut the verified initial package
+        run: python3 talk/twin_release.py cut --version "$VERSION" --expected-commit "$EXPECTED_COMMIT" --message "$MESSAGE"

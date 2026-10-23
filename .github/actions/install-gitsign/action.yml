@@ -1,0 +1,17 @@
+name: Install release-pinned gitsign
+description: Existing estate gitsign 0.17.1 binary and SHA256, without a mutable installer
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GITSIGN_VERSION: 0.17.1
+        GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+      run: |
+        set -euo pipefail
+        tools="${RUNNER_TEMP}/twin-release-tools"
+        mkdir -p "$tools"
+        curl -fsSL --connect-timeout 20 --max-time 120 "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64" -o "$tools/gitsign"
+        echo "${GITSIGN_SHA256}  $tools/gitsign" | sha256sum -c -
+        chmod +x "$tools/gitsign"
+        echo "$tools" >> "$GITHUB_PATH"

@@ -1,0 +1,47 @@
+name: Verify and publish the signed twin package
+
+# A GITHUB_TOKEN tag push does not trigger another workflow. The cutter explicitly
+# dispatches this same verification route; direct tag pushes also reach it.
+on:
+  push:
+    tags: ['twin/v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing initial signed twin tag
+        required: true
+      expected_commit:
+        description: Exact source commit recorded by the cut, full lowercase SHA1
+        required: true
+
+permissions:
+  contents: read
+concurrency:
+  group: twin-initial-release-publication
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      EXPECTED_COMMIT: ${{ inputs.expected_commit || github.sha }}
+      GITSIGN_REKOR_MODE: offline
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: install hash-pinned package-proof dependencies
+        run: python3 -m pip install --retries 0 --timeout 60 --require-hashes -r .github/requirements/twin-release.txt
+      - name: package release callsite proof
+        run: python3 -m pytest -q -n0 tests/test_twin_release.py
+      - uses: ./.github/actions/install-gitsign
+      - name: verify and publish the exact tag
+        run: python3 talk/twin_release.py publish --tag "$TAG" --expected-commit "$EXPECTED_COMMIT"
