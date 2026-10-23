@@ -1,0 +1,113 @@
+{
+  "kind": "feed",
+  "name": "recovery-expense",
+  "payload": {
+    "accounting": {
+      "allocation": "Allocate each independently evidenced source cost once across registered cost centres; disclose shared incidents and dependence.",
+      "collection_policy_sha256": "5d77ac2f15f4179f006cdb61deb2f75425325b6e1fb8169ce6bbe574c3d9e5c1",
+      "completeness": "Complete cost-centre incident ledger plus attributable invoices/worklogs and an independent final completeness attestation; an empty log is not zero.",
+      "excluded": [
+        "Routine controls and already-budgeted operating cost",
+        "Missed sales, fines, premiums, customer/patient losses",
+        "Double-counted shared incident costs, forecast-generated outcomes and synthetic tests"
+      ],
+      "finality": "Year-end independent reconciliation and signed final/complete record; unresolved or disputed amounts are ineligible. Closing within 31 days is a process target.",
+      "included": [
+        "Incremental incident-response and restoration labour at an agreed charge-out rule, supported by worklogs",
+        "Actual incremental restoration/vendor invoices allocated once to a registered cost centre"
+      ],
+      "recognition": "Recognize eligible expense by incurred UTC date in the registered subject-year, not incident onset, payment or recording date. Annual frequency counts incidents with eligible recovery activity in that year, including carry-in; severity is only their eligible within-year incremental direct expense, excluding carry-out.",
+      "unit_basis": "nominal direct security-incident recovery expense per registered subject-year"
+    },
+    "currency": "GBP",
+    "feed_version": "v1",
+    "institutions": {
+      "driftwood": {
+        "cost_centres": [
+          "driftwood/recovery-engineering-2027"
+        ],
+        "lef": [
+          0.25,
+          1,
+          3
+        ],
+        "lef_basis": {
+          "as_of": "2026-10-23",
+          "kind": "normative-planning-unvalidated",
+          "statement": "Delegated prospective institution-year planning policy, not measured frequency: use a common PERT annual incident-frequency range [0.25, 1, 3] for incidents with eligible recovery activity incurred during 2027, including carry-in. One incident/year is a planning reserve reference; lower/upper parameters are chosen uncertainty bounds, not evidence-derived rates or a real-world cap. No workload contingencies were summed, no known/future outcomes were fitted, and identical policy across the three institutions does not establish independent incidents."
+        },
+        "lm_basis": {
+          "as_of": "2026-10-23",
+          "kind": "normative-planning-unvalidated",
+          "statement": "Delegated prospective per-incident within-year expense budget, not measured staffing/payroll/loss: planned incremental labour [10, 40, 160] hours at an explicitly adopted GBP100/hour charge-out rule plus illustrative incremental vendor/restoration allowances [0, 1000, 4000] GBP gives PERT [1000, 5000, 20000] GBP. Forty hours is one planning work-week of aggregate recovery capacity, never a statement about employee count or available staff. These are distribution parameters, not quantiles, invoice forecasts or actual-expense caps. Count only eligible expense incurred within 2027; no carry-out, routine operating cost, lost sales/fines/premiums/customer losses or control-effectiveness credit."
+        },
+        "lm_gbp": [
+          1000,
+          5000,
+          20000
+        ],
+        "parameter_source": "institution-level-owner-planning"
+      },
+      "ludlow": {
+        "cost_centres": [
+          "ludlow/recovery-engineering-2027"
+        ],
+        "lef": [
+          0.25,
+          1,
+          3
+        ],
+        "lef_basis": {
+          "as_of": "2026-10-23",
+          "kind": "normative-planning-unvalidated",
+          "statement": "Delegated prospective institution-year planning policy, not measured frequency: use a common PERT annual incident-frequency range [0.25, 1, 3] for incidents with eligible recovery activity incurred during 2027, including carry-in. One incident/year is a planning reserve reference; lower/upper parameters are chosen uncertainty bounds, not evidence-derived rates or a real-world cap. No workload contingencies were summed, no known/future outcomes were fitted, and identical policy across the three institutions does not establish independent incidents."
+        },
+        "lm_basis": {
+          "as_of": "2026-10-23",
+          "kind": "normative-planning-unvalidated",
+          "statement": "Delegated prospective per-incident within-year expense budget, not measured staffing/payroll/loss: planned incremental labour [10, 40, 160] hours at an explicitly adopted GBP100/hour charge-out rule plus illustrative incremental vendor/restoration allowances [0, 1000, 4000] GBP gives PERT [1000, 5000, 20000] GBP. Forty hours is one planning work-week of aggregate recovery capacity, never a statement about employee count or available staff. These are distribution parameters, not quantiles, invoice forecasts or actual-expense caps. Count only eligible expense incurred within 2027; no carry-out, routine operating cost, lost sales/fines/premiums/customer losses or control-effectiveness credit."
+        },
+        "lm_gbp": [
+          1000,
+          5000,
+          20000
+        ],
+        "parameter_source": "institution-level-owner-planning"
+      },
+      "tuppence": {
+        "cost_centres": [
+          "tuppence/recovery-engineering-2027"
+        ],
+        "lef": [
+          0.25,
+          1,
+          3
+        ],
+        "lef_basis": {
+          "as_of": "2026-10-23",
+          "kind": "normative-planning-unvalidated",
+          "statement": "Delegated prospective institution-year planning policy, not measured frequency: use a common PERT annual incident-frequency range [0.25, 1, 3] for incidents with eligible recovery activity incurred during 2027, including carry-in. One incident/year is a planning reserve reference; lower/upper parameters are chosen uncertainty bounds, not evidence-derived rates or a real-world cap. No workload contingencies were summed, no known/future outcomes were fitted, and identical policy across the three institutions does not establish independent incidents."
+        },
+        "lm_basis": {
+          "as_of": "2026-10-23",
+          "kind": "normative-planning-unvalidated",
+          "statement": "Delegated prospective per-incident within-year expense budget, not measured staffing/payroll/loss: planned incremental labour [10, 40, 160] hours at an explicitly adopted GBP100/hour charge-out rule plus illustrative incremental vendor/restoration allowances [0, 1000, 4000] GBP gives PERT [1000, 5000, 20000] GBP. Forty hours is one planning work-week of aggregate recovery capacity, never a statement about employee count or available staff. These are distribution parameters, not quantiles, invoice forecasts or actual-expense caps. Count only eligible expense incurred within 2027; no carry-out, routine operating cost, lost sales/fines/premiums/customer losses or control-effectiveness credit."
+        },
+        "lm_gbp": [
+          1000,
+          5000,
+          20000
+        ],
+        "parameter_source": "institution-level-owner-planning"
+      }
+    },
+    "model": "direct-security-recovery-expense/v1",
+    "note": "Prospective normative institution-year planning model; unvalidated parameters, no observed expense or effectiveness claim.",
+    "published_by": "feeds",
+    "scope": "shadow-collection-only"
+  },
+  "payload_schema": "recovery-expense/payload.schema.json",
+  "published_at": "2026-10-23T18:12:29Z",
+  "published_by": "feeds",
+  "version": "1.0.2"
+}

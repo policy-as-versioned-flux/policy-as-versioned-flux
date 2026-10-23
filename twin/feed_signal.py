@@ -70,6 +70,9 @@ STEEP_BY_FEED: dict[str, str] = {
     # priced shock under a perspective; both are money moving, so both are economic.
     "quote": "economic",
     "forward-intel": "economic",
+    # A prospective expense model declares monetary planning inputs. Its publication
+    # is an economic signal, never evidence that a recovery expense actually occurred.
+    "recovery-expense": "economic",
 }
 
 # Feeds deliberately NOT in the table, with the reason, so that "no row" can be read as a decision
