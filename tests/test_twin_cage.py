@@ -206,6 +206,86 @@ class TwinCageCLI(unittest.TestCase):
         self.assert_receipt_refused('environment or schema changed')
 
 
+class TwinReleasePin(unittest.TestCase):
+    def release(self, organization: str) -> tuple[dict, dict[str, str]]:
+        workflow, files = fixture(organization)
+        pin = yaml.safe_load(files['twin/PIN.yaml'])
+        pin.update(tag_cut=True, twin_version='0.1.0', twin_tag='twin/v0.1.0')
+        files['twin/PIN.yaml'] = yaml.safe_dump(pin)
+        self.checkout(workflow)['ref'] = pin['twin_tag']
+        return workflow, files
+
+    @staticmethod
+    def checkout(workflow: dict) -> dict:
+        return next(step['with'] for step in workflow['jobs']['twin']['steps']
+                    if step.get('with', {}).get('repository') == cage.HUB)
+
+    def test_cut_tag_checkout_uses_declared_tag_and_retains_commit_anchor(self) -> None:
+        for organization in ('driftwood', 'tuppence', 'ludlow'):
+            with self.subTest(organization=organization):
+                workflow, files = self.release(organization)
+                self.assertEqual(grade(workflow, files, organization), [])
+
+    def test_uncut_pin_keeps_the_reviewed_commit_checkout_contract(self) -> None:
+        for ref in ('twin/v0.1.0', 'main', 'a' * 40, None):
+            with self.subTest(ref=ref):
+                workflow, files = fixture('driftwood')
+                self.checkout(workflow)['ref'] = ref
+                self.assertIn('hub checkout is not the commit the pin-reading step names',
+                              grade(workflow, files, 'driftwood'))
+
+    def test_cut_pin_refuses_other_tags_branches_and_commit_expressions(self) -> None:
+        for ref in ('twin/v0.2.0', 'main', 'a' * 40,
+                    '${{ steps.pin.outputs.hub_commit }}', None):
+            with self.subTest(ref=ref):
+                workflow, files = self.release('tuppence')
+                self.checkout(workflow)['ref'] = ref
+                self.assertIn('hub checkout is not the release tag twin/PIN.yaml names',
+                              grade(workflow, files, 'tuppence'))
+
+    def test_tag_cut_must_be_an_explicit_boolean(self) -> None:
+        for state in ('true', 'false', 0, 1, None, [], {}):
+            with self.subTest(state=state):
+                workflow, files = fixture('driftwood')
+                pin = yaml.safe_load(files['twin/PIN.yaml'])
+                pin['tag_cut'] = state
+                files['twin/PIN.yaml'] = yaml.safe_dump(pin)
+                self.assertIn('twin/PIN.yaml tag_cut is not an explicit boolean',
+                              grade(workflow, files, 'driftwood'))
+        workflow, files = fixture('driftwood')
+        files['twin/PIN.yaml'] = 'hub_commit: ' + 'a' * 40 + '\n'
+        self.assertIn('twin/PIN.yaml tag_cut is not an explicit boolean',
+                      grade(workflow, files, 'driftwood'))
+
+    def test_cut_pin_requires_a_semver_twin_tag(self) -> None:
+        for tag in (None, '', 1, [], {}, 'main', 'v0.1.0', 'twin/v',
+                    'twin/vnot-a-version', 'twin/v0.1.0/other', 'twin/v0.1.0\n',
+                    'twin/v01.1.0'):
+            with self.subTest(tag=tag):
+                workflow, files = self.release('ludlow')
+                pin = yaml.safe_load(files['twin/PIN.yaml'])
+                pin['twin_tag'] = tag
+                files['twin/PIN.yaml'] = yaml.safe_dump(pin)
+                self.checkout(workflow)['ref'] = tag
+                self.assertIn('tag_cut declares no signed twin tag',
+                              grade(workflow, files, 'ludlow'))
+
+    def test_release_tag_does_not_replace_the_full_commit_and_reader_anchor(self) -> None:
+        for commit in ('abc123', 'main', None):
+            with self.subTest(commit=commit):
+                workflow, files = self.release('driftwood')
+                pin = yaml.safe_load(files['twin/PIN.yaml'])
+                pin['hub_commit'] = commit
+                files['twin/PIN.yaml'] = yaml.safe_dump(pin)
+                self.assertIn('twin/PIN.yaml names no full hub commit',
+                              grade(workflow, files, 'driftwood'))
+        workflow, files = self.release('driftwood')
+        reader = next(s for s in workflow['jobs']['twin']['steps'] if s.get('id') == 'pin')
+        reader['run'] = 'echo hub_commit=' + 'a' * 40
+        self.assertIn('hub commit output is not read from twin/PIN.yaml',
+                      grade(workflow, files, 'driftwood'))
+
+
 class TwinObservationTransport(unittest.TestCase):
     def test_reviewed_observation_transport_is_not_a_declaration_proposal(self) -> None:
         for organization in ('driftwood', 'tuppence', 'ludlow'):
