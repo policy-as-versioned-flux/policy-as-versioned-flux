@@ -549,3 +549,58 @@ def test_the_grader_and_the_composer_agree_on_a_since_later_than_as_of(
     assert since == {"late": "2026-09-24"} and "FAIL" not in lines, lines
     price["limits"] = [lim for lim in price["limits"] if "precedes since" not in lim]
     assert "FAIL" in _lines(grader, doc, ctx)
+
+
+# Floor comparisons are supported, non-additive selection evidence (ticket 27).
+def _with_floor_change(grader: ModuleType) -> tuple[dict, dict]:
+    doc, ctx = grader._good()
+    comparison = {"schema": 1, "before": {"known": True, "value": None},
+                  "after": {"known": True, "value": "isolated"}, "changed": True,
+                  "basis": "floor-only counterfactual at current inputs",
+                  "residual_basis": "platform-cage-tiers@1.0.0",
+                  "lines": [{"source": "feeds", "kind": "feed", "name": "example",
+                             "perspective": "driftwood", "currency": "GBP",
+                             "uncaged_amount": 100.0, "before_tier": "baseline",
+                             "after_tier": "isolated", "before_residual": 70.0,
+                             "after_residual": 2.0, "residual_delta": -68.0}],
+                  "could_not_look": None, "limit": "counterfactual, not enacted"}
+    doc["floor_change"] = comparison
+    doc["deltas"].append({"kind": "floor-change", "subject": "driftwood",
+                          "detail": comparison["basis"], "comparison": comparison})
+    return doc, ctx
+
+
+def test_supported_non_additive_floor_comparison_passes(grader: ModuleType) -> None:
+    doc, ctx = _with_floor_change(grader)
+    assert "amount" not in doc["deltas"][-1]
+    assert "FAIL" not in _lines(grader, doc, ctx)
+
+
+@pytest.mark.parametrize("defect", ["subject", "different-comparison", "unknown-history",
+                                     "unchanged", "bool-schema", "wrong-perspective",
+                                     "nonfinite", "invented-tier", "missing-delta"])
+def test_floor_comparison_defects_fail(grader: ModuleType, defect: str) -> None:
+    import copy
+    doc, ctx = _with_floor_change(grader)
+    delta = doc["deltas"][-1]
+    comparison = doc["floor_change"]
+    if defect == "subject":
+        delta["subject"] = "another-party"
+    elif defect == "different-comparison":
+        delta["comparison"] = copy.deepcopy(comparison)
+        delta["comparison"]["basis"] = "another context"
+    elif defect == "unknown-history":
+        comparison["before"] = {"known": False}
+    elif defect == "unchanged":
+        comparison["changed"] = False
+    elif defect == "bool-schema":
+        comparison["schema"] = True
+    elif defect == "wrong-perspective":
+        comparison["lines"][0]["perspective"] = "another-party"
+    elif defect == "nonfinite":
+        comparison["lines"][0]["residual_delta"] = float("nan")
+    elif defect == "invented-tier":
+        comparison["lines"][0]["after_tier"] = "custom"
+    else:
+        doc["deltas"].pop()
+    assert "FAIL" in _lines(grader, doc, ctx)

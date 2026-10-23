@@ -12,6 +12,11 @@ THROWAWAY COPY whose declaration this step rewrites itself — the same syntheti
 already takes with the fabricated residual and the fabricated prices[] entry, and the reason it
 never has to touch driftwood's real `isolated` line to keep a green.
 
+An adopted maximal floor deliberately prevents every residual crossing. That owner context
+is checked first, through both selectors. The crossing/proposer demonstration then explicitly
+uses a SYNTHETIC floor-free context in memory; neither the signed floor nor the real priced
+position is changed. Both proposal legs and the final verdict name this counterfactual.
+
 The manifest is found here the same way the proposer finds it and by a second implementation:
 the one manifest in the adopter's repo whose Namespace document carries
 `policy-as-versioned.dev/governed: "true"`. The pod manifest is carried into the throwaway copy
@@ -337,6 +342,24 @@ def judge_landed(landed, org, want_manifest, want_tier):
     return None
 
 
+def crossing_probe(pick, band, floor, order):
+    """Keep an adopted maximal floor distinct from the synthetic crossing demonstration."""
+    under = band * 0.5
+    synthetic_floor = floor == order[-1]
+    if synthetic_floor:
+        if pick(under, floor) != floor or pick(band * 2, floor) != floor:
+            raise ValueError("the maximal owner floor did not hold on both residuals")
+    selection_floor = None if synthetic_floor else floor
+    tier_under = pick(under, selection_floor)
+    over, tier_over = under, tier_under
+    for _ in range(4000):
+        over *= 1.02
+        tier_over = pick(over, selection_floor)
+        if tier_over != tier_under:
+            return under, over, tier_under, tier_over, synthetic_floor
+    raise ValueError(f"no crossing from {tier_under} between {under:,.0f} and {over:,.0f}")
+
+
 def main():
     if "--selfcheck" in sys.argv or "selfcheck" in sys.argv[1:]:
         return selfcheck()
@@ -392,33 +415,31 @@ def observe():
         skip(f"cannot import {PLATFORM}/graded/cage.py: {exc!r}")
     floor = (party.get("overlay") or {}).get("floor")
 
-    def pick(ale):
+    def pick(ale, selection_floor):
         """The tier the adopter's OWN versioned package selects for this uncaged ALE."""
         residuals = {t: {"amount": cage.caged_residual(ale, t), "currency": ccy}
                      for t in cage.ORDER}
         try:
-            chose = policy.select(residuals, {"amount": band, "currency": ccy}, floor)
+            chose = policy.select(residuals, {"amount": band, "currency": ccy}, selection_floor)
         except Exception as exc:                                # noqa: BLE001
             fail(f"{org}'s own selection-policy package refused to pick at an uncaged residual "
                  f"of {ale:,.2f} {ccy}: {exc}")
-        theirs, ours = chose["tier"], cage.select_tier(ale, band, floor)
+        theirs, ours = chose["tier"], cage.select_tier(ale, band, selection_floor)
         if theirs != ours:
             fail(f"at an uncaged residual of {ale:,.2f} {ccy}, {org}'s own selection-policy "
                  f"package picks {theirs!r} and platform/graded/cage.py picks {ours!r} — a "
                  f"proposal could name a version that did not pick (ADR-0021)")
         return theirs
 
-    under = band * 0.5
-    tier_under = pick(under)
-    over, tier_over = under, tier_under
-    for _ in range(4000):
-        over *= 1.02
-        tier_over = pick(over)
-        if tier_over != tier_under:
-            break
-    if tier_over == tier_under:
-        fail(f"no residual between {under:,.0f} and {over:,.0f} {ccy} changes {org}'s tier off "
-             f"{tier_under} against its own band of {band:,.0f} {ccy} — the band selects nothing")
+    try:
+        under, over, tier_under, tier_over, synthetic_floor = crossing_probe(
+            pick, band, floor, cage.ORDER)
+    except ValueError as exc:
+        fail(f"{org}'s selection probe: {exc}")
+    selection_context = (f"SYNTHETIC floor=None counterfactual; signed owner floor {floor} "
+                         "was independently checked and remains unchanged"
+                         if synthetic_floor else f"signed floor {floor!r}")
+    print(f"    selection context: {selection_context}")
     print(f"    {org} band {band:,.0f} {ccy} (its own party.yaml), selection policy "
           f"{policy_version} ({os.path.relpath(version_file, ESTATE)})")
     print(f"    residual {under:,.2f} -> tier {tier_under}; {over:,.2f} (crosses the band) -> "
@@ -495,7 +516,8 @@ def observe():
             f"does not tighten it")
         synthetic_tier, synthetic_outcome = tier_under, "land"
 
-    legs = [("as declared", None, real_outcome), ("SYNTHETIC declaration", synthetic_tier,
+    declared_leg = "as declared" if not synthetic_floor else "real declaration, SYNTHETIC floor=None"
+    legs = [(declared_leg, None, real_outcome), ("SYNTHETIC declaration", synthetic_tier,
                                                   synthetic_outcome)]
     results = {}
     with tempfile.TemporaryDirectory() as tmp:
@@ -624,7 +646,7 @@ def observe():
     # which one it is.
     print(f"PASS: a SYNTHETIC residual placed either side of {org}'s own signed appetite band of "
           f"{band:,.0f} {ccy} ({under:,.2f} -> {over:,.2f} {ccy}, not {org}'s real priced "
-          f"position) selects {tier_under} -> {tier_over} through {org}'s own selection-policy "
+          f"position; {selection_context}) selects {tier_under} -> {tier_over} through {org}'s own selection-policy "
           f"package {policy_version} (which platform/graded/cage.py agrees with), and BOTH "
           f"tighten-only outcomes are graded on throwaway copies (ADR-0022): against "
           f"{org}'s own declaration ({real_note}) the proposer {real_outcome.upper()}S, and "
