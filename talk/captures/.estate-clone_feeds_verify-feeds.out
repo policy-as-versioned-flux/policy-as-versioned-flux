@@ -99,12 +99,12 @@ ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14:
 == the threat register publishes its own magnitudes, and ships the converter that reads them ==
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 2.732s
+Ran 9 tests in 2.911s
 
 OK
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 1.242s
+Ran 10 tests in 1.320s
 
 OK
 ok  12 (version, institution) scenarios; 6 price a magnitude the PUBLISHER published, 6 price the frozen table and say so by name

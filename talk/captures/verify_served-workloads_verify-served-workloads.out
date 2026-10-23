@@ -7,3 +7,4 @@ SKIP: a workload lane run started by hand cannot establish a cited pass
 ==> ludlow: served_apps.py
 ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
 PASS: fact_8_each_served_workload_runs_in_its_cage: reports: both copies run
+SKIP: a workload lane run started by hand cannot establish a cited pass
