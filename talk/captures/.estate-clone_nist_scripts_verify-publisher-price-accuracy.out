@@ -1,17 +1,1 @@
-PASS: monetary report fully reconstructed from its declared source population
-...............
-----------------------------------------------------------------------
-Ran 15 tests in 20.376s
-
-OK
-..........
-----------------------------------------------------------------------
-Ran 10 tests in 1.463s
-
-OK
-...
-----------------------------------------------------------------------
-Ran 3 tests in 10.322s
-
-OK
-PASS: monetary SDK, release and bounded-generation controls hold; labelled fixtures are not world measurements
+FAIL: source-binding: monetary report differs from complete authenticated reconstruction

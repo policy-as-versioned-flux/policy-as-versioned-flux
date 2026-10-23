@@ -55,6 +55,20 @@ Validated Git signature: true
 Validated Rekor entry: true
 Validated Certificate claims: true
 OK gitsign verified: v5.0.0
+tlog index: 3410381454
+gitsign: Signature made using certificate ID 0x1613bcc9604d6fd974dae53b078796def7b66a11 | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true
+OK gitsign verified: v5.1.0
+tlog index: 3416675132
+gitsign: Signature made using certificate ID 0x4c56e38805e8ca12ae424449181c8a1fbf4e46a5 | CN=sigstore-intermediate,O=sigstore.dev
+gitsign: Good signature from [https://github.com/policy-as-versioned-driftwood/driftwood/.github/workflows/cut-release.yml@refs/heads/main](https://token.actions.githubusercontent.com)
+Validated Git signature: true
+Validated Rekor entry: true
+Validated Certificate claims: true
+OK gitsign verified: v5.2.0
 
 == 2. synthetic RE2-equivalent shapes (identities we can't/shouldn't real-sign) ==
 regexp under test: ^https://github\.com/policy-as-versioned-driftwood/driftwood/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
