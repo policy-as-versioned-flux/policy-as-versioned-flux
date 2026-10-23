@@ -239,11 +239,12 @@ def whole_fixture(root, actual, *, degraded=False, unresolved=False):
                                         'resolution': resolved}]}]}
     report = build_price_report(scorer, manifest, '2021-02-01T00:00:00Z', sources)
     check_price_report(scorer, report, sources)
-    envelope = {'kind': 'feed', 'name': 'publisher-reliability', 'version': '2.0.0',
+    report_version = json.loads((scorer / 'publisher-reliability/price-version.json').read_text())['version']
+    envelope = {'kind': 'feed', 'name': 'publisher-reliability', 'version': report_version,
         'published_by': 'nist', 'published_at': report['cutoff'],
         'payload_schema': 'publisher-reliability/price-payload.schema.json', 'payload': report}
     write(scorer, 'publisher-reliability/v2/feed.json', envelope)
-    report_ref = publish(scorer, 'publisher-reliability/v2.0.0', '2021-02-01T00:00:00Z')(
+    report_ref = publish(scorer, 'publisher-reliability/v' + report_version, '2021-02-01T00:00:00Z')(
         'publisher-reliability/v2/feed.json')
     party['inherits'].append({'party': 'nist', 'kind': 'feed', 'name': 'publisher-reliability',
                               'version': 'v2', 'since': '2026-10-18'})
