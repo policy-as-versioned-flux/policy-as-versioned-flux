@@ -50,3 +50,56 @@ The single ordinary [fixed-source diagnostic `39882342142/1`](https://github.com
 The supplemental artifact's official ZIP digest/CRC, two exact post-text-decoding parser inputs and normalized-row hash bind to those same signed rows. The first available artifact poll was terminal; no preterminal capture timing or HTTP-wire-byte claim is made. Source delivery, original native verification, automatic recording, cleanup and independent artifact binding are frozen separately under `.scratch/ecosystem/research/resume-active-20261022T2203/`: `TU-inventory-encoder-public-conservation/`, `TU-fixed-encoder-native-diagnostic/`, and `TU-fixed-encoder-artifact-integrity/`.
 
 **Still claimed.** The same original reads 45 PolicyReports, maps 11 of 16 served policies and retains the two missing Tuppence risk-observation joins with `risks: []` and no report-read or risk-validation errors. No monetary assumptions, workload-risk declarations, mitigation credit or enacted tier are supplied here. The saved Driftwood and Ludlow gaps and c2p-collector archive prerequisite remain. This ordinary diagnostic is not a scheduled crossing or a new primary TRUTH result: the conserved latest root450 remains **115 PASS / 3 FAIL / 23 SKIP / 8 EXCLUDED**, including its historical Tuppence membership FAIL. Ticket155 stays claimed on its original completion criteria; tickets27,46,74 and156 are unchanged.
+
+
+## Delivered declarations and cleanup repair, 2026-10-23 UTC
+
+The earlier no-declaration statements describe their dated stages. The owner has now
+adopted five explicit workload recovery planning scenarios and the supported isolated
+floor. The real source/release/pointer chain is recorded in ticket46's owner-adoption
+section and ticket27's Answer. These are labelled unvalidated planning inputs, not
+observed recovery expenses or measured mitigation effectiveness.
+
+Three separate disposable local clusters captured all five served workload PodUID/risk
+joins, validated their carried risks and retained same-node uncaged references Running.
+Original probe and business FAIL results were retained. The baseline observer added a
+disclosed namespace-completion wait after the sampler's asynchronous cleanup; those
+baselines do not prove that the sampler itself waited.
+
+The cleanup repair now blocks on deletion of only the same two owned probe Namespaces
+within finite bounds and records a scoped absence check and typed cleanup metadata.
+[Driftwood PR103](https://github.com/policy-as-versioned-driftwood/driftwood/pull/103),
+[Tuppence PR111](https://github.com/policy-as-versioned-tuppence/tuppence/pull/111) and
+[Ludlow PR103](https://github.com/policy-as-versioned-ludlow/ludlow/pull/103) merged normally
+as `8033f271937d651e47c82775b28294560840ed44`,
+`74c6d4204cbccb7ac3e1a29f0fdf46a7d8683df5` and
+`007e6fdb8ecac1ee6591d8d80b3a3f0efe1152bf`. The generated HEADER refresh changes only
+comparison-inputs.after; policy, money, risk identities, selected releases and old streams
+are preserved. Both independent reviews passed on the exact source and whole PR bodies.
+Original CI 39960596566/1, 39960614931/1 and 39960631415/1 passed both jobs and 66, 77 and
+64 tests respectively; each actual discovery includes the eleven cleanup tests. The old
+compose-check failures before discovery and their correction evidence remain retained.
+
+A separate fixed-Driftwood sampler rehearsal observed completed product cleanup without
+an observer completion wait. Its private driver still exited2 on an empty-JSON parser
+error. Raw deletion/absence receipts and full Namespace lists support only the separately
+qualified local product result. Probe FAIL removal left the same three business FAILs
+and their validated risks; no report was filtered or manually deleted. Tuppence and
+Ludlow have no equivalent fixed-sampler runtime claim. All four diagnostic incarnations
+were deleted; the four incumbent Kind nodes, including c2p-spike, remain stopped.
+
+Independent public conservation preserved 1,160 prior raw objects and 256 full observation
+byte/blame records. Tuppence's original audit stop and exact qualification for an unrelated
+open Renovate PR47 branch refresh remain explicit; that proposal was not approved or
+merged by this delivery. Retained proof roots are
+`.scratch/ecosystem/research/adopt-three-owner-policies-20261023/runtime155-preparation-20261023/`,
+`runtime155-fixed-validation/` and `cleanup-public-conservation-final-20261023/` under
+that same adoption research directory, each with its own frozen receipts.
+
+Recorded TRUTH453, normally delivered through hub PR254, is 112 PASS / 2 FAIL / 27 SKIP /
+8 EXCLUDED, total149, ceiling130. It declares adopter roots DW80b5090/TUf8abcb8/LU64fbf04
+from before the cleanup merges and contains later live reads. Its OSCAL capture retains
+the old missing-risk joins; its other FAIL is the scheduled feeds clock. It is not uniform
+post-repair runtime proof. Ticket155 remains claimed on its original served-workload and
+OSCAL outcomes until genuine scheduled observations from the merged sources establish
+them. No fake risk join, new citable PASS or c2p-collector archive prerequisite is granted.
