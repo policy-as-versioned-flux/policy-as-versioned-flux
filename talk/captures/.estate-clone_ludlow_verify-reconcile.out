@@ -1,9 +1,9 @@
 [1;36m==>[0m 0. the five-fact sample: the composed set in force, from signed sources (graded first, cluster-free)
-   five-fact sample 2026-10-22T14:31:49Z on cluster dsample-39796090640 (run 39796090640), 3 sources
+   five-fact sample 2026-10-23T14:15:25Z on cluster dsample-39967686797 (run 39967686797), 3 sources
      the cage facts (6, 7) ARE scored on this sample: registered by e65acc95bd10 at 2026-10-18T16:01:32+01:00 on refs/remotes/origin/main, and the sample is later
      ludlow-composed      true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
-     ludlow-composed      true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v5.1.1 was verified at the source boundary against ludlow's own pinned identity ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
-     ludlow-composed      true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming ludlow-composed applied 4bc8baba9efa
+     ludlow-composed      true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v5.3.0 was verified at the source boundary against ludlow's own pinned identity ^https://github\.com/policy-as-versioned-ludlow/ludlow/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
+     ludlow-composed      true  fact_3_last_applied_revision_equals_the_pinned_commit: every Kustomization consuming ludlow-composed applied 6f8d4e9bceeb
      ludlow-composed      true  fact_4_rendered_objects_byte_equal_to_an_offline_render: all 16 rendered objects are live and equal to the offline render
      ludlow-composed      true  fact_5_every_rendered_object_is_in_the_flux_inventory: all 16 rendered objects appear in a Flux inventory
      ludlow-composed      true  fact_6_the_bottom_rung_is_admitted_and_runs: the workload the cage put on its bottom rung (isolated) was ADMITTED and is Running, on priority class cage-isolated-7-0-0 (priority -10000, the lowest `cage-` PriorityClass on this cluster), carrying 2 container(s) including waf-sidecar injected by the cage

@@ -1,6 +1,82 @@
-.......
+FFFFFFF
+======================================================================
+FAIL: test_a_worse_full_distribution_consumes_the_publishers_target_in_actual_composition (__main__.PublisherPriceVertical.test_a_worse_full_distribution_consumes_the_publishers_target_in_actual_composition)
 ----------------------------------------------------------------------
-Ran 7 tests in 64.382s
+Traceback (most recent call last):
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/tests/test_publisher_price_vertical.py", line 214, in test_a_worse_full_distribution_consumes_the_publishers_target_in_actual_composition
+    self.assertEqual(document['outcome'], 'composed', document)
+AssertionError: 'refused' != 'composed'
+- refused
++ composed
+ : {'outcome': 'refused', 'party_artefact_errors': ['publisher-reliability: publisher-reliability: monetary report authenticated reconstruction refused: FAIL: source-binding: monetary envelope identity/schema/version differs from selected source'], 'parents': [], 'members': [], 'refusals': [], 'restatements': [], 'cages': [], 'holes': [], 'ungoverned': [], 'prices': [], 'deltas': [], 'limits': [], 'vendored': []}
 
-OK
-PASS: complete synthetic publisher producer, independent resolver, scorer and actual composition consume the publisher target; no genuine signature, monetary observation or price credit
+======================================================================
+FAIL: test_an_unauthenticated_predecessor_cannot_supply_the_native_release_proof (__main__.PublisherPriceVertical.test_an_unauthenticated_predecessor_cannot_supply_the_native_release_proof)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/tests/test_publisher_price_vertical.py", line 299, in test_an_unauthenticated_predecessor_cannot_supply_the_native_release_proof
+    self.assertIn('pinned identity/issuer', str(refused['party_artefact_errors']))
+AssertionError: 'pinned identity/issuer' not found in "['publisher-reliability: publisher-reliability: monetary report authenticated reconstruction refused: FAIL: source-binding: monetary envelope identity/schema/version differs from selected source']"
+
+======================================================================
+FAIL: test_authentic_degraded_release_still_widens_without_any_resolved_case (__main__.PublisherPriceVertical.test_authentic_degraded_release_still_widens_without_any_resolved_case)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/tests/test_publisher_price_vertical.py", line 282, in test_authentic_degraded_release_still_widens_without_any_resolved_case
+    self.assertEqual(document['outcome'], 'composed', document)
+AssertionError: 'refused' != 'composed'
+- refused
++ composed
+ : {'outcome': 'refused', 'party_artefact_errors': ['publisher-reliability: publisher-reliability: monetary report authenticated reconstruction refused: FAIL: source-binding: monetary envelope identity/schema/version differs from selected source'], 'parents': [], 'members': [], 'refusals': [], 'restatements': [], 'cages': [], 'holes': [], 'ungoverned': [], 'prices': [], 'deltas': [], 'limits': [], 'vendored': []}
+
+======================================================================
+FAIL: test_comparison_identity_uses_the_same_captured_party_bytes_as_pricing (__main__.PublisherPriceVertical.test_comparison_identity_uses_the_same_captured_party_bytes_as_pricing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/tests/test_publisher_price_vertical.py", line 90, in test_comparison_identity_uses_the_same_captured_party_bytes_as_pricing
+    self.assertEqual(stable['outcome'], 'composed', stable)
+AssertionError: 'refused' != 'composed'
+- refused
++ composed
+ : {'outcome': 'refused', 'party_artefact_errors': ['publisher-reliability: publisher-reliability: monetary report authenticated reconstruction refused: FAIL: source-binding: monetary envelope identity/schema/version differs from selected source'], 'parents': [], 'members': [], 'refusals': [], 'restatements': [], 'cages': [], 'holes': [], 'ungoverned': [], 'prices': [], 'deltas': [], 'limits': [], 'vendored': []}
+
+======================================================================
+FAIL: test_self_controls_use_the_captured_catalogue_declaration_for_their_hole_price (__main__.PublisherPriceVertical.test_self_controls_use_the_captured_catalogue_declaration_for_their_hole_price)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/tests/test_publisher_price_vertical.py", line 53, in test_self_controls_use_the_captured_catalogue_declaration_for_their_hole_price
+    self.assertEqual(stable['outcome'], 'composed', stable)
+AssertionError: 'refused' != 'composed'
+- refused
++ composed
+ : {'outcome': 'refused', 'party_artefact_errors': ['publisher-reliability: publisher-reliability: monetary report authenticated reconstruction refused: FAIL: source-binding: monetary envelope identity/schema/version differs from selected source'], 'parents': [], 'members': [], 'refusals': [], 'restatements': [], 'cages': [], 'holes': [], 'ungoverned': [], 'prices': [], 'deltas': [], 'limits': [], 'vendored': []}
+
+======================================================================
+FAIL: test_the_consumed_policy_and_recorded_blob_use_the_same_captured_bytes (__main__.PublisherPriceVertical.test_the_consumed_policy_and_recorded_blob_use_the_same_captured_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/tests/test_publisher_price_vertical.py", line 190, in test_the_consumed_policy_and_recorded_blob_use_the_same_captured_bytes
+    self.assertEqual(document['outcome'], 'composed', document)
+AssertionError: 'refused' != 'composed'
+- refused
++ composed
+ : {'outcome': 'refused', 'party_artefact_errors': ['publisher-reliability: publisher-reliability: monetary report authenticated reconstruction refused: FAIL: source-binding: monetary envelope identity/schema/version differs from selected source'], 'parents': [], 'members': [], 'refusals': [], 'restatements': [], 'cages': [], 'holes': [], 'ungoverned': [], 'prices': [], 'deltas': [], 'limits': [], 'vendored': []}
+
+======================================================================
+FAIL: test_the_selected_tier_uses_the_captured_appetite_despite_an_interleaved_file_descriptor (__main__.PublisherPriceVertical.test_the_selected_tier_uses_the_captured_appetite_despite_an_interleaved_file_descriptor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/tests/test_publisher_price_vertical.py", line 129, in test_the_selected_tier_uses_the_captured_appetite_despite_an_interleaved_file_descriptor
+    expected = effect(stable)
+               ^^^^^^^^^^^^^^
+  File "/home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/tests/test_publisher_price_vertical.py", line 124, in effect
+    self.assertEqual(document['outcome'], 'composed', document)
+AssertionError: 'refused' != 'composed'
+- refused
++ composed
+ : {'outcome': 'refused', 'party_artefact_errors': ['publisher-reliability: publisher-reliability: monetary report authenticated reconstruction refused: FAIL: source-binding: monetary envelope identity/schema/version differs from selected source'], 'parents': [], 'members': [], 'refusals': [], 'restatements': [], 'cages': [], 'holes': [], 'ungoverned': [], 'prices': [], 'deltas': [], 'limits': [], 'vendored': []}
+
+----------------------------------------------------------------------
+Ran 7 tests in 32.051s
+
+FAILED (failures=7)

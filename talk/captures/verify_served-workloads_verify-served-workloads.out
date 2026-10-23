@@ -3,8 +3,8 @@ ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
 PASS: fact_8_each_served_workload_runs_in_its_cage: checkout-svc: both copies run ; storefront: both copies run ; api: both copies run
 ==> tuppence: served_apps.py
 ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
-SKIP: a workload lane run started by hand cannot establish a cited pass
+PASS: fact_8_each_served_workload_runs_in_its_cage: ledger: both copies run
 ==> ludlow: served_apps.py
 ok  fact 8: same workload, unclaimed reference, same node, tri-state fit verdict
 PASS: fact_8_each_served_workload_runs_in_its_cage: reports: both copies run
-SKIP: a workload lane run started by hand cannot establish a cited pass
+PASS: every party's served_apps.py lane verdict passed
