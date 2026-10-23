@@ -34,9 +34,11 @@ What it observes, on the estate's committed files only:
         the recount agrees (eco-system ticket 122);
      e. the regime entry's `holes[]` lines each carry the adopter's status for that control, and
         the open ones agree with `holes[]`;
-     f. every `deltas[]` entry is one of the twelve kinds `DELTA_KINDS` names (the eight hole,
+     f. every `deltas[]` entry is one of the thirteen kinds `DELTA_KINDS` names (the eight hole,
         removal, withdrawal, baseline and namespace kinds, ticket 69's two untagged-pin kinds and
-        ticket 148's two engine kinds), under the adopter's perspective and currency, and the
+        ticket 148's two engine kinds, and ticket 27's floor comparison). Monetary deltas carry
+        the adopter's perspective, currency and amount. A floor-change instead binds the
+        document's complete per-line counterfactual, without an additive amount. The
         new/closed hole and namespace deltas match the entries they report.
 
 Grading, per the gate contract: any FAIL -> 1; else any SKIP -> 3; else 0.
@@ -54,6 +56,7 @@ from __future__ import annotations
 import datetime
 import glob
 import json
+import math
 import os
 import re
 import subprocess
@@ -80,7 +83,7 @@ DELTA_KINDS = {"new-hole", "closed-hole", "baseline-widening",
                "removed-control", "baseline-narrowing", "withdrawn-control",
                "new-ungoverned-namespace", "closed-ungoverned-namespace",
                "new-untagged-pin", "closed-untagged-pin",
-               "unsupported-engine", "undeclared-engine"}
+               "unsupported-engine", "undeclared-engine", "floor-change"}
 HOLE_STATUS = {"new", "recorded", "closed"}
 # `withdrawn` is eco-system ticket 123's: the weight names a control its pinned catalogue
 # no longer defines, the feed's own fact to fix in its next version.
@@ -188,6 +191,53 @@ def check_schema(schema: dict) -> None:
 # --------------------------------------------------------------------------
 # the document check — pure, so selfcheck can plant defects in a dict
 # --------------------------------------------------------------------------
+def floor_delta_problems(delta: dict, doc: dict, who: str) -> list[str]:
+    """A floor change is per-line counterfactual evidence, never an added money amount."""
+    comparison = delta.get("comparison")
+    if (set(delta) != {"kind", "subject", "detail", "comparison"}
+            or delta.get("subject") != who or not isinstance(comparison, dict)):
+        return ["floor-change has no exact subject/comparison shape"]
+    if (type(comparison.get("schema")) is not int or comparison["schema"] != 1
+            or comparison.get("changed") is not True
+            or not isinstance(comparison.get("basis"), str) or not comparison["basis"]
+            or delta["detail"] != comparison["basis"]):
+        return ["floor-change is not a declared changed counterfactual"]
+    try:
+        same = (json.dumps(comparison, sort_keys=True, allow_nan=False)
+                == json.dumps(doc.get("floor_change"), sort_keys=True, allow_nan=False))
+    except (ValueError, TypeError):
+        same = False
+    if not same:
+        return ["floor-change differs from the document's complete comparison"]
+    tiers = {"baseline", "restricted", "quarantine", "isolated"}
+    states = [comparison.get(side) for side in ("before", "after")]
+    for state in states:
+        if (not isinstance(state, dict) or set(state) != {"known", "value"}
+                or state["known"] is not True
+                or (state["value"] is not None and
+                    (not isinstance(state["value"], str) or state["value"] not in tiers))):
+            return ["floor-change claims a change without two known supported floor states"]
+    if states[0] == states[1]:
+        return ["floor-change reports identical before/after floors"]
+    lines = comparison.get("lines")
+    if not isinstance(lines, list):
+        return ["floor-change carries no per-line comparison"]
+    for line in lines:
+        if (not isinstance(line, dict) or line.get("perspective") != who
+                or not isinstance(line.get("currency"), str) or not line["currency"]):
+            return ["floor-change line has no subject perspective/currency"]
+        for field in ("before_tier", "after_tier"):
+            if field not in line or (line[field] is not None and
+                    (not isinstance(line[field], str) or line[field] not in tiers)):
+                return ["floor-change line names an unsupported tier"]
+        for field in ("uncaged_amount", "before_residual", "after_residual", "residual_delta"):
+            value = line.get(field)
+            if field not in line or (value is not None and
+                    (type(value) not in (int, float) or not math.isfinite(value))):
+                return ["floor-change line carries a nonnumeric/nonfinite residual"]
+    return []
+
+
 def check_doc(doc: dict, ctx: dict) -> None:
     """Grade one adopter's evidence document. `ctx`: adopter, currency, since (namespace ->
     date or None, or the key absent where the clone's tags could not be read), workloads
@@ -365,10 +415,18 @@ def check_doc(doc: dict, ctx: dict) -> None:
         if not isinstance(d, dict) or d.get("kind") not in DELTA_KINDS:
             problems.append(f"deltas[{i}] kind {d.get('kind') if isinstance(d, dict) else d!r}")
             continue
+        if d["kind"] == "floor-change":
+            problems.extend(floor_delta_problems(d, doc, who))
+            continue
         if d.get("perspective") != who or d.get("currency") != ctx["currency"]:
             problems.append(f"deltas[{i}] is not under {who}/{ctx['currency']}")
         if "amount" not in d:
             problems.append(f"deltas[{i}] carries no amount field")
+    floor_deltas = [d for d in deltas if isinstance(d, dict) and d.get("kind") == "floor-change"]
+    comparison = doc.get("floor_change")
+    if isinstance(comparison, dict) and comparison.get("changed") is True:
+        if len(floor_deltas) != 1:
+            problems.append("changed floor must have exactly one floor-change delta")
     want_holes = {(h["source"], h["control_id"], h["status"]) for h in holes
                   if isinstance(h, dict) and h.get("status") in ("new", "closed")}
     got_holes = {(d.get("source"), d.get("control_id"), d["kind"].split("-")[0])
@@ -385,8 +443,8 @@ def check_doc(doc: dict, ctx: dict) -> None:
     if problems:
         out("FAIL", f"{who}: deltas[] observed false: {problems[:3]}")
     else:
-        out("PASS", f"{who}: {len(deltas)} delta(s), each one of the {len(DELTA_KINDS)} kinds under "
-                    f"{who}/{ctx['currency']}, matching the holes and namespaces they report")
+        out("PASS", f"{who}: {len(deltas)} delta(s), each one of the {len(DELTA_KINDS)} kinds "
+                    f"with its subject/currency evidence, matching the changes it reports")
 
 
 # --------------------------------------------------------------------------

@@ -195,12 +195,14 @@ def _trees(**override: Path) -> dict[str, Path]:
     return {**{name: ESTATE / name for name in PARENTS}, **override}
 
 
-def _tuppence(root: Path) -> Path:
+def _tuppence(root: Path, *, historical_no_floor: bool = False) -> Path:
     """A control-hole fixture with real source/inventory and no composed history yet.
 
     Isolate the unrelated optional cloud subscription and, before inventory
     adoption, the legacy CVE subscription. Their real refusal guards are
-    checked separately below.
+    checked separately below. The price/tier regression alone may explicitly
+    request a historical no-floor counterfactual, committed in this fixture's
+    own context; ordinary fixtures retain the real owner's floor.
     """
     work = root / "tuppence"
     work.mkdir(parents=True)
@@ -222,12 +224,31 @@ def _tuppence(root: Path) -> Path:
                              if not (edge.get("party") == "feeds" and edge.get("kind") == "feed"
                                      and edge.get("name") == "cve")]
         (work / "party.yaml").write_text(yaml.safe_dump(party, sort_keys=False))
+    # Workload declarations retain their real committed scenario instruments.
+    # A copied historical archive has no Git metadata; its bytes already came
+    # from the selected source ref in the scope-isolation regression below.
+    if (src / ".git").exists():
+        scenarios = subprocess.run(["git", "-C", str(src), "ls-tree", "--name-only", "HEAD",
+                                    "--", "scenarios"], check=True, capture_output=True, text=True)
+        if scenarios.stdout.strip():
+            archive = subprocess.run(["git", "-C", str(src), "archive", "HEAD", "scenarios"],
+                                     check=True, capture_output=True).stdout
+            with tarfile.open(fileobj=io.BytesIO(archive)) as tree:
+                tree.extractall(work, filter="data")
+    elif (src / "scenarios").is_dir():
+        shutil.copytree(src / "scenarios", work / "scenarios")
+    if historical_no_floor:
+        party = yaml.safe_load((work / "party.yaml").read_text())
+        party.setdefault("overlay", {}).pop("floor", None)
+        (work / "party.yaml").write_text(yaml.safe_dump(party, sort_keys=False))
     # This fixture composes the proposed manifests and their real matching scan,
     # so give that tree its own immutable apps pin. Production remains pinned to
     # its published tag until release; no scan is relabelled as that old tree.
     _git(work, "init", "-q")
     _git(work, "add", "-A")
-    _git(work, "commit", "-q", "-m", "fixture apps source")
+    message = ("fixture apps source: historical no-floor counterfactual" if historical_no_floor
+               else "fixture apps source")
+    _git(work, "commit", "-q", "-m", message)
     _git(work, "tag", "fixture-apps")
     commit = subprocess.run(["git", "-C", str(work), "rev-parse", "HEAD"],
                             check=True, capture_output=True, text=True).stdout.strip()
@@ -262,8 +283,13 @@ def test_control_hole_fixture_isolates_the_optional_cloud_subscription(tmp_path,
     """Real old/new adopter sources stay intact while this fixture selects its scope."""
     source = tmp_path / "source-estate" / "tuppence"
     source.mkdir(parents=True)
-    archive = subprocess.run(["git", "-C", str(ESTATE / "tuppence"), "archive", source_ref,
-                              "party.yaml", "gitops", ".github", "inventory"],
+    inputs = ["party.yaml", "gitops", ".github", "inventory"]
+    scenarios = subprocess.run(["git", "-C", str(ESTATE / "tuppence"), "ls-tree", "--name-only",
+                                source_ref, "--", "scenarios"],
+                               check=True, capture_output=True, text=True)
+    if scenarios.stdout.strip():
+        inputs.append("scenarios")
+    archive = subprocess.run(["git", "-C", str(ESTATE / "tuppence"), "archive", source_ref, *inputs],
                              check=True, capture_output=True).stdout
     with tarfile.open(fileobj=io.BytesIO(archive)) as tree:
         tree.extractall(source, filter="data")
@@ -292,6 +318,50 @@ def test_an_optional_cloud_subscription_keeps_its_real_source_binding_guard(tmp_
     assert evidence["outcome"] == "refused" and rendered == {}
     assert evidence["party_artefact_errors"] == [
         "missing instrument: cloud package: cloud package tag and commit disagree"]
+
+
+def test_control_hole_fixture_copies_only_committed_workload_scenarios(tmp_path, monkeypatch):
+    """Exact declared instruments survive the copy; dirty and untracked bytes do not."""
+    source = tmp_path / "source-estate" / "tuppence"
+    source.parent.mkdir()
+    subprocess.run(["git", "clone", "-q", "--no-hardlinks", str(ESTATE / "tuppence"), str(source)],
+                   check=True, capture_output=True)
+    paths = subprocess.run(["git", "-C", str(source), "ls-tree", "-r", "--name-only", "HEAD",
+                            "--", "scenarios"], check=True, capture_output=True, text=True).stdout.splitlines()
+    assert paths, "current owner declarations need their committed workload scenarios"
+    committed = {path: subprocess.run(["git", "-C", str(source), "show", f"HEAD:{path}"],
+                                      check=True, capture_output=True).stdout for path in paths}
+    dirty = source / paths[0]
+    dirty.write_text("dirty working bytes must not become a declared instrument\n")
+    untracked = source / "scenarios/fixture-untracked.json"
+    untracked.write_text("untracked bytes must not become an instrument\n")
+    monkeypatch.setattr(sys.modules[__name__], "ESTATE", source.parent)
+    work = _tuppence(tmp_path / "fixture")
+    for path, expected in committed.items():
+        assert (work / path).read_bytes() == expected
+        recorded = subprocess.run(["git", "-C", str(work), "show", f"HEAD:{path}"],
+                                  check=True, capture_output=True).stdout
+        assert recorded == expected
+    assert not (work / untracked.relative_to(source)).exists()
+    assert dirty.read_text() == "dirty working bytes must not become a declared instrument\n"
+    assert untracked.is_file()
+    assert yaml.safe_load((work / "party.yaml").read_text())["overlay"]["floor"] == "isolated"
+
+
+def test_control_hole_fixture_keeps_the_missing_workload_instrument_refusal(tmp_path):
+    """The fixture repair supplies instruments; it never weakens the production guard."""
+    comp = _composition()
+    work = _tuppence(tmp_path)
+    document, _ = comp.compose(work, _trees())
+    assert document["outcome"] == "composed", document["refusals"]
+    party = yaml.safe_load((work / "party.yaml").read_text())
+    scenario = work / party["overlay"]["workload_cages"][0]["scenario"]
+    scenario.unlink()
+    document, _ = comp.compose(work, _trees())
+    assert document["outcome"] == "refused"
+    assert any(refusal["kind"] == "missing-instrument" and
+               "workload scenario is absent from the adopter source" in refusal["detail"]
+               for refusal in document["refusals"]), document["refusals"]
 
 
 @pytest.mark.parametrize("writer_ref", ["v5.0.0", "HEAD"], ids=["published-write-only", "current-auto-commit"])
@@ -413,10 +483,11 @@ def _signed_tag_naming(comp: ModuleType, repo: Path, tag: str, date: str, ungove
 # the survivors
 # --------------------------------------------------------------------------------------------
 
-def _claiming(comp: ModuleType, root: Path, ids: list[str], trees: dict[str, Path] | None = None
+def _claiming(comp: ModuleType, root: Path, ids: list[str], trees: dict[str, Path] | None = None,
+              *, historical_no_floor: bool = False
               ) -> tuple[dict[str, Any], dict[str, str]]:
     """tuppence composed with its own claim on `ids`, shipped as its own overlay member."""
-    work = _tuppence(root)
+    work = _tuppence(root, historical_no_floor=historical_no_floor)
     _edit_party(work, lambda d: d.setdefault("overlay", {}).setdefault("add", []).append(
         _own_member(comp, "own-hardening")))
     comp._write_component_definition(work / comp.ADOPTER_CLAIMS_FILE,
@@ -449,7 +520,9 @@ def test_cve_subscription_without_inventory_remains_a_missing_instrument(tmp_pat
                for refusal in document["refusals"]), document["refusals"]
 
 
-def test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier(tmp_path):
+@pytest.mark.parametrize("historical_no_floor", [False, True],
+                         ids=["real-owner-floor", "historical-no-floor-counterfactual"])
+def test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier(tmp_path, historical_no_floor):
     """Survivor 1, round 1 `overreach-6`, repaired by eco-system ticket 121. tuppence is composed
     against its real pinned parents three times: as it is, with its own claim on `pl-2` alone,
     and with its own claim on every control the pinned regulator weights name. The partition on
@@ -457,16 +530,20 @@ def test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier(tmp
     The entry's amount is the sum of the lines still open. Claiming `pl-2` takes exactly its
     line off the entry and off the exposure total. Claiming every weighted control takes the
     whole entry to zero, and the regime's tier drops to the rung a zero residual selects under
-    tuppence's own floor. Every other entry keeps its tier."""
+    tuppence's own floor. The real isolated floor keeps the tier isolated; the explicitly
+    labelled historical no-floor leg retains the original tier-movement regression.
+    Every other entry keeps its tier."""
     comp = _composition()
-    before, before_rendered = comp.compose(_tuppence(tmp_path / "before"), _trees())
+    before, before_rendered = comp.compose(
+        _tuppence(tmp_path / "before", historical_no_floor=historical_no_floor), _trees())
     assert before["outcome"] == "composed", before["refusals"]
     entry = _regime_entry(before)
     weighted = sorted(h["id"] for h in entry["holes"])
     assert weighted and all(h["status"] != "covered" for h in entry["holes"]), entry["holes"]
     assert entry["amount"] == pytest.approx(entry["total"]), entry
 
-    one, one_rendered = _claiming(comp, tmp_path / "one", ["pl-2"])
+    one, one_rendered = _claiming(comp, tmp_path / "one", ["pl-2"],
+                                 historical_no_floor=historical_no_floor)
     assert one["outcome"] == "composed", one["refusals"]
     one_entry = _regime_entry(one)
     line = next(h for h in one_entry["holes"] if h["id"] == "pl-2")
@@ -477,7 +554,8 @@ def test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier(tmp
     assert one_entry["new_price"] == pytest.approx(one_entry["amount"])
     assert _exposure_total(one_rendered) == pytest.approx(_exposure_total(before_rendered) - line["amount"])
 
-    after, after_rendered = _claiming(comp, tmp_path / "after", weighted)
+    after, after_rendered = _claiming(comp, tmp_path / "after", weighted,
+                                     historical_no_floor=historical_no_floor)
     assert after["outcome"] == "composed", after["refusals"]
     after_entry = _regime_entry(after)
     assert {h["id"]: h["status"] for h in after_entry["holes"]} == {cid: "covered" for cid in weighted}
@@ -485,8 +563,12 @@ def test_implementing_a_weighted_control_moves_the_regime_price_and_the_tier(tmp
     assert after_entry["amount"] == 0.0, after_entry
     assert _exposure_total(after_rendered) == pytest.approx(_exposure_total(before_rendered) - entry["amount"])
 
-    rung = comp._cage_engine().select_tier(0.0, 1.0, _floor())
-    assert entry["proposed_tier"] == "isolated" and rung != "isolated", (entry["proposed_tier"], rung)
+    floor = None if historical_no_floor else _floor()
+    rung = comp._cage_engine().select_tier(0.0, 1.0, floor)
+    if historical_no_floor:
+        assert entry["proposed_tier"] == "isolated" and rung != "isolated", (entry["proposed_tier"], rung)
+    else:
+        assert floor == "isolated" and entry["proposed_tier"] == rung == "isolated"
     assert after_entry["proposed_tier"] == rung, after_entry
     others = [t for t in _tiers(before) if t[0] != "ico"]
     assert [t for t in _tiers(after) if t[0] != "ico"] == others
@@ -1107,7 +1189,7 @@ def test_a_bespoke_hole_is_priced_on_its_own_line_and_moves_no_tier(tmp_path):
     _edit_party(work, lambda d: (d["inherits"].append({"party": "tuppence", "kind": "controls", "version": "1.0.0"}),
                                  d.setdefault("overlay", {}).update(controls=["tuppence:vendor-review"])))
     comp._write_small_catalog(work, {"vendor-review": {"scenario": "scenarios/vendor-review.json"}})
-    (work / "scenarios").mkdir()
+    (work / "scenarios").mkdir(exist_ok=True)
     shutil.copy(PLATFORM / "policy" / "scenarios" / "driftwood-root-residual.json",
                 work / "scenarios" / "vendor-review.json")
     bespoke, bespoke_rendered = comp.compose(work, _trees())
