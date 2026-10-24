@@ -3,8 +3,8 @@ ok  OSCAL lane: failed observations require a real risk link, satisfied observat
 PASS: 42 PolicyReports; 9 served policies mapped; every not-satisfied observation joins an actual cage risk
 ==> tuppence: oscal_lane.py
 ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not
-FAIL: 1 not-satisfied observations have no cage risk; 0 failed policy results have no control mapping; 0 carried risks failed decision/live-Pod validation: 42ca452a-8b23-50d0-8b67-3fa61c65e221
+PASS: 43 PolicyReports; 11 served policies mapped; every not-satisfied observation joins an actual cage risk
 ==> ludlow: oscal_lane.py
 ok  OSCAL lane: failed observations require a real risk link, satisfied observations do not
 PASS: 40 PolicyReports; 9 served policies mapped; every not-satisfied observation joins an actual cage risk
-FAIL: workload lane aggregation contains a failed check or undeclared wait; see party outputs above
+PASS: every party's oscal_lane.py lane verdict passed
