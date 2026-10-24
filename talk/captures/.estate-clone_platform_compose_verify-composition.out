@@ -1,67 +1,67 @@
 [1;36m==>[0m 0. portable publisher observations (fixture publishers only)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 13.756s
+Ran 11 tests in 13.244s
 
 OK
 [1;36m==>[0m 0a. floor-change evidence (compose, persisted history and replay)
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 11.253s
+Ran 9 tests in 10.639s
 
 OK
 [1;36m==>[0m 0b. durable transition comparisons (saved evidence and replay)
 .............................
 ----------------------------------------------------------------------
-Ran 29 tests in 32.826s
+Ran 29 tests in 30.919s
 
 OK
 [1;36m==>[0m 0c. every PriorityClass a composed member names is carried in its own version (ticket 111)
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 2.156s
+Ran 16 tests in 2.024s
 
 OK
 [1;36m==>[0m 0d. an unsupported engine pairing is priced, never refused (ticket 148, hub ADR-0033 point 3)
 .............
 ----------------------------------------------------------------------
-Ran 13 tests in 3.428s
+Ran 13 tests in 3.122s
 
 OK
 [1;36m==>[0m 0e. quote validity uses composed input dates and conserves contract costs (ticket 37)
 ........
 ----------------------------------------------------------------------
-Ran 8 tests in 3.998s
+Ran 8 tests in 3.752s
 
 OK
 [1;36m==>[0m 0f. quote conditions name counted implementation claims without granting cover (ticket 37)
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 3.518s
+Ran 11 tests in 3.420s
 
 OK
 [1;36m==>[0m 0f1. quote conditions authenticate served evidence and consume modeled consequences
 .....................
 ----------------------------------------------------------------------
-Ran 21 tests in 109.252s
+Ran 21 tests in 105.980s
 
 OK
 [1;36m==>[0m 0f2. monetary publisher quality preserves absent behavior and renders its exact evidence
 ...
 ----------------------------------------------------------------------
-Ran 3 tests in 0.484s
+Ran 3 tests in 0.464s
 
 OK
 [1;36m==>[0m 0g. consumer retirement keeps its exact authority checks with credential-free public reads
 ...............................
 ----------------------------------------------------------------------
-Ran 31 tests in 5.333s
+Ran 31 tests in 3.435s
 
 OK
 [1;36m==>[0m 0h. explicit workload decisions compose and replay without changing policy enforcement
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 5.081s
+Ran 10 tests in 4.581s
 
 OK
 [1;36m==>[0m 1. composition.py's own asserts (compose, render faithfulness, verify, the CLI, priced deltas, the priced removal, the regulator's withdrawal)
