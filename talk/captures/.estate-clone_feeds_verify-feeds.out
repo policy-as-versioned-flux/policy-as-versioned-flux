@@ -7,13 +7,13 @@ test_timeouts_exhaust_the_same_four_attempts_and_close_responses (__main__.CVEFe
 test_transient_http_and_timeouts_share_one_budget (__main__.CVEFetchTransport.test_transient_http_and_timeouts_share_one_budget) ... ok
 
 ----------------------------------------------------------------------
-Ran 6 tests in 0.010s
+Ran 6 tests in 0.018s
 
 OK
 == release signing caller: embedded proof requested, signer refuses ==
 .
 ----------------------------------------------------------------------
-Ran 1 test in 0.024s
+Ran 1 test in 0.033s
 
 OK
 == envelope schema: /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/feeds/../platform/feeds/schema.json ==
@@ -100,12 +100,12 @@ ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14:
 == the threat register publishes its own magnitudes, and ships the converter that reads them ==
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 2.764s
+Ran 9 tests in 2.748s
 
 OK
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 1.295s
+Ran 10 tests in 1.226s
 
 OK
 ok  12 (version, institution) scenarios; 6 price a magnitude the PUBLISHER published, 6 price the frozen table and say so by name
