@@ -29,6 +29,32 @@ d/verify-d.sh | meta | -
 """
 
 POUND_SEAM = "verify/pound-seam/verify-pound-seam.sh"
+MOVED_WITNESS_WAIT = (
+    "SKIP: offline moved-path assertions passed; no committed moved:true witness")
+
+
+@pytest.mark.parametrize("party", ["tuppence", "ludlow"])
+def test_published_moved_instruments_have_a_declared_live_witness_wait(party: str) -> None:
+    manifest = Path(__file__).resolve().parent.parent / "talk" / "verify-manifest.txt"
+    entries = tm.load_manifest(str(manifest))
+    script = f".estate-clone/{party}/twin/verify-twin-sweep-moved.sh"
+    ok, why = tm.judge(entries, script, MOVED_WITNESS_WAIT)
+    assert ok, why
+    assert why == "declared waits"
+    summary = tm.summarise(entries, [(script, "SKIP", MOVED_WITNESS_WAIT)])
+    assert (summary.passed, summary.failed, summary.skipped, summary.ceiling) == (0, 0, 1, 1)
+    # A real assertion failure remains a failure even if it quotes the registered wait.
+    summary = tm.summarise(entries, [(script, "FAIL", "FAIL: " + MOVED_WITNESS_WAIT)])
+    assert (summary.passed, summary.failed, summary.skipped) == (0, 1, 0)
+    for missing_instrument in (
+        "SKIP: no twin hub checkout above the adopter",
+        "SKIP: the selected Python lacks PyYAML",
+        MOVED_WITNESS_WAIT + "; missing source PIN",
+    ):
+        ok, _ = tm.judge(entries, script, missing_instrument)
+        assert not ok, missing_instrument
+
+
 # Exact final native output from genuine main TRUTH run 400 (2026-10-16). The checker
 # exited 3 after 45 passes and nine skips; this remains an absence, never a passing price.
 KEV_ABSENCE = (
