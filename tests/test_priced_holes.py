@@ -450,6 +450,78 @@ def test_the_grader_reads_the_envelope_the_adopter_vendored_not_the_publishers_h
     assert grader._as_of(str(estate), parties, parties["adopter"], str(adopter)) == "2026-09-10"
 
 
+def _add_date_edge(adopter: Path, edge: dict, published_at: str | None) -> None:
+    party = adopter / "party.yaml"
+    doc = yaml.safe_load(party.read_text())
+    doc["inherits"].append(edge)
+    party.write_text(yaml.safe_dump(doc))
+    if published_at is not None:
+        copy = adopter / "composed" / "feeds" / edge["party"] / edge["name"] / edge["version"]
+        _envelope(copy / edge["name"] / "v1" / "feed.json", published_at)
+
+
+@pytest.mark.parametrize("published_at,since", [
+    ("2026-10-23T14:18:08Z", None),
+    (None, "2026-10-24"),
+    ("2026-10-23T14:18:08Z", "2026-10-24"),
+])
+def test_intrinsic_shadow_recovery_does_not_advance_the_financial_date(
+        grader: ModuleType, tmp_path: Path, published_at: str | None,
+        since: str | None) -> None:
+    estate, adopter = _plant(tmp_path, head="2026-10-25", vendored="2026-09-10")
+    edge = {"party": "feeds", "kind": "feed", "name": "recovery-expense", "version": "v1"}
+    if since is not None:
+        edge["since"] = since
+    _add_date_edge(adopter, edge, published_at)
+    parties = grader._parties(str(estate))
+    assert grader._as_of(str(estate), parties, parties["adopter"], str(adopter)) == "2026-09-10"
+
+
+@pytest.mark.parametrize("identity,published_at,since,expected", [
+    ({"party": "other-feeds", "kind": "feed", "name": "recovery-expense"},
+     "2026-10-23", None, "2026-10-23"),
+    ({"party": "feeds", "kind": "feed", "name": "other-recovery"},
+     "2026-10-23", None, "2026-10-23"),
+    ({"party": "feeds", "kind": "controls", "name": "recovery-expense"},
+     None, "2026-10-24", "2026-10-24"),
+])
+def test_claimed_shadow_cannot_exclude_an_ordinary_dated_edge(
+        grader: ModuleType, tmp_path: Path, identity: dict, published_at: str | None,
+        since: str | None, expected: str) -> None:
+    estate, adopter = _plant(tmp_path, head="2026-07-31", vendored="2026-09-10")
+    edge = dict(identity, version="v1", shadow=True, diagnostic=True)
+    if since is not None:
+        edge["since"] = since
+    _add_date_edge(adopter, edge, published_at)
+    parties = grader._parties(str(estate))
+    assert grader._as_of(str(estate), parties, parties["adopter"], str(adopter)) == expected
+
+
+def test_a_shadow_only_parent_set_has_no_financial_date(
+        grader: ModuleType, tmp_path: Path) -> None:
+    estate, adopter = _plant(tmp_path, head="2026-07-31", vendored="2026-09-10")
+    party = adopter / "party.yaml"
+    doc = yaml.safe_load(party.read_text())
+    doc["inherits"] = []
+    party.write_text(yaml.safe_dump(doc))
+    _add_date_edge(adopter, {"party": "feeds", "kind": "feed", "name": "recovery-expense",
+                            "version": "v1", "since": "2026-10-24"}, "2026-10-23")
+    parties = grader._parties(str(estate))
+    assert grader._as_of(str(estate), parties, parties["adopter"], str(adopter)) is None
+
+
+def test_an_ordinary_date_mismatch_remains_a_failed_price(
+        grader: ModuleType, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    estate, adopter = _plant(tmp_path, head="2026-10-25", vendored="2026-09-10")
+    parties = grader._parties(str(estate))
+    doc, ctx = grader._good()
+    ctx["as_of"] = grader._as_of(str(estate), parties, parties["adopter"], str(adopter))
+    grader.LINES.clear()
+    grader.check_doc(doc, ctx)
+    assert "FAIL" in grader.LINES
+    assert "as_of '2026-08-28' but the newest signed input" in capsys.readouterr().out
+
+
 def _composition() -> ModuleType:
     compose_dir = PLATFORM / "compose"
     for extra in (compose_dir, PLATFORM / "distribution"):
