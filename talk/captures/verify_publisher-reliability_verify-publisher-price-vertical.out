@@ -1,6 +1,6 @@
 .......
 ----------------------------------------------------------------------
-Ran 7 tests in 62.425s
+Ran 7 tests in 60.587s
 
 OK
 PASS: complete synthetic publisher producer, independent resolver, scorer and actual composition consume the publisher target; no genuine signature, monetary observation or price credit

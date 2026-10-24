@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-10-24T13:05Z run=458 hub=38021e2b enact=development units=[driftwood=2064974@main feeds=838abe5@recovery-expense/v1.0.2 ico=9d584cf@main insurer=0b91e8d@v2.0.0 ludlow=eabd610@main nist=56f093a@publisher-reliability/v2.0.1 platform=d0d0ace@v6.3.0 tuppence=5b7e3b9@main] pass=113 [observed=38 self=61 simulated=4 meta=10] fail=5 skip=25 [never=10 waits=15] excluded=8 total=151 ceiling=132
+# TRUTH 2026-10-24T13:51Z run=460 hub=96dfd63d enact=development units=[driftwood=2064974@main feeds=838abe5@recovery-expense/v1.0.2 ico=9d584cf@main insurer=0b91e8d@v2.0.0 ludlow=253fc53@main nist=56f093a@publisher-reliability/v2.0.1 platform=d0d0ace@v6.3.0 tuppence=7724184@main] pass=114 [observed=40 self=61 simulated=4 meta=9] fail=4 skip=25 [never=10 waits=15] excluded=8 total=151 ceiling=132
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      acceptance record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -21,7 +21,7 @@
 .estate-clone/ludlow/twin/verify-twin-scenarios.sh	PASS	PASS: ludlow carries its six standing scenarios, four committed classes in all three places, and no fine amount in the twin
 .estate-clone/ludlow/twin/verify-twin-sweep-moved.sh	SKIP	SKIP: offline moved-path assertions passed; no committed moved:true witness
 .estate-clone/ludlow/verify-adopter-gate.sh	PASS	      credential). Verifying what platform already signed is not, and is proved above.
-.estate-clone/ludlow/verify-cage-probe.sh	PASS	PASS: the served documents at v5.4.0 (the tag gitops/composed/composed-set.yaml pins) and at HEAD eabd610, run offline through kyverno 1.19.1 (the engine gitops
+.estate-clone/ludlow/verify-cage-probe.sh	PASS	PASS: the served documents at v5.4.0 (the tag gitops/composed/composed-set.yaml pins) and at HEAD 253fc53, run offline through kyverno 1.19.1 (the engine gitops
 .estate-clone/ludlow/verify-certificate-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only policy-as-versioned-ludlow/ludlow's propose-tier.yml on main; the release and proposal identities do not ov
 .estate-clone/ludlow/verify-reconcile.sh	PASS	PASS: no local kind cluster 'ludlow' here, and none is needed: the latest lane sample observes the composed set in force from signed sources on a cluster reconc
 .estate-clone/ludlow/verify-twin-overlay.sh	PASS	PASS: ludlow's twin overlay loads, is labelled, prices every rung it declares and emits its feed
@@ -83,14 +83,14 @@
 .estate-clone/tuppence/scripts/verify-identity-regexp.sh	PASS	    the release and proposal identities do not overlap in either direction
 .estate-clone/tuppence/twin/verify-twin-scenarios.sh	PASS	PASS: tuppence carries its six standing scenarios, four committed classes in all three places, and no fine amount in the twin
 .estate-clone/tuppence/twin/verify-twin-sweep-moved.sh	SKIP	SKIP: offline moved-path assertions passed; no committed moved:true witness
-.estate-clone/tuppence/verify-cage-probe.sh	PASS	PASS: the served documents at v4.4.0 (the tag gitops/composed/composed-set.yaml pins) and at HEAD 5b7e3b9, run offline through kyverno 1.18.2 (the engine gitops
+.estate-clone/tuppence/verify-cage-probe.sh	PASS	PASS: the served documents at v4.4.0 (the tag gitops/composed/composed-set.yaml pins) and at HEAD 7724184, run offline through kyverno 1.18.2 (the engine gitops
 .estate-clone/tuppence/verify-reconcile.sh	PASS	PASS: no local kind cluster 'tuppence' here, and none is needed: the latest lane sample observes the composed set in force from signed sources on a cluster reco
 .estate-clone/tuppence/verify-twin-overlay.sh	PASS	PASS: tuppence's twin overlay loads, is labelled, prices every rung it declares and emits its feed
 verify/a-fall-blocks/verify-a-fall-blocks.sh	PASS	PASS: talk/fall_check.py grades planted lines as ticket 83's contract documents, truth.yml carries the stop as a step of its own after the observation cage, tha
 verify/adopter-engines/verify-adopter-engines.sh	PASS	PASS: all 5 assertions hold: each adopter's gitops/engine/kyverno.yaml is the platform engine table's row for its version, the adopters that share a named clust
 verify/adr-supersession/verify-adr-supersession.sh	PASS	PASS: ADR-0026 records the priced-hole decision; ADR-0013, ADR-0017 and ADR-0018 point 3 carry dated banners naming it; CONTEXT.md cites it and no entry still r
 verify/branch-refs/verify-branch-refs.sh	FAIL	FAIL: 1 cross-organisation checkout(s) are not pinned to a signed tag: platform/cloud-release.yml checks out policy-as-versioned-flux/policy-as-versioned-flux a
-verify/can-record/verify-can-record.sh	PASS	PASS: recorded TRUTH lines retain clock provenance; default-branch measurements create their unique ref only when absent and durably publish the original source
+verify/can-record/verify-can-record.sh	FAIL	FAIL: 1 fault(s) -- the clock's recording provenance or protected-default delivery does not hold
 verify/cited-truth/verify-cited-truth.sh	PASS	PASS: every TRUTH line quoted in .scratch/ecosystem/issues/*.md resolves to a line talk/truth.log records, every gate-proof citation names a commit whose tree c
 verify/cloud-plane/verify-cloud-plane-contract.sh	PASS	OK
 verify/cloud-plane/verify-cloud-plane.sh	PASS	PASS: cloud claims admitted on KinD from tuppence composed delivery after signed e2e4 trigger 728c17cdd6db8127d0708fd82b7143057876bc0e
@@ -120,11 +120,11 @@ verify/local-clock/verify-local-clock.sh	SKIP	SKIP: no .local-clock/last-run.jso
 verify/map-surface/verify-map-surface.sh	PASS	PASS: every pass/fail figure .scratch/ecosystem/map.md quotes is a figure talk/truth.log records, every check it names is one talk/verify-all.sh discovers, ever
 verify/misuse/verify-misuse.sh	PASS	PASS: three misuse catalogues load through one loader and every row names a mechanism (misuse_catalogues_load_and_every_row_names_a_mechanism); eco-system rows:
 verify/model-permission/verify-model-permission.sh	PASS	PASS: the model-judging permission grades all ten conditions (ticket 05's nine, plus a fitted-corpus condition the first run of the nine forced), each with a ne
-verify/oscal-lane/verify-oscal-lane.sh	FAIL	FAIL: workload lane aggregation contains a failed check or undeclared wait; see party outputs above
+verify/oscal-lane/verify-oscal-lane.sh	PASS	PASS: every party's oscal_lane.py lane verdict passed
 verify/party/verify-party.sh	PASS	mirror each party's OWN signed party.yaml rather than standing in for it.
 verify/portability/verify-portability.sh	SKIP	SKIP: no vendored converter records an invocation: driftwood's vendored converter for recovery-expense@v1 carries no `invocation` and `scenario_sha256` in its P
 verify/pound-seam/verify-pound-seam.sh	SKIP	SKIP: driftwood prices[3] (feeds/cve feed) could not be priced, and says why: No scanned CVE is in the pinned KEV feed; 413 scanned CVE(s) outside it are named 
-verify/priced-holes/verify-priced-holes.sh	FAIL	FAIL: 2 priced-holes check(s) observed false
+verify/priced-holes/verify-priced-holes.sh	PASS	PASS: no hole, widening, removal or ungoverned namespace refuses; each is a priced delta keyed (source, id), the ungoverned share ramps from a signed since and 
 verify/proportionality/verify-proportionality.sh	SKIP	SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- kind-driftwood is not reachable, so driftwood's ren
 verify/provenance/verify-provenance.sh	SKIP	SKIP: the offline proof holds; 2 live tail(s) could not look, so this run did not observe the claim above -- no rekor-cli here to query the transparency log, so
 verify/provenance/verify-release-evidence-reaches-main.sh	PASS	the branch and the tags in one atomic push, and the tag each adopter pins carries every bundle (ticket 53).
@@ -138,7 +138,7 @@ verify/renovate/verify-renovate-merged-feed-pr.sh	PASS	PASS: driftwood #20: Reno
 verify/sampler-wait-order/verify-sampler-wait-order.sh	PASS	PASS: driftwood, tuppence and ludlow each wait for the webhooks before applying the composed set, then wait for the ResourceSet and for the Kustomizations it na
 verify/schedules/verify-lane.sh	PASS	PASS: the observation lane, and none of them is a merge
 verify/schedules/verify-schedules.sh	FAIL	FAIL: 3 schedule/cage check(s) observed false: driftwood/twin-sweep.yml ludlow/twin-sweep.yml tuppence/twin-sweep.yml
-verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=2064974 ludlow=253fc53 tuppence=7724184]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
+verify/sensor-admission/verify-sensor-admission.sh	SKIP	SKIP: 3 adopters read at origin/main [driftwood=2064974 ludlow=dcecdea tuppence=7724184]; 3 carry a bus-factor-key-person scenario and every one still says 'A r
 verify/served-workloads/verify-served-workloads.sh	PASS	PASS: every party's served_apps.py lane verdict passed
 verify/supersede/verify-supersede.sh	PASS	PASS: every adopter feed pin at its served commit is either at the newest major its publisher's real remote carries a tag for, or priced as behind by a supersed
 verify/tier-binding/verify-tier-binding.sh	PASS	PASS: every party this run could look at declares a tier at least as tight as its own strictest priced line, and every published party fold agrees with platform
