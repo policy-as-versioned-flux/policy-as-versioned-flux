@@ -24,7 +24,8 @@ What it observes, on the estate's committed files only:
         every ungoverned one the recount finds must carry a price), whose ramp is the EOL feed's own ramp from `since` to `as_of` (re-derived
         here; `as_of` is the composer's rule since eco-system ticket 138, the newest of every
         pinned envelope's published_at, read from the adopter's vendored copy first, and every
-        edge's own since), whose amount is `min(base, base * share * ramp)` with `base` the header's signed
+        edge's own since, excluding the intrinsic shadow recovery-expense family from both),
+        whose amount is `min(base, base * share * ramp)` with `base` the header's signed
         exposure total, and whose `since` is the date of the first signed tag whose header names
         the namespace, or names as ungoverned a Namespace a workload now in it has left
         (eco-system ticket 122; re-read here from the adopter clone's tags and tagged trees), or
@@ -640,16 +641,24 @@ def _feed_path(estate: str, parties: dict, edge: dict, repo: str | None = None) 
     return fallback if fallback and os.path.exists(fallback) else None
 
 
+def _shadow_recovery(edge: dict) -> bool:
+    """This exact pilot family is intrinsically outside ordinary financial dates."""
+    return (edge.get("party"), edge.get("kind"), edge.get("name")) == (
+        "feeds", "feed", "recovery-expense")
+
+
 def _as_of(estate: str, parties: dict, adopter_doc: dict, repo: str | None = None) -> str | None:
     """The date composition prices as of: the newest SIGNED date among its inputs. That is every
     pinned feed envelope's published_at and, since platform ticket 84, every edge's own `since`
     (composition.py `_composition_as_of`, ADR-0006's 2026-09-08 note). Before eco-system ticket 138
     this read the envelopes only, and tuppence's cve@v2 edge, signed 2026-09-08 over envelopes
-    published by 2026-08-28, graded as two dates."""
+    published by 2026-08-28, graded as two dates. The intrinsic shadow recovery-expense
+    family contributes neither envelope nor edge dates (ticket 46); no arbitrary edge's
+    claimed diagnostic/shadow flag grants this exclusion."""
     dates = [str(edge["since"])[:10] for edge in adopter_doc.get("inherits") or []
-             if isinstance(edge, dict) and edge.get("since")]
+             if isinstance(edge, dict) and edge.get("since") and not _shadow_recovery(edge)]
     for edge in adopter_doc.get("inherits") or []:
-        if edge.get("kind") not in ("feed", "pricing", "threat"):
+        if _shadow_recovery(edge) or edge.get("kind") not in ("feed", "pricing", "threat"):
             continue
         if edge.get("kind") != "feed":
             edge = dict(edge, name={"pricing": "penalty-schema", "threat": "threat-register"}[edge["kind"]])
