@@ -1,0 +1,103 @@
+{
+  "schema": "incumbent-final-archives/v1",
+  "recorded_at": "2026-10-25T19:49:17.740038+00:00",
+  "authority": "Owner standing authorization, ticket35 round1 Q6 and ticket156 item3; ADR0036",
+  "prerequisite": {
+    "TRUTH_run": 461,
+    "original_workflow_run": 40183546501,
+    "attempt": 1,
+    "event": "schedule",
+    "source": "4471fb35193521beac90c7c875000f0f40ee8a84",
+    "observation": "3d0cadd9372a3e97ce36746a274ddc3f7ca10d6a",
+    "normally_recorded_PR": 267,
+    "normal_merge": "646416d3f336c167c9c8c166bccf14c08f52aa3f",
+    "overall_primary_conclusion": "failure",
+    "OSCAL_grade": "PASS",
+    "all_three_reconcile_captures": "PASS, facts6/7 explicitly scored after current reference registration"
+  },
+  "actions": [
+    {
+      "repository": "policy-as-versioned-flux/c2p-collector",
+      "PATCH_payload": {
+        "archived": true
+      },
+      "request_started_at": "2026-10-25T19:44:27.363277+00:00",
+      "verified_flag_at": "2026-10-25T19:44:28.722423+00:00",
+      "unchanged_main": "84dc58f6ce5f26292f7f4145b867bf5e0d95f00d",
+      "unchanged_main_tree": "7fbdaeee71b74e99b8278157170fd3378fcb5a24",
+      "unchanged_public_refs": 17,
+      "unchanged_reachable_objects": 51
+    },
+    {
+      "repository": "policy-as-versioned-flux/fleet",
+      "PATCH_payload": {
+        "archived": true
+      },
+      "request_started_at": "2026-10-25T19:45:01.455587+00:00",
+      "verified_flag_at": "2026-10-25T19:45:02.768152+00:00",
+      "unchanged_main": "d2da2d00ed92af78089268f0839f4a9f08bb030a",
+      "unchanged_main_tree": "91080f981faabc4bc4eefbeaeb1cb4a7ddcbaa56",
+      "unchanged_public_refs": 73,
+      "unchanged_reachable_objects": 559
+    },
+    {
+      "repository": "policy-as-versioned-flux/policy",
+      "PATCH_payload": {
+        "archived": true
+      },
+      "request_started_at": "2026-10-25T19:45:02.768472+00:00",
+      "verified_flag_at": "2026-10-25T19:45:04.070473+00:00",
+      "unchanged_main": "74eb23957018fc1f61c3cd4f7957b3ed8139edba",
+      "unchanged_main_tree": "45c5256bd7cce07f343128e1b7f18bfd1be79080",
+      "unchanged_public_refs": 32,
+      "unchanged_reachable_objects": 329
+    },
+    {
+      "repository": "policy-as-versioned-flux/governance-agent",
+      "PATCH_payload": {
+        "archived": true
+      },
+      "request_started_at": "2026-10-25T19:45:04.070809+00:00",
+      "verified_flag_at": "2026-10-25T19:45:05.413268+00:00",
+      "unchanged_main": "ab8053e3b92f7cf1a939b734f398f24c8a435cb1",
+      "unchanged_main_tree": "8806f86b967d5243bbe0c87bc8b6787b34a91850",
+      "unchanged_public_refs": 4,
+      "unchanged_reachable_objects": 26
+    }
+  ],
+  "final_group": {
+    "order": [
+      "fleet",
+      "policy",
+      "governance-agent"
+    ],
+    "logical_final_operation": true,
+    "atomic": false,
+    "reason": "Stop fleet daily caller before governance-agent dependency."
+  },
+  "post_action": {
+    "operational_register": {
+      "PASS": 17,
+      "LIMIT": 0,
+      "FAIL": 0,
+      "SKIP": 0
+    },
+    "registered_forge_rows": 16,
+    "all_target_source_trees_and_full_public_refs_unchanged": true,
+    "reachable_objects_checked": 965,
+    "all_reachable_object_types_sizes_and_raw_sha256_unchanged": true,
+    "anonymous_OCI_manifests": 5,
+    "anonymous_HTTP_status": 200,
+    "all_manifest_digests_unchanged": true,
+    "no_served_incumbent_target_images": true,
+    "readiness_probe_digest": "sha256:8c5d78146351822a31935cf5e7cfc54bb855d7a1300bdb56ff0311b9d84786cd",
+    "downloaded_image_layers_or_new_runtime_validation": false
+  },
+  "local_receipt_manifest": {
+    "path": ".scratch/ecosystem/research/resume-20261025/incumbent-final-archive-preparation/actual-archive-actions-root-owned/MANIFEST.json",
+    "sha256": "37e90d4a1f2c9df52aa5530f6b7ea2760740bbb08a0334ea29e37aeafecbd6c0"
+  },
+  "new_recorded_primary_result": false,
+  "next_natural_primary_completed_archive_flags": "pending",
+  "whole_ecosystem_completion_claim": false
+}
