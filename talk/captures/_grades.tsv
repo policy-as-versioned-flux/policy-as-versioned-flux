@@ -1,7 +1,7 @@
 # talk/captures/_grades.tsv -- what talk/verify-all.sh graded each discovered script,
 # one row per script, TAB separated: path, status, the last line of its capture.
 # Written by the run whose TRUTH line follows, and committed with the captures it grades.
-# TRUTH 2026-10-24T13:51Z run=460 hub=96dfd63d enact=development units=[driftwood=2064974@main feeds=838abe5@recovery-expense/v1.0.2 ico=9d584cf@main insurer=0b91e8d@v2.0.0 ludlow=253fc53@main nist=56f093a@publisher-reliability/v2.0.1 platform=d0d0ace@v6.3.0 tuppence=7724184@main] pass=114 [observed=40 self=61 simulated=4 meta=9] fail=4 skip=25 [never=10 waits=15] excluded=8 total=151 ceiling=132
+# TRUTH 2026-10-25T10:57Z run=461 hub=4471fb35 enact=development units=[driftwood=2064974@main feeds=838abe5@recovery-expense/v1.0.2 ico=9d584cf@main insurer=0b91e8d@v2.0.0 ludlow=dcecdea@main nist=56f093a@publisher-reliability/v2.0.1 platform=d0d0ace@v6.3.0 tuppence=7724184@main] pass=115 [observed=40 self=61 simulated=4 meta=10] fail=3 skip=25 [never=10 waits=15] excluded=8 total=151 ceiling=132
 .estate-clone/driftwood/scripts/verify-adopter-gate.sh	PASS	      acceptance record, and refuses when that record is removed or names another version or party (J).
 .estate-clone/driftwood/scripts/verify-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only this repo's propose-tier.yml on main, and the release and proposal identities do not overlap.
 .estate-clone/driftwood/twin/verify-twin-scenarios.sh	PASS	PASS: driftwood carries its six standing scenarios, two new classes in all three places, and no fine amount in the twin
@@ -21,7 +21,7 @@
 .estate-clone/ludlow/twin/verify-twin-scenarios.sh	PASS	PASS: ludlow carries its six standing scenarios, four committed classes in all three places, and no fine amount in the twin
 .estate-clone/ludlow/twin/verify-twin-sweep-moved.sh	SKIP	SKIP: offline moved-path assertions passed; no committed moved:true witness
 .estate-clone/ludlow/verify-adopter-gate.sh	PASS	      credential). Verifying what platform already signed is not, and is proved above.
-.estate-clone/ludlow/verify-cage-probe.sh	PASS	PASS: the served documents at v5.4.0 (the tag gitops/composed/composed-set.yaml pins) and at HEAD 253fc53, run offline through kyverno 1.19.1 (the engine gitops
+.estate-clone/ludlow/verify-cage-probe.sh	PASS	PASS: the served documents at v5.4.0 (the tag gitops/composed/composed-set.yaml pins) and at HEAD dcecdea, run offline through kyverno 1.19.1 (the engine gitops
 .estate-clone/ludlow/verify-certificate-identity-regexp.sh	PASS	PASS: EXPECTED_PROPOSAL_IDENTITY_REGEXP matches only policy-as-versioned-ludlow/ludlow's propose-tier.yml on main; the release and proposal identities do not ov
 .estate-clone/ludlow/verify-reconcile.sh	PASS	PASS: no local kind cluster 'ludlow' here, and none is needed: the latest lane sample observes the composed set in force from signed sources on a cluster reconc
 .estate-clone/ludlow/verify-twin-overlay.sh	PASS	PASS: ludlow's twin overlay loads, is labelled, prices every rung it declares and emits its feed
@@ -90,10 +90,10 @@ verify/a-fall-blocks/verify-a-fall-blocks.sh	PASS	PASS: talk/fall_check.py grade
 verify/adopter-engines/verify-adopter-engines.sh	PASS	PASS: all 5 assertions hold: each adopter's gitops/engine/kyverno.yaml is the platform engine table's row for its version, the adopters that share a named clust
 verify/adr-supersession/verify-adr-supersession.sh	PASS	PASS: ADR-0026 records the priced-hole decision; ADR-0013, ADR-0017 and ADR-0018 point 3 carry dated banners naming it; CONTEXT.md cites it and no entry still r
 verify/branch-refs/verify-branch-refs.sh	FAIL	FAIL: 1 cross-organisation checkout(s) are not pinned to a signed tag: platform/cloud-release.yml checks out policy-as-versioned-flux/policy-as-versioned-flux a
-verify/can-record/verify-can-record.sh	FAIL	FAIL: 1 fault(s) -- the clock's recording provenance or protected-default delivery does not hold
+verify/can-record/verify-can-record.sh	PASS	PASS: recorded TRUTH lines retain clock provenance; default-branch measurements create their unique ref only when absent and durably publish the original source
 verify/cited-truth/verify-cited-truth.sh	PASS	PASS: every TRUTH line quoted in .scratch/ecosystem/issues/*.md resolves to a line talk/truth.log records, every gate-proof citation names a commit whose tree c
 verify/cloud-plane/verify-cloud-plane-contract.sh	PASS	OK
-verify/cloud-plane/verify-cloud-plane.sh	PASS	PASS: cloud claims admitted on KinD from tuppence composed delivery after signed e2e4 trigger 728c17cdd6db8127d0708fd82b7143057876bc0e
+verify/cloud-plane/verify-cloud-plane.sh	PASS	PASS: cloud claims admitted on KinD from tuppence composed delivery after signed e2e4 trigger a35f8bc5a98ba5af17611ff4a7cefc95016538f0
 verify/cve-inventory/verify-cve-inventory.sh	PASS	PASS: ludlow served CVE line prices its digest-matched inventory intersection
 verify/demo/verify-demo.sh	PASS	PASS: a deck builds from this run's captures and survives its checks, every section 4 step check that exists on disk produced a capture, the committed talk/deck
 verify/deny-is-not-a-rung/verify-deny-is-not-a-rung.sh	SKIP	SKIP: 12 served copies of a declared Deny are still in the estate, each awaiting a named tag: posture-trust-boundary (12 copies) awaits ticket 84's next declare

@@ -13,7 +13,7 @@
           listed by gitops/apps/kustomization.yaml at the checked-out tree (2064974), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by policy-as-versioned-driftwood/storefront@v1.0.1; image digest bumped by the adopter; lifted from policy-as-versioned-flux/storefront@a97344e4ba767564192240278492456ef76b8b2d
           pinned tree: v4.0.0 (1cd446f) lists storefront.yaml in gitops/apps/kustomization.yaml
   PASS  reports -> ludlow
-          listed by gitops/apps/kustomization.yaml at the checked-out tree (253fc53), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by policy-as-versioned-ludlow/reports@v1.0.1; image digest bumped by the adopter; lifted from policy-as-versioned-flux/reports@b809e063514dedee5a1df8701d71d3a1856d5693
+          listed by gitops/apps/kustomization.yaml at the checked-out tree (dcecdea), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by policy-as-versioned-ludlow/reports@v1.0.1; image digest bumped by the adopter; lifted from policy-as-versioned-flux/reports@b809e063514dedee5a1df8701d71d3a1856d5693
           pinned tree: v4.0.0 (c5f33cc) lists reports.yaml in gitops/apps/kustomization.yaml
   PASS  api -> driftwood
           listed by gitops/apps/kustomization.yaml at the checked-out tree (2064974), on the path gitops/flux-system/gotk-sync.yaml reconciles (./gitops/apps); versioned by policy-as-versioned-driftwood/api@v1.0.1; image digest bumped by the adopter; lifted from policy-as-versioned-flux/api@c1d92aa61c21f0363da188dbd3b4f4c81f40cda2
