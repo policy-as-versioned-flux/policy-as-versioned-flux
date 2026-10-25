@@ -330,9 +330,63 @@ class Pending:
     guard: Callable[[], None]
 
 
+def isolated_writer_skipped(root: Path, run: dict[str, Any], default: str,
+                            profile: Profile, api: Api) -> bool:
+    """Prove a twin run expected no PR, without reading or executing its artifact."""
+    if profile.clock != "twin-sweep" or run.get("conclusion") != "success":
+        return False
+    source = sha(run["head_sha"])
+    git(root, "merge-base", "--is-ancestor", source, "refs/remotes/origin/" + default)
+
+    def data(path: str) -> str:
+        entry = git(root, "ls-tree", source, "--", path).split()
+        require(len(entry) >= 4 and entry[:2] == ["100644", "blob"],
+                "no-writer source declaration is not a regular data file")
+        return git(root, "show", f"{source}:{path}")
+
+    workflow = mapping(yaml.load(data(profile.workflow), Loader=yaml.BaseLoader), "source workflow")
+    jobs = mapping(workflow.get("jobs"), "source workflow jobs")
+    twin = mapping(jobs.get("twin"), "source twin job")
+    writer = mapping(jobs.get("write"), "source writer job")
+    expected_guard = ("needs.twin.outputs.agent_rung != 'isolated' && "
+                      "github.ref_name == github.event.repository.default_branch")
+    require(set(jobs) == {"twin", "write"} and writer.get("needs") == "twin"
+            and " ".join(str(writer.get("if", "")).split()) == expected_guard
+            and mapping(twin.get("outputs"), "source twin outputs").get("agent_rung")
+            == "${{ steps.cage.outputs.rung }}", "source workflow has no recognised isolated writer guard")
+    evidence = mapping(json.loads(data("composed/evidence.json"), object_pairs_hook=unique_object),
+                       "source priced evidence")
+    prices = evidence.get("prices")
+    require(isinstance(prices, list), "source priced evidence has no prices")
+    selected = [row for row in prices if isinstance(row, dict)
+                and row.get("kind") == "agent-cage" and row.get("subject") == "twin-agent"]
+    require(len(selected) == 1 and selected[0].get("proposed_tier") == "isolated",
+            "source does not explicitly price the twin writer at isolated")
+    endpoint = (f"repos/{profile.repository}/actions/runs/{run['id']}/attempts/"
+                f"{run['run_attempt']}/jobs?per_page=100")
+    facts = mapping(api("GET", endpoint, None), "official attempt jobs")
+    attempts = facts.get("jobs")
+    require(type(facts.get("total_count")) is int and facts["total_count"] == 2
+            and isinstance(attempts, list) and len(attempts) == 2,
+            "official attempt jobs are incomplete or ambiguous")
+    by_name: dict[str, dict[str, Any]] = {}
+    for item in attempts:
+        job = mapping(item, "official attempt job")
+        name = job.get("name")
+        require(isinstance(name, str) and name in {"twin", "write"} and name not in by_name,
+                "official attempt jobs have unknown or duplicate names")
+        require(positive(job.get("run_id"), "job run id") == run["id"]
+                and positive(job.get("run_attempt"), "job run attempt") == run["run_attempt"]
+                and job.get("head_sha") == source and job.get("head_branch") == default
+                and job.get("workflow_name") == profile.clock and job.get("status") == "completed",
+                "official attempt job is not bound to this completed source run")
+        by_name[str(name)] = job
+    return by_name["twin"].get("conclusion") == "success" and by_name["write"].get("conclusion") == "skipped"
+
+
 def pending(root: Path, run_id: int, attempt: int, profile: Profile, api: Api,
             verify: Verifier | None, today: dt.date | None, authority_root: Path | None = None,
-            require_name: bool = False) -> Pending:
+            require_name: bool = False) -> Pending | None:
     positive(run_id, "run id")
     positive(attempt, "run attempt")
     run, default, branch = facts(api, run_id, attempt, profile=profile)
@@ -341,6 +395,8 @@ def pending(root: Path, run_id: int, attempt: int, profile: Profile, api: Api,
     query = urlencode({"state": "all", "head": profile.repository.split("/")[0] + ":" + branch,
                        "base": default, "per_page": 100})
     prs = api("GET", f"repos/{profile.repository}/pulls?{query}", None)
+    if prs == [] and isolated_writer_skipped(root, run, default, profile, api):
+        return None
     require(isinstance(prs, list) and len(prs) == 1, "expected exactly one pending observation PR")
     require(isinstance(prs[0], dict), "PR list did not provide a delivery record")
     number = positive(prs[0].get("number"), "PR number")
@@ -450,6 +506,7 @@ def already_integrated(root: Path, item: Pending, api: Api) -> str | None:
 def prepare_truth(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier | None = None,
                   today: dt.date | None = None, attempt: int = 1) -> str:
     item = pending(root, run_id, attempt, TRUTH, api, verify, today, require_name=True)
+    assert item is not None  # TRUTH always requires its original observation.
     item.guard()
     recorded_line = already_integrated(root, item, api)
     if recorded_line:
@@ -500,6 +557,8 @@ def deliver(root: Path, run_id: int, *, api: Api = github_api, verify: Verifier 
     require(not review_integration or profile == TRUTH, 'integration review is restricted to the TRUTH profile')
     item = pending(root, run_id, attempt, profile, api, verify, today, authority_root,
                    require_name=review_integration)
+    if item is None:
+        return "SKIP: no delivery expected; the explicitly isolated twin writer was skipped; no observation recorded"
     run, default, branch, pr, head, line, guard = (item.run, item.default, item.branch, item.pr,
                                                 item.original, item.line, item.guard)
     original = head
@@ -917,7 +976,7 @@ def main() -> int:
             options['review_integration'] = True
         if args.mint:
             preflight = deliver(args.root, args.run_id, check_only=True, **options)
-            if preflight.startswith("RECORDED"):
+            if preflight.startswith(("RECORDED", "SKIP: no delivery expected;")):
                 print(preflight)
                 return 0
             mint_for(select_profile(args.repository, args.workflow))
