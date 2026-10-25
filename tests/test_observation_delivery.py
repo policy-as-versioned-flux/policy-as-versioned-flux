@@ -138,7 +138,7 @@ class API:
 
 @pytest.fixture
 def make_estate(tmp_path):
-    def make(org='tuppence', clock='twin-sweep'):
+    def make(org='tuppence', clock='twin-sweep', *, writer_rung=None, mutate_source=None):
         root, hub = tmp_path / 'adopter', tmp_path / 'authority'
         init(root); init(hub)
         (hub / 'twin').mkdir()
@@ -155,6 +155,19 @@ def make_estate(tmp_path):
         (root / f'.github/workflows/{clock}.yml').write_text('env:\n  OBSERVATION_LANE: "' + ' '.join(lanes) + '"\n')
         # Old row is deliberately not schema-graded: it must be conserved byte for byte.
         first = root / lanes[0]; first.parent.mkdir(exist_ok=True); first.write_bytes(b'{"old":"original bytes", "fail": true}\n')
+        if writer_rung is not None:
+            # The historical caller's real guard; source blobs stay data only.
+            (root / f'.github/workflows/{clock}.yml').write_text(
+                'env:\n  OBSERVATION_LANE: observations/twin-sweep.jsonl\n'
+                'jobs:\n  twin:\n    outputs:\n'
+                '      agent_rung: ${{ steps.cage.outputs.rung }}\n'
+                '  write:\n    needs: twin\n'
+                "    if: needs.twin.outputs.agent_rung != 'isolated' && github.ref_name == github.event.repository.default_branch\n")
+            (root / 'composed').mkdir()
+            (root / 'composed/evidence.json').write_text(json.dumps({'prices': [
+                {'kind': 'agent-cage', 'subject': 'twin-agent', 'proposed_tier': writer_rung}]}))
+        if mutate_source is not None:
+            mutate_source(root)
         source = commit(root, 'measured fixture source')
         target = tmp_path / 'target.git'; remote(root, target)
         git(target, 'config', 'core.hooksPath', str(target / 'hooks'))
@@ -444,4 +457,211 @@ def test_emitter_status_exit_and_moved_are_one_reading(shared, make_estate, monk
     api.pr['head']['sha'] = git(root, 'rev-parse', 'HEAD')
     git(root, 'push', '-q', '--force', 'origin', 'observations/twin-sweep/100-2');git(root, 'switch', '-q', 'main')
     with pytest.raises(shared.Refusal): invoke(shared, estate, monkeypatch)
+    assert not api.approved
+
+
+@pytest.mark.parametrize('org', ['tuppence', 'ludlow'])
+def test_completed_twin_without_writer_does_not_require_observation_pr(shared, make_estate, monkeypatch, org):
+    """Synthetic API for the actual successful-read/skipped-writer call pattern.
+
+    Real temporary Git stores and the real controller are used. The source/API
+    identifiers are fixtures; this creates no genuine observation or signature.
+    """
+    estate = make_estate(org=org, writer_rung='isolated')
+    api = estate[3]
+    api.run['conclusion'] = 'success'
+    original = api.__call__
+
+    def no_writer(method, path, body=None):
+        if '/pulls?' in path:
+            api.calls.append((method, path, copy.deepcopy(body)))
+            return []
+        if path.endswith('/actions/runs/100/attempts/2/jobs?per_page=100'):
+            api.calls.append((method, path, copy.deepcopy(body)))
+            return {'total_count': 2, 'jobs': [
+                {**job, 'head_sha': api.run['head_sha'], 'head_branch': 'main', 'workflow_name': 'twin-sweep'} for job in [
+                {'name': 'twin', 'run_id': 100, 'run_attempt': 2, 'status': 'completed', 'conclusion': 'success'},
+                {'name': 'write', 'run_id': 100, 'run_attempt': 2, 'status': 'completed', 'conclusion': 'skipped'}]]}
+        return original(method, path, body)
+
+    monkeypatch.setattr(shared, 'HUB_URL', str(estate[2]))
+    result = shared.deliver(estate[0], 100, repository=api.repo, workflow=api.clock,
+                            attempt=2, authority_root=estate[0].parent / 'hub-data',
+                            api=no_writer, verify=lambda *args: None, today=TODAY,
+                            check_only=True)
+    assert result.startswith('SKIP:'), result
+    assert not api.approved
+    assert not any(method != 'GET' for method, _, _ in api.calls)
+
+
+def missing_pr_attempt(estate):
+    """External API fixture only; controller, Git and declarations remain real."""
+    api = estate[3]
+    api.run['conclusion'] = 'success'
+    jobs = {'total_count': 2, 'jobs': [
+        dict(name=name, run_id=100, run_attempt=2, head_sha=api.run['head_sha'],
+             head_branch='main', workflow_name='twin-sweep', status='completed', conclusion=conclusion)
+        for name, conclusion in [('twin', 'success'), ('write', 'skipped')]]}
+
+    def boundary(method, path, body=None):
+        if '/pulls?' in path:
+            api.calls.append((method, path, copy.deepcopy(body)))
+            return []
+        if path.endswith('/actions/runs/100/attempts/2/jobs?per_page=100'):
+            api.calls.append((method, path, copy.deepcopy(body)))
+            return copy.deepcopy(jobs)
+        return api(method, path, body)
+    return boundary, jobs
+
+
+@pytest.mark.parametrize('case', ['eligible-writer', 'failed-writer', 'cancelled-writer',
+    'missing-writer', 'duplicate-writer', 'extra-job', 'incomplete-page', 'wrong-attempt',
+    'wrong-run', 'wrong-source', 'wrong-branch', 'wrong-workflow', 'unfinished-job',
+    'failed-reader', 'failed-producer', 'unavailable-jobs', 'malformed-jobs'])
+def test_missing_pr_does_not_hide_an_eligible_or_unknown_writer(shared, make_estate, monkeypatch, case):
+    estate = make_estate(writer_rung='isolated'); api = estate[3]
+    boundary, jobs = missing_pr_attempt(estate)
+    if case in {'eligible-writer', 'failed-writer', 'cancelled-writer'}:
+        jobs['jobs'][1]['conclusion'] = {'eligible-writer': 'success', 'failed-writer': 'failure',
+                                        'cancelled-writer': 'cancelled'}[case]
+    elif case == 'missing-writer': jobs['jobs'] = jobs['jobs'][:1]; jobs['total_count'] = 1
+    elif case == 'duplicate-writer': jobs['jobs'][0] = copy.deepcopy(jobs['jobs'][1])
+    elif case == 'extra-job': jobs['jobs'].append(copy.deepcopy(jobs['jobs'][0])); jobs['total_count'] = 3
+    elif case == 'incomplete-page': jobs['total_count'] = 3
+    elif case == 'wrong-attempt': jobs['jobs'][1]['run_attempt'] = 1
+    elif case == 'wrong-run': jobs['jobs'][1]['run_id'] = 101
+    elif case == 'wrong-source': jobs['jobs'][1]['head_sha'] = 'f' * 40
+    elif case == 'wrong-branch': jobs['jobs'][1]['head_branch'] = 'topic'
+    elif case == 'wrong-workflow': jobs['jobs'][1]['workflow_name'] = 'drift-sample'
+    elif case == 'unfinished-job': jobs['jobs'][1]['status'] = 'in_progress'
+    elif case == 'failed-reader': jobs['jobs'][0]['conclusion'] = 'failure'
+    elif case == 'failed-producer': api.run['conclusion'] = 'failure'
+    elif case == 'malformed-jobs': jobs['jobs'] = None
+    original = boundary
+
+    def transport(method, path, body=None):
+        if case == 'unavailable-jobs' and '/jobs?' in path:
+            raise shared.Refusal('synthetic unavailable jobs API')
+        return original(method, path, body)
+
+    monkeypatch.setattr(shared, 'HUB_URL', str(estate[2]))
+    with pytest.raises(shared.Refusal):
+        shared.deliver(estate[0], 100, repository=api.repo, workflow=api.clock,
+                       attempt=2, authority_root=estate[0].parent / 'hub-data',
+                       api=transport, verify=lambda *args: None, today=TODAY, check_only=True)
+    assert not api.approved
+    assert not any(method != 'GET' for method, _, _ in api.calls)
+
+
+@pytest.mark.parametrize('writer_state', ['skipped', 'eligible'])
+def test_actual_rendered_caller_and_bundle_do_not_mint_for_skipped_writer(make_estate, tmp_path, writer_state):
+    """Run the real workflow commands and ZIP application; fake only remote APIs.
+
+    No genuine key, crypto, observation or network operation is used. Git URL
+    rewriting keeps both authority stores real and disposable. A trap executable
+    makes any attempted signing/mint path fail before real crypto can run.
+    """
+    import hashlib
+    import sys
+    from urllib.parse import urlencode
+    import yaml
+    from talk import build_observation_delivery as builder
+    from talk import render_observation_delivery as renderer
+
+    estate = make_estate(writer_rung='isolated' if writer_state == 'skipped' else 'baseline'); api = estate[3]
+    boundary, jobs = missing_pr_attempt(estate)
+    if writer_state == 'eligible': jobs['jobs'][1]['conclusion'] = 'success'
+    # A current synthetic authority avoids substituting the real validator/time.
+    hub = tmp_path / 'authority'
+    today = dt.datetime.now(dt.timezone.utc).date()
+    (hub / 'owner.md').write_text(f'{today}, owner: "fixture renewal".\n')
+    (hub / 'twin/ENACT_MODE.why').write_text(
+        f"mode: development\nuntil: '{today + dt.timedelta(days=1)}'\nsaid:\n"
+        f"  - on: '{today}'\n    by: owner\n    words: fixture renewal\n    where: owner.md\n")
+    commit(hub, 'TEST ONLY current authority')
+    git(hub, 'push', '-q', 'origin', 'main')
+    query = urlencode(dict(state='all', head='policy-as-versioned-tuppence:observations/twin-sweep/100-2',
+                           base='main', per_page=100))
+    endpoints = [f'repos/{api.repo}', f'repos/{HUB}', f'repos/{api.repo}/actions/runs/100/attempts/2',
+                 f'repos/{api.repo}/actions/workflows/twin-sweep.yml', f'repos/{api.repo}/pulls?{query}',
+                 f'repos/{api.repo}/actions/runs/100/attempts/2/jobs?per_page=100']
+    routes = tmp_path / 'api-fixtures.json'
+    routes.write_text(json.dumps({path: boundary('GET', path) for path in endpoints}))
+    executable = tmp_path / 'bin'; executable.mkdir()
+    calls, forbidden = tmp_path / 'api-calls.jsonl', tmp_path / 'unexpected-mint'
+    (executable / 'gh').write_text(f'''#!{sys.executable}
+import json,os,pathlib,sys
+args=sys.argv[1:]
+assert args[:3]==['api','--method','GET'], args
+assert 'PAVC_OTHER_HAND_PRIVATE_KEY' not in os.environ
+with pathlib.Path({str(calls)!r}).open('a') as f: f.write(json.dumps(args)+'\\n')
+print(json.dumps(json.loads(pathlib.Path({str(routes)!r}).read_text())[args[3]]))
+''')
+    (executable / 'openssl').write_text(f'#!/bin/sh\ntouch {str(forbidden)!r}\nexit 91\n')
+    for path in executable.iterdir(): path.chmod(0o755)
+    bundle = builder.build()
+    (tmp_path / 'observation-delivery.pyz').write_bytes(bundle)
+    workflow = yaml.load(renderer.render('tuppence', 'a' * 40, hashlib.sha256(bundle).hexdigest()), Loader=yaml.BaseLoader)
+    preflight, writer = workflow['jobs']['review']['steps'][-2:]
+    env = {k:v for k,v in os.environ.items() if k not in {'GH_TOKEN', 'GITHUB_TOKEN', 'TRUTH_READ_TOKEN', 'PAVC_OTHER_HAND_PRIVATE_KEY'}}
+    env.update(PATH=str(executable) + os.pathsep + str(Path(sys.executable).parent) + os.pathsep + env['PATH'],
+               DELIVERY_REPOSITORY=api.repo, DELIVERY_WORKFLOW=api.clock, DELIVERY_RUN_ID='100', DELIVERY_ATTEMPT='2',
+               RUNNER_TEMP=str(tmp_path), GITHUB_WORKSPACE=str(estate[0]),
+               GIT_CONFIG_COUNT='1', GIT_CONFIG_KEY_0=f'url.{estate[2]}.insteadOf',
+               GIT_CONFIG_VALUE_0='https://github.com/policy-as-versioned-flux/policy-as-versioned-flux.git')
+    for step in [preflight, writer]:
+        child_env = dict(env)
+        if step is writer: child_env['PAVC_OTHER_HAND_PRIVATE_KEY'] = 'TEST_ONLY_NOT_A_REAL_KEY'
+        result = subprocess.run(['bash', '-euo', 'pipefail', '-c', step['run']], env=child_env,
+                                cwd=tmp_path, text=True, capture_output=True, timeout=30)
+        if writer_state == 'eligible':
+            assert result.returncode == 1, (result.stdout, result.stderr)
+            assert result.stderr.startswith('PENDING:'), result.stderr
+            break  # A failed preflight never admits the workflow's key step.
+        assert result.returncode == 0, (result.stdout, result.stderr)
+        assert result.stdout.startswith('SKIP: no delivery expected'), result.stdout
+        assert 'no observation recorded' in result.stdout
+    assert not forbidden.exists(), 'a no-delivery invocation attempted to mint/sign'
+    assert len(calls.read_text().splitlines()) >= (12 if writer_state == 'skipped' else 5)
+
+
+@pytest.mark.parametrize('case', ['eligible-price', 'missing-price', 'duplicate-price', 'malformed-price',
+    'missing-workflow', 'different-guard', 'different-output', 'symlink-evidence'])
+def test_skipped_writer_requires_explicit_source_workflow_and_isolated_price(shared, make_estate, monkeypatch, case):
+    def mutate(root):
+        evidence = root / 'composed/evidence.json'
+        workflow = root / '.github/workflows/twin-sweep.yml'
+        data = json.loads(evidence.read_text())
+        if case == 'eligible-price': data['prices'][0]['proposed_tier'] = 'baseline'
+        elif case == 'missing-price': data['prices'] = []
+        elif case == 'duplicate-price': data['prices'] *= 2
+        elif case == 'malformed-price': data['prices'] = None
+        elif case == 'missing-workflow': workflow.unlink()
+        elif case == 'different-guard': workflow.write_text(workflow.read_text().replace(" != 'isolated'", " == 'isolated'"))
+        elif case == 'different-output': workflow.write_text(workflow.read_text().replace('steps.cage.outputs.rung', 'steps.other.outputs.rung'))
+        if case == 'symlink-evidence':
+            evidence.rename(root / 'priced.json'); evidence.symlink_to('../priced.json')
+        else: evidence.write_text(json.dumps(data))
+    estate = make_estate(writer_rung='isolated', mutate_source=mutate); api = estate[3]
+    boundary, _ = missing_pr_attempt(estate)
+    monkeypatch.setattr(shared, 'HUB_URL', str(estate[2]))
+    with pytest.raises(shared.Refusal):
+        shared.deliver(estate[0], 100, repository=api.repo, workflow=api.clock, attempt=2,
+                       authority_root=estate[0].parent / 'hub-data', api=boundary,
+                       verify=lambda *args: None, today=TODAY, check_only=True)
+    assert not api.approved
+    assert not any(method != 'GET' for method, _, _ in api.calls)
+
+
+def test_no_writer_source_must_be_an_ancestor_of_current_default(shared, make_estate, monkeypatch):
+    estate = make_estate(writer_rung='isolated'); api = estate[3]
+    boundary, jobs = missing_pr_attempt(estate)
+    # A real sibling commit exists but was never on the official default history.
+    api.run['head_sha'] = api.pr['head']['sha']
+    for job in jobs['jobs']: job['head_sha'] = api.run['head_sha']
+    monkeypatch.setattr(shared, 'HUB_URL', str(estate[2]))
+    with pytest.raises(shared.Refusal):
+        shared.deliver(estate[0], 100, repository=api.repo, workflow=api.clock, attempt=2,
+                       authority_root=estate[0].parent / 'hub-data', api=boundary,
+                       verify=lambda *args: None, today=TODAY, check_only=True)
     assert not api.approved
