@@ -358,6 +358,7 @@ def isolated_writer_skipped(root: Path, run: dict[str, Any], default: str,
                        "source priced evidence")
     prices = evidence.get("prices")
     require(isinstance(prices, list), "source priced evidence has no prices")
+    assert isinstance(prices, list)  # Runtime require() is not a static type guard.
     selected = [row for row in prices if isinstance(row, dict)
                 and row.get("kind") == "agent-cage" and row.get("subject") == "twin-agent"]
     require(len(selected) == 1 and selected[0].get("proposed_tier") == "isolated",
@@ -369,6 +370,7 @@ def isolated_writer_skipped(root: Path, run: dict[str, Any], default: str,
     require(type(facts.get("total_count")) is int and facts["total_count"] == 2
             and isinstance(attempts, list) and len(attempts) == 2,
             "official attempt jobs are incomplete or ambiguous")
+    assert isinstance(attempts, list)  # The same validated shape must narrow for mypy.
     by_name: dict[str, dict[str, Any]] = {}
     for item in attempts:
         job = mapping(item, "official attempt job")
