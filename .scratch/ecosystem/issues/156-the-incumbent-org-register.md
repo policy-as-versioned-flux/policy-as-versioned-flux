@@ -95,3 +95,12 @@ and its115PASS/3FAIL/23SKIP/8EXCLUDED vector and eligible-LIMIT capture remain u
 stays claimed: c2p-collector still needs its workload-OSCAL prerequisite; governance-agent, policy
 and fleet remain live and must be archived last, together, after the earlier rows and their
 recorded prerequisites pass. No remaining archive or whole-ticket completion is claimed.
+
+
+**2026-10-25: final four eligible archives performed and post-verified.** Original scheduled TRUTH 461 (`40183546501`, attempt 1), normally recorded by [PR 267](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/pull/267) at `646416d3f336c167c9c8c166bccf14c08f52aa3f`, explicitly passes the OSCAL prerequisite and all three reconcile checks. Those reconcile captures score facts 6 and 7 under the current reference registration; this is not the earlier five-fact shortcut. The overall primary remains failed on its other recorded rows.
+
+Under the owner's standing authorization, `c2p-collector` was archived first at 19:44 UTC and its postchecks passed. The final logical group followed at 19:45 UTC in the order `fleet`, `policy`, `governance-agent`, stopping the daily caller first. The three archive requests are separate, non-atomic GitHub writes; their retained responses span approximately three seconds. No intermediate partial group is claimed as a register pass.
+
+All four post-action forge flags are archived. The operational register reports 17 PASS, zero LIMIT/FAIL/SKIP over all 16 registered repository rows and the permanent readiness probe. All four source trees, complete public ref maps and 965 reachable commit/tag/tree/blob contents are unchanged. Current served tags name no incumbent target image; five anonymous OCI manifest reads retain HTTP 200 and their exact digests, including the readiness probe `sha256:8c5d78146351822a31935cf5e7cfc54bb855d7a1300bdb56ff0311b9d84786cd`. These are manifest observations, not downloaded-layer or new runtime proofs.
+
+The exact per-action times, unchanged main/tree identities and receipt-manifest digest are in [`incumbent-final-archives.json`](../research/resume-20261025/incumbent-final-archives.json). All archive actions are now performed and operationally verified. The next unforced primary must record the completed flags before the ticket claims a new signed TRUTH result; the existing 461 grades and all original failures remain unchanged. No whole-ecosystem completion is claimed here.
