@@ -3,7 +3,9 @@
 1. ADR-0026 exists, is accepted, and carries the four required sections
   ok   0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md
   ok   ADR-0026: ^status: accepted$
+verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write error: Broken pipe
   ok   ADR-0026: ^## Context$
+verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write error: Broken pipe
   ok   ADR-0026: ^## Decision$
   ok   ADR-0026: ^## Options considered$
   ok   ADR-0026: ^## Consequences$
