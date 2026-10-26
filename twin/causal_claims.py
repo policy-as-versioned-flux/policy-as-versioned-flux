@@ -51,6 +51,7 @@ from . import fixtures, schema
 from .evidence import threshold as pricing_threshold
 from .model import Graph, Overlay
 from .repo import ModelRepo
+from .skills import Stated
 
 SKILL = "causal-claims"
 # A second, separately-thresholded metric on the same skill's output, registered under its own
@@ -100,14 +101,20 @@ _NEGATIVE_MARKERS = (
     "cut", "loses", "lose", "delay", "fall",
 )
 _POSITIVE_MARKERS = ("lift", "boost", "increas", "improv", "grow", "strengthen", "accelerat", "expand", "support", "gain", "rise")
+_DEFAULT_SIGN = "negative"
 
 
 def _sign(haystack: str) -> str:
-    if any(m in haystack for m in _POSITIVE_MARKERS):
-        return "positive"
+    return _sign_rule(haystack)[1]
+
+
+def _sign_rule(haystack: str) -> tuple[str | None, str]:
+    marker = next((m for m in _POSITIVE_MARKERS if m in haystack), None)
+    if marker is not None:
+        return marker, "positive"
     # ponytail: an arbitrary conservative default when the text names neither direction — a real
     # deployment infers this from data or a model call, not a keyword default.
-    return "negative"
+    return None, _DEFAULT_SIGN
 
 
 # Longest/most specific phrase first within a rung so a real hit is not lost to a shorter
@@ -126,10 +133,15 @@ _DEFAULT_GRADE = 5
 
 
 def _grade(haystack: str) -> int:
+    return _grade_rule(haystack)[1]
+
+
+def _grade_rule(haystack: str) -> tuple[str | None, int]:
     for grade, markers in _GRADE_MARKERS:
-        if any(m in haystack for m in markers):
-            return grade
-    return _DEFAULT_GRADE
+        for marker in markers:
+            if marker in haystack:
+                return marker, grade
+    return None, _DEFAULT_GRADE
 
 
 _LAG_MARKERS: tuple[tuple[str, int], ...] = (
@@ -144,10 +156,14 @@ _DEFAULT_LAG_DAYS = 180
 
 
 def _lag_days(haystack: str) -> int:
+    return _lag_rule(haystack)[1]
+
+
+def _lag_rule(haystack: str) -> tuple[str | None, int]:
     for marker, days in _LAG_MARKERS:
         if marker in haystack:
-            return days
-    return _DEFAULT_LAG_DAYS
+            return marker, days
+    return None, _DEFAULT_LAG_DAYS
 
 
 # A fixed starting mode with a grade-scaled width: stronger evidence claims a tighter range,
@@ -193,6 +209,16 @@ def propose(payload: dict[str, Any]) -> dict[str, Any]:
     `alternatives` are the skill's own working notes, not (yet) a schema-committed field on
     anything — they travel beside the edge rather than inside it.
     """
+    return _propose(payload)[0]
+
+
+def propose_stated(payload: dict[str, Any]) -> Stated:
+    """Expose the actual heuristic and source witnesses, never a measured causal effect."""
+    answer, basis = _propose(payload)
+    return Stated(answer, basis)
+
+
+def _propose(payload: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     missing = [f for f in ("from", "to", "evidence") if f not in payload]
     if missing:
         raise CausalClaimsError(f"{SKILL}: payload declares no {', '.join(missing)}")
@@ -204,7 +230,9 @@ def propose(payload: dict[str, Any]) -> dict[str, Any]:
         raise CausalClaimsError(f"{SKILL}: no evidence to assess a causal claim from")
 
     haystack = " ".join(str(item.get("statement", "")) for item in evidence).lower()
-    grade = _grade(haystack)
+    grade_marker, grade = _grade_rule(haystack)
+    sign_marker, sign = _sign_rule(haystack)
+    lag_marker, lag = _lag_rule(haystack)
 
     candidates = payload.get("candidate_confounders") or []
     confounders = [
@@ -227,19 +255,32 @@ def propose(payload: dict[str, Any]) -> dict[str, Any]:
         # `_alternatives()` ever makes it reachable.
         raise CausalClaimsError(f"{SKILL}: grade {grade} carries no alternative explanation")
 
-    return {
+    answer = {
         "edge": {
             "from": from_c["id"],
             "to": to_c["id"],
             "type": schema.CAUSAL_EDGE,
-            "sign": _sign(haystack),
-            "lag_days": _lag_days(haystack),
+            "sign": sign,
+            "lag_days": lag,
             "elasticity": _elasticity(grade),
             "evidence_grade": grade,
         },
         "confounders": confounders,
         "alternatives": alternatives,
         "claimed_by": f"{SKILL} (skill)",
+    }
+    return answer, {
+        "method": "causal-keywords/v1",
+        "from": {k: from_c[k] for k in ("id", "name") if k in from_c},
+        "to": {k: to_c[k] for k in ("id", "name") if k in to_c},
+        "evidence": [{k: e[k] for k in ("id", "statement", "source", "observed_at", "date") if k in e} for e in evidence],
+        "grade_marker": grade_marker, "sign_marker": sign_marker, "lag_marker": lag_marker,
+        "defaults": {"evidence_grade": _DEFAULT_GRADE, "sign": _DEFAULT_SIGN, "lag_days": _DEFAULT_LAG_DAYS},
+        "defaults_used": {"evidence_grade": grade_marker is None, "sign": sign_marker is None, "lag_days": lag_marker is None},
+        "elasticity_rule": {"method": "fixed fitted mode with grade-scaled width",
+                            "mode": _BASE_MODE, "band_per_grade": _BAND_PER_GRADE},
+        "candidate_confounders": [{k: c[k] for k in ("id", "name") if k in c} for c in candidates],
+        "alternative_rule": "reverse causation plus declared candidate common causes",
     }
 
 

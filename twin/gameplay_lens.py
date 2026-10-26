@@ -48,6 +48,7 @@ from .grades import Capabilities
 from .model import Overlay, orgs
 from .repo import ModelRepo
 from .schema import PERSON_EDGES, STRUCTURAL_EDGE
+from .skills import Stated
 
 SKILL = "gameplay-lens"
 KIND_OPPORTUNITY_SWEEP = "opportunity-sweep"
@@ -177,15 +178,28 @@ def propose(payload: dict[str, Any]) -> dict[str, Any]:
     checked against the map, and a grade-5 claim-shaped dict (see module docstring). No parameter
     here can set a different grade.
     """
+    return _propose(payload)[0]
+
+
+def propose_stated(payload: dict[str, Any]) -> Stated:
+    """The same catalogue decisions with their graph witnesses, including rejected checks."""
+    answer, basis = _propose(payload)
+    return Stated(answer, basis)
+
+
+def _propose(payload: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     missing = [f for f in ("positions", "edges", "org_components") if f not in payload]
     if missing:
         raise GameplayLensError(f"{SKILL}: payload declares no {', '.join(missing)}")
 
     positions, needs_out, needs_in, held_by = _index(payload)
     opportunities = []
+    checks = []
     for component in sorted(payload["org_components"]):
         for name in PLAYS:
             hit = _PLAY_CHECKS[name](component, positions, needs_out, needs_in, held_by)
+            checks.append({"component": component, "play": name,
+                           "witness": None if hit is None else hit["preconditions"]})
             if hit is None:
                 continue
             opportunities.append(
@@ -200,7 +214,16 @@ def propose(payload: dict[str, Any]) -> dict[str, Any]:
                     },
                 }
             )
-    return {"opportunities": opportunities}
+    return {"opportunities": opportunities}, {
+        "method": "graph-play-preconditions/v1",
+        "positions": {c: {k: p[k] for k in ("stage", "evolution") if k in p} for c, p in positions.items()},
+        "needs_out": {c: sorted(v) for c, v in needs_out.items()},
+        "needs_in": {c: sorted(v) for c, v in needs_in.items()},
+        "held_by": {c: sorted(v) for c, v in held_by.items()},
+        "org_components": sorted(payload["org_components"]),
+        "land_grab_min_position": _LAND_GRAB_MIN_POSITION, "young_stages": list(_YOUNG_STAGES),
+        "checks": checks,
+    }
 
 
 def scorer(actual: Any, expected: Any) -> bool:

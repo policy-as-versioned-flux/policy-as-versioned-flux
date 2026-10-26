@@ -41,6 +41,7 @@ from .fixtures import (
 )
 from .model import Overlay
 from .repo import ModelRepo
+from .skills import Stated
 
 SKILL = "evolution-judge"
 
@@ -104,11 +105,15 @@ _DEFAULT_POSITION = 0.5
 
 
 def _infer_position(haystack: str) -> float:
+    return _position_rule(haystack)[1]
+
+
+def _position_rule(haystack: str) -> tuple[str | None, float]:
     haystack = haystack.lower()
     for phrase, position in _MATURITY_KEYWORDS:
         if phrase in haystack:
-            return position
-    return _DEFAULT_POSITION
+            return phrase, position
+    return None, _DEFAULT_POSITION
 
 
 def judge(payload: dict[str, Any]) -> dict[str, Any]:
@@ -121,6 +126,16 @@ def judge(payload: dict[str, Any]) -> dict[str, Any]:
     is a literal `5`: there is no parameter here that can set it to anything else, so a caller
     cannot ask the skill to self-assert a higher grade than a model assertion is.
     """
+    return _judge(payload)[0]
+
+
+def judge_stated(payload: dict[str, Any]) -> Stated:
+    """State the fitted keyword/default rule actually used, not independent accuracy."""
+    answer, basis = _judge(payload)
+    return Stated(answer, basis)
+
+
+def _judge(payload: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     missing = [f for f in ("component", "evidence") if f not in payload]
     if missing:
         raise EvolutionJudgeError(f"{SKILL}: payload declares no {', '.join(missing)}")
@@ -131,9 +146,9 @@ def judge(payload: dict[str, Any]) -> dict[str, Any]:
     haystack = " ".join(
         [str(component.get("name", ""))] + [str(item.get("statement", "")) for item in payload["evidence"]]
     )
-    position = _infer_position(haystack)
+    phrase, position = _position_rule(haystack)
     stage = wardley.stage_of(position)
-    return {
+    answer = {
         "evolution": stage,
         "evolution_position": position,
         "claim": {
@@ -147,6 +162,14 @@ def judge(payload: dict[str, Any]) -> dict[str, Any]:
             ),
             "evolution_position": position,
         },
+    }
+    return answer, {
+        "method": "maturity-keywords/v1",
+        "component": {"id": component["id"], "name": component["name"]},
+        "evidence": [{k: e[k] for k in ("id", "statement", "source", "observed_at", "date") if k in e}
+                     for e in payload["evidence"]],
+        "matched_phrase": phrase,
+        "rule_position": position,
     }
 
 
