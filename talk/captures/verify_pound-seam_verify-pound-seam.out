@@ -52,4 +52,13 @@ PASS: tuppence prices[5] agent-cage: the platform prices the twin agent's cage u
 PASS: tuppence regime entry (penalty-schema): 4 priced hole(s) sum to its total 17,907,950.70 GBP; the open lines price it at 17,907,950.70
 PASS: tuppence: every list of amounts in the document is one perspective in one currency
 PASS: tuppence: selection policy 1.1.0 matches tuppence/selection-policy/VERSION
+declared waits
+declared waits
+declared waits
+declared waits
+declared waits
+declared waits
+declared waits
+declared waits
+declared waits
 SKIP: driftwood prices[3] (feeds/cve feed) could not be priced, and says why: No scanned CVE is in the pinned KEV feed; 413 scanned CVE(s) outside it are named absences carrying no amount.
