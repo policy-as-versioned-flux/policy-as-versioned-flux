@@ -276,6 +276,10 @@ jobs:
             merges="$(git rev-list --count --merges "origin/${DEFAULT_BRANCH}..HEAD")"
             why="this run is on ${GITHUB_REF_NAME}, not ${DEFAULT_BRANCH}, and only ${DEFAULT_BRANCH}'s talk/truth.log is citable. This ref carries ${own} commit(s) ${DEFAULT_BRANCH} does not, ${merges} of them merges: with anything to replay, git pull --rebase --autostash origin ${DEFAULT_BRANCH} rewrites them and the push is refused non-fast-forward (run 98); with nothing to replay the push LANDS on the branch, and the line is then lost anyway the moment the branch merges without that commit (run 101, 2026-09-05)"
           fi
+          # Fresh SHA checkouts may lack origin/HEAD. Name the already-fetched record
+          # from trusted event metadata; never guess main or move its commit ref.
+          git rev-parse --verify "refs/remotes/origin/${DEFAULT_BRANCH}^{commit}" >/dev/null
+          git symbolic-ref refs/remotes/origin/HEAD "refs/remotes/origin/${DEFAULT_BRANCH}"
           echo "CAN_RECORD=${can}" >> "$GITHUB_ENV"
           echo "CANNOT_REASON=${why}" >> "$GITHUB_ENV"
           if [ "${can}" = yes ]; then

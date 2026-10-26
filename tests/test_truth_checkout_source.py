@@ -37,7 +37,10 @@ def _git(root: Path, env: dict[str, str], *args: str) -> str:
                           capture_output=True, text=True).stdout.strip()
 
 
-def _checkout_fixture(tmp_path: Path, *, default: str = "main", recorded: bool = True) -> dict[str, Any]:
+def _checkout_fixture(
+    tmp_path: Path, *, default: str = "main", recorded: bool = True,
+    decoy_main: bool = False, expected_default: str | None = None,
+) -> dict[str, Any]:
     env = dict(os.environ, GIT_CONFIG_GLOBAL=str(tmp_path / "gitconfig"), GIT_CONFIG_NOSYSTEM="1",
                GIT_TERMINAL_PROMPT="0", GIT_AUTHOR_NAME="fixture", GIT_COMMITTER_NAME="fixture",
                GIT_AUTHOR_EMAIL="fixture@example.invalid", GIT_COMMITTER_EMAIL="fixture@example.invalid")
@@ -66,12 +69,18 @@ def _checkout_fixture(tmp_path: Path, *, default: str = "main", recorded: bool =
         _git(work, env, "merge", "-q", "--no-ff", pending, "-m", "TEST_ONLY normal reviewed merge")
         _git(work, env, "push", "-q", "origin", default)
     default_tip = _git(work, env, "rev-parse", "HEAD")
+    if decoy_main:
+        assert default != "main"
+        _git(work, env, "push", "-q", "origin", f"{source}:refs/heads/main")
     reader = tmp_path / "measurement"
-    _git(tmp_path, env, "clone", "-q", str(remote), str(reader))
-    _git(reader, env, "fetch", "--no-tags", "origin", "+refs/heads/*:refs/remotes/origin/*")
+    reader.mkdir()
+    # Match actions/checkout's actual fresh setup; clone would seed origin/HEAD for us.
+    _git(reader, env, "init", "-q", str(reader))
+    _git(reader, env, "remote", "add", "origin", str(remote))
+    _git(reader, env, "-c", "protocol.version=2", "fetch", "--prune", "--no-recurse-submodules", "origin",
+         "+refs/heads/*:refs/remotes/origin/*", "+refs/tags/*:refs/tags/*")
 
-    # Model only the two supported same-repository event inputs, then execute real Git.
-    # Missing input follows context.ref+context.sha; explicit github.sha becomes SHA-only.
+    # The actual gate input selects the documented same-repository event refspec path.
     configured = _checkout_step()["with"].get("ref", "")
     assert configured in ("", "${{ github.sha }}"), "Update this bounded replay for a different checkout contract"
     ref = f"refs/heads/{default}" if not configured else ""
@@ -80,14 +89,34 @@ def _checkout_fixture(tmp_path: Path, *, default: str = "main", recorded: bool =
     if ref:
         _git(reader, env, "checkout", "-q", "-B", default, f"refs/remotes/origin/{default}")
     else:
-        _git(reader, env, "checkout", "-q", "--detach", source)
-    # No verdict stub: execute the production CLI over the resulting actual Git graph.
-    result = subprocess.run([sys.executable, str(GRADER), "stranded", str(reader)],
-                            env=env, capture_output=True, text=True)
+        _git(reader, env, "checkout", "--progress", "--force", source)
+
+    # Execute the actual trusted guard before its consumer. Event metadata is fixture data;
+    # no verdict, Git operation or default discovery is stubbed.
+    steps = yaml.safe_load(WORKFLOW.read_text())["jobs"]["gate"]["steps"]
+    guard = next(s for s in steps if "does this run record?" in s.get("name", ""))
+    assert guard["env"]["DEFAULT_BRANCH"] == "${{ github.event.repository.default_branch }}"
+    assert "${{" not in guard["run"]
+    shell = tmp_path / "actual-guard.sh"
+    shell.write_text(guard["run"])
+    event_default = default if expected_default is None else expected_default
+    guard_env = dict(env, DEFAULT_BRANCH=event_default, GITHUB_REF_NAME=event_default,
+                     GITHUB_ENV=str(tmp_path / "github-env"))
+    guard_result = subprocess.run(["bash", "-e", str(shell)], cwd=reader, env=guard_env,
+                                  capture_output=True, text=True)
+    # A failed guard stops the workflow; do not run the consumer under an invented default.
+    result = None
+    if guard_result.returncode == 0:
+        result = subprocess.run([sys.executable, str(GRADER), "stranded", str(reader)],
+                                env=env, capture_output=True, text=True)
     detached = subprocess.run(["git", "symbolic-ref", "-q", "HEAD"], cwd=reader, env=env,
                               capture_output=True).returncode == 1
-    return {"result": result, "source": source, "clock": clock, "default_tip": default_tip,
+    hint = subprocess.run(["git", "symbolic-ref", "-q", "refs/remotes/origin/HEAD"],
+                          cwd=reader, env=env, capture_output=True, text=True)
+    return {"result": result, "guard_result": guard_result, "source": source,
+            "clock": clock, "default_tip": default_tip,
             "HEAD": _git(reader, env, "rev-parse", "HEAD"), "detached": detached,
+            "default_hint": hint.stdout.strip(),
             "read_default": _git(reader, env, "rev-parse", f"refs/remotes/origin/{default}")}
 
 
@@ -101,11 +130,30 @@ def test_actual_workflow_input_keeps_recorded_default_beside_frozen_event_source
     assert replay["detached"]
 
 
-def test_actual_workflow_input_cannot_excuse_a_genuinely_missing_clock_line(tmp_path):
-    replay = _checkout_fixture(tmp_path, recorded=False)
+@pytest.mark.parametrize("default", ["main", "trunk"])
+def test_actual_workflow_input_cannot_excuse_a_genuinely_missing_clock_line(tmp_path, default):
+    replay = _checkout_fixture(tmp_path, default=default, recorded=False)
     result = replay["result"]
     assert result.returncode == 1 and "run=1" in result.stdout and "line never reached" in result.stdout
     assert replay["HEAD"] == replay["source"] == replay["read_default"]
+
+
+def test_actual_event_default_wins_over_a_decoy_main_ref(tmp_path):
+    replay = _checkout_fixture(tmp_path, default="trunk", decoy_main=True)
+    result = replay["result"]
+    assert replay["guard_result"].returncode == 0
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert replay["default_hint"] == "refs/remotes/origin/trunk"
+    assert replay["HEAD"] == replay["source"]
+    assert replay["read_default"] == replay["default_tip"] != replay["source"]
+
+
+def test_missing_event_default_ref_fails_guard_without_guessing_main(tmp_path):
+    replay = _checkout_fixture(tmp_path, default="trunk", decoy_main=True, expected_default="gone")
+    assert replay["guard_result"].returncode != 0
+    assert replay["result"] is None
+    assert replay["HEAD"] == replay["source"]
+    assert replay["read_default"] == replay["default_tip"] != replay["source"]
 
 
 @pytest.mark.parametrize("case", ["protected-main", "main-behind", "renamed-default", "feature", "forged-feature"])
