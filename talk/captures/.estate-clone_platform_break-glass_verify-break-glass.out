@@ -18,19 +18,19 @@ break-glass selfcheck: all asserts passed (read £1,868 T1 | write £53,469 T2 |
 == offline: alternate assurance-band input ==
 .....
 ----------------------------------------------------------------------
-Ran 5 tests in 1.403s
+Ran 5 tests in 1.392s
 
 OK
 == offline: independence from the legacy operation selector ==
 ...
 ----------------------------------------------------------------------
-Ran 3 tests in 15.123s
+Ran 3 tests in 15.223s
 
 OK
 == offline: explicit party assurance policies and shared input validation ==
 ................
 ----------------------------------------------------------------------
-Ran 16 tests in 4.255s
+Ran 16 tests in 4.373s
 
 OK
 verify-break-glass: done (offline; rides on the access plane — see ../access/verify-access.sh for the live IAP checks)
