@@ -192,7 +192,7 @@ def _mixed_sums(node, path, inherited, found):
 def check_doc(doc, ctx):
     """Grade one adopter's evidence document. `ctx` carries the facts read off the estate:
     adopter, parties, customers (party -> size.customers or None), forward_intel (bool),
-    policy_version (str or None) and policy_version_source."""
+    inherits (the adopter's declared edges), policy_version (str or None) and policy_version_source."""
     who = ctx["adopter"]
     prices = doc.get("prices")
     if not isinstance(prices, list) or not prices:
@@ -464,9 +464,29 @@ def check_doc(doc, ctx):
     # holes[]; they are graded by the legs above and by verify/supersede/ (eco-system
     # ticket 127). A regime entry the composer could not price is the SKIP leg 1 printed.
     regimes = [e for e in prices if e.get("source") == "ico" and e.get("kind") == "feed"]
-    if not regimes:
-        out("PASS", f"{who}: declares no ico regime edge, so there is no hole breakdown to "
-                    f"check (named absence)")
+    inherits = ctx.get("inherits")
+    if not isinstance(inherits, list) or any(
+            not isinstance(edge, dict)
+            or any(not isinstance(edge.get(field), str) or not edge[field]
+                   for field in ("party", "version"))
+            or edge.get("kind") not in ("controls", "implementations", "feed")
+            or (edge.get("kind") == "feed"
+                and (not isinstance(edge.get("name"), str) or not edge["name"]))
+            for edge in inherits):
+        out("FAIL", f"{who}: declared parent edges are missing or malformed, so absence of an ico "
+                    f"regime price cannot be established")
+    else:
+        names = [edge.get("name") for edge in inherits
+                 if edge.get("party") == "ico" and edge.get("kind") == "feed"]
+        for name in sorted(set(names)):
+            expected = names.count(name)
+            found = sum(e.get("name") == name for e in regimes)
+            if found != expected:
+                out("FAIL", f"{who}: declares {expected} ico feed edge(s) named {name}, "
+                            f"but evidence carries {found} matching regime feed price(s)")
+        if not regimes and not names:
+            out("PASS", f"{who}: declares no ico regime edge, so there is no hole breakdown to "
+                        f"check (named absence)")
     for e in regimes:
         if amount_of(e) is None and e.get("could_not_look"):
             continue
@@ -1613,6 +1633,7 @@ def run(estate):
         version, source = _policy_version(estate, name)
         publishes = parties[name].get("publishes") or []
         check_doc(doc, {
+            "inherits": parties[name].get("inherits"),
             "regime_weights": _regime_weights(estate, parties, parties[name]),
             "agent_register": _agent_register(estate, parties, name, parties[name]),
             "agent_reach": _agent_reach(os.path.join(estate, name), doc.get("prices") or []),
@@ -1651,6 +1672,8 @@ def _good():
     }
     ctx = {"adopter": "driftwood", "parties": {"driftwood", "ico", "nist", "platform"},
            "customers": {"driftwood": 100}, "forward_intel": True,
+           # TEST_ONLY selfcheck: the fixture's ICO price corresponds to this declared pin.
+           "inherits": [{"party": "ico", "kind": "feed", "name": "penalty-schema", "version": "v3"}],
            "regime_weights": {"version": "v3", "available": True},
            # eco-system ticket 145: what the estate serves for the agent-cage line to be
            # measured against -- the pinned register's row and the hub gate's own schedule

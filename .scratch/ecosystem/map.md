@@ -23,6 +23,7 @@ Every joint in [NORTH-STAR.md](../../NORTH-STAR.md) §4 (regulator publishes; Re
 - The twin's model call runs inside Claude Code on the owner's machine, on a local clock (ticket 92), because no tokens exist elsewhere (ticket 75 Q10).
 
 ## Decisions so far
+- [165 — A declared ICO feed must have a regime price](issues/165-a-declared-ico-feed-must-have-a-regime-price.md) — privately verified software capability, 2026-10-26: the Pound document grader compares named ICO feed prices with actual declared edges, preserves true no-subscription absence and explicit could-not-look, and cannot substitute switching/supersede entries. Pure caller-level RED/GREEN and original-source restoration hold the boundary; ordinary source delivery and genuine estate evidence remain separate.
 
 <!-- one line per closed ticket -->
 - [164 — The six skills state the basis they actually use](issues/164-the-six-skills-state-the-basis-they-actually-use.md) — privately verified software capability, 2026-10-26: actual decision traces reach the existing evaluator for all six skills/seven metrics while raw answers, corpus facts, scorers and permission boundaries are conserved. Fitted corpora remain basis-less and not measurable; authentic independent labels, review and public delivery remain separate.
