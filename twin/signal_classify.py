@@ -40,8 +40,10 @@ from .fixtures import (
 )
 from .model import Overlay
 from .repo import ModelRepo
+from .skills import Stated
 
 SKILL = "signal-classify"
+_CLAIM_GRADE = 5
 
 
 class SignalClassifyError(RuntimeError):
@@ -53,6 +55,7 @@ class SignalClassifyError(RuntimeError):
 # `toy_classifier` is fitted to its own five-item corpus — the point is the harness, not the
 # classifier (see module docstring).
 _POLITICAL_KEYWORDS = ("liquidation", "bafin", "administrative act")
+_DEFAULT_STEEP = "economic"
 
 # Common function words, excluded so two candidates that merely share "the" or "and" don't
 # outscore the one that actually shares the subject matter — a real gap the multi-candidate
@@ -68,10 +71,19 @@ def _tokens(*texts: str) -> set[str]:
 
 
 def _steep(statement: str, source: str) -> str:
+    return _steep_rule(statement, source)[0]
+
+
+def _steep_rule(statement: str, source: str) -> tuple[str, list[str]]:
     haystack = f"{statement} {source}".lower()
-    result = "political" if any(keyword in haystack for keyword in _POLITICAL_KEYWORDS) else "economic"
+    matched = [keyword for keyword in _POLITICAL_KEYWORDS if keyword in haystack]
+    result = "political" if matched else _DEFAULT_STEEP
     assert result in schema.STEEP  # the domain type this answers into, not re-typed here
-    return result
+    return result, matched
+
+
+def _overlap(statement: str, source: str, candidate: dict[str, str]) -> list[str]:
+    return sorted(_tokens(statement, source) & _tokens(candidate["id"].replace("-", " "), candidate.get("name", "")))
 
 
 def best_match(statement: str, source: str, candidates: list[dict[str, str]]) -> tuple[dict[str, str], int]:
@@ -83,11 +95,8 @@ def best_match(statement: str, source: str, candidates: list[dict[str, str]]) ->
     empty overlap is still a choice — but a score of zero means nothing about the current
     candidate set actually bears on the signal.
     """
-    signal_tokens = _tokens(statement, source)
-
     def score(candidate: dict[str, str]) -> int:
-        candidate_tokens = _tokens(candidate["id"].replace("-", " "), candidate.get("name", ""))
-        return len(signal_tokens & candidate_tokens)
+        return len(_overlap(statement, source, candidate))
 
     best = max(candidates, key=score)
     return best, score(best)
@@ -108,6 +117,16 @@ def classify(payload: dict[str, Any]) -> dict[str, Any]:
     `evidence_grade` is a literal `5` — there is no parameter on this function that can set it to
     anything else, so a caller cannot ask the skill to self-assert a higher grade.
     """
+    return _classify(payload)[0]
+
+
+def classify_stated(payload: dict[str, Any]) -> Stated:
+    """The same decision with checkable rule/source witnesses; no independent label is implied."""
+    answer, basis = _classify(payload)
+    return Stated(answer, basis)
+
+
+def _classify(payload: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     missing = [field for field in ("statement", "source", "candidates") if field not in payload]
     if missing:
         raise SignalClassifyError(f"{SKILL}: payload declares no {', '.join(missing)}")
@@ -116,15 +135,30 @@ def classify(payload: dict[str, Any]) -> dict[str, Any]:
     candidates = payload["candidates"]
     if not candidates:
         raise SignalClassifyError(f"{SKILL}: no candidate components to bind to")
-    return {
-        "steep": _steep(statement, source),
+    overlaps = [{"id": c["id"], "name": c.get("name", ""), "tokens": _overlap(statement, source, c)} for c in candidates]
+    # The selected overlap supplies BOTH the actual binding and its trace. Zero overlap and
+    # first-in-order ties remain disclosed heuristic defaults, never corroborated evidence.
+    chosen = max(overlaps, key=lambda c: len(c["tokens"]))
+    steep, matched = _steep_rule(statement, source)
+    answer = {
+        "steep": steep,
         "claim": {
             "kind": "binding",
-            "component": _bind(statement, source, candidates),
-            "evidence_grade": 5,
+            "component": chosen["id"],
+            "evidence_grade": _CLAIM_GRADE,
             "claimed_by": f"{SKILL} (skill)",
             "evidence": "automated STEEP tag and component binding from the signal's own statement and source",
         },
+    }
+    return answer, {
+        "method": "signal-keywords-and-overlap/v1",
+        "signal": {"statement": statement, "source": source},
+        "steep_keywords": matched,
+        "steep_default": _DEFAULT_STEEP,
+        "steep_default_used": not matched,
+        "claim_grade_rule": {"kind": "fixed model assertion", "value": _CLAIM_GRADE},
+        "candidate_overlaps": overlaps,
+        "binding_rule": "first maximum token overlap",
     }
 
 

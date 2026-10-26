@@ -30,7 +30,7 @@ import argparse
 from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from typing import Any, Callable
 
 from . import TOOL_VERSION
 from .canon import digest_of
@@ -49,27 +49,47 @@ from .skills import EvalResult, evaluate, record_score
 HEURISTIC_MODEL_VERSION = f"heuristic-{TOOL_VERSION}"
 
 
-# One row per metric: the skill name, the function under test, how its corpus is built, and the
+# One row per metric: name, raw answer function, stated evaluation function, corpus, and the
 # scorer. Walked by `_evaluate_all()` below and by `corpus_facts()`, so the corpus a permission
 # is derived from is the same corpus the score was recorded on — two lists would drift.
-_SPECS: tuple[tuple[str, Any, Any, Any], ...] = (
-    (sc.SKILL, sc.classify, lambda d: sc.labelled_corpus(d / "signal-classify"), sc.scorer),
-    (ej.SKILL, ej.judge, lambda d: ej.labelled_corpus(d / "evolution-judge"), ej.scorer),
-    (cc.SKILL, cc.propose, lambda d: cc.labelled_corpus(d / "causal-claims"), cc.scorer),
-    (cc.GRADE_SKILL, cc.propose, lambda d: cc.labelled_corpus(d / "causal-claims-grade"), cc.grade_scorer),
-    (gl.SKILL, gl.propose, lambda d: gl.labelled_corpus(d / "gameplay-lens"), gl.scorer),
-    (sg.SKILL, sg.generate_from_recipe_yaml, lambda d: sg.labelled_corpus(), sg.scorer),
-    (eg.SKILL, eg.admit, lambda d: eg.labelled_corpus(), eg.scorer),
+_SPECS: tuple[tuple[str, Any, Any, Any, Any], ...] = (
+    (sc.SKILL, sc.classify, sc.classify_stated, lambda d: sc.labelled_corpus(d / "signal-classify"), sc.scorer),
+    (ej.SKILL, ej.judge, ej.judge_stated, lambda d: ej.labelled_corpus(d / "evolution-judge"), ej.scorer),
+    (cc.SKILL, cc.propose, cc.propose_stated, lambda d: cc.labelled_corpus(d / "causal-claims"), cc.scorer),
+    (cc.GRADE_SKILL, cc.propose, cc.propose_stated, lambda d: cc.labelled_corpus(d / "causal-claims-grade"), cc.grade_scorer),
+    (gl.SKILL, gl.propose, gl.propose_stated, lambda d: gl.labelled_corpus(d / "gameplay-lens"), gl.scorer),
+    (sg.SKILL, sg.generate_from_recipe_yaml, sg.generate_from_recipe_yaml_stated, lambda d: sg.labelled_corpus(), sg.scorer),
+    (eg.SKILL, eg.admit, eg.admit_stated, lambda d: eg.labelled_corpus(), eg.scorer),
 )
 
 METRICS: tuple[str, ...] = tuple(spec[0] for spec in _SPECS)
+
+
+def raw_skill(skill: str) -> Callable[[Any], Any]:
+    """Original answer API, including the reference answers used by permission baselines."""
+    for name, raw, _, _, _ in _SPECS:
+        if name == skill:
+            return raw
+    raise KeyError(f"no metric named {skill!r}; have {', '.join(METRICS)}")
+
+
+def evaluation_skill(skill: str) -> Callable[[Any], Any]:
+    """Actual stated callable for `evaluate(skill, ..., separately_supplied_corpus)`.
+
+    A trace alone does not authenticate a corpus label. Fitted corpora remain unchanged and
+    basis-less, so their metrics remain not measurable and grant no model permission.
+    """
+    for name, _, stated, _, _ in _SPECS:
+        if name == skill:
+            return stated
+    raise KeyError(f"no metric named {skill!r}; have {', '.join(METRICS)}")
 
 
 def _evaluate_all(tmp_dir: Path) -> list[EvalResult]:
     """Every real skill's own honest `evaluate()` call, against a fixture repository built fresh
     in `tmp_dir` exactly the way each per-skill harness guard already builds its own — the same
     corpus, scored the same way, only actually recorded this time."""
-    return [evaluate(skill, fn, build(tmp_dir), scorer=scorer) for skill, fn, build, scorer in _SPECS]
+    return [evaluate(skill, stated, build(tmp_dir), scorer=scorer) for skill, _, stated, build, scorer in _SPECS]
 
 
 def fitted_models() -> dict[str, str]:
@@ -102,7 +122,7 @@ def corpus_facts(skill: str) -> dict[str, Any]:
     """
     from . import model_permission as mp
 
-    for name, fn, build, scorer in _SPECS:
+    for name, fn, _, build, scorer in _SPECS:
         if name != skill:
             continue
         with TemporaryDirectory() as tmp:

@@ -65,6 +65,7 @@ import yaml
 
 from . import PACKAGE_DIR
 from .sign import role_ids
+from .skills import Stated
 
 SKILL = "ethics-gate"
 
@@ -153,39 +154,43 @@ def _intrusiveness(kind: str, level: str) -> tuple[int, int]:
     return (_KIND_RANK[kind], _LEVEL_RANK[level])
 
 
-def _check_purpose(rung: dict[str, Any]) -> tuple[bool, str]:
+def _check_purpose(rung: dict[str, Any]) -> tuple[bool, str, dict[str, Any]]:
     scenario = str(rung.get("scenario") or "").strip()
     will_act = bool(rung.get("will_act"))
+    readings = {"scenario": scenario, "will_act": will_act}
     if not scenario:
-        return False, "no named scenario consumes this sensor — a sensor feeding nothing is surveillance for its own sake"
+        return False, "no named scenario consumes this sensor — a sensor feeding nothing is surveillance for its own sake", readings
     if not will_act:
-        return False, f"a scenario ({scenario!r}) is named but nobody will act on what this sensor feeds it"
-    return True, f"scenario {scenario!r} consumes this sensor and will be acted on"
+        return False, f"a scenario ({scenario!r}) is named but nobody will act on what this sensor feeds it", readings
+    return True, f"scenario {scenario!r} consumes this sensor and will be acted on", readings
 
 
-def _check_necessity(rung: dict[str, Any]) -> tuple[bool, str]:
+def _check_necessity(rung: dict[str, Any]) -> tuple[bool, str, dict[str, Any]]:
     chosen_kind, chosen_level = str(rung["kind"]), str(rung["level"])
     chosen = _intrusiveness(chosen_kind, chosen_level)
     alternatives = rung.get("alternatives") or []
+    readings: dict[str, Any] = {"kind": chosen_kind, "level": chosen_level, "alternatives_checked": []}
     for alt in alternatives:
         alt_kind, alt_level = str(alt["kind"]), str(alt["level"])
+        readings["alternatives_checked"].append({"kind": alt_kind, "level": alt_level})
         if _intrusiveness(alt_kind, alt_level) < chosen:
             return False, (
                 f"a less intrusive route exists ({alt_kind}/{alt_level}) that answers the same "
                 f"question as {chosen_kind}/{chosen_level} — prefer structural over behavioural, "
                 "aggregate over individual, cohort over person"
-            )
+            ), readings
     return True, (
         f"no less intrusive alternative among {len(alternatives)} considered outranks "
         f"{chosen_kind}/{chosen_level}"
-    )
+    ), readings
 
 
-def _check_proportionality(rung: dict[str, Any]) -> tuple[bool, str]:
+def _check_proportionality(rung: dict[str, Any]) -> tuple[bool, str, dict[str, Any]]:
     cost, value = float(rung["intrusion_cost"]), float(rung["value_illuminated"])
+    readings = {"intrusion_cost": cost, "value_illuminated": value}
     if value <= cost:
-        return False, f"the illuminated value ({value}) does not outweigh the intrusion imposed ({cost})"
-    return True, f"the illuminated value ({value}) outweighs the intrusion imposed ({cost})"
+        return False, f"the illuminated value ({value}) does not outweigh the intrusion imposed ({cost})", readings
+    return True, f"the illuminated value ({value}) outweighs the intrusion imposed ({cost})", readings
 
 
 _RUNG_CHECKS = {"purpose": _check_purpose, "necessity": _check_necessity, "proportionality": _check_proportionality}
@@ -202,17 +207,23 @@ def walk_ladder(payload: dict[str, Any]) -> dict[str, Any]:
     each carrying a non-empty `justification` — the recorded reason this ticket's own checklist
     asks for, on both a pass and a fail.
     """
+    return _walk_ladder(payload)[0]
+
+
+def _walk_ladder(payload: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     missing = [f for f in _RUNGS if f not in payload]
     if missing:
         raise EthicsGateError(f"{SKILL}: payload declares no {', '.join(missing)}")
     rungs: list[dict[str, Any]] = []
+    checks = []
     for rung in _RUNGS:
-        passed, justification = _RUNG_CHECKS[rung](payload[rung])
+        passed, justification, readings = _RUNG_CHECKS[rung](payload[rung])
+        checks.append({"rung": rung, "readings": readings})
         rungs.append({"rung": rung, "passed": passed, "justification": justification})
         if not passed:
             break
     admitted = len(rungs) == len(_RUNGS) and all(r["passed"] for r in rungs)
-    return {"admitted": admitted, "stopped_at": None if admitted else rungs[-1]["rung"], "rungs": tuple(rungs)}
+    return {"admitted": admitted, "stopped_at": None if admitted else rungs[-1]["rung"], "rungs": tuple(rungs)}, checks
 
 
 # -- the DPIA triage (research 05 Part B.2, the ICO's 2023 monitoring guidance) -----------------
@@ -230,11 +241,16 @@ def dpia_triage(payload: dict[str, Any]) -> dict[str, Any]:
     actually been *done*; `admit()` below is where a mandatory-but-incomplete DPIA blocks
     admission. Triage names why a DPIA is mandatory; it is not the DPIA itself.
     """
+    return _dpia_triage(payload)[0]
+
+
+def _dpia_triage(payload: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     channels = {str(c) for c in (payload.get("channels") or [])}
+    profiling, financial_loss_risk = bool(payload.get("profiling")), bool(payload.get("financial_loss_risk"))
     triggers = sorted(channels & set(_DPIA_CHANNEL_TRIGGERS))
-    if payload.get("profiling"):
+    if profiling:
         triggers.append("profiling")
-    if payload.get("financial_loss_risk"):
+    if financial_loss_risk:
         triggers.append("financial_loss_risk")
     return {
         "mandatory": bool(triggers),
@@ -243,7 +259,7 @@ def dpia_triage(payload: dict[str, Any]) -> dict[str, Any]:
             "ICO Employment Practices guidance, Monitoring workers (2023); UK GDPR Art. 35; "
             "DPA 2018 — research 05 Part B.2"
         ),
-    }
+    }, {"channels": sorted(channels), "profiling": profiling, "financial_loss_risk": financial_loss_risk}
 
 
 # -- the full skill: ladder + DPIA gate together (decision ticket 15's own "operational gate") --
@@ -269,6 +285,16 @@ def admit(payload: dict[str, Any]) -> dict[str, Any]:
     criterion here asks for this to be committed into a model repository, the same limit
     `gameplay_lens.propose()`'s own claim-shaped output states.
     """
+    return _admit(payload)[0]
+
+
+def admit_stated(payload: dict[str, Any]) -> Stated:
+    """State actual walked readings/table rules; neither source authenticity nor normative truth is asserted."""
+    answer, basis = _admit(payload)
+    return Stated(answer, basis)
+
+
+def _admit(payload: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     missing = [f for f in ("sensor", *_RUNGS, "dpia") if f not in payload]
     if missing:
         raise EthicsGateError(f"{SKILL}: payload declares no {', '.join(missing)}")
@@ -279,8 +305,8 @@ def admit(payload: dict[str, Any]) -> dict[str, Any]:
             f"{SKILL}: {sensor_id!r} is not a named sensor (have: {', '.join(known)}) — "
             f"{SENSOR_TABLE_PATH.name} is the closed table, not any string a payload proposes"
         )
-    ladder = walk_ladder({rung: payload[rung] for rung in _RUNGS})
-    triage = dpia_triage(payload["dpia"])
+    ladder, checks = _walk_ladder({rung: payload[rung] for rung in _RUNGS})
+    triage, dpia_readings = _dpia_triage(payload["dpia"])
     dpia_complete = bool(payload["dpia"].get("complete"))
     dpia_satisfied = (not triage["mandatory"]) or dpia_complete
     admitted = ladder["admitted"] and dpia_satisfied
@@ -295,7 +321,7 @@ def admit(payload: dict[str, Any]) -> dict[str, Any]:
     else:
         reason = "the ladder passed and no outstanding DPIA gate blocks admission"
 
-    return {
+    answer = {
         "admitted": admitted,
         "ladder": ladder,
         "dpia": {**triage, "complete": dpia_complete, "satisfied": dpia_satisfied},
@@ -306,6 +332,18 @@ def admit(payload: dict[str, Any]) -> dict[str, Any]:
             "claimed_by": f"{SKILL} (skill)",
             "evidence": reason,
         },
+    }
+    table = load_sensors()
+    row = next(r for r in table["sensors"] if str(r["sensor"]) == sensor_id)
+    return answer, {
+        "method": "sensor-ladder-and-dpia/v1",
+        "sensor_table": {"schema": table["schema"], "version": table.get("version"),
+                         "row": {k: row[k] for k in SENSOR_REQUIRED}},
+        "rung_checks": checks,
+        "ladder_rules": {"order": list(_RUNGS), "kind_rank": dict(_KIND_RANK), "level_rank": dict(_LEVEL_RANK),
+                         "proportionality": "value must exceed intrusion cost"},
+        "dpia_readings": {**dpia_readings, "complete": dpia_complete},
+        "dpia_channel_triggers": list(_DPIA_CHANNEL_TRIGGERS),
     }
 
 

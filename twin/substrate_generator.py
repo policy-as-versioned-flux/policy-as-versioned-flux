@@ -46,6 +46,7 @@ import random
 from typing import Any
 
 from .substrate import SubstrateRecipe, generate_deterministic
+from .skills import Stated
 
 SKILL = "substrate-generator"
 
@@ -102,6 +103,10 @@ def generate(recipe: SubstrateRecipe, lines_per_channel: int = LINES_PER_CHANNEL
     reproduces byte-for-byte — `random.Random(recipe.seed)` and `generate_deterministic`
     (ticket 48) are the only sources of variation, and neither draws external entropy.
     """
+    return _generate(recipe, lines_per_channel)[0]
+
+
+def _generate(recipe: SubstrateRecipe, lines_per_channel: int) -> tuple[dict[str, Any], dict[str, Any]]:
     if lines_per_channel < 1:
         raise SubstrateGeneratorError(f"{SKILL}: lines_per_channel must be at least 1")
     if len(recipe.templates) < len(CHANNELS):
@@ -128,6 +133,7 @@ def generate(recipe: SubstrateRecipe, lines_per_channel: int = LINES_PER_CHANNEL
 
     channels: dict[str, list[str]] = {}
     plants: list[dict[str, Any]] = []
+    channel_recipes = []
     for i, channel in enumerate(CHANNELS):
         pool = tuple(templates_by_channel[channel])
         channel_recipe = _channel_recipe(recipe, i, channel, pool)
@@ -140,13 +146,22 @@ def generate(recipe: SubstrateRecipe, lines_per_channel: int = LINES_PER_CHANNEL
             lines.insert(index, f"[{focus}] {plant}")
             plants.append({"channel": channel, "index": index, "signal": plant})
         channels[channel] = lines
+        channel_recipes.append({"channel": channel, "seed": channel_recipe.seed,
+                                "templates": list(pool), "plant_index": lines_per_channel // 2 if plant is not None else None})
 
-    return {
+    answer = {
         "recipe_id": recipe.id,
         "focus_entity": focus,
         "channels": channels,
         "plants": plants,
         "resolution": RESOLUTION,
+    }
+    return answer, {
+        "method": "deterministic-recipe-generation/v1",
+        "recipe": {"id": recipe.id, "seed": recipe.seed, "model_version": recipe.model_version,
+                   "templates": list(recipe.templates), "planted_signals": list(recipe.planted_signals)},
+        "focus_rule": "seeded choice from declared focus pool", "focus_pool": list(FOCUS_POOL),
+        "focus_entity": focus, "lines_per_channel": lines_per_channel, "channel_recipes": channel_recipes,
     }
 
 
@@ -156,6 +171,12 @@ def generate_from_recipe_yaml(text: str) -> dict[str, Any]:
     (build ticket 48) is the existing text form, reused rather than inventing a second one only
     for the harness."""
     return generate(SubstrateRecipe.from_yaml(text))
+
+
+def generate_from_recipe_yaml_stated(text: str) -> Stated:
+    """Expose actual recipe/seed/plant-placement witnesses; this proves mechanics, not realism."""
+    answer, basis = _generate(SubstrateRecipe.from_yaml(text), LINES_PER_CHANNEL)
+    return Stated(answer, basis)
 
 
 def scorer(actual: dict[str, Any], expected: dict[str, Any]) -> bool:
