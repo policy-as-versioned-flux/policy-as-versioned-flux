@@ -133,6 +133,9 @@ class CloudClockSelection(unittest.TestCase):
             git('-c', 'commit.gpgsign=false', '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid',
                 'commit', '--allow-empty', '-qm', 'local selector fixture')
             git('remote', 'add', 'origin', str(repo)) # filesystem only; the real nondefault guard fetches
+            # The real checkout fetches the default tracking ref before this guard.
+            git('-c', 'protocol.version=2', 'fetch', '--prune', '--no-recurse-submodules', 'origin',
+                '+refs/heads/*:refs/remotes/origin/*', '+refs/tags/*:refs/tags/*')
             for branch in ('trunk', 'preview'):
                 env_file = repo / ('env-' + branch)
                 env = dict(os.environ, DEFAULT_BRANCH='trunk', GITHUB_REF_NAME=branch, GITHUB_ENV=str(env_file))

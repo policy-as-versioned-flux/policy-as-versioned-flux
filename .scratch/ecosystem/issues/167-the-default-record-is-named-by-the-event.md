@@ -66,3 +66,28 @@ that PASS nor these TEST_ONLY controls proves hosted renamed-default execution o
 capability. Normal reviewed source delivery, configured CI and a genuine primary containing
 167 remain separate. The unchanged reader's Git-history check ownership still belongs to
 ticket100; naming the check does not manufacture a PASS or transfer that ownership.
+
+## First configured CI and fixture follow-up
+
+**Follow-up, 2026-10-26.** Public source074adc5e was published through PR279 on accepted
+observation-only basee3411606. Its original configured CI40403152221/attempt1 completed with
+3,535 PASS, 267 passed subtests, 24 SKIP and 2 FAIL: the retained historical coverage-floor
+failure and a new cloud-selector fixture failure. Invariants retain 72 PASS / 1 historical
+FAIL / 2 SKIP; the other six jobs succeeded. This original failure is not rerun or relabelled.
+
+The cloud-selector test initialized a local trunk repository and self-remote but never fetched
+its default tracking ref before invoking the actual guard. The default-path guard correctly
+failed at the explicit-ref check with exit128, "Needed a single revision". Adding only the
+actual checkout-equivalent full heads/tags fetch to that local fixture lets both guards pass
+and preserves all 12 selector cases and 24 prepare/cleanup assertions, source HEAD and the
+default tip. The fixture now performs that real filesystem-only fetch before the guard;
+no guard, reader, selector, permission, cage, controller or expected assertion is changed.
+
+The exact failing node was RED before the edit, the whole cloud-contract file passes
+13 tests and 53 subtests, and test-file typing passes. Restoring only the original fixture
+reproduces the same exit128 failure; the corrected fixture is restored exactly. The prior
+81-test source capability proof is retained without a new run or change to its tested workflow,
+reader or checkout test bytes. This follow-up changes only fixture setup and this dated record.
+Its normal fast-forward publication, new configured CI and a genuine primary containing167
+remain separate; original466, genuine pre167 run468 and all observation/capture bytes remain
+unchanged. These local fixtures run no hosted Action, Kind/provider, financial replay or signer.
