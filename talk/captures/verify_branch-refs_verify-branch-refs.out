@@ -44,7 +44,7 @@ PASS: ludlow/shift-left.yml checks out policy-as-versioned-ico/ico at the tag lu
 PASS: ludlow/shift-left.yml checks out policy-as-versioned-feeds/feeds at the tag ludlow pins it to (fx/v2.0.0, recovery-expense/v1.0.0)
 PASS: ludlow/twin-sweep.yml checks out policy-as-versioned-flux/policy-as-versioned-flux at the literal tag twin/v0.1.0
 PASS: ludlow/twin-sweep.yml checks out policy-as-versioned-feeds/feeds at the tag ludlow pins it to (fx/v2.0.0, recovery-expense/v1.0.0)
-FAIL: platform/cloud-release.yml checks out policy-as-versioned-flux/policy-as-versioned-flux at a computed ref, and nothing in platform declares which version of flux it is on -- no GitRepository pin under gitops/, no FLUX_TAG in this workflow and no flux entry in its party.yaml inherits[]
+PASS: platform/cloud-release.yml checks out policy-as-versioned-flux/policy-as-versioned-flux at the literal tag twin/v0.1.0
 PASS: tuppence/cut-release.yml checks out policy-as-versioned-platform/platform at the tag tuppence pins it to (cloud/v1.0.1, v5.0.0)
 PASS: tuppence/cut-release.yml checks out policy-as-versioned-nist/nist at the tag tuppence pins it to (v1.1.0)
 PASS: tuppence/cut-release.yml checks out policy-as-versioned-ico/ico at the tag tuppence pins it to (v3.0.0)
@@ -62,4 +62,4 @@ PASS: tuppence/shift-left.yml checks out policy-as-versioned-nist/nist at the ta
 PASS: tuppence/shift-left.yml checks out policy-as-versioned-ico/ico at the tag tuppence pins it to (v3.0.0)
 PASS: tuppence/shift-left.yml checks out policy-as-versioned-feeds/feeds at the tag tuppence pins it to (fx/v1.1.0, recovery-expense/v1.0.0)
 PASS: tuppence/twin-sweep.yml checks out policy-as-versioned-flux/policy-as-versioned-flux at the literal tag twin/v0.1.0
-FAIL: 1 cross-organisation checkout(s) are not pinned to a signed tag: platform/cloud-release.yml checks out policy-as-versioned-flux/policy-as-versioned-flux at a computed ref, and nothing in platform declares which version of flux it is on -- no GitRepository pin under gitops/, no FLUX_TAG in this workflow and no flux entry in its party.yaml inherits[]
+PASS: every cross-organisation checkout in the estate names a tag its own repository pins, and every one of those tags is signed on the publisher's remote (64 checkout(s))

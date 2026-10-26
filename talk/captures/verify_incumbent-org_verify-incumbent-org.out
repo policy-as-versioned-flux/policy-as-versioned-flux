@@ -9,10 +9,10 @@ PASS: ledger: forge names new owner policy-as-versioned-tuppence
 PASS: storefront: forge names new owner policy-as-versioned-driftwood
 PASS: api: forge names new owner policy-as-versioned-driftwood
 PASS: reports: forge names new owner policy-as-versioned-ludlow
-LIMIT: c2p-collector: row passes; archive has not been performed
+PASS: c2p-collector: archived and its current prerequisite passes
 PASS: datastore: archived and its current prerequisite passes
 PASS: cloud: archived and its current prerequisite passes
-LIMIT: governance-agent: row passes; archive has not been performed
-LIMIT: policy: row passes; archive has not been performed
-LIMIT: fleet: row passes; archive has not been performed
+PASS: governance-agent: archived and its current prerequisite passes
+PASS: policy: archived and its current prerequisite passes
+PASS: fleet: archived and its current prerequisite passes
 PASS: anonymous OCI manifest read ghcr.io/policy-as-versioned-flux/readiness-collector:v1.0.0: HTTP 200

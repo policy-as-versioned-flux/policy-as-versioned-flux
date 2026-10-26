@@ -13,7 +13,7 @@ OK
 == release signing caller: embedded proof requested, signer refuses ==
 .
 ----------------------------------------------------------------------
-Ran 1 test in 0.024s
+Ran 1 test in 0.026s
 
 OK
 == envelope schema: /home/runner/work/policy-as-versioned-flux/policy-as-versioned-flux/.estate-clone/feeds/../platform/feeds/schema.json ==
@@ -100,12 +100,12 @@ ok  2026-05-14 refuses: MISSING INSTRUMENT: no fx rate published for 2026-05-14:
 == the threat register publishes its own magnitudes, and ships the converter that reads them ==
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 2.832s
+Ran 9 tests in 2.704s
 
 OK
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 1.223s
+Ran 10 tests in 1.228s
 
 OK
 ok  12 (version, institution) scenarios; 6 price a magnitude the PUBLISHER published, 6 price the frozen table and say so by name

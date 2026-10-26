@@ -1,11 +1,11 @@
 .........................
 ----------------------------------------------------------------------
-Ran 25 tests in 11.024s
+Ran 25 tests in 11.330s
 
 OK
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 1.475s
+Ran 10 tests in 1.462s
 
 OK
 PASS: publisher reliability report recomputes and labelled synthetic provenance/scoring controls hold; no publisher-price accuracy was measured
