@@ -23,6 +23,7 @@ Every joint in [NORTH-STAR.md](../../NORTH-STAR.md) §4 (regulator publishes; Re
 - The twin's model call runs inside Claude Code on the owner's machine, on a local clock (ticket 92), because no tokens exist elsewhere (ticket 75 Q10).
 
 ## Decisions so far
+- [166 — The orphan check must observe the default record](issues/166-the-orphan-check-must-observe-the-default-record.md) — privately verified source capability, 2026-10-26: gate checkout detaches at the exact event SHA while retaining the fetched default record for the unchanged orphan checker. Actual-public-object and workflow-input Git replays preserve the measurement, missing-line failure and reviewed delivery boundaries; original 464/466 grades remain unchanged. External Action execution, normal source delivery and a later primary are separate.
 - [165 — A declared ICO feed must have a regime price](issues/165-a-declared-ico-feed-must-have-a-regime-price.md) — privately verified software capability, 2026-10-26: the Pound document grader compares named ICO feed prices with actual declared edges, preserves true no-subscription absence and explicit could-not-look, and cannot substitute switching/supersede entries. Pure caller-level RED/GREEN and original-source restoration hold the boundary; ordinary source delivery and genuine estate evidence remain separate.
 
 <!-- one line per closed ticket -->
