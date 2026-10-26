@@ -26,7 +26,31 @@ fi
 log="$(mktemp)"; "$PY" "$HERE/pound_seam.py" check | tee "$log"; rc=${PIPESTATUS[0]}
 case $rc in
   0) echo "PASS: every price names its perspective, currency, source and per-customer share; no sum crosses either; and wherever a party publishes both a selection-policy package and composed evidence, the two selection engines agree";;
-  3) echo "SKIP: $(grep '^SKIP:' "$log" | head -1 | cut -c7-)";;
+  3)
+    # The outer truth gate judges only our final line. Keep that compact summary
+    # only after the same manifest judge has accepted EVERY reason, in any order.
+    first_skip=""
+    while IFS= read -r line || [ -n "$line" ]; do
+      case "$line" in
+        SKIP:*)
+          [ -n "$first_skip" ] || first_skip="$line"
+          "$PY" "$ROOT/talk/truth_manifest.py" judge "$ROOT/talk/verify-manifest.txt" \
+            verify/pound-seam/verify-pound-seam.sh "$line" || rc=1
+          ;;
+      esac
+    done < "$log"
+    if [ -z "$first_skip" ]; then
+      echo "FAIL: £-seam child exited 3 without a SKIP reason"
+      rc=1
+    elif grep -q '^FAIL:' "$log"; then
+      echo "FAIL: £-seam child reported a failure despite exiting 3"
+      rc=1
+    elif [ "$rc" -ne 3 ]; then
+      echo "FAIL: a £-seam SKIP reason is undeclared or could not be judged"
+    else
+      printf '%s\n' "$first_skip"
+    fi
+    ;;
   *) echo "FAIL: $(grep -c '^FAIL:' "$log") £-seam check(s) observed false";;
 esac
 rm -f "$log"; exit "$rc"
