@@ -197,8 +197,10 @@ jobs:
       # verify/can-record/verify-can-record.sh grades that every recorded line came from the
       # clock commit naming the same run; and see the other branches at all, which is how the
       # same script finds a clock line stranded on a branch that merged without it.
+      # Detach at the measured event SHA without rewinding the fetched default ref.
+      # The orphan check reads that current record as data beside the frozen source.
       - uses: actions/checkout@v4
-        with: {persist-credentials: false, fetch-depth: 0}
+        with: {persist-credentials: false, fetch-depth: 0, ref: '${{ github.sha }}'}
 
       # --- the clock says what it can record, before it measures (ticket 100) -------------------
       # Until 2026-09-05 this workflow wrote its TRUTH line, committed it, rebased and pushed on
