@@ -110,7 +110,28 @@ def decayed_on(signal_date: str, path: Path | None = None) -> str:
     threshold = float(doc["decayed_out_threshold"])
     half_lives_to_threshold = math.log(threshold) / math.log(0.5)
     days = math.ceil(half_life * half_lives_to_threshold)
-    return (datetime.date.fromisoformat(signal_date) + datetime.timedelta(days=days)).isoformat()
+    observed = datetime.date.fromisoformat(signal_date)
+    last_day = (datetime.date.max - observed).days
+    days = min(days, last_day)
+    # Logarithms only estimate the crossing: equality is still live, and floating
+    # rounding can put the estimate on either side of the actual public predicate.
+    if is_decayed(weight(days, path), path):
+        if days > 0 and not is_decayed(weight(days - 1, path), path):
+            return (observed + datetime.timedelta(days=days)).isoformat()
+        low, high = 0, days
+    else:
+        low, high = days, last_day
+        if not is_decayed(weight(high, path), path):
+            raise OverflowError("date value out of range")
+    # Age zero is live; high is decayed. The calendar bounds this search to at
+    # most 22 steps, including half-lives too large to cross on a valid date.
+    while high - low > 1:
+        middle = (low + high) // 2
+        if is_decayed(weight(middle, path), path):
+            high = middle
+        else:
+            low = middle
+    return (observed + datetime.timedelta(days=high)).isoformat()
 
 
 def pin(path: Path | None = None) -> dict[str, Any]:
