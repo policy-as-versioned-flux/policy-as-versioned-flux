@@ -295,6 +295,69 @@ def test_a_theory_source_need_not_be_a_local_observation() -> None:
     assert propose(payload)["edge"]["evidence_grade"] == 3
 
 
+@pytest.mark.parametrize("apostrophe", ["'", "’"])
+@pytest.mark.parametrize("subject, auxiliary, predicate, grade", [
+    ("A dated natural experiment", "did", "occur", 1),
+    ("Published work", "does", "support this claim", 3),
+    ("The cited instances measured before and after", "do", "support this claim", 1),
+    ("Published work", "is", "available", 3),
+    ("The cited instances measured before and after", "are", "available", 1),
+    ("Repeated historical co-movement", "was", "observed", 2),
+    ("A calibrated expert judgement", "was", "provided", 4),
+    ("The cited instances measured before and after", "were", "provided", 1),
+    ("A calibrated expert judgement", "has", "been provided", 4),
+    ("The cited instances measured before and after", "have", "been provided", 1),
+    ("Published work", "had", "been provided", 3),
+])
+def test_contracting_an_immediate_denial_does_not_change_its_grade(
+    subject: str, auxiliary: str, predicate: str, grade: int, apostrophe: str,
+) -> None:
+    """An apostrophe cannot turn denial of the same source into affirmative evidence."""
+    affirmative = f"{subject} {auxiliary} {predicate}."
+    expanded = f"{subject} {auxiliary} not {predicate}."
+    contracted = f"{subject} {auxiliary}n{apostrophe}t {predicate}."
+    for statement, expected_grade in [(affirmative, grade), (expanded, 5), (contracted, 5)]:
+        payload = {**_PAYLOAD, "evidence": [{"statement": statement}]}
+        stated = propose_stated(payload)
+        assert stated.answer == propose(payload)
+        assert stated.answer["edge"]["evidence_grade"] == expected_grade
+        assert grade_scorer(stated.answer, {"evidence_grade": expected_grade})
+        assert (stated.basis["grade_marker"] is None) == (expected_grade == 5)
+        assert stated.basis["defaults_used"]["evidence_grade"] == (expected_grade == 5)
+
+
+@pytest.mark.parametrize("affirmative, denied, grade", [
+    ("A dated natural experiment occurred.", "A dated natural experiment never occurred.", 1),
+    ("Repeated historical co-movement was observed.", "Repeated historical co-movement was never observed.", 2),
+    ("Published work supports this claim.", "Published work never supports this claim.", 3),
+    ("A calibrated expert judgement was provided.", "A calibrated expert judgement was never provided.", 4),
+])
+def test_direct_never_denial_is_not_positive_evidence(affirmative: str, denied: str, grade: int) -> None:
+    for statement, expected_grade in [(affirmative, grade), (denied, 5)]:
+        payload = {**_PAYLOAD, "evidence": [{"statement": statement}]}
+        stated = propose_stated(payload)
+        assert stated.answer == propose(payload)
+        assert stated.answer["edge"]["evidence_grade"] == expected_grade
+        assert grade_scorer(stated.answer, {"evidence_grade": expected_grade})
+
+
+@pytest.mark.parametrize("denied, affirmative, grade", [
+    ("A dated natural experiment didn't occur", "Another dated natural experiment occurred", 1),
+    ("Repeated historical co-movement wasn't observed", "Repeated historical co-movement was observed", 2),
+    ("Published work doesn’t support this claim", "Another published work supports this claim", 3),
+    ("A calibrated expert judgement wasn’t provided", "Another calibrated expert judgement was provided", 4),
+])
+def test_independent_support_after_contracted_denial_remains_usable(denied: str, affirmative: str, grade: int) -> None:
+    groups = [[{"statement": denied}, {"statement": affirmative}]]
+    groups += [[{"statement": denied + separator + affirmative}] for separator in [". ", "; ", ", but "]]
+    for evidence in groups:
+        payload = {**_PAYLOAD, "evidence": evidence}
+        stated = propose_stated(payload)
+        assert stated.answer == propose(payload)
+        assert stated.answer["edge"]["evidence_grade"] == grade
+        assert grade_scorer(stated.answer, {"evidence_grade": grade})
+
+
 def test_sign_is_read_from_directional_language() -> None:
     lifts = propose({**_PAYLOAD, "evidence": [{"statement": "This lifts and boosts the other component.", "source": "x"}]})
     assert lifts["edge"]["sign"] == "positive"

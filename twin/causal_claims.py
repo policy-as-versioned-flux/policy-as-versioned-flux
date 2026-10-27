@@ -143,10 +143,12 @@ def _grade(haystack: str) -> int:
 # its immediate predicate cannot strengthen a claim. Unsupported grammar remains a limitation.
 _EVIDENCE_CLAUSE_BREAK = re.compile(r"[.!?;\n]|\b(?:but|however|whereas)\b")
 _EVIDENCE_DENIAL = re.compile(r"\b(?:not|no|never|without)\b|\b\w+n['’]t\b")
+_EVIDENCE_CONTRACTION = re.compile(r"\b(did|does|do|is|are|was|were|has|have|had)n['’]t\b")
 _EVIDENCE_POST_DENIAL = re.compile(
-    r"^\s*(?:(?:did|does|do)\s+not\s+(?:occur|exist|support|happen)\b"
-    r"|(?:is|are|was|were|has|have|had)\s+not\s+(?:been\s+)?"
-    r"(?:observed|available|provided|established|supported)\b)"
+    r"^\s*(?:(?:did|does|do)\s+(?:not|never)\s+(?:occur|exist|support|happen)\b"
+    r"|(?:is|are|was|were|has|have|had)\s+(?:not|never)\s+(?:been\s+)?"
+    r"(?:observed|available|provided|established|supported)\b"
+    r"|never\s+(?:occur(?:red)?|exist(?:ed|s)?|support(?:ed|s)?|happen(?:ed|s)?)\b)"
 )
 _CALIBRATION_CONTRADICTION = re.compile(r"\b(?:uncalibrated|miscalibrated|untrained)\b")
 
@@ -160,7 +162,10 @@ def _affirmative_evidence(marker: str, grade: int, statements: list[str]) -> boo
             for match in phrase.finditer(clause):
                 if _EVIDENCE_DENIAL.search(clause[:match.start()]):
                     continue
-                if not _EVIDENCE_POST_DENIAL.search(clause[match.end():]):
+                # Normalize only the immediate predicate reading; preserve the authored
+                # evidence in the Stated trace, including its original apostrophe.
+                predicate = _EVIDENCE_CONTRACTION.sub(r"\1 not", clause[match.end():])
+                if not _EVIDENCE_POST_DENIAL.search(predicate):
                     return True
     return False
 
