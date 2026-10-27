@@ -1347,7 +1347,7 @@ def _unbound_pool_retains_decayed_signals(ctx: Context) -> str:
     indistinguishable from the deletion Q3 explicitly rejects unless a decayed-out signal stays
     visible in the pool's own report rather than quietly ceasing to be listed.
 
-    Two legs, both against the default fixture's `netflix` overlay (its own signal collection is
+    Three legs against the default fixture's `netflix` overlay (its own signal collection is
     mutated in memory only — nothing here is committed, the same throwaway-input shape
     `signal_classify_is_grade_5_by_construction` uses for its synthetic sample). Live: a signal
     planted ten years before the declared time — comfortably past the published threshold at any
@@ -1355,7 +1355,8 @@ def _unbound_pool_retains_decayed_signals(ctx: Context) -> str:
     computed `decayed_on` date: not absent, not silently dropped. Structural: the observable
     `pool_size`/`age_distribution` a reader actually watches excludes it, so "recorded" and
     "still counted as live" are demonstrably two different properties rather than one field doing
-    both jobs.
+    both jobs. Boundary: the reported date is the first whole day satisfying the unchanged
+    strict decay predicate, including equality at the preceding day (eco-system ticket 169).
     """
     from .. import unbound_pool
     from ..model import Overlay
@@ -1388,10 +1389,22 @@ def _unbound_pool_retains_decayed_signals(ctx: Context) -> str:
     if planted["id"] in {e["id"] for e in entries if not e["decayed"]}:
         raise Violated("a decayed signal is still counted as live")
 
+    boundary_path = ctx.tmp / "strict-decay-boundary.yaml"
+    boundary_path.write_text(
+        "schema: twin.decay/v1\nversion: 1\nhalf_life_days: 1\ndecayed_out_threshold: 0.5\n"
+    )
+    if unbound_pool.decayed_on("2026-01-01", boundary_path) != "2026-01-03":
+        raise Violated("decayed_on does not name the first strictly decayed calendar day")
+    if not unbound_pool.is_decayed(unbound_pool.weight(2, boundary_path), boundary_path):
+        raise Violated("the reported decay day is still live")
+    if unbound_pool.is_decayed(unbound_pool.weight(1, boundary_path), boundary_path):
+        raise Violated("the day before the reported decay date already decayed")
+
     return (
         f"a signal {planted['age_days']} days old stays in the pool report (decayed: true, "
         f"decayed_on {planted['decayed_on']}) rather than being dropped, and is excluded from "
-        "the observable live pool_size/age_distribution rather than double-counted"
+        "the observable live pool_size/age_distribution rather than double-counted; the reported "
+        "decay date is the first strictly decayed day, with its predecessor still live"
     )
 
 
