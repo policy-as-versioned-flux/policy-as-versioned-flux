@@ -1023,7 +1023,7 @@ def _causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory(ctx:
     asymmetric penalty and the mandatory alternative-explanation field survive contact with a
     proposer that cheats in the dangerous direction.**
 
-    Three legs. First, a proposer that gets every claim's sign/lag/elasticity right but stamps
+    Four legs. First, a proposer that gets every claim's sign/lag/elasticity right but stamps
     every grade to the strongest rung (1) passes the claim metric and fails the grade metric at
     0.0 — the precise failure this ticket exists to catch, run here against the real labelled
     corpus rather than trusted from a docstring. Second, `propose()`'s own `alternatives` field is
@@ -1032,12 +1032,54 @@ def _causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory(ctx:
     genuinely finds the real, fixture-authored shared dependency on both co-flagship edges
     (`content-delivery-network` for netflix's `streaming-displaces-dvd`, `foundry-services` for
     intel's `euv-delay-slips-the-node`) — a confounder detector that never fires on real data
-    proves nothing by existing.
+    proves nothing by existing. Fourth, tested direct evidence denials and unsupported
+    calibration authority stay at grade 5, while affirmative evidence retains its supported
+    rung (eco-system ticket 168).
     """
     from .. import causal_claims as cc
     from .. import skills as skills_mod
     from ..model import Overlay
     from ..repo import ModelRepo
+
+    evidence_cases = [
+        ("Repeated historical co-movements.", 2),
+        ("No repeated historical co-movements were observed.", 5),
+        ("Domain theories support this claim.", 3),
+        ("Published works don't support this claim.", 5),
+        ("Published work doesn't support this claim.", 5),
+        ("Published work doesn’t support this claim.", 5),
+        ("A calibrated expert judgement wasn't provided.", 5),
+        ("A calibrated expert judgement wasn’t provided.", 5),
+        ("A dated natural experiment never occurred.", 5),
+        ("Repeated historical co-movement was never observed.", 5),
+        ("No dated natural experiment occurred.", 5),
+        ("A dated natural experiment did not occur.", 5),
+        ("No repeated historical co-movement has been observed.", 5),
+        ("Repeated historical co-movement was not observed.", 5),
+        ("There is no published work supporting this claim.", 5),
+        ("Published work does not support this claim.", 5),
+        ("A dated natural experiment occurred.", 1),
+        ("Repeated historical co-movement has been observed.", 2),
+        ("There is published work supporting this claim.", 3),
+        ("An ordinary expert judgement.", 5),
+        ("An uncalibrated expert judgement.", 5),
+        ("This is not calibrated expert judgement.", 5),
+        ("The author is not a calibration-trained estimator.", 5),
+        ("A calibrated expert judgement, explicitly recorded as judgement.", 4),
+        ("A calibration-trained estimator records this judgement.", 4),
+    ]
+    for statement, expected_grade in evidence_cases:
+        payload = {"from": {"id": "x"}, "to": {"id": "y"}, "evidence": [{"statement": statement}]}
+        stated = cc.propose_stated(payload)
+        if stated.answer != cc.propose(payload):
+            raise Violated("raw and stated causal proposals disagree on evidence authority")
+        if stated.answer["edge"]["evidence_grade"] != expected_grade:
+            raise Violated(
+                f"causal evidence authority {statement!r} received grade "
+                f"{stated.answer['edge']['evidence_grade']}, expected {expected_grade}"
+            )
+        if not cc.grade_scorer(stated.answer, {"evidence_grade": expected_grade}):
+            raise Violated("the actual grade scorer rejected the evidence authority control")
 
     corpus = cc.labelled_corpus(ctx.tmp / "causal-claims-corpus")
 
@@ -1079,7 +1121,8 @@ def _causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory(ctx:
     return (
         "over-grading every item to grade 1 passes the claim metric and fails the grade metric at "
         "0.0; propose() never returns an empty alternatives field; shared_ancestors() finds the "
-        "real shared dependency on both co-flagship edges"
+        "real shared dependency on both co-flagship edges; tested evidence denials or unsupported "
+        "calibration stays grade 5 and affirmative evidence retains its supported rung"
     )
 
 
