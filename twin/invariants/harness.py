@@ -1042,6 +1042,10 @@ def _causal_claims_over_grading_is_penalised_and_alternatives_are_mandatory(ctx:
     from ..repo import ModelRepo
 
     evidence_cases = [
+        ("Repeated historical co-movements.", 2),
+        ("No repeated historical co-movements were observed.", 5),
+        ("Domain theories support this claim.", 3),
+        ("Published works don't support this claim.", 5),
         ("Published work doesn't support this claim.", 5),
         ("Published work doesn’t support this claim.", 5),
         ("A calibrated expert judgement wasn't provided.", 5),

@@ -153,8 +153,18 @@ _EVIDENCE_POST_DENIAL = re.compile(
 _CALIBRATION_CONTRADICTION = re.compile(r"\b(?:uncalibrated|miscalibrated|untrained)\b")
 
 
-def _affirmative_evidence(marker: str, grade: int, statements: list[str]) -> bool:
-    phrase = re.compile(rf"(?<!\w){re.escape(marker)}(?!\w)")
+# Ordinary noun inflections of the closed ladder vocabulary, not substring stemming or
+# an open-ended language model. Interior nouns ("dated changes with observable data") count too.
+_EVIDENCE_NOUN_FORMS = {
+    "experiment": r"experiments?", "change": r"changes?", "co-movement": r"co-movements?",
+    "mechanism": r"mechanisms?", "theory": r"theor(?:y|ies)", "work": r"works?",
+    "account": r"accounts?", "judgement": r"judgements?", "estimator": r"estimators?",
+}
+
+
+def _affirmative_evidence(marker: str, grade: int, statements: list[str]) -> str | None:
+    words = " ".join(_EVIDENCE_NOUN_FORMS.get(word, re.escape(word)) for word in marker.split())
+    phrase = re.compile(rf"(?<!\w){words}(?!\w)")
     for statement in statements:
         for clause in _EVIDENCE_CLAUSE_BREAK.split(statement):
             if grade == 4 and _CALIBRATION_CONTRADICTION.search(clause):
@@ -166,15 +176,16 @@ def _affirmative_evidence(marker: str, grade: int, statements: list[str]) -> boo
                 # evidence in the Stated trace, including its original apostrophe.
                 predicate = _EVIDENCE_CONTRACTION.sub(r"\1 not", clause[match.end():])
                 if not _EVIDENCE_POST_DENIAL.search(predicate):
-                    return True
-    return False
+                    return match.group()
+    return None
 
 
 def _grade_rule(haystack: str, evidence_statements: list[str] | None = None) -> tuple[str | None, int]:
     for grade, markers in _GRADE_MARKERS:
         for marker in markers:
-            if _affirmative_evidence(marker, grade, evidence_statements or [haystack]):
-                return marker, grade
+            matched = _affirmative_evidence(marker, grade, evidence_statements or [haystack])
+            if matched is not None:
+                return matched, grade
     return None, _DEFAULT_GRADE
 
 

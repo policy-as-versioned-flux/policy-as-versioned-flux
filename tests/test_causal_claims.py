@@ -358,6 +358,68 @@ def test_independent_support_after_contracted_denial_remains_usable(denied: str,
         assert grade_scorer(stated.answer, {"evidence_grade": grade})
 
 
+@pytest.mark.parametrize("singular, plural, grade", [
+    ("dated natural experiment", "dated natural experiments", 1),
+    ("dated price change", "dated price changes", 1),
+    ("dated change with observable data", "dated changes with observable data", 1),
+    ("repeated historical co-movement", "repeated historical co-movements", 2),
+    ("co-movement across", "co-movements across", 2),
+    ("established mechanism", "established mechanisms", 3),
+    ("domain theory", "domain theories", 3),
+    ("published work", "published works", 3),
+    ("published account", "published accounts", 3),
+    ("calibrated expert judgement", "calibrated expert judgements", 4),
+    ("calibration-trained estimator", "calibration-trained estimators", 4),
+    ("calibrated judgement", "calibrated judgements", 4),
+])
+def test_ordinary_noun_inflections_preserve_supported_rungs_and_actual_trace(
+    singular: str, plural: str, grade: int,
+) -> None:
+    """More than one source is not absence of the same kind of source."""
+    for form in (singular, plural):
+        statement = f"Evidence supplied: {form}."
+        payload = {**_PAYLOAD, "evidence": [{"statement": statement}]}
+        stated = propose_stated(payload)
+        assert stated.answer == propose(payload)
+        assert stated.answer["edge"]["evidence_grade"] == grade
+        assert grade_scorer(stated.answer, {"evidence_grade": grade})
+        assert stated.basis["evidence"] == payload["evidence"]
+        assert stated.basis["grade_marker"] == form
+        assert stated.basis["defaults_used"]["evidence_grade"] is False
+        denied = {**_PAYLOAD, "evidence": [{"statement": f"There is no support from {form}."}]}
+        unsupported = propose_stated(denied)
+        assert unsupported.answer == propose(denied)
+        assert unsupported.answer["edge"]["evidence_grade"] == 5
+        assert grade_scorer(unsupported.answer, {"evidence_grade": 5})
+        assert unsupported.basis["grade_marker"] is None
+
+
+@pytest.mark.parametrize("statement", [
+    "Published workshops are available.",
+    "Published accountancy is available.",
+    "An established mechanistic argument is offered.",
+    "Domain theoretical speculation is offered.",
+    "A calibrated judgemental tone is present.",
+])
+def test_noun_inflection_support_keeps_real_word_boundaries(statement: str) -> None:
+    payload = {**_PAYLOAD, "evidence": [{"statement": statement}]}
+    assert propose(payload)["edge"]["evidence_grade"] == 5
+
+
+def test_plural_denial_does_not_veto_independent_plural_support() -> None:
+    denied = "Repeated historical co-movements weren't observed"
+    affirmative = "Repeated historical co-movements were observed"
+    groups = [[{"statement": denied}, {"statement": affirmative}]]
+    groups += [[{"statement": denied + separator + affirmative}] for separator in [". ", "; ", ", but "]]
+    for evidence in groups:
+        payload = {**_PAYLOAD, "evidence": evidence}
+        stated = propose_stated(payload)
+        assert stated.answer == propose(payload)
+        assert stated.answer["edge"]["evidence_grade"] == 2
+        assert grade_scorer(stated.answer, {"evidence_grade": 2})
+        assert stated.basis["grade_marker"] == "repeated historical co-movements"
+
+
 def test_sign_is_read_from_directional_language() -> None:
     lifts = propose({**_PAYLOAD, "evidence": [{"statement": "This lifts and boosts the other component.", "source": "x"}]})
     assert lifts["edge"]["sign"] == "positive"
