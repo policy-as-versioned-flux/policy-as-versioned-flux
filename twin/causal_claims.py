@@ -45,6 +45,7 @@ harness guard changes, because `evaluate()` (`twin/skills.py`) reads `skill_fn` 
 from __future__ import annotations
 
 from pathlib import Path
+import re
 from typing import Any
 
 from . import fixtures, schema
@@ -125,7 +126,7 @@ _GRADE_MARKERS: tuple[tuple[int, tuple[str, ...]], ...] = (
     (1, ("dated natural experiment", "measured before and after", "dated price change", "dated change with observable data")),
     (2, ("repeated historical co-movement", "moving together", "repeated across more than one", "co-movement across")),
     (3, ("established mechanism", "domain theory", "literature", "published work", "published account")),
-    (4, ("calibrated expert judgement", "expert judgement", "calibration-trained estimator", "calibrated judgement")),
+    (4, ("calibrated expert judgement", "calibration-trained estimator", "calibrated judgement")),
 )
 # The safe default when the text names none of the ladder's stronger rungs: grade 5, model
 # assertion — never guess a grade the evidence text does not support (decision ticket 08 Q2).
@@ -136,10 +137,38 @@ def _grade(haystack: str) -> int:
     return _grade_rule(haystack)[1]
 
 
-def _grade_rule(haystack: str) -> tuple[str | None, int]:
+# This remains a lexical heuristic, not source authentication or general natural-language
+# understanding. Each rung needs an affirmative whole-phrase cue in a supplied statement.
+# Simple clause boundaries preserve independent support; direct denials before a cue or in
+# its immediate predicate cannot strengthen a claim. Unsupported grammar remains a limitation.
+_EVIDENCE_CLAUSE_BREAK = re.compile(r"[.!?;\n]|\b(?:but|however|whereas)\b")
+_EVIDENCE_DENIAL = re.compile(r"\b(?:not|no|never|without)\b|\b\w+n['’]t\b")
+_EVIDENCE_POST_DENIAL = re.compile(
+    r"^\s*(?:(?:did|does|do)\s+not\s+(?:occur|exist|support|happen)\b"
+    r"|(?:is|are|was|were|has|have|had)\s+not\s+(?:been\s+)?"
+    r"(?:observed|available|provided|established|supported)\b)"
+)
+_CALIBRATION_CONTRADICTION = re.compile(r"\b(?:uncalibrated|miscalibrated|untrained)\b")
+
+
+def _affirmative_evidence(marker: str, grade: int, statements: list[str]) -> bool:
+    phrase = re.compile(rf"(?<!\w){re.escape(marker)}(?!\w)")
+    for statement in statements:
+        for clause in _EVIDENCE_CLAUSE_BREAK.split(statement):
+            if grade == 4 and _CALIBRATION_CONTRADICTION.search(clause):
+                continue
+            for match in phrase.finditer(clause):
+                if _EVIDENCE_DENIAL.search(clause[:match.start()]):
+                    continue
+                if not _EVIDENCE_POST_DENIAL.search(clause[match.end():]):
+                    return True
+    return False
+
+
+def _grade_rule(haystack: str, evidence_statements: list[str] | None = None) -> tuple[str | None, int]:
     for grade, markers in _GRADE_MARKERS:
         for marker in markers:
-            if marker in haystack:
+            if _affirmative_evidence(marker, grade, evidence_statements or [haystack]):
                 return marker, grade
     return None, _DEFAULT_GRADE
 
@@ -230,7 +259,7 @@ def _propose(payload: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
         raise CausalClaimsError(f"{SKILL}: no evidence to assess a causal claim from")
 
     haystack = " ".join(str(item.get("statement", "")) for item in evidence).lower()
-    grade_marker, grade = _grade_rule(haystack)
+    grade_marker, grade = _grade_rule(haystack, [str(item.get("statement", "")).lower() for item in evidence])
     sign_marker, sign = _sign_rule(haystack)
     lag_marker, lag = _lag_rule(haystack)
 
