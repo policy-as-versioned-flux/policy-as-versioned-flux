@@ -1,5 +1,5 @@
 [1;36m==>[0m 0. the five-fact sample: the composed set in force, from signed sources (graded first, cluster-free)
-   five-fact sample 2026-10-26T15:19:44Z on cluster dsample-40347821737 (run 40347821737), 3 sources
+   five-fact sample 2026-10-27T14:42:18Z on cluster dsample-40523204683 (run 40523204683), 3 sources
      the cage facts (6, 7) ARE scored on this sample: registered by e7e2969cd50a at 2026-10-18T16:01:19+01:00 on refs/remotes/origin/main, and the sample is later
      nist                 true  fact_1_ready_at_the_pin_on_the_real_remote: Ready at the pinned tag and commit, from the publisher's real remote
      nist                 true  fact_2_tag_signature_verified_at_the_source_boundary: the gitsign tag v1.1.0 was verified at the source boundary against nist's own pinned identity ^https://github\.com/policy-as-versioned-nist/nist/\.github/workflows/cut-release\.yml@refs/heads/(main|release/[0-9]+\.[0-9]+\.x)$
