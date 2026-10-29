@@ -1,5 +1,5 @@
   ok   selfcheck: with git unreachable this script exits 3 and its last line is SKIP:
-test_actual_guard_and_prepare_cleanup_select_default_clocks_and_opt_in_previews (__main__.CloudClockSelection.test_actual_guard_and_prepare_cleanup_select_default_clocks_and_opt_in_previews) ... From /tmp/cloud-selector-selfcheck-zu0ggd9z
+test_actual_guard_and_prepare_cleanup_select_default_clocks_and_opt_in_previews (__main__.CloudClockSelection.test_actual_guard_and_prepare_cleanup_select_default_clocks_and_opt_in_previews) ... From /tmp/cloud-selector-selfcheck-1iv775ab
  * [new branch]      trunk      -> origin/trunk
 ok
 test_missing_or_malformed_document_revision_refuses_in_both_modes (__main__.CloudDocumentRevision.test_missing_or_malformed_document_revision_refuses_in_both_modes) ... ok
@@ -16,6 +16,6 @@ test_native_ready_both_policy_kinds_reach_the_unchanged_crd_gate (__main__.Cloud
 test_ready_status_does_not_accept_a_different_signed_body (__main__.CloudReadiness.test_ready_status_does_not_accept_a_different_signed_body) ... ok
 
 ----------------------------------------------------------------------
-Ran 13 tests in 0.338s
+Ran 13 tests in 0.377s
 
 OK
