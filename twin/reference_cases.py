@@ -67,16 +67,7 @@ def admit_reference(case: dict[str, Any], scope: dict[str, Any]) -> Admission:
     candidate's response. Returned projections are fresh copies, so candidate mutation cannot
     change the conserved packet. Source rights and label provenance are separate declarations.
     """
-    reasons: list[str] = []
-    for field in ('expected', 'sources', 'rights', 'basis', 'field_support', 'selection', 'exposure'):
-        if field in case and not isinstance(case[field], dict):
-            reasons.append('invalid-shape:' + field)
-    for field in ('sources', 'field_support'):
-        if isinstance(case.get(field), dict) and any(not isinstance(v, dict) for v in case[field].values()):
-            reasons.append('invalid-shape:' + field)
-    if reasons:
-        return _decision(case, scope, reasons)
-    reasons.extend(_support_shape_reasons(case.get('field_support', {})))
+    reasons = _custody_shape_reasons(case)
     if reasons:
         return _decision(case, scope, reasons)
     if 'input' not in case or case['input'] is None:
@@ -172,7 +163,8 @@ def admit_reference(case: dict[str, Any], scope: dict[str, Any]) -> Admission:
               'agent-reference-agreement': 'agent-authored',
               'complete-causal-reference': 'causal-reference',
               'task-conformance': 'declared-constraints'}
-    if claims.get(scope.get('claim', '')) != case.get('reference_kind'):
+    claim = scope.get('claim')
+    if not isinstance(claim, str) or claims.get(claim) != case.get('reference_kind'):
         reasons.append('reference-claim-conflict')
     if _contains_reference_fields(case.get('input')):
         reasons.append('reference-fields-in-input')
@@ -192,6 +184,28 @@ def admit_reference(case: dict[str, Any], scope: dict[str, Any]) -> Admission:
             if not valid:
                 reasons.append('invalid-support-witness:' + field)
     return _decision(case, scope, reasons)
+
+
+def _custody_shape_reasons(case: dict[str, Any]) -> list[str]:
+    """Check custody declaration shapes before any nested iteration or mapping lookup."""
+    reasons: list[str] = []
+    for field in ('expected', 'sources', 'rights', 'basis', 'field_support', 'selection', 'exposure'):
+        if field in case and not isinstance(case[field], dict):
+            reasons.append('invalid-shape:' + field)
+    for field in ('sources', 'field_support'):
+        if isinstance(case.get(field), dict) and any(not isinstance(v, dict) for v in case[field].values()):
+            reasons.append('invalid-shape:' + field)
+    if reasons:
+        return reasons
+    for field in ('evidence', 'uses', 'covered_sources'):
+        value = case.get('rights', {}).get(field, [])
+        if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+            reasons.append('invalid-shape:rights.' + field)
+    hashes = case.get('basis', {}).get('source_hashes', {})
+    if not isinstance(hashes, dict) or any(not isinstance(value, str) for value in hashes.values()):
+        reasons.append('invalid-shape:basis.source_hashes')
+    reasons.extend(_support_shape_reasons(case.get('field_support', {})))
+    return reasons
 
 
 def _support_shape_reasons(supports: dict[str, dict[str, Any]]) -> list[str]:
