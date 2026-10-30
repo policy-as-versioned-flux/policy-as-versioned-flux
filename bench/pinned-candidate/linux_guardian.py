@@ -149,6 +149,48 @@ class Identity:
         os.close(self.fd)
 
 
+class TrustedHandoff:
+    """Closed source-appointed TEST_ONLY instrumentation; never parsed from config.
+
+    The fixed control entry owns these private handles. The candidate receives
+    neither them nor a callback. Loss at every barrier is a failure, not release.
+    """
+    STAGES = ('raw-clone','attached','dropped','armed','ready','descendants')
+
+    def __init__(self, control: int, output: int, wire: Wire, deadline: float, supervisor: Identity):
+        self.control,self.output,self.wire,self.deadline,self.supervisor=control,output,wire,deadline,supervisor
+        self.phase:str|None=None
+
+    def reach(self, stage: str, identity: Identity) -> None:
+        if stage not in self.STAGES:raise ValueError('fixed trusted handoff required')
+        identity.verify();self.supervisor.verify()
+        raw=self.wire.event('handoff',stage=stage,phase=self.phase,pid=identity.pid,start=identity.start)
+        offset=0
+        while offset<len(raw):
+            self.supervisor.verify()
+            remaining=self.deadline-time.monotonic()
+            if remaining<=0:raise ValueError('shared handoff deadline exhausted')
+            if select.select([], [self.output], [], min(.05,remaining))[1]:
+                offset+=os.write(self.output,raw[offset:])
+        while time.monotonic()<self.deadline:
+            self.supervisor.verify();identity.verify()
+            if select.select([self.control], [], [], .05)[0]:
+                if os.read(self.control,1)!=b'C':raise ValueError('trusted handoff control lost')
+                return
+        raise ValueError('shared handoff deadline exhausted')
+
+
+def child_handoff(stage: str, report: int, release: int, guardian: int) -> None:
+    """Trusted bootstrap only. Guardian pidfd is checked even before early arm."""
+    if stage not in TrustedHandoff.STAGES:os._exit(125)
+    wait_guardian(guardian)
+    raw=stage.encode()+b'\n'
+    if os.write(report,raw)!=len(raw):os._exit(125)
+    ready=select.select([release,guardian],[],[],10)[0]
+    if guardian in ready or release not in ready or os.read(release,1)!=b'C':os._exit(125)
+    wait_guardian(guardian)
+
+
 class ChildIdentity(Identity):
     """The one trusted bootstrap credential transition on an unchanged pidfd.
 
@@ -759,7 +801,7 @@ class Leaf:
         os.close(self.parentfd)
 
 
-def storage_paths(host: dict[str, Any], profile: dict[str, Any]) -> tuple[str, ...]:
+def storage_paths(host: dict[str, Any], profile: dict[str, Any], anchor: str = ANCHOR) -> tuple[str, ...]:
     """Derive storage solely from the fixed anchor and its protected read closure.
 
     The anchor parent holds receipts, locks and private-root scaffolding. Acquired
@@ -769,7 +811,7 @@ def storage_paths(host: dict[str, Any], profile: dict[str, Any]) -> tuple[str, .
     """
     sources = [host['guardian_entry'], host['guardian_python'], *host['support_sources'],
                *(entry['source'] for entry in profile['readonly_mounts'])]
-    return tuple(sorted({str(Path(ANCHOR).parent), *(str(Path(source).parent) for source in sources)}))
+    return tuple(sorted({str(Path(anchor).parent), *(str(Path(source).parent) for source in sources)}))
 
 
 def reserve(paths: tuple[str, ...], minimum: int, enforce: bool = True) -> dict[str, Any]:
@@ -835,7 +877,8 @@ def projected(profile: dict[str, Any], source: str) -> str:
 
 
 def bootstrap(host: dict[str, Any], profile: dict[str, Any], lease: dict[str, Any], root: str,
-              guardian_fd: int, barrier: int, pipes: tuple[int,int,int], close_fds: set[int]) -> None:
+              guardian_fd: int, barrier: int, pipes: tuple[int,int,int], close_fds: set[int],
+              handoff: tuple[int,int] | None = None) -> None:
     """Only this fixed trusted function runs privileged in namespace init."""
     try:
         # clone creates this process directly as private PID namespace init. PPID
@@ -848,7 +891,7 @@ def bootstrap(host: dict[str, Any], profile: dict[str, Any], lease: dict[str, An
         for target_fd,data_fd in enumerate(pipes):os.dup2(data_fd,target_fd,inheritable=True)
         inherited={int(item.name) for item in Path('/proc/self/fd').iterdir() if item.name.isdigit()}
         for fd in inherited | close_fds:
-            if fd>2 and fd not in {guardian_fd,barrier,*pipes}:
+            if fd>2 and fd not in {guardian_fd,barrier,*pipes,*(handoff or ())}:
                 try:os.close(fd)
                 except OSError as exc:
                     if exc.errno!=errno.EBADF:raise
@@ -902,10 +945,12 @@ def bootstrap(host: dict[str, Any], profile: dict[str, Any], lease: dict[str, An
         class Header(ctypes.Structure): _fields_ = [('version',ctypes.c_uint),('pid',ctypes.c_int)]
         class Data(ctypes.Structure): _fields_ = [('effective',ctypes.c_uint),('permitted',ctypes.c_uint),('inheritable',ctypes.c_uint)]
         libc_call('capset',ctypes.byref(Header(0x20080522,0)),ctypes.byref((Data*2)()))
+        if handoff is not None:child_handoff('dropped',*handoff,guardian_fd)
         prctl(4,0)  # nondumpable after the final credential transition
         prctl(38,1) # no_new_privs
         prctl(1,signal.SIGKILL) # credentials reset PDEATHSIG, therefore re-arm now
         wait_guardian(guardian_fd)
+        if handoff is not None:child_handoff('armed',*handoff,guardian_fd)
         filter_sources = [path for path in profile['paths']['support_sources'] if Path(path).name == 'linux_runtime_filter.py']
         if len(filter_sources) != 1: raise ValueError('exact pinned runtime filter source required')
         source = filter_sources[0]
@@ -943,16 +988,24 @@ class Child:
         self.reaped=True
         self.returncode:int|None=None
         self.identity:ChildIdentity|None=None
+        self.handoff_r=self.handoff_w=self.release_r=self.release_w=-1
+        self.handoff_pending=bytearray()
 
-    def launch(self,host:dict[str,Any],profile:dict[str,Any],lease:dict[str,Any],leaf:Leaf)->None:
+    def launch(self,host:dict[str,Any],profile:dict[str,Any],lease:dict[str,Any],leaf:Leaf,
+               handoff:TrustedHandoff|None=None)->None:
         root=self.root
         self.input_r,self.input_w = os.pipe2(os.O_CLOEXEC)
         self.output_r,self.output_w = os.pipe2(os.O_CLOEXEC)
         self.error_r,self.error_w = os.pipe2(os.O_CLOEXEC)
         barrier_r,barrier_w = os.pipe2(os.O_CLOEXEC)
         guardian_fd = os.pidfd_open(os.getpid(),0)
+        if handoff is not None:
+            if type(handoff) is not TrustedHandoff:raise ValueError('fixed trusted handoff object required')
+            self.handoff_r,self.handoff_w=os.pipe2(os.O_CLOEXEC)
+            self.release_r,self.release_w=os.pipe2(os.O_CLOEXEC)
         descriptors = {self.input_r,self.input_w,self.output_r,self.output_w,self.error_r,self.error_w,
-                       barrier_r,barrier_w,guardian_fd,leaf.fd,leaf.parentfd}
+                       barrier_r,barrier_w,guardian_fd,leaf.fd,leaf.parentfd,
+                       self.handoff_r,self.handoff_w,self.release_r,self.release_w}
         pid = -1
         try:
             number = {'x86_64':56,'aarch64':220}[platform.machine()]
@@ -964,23 +1017,56 @@ class Child:
                 code=ctypes.get_errno()
                 raise OSError(code,os.strerror(code),'clone namespace-init')
             if pid == 0:
+                if handoff is not None:
+                    child_handoff('raw-clone',self.handoff_w,self.release_r,guardian_fd)
                 bootstrap(host,profile,lease,root,guardian_fd,barrier_r,
-                          (self.input_r,self.output_w,self.error_w),descriptors)
+                          (self.input_r,self.output_w,self.error_w),descriptors,
+                          (self.handoff_w,self.release_r) if handoff is not None else None)
                 os._exit(126)
             self.pid=pid
             self.reaped=False
             self.identity = ChildIdentity(pid,host['candidate_uid'],host['candidate_gid'])
+            if handoff is not None:self.instrument(handoff,'raw-clone')
             leaf.write('cgroup.procs',str(pid))
             members = [int(value) for value in leaf.read('cgroup.procs').split()]
             if members != [pid]: raise ValueError('exact namespace-init attach readback differs')
             self.identity.verify()
             leaf.verify_limits()
+            if handoff is not None:handoff.reach('attached',self.identity)
             self.identity.begin_transition()
             os.write(barrier_w,b'A')
         finally:
             for fd in (self.input_r,self.output_w,self.error_w,barrier_r,barrier_w,guardian_fd): os.close(fd)
             for fd in (self.output_r,self.error_r,self.input_w): os.set_blocking(fd,False)
+            if handoff is not None:
+                os.close(self.handoff_w);os.close(self.release_r)
+                self.handoff_w=self.release_r=-1
+                os.set_blocking(self.handoff_r,False)
         if self.identity is None: raise ValueError('namespace child identity missing')
+
+    def instrument(self,handoff:TrustedHandoff,expected:str|None=None)->bool:
+        if self.identity is None:raise ValueError('trusted instrument child identity unavailable')
+        deadline=handoff.deadline
+        while time.monotonic()<deadline:
+            self.identity.verify();handoff.supervisor.verify()
+            if select.select([self.handoff_r],[],[],.05)[0]:
+                raw=os.read(self.handoff_r,64)
+                if not raw:
+                    if self.handoff_pending:raise ValueError('partial trusted child handoff')
+                    return False
+                self.handoff_pending.extend(raw)
+                if len(self.handoff_pending)>64:raise ValueError('trusted handoff cap exceeded')
+                if b'\n' in self.handoff_pending:
+                    raw_stage,tail=self.handoff_pending.split(b'\n',1)
+                    if tail:raise ValueError('unexpected queued trusted handoff')
+                    self.handoff_pending.clear()
+                    stage=raw_stage.decode('ascii')
+                    if stage not in ('raw-clone','dropped','armed') or expected is not None and stage!=expected:
+                        raise ValueError('unexpected trusted child handoff stage')
+                    handoff.reach(stage,self.identity)
+                    if os.write(self.release_w,b'C')!=1:raise ValueError('trusted handoff release failed')
+                    return True
+        raise ValueError('shared handoff deadline exhausted')
 
     def poll(self) -> None:
         if self.reaped: return
@@ -990,7 +1076,8 @@ class Child:
             self.reaped = True
 
     def close(self) -> None:
-        for fd in (self.input_w,self.output_r,self.error_r):
+        for fd in (self.input_w,self.output_r,self.error_r,self.handoff_r,self.release_w):
+            if fd<0:continue
             try: os.close(fd)
             except OSError as exc:
                 if exc.errno != errno.EBADF: raise
@@ -1152,16 +1239,23 @@ def attempt_deadlines(started: float, timeout: int, requested: Any) -> tuple[flo
     return work,outer
 
 
-class Guardian:
-    def __init__(self,request:dict[str,Any],host:dict[str,Any],profile:dict[str,Any],supervisor:Identity):
-        validate_reviewed_profile(profile['config'])
+class LeaseMechanics:
+    """Shared kernel mechanics. Only separate fixed source constructors select it.
+
+    No serialized input selects a constructor, anchor, instrument or timeout.
+    Production Guardian below always validates its original full profile first.
+    """
+    anchor = ANCHOR
+    lease_schema = 'linux-candidate-lease/v1'
+
+    def _initialize(self,request:dict[str,Any],host:dict[str,Any],profile:dict[str,Any],
+                    supervisor:Identity,timeout:int)->None:
         self.request,self.host,self.profile,self.supervisor = request,host,profile,supervisor
         self.lease=os.urandom(24).hex()
         self.wire=Wire(self.lease)
         self.started=time.monotonic()
-        timeout=profile['config']['timeout_seconds']
-        if timeout not in (600,900,1200): raise ValueError('unreviewed shared attempt deadline')
         self.work_deadline,self.deadline=attempt_deadlines(self.started,timeout,request['deadline_monotonic'])
+        self.handoff:TrustedHandoff|None=None
         self.child:Child|None=None
         self.leaf:Leaf|None=None
         self.root: str|None=None
@@ -1200,7 +1294,7 @@ class Guardian:
                 or self.child.identity is None or self.phase is None):
             raise ValueError('fixed protected receipt role required')
         if self.receipt_directory is None:
-            parent=str(Path(ANCHOR).parent)+'/receipts'
+            parent=str(Path(self.anchor).parent)+'/receipts'
             try:os.mkdir(parent,0o755)
             except FileExistsError:protected_path(parent,False)
             self.receipt_directory=parent+'/'+self.lease
@@ -1280,14 +1374,15 @@ class Guardian:
         admission = self.leaf.admit()
         self.liveness()
         self.phase=phase
-        lease={'schema':'linux-candidate-lease/v1','lease':self.lease,
+        lease={'schema':self.lease_schema,'lease':self.lease,
                'authority':self.request['authority'],'profile_sha256':self.request['profile_sha256'],
                'candidate_uid':self.host['candidate_uid'],'candidate_gid':self.host['candidate_gid'],'phase':phase}
         # self.leaf/root are registered before clone so every exception reaches
         # pinned-leaf teardown. Child is constructed without any candidate input.
         child=Child(phase,self.root)
         self.child=child
-        child.launch(self.host,self.profile,lease,self.leaf)
+        if self.handoff is not None:self.handoff.phase=phase
+        child.launch(self.host,self.profile,lease,self.leaf,self.handoff)
         if child.identity is None:raise ValueError('phase child identity unavailable')
         self.emit('phase_start',phase=phase,pid=child.identity.pid,start=child.identity.start,admission=admission)
         reader=FrameReader()
@@ -1297,12 +1392,17 @@ class Guardian:
         selector=selectors.DefaultSelector()
         selector.register(child.output_r,selectors.EVENT_READ,'stdout')
         selector.register(child.error_r,selectors.EVENT_READ,'stderr')
+        if self.handoff is not None:selector.register(child.handoff_r,selectors.EVENT_READ,'handoff')
         try:
             while not (stdout_eof and stderr_eof and child.reaped):
                 self.liveness()
                 now=time.monotonic()
                 if self.last_sample is None or now-self.last_sample>=SAMPLE_SECONDS:self.sample()
                 for key,_ in selector.select(.05):
+                    if key.data=='handoff':
+                        if self.handoff is None:raise ValueError('unexpected trusted instrumentation')
+                        if not child.instrument(self.handoff):selector.unregister(child.handoff_r)
+                        continue
                     raw=os.read(key.fd,65536)
                     if not raw:
                         selector.unregister(key.fd)
@@ -1333,6 +1433,7 @@ class Guardian:
                             self.emit('proof',phase=phase,facts=facts)
                             ready=True
                             self.emit('frame',phase=phase,body=packet)
+                            if self.handoff is not None:self.handoff.reach('ready',child.identity)
                             payload=canonical(self.request['request'])+b'\n'
                             sent=0
                             while sent<len(payload):
@@ -1372,7 +1473,7 @@ class Guardian:
         cleanup=False
         try:
             self.emit('lease',authority=self.request['authority'],profile_sha256=self.request['profile_sha256'])
-            lock_parent=str(Path(ANCHOR).parent)
+            lock_parent=str(Path(self.anchor).parent)
             protected_path(lock_parent,False)
             self.lock_path=lock_parent+'/candidate-'+str(self.host['candidate_uid'])+'.lease'
             self.lockfd=os.open(self.lock_path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW|os.O_CLOEXEC,0o600)
@@ -1381,8 +1482,8 @@ class Guardian:
             candidate_unused(self.host['candidate_uid'],self.host['candidate_gid'])
             guardian_closure=verify_guardian_closure(self.host,self.liveness)
             self.leaf=Leaf(self.host['cgroup_parent'],self.lease,self.host['cpus'],
-                           storage_paths(self.host,self.profile))
-            root_parent=str(Path(ANCHOR).parent)
+                           storage_paths(self.host,self.profile,self.anchor))
+            root_parent=str(Path(self.anchor).parent)
             protected_path(root_parent,False)
             self.root=root_parent+'/root-'+self.lease
             os.mkdir(self.root,0o700)
@@ -1437,6 +1538,14 @@ class Guardian:
                 except Exception:pass
             self.supervisor.close()
         return 1 if failed or not cleanup else 0
+
+
+class Guardian(LeaseMechanics):
+    def __init__(self,request:dict[str,Any],host:dict[str,Any],profile:dict[str,Any],supervisor:Identity):
+        validate_reviewed_profile(profile['config'])
+        timeout=profile['config']['timeout_seconds']
+        if timeout not in (600,900,1200):raise ValueError('unreviewed shared attempt deadline')
+        self._initialize(request,host,profile,supervisor,timeout)
 
 
 def read_initial()->dict[str,Any]:
