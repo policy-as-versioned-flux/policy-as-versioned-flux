@@ -20,11 +20,21 @@ def task_request(protected_request, task='evolution', org='driftwood'):
                  for name, value in acquired.public['members'].items()}
     evidence = [{'id': 'TEST_ONLY-evidence', 'source_id': 'primary',
         'visible_excerpt_id': None, 'statement': acquired.public['statement']['text']}]
+    target = {'kind': 'component', 'component': 'test-only-cloud'}
+    task_fields = {'evidence': evidence}
+    if task == 'causal':
+        target = {'kind': 'edge', 'from': 'test-only-local-records', 'to': 'test-only-local-service'}
+        task_fields['measurement'] = {'from_unit': 'TEST_ONLY source units', 'to_unit': 'TEST_ONLY outcome units',
+            'lag_unit': 'days', 'elasticity_definition': 'TEST_ONLY declared finite magnitude',
+            'temporal_interpretation': 'TEST_ONLY subsequent interval, no measured effect'}
+    elif task == 'gameplay':
+        target = {'kind': 'map', 'organisation': org}
+        task_fields = {}
     packet = q.canonical({'schema': 'twin.task-source-packet/v1', 'subject': 'TEST_ONLY-task-subject',
-        'as_of': '2019-01-03', 'target': {'kind': 'component', 'component': 'test-only-cloud'}, 'task': {'evidence': evidence},
+        'as_of': '2019-01-03', 'target': target, 'task': task_fields,
                           'original_sources': {'primary': originals}})
     job = {**{key: request['policy'][key] for key in ('issuer', 'domain', 'capability', 'frame', 'model_as_of', 'model_pins')},
-        'subject': 'TEST_ONLY-task-subject', 'organisation': org, 'target': {'kind': 'component', 'component': 'test-only-cloud'},
+        'subject': 'TEST_ONLY-task-subject', 'organisation': org, 'target': target,
         'as_of': '2019-01-03', 'source': 'TEST_ONLY-protected-common-source', 'estate_scope_sha256': '1' * 64,
         'source_packet': packet, 'source_pin': sm.sha256(packet),
         'source_bindings': {'primary': acquired.binding},
@@ -50,3 +60,12 @@ def test_constructor_builds_actual_typed_component_and_metadata_without_private_
     policy.verify_input(resolved.host_record)
     with pytest.raises(ValueError):
         q.HostInputs.restore(host.description)
+
+
+def test_factual_decline_is_preserved_as_actual_basis(protected_request):
+    from twin.task_inputs import resolve_task_input, verify_output
+    from twin.skills import Stated
+    payload = resolve_task_input(**task_request(protected_request)).payload
+    actual = Stated(None, {'decline': 'TEST_ONLY no supplied source establishes an answer'})
+    verify_output(payload, actual)
+    assert actual.basis == {'decline': 'TEST_ONLY no supplied source establishes an answer'}

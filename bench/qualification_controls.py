@@ -169,7 +169,7 @@ def defaulted_selection():
     review = q.PopulationReview.freeze(original.population, original.review.record, defaulted_review_checker)
     actor = q.Actor.freeze(defaulted_runner, keyword_default_parser, {'purpose': 'TEST_ONLY'})
     return q.Selection.freeze(actor, original.population, defaulted_basis_checker,
-        reference_projection=defaulted_reference_projection, review=review)
+        reference_projection=defaulted_reference_projection, review=review, test_only=q.TEST_ONLY_MECHANICS)
 
 
 def wrong_basis_actor(payload, config):
@@ -265,5 +265,5 @@ def reviewed_mechanical_selection(change=None):
         record.update(change)
     review = q.PopulationReview.freeze(pop, q.canonical(record), fixture_review_checker)
     return q.Selection.freeze(q.Actor.freeze(literal_actor, parse_position, {'purpose': 'TEST_ONLY'}),
-        pop, basis_holds, review=review)
+        pop, basis_holds, review=review, test_only=q.TEST_ONLY_MECHANICS)
 
