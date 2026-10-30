@@ -240,6 +240,9 @@ class Actor:
             stated = self.parser(raw, json.loads(self.description)['config'])
             if not isinstance(stated, Stated):
                 raise ValueError('actor parser must retain stated answer and actual basis')
+            if config.get('task') in ('evolution', 'causal', 'gameplay', 'ethics'):
+                from .task_inputs import verify_output
+                verify_output(payload, stated)
             canonical({'answer': stated.answer, 'basis': stated.basis})
         except Exception as exc:  # an attempted item stays in the denominator, including parser failure
             failure = type(exc).__name__ + ': ' + str(exc)
@@ -338,6 +341,8 @@ class Population:
 class Capture:
     packet: bytes
     authentication: bytes = field(repr=False, default=b'')
+    _group: Any = field(default=None, repr=False, compare=False)
+    _core: Any = field(default=None, repr=False, compare=False)
 
     @property
     def digest(self) -> str:
@@ -472,6 +477,8 @@ class Selection:
     _metadata_store: Any = field(default=None, repr=False, compare=False)
     _metadata_policy: bytes | None = field(default=None, repr=False, compare=False)
     _test_only: TestOnlyPurpose | None = field(default=None, repr=False, compare=False)
+    _task_contract: Any = field(default=None, repr=False, compare=False)
+    _task_policy: Any = field(default=None, repr=False, compare=False)
 
     @classmethod
     def freeze(cls, actor: Actor, population: Population,
@@ -480,7 +487,8 @@ class Selection:
                review: PopulationReview | None = None,
                assessment_policy: BasisPolicy | None = None,
                source_metadata_policy: dict[str, Any] | None = None, metadata_store: Any = None,
-               test_only: TestOnlyPurpose | None = None) -> Selection:
+               test_only: TestOnlyPurpose | None = None, task_contract: Any = None,
+               task_policy: Any = None) -> Selection:
         identity = _callable_identity(basis_checker)
         functions = (basis_checker, reference_projection, rss.scorer_for(population.metric))
         sources = {_source_name(Path(inspect.getfile(fn))): hashlib.sha256(
@@ -504,6 +512,40 @@ class Selection:
         if assessment_policy:
             assessment_policy.verify()
             description['assessment_policy'] = json.loads(assessment_policy.description)
+        from .task_contracts import METRIC_TASK, validate
+        if population.metric in METRIC_TASK and test_only is not TEST_ONLY_MECHANICS:
+            from .task_inputs import support_sources, reference_row
+            if task_contract is None or task_policy is None:
+                raise ValueError('registered metric requires independently selected protected task contract/policy')
+            task_contract.verify(); task_policy.verify()
+            config = json.loads(actor.description)['config']
+            if (task_contract.task != METRIC_TASK[population.metric]
+                    or task_policy.contract.description != task_contract.description
+                    or config.get('task') != task_contract.task or config.get('task_contract_digest') != task_contract.digest):
+                raise ValueError('actor/metric/protected task contract differs')
+            actor_sources = json.loads(actor.description)['sources']
+            for path in support_sources():
+                pin = hashlib.sha256(path.read_bytes()).hexdigest()
+                if actor_sources.get(_source_name(path)) != pin:
+                    raise ValueError('task actor lacks exact constructor/rubric/metadata/schema support identity')
+                sources[_source_name(path)] = pin
+            if (assessment_policy is None or json.loads(assessment_policy.description).get('schema') != 'twin.basis-policy/v2'
+                    or json.loads(assessment_policy.description).get('metric') != population.metric
+                    or json.loads(assessment_policy.description).get('contract') != task_contract.digest):
+                raise ValueError('registered task requires its exact independently acquired task rubric')
+            validate('Envelope', population.envelope)
+            policy_value = json.loads(task_policy.description)
+            if policy_value['contexts'] != population.envelope['task_contexts']:
+                raise ValueError('qualified task context differs from actual protected model/party/universe/policy')
+            for packet in json.loads(population.description)['selected']:
+                row = reference_row(packet['case'])
+                task_policy.verify_input(row)
+                if _scope_reasons(population, row['context']):
+                    raise ValueError('qualification task input lies outside declared scope/source families')
+            description['task_contract'] = json.loads(task_contract.description)
+            description['task_policy'] = policy_value
+        elif task_contract is not None or task_policy is not None:
+            raise ValueError('task contract handles cannot replace metric or protected TEST_ONLY mechanics')
         if population.metric == 'signal-classify' and (test_only is not TEST_ONLY_MECHANICS or assessment_policy is not None):
             from .signal_inputs import binding_context
             from . import source_metadata as sm
@@ -549,7 +591,8 @@ class Selection:
             sources[_source_name(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
         return cls(actor, population, basis_checker, reference_projection,
                    canonical(description), secrets.token_bytes(32), review, assessment_policy,
-                   metadata_store, canonical(source_metadata_policy) if source_metadata_policy else None, test_only)
+                   metadata_store, canonical(source_metadata_policy) if source_metadata_policy else None, test_only,
+                   task_contract, task_policy)
 
     @property
     def digest(self) -> str:
@@ -564,6 +607,13 @@ class Selection:
             raise ValueError('selection requires original protected TEST_ONLY purpose')
         if value.get('source_metadata_policy') != (json.loads(self._metadata_policy) if self._metadata_policy else None):
             raise ValueError('selection requires original protected metadata policy')
+        from .task_contracts import METRIC_TASK
+        if self.population.metric in METRIC_TASK and self._test_only is not TEST_ONLY_MECHANICS:
+            rebound = Selection.freeze(self.actor, self.population, self.basis_checker,
+                reference_projection=self.reference_projection, review=self.review,
+                assessment_policy=self.assessment_policy, task_contract=self._task_contract, task_policy=self._task_policy)
+            if rebound.description != self.description:
+                raise ValueError('selection requires original protected task model/source/policy handles')
         if self.population.metric == 'signal-classify' and self._test_only is not TEST_ONLY_MECHANICS:
             # Reapply the mandatory constructor/acquisition/actor invariants using the
             # retained protected handles, including for restored public descriptions.
@@ -591,6 +641,11 @@ class Selection:
     def verify_input(self, row: dict[str, Any]) -> None:
         """Recompute the complete live signal binding for the selected task."""
         self.verify()
+        from .task_contracts import METRIC_TASK
+        if self.population.metric in METRIC_TASK and self._test_only is not TEST_ONLY_MECHANICS:
+            self._task_policy.verify_input(row)
+            if _scope_reasons(self.population, row['context']):
+                raise ValueError('task input is outside qualified model/source/date/target scope')
         if self.population.metric == 'signal-classify' and self._test_only is not TEST_ONLY_MECHANICS:
             from .signal_inputs import binding_context
             from .source_metadata import verify_host_metadata
@@ -613,6 +668,8 @@ class Selection:
 
     def capture(self) -> Capture:
         self.verify()
+        if self._task_contract is not None and self._task_contract.task == 'causal':
+            raise ValueError('registered causal task requires authenticated paired CaptureGroup')
         rows = []
         for item in self.population.corpus:
             output = self.actor.invoke(item['input'])
@@ -620,16 +677,25 @@ class Selection:
         packet = canonical({'selection': self.digest, 'rows': rows})
         return Capture(packet, hmac.digest(self._capture_key, packet, 'sha256'))
 
-    def captured_outputs(self, capture: Capture) -> list[Stated]:
-        """Verify actual host capture before constructing a reviewer-visible projection."""
-        self.verify()
+    def _capture_rows(self, capture: Capture) -> list[dict[str, Any]]:
+        if capture._group is not None:
+            return capture._group._rows(self, capture)
+        if capture._core is not None:
+            raise ValueError('capture core requires original authenticated group membership')
+        if self._task_contract is not None and self._task_contract.task == 'causal':
+            raise ValueError('registered causal capture requires original authenticated group core')
         value = json.loads(capture.packet)
-        if value['selection'] != self.digest:
+        if value.get('selection') != self.digest:
             raise ValueError('capture belongs to a different selection')
         if not hmac.compare_digest(capture.authentication, hmac.digest(self._capture_key, capture.packet, 'sha256')):
             raise ValueError('host capture authentication failed')
+        return value['rows']
+
+    def captured_outputs(self, capture: Capture) -> list[Stated]:
+        """Verify actual host capture before constructing a reviewer-visible projection."""
+        self.verify()
         corpus = self.population.corpus
-        rows = value['rows']
+        rows = self._capture_rows(capture)
         if [row['id'] for row in rows] != [item['id'] for item in corpus]:
             raise ValueError('capture must cover exact ordered population')
         outputs = []
@@ -647,6 +713,9 @@ class Selection:
                 if config.get('runtime_contract') and output.get('observed_runtime') != config['runtime_contract']:
                     raise ValueError('capture host runtime differs from the immutable contract')
                 stated = self.actor.parser(raw, json.loads(self.actor.description)['config'])
+                if self._task_contract is not None:
+                    from .task_inputs import verify_output
+                    verify_output(item['input'], stated)
             if canonical({'answer': stated.answer, 'basis': stated.basis}) != canonical({
                     'answer': output['answer'], 'basis': output['basis']}):
                 raise ValueError('capture raw output and stated answer differ')
@@ -657,7 +726,7 @@ class Selection:
         self.captured_outputs(capture)
         if self.assessment_policy is None:
             raise ValueError('selection has no independent assessment policy')
-        rows = json.loads(capture.packet)['rows']
+        rows = self._capture_rows(capture)
         packets = json.loads(self.population.description)
         original = packets['observations'] if packets.get('trace_only') else packets['selected']
         return canonical({'schema': 'twin.basis-request/v1', 'policy': self.assessment_policy.digest,
@@ -705,7 +774,7 @@ class Selection:
         if any(not mp.scores_item(scorer, answer, item['expected']) for answer, item in zip(references, corpus)):
             raise ValueError('reference projection must score correctly before baseline derivation')
         baseline = mp.frozen_field_baseline(references, corpus, scorer)
-        answers = [row['output']['answer'] for row in json.loads(capture.packet)['rows']]
+        answers = [row['output']['answer'] for row in self._capture_rows(capture)]
         variance = mp.answer_variance(answers, baseline.reads)
         return {'skill': metric, 'model_version': self.actor.model_version,
                 'reference_admission': 'held development trace' if json.loads(self.population.description).get('trace_only')
@@ -753,6 +822,120 @@ class Selection:
                       if self.review else None})
 
 
+@dataclass(frozen=True)
+class GroupCapture:
+    packet: bytes
+    authentication: bytes = field(repr=False)
+
+    @property
+    def digest(self) -> str:
+        return hashlib.sha256(self.packet).hexdigest()
+
+
+def _neutral_population(population: Population) -> dict[str, Any]:
+    value = json.loads(population.description)
+    if value.get('trace_only'):
+        raise ValueError('held development traces cannot become paired causal proof')
+    rows = []
+    for packet in value['selected']:
+        case = packet['case']
+        scope = {key: child for key, child in packet['requested_scope'].items() if key != 'metric'}
+        context = {key: child for key, child in case['context'].items() if key != 'metric'}
+        rows.append({'scope': scope, **{key: case[key] for key in (
+            'id', 'group', 'input', 'reference_kind', 'sources', 'rights', 'selection', 'exposure', 'limitations')},
+            'context': context})
+    return {'rows': rows, 'envelope': value['envelope'], 'exposure': value['exposure'], 'held': value['held']}
+
+
+@dataclass(frozen=True)
+class CaptureGroup:
+    description: bytes
+    selections: tuple[Selection, Selection] = field(repr=False)
+    _capture_key: bytes = field(repr=False)
+
+    @classmethod
+    def freeze(cls, selections: tuple[Selection, ...]) -> CaptureGroup:
+        metrics = ('causal-claims', 'causal-claims-grade-accuracy')
+        if len(selections) != 2 or {item.population.metric for item in selections} != set(metrics):
+            raise ValueError('causal capture requires exactly quantity and grade selections')
+        pair = tuple(next(item for item in selections if item.population.metric == metric) for metric in metrics)
+        first, second = pair
+        for selected in pair:
+            selected.verify()
+        legacy = all(item._test_only is TEST_ONLY_MECHANICS for item in pair)
+        contracts = [json.loads(item.description).get('task_contract') for item in pair]
+        if (first.actor.digest != second.actor.digest or contracts[0] != contracts[1]
+                or not legacy and contracts[0] is None
+                or canonical(_neutral_population(first.population)) != canonical(_neutral_population(second.population))):
+            raise ValueError('causal group actor/task/ordered input/target/source/custody/exposure/scope differs')
+        description = canonical({'schema': 'twin.capture-group/v1', 'actor_digest': first.actor.digest,
+            'task_contract_digest': digest(contracts[0]) if contracts[0] else digest({'purpose': TEST_ONLY_MECHANICS.value}),
+            'ordered_batch_digest': digest(_neutral_population(first.population)),
+            'allowed_selection_digests': [item.digest for item in pair]})
+        return cls(description, (first, second), secrets.token_bytes(32))
+
+    @property
+    def digest(self) -> str:
+        return hashlib.sha256(self.description).hexdigest()
+
+    def verify(self) -> None:
+        if self.description != self.freeze(self.selections).description:
+            raise ValueError('causal group membership or support binding changed')
+
+    def capture(self) -> GroupCapture:
+        self.verify()
+        rows = []
+        for item in self.selections[0].population.corpus:
+            output = self.selections[0].actor.invoke(item['input'])
+            rows.append({'id': item['id'], 'target_digest': digest(item['input'].get('target')),
+                         'attempt_id': secrets.token_hex(24), 'output': json.loads(output.packet)})
+        packet = canonical({'schema': 'twin.invocation-capture/v1', 'group_digest': self.digest,
+            'actor_digest': self.selections[0].actor.digest,
+            'batch_digest': json.loads(self.description)['ordered_batch_digest'], 'rows': rows})
+        return GroupCapture(packet, hmac.digest(self._capture_key, packet, 'sha256'))
+
+    def _verify_capture(self, capture: GroupCapture) -> dict[str, Any]:
+        self.verify()
+        if not hmac.compare_digest(capture.authentication, hmac.digest(self._capture_key, capture.packet, 'sha256')):
+            raise ValueError('group capture was not invoked by the protected host')
+        core = json.loads(capture.packet)
+        corpus = self.selections[0].population.corpus
+        if (core['schema'] != 'twin.invocation-capture/v1' or core['group_digest'] != self.digest
+                or core['actor_digest'] != self.selections[0].actor.digest
+                or core['batch_digest'] != json.loads(self.description)['ordered_batch_digest']
+                or [row['id'] for row in core['rows']] != [item['id'] for item in corpus]
+                or len({row['attempt_id'] for row in core['rows']}) != len(corpus)
+                or any(row['target_digest'] != digest(item['input'].get('target')) for row, item in zip(core['rows'], corpus))):
+            raise ValueError('group raw core differs from exact frozen membership/batch')
+        return core
+
+    def view(self, selection: Selection, capture: GroupCapture) -> Capture:
+        core = self._verify_capture(capture)
+        if selection.digest not in [item.digest for item in self.selections]:
+            raise ValueError('selection is outside frozen causal group')
+        packet = canonical({'schema': 'twin.group-capture-view/v1', 'selection_digest': selection.digest,
+            'group_digest': capture.digest, 'row_refs': [{'id': row['id'], 'index': index} for index, row in enumerate(core['rows'])]})
+        return Capture(packet, hmac.digest(selection._capture_key, packet + capture.packet, 'sha256'), self, capture)
+
+    def archive(self, capture: GroupCapture, assessments: dict[str, BasisAssessment] | None = None) -> bytes:
+        self._verify_capture(capture)
+        assessments = assessments or {}
+        if set(assessments) != {selected.population.metric for selected in self.selections if selected.assessment_policy}:
+            raise ValueError('group archive requires every independent metric assessment')
+        members = [json.loads(selected.archive(self.view(selected, capture), assessments.get(selected.population.metric)))
+                   for selected in self.selections]
+        return canonical({'schema': 'twin.qualification-group-bundle/v1', 'group': json.loads(self.description),
+                          'core': json.loads(capture.packet), 'members': members})
+
+    def _rows(self, selection: Selection, view: Capture) -> list[dict[str, Any]]:
+        if view._group is not self or not isinstance(view._core, GroupCapture):
+            raise ValueError('group view requires original protected core')
+        expected = self.view(selection, view._core)
+        if view.packet != expected.packet or not hmac.compare_digest(view.authentication, expected.authentication):
+            raise ValueError('causal view membership/raw core authentication changed')
+        return [{'id': row['id'], 'output': row['output']} for row in json.loads(view._core.packet)['rows']]
+
+
 def _refuse(permission: mp.Permission, item: int, detail: str) -> mp.Permission:
     old = next(condition for condition in permission.conditions if condition.item == item)
     return mp.Permission(permission.skill, permission.model_version, tuple(
@@ -778,11 +961,26 @@ class Resolver:
         self._allow_test_only = allow_test_only
         self._facts: dict[tuple[str, str, str], dict[str, Any]] = {}
         self._sessions: dict[str, HostSession] = {}
+        self._task_policies: dict[str, Any] = {}
+        self._groups: dict[str, CaptureGroup] = {}
+        for selected, captured in self._bindings.values():
+            if selected._task_policy is not None:
+                self._task_policies[selected._task_policy.digest] = selected._task_policy
+            if selected._task_contract is not None and selected._task_contract.task == 'causal':
+                if not isinstance(captured._group, CaptureGroup):
+                    raise ValueError('registered causal binding requires both authenticated group views')
+                group = captured._group
+                if any((member.population.metric, member.actor.model_version) not in self._bindings
+                       or self._bindings[(member.population.metric, member.actor.model_version)][1]._group is not group
+                       for member in group.selections):
+                    raise ValueError('ordinary single-metric causal registration is forbidden')
+                self._groups[selected.actor.model_version] = group
 
     @classmethod
     def from_catalogue(cls, catalogue: Path, expected_digest: str, scores_path: Path | None = None,
                        *, allow_test_only: bool = False, metadata_store: Any = None,
-                       source_metadata_policy: dict[str, Any] | None = None) -> Resolver:
+                       source_metadata_policy: dict[str, Any] | None = None,
+                       task_policies: dict[str, Any] | None = None) -> Resolver:
         """Import a durable host snapshot, not a model-provided path or checksum.
 
         The caller must obtain expected_digest from its protected source/configuration before
@@ -803,10 +1001,20 @@ class Resolver:
             bundle = path.read_bytes()
             if hashlib.sha256(bundle).hexdigest() != entry['sha256']:
                 raise ValueError('protected bundle digest differs')
-            bindings.append(_restore_bundle(bundle, metadata_store=metadata_store,
-                source_metadata_policy=source_metadata_policy,
-                test_only=TEST_ONLY_MECHANICS if allow_test_only else None))
+            if json.loads(bundle).get('schema') == 'twin.qualification-group-bundle/v1':
+                bindings.extend(_restore_group_bundle(bundle, metadata_store=metadata_store,
+                    source_metadata_policy=source_metadata_policy, task_policies=task_policies,
+                    test_only=TEST_ONLY_MECHANICS if allow_test_only else None))
+            else:
+                bindings.append(_restore_bundle(bundle, metadata_store=metadata_store,
+                    source_metadata_policy=source_metadata_policy, task_policies=task_policies,
+                    test_only=TEST_ONLY_MECHANICS if allow_test_only else None))
         resolver = cls(tuple(bindings), scores_path, allow_test_only=allow_test_only)
+        for key, policy in (task_policies or {}).items():
+            policy.verify()
+            if key != policy.digest:
+                raise ValueError('protected task policy lookup digest differs')
+            resolver._task_policies[key] = policy
         for entry in document.get('sessions', []):
             path = catalogue.parent / entry['bundle']
             if path.is_symlink() or not path.resolve().is_relative_to(catalogue.parent.resolve()):
@@ -817,7 +1025,9 @@ class Resolver:
             legacy = json.loads(session_bytes).get('inputs', {}).get('purpose')
             session = HostSession.restore(session_bytes, resolver, metadata_store=metadata_store,
                 metadata_policy=source_metadata_policy,
-                test_only=TEST_ONLY_MECHANICS if allow_test_only and legacy else None)
+                test_only=TEST_ONLY_MECHANICS if allow_test_only and legacy else None,
+                task_policy=(task_policies or {}).get(digest(json.loads(session_bytes)['inputs']['task_policy']))
+                    if 'task_policy' in json.loads(session_bytes)['inputs'] else None)
             if session.identity in resolver._sessions:
                 raise ValueError('duplicate host session')
             resolver._sessions[session.identity] = session
@@ -889,6 +1099,19 @@ class Resolver:
             permission = _refuse(permission, 10, '; '.join(reasons))
         return permission
 
+    def task_policy(self, policy_digest: str) -> Any:
+        policy = self._task_policies.get(policy_digest)
+        if policy is None:
+            raise ValueError('protected task policy handle was not independently supplied')
+        policy.verify()
+        return policy
+
+    def task_session(self, identity: str) -> HostSession:
+        session = self._sessions.get(identity)
+        if session is None:
+            raise ValueError('no protected imported/registered task session')
+        return session
+
     def host_session(self, inputs: HostInputs) -> HostSession:
         """Create before the child starts, from protected host-resolved source projections."""
         session = HostSession(self, inputs)
@@ -929,11 +1152,12 @@ class HostInputs:
     _metadata_store: Any = field(default=None, repr=False, compare=False)
     _metadata_policy: bytes | None = field(default=None, repr=False, compare=False)
     _test_only: TestOnlyPurpose | None = field(default=None, repr=False, compare=False)
+    _task_policy: Any = field(default=None, repr=False, compare=False)
 
     @classmethod
     def freeze(cls, records: tuple[dict[str, Any], ...], issuers: tuple[str, ...], *,
                metadata_store: Any = None, metadata_policy: dict[str, Any] | None = None,
-               test_only: TestOnlyPurpose | None = None) -> HostInputs:
+               test_only: TestOnlyPurpose | None = None, task_policy: Any = None) -> HostInputs:
         subjects = [row.get('subject') for row in records]
         if any(not isinstance(subject, str) or not subject for subject in subjects) or len(set(subjects)) != len(subjects):
             raise ValueError('host inputs need unique nonempty subjects')
@@ -941,7 +1165,7 @@ class HostInputs:
             raise ValueError('invalid protected TEST_ONLY host purpose')
         description: dict[str, Any] = {'records': records, 'issuers': issuers}
         if test_only is TEST_ONLY_MECHANICS:
-            if metadata_store is not None or metadata_policy is not None or any(
+            if metadata_store is not None or metadata_policy is not None or task_policy is not None or any(
                     not row.get('issuer', '').startswith('TEST_ONLY') for row in records):
                 raise ValueError('legacy mechanics require protected TEST_ONLY host purpose')
             description['purpose'] = test_only.value
@@ -951,25 +1175,36 @@ class HostInputs:
             if metadata_policy['purpose'] == 'TEST_ONLY' and any(not row.get('issuer', '').startswith('TEST_ONLY') for row in records):
                 raise ValueError('TEST_ONLY source authority cannot enter an actual host import')
             description['source_metadata_policy'] = metadata_policy
+        if task_policy is not None:
+            task_policy.verify()
+            for row in records:
+                task_policy.verify_input(row)
+            description['task_policy'] = json.loads(task_policy.description)
         return cls(canonical(description), metadata_store,
-                   canonical(metadata_policy) if metadata_policy is not None else None, test_only)
+                   canonical(metadata_policy) if metadata_policy is not None else None, test_only, task_policy)
 
     @classmethod
     def restore(cls, archive: bytes, *, metadata_store: Any = None,
                 metadata_policy: dict[str, Any] | None = None,
-                test_only: TestOnlyPurpose | None = None) -> HostInputs:
+                test_only: TestOnlyPurpose | None = None, task_policy: Any = None) -> HostInputs:
         value = json.loads(archive)
+        if 'task_policy' not in value:
+            task_policy = None
         # A catalogue's signal handles must not add a binding to unrelated inputs.
         # Actual signal rows still require their protected handles in resolve below.
         if 'source_metadata_policy' not in value:
             metadata_store, metadata_policy = None, None
         restored = cls.freeze(tuple(value['records']), tuple(value['issuers']), metadata_store=metadata_store,
-                              metadata_policy=metadata_policy, test_only=test_only)
+                              metadata_policy=metadata_policy, test_only=test_only, task_policy=task_policy)
         if restored.description != archive:
             raise ValueError('host restore differs from independently selected protected store/policy/purpose')
         for record in value['records']:
             restored.resolve(record['subject'])
         return restored
+
+    @property
+    def records(self) -> tuple[dict[str, Any], ...]:
+        return tuple(self.resolve(row['subject']) for row in json.loads(self.description)['records'])
 
     def resolve(self, subject: str) -> dict[str, Any]:
         value = json.loads(self.description)
@@ -992,6 +1227,16 @@ class HostInputs:
             for name in ('organisation', 'domain', 'capability', 'as_of', 'frame', 'source'):
                 if not isinstance(context.get(name), str) or not context[name]:
                     raise ValueError('missing host context: ' + name)
+            if value.get('task_policy') != (json.loads(self._task_policy.description) if self._task_policy else None):
+                raise ValueError('host archive requires original protected task policy')
+            from .task_contracts import TASK_METRICS
+            typed_task = isinstance(row['input'], dict) and row['input'].get('schema') in {
+                f'twin.{task}-input/v2' for task in TASK_METRICS}
+            if self._task_policy is not None:
+                self._task_policy.verify_input(row)
+                return row
+            if typed_task:
+                raise ValueError('typed task input requires independently selected protected task policy')
             # A v2 source projection cannot opt into generic component routing by
             # removing public signal flags or its serialized metadata policy.
             source_context = row['input'].get('source_context') if isinstance(row['input'], dict) else None
@@ -1035,6 +1280,16 @@ def _scope_reasons(population: Population, context: dict[str, Any]) -> list[str]
                            ('capability', 'capabilities'), ('frame', 'frames'), ('source', 'sources')):
         if context.get(field) not in envelope[allowed]:
             reasons.append('host ' + field + ' is outside the predeclared applicability envelope')
+    from .task_contracts import METRIC_TASK
+    if population.metric in METRIC_TASK and 'task_contexts' in envelope:
+        frozen = envelope['task_contexts'].get(context.get('organisation'), {})
+        for name in ('model_pins', 'model_as_of', 'party_sha256', 'input_constructor_sha256', 'task_contract_sha256'):
+            if context.get(name) != frozen.get(name) or not frozen.get(name):
+                reasons.append('host ' + name + ' differs from qualified task context')
+        if context.get('estate_scope_sha256') != envelope.get('estate_scope_sha256'):
+            reasons.append('host task estate scope differs')
+        if not context.get('source_families') or any(family not in envelope['sources'] for family in context['source_families']):
+            reasons.append('a task source family is outside declared applicability')
     if population.metric == 'signal-classify' and 'signal_contexts' in envelope:
         frozen = envelope['signal_contexts'].get(context.get('organisation'), {})
         for name in ('candidate_universe_digest', 'model_pins', 'model_as_of', 'input_construction_sha256'):
@@ -1075,6 +1330,30 @@ class HostSession:
         self._reviewed_outputs: list[dict[str, Any]] = []
         self._generation_dispositions: list[dict[str, Any]] = []
         self._generation_blobs: dict[str, str] = {}
+        self._task_job: bytes | None = None
+        self._task_attempts: list[dict[str, Any]] = []
+        self._task_events: list[dict[str, Any]] = []
+        self._task_reviews: dict[str, Any] = {}
+
+    def bind_task_job(self, job: dict[str, Any]) -> None:
+        from .task_sessions import bind_job
+        bind_job(self, job)
+
+    def task_snapshot(self) -> dict[str, Any]:
+        from .task_sessions import snapshot
+        return snapshot(self)
+
+    def decline_task_run(self, subjects: tuple[str, ...], reason: str) -> None:
+        from .task_sessions import decline_run
+        decline_run(self, subjects, reason)
+
+    def judge_group(self, model_version: str, subject: str) -> Judgement:
+        from .task_sessions import judge
+        return judge(self, 'causal', model_version, subject, paired=True)
+
+    def check_task_document(self, document: dict[str, Any]) -> list[str]:
+        from .task_sessions import check_document
+        return check_document(self, document)
 
     @property
     def declines(self) -> list[dict[str, str]]:
@@ -1082,10 +1361,13 @@ class HostSession:
 
     @property
     def pending_reviews(self) -> list[dict[str, Any]]:
-        return [{'request_digest': key, 'request': self._review_request(json.loads(record))}
+        return [{'request_digest': key, 'request': json.loads(record).get('task_review_request') or self._review_request(json.loads(record))}
                 for key, record in self._pending.items()]
 
     def _review_request(self, record: dict[str, Any]) -> dict[str, Any]:
+        if 'task_metrics' in record:
+            from .task_sessions import review_request
+            return review_request(self, record)
         selected, _ = self._resolver._bindings[(record['metric'], record['model_version'])]
         if selected.assessment_policy is None:
             raise ValueError('live selection has no independent assessment policy')
@@ -1098,6 +1380,10 @@ class HostSession:
                 'output': record['output']}]}
 
     def _verify_record(self, record: dict[str, Any]) -> None:
+        if 'task_metrics' in record:
+            from .task_sessions import verify_record
+            verify_record(self, record)
+            return
         row = self._inputs.resolve(record['subject'])
         selected, _ = self._resolver._bindings[(record['metric'], record['model_version'])]
         selected.verify_input(row)
@@ -1115,6 +1401,9 @@ class HostSession:
 
     def review_pending(self, request_digest: str, store: ReviewStore) -> Judgement:
         """Resume the retained actual output after host acquisition, never rerun inference."""
+        if request_digest in self._pending and 'task_metrics' in json.loads(self._pending[request_digest]):
+            from .task_sessions import review_pending
+            return review_pending(self, request_digest, store)
         subject = request_digest
         try:
             record = json.loads(self._pending[request_digest])
@@ -1147,6 +1436,11 @@ class HostSession:
             return Judgement(None, str(exc))
 
     def judge(self, metric: str, model_version: str, subject: str) -> Judgement:
+        from .task_contracts import METRIC_TASK
+        binding = self._resolver._bindings.get((metric, model_version))
+        if metric in METRIC_TASK and (binding is None or binding[0]._test_only is not TEST_ONLY_MECHANICS):
+            from .task_sessions import judge
+            return judge(self, METRIC_TASK[metric], model_version, subject, paired=False)
         try:
             row = self._inputs.resolve(subject)
             bound = self._resolver._bindings.get((metric, model_version))
@@ -1158,7 +1452,9 @@ class HostSession:
             reasons = _scope_reasons(selected.population, row['context'])
             if reasons:
                 raise ValueError('; '.join(reasons))
-            if metric != 'signal-classify' and not row['context'].get('component'):
+            if selected._task_contract is not None and selected._task_contract.task == 'causal':
+                raise ValueError('registered causal task requires paired judgement and both current permissions')
+            if metric != 'signal-classify' and selected._task_contract is None and not row['context'].get('component'):
                 raise ValueError('non-signal judgement requires its fixed host component')
             if metric == 'substrate-generator':
                 from .substrate_generation import validate_row
@@ -1280,23 +1576,32 @@ class HostSession:
             'pending_reviews': {key: json.loads(value) for key, value in self._pending.items()},
             'reviewed_outputs': self._reviewed_outputs,
             'generation_dispositions': self._generation_dispositions,
-            'generation_blobs': self._generation_blobs})
+            'generation_blobs': self._generation_blobs,
+            **({'task_job': json.loads(self._task_job), 'task_attempts': self._task_attempts,
+                'task_events': self._task_events, 'task_reviews': self._task_reviews} if self._task_job is not None else {})})
 
     @classmethod
     def restore(cls, archive: bytes, resolver: Resolver, *, metadata_store: Any = None,
                 metadata_policy: dict[str, Any] | None = None,
-                test_only: TestOnlyPurpose | None = None) -> HostSession:
+                test_only: TestOnlyPurpose | None = None, task_policy: Any = None) -> HostSession:
         value = json.loads(archive)
         if value.get('schema') != 'twin.host-session/v1':
             raise ValueError('unknown protected session schema')
         session = cls(resolver, HostInputs.restore(canonical(value['inputs']), metadata_store=metadata_store,
-            metadata_policy=metadata_policy, test_only=test_only))
+            metadata_policy=metadata_policy, test_only=test_only, task_policy=task_policy))
         session.identity = value['identity']
         session._declines = value['declines']
         session._failed_outputs = value.get('failed_outputs', [])
         session._reviewed_outputs = value.get('reviewed_outputs', [])
         session._generation_dispositions = value.get('generation_dispositions', [])
         session._generation_blobs = value.get('generation_blobs', {})
+        if 'task_job' in value:
+            session.bind_task_job(value['task_job'])
+            session._task_attempts = value['task_attempts']
+            session._task_events = value['task_events']
+            session._task_reviews = value['task_reviews']
+            from .task_sessions import restore_assessments
+            restore_assessments(session)
         for key, record in value.get('pending_reviews', {}).items():
             session._verify_record(record)
             selected, _ = resolver._bindings[(record['metric'], record['model_version'])]
@@ -1305,6 +1610,11 @@ class HostSession:
                 raise ValueError('pending host review request differs from protected capture')
             session._pending[key] = canonical(record)
         for token, record in value['records'].items():
+            if 'task_metrics' in record:
+                from .task_sessions import restore_record
+                restore_record(session, record)
+                session._records[token] = canonical(record)
+                continue
             row = session._inputs.resolve(record['subject'])
             selected, _ = resolver._bindings[(record['metric'], record['model_version'])]
             selected.verify_input(row)
@@ -1348,10 +1658,10 @@ def _restore_callable(identity: dict[str, Any]) -> Callable[..., Any]:
     return value
 
 
-def _restore_bundle(bundle: bytes, *, metadata_store: Any = None,
-                    source_metadata_policy: dict[str, Any] | None = None,
-                    test_only: TestOnlyPurpose | None = None) -> tuple[Selection, Capture] | tuple[Selection, Capture, BasisAssessment]:
-    value = json.loads(bundle)
+def _restore_selection(value: dict[str, Any], *, metadata_store: Any = None,
+                       source_metadata_policy: dict[str, Any] | None = None,
+                       test_only: TestOnlyPurpose | None = None,
+                       task_policies: dict[str, Any] | None = None) -> Selection:
     if value.get('schema') != 'twin.qualification-bundle/v1':
         raise ValueError('unknown host bundle schema')
     actor_value = value['actor']
@@ -1378,13 +1688,32 @@ def _restore_bundle(bundle: bytes, *, metadata_store: Any = None,
     if legacy and test_only is not TEST_ONLY_MECHANICS:
         raise ValueError('ordinary operational catalogue cannot restore TEST_ONLY legacy mechanics')
     policy = BasisPolicy(canonical(selection_value['assessment_policy'])) if selection_value.get('assessment_policy') else None
+    task_policy = None
+    if selection_value.get('task_policy') is not None:
+        task_policy = (task_policies or {}).get(digest(selection_value['task_policy']))
+        if task_policy is None or task_policy.description != canonical(selection_value['task_policy']):
+            raise ValueError('restored task requires original independently selected protected policy handles')
     selected = Selection.freeze(actor, population, _restore_callable(selection_value['basis_checker']),
         reference_projection=_restore_callable(selection_value['projection']), review=review, assessment_policy=policy,
         source_metadata_policy=source_metadata_policy if population.metric == 'signal-classify' else None,
         metadata_store=metadata_store if population.metric == 'signal-classify' else None,
-        test_only=TEST_ONLY_MECHANICS if legacy and test_only is TEST_ONLY_MECHANICS else None)
+        test_only=TEST_ONLY_MECHANICS if legacy and test_only is TEST_ONLY_MECHANICS else None,
+        task_contract=task_policy.contract if task_policy else None, task_policy=task_policy)
     if selected.description != canonical(selection_value):
         raise ValueError('archived selection differs from current host binding')
+    return selected
+
+
+def _restore_bundle(bundle: bytes, *, metadata_store: Any = None,
+                    source_metadata_policy: dict[str, Any] | None = None,
+                    test_only: TestOnlyPurpose | None = None,
+                    task_policies: dict[str, Any] | None = None) -> tuple[Selection, Capture] | tuple[Selection, Capture, BasisAssessment]:
+    value = json.loads(bundle)
+    selected = _restore_selection(value, metadata_store=metadata_store,
+        source_metadata_policy=source_metadata_policy, test_only=test_only, task_policies=task_policies)
+    if selected._task_contract is not None and selected._task_contract.task == 'causal':
+        raise ValueError('ordinary single-metric bundle cannot establish paired causal proof')
+    policy = selected.assessment_policy
     packet = canonical(value['capture'])
     captured = Capture(packet, hmac.digest(selected._capture_key, packet, 'sha256'))
     if policy:
@@ -1395,3 +1724,38 @@ def _restore_bundle(bundle: bytes, *, metadata_store: Any = None,
         return selected, captured, assessment
     selected.evaluate(captured)
     return selected, captured
+
+
+def _restore_group_bundle(bundle: bytes, *, metadata_store: Any = None,
+                          source_metadata_policy: dict[str, Any] | None = None,
+                          test_only: TestOnlyPurpose | None = None,
+                          task_policies: dict[str, Any] | None = None) -> list[Any]:
+    value = json.loads(bundle)
+    if value.get('schema') != 'twin.qualification-group-bundle/v1' or len(value.get('members', [])) != 2:
+        raise ValueError('complete paired causal group bundle required')
+    selections = tuple(_restore_selection(member, metadata_store=metadata_store,
+        source_metadata_policy=source_metadata_policy, test_only=test_only, task_policies=task_policies)
+        for member in value['members'])
+    group = CaptureGroup.freeze(selections)
+    if canonical(value['group']) != group.description:
+        raise ValueError('restored causal group membership/actor/input/custody differs')
+    raw = canonical(value['core'])
+    core = GroupCapture(raw, hmac.digest(group._capture_key, raw, 'sha256'))
+    group._verify_capture(core)
+    result: list[tuple[Selection, Capture] | tuple[Selection, Capture, BasisAssessment]] = []
+    for selected, member in zip(selections, value['members']):
+        view = group.view(selected, core)
+        if view.packet != canonical(member['capture']):
+            raise ValueError('restored metric view differs from actual shared raw core')
+        selected.captured_outputs(view)
+        if selected.assessment_policy:
+            if member.get('assessment') is None:
+                raise ValueError('group member omits its independent semantic assessment')
+            assessment = _restore_assessment(canonical(member['assessment']), selected.assessment_policy,
+                                              selected.assessment_request(view))
+            selected.evaluate(view, assessment)
+            result.append((selected, view, assessment))
+        else:
+            selected.evaluate(view)
+            result.append((selected, view))
+    return result
