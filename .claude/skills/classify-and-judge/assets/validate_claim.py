@@ -82,6 +82,13 @@ def validate(doc, kinds, roles, headless=False, clock=None, permission=None):
     only on a `github` clock, the model-judging permission is graded here -- this function is
     the seam. Given neither, the file is checked exactly as before, which is what every
     human-run and local-clock path gets."""
+    if doc.get('schema') == 'twin.substrate-generation/v1':
+        # Generation has no headline claim kind. It requires its protected parent receipt
+        # checker even for a human/local invocation of this explicit model-only route.
+        if permission is None or clock is None:
+            return ['protected generator validation requires the host resolver and derived clock']
+        check_document, lookup = permission
+        return check_document(doc, clock, lookup)
     bad = []
 
     def need(condition, message):
@@ -207,6 +214,8 @@ def main(argv=None):
     parser.add_argument("claim", nargs="?")
     parser.add_argument("--run-registered-signals", metavar="ADOPTER",
                         help="protected parent execution of this judge package's registered signal job")
+    parser.add_argument("--run-registered-generation", metavar="ADOPTER",
+                        help="protected parent execution of this judge package's registered generator job")
     parser.add_argument("--output", help="new host evidence directory for registered signal execution")
     parser.add_argument("--twin", default=".",
                         help="the hub checkout holding the twin package and roles.yaml")
@@ -220,6 +229,15 @@ def main(argv=None):
                              "permission")
     args = parser.parse_args(argv)
 
+    if args.run_registered_generation:
+        if args.claim or args.run_registered_signals or not args.output:
+            parser.error('registered generation needs --output and no claim or signal-job input')
+        sys.path.insert(0, os.path.abspath(args.twin))
+        from pathlib import Path
+        from twin.substrate_generation import run_registered
+        result = run_registered(args.run_registered_generation, Path(args.output), args.clock)
+        print(yaml.safe_dump(result, sort_keys=True))
+        return 0 if result['accepted'] else 2
     if args.run_registered_signals:
         if args.claim or not args.output:
             parser.error('registered execution needs --output and no model-written claim input')
@@ -244,6 +262,9 @@ def main(argv=None):
             print(f"not ok  {line}")
         print(f"FAIL: {args.claim} is not a claim file the twin can read")
         return 1
+    if doc.get('schema') == 'twin.substrate-generation/v1':
+        print(f"ok  {args.claim}: protected authored generator captures and counted dispositions match")
+        return 0
     kinds_used = sorted({claim["kind"] for claim in doc["claims"]})
     print(f"ok  {args.claim}: {len(doc['claims'])} claims, kinds {kinds_used}, all in the twin's "
           f"own CLAIM_KINDS; every pin derived_from names is cited by a claim and every pin a "
