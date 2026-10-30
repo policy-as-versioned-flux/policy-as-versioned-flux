@@ -65,6 +65,14 @@ _SPECS: tuple[tuple[str, Any, Any, Any, Any], ...] = (
 METRICS: tuple[str, ...] = tuple(spec[0] for spec in _SPECS)
 
 
+def scorer_for(skill: str) -> Callable[[Any, Any], bool]:
+    """The existing metric's scorer, shared by bound candidate evaluation."""
+    for name, _, _, _, scorer in _SPECS:
+        if name == skill:
+            return scorer
+    raise KeyError(f'no metric named {skill!r}')
+
+
 def raw_skill(skill: str) -> Callable[[Any], Any]:
     """Original answer API, including the reference answers used by permission baselines."""
     for name, raw, _, _, _ in _SPECS:
@@ -147,6 +155,8 @@ def run(
     """Evaluate every real skill against its real corpus and append one score-over-time entry
     each. `recorded_at` is supplied by the caller — `record_score`'s own discipline — never read
     from the clock inside this function."""
+    if model_version != HEURISTIC_MODEL_VERSION:
+        raise ValueError('select an actual actor through twin.qualification; model_version is not a selector')
     with TemporaryDirectory() as tmp:
         results = _evaluate_all(Path(tmp))
     return [record_score(result, model_version, recorded_at, path=path) for result in results]
