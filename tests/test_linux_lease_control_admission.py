@@ -107,6 +107,23 @@ def test_aggregate_cannot_substitute_a_different_live_sentinel():
         control().verify_result(value)
 
 
+@pytest.mark.parametrize('seconds', (30.0, 30.0001, 40.0))
+def test_fixed_deadline_subcase_retains_its_stricter_thirty_second_ceiling(seconds):
+    value = receipt('invalid-evidence')
+    deadline = value['attempts'][1]
+    extension = seconds - (deadline['finished'] - deadline['started'])
+    deadline['finished'] += extension
+    for later in value['attempts'][2:]:
+        later['started'] += extension
+        later['finished'] += extension
+    value['finished'] += extension
+    if seconds == 30.0:
+        assert control().verify_result(value)['production_capture_accepted'] is False
+    else:
+        with pytest.raises(ValueError, match='ceiling'):
+            control().verify_result(value)
+
+
 def ancestry(monkeypatch, executable='/usr/bin/sudo', mode=0o4755, owner=0, capabilities=False, links=1, acl=False, symlink=False):
     module = control()
     guardian = module._guardian()

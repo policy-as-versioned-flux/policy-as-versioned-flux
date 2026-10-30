@@ -29,6 +29,7 @@ SCENARIOS = ('baseline','boundaries','resources','supervisor-loss','guardian-los
 STORE = '/var/lib/policy-as-versioned-flux-linux-control'
 ANCHOR = STORE+'/host.json'
 ATTEMPT_SECONDS, CLEANUP_SECONDS, TOTAL_SECONDS = 60,10,900
+DEADLINE_SECONDS = 30
 MAX_FILES, MAX_BYTES = 4096,256*1024**2
 HANDOFFS = ('raw-clone','attached','dropped','armed','ready','descendants')
 CHECKS = {'baseline':('paired','limits','network','sources'),
@@ -456,7 +457,9 @@ def verify_result(value: Any) -> dict[str,Any]:
     merged={}
     previous=finite(value.get('started'))
     for attempt in attempts:
-        if (not isinstance(attempt,dict) or not 0<=finite(attempt.get('finished'))-finite(attempt.get('started'))<=ATTEMPT_SECONDS
+        if not isinstance(attempt,dict):raise ValueError('actual attempt record required')
+        ceiling=DEADLINE_SECONDS if scenario=='invalid-evidence' and attempt.get('case')=='deadline' else ATTEMPT_SECONDS
+        if (not 0<=finite(attempt.get('finished'))-finite(attempt.get('started'))<=ceiling
                 or attempt.get('error') is not None or attempt.get('executed') is not True
                 or attempt.get('scenario')!=scenario):
             raise ValueError('an actual attempt failed or exceeded its shared ceiling')
@@ -937,7 +940,7 @@ def run_attempt(g:Any,host:dict[str,Any],profile:dict[str,Any],caller:Any,
     scenario=profile['config']['scenario']
     if case not in CASES[scenario]:raise ValueError('fixed source-appointed subcase required')
     started=time.monotonic();deadline=min(started+ATTEMPT_SECONDS,total_deadline)
-    if case=='deadline':deadline=min(deadline,started+30)
+    if case=='deadline':deadline=min(deadline,started+DEADLINE_SECONDS)
     if deadline-started<=10:raise ValueError('no finite attempt/teardown reserve remains')
     events=[];observed:dict[str,Any]={'receipts':[],'host_pids':[],
         'candidate_code_before_release':False,'detached':[]}
