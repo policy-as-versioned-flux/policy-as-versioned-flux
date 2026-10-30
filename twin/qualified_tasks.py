@@ -19,6 +19,7 @@ SCHEMAS = {'causal': 'twin.causal-proposal/v1', 'gameplay': 'twin.gameplay-propo
            'ethics': 'twin.ethics-judgement/v1'}
 ATTEMPT_FIELDS = ('attempt_id', 'subject', 'input_sha256', 'target_sha256', 'actor_sha256',
                   'capture_sha256', 'raw_available', 'disposition', 'reason')
+CATALOGUE = Path(q.__file__).with_name('qualification-registry.json')
 
 
 def _job(job: dict[str, Any]) -> TaskContract:
@@ -152,6 +153,29 @@ class TaskResolver(Protocol):
     def task_policy(self, digest: str) -> Any: ...
 
 
+def validate_document(document: dict[str, Any], resolver: TaskResolver, clock: str | None = None) -> list[str]:
+    """Public validator hook: a document cannot recreate a private host session/receipt."""
+    from .repo import load_yaml
+    bad = []
+    try:
+        run = document.get('run') or {}
+        if run.get('clock') != q.mp.derive_clock(clock)[0]:
+            bad.append('task document clock differs from the protected caller/environment')
+        if run.get('headless') is not True:
+            bad.append('protected model task document must retain its headless parent mode')
+        roles = load_yaml(Path(q.__file__).with_name('roles.yaml').read_text())
+        if run.get('operator_role') not in {item['id'] for item in roles['roles']}:
+            bad.append('task operator role is not registered')
+        identity = run.get('host_session')
+        if not isinstance(identity, str) or not identity:
+            raise ValueError('no protected task session identity')
+        session = resolver.task_session(identity)
+        bad.extend(session.check_task_document(document))
+    except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:
+        bad.append('protected task session verification failed: ' + str(exc))
+    return bad
+
+
 class TaskParent:
     """A protected parent invokes only the host's registered task or paired causal seam."""
     def __init__(self, resolver: TaskResolver, *, role: str = 'model-steward', clock: str | None = None):
@@ -221,7 +245,7 @@ class TaskRun:
         document = self.document()
         if document is None:
             return ['no accepted task judgement; human-required fallback remains']
-        return self.session.check_task_document(document)
+        return validate_document(document, self.parent.resolver, self.parent.clock)
 
     def save(self, output: Path) -> dict[str, Any]:
         output.mkdir(parents=True, exist_ok=False)
@@ -274,9 +298,11 @@ def run_registered(task: str, organisation: str, output: Path, clock: str | None
     """Use only fixed protected-package jobs and original independently supplied handles."""
     if output.exists():
         raise FileExistsError('historical task output already exists')
-    catalogue = Path(q.__file__).with_name('qualification-registry.json')
+    catalogue = CATALOGUE
     try:
         TaskContract.freeze(task)
+        if catalogue.is_symlink():
+            raise ValueError('protected task catalogue is a symlink')
         raw = catalogue.read_bytes()
         entry = decode(raw).get('task_jobs', {}).get(task, {}).get(organisation)
         if entry is None:
@@ -288,19 +314,20 @@ def run_registered(task: str, organisation: str, output: Path, clock: str | None
                 or bundle['schema'] != 'twin.protected-task-job/v1'
                 or bundle['execution']['task'] != task or bundle['execution']['organisation'] != organisation):
             raise ValueError('registered task job shape or route differs')
-        _job(bundle['execution'])
         host = resolver or cast(TaskResolver, q.Resolver.from_catalogue(catalogue, hashlib.sha256(raw).hexdigest()))
         policy = host.task_policy(bundle['task_policy_sha256'])
         inputs_raw = _member(root, bundle['inputs'])
         # Only the original independently supplied handle can restore host inputs.
         inputs = q.HostInputs.restore(inputs_raw, task_policy=policy)
-        parent = TaskParent(host, clock=clock)
-        run = (parent.resume(bundle['execution'], host.task_session(bundle['resume_session']))
-               if bundle.get('resume_session') else parent.start(bundle['execution'], inputs))
+        store = None
         if bundle.get('review_store'):
             from .basis_assessment import ReviewStore
             _member(root, bundle['review_store'])
             store = ReviewStore(root / bundle['review_store']['path'], bundle['review_store']['sha256'])
+        parent = TaskParent(host, clock=clock)
+        run = (parent.resume(bundle['execution'], host.task_session(bundle['resume_session']))
+               if bundle.get('resume_session') else parent.start(bundle['execution'], inputs))
+        if store is not None:
             run.review_pending(store)
         return run.save(output)
     except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:

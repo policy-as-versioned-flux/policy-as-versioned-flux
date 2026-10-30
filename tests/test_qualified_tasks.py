@@ -1,11 +1,14 @@
 """TEST_ONLY parent serialization controls, never earned task permissions."""
 import base64
 import copy
+import hashlib
+import json
 
 import pytest
 
 from twin import qualification as q, qualified_tasks as parent
 from twin.task_contracts import TaskContract, validate
+from test_signal_inputs import protected_request
 
 
 def snapshot(task):
@@ -105,6 +108,21 @@ def test_snapshot_job_cannot_be_relabelled_by_the_document_caller():
     with pytest.raises(ValueError): parent.document_from_snapshot(job, state, role='model-steward', clock='human')
 
 
+def test_a_well_shaped_serialized_snapshot_cannot_create_a_protected_receipt():
+    job, state = snapshot('causal')
+    document = parent.document_from_snapshot(job, state, role='model-steward', clock='local')
+    reasons = parent.validate_document(document, q.Resolver(), clock='local')
+    assert reasons and any('session' in reason for reason in reasons)
+
+
+def test_protected_caller_clock_and_role_are_not_chosen_by_the_document():
+    job, state = snapshot('gameplay')
+    document = parent.document_from_snapshot(job, state, role='TEST_ONLY-nonrole', clock='local')
+    reasons = parent.validate_document(document, q.Resolver(), clock='github')
+    assert any('clock' in reason for reason in reasons)
+    assert any('role' in reason for reason in reasons)
+
+
 def test_fixed_default_registered_route_has_no_job_or_permission(tmp_path):
     result = parent.run_registered('causal', 'driftwood', tmp_path / 'unregistered')
     assert result['accepted'] is False and result['human_required'] is True
@@ -173,3 +191,153 @@ def test_mixed_scope_is_counted_before_any_judge_even_without_a_granted_adapter(
     assert len(summary['declined']) == 2
     assert summary['reasons'] == ['no accepted task judgement; human-required fallback remains']
     assert (tmp_path / 'mixed-refusal' / 'host-session.json').is_file()
+
+
+def test_actual_foundation_missing_selection_keeps_counted_raw_free_fallback(protected_request, tmp_path, monkeypatch):
+    from test_task_inputs import task_request
+    from twin.task_inputs import resolve_task_input, TaskPolicy
+    args = task_request(protected_request)
+    resolved = resolve_task_input(**args)
+    policy = TaskPolicy.freeze(args['contract'], (resolved,))
+    job = {'task': 'evolution', 'task_contract_sha256': args['contract'].digest,
+        'model_version': 'actor-' + '1' * 64, 'organisation': 'driftwood', 'subjects': ['TEST_ONLY-task-subject']}
+    calls = []
+    def forbidden(*values):
+        calls.append(values)
+        raise AssertionError('no unregistered task inference')
+    monkeypatch.setattr(q.Actor, 'invoke', forbidden)
+    resolver = q.Resolver()
+    run = parent.TaskParent(resolver).start(job, resolved.host_inputs())
+    state = run.session.task_snapshot()
+    assert calls == [] and len(state['attempts']) == len(state['declines']) == 1
+    assert state['attempts'][0]['raw_available'] is False and state['attempts'][0]['capture_sha256'] is None
+    assert 'no protected registered task selection' in state['declines'][0]['reason']
+    result = run.save(tmp_path / 'real-foundation-refusal')
+    assert result['accepted'] is False and result['human_required'] is True
+    restored = q.HostSession.restore(run.session.archive(), resolver, task_policy=policy)
+    resumed = parent.TaskParent(resolver).resume(job, restored)
+    assert resumed.session.task_snapshot() == state
+    assert resumed.save(tmp_path / 'restored-refusal')['declined'] == state['declines']
+    assert calls == []
+
+
+def test_actual_foundation_mixed_adopter_preflight_counts_all_original_requests(protected_request, tmp_path, monkeypatch):
+    from test_task_inputs import task_request
+    from twin.task_inputs import resolve_task_input, TaskPolicy
+    contract = TaskContract.freeze('evolution')
+    resolved = []
+    for index, org in enumerate(('driftwood', 'tuppence')):
+        args = task_request(protected_request, org=org)
+        packet = json.loads(args['protected_job']['source_packet'])
+        packet['subject'] += str(index)
+        args['protected_job']['subject'] = packet['subject']
+        args['protected_job']['source_packet'] = q.canonical(packet)
+        args['protected_job']['source_pin'] = hashlib.sha256(q.canonical(packet)).hexdigest()
+        resolved.append(resolve_task_input(**args))
+    policy = TaskPolicy.freeze(contract, tuple(resolved))
+    rows = tuple(item.host_record for item in resolved)
+    inputs = q.HostInputs.freeze(rows, tuple({row['issuer'] for row in rows}), task_policy=policy)
+    job = {'task': 'evolution', 'task_contract_sha256': contract.digest,
+        'model_version': 'actor-' + '1' * 64, 'organisation': 'driftwood', 'subjects': [row['subject'] for row in rows]}
+    def forbidden(*values):
+        raise AssertionError('mixed task run must never reach judge')
+    monkeypatch.setattr(q.HostSession, 'judge', forbidden)
+    run = parent.TaskParent(q.Resolver()).start(job, inputs)
+    state = run.session.task_snapshot()
+    assert [item['subject'] for item in state['attempts']] == job['subjects']
+    assert len(state['declines']) == 2 and all(item['capture_sha256'] is None for item in state['attempts'])
+    assert run.save(tmp_path / 'actual-mixed')['accepted'] is False
+
+
+def test_registered_job_restores_only_with_actual_original_private_policy(protected_request, tmp_path, monkeypatch):
+    from test_task_inputs import task_request
+    from twin.task_inputs import resolve_task_input, TaskPolicy
+    args = task_request(protected_request)
+    resolved = resolve_task_input(**args)
+    policy = TaskPolicy.freeze(args['contract'], (resolved,))
+    inputs_raw = resolved.host_inputs().description
+    (tmp_path / 'inputs.json').write_bytes(inputs_raw)
+    job = {'task': 'evolution', 'task_contract_sha256': args['contract'].digest,
+        'model_version': 'actor-' + '1' * 64, 'organisation': 'driftwood', 'subjects': ['TEST_ONLY-task-subject']}
+    bundle = q.canonical({'schema': 'twin.protected-task-job/v1', 'execution': job,
+        'task_policy_sha256': policy.digest,
+        'inputs': {'path': 'inputs.json', 'sha256': hashlib.sha256(inputs_raw).hexdigest()}})
+    (tmp_path / 'job.json').write_bytes(bundle)
+    registry = q.canonical({'schema': 'twin.qualification-registry/v1', 'entries': [],
+        'task_jobs': {'evolution': {'driftwood': {'path': 'job.json', 'sha256': hashlib.sha256(bundle).hexdigest()}}}})
+    catalogue = tmp_path / 'registry.json'
+    catalogue.write_bytes(registry)
+    host = q.Resolver.from_catalogue(catalogue, hashlib.sha256(registry).hexdigest(),
+        task_policies={policy.digest: policy})
+    monkeypatch.setattr(parent, 'CATALOGUE', catalogue)
+    outcome = parent.run_registered('evolution', 'driftwood', tmp_path / 'with-handles', resolver=host)
+    assert outcome['accepted'] is False and outcome['human_required'] is True
+    assert len(outcome['attempts']) == 1 and len(outcome['declined']) == 1
+    assert (tmp_path / 'with-handles' / 'host-session.json').is_file()
+    stale_bundle = json.loads(bundle)
+    stale_bundle['execution']['task_contract_sha256'] = '0' * 64
+    stale_raw = q.canonical(stale_bundle)
+    (tmp_path / 'job.json').write_bytes(stale_raw)
+    stale_registry = json.loads(registry)
+    stale_registry['task_jobs']['evolution']['driftwood']['sha256'] = hashlib.sha256(stale_raw).hexdigest()
+    catalogue.write_bytes(q.canonical(stale_registry))
+    stale = parent.run_registered('evolution', 'driftwood', tmp_path / 'stale-contract', resolver=host)
+    assert len(stale['attempts']) == len(stale['declined']) == 1
+    assert stale['attempts'][0]['capture_sha256'] is None and stale['accepted'] is False
+    assert (tmp_path / 'stale-contract' / 'host-session.json').is_file()
+    (tmp_path / 'job.json').write_bytes(bundle)
+    catalogue.write_bytes(registry)
+    without = parent.run_registered('evolution', 'driftwood', tmp_path / 'without-handles', resolver=q.Resolver())
+    assert without['accepted'] is False and without['attempts'] == []
+    assert 'policy' in without['reasons'][0]
+    alias = tmp_path / 'symlink-registry.json'
+    alias.symlink_to(catalogue)
+    monkeypatch.setattr(parent, 'CATALOGUE', alias)
+    linked = parent.run_registered('evolution', 'driftwood', tmp_path / 'symlink-catalogue', resolver=host)
+    assert linked['accepted'] is False and linked['attempts'] == []
+    assert 'symlink' in linked['reasons'][0]
+
+
+@pytest.mark.parametrize('task', ['evolution', 'causal', 'gameplay', 'ethics'])
+def test_public_validator_requires_the_actual_task_session_for_every_clock(task, monkeypatch):
+    from pathlib import Path
+    from twin.qualified_signals import _validator
+    validator = _validator()
+    root = str(Path(q.__file__).resolve().parents[1])
+    kinds, roles = validator.twin_facts(root)
+    job, state = snapshot(task)
+    document = parent.document_from_snapshot(job, state, role='model-steward', clock='local')
+    calls = []
+    def deny(doc, resolver, clock):
+        calls.append((doc, resolver, clock))
+        return ['TEST_ONLY protected session denial']
+    monkeypatch.setattr(parent, 'validate_document', deny)
+    host = q.Resolver()
+    derive, check, lookup = validator.permission_rules(root, host)
+    bad = validator.validate(document, kinds, roles, clock=derive('local')[0], permission=(check, lookup))
+    assert calls == [(document, host, 'local')]
+    assert bad == ['TEST_ONLY protected session denial']
+    assert validator.validate(document, kinds, roles)
+
+
+def test_public_task_route_cannot_mint_a_receipt_from_a_well_shaped_snapshot():
+    from pathlib import Path
+    from twin.qualified_signals import _validator
+    validator = _validator()
+    root = str(Path(q.__file__).resolve().parents[1])
+    kinds, roles = validator.twin_facts(root)
+    job, state = snapshot('evolution')
+    document = parent.document_from_snapshot(job, state, role='model-steward', clock='local')
+    derive, check, lookup = validator.permission_rules(root, q.Resolver())
+    bad = validator.validate(document, kinds, roles, clock=derive('local')[0], permission=(check, lookup))
+    assert any('protected' in reason and 'session' in reason for reason in bad)
+    assert not any('derived_from is empty' in reason for reason in bad)
+
+
+def test_public_registered_task_command_has_no_default_job_or_permission(tmp_path):
+    from twin.qualified_signals import _validator
+    output = tmp_path / 'public-default'
+    assert _validator().main(['--run-registered-task', 'evolution', 'driftwood', '--output', str(output)]) == 2
+    summary = json.loads((output / 'summary.json').read_bytes())
+    assert summary['accepted'] is False and summary['human_required'] is True
+    assert summary['attempts'] == [] and summary['actual_permission_grant'] is False
