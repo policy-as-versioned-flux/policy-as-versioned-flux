@@ -90,12 +90,20 @@ SCORES = load_scores()
 READINGS = mp.load_head_readings()
 FACTS = {metric: rss.corpus_facts(metric) for metric in rss.METRICS}
 
+# Operational rows resolve the same protected actor/population/capture catalogue as the validator.
+from twin.qualification import Resolver
+RESOLVER = Resolver.from_checkout()
+
 
 FITTED = rss.fitted_models()
 
 
 def permission(skill, model_version, scores=None, facts=None, readings=None, seam=True, fitted=None,
                threshold=None, min_items=None):
+    if (scores is None and facts is None and readings is None and seam is True
+            and fitted is None and threshold is None and min_items is None):
+        return RESOLVER.permission(skill, model_version)
+    # Explicit fabricated overrides below are historical arithmetic controls, not registrations.
     facts = facts or FACTS[skill]
     return mp.permission_for(
         skill, model_version,
@@ -182,8 +190,8 @@ good_row = {"skill": "gameplay-lens", "model_version": FAKE, "score": 0.95,
 # POSITIVE control first. A rule that refuses everything passes every negative control there is.
 perm = permission("gameplay-lens", FAKE, scores=[good_row], facts=facts, readings=[], fitted={})
 out(perm.granted and perm.permits(mp.JUDGE),
-    "POSITIVE control: a fabricated model that clears all six model-side conditions IS granted, "
-    "so the rule is not simply refusing everything (%s)" % perm.why())
+    "Historical TEST_ONLY arithmetic positive: a fabricated row clears the model-side conditions; "
+    "this does not register an operational actor (%s)" % perm.why())
 
 def refused_by(item, row=None, facts_=None, readings=None, seam=True, fitted=None, threshold=None, label=""):
     perm = permission("gameplay-lens", FAKE, scores=[row or good_row], facts=facts_ or facts,
@@ -392,7 +400,7 @@ for path in at_rest:
     if declared != mp.GOVERNED_CLOCK:
         ungoverned += 1
         continue
-    at_rest_bad.extend(f"{path.name}: {line}" for line in mp.check_claim_document(doc, mp.GOVERNED_CLOCK, lookup_real))
+    at_rest_bad.extend(f"{path.name}: {line}" for line in RESOLVER.check_claim_document(doc, mp.GOVERNED_CLOCK))
     exercise = mp.exercise_of(doc)
     judged += exercise.judged
     declined += exercise.declined
@@ -405,9 +413,15 @@ out(not at_rest_bad,
 
 # A GitHub-clock file that clears every one of items 3, 4 and 7 with a granted permission passes.
 out(mp.check_claim_document(claim_doc(), "github", lookup_granted) == [],
-    "POSITIVE control: a GitHub-clock claim file naming its model, counting its declines, "
-    "claiming no override and holding a granted permission is accepted")
+    "Historical TEST_ONLY claim-arithmetic positive: names, decline counts and rights are accepted; "
+    "this is separate from the protected operational registry")
 
+
+# The real resolver/host-session path carries its own registered TEST_ONLY positive and negatives.
+# These fabricated actors cannot enter the default operational registry.
+from bench.qualification_controls import public_controls
+for name, passed in public_controls().items():
+    out(passed, "protected actor/population/host-session control: " + name)
 
 # -- reported, never graded: the thresholds against their own corpora ----------------------------
 print("THRESHOLDS AGAINST THEIR OWN CORPUS'S BEST CONSTANT ANSWER (reported, not graded):")
