@@ -138,6 +138,90 @@ Clock identity still comes from `derive_clock`: GitHub environment markers overr
 local assertion. Human and local-clock claim semantics remain unchanged. A qualification
 permission covers judging only; it never grants merge rights or human overrides.
 
+## Signal input and independent basis assessment
+
+`signal_inputs.resolve_signal_input` constructs the same canonical input for qualification
+and live use. Its host caller supplies independently acquired source/party digests, the staged
+`ModelRepo` and the declared domain, capability, frame, model date and exact repository pins.
+The resolver opens the actual overlay with the party's declared pricing threshold and uses
+the existing `ingest.candidates_of` population: all fifteen world and five local definitions,
+in their actual order. A changed or dirty closure refuses. The protected context retains the
+complete eligible set and its digest; it contains no selected component. Evolution and other
+fixed-component judgements still require their original host target.
+
+Only the statement, display source, declared source context, model context and complete
+candidate definitions reach the signal actor. Original source bodies remain in host evidence;
+the candidate receives their identity/version/byte-count/hash manifest and the declared literal
+excerpts. The resolver checks those excerpts against the retained original bytes. It does not
+invent a description where a source component has none. Source/task dates and model dates are
+separate. The host-authored `signal.from` pin is preserved; an acquisition process must establish
+its actual feed membership. A URL or display name cannot establish that fact by itself.
+
+A reviewed signal selection freezes each adopter's exact universe digest, model closure,
+model date and input-construction source hash in its population envelope. A self-consistent
+new live packet cannot borrow a qualified frame from another closure. The adapter parses a
+flat `component` into the existing scorer's `claim.component` without an alias lookup or
+incumbent prediction. Before capture, selection checks every actual qualification input's
+full universe, model pins/date and construction identity against its adopter's envelope, and
+checks its namespace, domain, capability, frame, source family and task date. The same
+`binding_context` reader is used by source construction and prompt rendering; changed
+definitions or a five-choice substitute refuse before runner invocation. It is not a substitute
+for custody's independent byte-for-byte input compatibility receipt. Missing basis remains
+missing. Structured quote lists and reasons are retained from actual output; their canonical
+JSON representation supplies the existing claim
+schema's evidence text. A malformed response, foreign member or absent literal witness is a
+counted refusal, never repaired into an answer.
+
+Literal witness checks are necessary but insufficient. `BasisPolicy` freezes the independent
+review rubric, registered acquisition issuers and policy source. After capture, a review
+request discloses actual raw output, answer, basis, original input, original sources and host
+context. It omits hidden expected answers and reference bases. The protected parent acquires
+review records through a `ReviewStore` whose exact digest comes from host configuration, not
+model output. Every ordered row needs an exact subject digest, original reviewer bytes,
+acquisition provenance, and witness/STEEP/binding/applicability dispositions with actual
+reasons and source locations. Quotation existence does not author those dispositions. The
+reviewer must assess entailment, tense, the selected component's primary subject and applicable
+frame; unsupported or uncertain conclusions remain fail or held.
+
+The contextual evaluator preserves RIGHT, WRONG, WRONG_BASIS and UNSCOREABLE. A wrong answer
+is still wrong; a correct answer with a failed semantic assessment is wrong-basis, and a held
+assessment is unscoreable. Missing, stale, foreign or forged assessments refuse recording or
+permission. Assessment identity is conserved through score binding, facts cache, durable
+bundle import and the public verifier. These receipts authenticate protected acquisition and
+exact subjects; they do not make an untrusted reviewer authoritative by its own declaration.
+
+For a live reviewed signal, the parent retains the actual output as pending and counts the
+initial refusal. `review_pending` resumes that exact capture without inference. A passing
+independently acquired review can mint a receipt; a failed or held review consumes the pending
+attempt and remains in retained outcomes. Declines are never removed from the claim document.
+Pending and accepted outputs survive protected catalogue import in a separate process, with
+current source, runtime, scope and actual parser agreement checked again.
+
+The existing validator exposes `--run-registered-signals ADOPTER --output NEW_DIRECTORY`.
+It loads jobs, source/party pins and review acquisition only from its protected judge catalogue,
+checks current permission, invokes the shared input/actor/session path, and writes a claim only
+after the existing validator accepts it. The command can also resume a protected pending
+session. No claim-selected catalogue, reviewer path or TEST_ONLY override is exposed. Existing
+claim-file validation remains available, and this command does not start a schedule or merge
+anything. An existing output directory refuses to preserve historical evidence.
+
+`signal_candidate.freeze_actor` binds the input adapter, parser, prompt, serializer, reviewed
+basis policy and a pinned host backend/executable. One immutable config is used for invocation
+and provenance. The subprocess transport runs a tokenizer-only preflight before generation,
+refuses over-bound inputs without truncation, applies a shared timeout and compute-thread
+environment, and retains raw output with host observations even on output-limit failure. The
+backend must independently observe its actual loaded assets/build/dtype/device and resource
+and cage facts. Model-response identity fields are never used as runtime observations.
+
+No real model backend, Linux network cage, reviewer acquisition, current qualification
+population or signal job is registered by this source change. The proposed Linux BF16 profile
+and 4096/512 caps remain unmeasured. Controlled Python subprocesses and authored TEST_ONLY
+assessment receipts prove software mechanics only; no actual model load, tokenization or
+inference is part of these tests. Current custody/input compatibility, independently reviewed
+backend/cage acquisition, bounded target measurement, actual complete capture and semantic
+review, all ten permission conditions and an observed operational outcome remain prerequisites.
+The historical Mac smoke and its caps/measurements remain unchanged.
+
 ## Durable verification and the trust assumption
 
 Fresh captures carry an ephemeral parent-process authenticator. It is not a durable credential
@@ -168,6 +252,9 @@ of a genuine registration still requires ordinary reviewed source/evidence deliv
 | Caller | Current treatment |
 | --- | --- |
 | Headline validator, binding → signal-classify; position → evolution-judge | Shared resolver and host-session enforcement on governed claims |
+| Validator `--run-registered-signals`; `qualified_signals.SignalParent` | Actual protected job/input/actor/pending-review/serializer/validator lifecycle; empty default registrations refuse; no enabled schedule |
+| `signal_inputs.resolve_signal_input` | Shared full-source signal input and eligible-universe construction; original sources and model closure remain host-bound |
+| `signal_candidate` and `basis_assessment` | Strict actual-output adapter, bounded host transport and protected independent post-capture review; real backend/acquisition remain prerequisites |
 | Generic `HostSession.judge` | Guarded invocation and counted disposition for all seven metric selections; later skill adoption tickets must wire each actual product consumer |
 | Public model-permission verifier | Same protected registry/facts and governed-claim checking; historical baselines and arithmetic controls preserved separately |
 | `record_skill_scores` | Original incumbent-only mechanism; alternate actors use `Selection.record` and an explicit destination |
