@@ -299,6 +299,8 @@ def evaluate(
     scorer: Scorer = _exact_match,
     threshold_path: Path | None = None,
     basis_scorer: BasisScorer = _exact_match,
+    *,
+    contextual_basis_scorer: Callable[[str, Stated, Any], bool | None] | None = None,
 ) -> EvalResult:
     """Run `skill_fn` against every corpus item, score it, and compare to the versioned threshold.
 
@@ -321,19 +323,22 @@ def evaluate(
 
     threshold = threshold_for(skill, threshold_path)
     min_items = min_items_for(skill, threshold_path)
-    items = tuple(_verdict(item, skill_fn(item["input"]), scorer, basis_scorer) for item in corpus)
+    items = tuple(_verdict(item, skill_fn(item["input"]), scorer, basis_scorer,
+                          contextual_basis_scorer) for item in corpus)
     return EvalResult(
         skill=skill, corpus_digest=digest_of(corpus), threshold=threshold, items=items, min_items=min_items,
     )
 
 
-def _verdict(item: dict[str, Any], output: Any, scorer: Scorer, basis_scorer: BasisScorer) -> ItemResult:
+def _verdict(item: dict[str, Any], output: Any, scorer: Scorer, basis_scorer: BasisScorer,
+             contextual: Callable[[str, Stated, Any], bool | None] | None = None) -> ItemResult:
     answer, stated = (output.answer, output.basis) if isinstance(output, Stated) else (output, None)
     right = bool(scorer(answer, item["expected"]))
     basis = item.get("basis")
     held = None
     if right and basis is not None and stated is not None:
-        held = bool(basis_scorer(stated, basis))
+        held = (contextual(str(item['id']), output, basis) if contextual is not None
+                else bool(basis_scorer(stated, basis)))
     return ItemResult(item_id=str(item["id"]), verdict=attribute(right, held))
 
 

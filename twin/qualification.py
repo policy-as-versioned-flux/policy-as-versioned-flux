@@ -27,6 +27,7 @@ from .reference_cases import Admission
 from . import record_skill_scores as rss
 from . import model_permission as mp
 from .canon import digest_of
+from .basis_assessment import BasisPolicy, BasisAssessment, ReviewStore, _restore_assessment
 
 
 def canonical(value: Any) -> bytes:
@@ -144,6 +145,8 @@ class RuntimeResult:
     """
     raw: bytes
     observed_runtime: dict[str, Any]
+    observations: dict[str, Any] = field(default_factory=dict)
+    failure: str | None = None
 
 
 @dataclass(frozen=True)
@@ -187,6 +190,7 @@ class Actor:
         config = json.loads(self.description)['config']
         raw = None
         observed_runtime = None
+        observations = None
         failure = None
         stated = Stated(None, None)
         try:
@@ -194,6 +198,9 @@ class Actor:
             if isinstance(produced, RuntimeResult):
                 raw = produced.raw
                 observed_runtime = json.loads(canonical(produced.observed_runtime))
+                observations = json.loads(canonical(produced.observations))
+                if produced.failure:
+                    raise ValueError(produced.failure)
                 if not config.get('runtime_contract') or canonical(observed_runtime) != canonical(config['runtime_contract']):
                     raise ValueError('observed host runtime differs from the immutable invocation contract')
             else:
@@ -217,6 +224,7 @@ class Actor:
         return Output(canonical({'actor_digest': self.digest, 'input_digest': hashlib.sha256(original).hexdigest(),
                                  'raw': base64.b64encode(raw or b'').decode(), 'raw_available': raw is not None,
                                  'failure': failure, 'observed_runtime': observed_runtime,
+                                 'observations': observations,
                                  'answer': stated.answer, 'basis': stated.basis}))
 
 
@@ -434,21 +442,54 @@ class Selection:
     description: bytes
     _capture_key: bytes = field(repr=False, compare=False)
     review: PopulationReview | None = None
+    assessment_policy: BasisPolicy | None = None
 
     @classmethod
     def freeze(cls, actor: Actor, population: Population,
                basis_checker: Callable[[Any, Any], bool], *,
                reference_projection: Callable[[str, Any], Any] = project_reference,
-               review: PopulationReview | None = None) -> Selection:
+               review: PopulationReview | None = None,
+               assessment_policy: BasisPolicy | None = None) -> Selection:
         identity = _callable_identity(basis_checker)
         functions = (basis_checker, reference_projection, rss.scorer_for(population.metric))
         sources = {_source_name(Path(inspect.getfile(fn))): hashlib.sha256(
             Path(inspect.getfile(fn)).read_bytes()).hexdigest() for fn in functions}
-        return cls(actor, population, basis_checker, reference_projection,
-                   canonical({'actor': actor.digest, 'population': population.digest,
+        description = {'actor': actor.digest, 'population': population.digest,
                               'basis_checker': identity, 'projection': _callable_identity(reference_projection),
-                              'sources': sources, 'review': review.digest if review else None}),
-                   secrets.token_bytes(32), review)
+                              'sources': sources, 'review': review.digest if review else None}
+        if assessment_policy:
+            assessment_policy.verify()
+            if population.metric == 'signal-classify':
+                from .signal_inputs import binding_context
+                envelope = population.envelope
+                contexts = envelope.get('signal_contexts', {})
+                if (set(contexts) != set(envelope['adopters'])
+                        or any(not isinstance(value, dict) or set(value) != {
+                            'candidate_universe_digest', 'model_pins', 'model_as_of',
+                            'input_construction_sha256'} for value in contexts.values())):
+                    raise ValueError('reviewed signal selection requires every adopter exact model/universe/construction context')
+                for packet in json.loads(population.description)['selected']:
+                    case = packet['case']
+                    try:
+                        actual = binding_context(case['input'])
+                        model = case['input']['model_context']
+                        if (actual != contexts.get(case['context']['organisation'])
+                                or any(model[field] != case['context'][field]
+                                       for field in ('organisation', 'domain', 'capability', 'frame'))
+                                or any(model[field] not in envelope[allowed] for field, allowed in (
+                                    ('domain', 'domains'), ('capability', 'capabilities'), ('frame', 'frames')))
+                                or case['input']['source_context']['family'] not in envelope['sources']
+                                or case['input']['source_context']['as_of'] != case['context']['as_of']
+                                or not date.fromisoformat(envelope['from']) <= date.fromisoformat(case['context']['as_of'])
+                                    <= date.fromisoformat(envelope['until'])):
+                            raise ValueError('model/universe/date/construction or declared scope differs')
+                    except (ValueError, KeyError, TypeError) as exc:
+                        raise ValueError('qualification input differs from qualified signal context: ' + str(exc)) from exc
+                source = Path(inspect.getfile(binding_context))
+                sources[_source_name(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
+            description['assessment_policy'] = json.loads(assessment_policy.description)
+        return cls(actor, population, basis_checker, reference_projection,
+                   canonical(description), secrets.token_bytes(32), review, assessment_policy)
 
     @property
     def digest(self) -> str:
@@ -456,11 +497,15 @@ class Selection:
 
     def verify(self) -> None:
         self.actor.verify()
+        if self.assessment_policy:
+            self.assessment_policy.verify()
         value = json.loads(self.description)
         if (value['actor'] != self.actor.digest or value['population'] != self.population.digest
                 or value['basis_checker'] != _callable_identity(self.basis_checker)
                 or value['projection'] != _callable_identity(self.reference_projection)
-                or value['review'] != (self.review.digest if self.review else None)):
+                or value['review'] != (self.review.digest if self.review else None)
+                or value.get('assessment_policy') != (json.loads(self.assessment_policy.description)
+                                                       if self.assessment_policy else None)):
             raise ValueError('selection or basis checker changed')
         if any(hashlib.sha256(_source_path(path).read_bytes()).hexdigest() != expected
                for path, expected in value['sources'].items()):
@@ -475,7 +520,8 @@ class Selection:
         packet = canonical({'selection': self.digest, 'rows': rows})
         return Capture(packet, hmac.digest(self._capture_key, packet, 'sha256'))
 
-    def evaluate(self, capture: Capture) -> EvalResult:
+    def captured_outputs(self, capture: Capture) -> list[Stated]:
+        """Verify actual host capture before constructing a reviewer-visible projection."""
         self.verify()
         value = json.loads(capture.packet)
         if value['selection'] != self.digest:
@@ -505,6 +551,29 @@ class Selection:
                     'answer': output['answer'], 'basis': output['basis']}):
                 raise ValueError('capture raw output and stated answer differ')
             outputs.append(stated)
+        return outputs
+
+    def assessment_request(self, capture: Capture) -> bytes:
+        self.captured_outputs(capture)
+        if self.assessment_policy is None:
+            raise ValueError('selection has no independent assessment policy')
+        rows = json.loads(capture.packet)['rows']
+        packets = json.loads(self.population.description)
+        original = packets['observations'] if packets.get('trace_only') else packets['selected']
+        return canonical({'schema': 'twin.basis-request/v1', 'policy': self.assessment_policy.digest,
+            **self.binding(capture), 'rows': [{'id': row['id'], 'input': packet['case']['input'],
+                'context': packet['case']['context'], 'sources': packet['case']['sources'],
+                'output': row['output']}
+                for row, packet in zip(rows, original)]})
+
+    def evaluate(self, capture: Capture, assessment: BasisAssessment | None = None) -> EvalResult:
+        outputs = self.captured_outputs(capture)
+        if self.assessment_policy:
+            if assessment is None:
+                raise ValueError('exact independent semantic assessment is required')
+            assessment.verify(self.assessment_policy, self.assessment_request(capture))
+        elif assessment is not None:
+            raise ValueError('assessment cannot replace an unfrozen policy')
         stream = iter(outputs)
         scorer = rss.scorer_for(self.population.metric)
         def valid_answer(actual: Any, expected: Any) -> bool:
@@ -514,11 +583,21 @@ class Selection:
                 return bool(scorer(actual, expected))
             except (KeyError, TypeError, AttributeError, ValueError, OverflowError):
                 return False
-        return evaluate(self.population.metric, lambda _: next(stream), corpus,
-                        scorer=valid_answer, basis_scorer=self.basis_checker)
+        def assessed_basis(item_id: str, actual: Stated, reference: Any) -> bool | None:
+            if assessment is None:
+                raise ValueError('independent assessment missing')
+            if self.population.metric == 'signal-classify':
+                from .signal_candidate import quote_integrity
+                item = next(item for item in self.population.corpus if item['id'] == item_id)
+                if not quote_integrity(actual, item['input']):
+                    return False
+            return assessment.outcome(item_id)
+        return evaluate(self.population.metric, lambda _: next(stream), self.population.corpus,
+                        scorer=valid_answer, basis_scorer=self.basis_checker,
+                        contextual_basis_scorer=assessed_basis if assessment else None)
 
-    def facts(self, capture: Capture) -> dict[str, Any]:
-        result = self.evaluate(capture)
+    def facts(self, capture: Capture, assessment: BasisAssessment | None = None) -> dict[str, Any]:
+        result = self.evaluate(capture, assessment)
         corpus = self.population.corpus
         metric = self.population.metric
         scorer = rss.scorer_for(metric)
@@ -533,33 +612,39 @@ class Selection:
                                        else 'development case admission; population review separate',
                 'selection_digest': self.digest, 'population_digest': self.population.digest,
                 'capture_digest': capture.digest, 'actor_digest': self.actor.digest,
+                'assessment_digest': assessment.digest if assessment else None,
                 'corpus_digest': digest_of(corpus), 'reference_score': 1.0,
                 'baseline': baseline, 'variance': variance, 'evaluation': result,
                 'readings': tuple(mp.HeadReading(self.actor.model_version, name, len(answers), distinct,
                                                 'capture:' + capture.digest)
                                   for name, distinct in variance.items())}
 
-    def binding(self, capture: Capture) -> dict[str, str]:
-        return {'selection_digest': self.digest, 'population_digest': self.population.digest,
+    def binding(self, capture: Capture, assessment: BasisAssessment | None = None) -> dict[str, str]:
+        value = {'selection_digest': self.digest, 'population_digest': self.population.digest,
                 'capture_digest': capture.digest, 'actor_digest': self.actor.digest}
+        if assessment:
+            value['assessment_digest'] = assessment.digest
+        return value
 
-    def record(self, capture: Capture, recorded_at: str, path: Path) -> dict[str, Any]:
+    def record(self, capture: Capture, recorded_at: str, path: Path,
+               assessment: BasisAssessment | None = None) -> dict[str, Any]:
         """Append one complete host-bound row; no official destination is implicit."""
-        result = self.evaluate(capture)
-        self.facts(capture)  # invalid reference projection must not produce an official row
+        result = self.evaluate(capture, assessment)
+        self.facts(capture, assessment)  # invalid reference projection must not produce an official row
         return record_score(result, self.actor.model_version, recorded_at, path,
-                            binding=self.binding(capture))
+                            binding=self.binding(capture, assessment))
 
-    def archive(self, capture: Capture) -> bytes:
+    def archive(self, capture: Capture, assessment: BasisAssessment | None = None) -> bytes:
         """Export public evidence without the ephemeral host key.
 
         Export alone does not authorise later import. A protected, reviewed catalogue must
         independently pin these exact bytes before a later verifier can rebind the capture.
         """
-        self.evaluate(capture)
+        self.evaluate(capture, assessment)
         return canonical({'schema': 'twin.qualification-bundle/v1',
             'actor': json.loads(self.actor.description), 'population': json.loads(self.population.description),
             'selection': json.loads(self.description), 'capture': json.loads(capture.packet),
+            'assessment': json.loads(assessment.packet) if assessment else None,
             'review': {'record': base64.b64encode(self.review.record).decode(),
                        'checker_identity': base64.b64encode(self.review.checker_identity).decode()}
                       if self.review else None})
@@ -578,15 +663,17 @@ class Resolver:
     Only the incumbent receives historical mechanism facts. An unregistered actor cannot
     borrow them. TEST_ONLY registries are explicit test controls and never the default.
     """
-    def __init__(self, bindings: tuple[tuple[Selection, Capture], ...] = (),
+    def __init__(self, bindings: tuple[tuple[Selection, Capture] | tuple[Selection, Capture, BasisAssessment], ...] = (),
                  scores_path: Path | None = None, *, allow_test_only: bool = False):
-        self._bindings = {(selection.population.metric, selection.actor.model_version): (selection, capture)
-                          for selection, capture in bindings}
+        self._bindings = {(bound[0].population.metric, bound[0].actor.model_version): (bound[0], bound[1])
+                          for bound in bindings}
+        self._assessments = {(bound[0].population.metric, bound[0].actor.model_version): bound[2]
+                             for bound in bindings if len(bound) == 3}
         if len(self._bindings) != len(bindings):
             raise ValueError('one current selection/capture per actor and metric is required')
         self._scores_path = scores_path
         self._allow_test_only = allow_test_only
-        self._facts: dict[tuple[str, str], dict[str, Any]] = {}
+        self._facts: dict[tuple[str, str, str], dict[str, Any]] = {}
         self._sessions: dict[str, HostSession] = {}
 
     @classmethod
@@ -649,11 +736,12 @@ class Resolver:
                 baseline=None, variance=None, seam_crossed=False)
             return _refuse(permission, 10, 'no host-registered actor/population/exposure binding')
         selected, capture = bound
+        assessment = self._assessments.get((metric, model_version))
         try:
-            selected.evaluate(capture)  # verify current sources/runtime and host capture even on a cache hit
-            key = (selected.digest, capture.digest)
+            selected.evaluate(capture, assessment)  # verify current sources/runtime/capture/assessment on cache hits
+            key = (selected.digest, capture.digest, assessment.digest if assessment else '')
             if key not in self._facts:
-                self._facts[key] = selected.facts(capture)
+                self._facts[key] = selected.facts(capture, assessment)
             facts = self._facts[key]
         except (ValueError, OSError, KeyError, TypeError) as exc:
             permission = mp.permission_for(metric, model_version, scores=[], corpus_digest_now='',
@@ -666,7 +754,7 @@ class Resolver:
             readings=facts['readings'], fitted_models={})
         latest = mp.newest_score(metric, model_version, rows)
         result = facts['evaluation']
-        if (latest is None or latest.get('qualification') != selected.binding(capture)
+        if (latest is None or latest.get('qualification') != selected.binding(capture, assessment)
                 or any(latest.get(name) != value for name, value in {
                     'score': result.score, 'attributable_rate': result.attributable_rate,
                     'measured_count': result.measured_count, 'total': len(result.items),
@@ -741,9 +829,22 @@ class HostInputs:
                     or raw != canonical(row['input']) or not source['version']
                     or context['source'] != source['identity'] or context['source_sha256'] != source['sha256']):
                 raise ValueError('host source/input/context provenance conflict')
-            for name in ('organisation', 'domain', 'capability', 'as_of', 'frame', 'source', 'component'):
+            for name in ('organisation', 'domain', 'capability', 'as_of', 'frame', 'source'):
                 if not isinstance(context.get(name), str) or not context[name]:
                     raise ValueError('missing host context: ' + name)
+            if 'eligible_components' in context:
+                candidates = row['input'].get('candidates')
+                if (not isinstance(candidates, list) or not candidates
+                        or any(not isinstance(item, dict) or not isinstance(item.get('id'), str)
+                               or not isinstance(item.get('definition'), dict) for item in candidates)):
+                    raise ValueError('signal host needs full candidate definitions')
+                eligible = [item['id'] for item in candidates]
+                if (len(set(eligible)) != len(eligible) or context['eligible_components'] != eligible
+                        or context.get('candidate_universe_digest') != digest(candidates)
+                        or 'component' in context):
+                    raise ValueError('signal host universe differs from actual input or preselects an answer')
+            elif not isinstance(context.get('component'), str) or not context['component']:
+                raise ValueError('missing fixed host component')
         except (KeyError, TypeError) as exc:
             raise ValueError('missing host source provenance') from exc
         return row
@@ -756,6 +857,11 @@ def _scope_reasons(population: Population, context: dict[str, Any]) -> list[str]
                            ('capability', 'capabilities'), ('frame', 'frames'), ('source', 'sources')):
         if context.get(field) not in envelope[allowed]:
             reasons.append('host ' + field + ' is outside the predeclared applicability envelope')
+    if population.metric == 'signal-classify' and 'signal_contexts' in envelope:
+        frozen = envelope['signal_contexts'].get(context.get('organisation'), {})
+        for name in ('candidate_universe_digest', 'model_pins', 'model_as_of', 'input_construction_sha256'):
+            if not frozen.get(name) or context.get(name) != frozen[name]:
+                reasons.append('host ' + name + ' differs from qualified signal model context')
     try:
         as_of = date.fromisoformat(context['as_of'])
         if not date.fromisoformat(envelope['from']) <= as_of <= date.fromisoformat(envelope['until']):
@@ -786,10 +892,79 @@ class HostSession:
         self._records: dict[str, bytes] = {}
         self._declines: list[dict[str, str]] = []
         self._failed_outputs: list[dict[str, Any]] = []
+        self._pending: dict[str, bytes] = {}
+        self._live_assessments: dict[str, BasisAssessment] = {}
+        self._reviewed_outputs: list[dict[str, Any]] = []
 
     @property
     def declines(self) -> list[dict[str, str]]:
         return json.loads(canonical(self._declines))
+
+    @property
+    def pending_reviews(self) -> list[dict[str, Any]]:
+        return [{'request_digest': key, 'request': self._review_request(json.loads(record))}
+                for key, record in self._pending.items()]
+
+    def _review_request(self, record: dict[str, Any]) -> dict[str, Any]:
+        selected, _ = self._resolver._bindings[(record['metric'], record['model_version'])]
+        if selected.assessment_policy is None:
+            raise ValueError('live selection has no independent assessment policy')
+        row = self._inputs.resolve(record['subject'])
+        return {'schema': 'twin.basis-request/v1', 'policy': selected.assessment_policy.digest,
+            'actor_digest': selected.actor.digest, 'population_digest': selected.population.digest,
+            'selection_digest': selected.digest, 'capture_digest': digest(record),
+            'rows': [{'id': record['subject'], 'input': row['input'], 'context': row['context'],
+                'sources': row['context'].get('original_sources', {'input': row['source']}),
+                'output': record['output']}]}
+
+    def _verify_record(self, record: dict[str, Any]) -> None:
+        row = self._inputs.resolve(record['subject'])
+        selected, _ = self._resolver._bindings[(record['metric'], record['model_version'])]
+        selected.verify()
+        output = record['output']
+        parsed = selected.actor.parser(base64.b64decode(output['raw'], validate=True),
+                                      json.loads(selected.actor.description)['config'])
+        runtime = json.loads(selected.actor.description)['config'].get('runtime_contract')
+        if (record['selection'] != selected.digest or record['context'] != row['context']
+                or _scope_reasons(selected.population, row['context'])
+                or output['actor_digest'] != selected.actor.digest or output['input_digest'] != digest(row['input'])
+                or output.get('failure') or runtime and output.get('observed_runtime') != runtime
+                or canonical({'answer': parsed.answer, 'basis': parsed.basis}) != canonical({
+                    'answer': output['answer'], 'basis': output['basis']})):
+            raise ValueError('protected session no longer matches current host binding')
+
+    def review_pending(self, request_digest: str, store: ReviewStore) -> Judgement:
+        """Resume the retained actual output after host acquisition, never rerun inference."""
+        subject = request_digest
+        try:
+            record = json.loads(self._pending[request_digest])
+            self._verify_record(record)
+            subject = record['subject']
+            selected, _ = self._resolver._bindings[(record['metric'], record['model_version'])]
+            selected.verify()
+            permission = self._resolver.permission(record['metric'], record['model_version'])
+            if not permission.granted:
+                raise ValueError(permission.why())
+            row = self._inputs.resolve(subject)
+            if row['context'] != record['context'] or _scope_reasons(selected.population, row['context']):
+                raise ValueError('pending review host context is stale')
+            request = canonical(self._review_request(record))
+            if digest(json.loads(request)) != request_digest or selected.assessment_policy is None:
+                raise ValueError('pending actual-output review request changed')
+            assessment = store.assess(selected.assessment_policy, request)
+            del self._pending[request_digest]  # a failed assessment cannot be selectively replaced
+            self._reviewed_outputs.append({'record': record, 'assessment': json.loads(assessment.packet)})
+            if assessment.outcome(subject) is not True:
+                raise ValueError('independent live semantic assessment did not pass')
+            self._live_assessments[assessment.digest] = assessment
+            record['assessment'] = json.loads(assessment.packet)
+            record['assessment_digest'] = assessment.digest
+            receipt = secrets.token_hex(24)
+            self._records[receipt] = canonical(record)
+            return Judgement(receipt, None, Output(canonical(record['output'])))
+        except Exception as exc:
+            self._declines.append({'subject': subject, 'reason': str(exc)})
+            return Judgement(None, str(exc))
 
     def judge(self, metric: str, model_version: str, subject: str) -> Judgement:
         try:
@@ -802,7 +977,11 @@ class HostSession:
             reasons = _scope_reasons(selected.population, row['context'])
             if reasons:
                 raise ValueError('; '.join(reasons))
+            if metric != 'signal-classify' and not row['context'].get('component'):
+                raise ValueError('non-signal judgement requires its fixed host component')
             if metric == 'signal-classify':
+                if selected.assessment_policy and 'eligible_components' not in row['context']:
+                    raise ValueError('reviewed signal actor requires the full protected eligible universe')
                 metadata = row['context'].get('signal', {})
                 if (metadata.get('id') != subject or metadata.get('date') != row['context']['as_of']
                         or not metadata.get('from') or not metadata.get('provenance', {}).get('url')):
@@ -816,10 +995,27 @@ class HostSession:
                 self._failed_outputs.append({'subject': subject, 'metric': metric,
                                              'output': json.loads(output.packet)})
                 raise ValueError('live actor output lacks an answer object or actual stated basis')
-            receipt = secrets.token_hex(24)
-            self._records[receipt] = canonical({'subject': subject, 'metric': metric,
+            if metric == 'signal-classify' and 'eligible_components' in row['context']:
+                if output.stated.answer.get('claim', {}).get('component') not in row['context']['eligible_components']:
+                    self._failed_outputs.append({'subject': subject, 'metric': metric,
+                                                 'output': json.loads(output.packet)})
+                    raise ValueError('actual signal selected a component outside the host universe')
+                if selected.assessment_policy:
+                    from .signal_candidate import quote_integrity
+                    if not quote_integrity(output.stated, row['input']):
+                        self._failed_outputs.append({'subject': subject, 'metric': metric,
+                                                     'output': json.loads(output.packet)})
+                        raise ValueError('actual signal quotes lack literal input witnesses; semantics not assessed')
+            record = {'subject': subject, 'metric': metric,
                 'model_version': model_version, 'selection': selected.digest,
-                'context': row['context'], 'output': json.loads(output.packet)})
+                'context': row['context'], 'output': json.loads(output.packet),
+                'attempt': secrets.token_hex(24)}
+            if selected.assessment_policy:
+                request = self._review_request(record)
+                self._pending[digest(request)] = canonical(record)
+                raise ValueError('independent live semantic assessment required; actual output retained')
+            receipt = secrets.token_hex(24)
+            self._records[receipt] = canonical(record)
             return Judgement(receipt, None, output)
         except Exception as exc:  # every attempted operation/decline remains counted
             reason = str(exc)
@@ -852,12 +1048,30 @@ class HostSession:
                 continue
             selected, _ = bound
             bad.extend(_scope_reasons(selected.population, row['context']))
+            if selected.assessment_policy:
+                assessment = self._live_assessments.get(record.get('assessment_digest', ''))
+                if assessment is None:
+                    bad.append('claim lacks actual independent live semantic assessment')
+                else:
+                    original = {key: item for key, item in record.items()
+                                if key not in ('assessment', 'assessment_digest')}
+                    try:
+                        assessment.verify(selected.assessment_policy, canonical(self._review_request(original)))
+                        if assessment.outcome(record['subject']) is not True:
+                            bad.append('claim independent semantic assessment did not pass')
+                    except (ValueError, KeyError, TypeError) as exc:
+                        bad.append('claim semantic assessment failed verification: ' + str(exc))
             output = record['output']
             answer = output['answer']
-            matches = claim.get('component') == row['context']['component'] and claim.get('evidence') == output['basis']
+            matches = claim.get('evidence') == output['basis']
             if metric == 'evolution-judge':
-                matches = matches and claim.get('evolution_position') == answer.get('evolution_position')
+                matches = (matches and claim.get('component') == row['context']['component']
+                           and claim.get('evolution_position') == answer.get('evolution_position'))
             elif metric == 'signal-classify':
+                from .signal_candidate import evidence_text
+                allowed = row['context'].get('eligible_components', [row['context'].get('component')])
+                matches = (claim.get('component') in allowed
+                           and claim.get('evidence') == evidence_text(output['basis']))
                 signal = claim.get('signal', {})
                 matches = (matches and claim.get('component') == answer.get('claim', {}).get('component')
                            and signal.get('steep') == answer.get('steep')
@@ -877,7 +1091,9 @@ class HostSession:
         return canonical({'schema': 'twin.host-session/v1', 'identity': self.identity,
             'inputs': json.loads(self._inputs.description),
             'records': {token: json.loads(packet) for token, packet in self._records.items()},
-            'declines': self.declines, 'failed_outputs': self._failed_outputs})
+            'declines': self.declines, 'failed_outputs': self._failed_outputs,
+            'pending_reviews': {key: json.loads(value) for key, value in self._pending.items()},
+            'reviewed_outputs': self._reviewed_outputs})
 
     @classmethod
     def restore(cls, archive: bytes, resolver: Resolver) -> HostSession:
@@ -888,6 +1104,15 @@ class HostSession:
         session.identity = value['identity']
         session._declines = value['declines']
         session._failed_outputs = value.get('failed_outputs', [])
+        session._reviewed_outputs = value.get('reviewed_outputs', [])
+        for key, record in value.get('pending_reviews', {}).items():
+            session._verify_record(record)
+            selected, _ = resolver._bindings[(record['metric'], record['model_version'])]
+            selected.verify()
+            request = session._review_request(record)
+            if digest(request) != key:
+                raise ValueError('pending host review request differs from protected capture')
+            session._pending[key] = canonical(record)
         for token, record in value['records'].items():
             row = session._inputs.resolve(record['subject'])
             selected, _ = resolver._bindings[(record['metric'], record['model_version'])]
@@ -903,6 +1128,16 @@ class HostSession:
                     or canonical({'answer': parsed.answer, 'basis': parsed.basis}) != canonical({
                         'answer': output['answer'], 'basis': output['basis']})):
                 raise ValueError('protected session no longer matches current host binding')
+            if selected.assessment_policy:
+                if not record.get('assessment'):
+                    raise ValueError('live receipt omits independent semantic assessment')
+                original = {key: item for key, item in record.items()
+                            if key not in ('assessment', 'assessment_digest')}
+                assessment = _restore_assessment(canonical(record['assessment']), selected.assessment_policy,
+                    canonical(session._review_request(original)))
+                if assessment.digest != record.get('assessment_digest') or assessment.outcome(record['subject']) is not True:
+                    raise ValueError('live receipt semantic assessment does not pass for actual output')
+                session._live_assessments[assessment.digest] = assessment
             session._records[token] = canonical(record)
         return session
 
@@ -919,7 +1154,7 @@ def _restore_callable(identity: dict[str, Any]) -> Callable[..., Any]:
     return value
 
 
-def _restore_bundle(bundle: bytes) -> tuple[Selection, Capture]:
+def _restore_bundle(bundle: bytes) -> tuple[Selection, Capture] | tuple[Selection, Capture, BasisAssessment]:
     value = json.loads(bundle)
     if value.get('schema') != 'twin.qualification-bundle/v1':
         raise ValueError('unknown host bundle schema')
@@ -935,11 +1170,18 @@ def _restore_bundle(bundle: bytes) -> tuple[Selection, Capture]:
             _restore_callable(json.loads(checker_identity)['callable']) if checker_identity else None,
             checker_identity)
     selection_value = value['selection']
+    policy = BasisPolicy(canonical(selection_value['assessment_policy'])) if selection_value.get('assessment_policy') else None
     selected = Selection.freeze(actor, population, _restore_callable(selection_value['basis_checker']),
-        reference_projection=_restore_callable(selection_value['projection']), review=review)
+        reference_projection=_restore_callable(selection_value['projection']), review=review, assessment_policy=policy)
     if selected.description != canonical(selection_value):
         raise ValueError('archived selection differs from current host binding')
     packet = canonical(value['capture'])
     captured = Capture(packet, hmac.digest(selected._capture_key, packet, 'sha256'))
+    if policy:
+        if value.get('assessment') is None:
+            raise ValueError('protected bundle omits required semantic assessment')
+        assessment = _restore_assessment(canonical(value['assessment']), policy, selected.assessment_request(captured))
+        selected.evaluate(captured, assessment)
+        return selected, captured, assessment
     selected.evaluate(captured)
     return selected, captured
