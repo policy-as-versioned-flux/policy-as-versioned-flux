@@ -103,7 +103,7 @@ jobs:
         include:
           - {os: ubuntu-24.04,     arch: x86_64-linux}
           - {os: ubuntu-24.04-arm, arch: aarch64-linux}
-          - {os: macos-14,         arch: arm64-darwin}
+          - {os: macos-15,         arch: arm64-darwin}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -138,7 +138,7 @@ jobs:
   # having built the model repository itself from the same deterministic recipe.
   reproduce-elsewhere:
     needs: determinism
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
