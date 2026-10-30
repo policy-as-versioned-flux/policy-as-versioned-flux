@@ -54,8 +54,15 @@ stock origin, byte, review and authorship requirements.
 
 Profile limits (MiB = 1,048,576 bytes): text input/stdout 64/64 MiB and 10s; HTML 64/128 MiB
 and 30s; PDF 256/128 MiB and 120s. Stderr is 1/1/4 MiB respectively, syntax metadata is capped
-at 64 MiB, and termination grace is two seconds. Pipes are streamed, overflow/deadline
-terminates/reaps the owned process group, and only the fresh owned workspace is removed.
+at 64 MiB. The total wall budget includes a single two-second cleanup allowance, reserved
+from extraction time; TERM grace, final KILL, direct-child reap and group-absence observation
+share that allowance. Pipes are streamed. Exit is observed with `waitid(WNOWAIT)` so the
+unreaped leader reserves its PID/PGID through the final group signal, even after a zero exit
+and closed pipes. Direct-parent exit never proves group completion. No destructive signal
+is sent after reaping. Only the direct child is reaped by this process; descendants are not
+claimed reaped. Success requires independently observed group absence and workspace removal.
+If reaping or group absence is unverified, the result holds and its fresh workspace is
+preserved for the custodian; no other workspace or process group is cleaned.
 Failure/truncation is explicit. Zero exit with bounded diagnostic stderr is accepted by the
 fixed v1 diagnostic policy; nonzero exit, overflow, timeout or cleanup failure is not success.
 
