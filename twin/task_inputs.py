@@ -124,7 +124,7 @@ def _compose(contract: TaskContract, policy: dict[str, Any], model: dict[str, An
     elif contract.task == 'gameplay':
         if task or target['organisation'] != policy['organisation'] or len(definitions) != 20:
             raise ValueError('complete actual twenty-definition adopter map required')
-        built = {**model['graph'], 'components': list(definitions.values()),
+        built = {**model['graph'], 'components': [definitions[name] for name in sorted(definitions)],
                  'catalogue': ['exploit-commoditisation', 'land-grab'],
                  'catalogue_source_sha256': sm.sha256(Path(gameplay_lens.__file__).read_bytes())}
     else:
@@ -233,6 +233,8 @@ def resolve_task_input(contract: TaskContract, protected_job: dict[str, Any], re
         raise ValueError('actual task model closure differs from independently pinned job')
     from .gameplay_lens import payload_for
     definitions = {**overlay.world.components, **overlay.components}
+    if len(definitions) != 20:
+        raise ValueError('complete actual twenty-definition task model required')
     graph = overlay.graph()
     model_sources = {}
     for label, ref in (('world', overlay.world.ref), ('overlay', overlay.ref)):

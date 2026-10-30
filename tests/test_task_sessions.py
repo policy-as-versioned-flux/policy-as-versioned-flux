@@ -32,7 +32,7 @@ def task_mechanical_runner(payload, config):
     index = int(payload['context']['as_of'][-2:]) - 1
     if config['task'] == 'evolution':
         answer = {'evolution_position': (index % 4) / 3}
-    else:
+    elif config['task'] == 'causal':
         measurement = payload['task']['measurement']
         answer = {'edge': {'from': payload['target']['from'], 'to': payload['target']['to'], 'type': 'influences',
             'sign': 'positive' if index % 2 == 0 else 'negative', 'lag_days': 10 + index * 80,
@@ -42,8 +42,25 @@ def task_mechanical_runner(payload, config):
             'alternatives': ['TEST_ONLY reverse direction remains possible'],
             'units': {'from': measurement['from_unit'], 'to': measurement['to_unit'], 'lag': 'days',
                       'elasticity_definition': measurement['elasticity_definition']}}
+    elif config['task'] == 'gameplay':
+        pairs = [(play, component) for play in payload['task']['catalogue'] for component in payload['task']['org_components']]
+        answer = {'opportunities': [{'play': play, 'component': component, 'reason': 'TEST_ONLY openly authored fixture outcome'}
+            for ordinal, (play, component) in enumerate(pairs) if index % 4 and ordinal % 3 == index % 3]}
+    else:
+        names = ['purpose', 'necessity', 'proportionality']
+        stop = None if index % 4 == 0 else names[index % 4 - 1]
+        used = names if stop is None else names[:names.index(stop) + 1]
+        # The first child admits while the independent original-task DPIA gate
+        # denies. These public fixture answers never copy the mandatory gate.
+        answer = {'admitted': stop is None, 'ladder': {'stopped_at': stop,
+            'rungs': [{'rung': name, 'passed': name != stop, 'justification': 'TEST_ONLY authored fixture judgement'} for name in used]}}
     basis = {'reason': 'TEST_ONLY mechanical control; no semantic competence claim', 'calculations': [],
              'witnesses': [{'path': ['context', 'as_of'], 'quote': payload['context']['as_of']}]}
+    if config['task'] == 'gameplay':
+        present = {(item['play'], item['component']) for item in answer['opportunities']}
+        basis['checks'] = [{'play': play, 'component': component, 'present': (play, component) in present,
+            'incumbency_checked': False, 'reason': 'TEST_ONLY complete literal control, not semantic support',
+            'witnesses': basis['witnesses']} for play, component in pairs]
     return q.canonical({'schema': f"twin.{config['task']}-response/v1", 'answer': answer, 'basis': basis})
 
 
@@ -84,7 +101,7 @@ def task_review_store(path, policy, request, decision='pass'):
     return ReviewStore(target, hashlib.sha256(target.read_bytes()).hexdigest())
 
 
-def genuine_task_material(protected_request, tmp_path, task='evolution', count=16):
+def genuine_task_material(protected_request, tmp_path, task='evolution', count=16, *, runner=None, actor_config=None, support=()):
     """Actual protected software mechanisms on openly authored TEST_ONLY inputs only."""
     import json
     from bench.qualification_controls import reference, basis_holds
@@ -92,8 +109,6 @@ def genuine_task_material(protected_request, tmp_path, task='evolution', count=1
     from twin.task_inputs import resolve_task_input, TaskPolicy, support_sources
     from twin.basis_assessment import BasisPolicy
     from test_task_inputs import task_request
-    if task not in ('evolution', 'causal'):
-        raise ValueError('this TEST_ONLY mechanical factory currently covers evolution and causal')
     contract = TaskContract.freeze(task)
     resolved = []
     for index in range(count):
@@ -105,8 +120,12 @@ def genuine_task_material(protected_request, tmp_path, task='evolution', count=1
         job['source_packet'] = q.canonical(packet); job['source_pin'] = q.digest(packet)
         resolved.append(resolve_task_input(**args))
     policy = TaskPolicy.freeze(contract, tuple(resolved))
-    actor = q.Actor.freeze(task_mechanical_runner, task_mechanical_parser,
-        {'purpose': 'TEST_ONLY', 'task': task, 'task_contract_digest': contract.digest}, support=support_sources())
+    config = {'purpose': 'TEST_ONLY', 'task': task, 'task_contract_digest': contract.digest}
+    if set(actor_config or {}) & set(config):
+        raise ValueError('TEST_ONLY fault controls cannot replace protected task config')
+    config.update(actor_config or {})
+    actor = q.Actor.freeze(runner or task_mechanical_runner, task_mechanical_parser,
+        config, support=(*support_sources(), *support))
     contexts = json.loads(policy.description)['contexts']
     first = resolved[0].host_record
     envelope = {'adopters': ['driftwood', 'tuppence', 'ludlow'], 'domains': [first['context']['domain']],
@@ -125,11 +144,18 @@ def genuine_task_material(protected_request, tmp_path, task='evolution', count=1
             case['context'] = scope
             if task == 'evolution':
                 case['expected'] = {'evolution_position': (index % 4) / 3}
-            else:
+            elif task == 'causal':
                 case['expected'] = {'evidence_grade': (1, 3, 5)[index % 3]}
                 if metric == 'causal-claims':
                     case['expected'].update(sign='positive' if index % 2 == 0 else 'negative', lag_days=10 + index * 80,
                                             elasticity_mode=.2 + (index % 5) * .1)
+            elif task == 'gameplay':
+                pairs = [(play, component) for play in row['input']['task']['catalogue'] for component in row['input']['task']['org_components']]
+                case['expected'] = {'opportunities': [[play, component] for ordinal, (play, component) in enumerate(pairs)
+                                                     if index % 4 and ordinal % 3 == index % 3]}
+            else:
+                case['expected'] = {'admitted': index % 4 == 0,
+                                   'stopped_at': None if index % 4 == 0 else ('purpose', 'necessity', 'proportionality')[index % 4 - 1]}
             case['basis'] = {'witness': 'TEST_ONLY reference reason, not empirical truth',
                              'source_hashes': {key: value['sha256'] for key, value in row['sources'].items()}}
             source = row['sources']['task_packet']
@@ -138,6 +164,8 @@ def genuine_task_material(protected_request, tmp_path, task='evolution', count=1
             case['field_support'] = {name: {'meaning': 'TEST_ONLY worked value; no real label authority',
                 'sources': ['task_packet'], 'witnesses': [{'source': 'task_packet', 'start': 0,
                     'end': source['bytes'], 'sha256': source['sha256']}]} for name in case['expected']}
+            if task == 'gameplay' and not case['expected']['opportunities']:
+                case['field_support']['opportunities']['complete_negative_basis'] = 'TEST_ONLY independently authored full pair-domain fixture; no real negative labels'
             case['basis_binding'] = binding_for(case)
             admission = admit_reference(case, scope)
             assert admission.admitted, admission.reasons
@@ -220,3 +248,41 @@ def test_actual_causal_pair_invokes_once_reviews_both_and_restores_without_reinv
     assert final.archive() == restored.archive() and len(TASK_CALLS) == before + 1
 
 from test_task_inputs import protected_request
+
+
+def test_actual_gameplay_empty_judgement_keeps_complete_negative_domain(protected_request, tmp_path):
+    material = genuine_task_material(protected_request, tmp_path, task='gameplay')
+    assert material['resolver'].permission('gameplay-lens', material['actor'].model_version).granted
+    session = material['resolver'].host_session(material['inputs']); session.bind_task_job(material['job'])
+    before = len(TASK_CALLS)
+    session.judge('gameplay-lens', material['actor'].model_version, material['job']['subjects'][0])
+    attempt = session.task_snapshot()['attempts'][0]
+    assert attempt['output']['answer'] == {'opportunities': []}
+    checks = attempt['output']['basis']['checks']
+    expected = {(play, component) for play in material['resolved'][0].payload['task']['catalogue']
+                for component in material['resolved'][0].payload['task']['org_components']}
+    assert {(item['play'], item['component']) for item in checks} == expected
+    assert all(item['present'] is False and item['incumbency_checked'] is False for item in checks)
+    assert len(TASK_CALLS) == before + 1 and len(session.pending_reviews) == 1
+    pending = session.pending_reviews[0]; selected = material['selections'][0]
+    store = task_review_store(tmp_path / 'live-gameplay-review', selected.assessment_policy, q.canonical(pending['request']))
+    assert session.review_pending(pending['request_digest'], store).receipt
+    restored = q.HostSession.restore(session.archive(), material['resolver'], task_policy=material['host_policy'])
+    assert restored.archive() == session.archive() and len(TASK_CALLS) == before + 1
+
+
+def test_actual_ethics_keeps_child_admit_and_independent_mandatory_dpia_denial(protected_request, tmp_path):
+    material = genuine_task_material(protected_request, tmp_path, task='ethics')
+    assert material['resolver'].permission('ethics-gate', material['actor'].model_version).granted
+    session = material['resolver'].host_session(material['inputs']); session.bind_task_job(material['job'])
+    before = len(TASK_CALLS)
+    session.judge('ethics-gate', material['actor'].model_version, material['job']['subjects'][0])
+    attempt = session.task_snapshot()['attempts'][0]
+    assert attempt['output']['answer']['admitted'] is True
+    assert attempt['mandatory_gate']['admitted'] is False
+    assert set(attempt['mandatory_gate']) == {'admitted', 'source_sha256', 'result_sha256'}
+    pending = session.pending_reviews[0]; selected = material['selections'][0]
+    store = task_review_store(tmp_path / 'live-ethics-review', selected.assessment_policy, q.canonical(pending['request']))
+    assert session.review_pending(pending['request_digest'], store).receipt
+    restored = q.HostSession.restore(session.archive(), material['resolver'], task_policy=material['host_policy'])
+    assert restored.archive() == session.archive() and len(TASK_CALLS) == before + 1

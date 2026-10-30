@@ -30,6 +30,21 @@ def task_request(protected_request, task='evolution', org='driftwood'):
     elif task == 'gameplay':
         target = {'kind': 'map', 'organisation': org}
         task_fields = {}
+    elif task == 'ethics':
+        from twin.ethics_gate import load_sensors, SENSOR_REQUIRED
+        table = [{key: row[key] for key in SENSOR_REQUIRED} for row in load_sensors()['sensors']]
+        original = originals['original']
+        policy_text = archive[original['sha256']].decode()
+        target = {'kind': 'sensor', 'sensor': table[0]['sensor'], 'policy_sha256': original['sha256']}
+        task_fields = {'sensor': {'id': table[0]['sensor'], 'name': table[0]['name']},
+            'sensor_table': table, 'sensor_table_sha256': q.digest(table),
+            'policy': {key: original[key] for key in ('identity', 'version', 'sha256')},
+            'purpose': {'scenario': 'TEST_ONLY explicitly declared fixture purpose', 'will_act': True},
+            'necessity': {'kind': 'structural', 'level': 'aggregate', 'alternatives': []},
+            'proportionality': {'intrusion_cost': 1, 'value_illuminated': 10},
+            'dpia': {'channels': ['keystroke'], 'profiling': False, 'financial_loss_risk': False,
+                     'complete': False, 'completion_source_id': None}}
+        task_fields['policy'].update(text=policy_text, as_of='2019-01-01')
     packet = q.canonical({'schema': 'twin.task-source-packet/v1', 'subject': 'TEST_ONLY-task-subject',
         'as_of': '2019-01-03', 'target': target, 'task': task_fields,
                           'original_sources': {'primary': originals}})
@@ -69,3 +84,36 @@ def test_factual_decline_is_preserved_as_actual_basis(protected_request):
     actual = Stated(None, {'decline': 'TEST_ONLY no supplied source establishes an answer'})
     verify_output(payload, actual)
     assert actual.basis == {'decline': 'TEST_ONLY no supplied source establishes an answer'}
+
+
+@pytest.mark.parametrize('task', ['evolution', 'causal', 'gameplay', 'ethics'])
+@pytest.mark.parametrize('org', ['driftwood', 'tuppence', 'ludlow'])
+def test_all_typed_tasks_keep_actual_twenty_model_and_independent_source_handles(protected_request, task, org):
+    import copy
+    from twin.task_inputs import resolve_task_input, TaskPolicy, validate_payload
+    resolved = resolve_task_input(**task_request(protected_request, task, org))
+    payload, row = resolved.payload, resolved.host_record
+    validate_payload(payload)
+    policy = TaskPolicy.freeze(TaskContract.freeze(task), (resolved,))
+    policy.verify_input(row)
+    assert payload['context']['organisation'] == org
+    assert payload['context']['model_pins']['model_repo']['root'] == ''
+    if task == 'gameplay':
+        assert len(payload['task']['components']) == len(payload['task']['positions']) == 20
+        assert len(payload['task']['org_components']) > 0
+    if task == 'ethics':
+        assert payload['target']['policy_sha256'] == payload['task']['policy']['sha256']
+    for field in ('target', 'model_pins', 'source_metadata_bindings', 'input_constructor_sha256', 'task_contract_sha256'):
+        forged = copy.deepcopy(row); forged['context'].pop(field)
+        with pytest.raises(ValueError):
+            policy.verify_input(forged)
+    for mutate in (
+        lambda value: value['input'].update(schema='TEST_ONLY-generic', component='TEST_ONLY-sentinel'),
+        lambda value: value['input']['context'].update(metadata={}),
+        lambda value: value['context'].update(organisation='TEST_ONLY-foreign'),
+        lambda value: value['context'].update(as_of='2019-01'),
+        lambda value: value['sources'].pop('party'),
+    ):
+        forged = copy.deepcopy(row); mutate(forged)
+        with pytest.raises(ValueError):
+            policy.verify_input(forged)
