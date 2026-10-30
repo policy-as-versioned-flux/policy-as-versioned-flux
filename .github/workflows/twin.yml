@@ -151,14 +151,21 @@ jobs:
           sudo -n -- /usr/bin/env -i LANG=C.UTF-8 LC_ALL=C.UTF-8 /usr/bin/python3.12 -B -I -S - > "$stage/root-export.jsonl" 2> "$stage/root-error.txt" <<'FIXED_ROOT_BOOTSTRAP'
           import time
           started=time.monotonic()
-          import hashlib,json,os,stat,sys
+          import hashlib,json,os,signal,stat,sys
           STORE='/var/lib/policy-as-versioned-flux-linux-control'
-          REVIEWED_MANIFEST='ef81d50a72f924810e2779797d36c795f5445c8752fa4b2a9baf5f45a2858e22'
+          REVIEWED_MANIFEST='640fcea6623f2439dedc0a7b938445df3bad0054bf093e7726881e7716a4c6f5'
           NAMES=('linux_guardian.py','linux_lease_control.py','linux_lease_control_child.py','linux_lease_control_entry','linux_lease_control_ci.py','linux_lease_control_ci_entry','linux_network.py','linux_runtime_filter.py','qwen_backend.py')
           deadline=started+900
 
           def check():
               if time.monotonic()>=deadline-10:raise ValueError('original900 bootstrap budget exhausted')
+
+          def arm_budget():
+              remaining=deadline-time.monotonic()
+              if remaining<=10:raise ValueError('original900 bootstrap work budget exhausted')
+              signal.signal(signal.SIGALRM,signal.SIG_DFL)
+              signal.pthread_sigmask(signal.SIG_UNBLOCK,{signal.SIGALRM})
+              signal.setitimer(signal.ITIMER_REAL,remaining)
 
           def safe(path,regular=False):
               components=path.split('/')
@@ -175,18 +182,43 @@ jobs:
 
           def readat(directory,name):
               check()
-              fd=os.open(name,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=directory)
+              fd=os.open(name,os.O_RDONLY|os.O_NONBLOCK|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=directory)
               try:
                   info=os.fstat(fd)
                   if not stat.S_ISREG(info.st_mode) or info.st_nlink!=1 or info.st_size>1048576:raise ValueError('bounded regular checkout DATA required')
                   raw=b''
                   while True:
+                      check()
                       part=os.read(fd,min(65536,1048577-len(raw)))
                       if not part:break
                       raw+=part
                       if len(raw)>1048576:raise ValueError('source DATA byte cap exceeded')
                   return raw
               finally:os.close(fd)
+
+          def verify_installed(manifest_raw,sources):
+              check()
+              safe(STORE)
+              directory=os.open(STORE,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC)
+              copied=-1
+              try:
+                  safe(STORE+'/source-manifest.json',True)
+                  actual=readat(directory,'source-manifest.json')
+                  if actual!=manifest_raw or hashlib.sha256(actual).hexdigest()!=REVIEWED_MANIFEST:
+                      raise ValueError('installed manifest bytes differ')
+                  safe(STORE+'/source')
+                  copied=os.open('source',os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=directory)
+                  manifest=json.loads(actual)['files']
+                  for name in NAMES:
+                      check()
+                      safe(STORE+'/source/'+name,True)
+                      raw=readat(copied,name)
+                      if raw!=sources[name] or manifest[name]!={'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}:
+                          raise ValueError('installed source/entry copy bytes differ')
+              finally:
+                  if copied>=0:os.close(copied)
+                  os.close(directory)
+              check()
 
           def write(name,raw,mode):
               check()
@@ -202,6 +234,9 @@ jobs:
 
           if os.getresuid()!=(0,0,0) or sys.executable!='/usr/bin/python3.12' or not sys.flags.isolated or not sys.flags.no_site or not sys.dont_write_bytecode:
               raise ValueError('literal isolated OS root bootstrap required')
+          # Default SIGALRM/ITIMER_REAL survives exec; never renewed. Expiry is
+          # failed/missing evidence, never teardown proof or a fresh17min lease.
+          arm_budget()
           for path in ('/usr/bin/python3.12','/usr/bin/env','/usr/bin/dash'):safe(path,True)
           if os.path.realpath('/proc/self/exe')!='/usr/bin/python3.12' or os.path.realpath('/bin/sh')!='/usr/bin/dash':
               raise ValueError('actual literal OS interpreter/shell differs')
@@ -236,8 +271,16 @@ jobs:
           start_ticks=open('/proc/self/stat').read().rsplit(')',1)[1].split()[19]
           receipt={'schema':'TEST_ONLY-ci-start/v1','pid':start,'start':start_ticks,'started':started,'deadline':deadline,'source_manifest_sha256':REVIEWED_MANIFEST}
           write(STORE+'/start.json',(json.dumps(receipt,sort_keys=True,separators=(',',':'))+'\n').encode(),0o400)
+          public_context={'schema':'TEST_ONLY-ci-context/v1','source_manifest_sha256':REVIEWED_MANIFEST,
+              'workflow_run':{'repository':'${{ github.repository }}','workflow':'twin','job':'determinism',
+                  'run_id':'${{ github.run_id }}','attempt':'${{ github.run_attempt }}','source_commit':'${{ github.sha }}',
+                  'event':'${{ github.event_name }}','arch':'${{ matrix.arch }}','runner_label':'${{ matrix.os }}'}}
+          # Public workflow attribution only. No caller environment is forwarded
+          # into the root helper or child, and labels are not native proof.
+          write(STORE+'/ci-context.json',(json.dumps(public_context,sort_keys=True,separators=(',',':'))+'\n').encode(),0o400)
           for name,raw in sources.items():write(STORE+'/source/'+name,raw,0o555 if name.endswith('_entry') else 0o444)
           check()
+          verify_installed(manifest_raw,sources)
           os.chdir(STORE)
           os.execve(STORE+'/source/linux_lease_control_ci_entry',['linux_lease_control_ci_entry','ci-suite'],{'LANG':'C.UTF-8','LC_ALL':'C.UTF-8'})
           FIXED_ROOT_BOOTSTRAP

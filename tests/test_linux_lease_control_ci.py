@@ -233,7 +233,7 @@ def test_coordinator_serializes_all_twenty_and_aborts_before_next_leaf_on_failed
         row=next(row for row in receipt(scenario)['attempts'] if row['case']==case)
         row['started']=clock[0];clock[0]+=10.;row['finished']=clock[0]
         return row
-    transport=SimpleNamespace(SCENARIOS=c.SCENARIOS,CASES=c.CASES,verify_result=c.verify_result,
+    transport=SimpleNamespace(SCENARIOS=c.SCENARIOS,CASES=c.CASES,verify_result=c.verify_result,verify_attempt=c.verify_attempt,
         load_ci_control_host=lambda g,scenario,caller:({}, {'config':{'scenario':scenario}}, {'TEST_ONLY':True}),run_attempt=run)
     caller=SimpleNamespace(verify=lambda:None)
     result=m.execute_suite(None,transport,caller,m.SuiteBudget(100.,1000.),tmp_path)
@@ -308,3 +308,153 @@ def test_nonroot_local_export_cannot_outlive_original_whole_control_deadline(mon
     monkeypatch.setattr(time,'monotonic',lambda:1001.);monkeypatch.chdir(tmp_path)
     with pytest.raises(ValueError,match='original|ceiling|deadline'):m.receiver_main()
     assert not (tmp_path/'native-outcome.json').exists()
+
+
+def bootstrap_namespace():
+    """Definitions only from reviewed literal; never execute privileged payload."""
+    import ast,hashlib,json,os,stat,time,yaml
+    workflow=yaml.safe_load((Path(__file__).parents[1]/'.github/workflows/twin.yml').read_text())
+    script=next(row['run'] for row in workflow['jobs']['determinism']['steps'] if row.get('name')=='native tiny lease controls; no model')
+    payload=script.split("<<'FIXED_ROOT_BOOTSTRAP'\n",1)[1].split('\nFIXED_ROOT_BOOTSTRAP',1)[0]
+    tree=ast.parse(payload);scope={'os':os,'stat':stat,'time':time,'hashlib':hashlib,'json':json,'deadline':time.monotonic()+900}
+    exec(compile(ast.Module(body=[node for node in tree.body if isinstance(node,ast.FunctionDef)],type_ignores=[]),'<TEST_ONLY-bootstrap-definitions>','exec'),scope)
+    return scope,payload
+
+
+def test_bootstrap_fifo_is_refused_without_waiting_for_a_writer(tmp_path):
+    import os,subprocess
+    scope,payload=bootstrap_namespace();os.mkfifo(tmp_path/'fifo')
+    program='import ast,os,stat,time\ndeadline=time.monotonic()+900\nsource='+repr(payload)+'\n'
+    program+="tree=ast.parse(source);exec(compile(ast.Module(body=[n for n in tree.body if isinstance(n,ast.FunctionDef)],type_ignores=[]),'TEST_ONLY','exec'))\n"
+    program+='directory=os.open('+repr(str(tmp_path))+',os.O_RDONLY|os.O_DIRECTORY)\n'
+    program+="try:readat(directory,'fifo')\nexcept ValueError:print('REFUSED_NONREGULAR')\nelse:raise AssertionError('FIFO accepted')\nfinally:os.close(directory)\n"
+    result=subprocess.run([sys.executable,'-B','-I','-S','-c',program],capture_output=True,text=True,timeout=1)
+    assert result.returncode==0 and result.stdout.strip()=='REFUSED_NONREGULAR'
+
+
+def test_initial_source_integrity_failure_is_not_a_neutral_skip():
+    import ast
+    from types import SimpleNamespace
+    m=ci();tree=ast.parse((Path(__file__).parents[1]/'bench/pinned-candidate/linux_lease_control_ci.py').read_text())
+    main=next(node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name=='suite_main')
+    stage=next(node for node in main.body if isinstance(node,ast.Try) and any(
+        isinstance(call,ast.Call) and isinstance(call.func,ast.Name) and call.func.id=='installed_module' for call in ast.walk(node)))
+    class MissingNative(ValueError):pass
+    control=SimpleNamespace(principal_facts=lambda *args:None,CiPrerequisiteUnavailable=MissingNative)
+    def namespace(error):
+        def refused(*args):raise error
+        return {'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),
+            'control':control,'g':None,'caller':None,'installed_module':refused,'manifest':{},'base':{},'outcome':None,
+            'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'persist_observation':lambda *args:None,
+            'Path':Path,'STORE':m.STORE,'canonical':m.canonical}
+    code=compile(ast.Module(body=[stage],type_ignores=[]),'TEST_ONLY-initial-stage','exec')
+    for error in (ValueError('actual source member bytes differ from reviewed manifest'),
+                  PermissionError('protected source discretionary ACL'),KeyError('required source pin')):
+        with pytest.raises(type(error)):exec(code,namespace(error))
+    scope=namespace(m.PrerequisiteUnavailable('four controllers not already enabled'))
+    exec(code,scope)
+    assert scope['outcome']['status']=='SKIP' and scope['outcome']['control_passed'] is False
+
+
+def test_bootstrap_alarm_uses_remaining_original_clock_without_installing_a_timer():
+    from types import SimpleNamespace
+    scope,payload=bootstrap_namespace();calls=[]
+    scope.update(deadline=1000.,time=SimpleNamespace(monotonic=lambda:700.),
+        signal=SimpleNamespace(SIGALRM=14,SIG_DFL=0,ITIMER_REAL=0,SIG_UNBLOCK=1,
+            signal=lambda *args:calls.append(args),pthread_sigmask=lambda *args:calls.append(args),setitimer=lambda *args:calls.append(args)))
+    scope['arm_budget']()
+    assert calls==[(14,0),(1,{14}),(0,300.)]
+    scope['time']=SimpleNamespace(monotonic=lambda:991.)
+    with pytest.raises(ValueError,match='original900'):scope['arm_budget']()
+    assert payload.index('\narm_budget()')<payload.index("manifest_raw=readat(")
+
+
+def test_observed_prerequisites_are_persisted_before_export_and_survive_later_failure(monkeypatch,tmp_path):
+    import hashlib
+    from types import SimpleNamespace
+    m=ci();monkeypatch.setattr(m,'STORE',str(tmp_path));base={};reads=[]
+    def protected(path,pin,maximum):
+        raw=Path(path).read_bytes();reads.append(path)
+        assert hashlib.sha256(raw).hexdigest()==pin and len(raw)<=maximum
+        return raw
+    g=SimpleNamespace(protected_path=lambda *args:None,protected_read=protected)
+    record={'TEST_ONLY':True,'native_maps_sha256':'1'*64,'caller':{'pid':201,'start':'77'}}
+    m.persist_observation(g,base,'suite/installation.json',record)
+    original=(tmp_path/'ci-evidence/installation.json').read_bytes()
+    assert original==m.canonical(record)+b'\n' and base['suite/installation.json']==original and len(reads)==1
+    try:raise RuntimeError('TEST_ONLY later export failure')
+    except RuntimeError:pass
+    assert (tmp_path/'ci-evidence/installation.json').read_bytes()==original
+    with pytest.raises(ValueError):m.persist_observation(g,base,'../../private.json',record)
+    with pytest.raises(FileExistsError):m.persist_observation(g,base,'suite/installation.json',record)
+
+
+def test_missing_required_terminal_aborts_before_the_next_subcase(monkeypatch,tmp_path):
+    from types import SimpleNamespace
+    from test_linux_lease_control import control
+    from test_linux_lease_control_admission import receipt
+    import time
+    m=ci();c=control();calls=[];clock=[120.]
+    monkeypatch.setattr(time,'monotonic',lambda:clock[0])
+    def run(g,host,profile,caller,case,deadline,directory):
+        calls.append(case);row=next(row for row in receipt('invalid-evidence')['attempts'] if row['case']==case)
+        row['started']=clock[0];clock[0]+=10.;row['finished']=clock[0]
+        if case=='eof':row['guardian_terminal']=None
+        return row
+    transport=SimpleNamespace(SCENARIOS=('invalid-evidence',),CASES=c.CASES,verify_result=c.verify_result,
+        load_ci_control_host=lambda *args:({}, {'config':{'scenario':'invalid-evidence'}}, {}),run_attempt=run)
+    if hasattr(c,'verify_attempt'):transport.verify_attempt=c.verify_attempt
+    result=m.execute_suite(None,transport,SimpleNamespace(verify=lambda:None),m.SuiteBudget(100.,1000.),tmp_path)
+    assert result['status']=='FAIL' and calls==['eof']
+    assert 'terminal' in result['error'] and (tmp_path/'invalid-evidence-eof.json').is_file()
+
+
+def test_bootstrap_reads_back_protected_manifest_and_every_copy_before_first_exec(tmp_path):
+    import hashlib,json
+    scope,payload=bootstrap_namespace();m=ci();sources={name:b'TEST_ONLY '+name.encode() for name in m.MEMBERS}
+    raw=m.canonical({'schema':'TEST_ONLY-ci-sources/v1','files':{name:{'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()} for name,data in sources.items()}})+b'\n'
+    (tmp_path/'source').mkdir();(tmp_path/'source-manifest.json').write_bytes(raw)
+    for name,data in sources.items():(tmp_path/'source'/name).write_bytes(data)
+    scope.update(STORE=str(tmp_path),NAMES=m.MEMBERS,REVIEWED_MANIFEST=hashlib.sha256(raw).hexdigest(),safe=lambda *args:None)
+    scope['verify_installed'](raw,sources)
+    (tmp_path/'source/linux_lease_control_ci_entry').write_bytes(b'TEST_ONLY changed installed entry')
+    with pytest.raises(ValueError,match='installed|copy|bytes'):scope['verify_installed'](raw,sources)
+    assert payload.rindex('verify_installed(manifest_raw,sources)')<payload.index('os.execve(')
+
+
+def test_public_ci_context_is_bound_annotation_and_never_an_authority_or_path_selector():
+    m=ci();context={'schema':'TEST_ONLY-ci-context/v1','source_manifest_sha256':'1'*64,
+        'workflow_run':{'repository':'TEST_ONLY/repository','workflow':'twin','job':'determinism','run_id':'123',
+            'attempt':'2','source_commit':'a'*40,'event':'pull_request','arch':'x86_64-linux','runner_label':'ubuntu-24.04'}}
+    assert m.workflow_context(m.canonical(context),'1'*64)==context
+    for bad in (dict(context,source_manifest_sha256='2'*64),dict(context,root_path='/root'),
+                dict(context,workflow_run=dict(context['workflow_run'],job='unreviewed-job'))):
+        with pytest.raises(ValueError):m.workflow_context(m.canonical(bad),'1'*64)
+
+
+def test_initial_stage_keeps_observed_kernel_and_principal_when_later_discovery_fails(monkeypatch,tmp_path):
+    import ast,hashlib
+    from types import SimpleNamespace
+    m=ci();monkeypatch.setattr(m,'STORE',str(tmp_path));base={}
+    def protected(path,pin,maximum):
+        raw=Path(path).read_bytes()
+        if hashlib.sha256(raw).hexdigest()!=pin:raise ValueError('protected original changed')
+        return raw
+    g=SimpleNamespace(protected_path=lambda *args:None,protected_read=protected)
+    tree=ast.parse((Path(__file__).parents[1]/'bench/pinned-candidate/linux_lease_control_ci.py').read_text())
+    main=next(node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name=='suite_main')
+    stage=next(node for node in main.body if isinstance(node,ast.Try) and any(
+        isinstance(call,ast.Call) and isinstance(call.func,ast.Name) and call.func.id=='installed_module' for call in ast.walk(node)))
+    class MissingNative(ValueError):pass
+    def refused(*args):raise ValueError('TEST_ONLY later native mapping integrity refusal')
+    scope={'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),'g':g,'caller':None,
+        'control':SimpleNamespace(principal_facts=lambda *args:{'TEST_ONLY_principal':65534},CiPrerequisiteUnavailable=MissingNative),
+        'installed_module':lambda *args:None,'manifest':{},'base':base,'outcome':None,
+        'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'persist_observation':m.persist_observation,
+        'admit_ci_root':lambda *args:{'TEST_ONLY_controllers':['memory','cpu','cpuset','pids']},
+        'discover_closure':refused,'Path':Path,'STORE':str(tmp_path),'canonical':m.canonical}
+    with pytest.raises(ValueError,match='mapping integrity'):exec(compile(ast.Module(body=[stage],type_ignores=[]),'TEST_ONLY-stage','exec'),scope)
+    assert set(base)=={'suite/principal.json','suite/kernel.json'}
+    assert (tmp_path/'ci-evidence/kernel.json').read_bytes()==base['suite/kernel.json']
+    (tmp_path/'ci-evidence/kernel.json').chmod(0o600);(tmp_path/'ci-evidence/kernel.json').write_bytes(b'TEST_ONLY tampered original')
+    with pytest.raises(ValueError,match='changed'):m.owned_exports(g,base,None,{'status':'FAIL'},m.SuiteBudget(100.,1000.))

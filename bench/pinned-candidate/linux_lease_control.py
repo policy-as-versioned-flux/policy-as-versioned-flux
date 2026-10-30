@@ -45,6 +45,12 @@ WRITE_PATHS=('/TEST_ONLY-root-write','/app/actor-config.json','/app/lease.json',
     '/app/linux_lease_control_child.py','/evidence/write','/sys/fs/cgroup/cgroup.procs','/sys/fs/cgroup/memory.max')
 
 
+class CiPrerequisiteUnavailable(ValueError):
+    """Known initial capacity absence; carries the actual protected readings."""
+    def __init__(self,message:str,facts:dict[str,Any]):
+        super().__init__(message);self.facts=facts
+
+
 def finite(value: Any) -> float:
     if type(value) not in (int,float) or not math.isfinite(value):
         raise ValueError('finite actual monotonic timestamp required')
@@ -439,6 +445,19 @@ def _verify_capture_witnesses(value:dict[str,Any],scenario:str,case:str)->None:
         raise ValueError('guardian terminal receipt missing')
 
 
+def verify_attempt(value:Any,scenario:str,case:str)->dict[str,Any]:
+    """Admit this original attempt's existing terminal/sentinel/removal proof."""
+    if scenario not in SCENARIOS or case not in CASES[scenario]:raise ValueError('fixed actual attempt required')
+    if not isinstance(value,dict):raise ValueError('actual attempt record required')
+    ceiling=DEADLINE_SECONDS if scenario=='invalid-evidence' and case=='deadline' else ATTEMPT_SECONDS
+    if (not 0<=finite(value.get('finished'))-finite(value.get('started'))<=ceiling
+            or value.get('error') is not None or value.get('executed') is not True
+            or value.get('scenario')!=scenario or value.get('case')!=case):
+        raise ValueError('an actual attempt failed or exceeded its shared ceiling')
+    _verify_capture_witnesses(value,scenario,case)
+    return {'control_passed':True,'production_capture_accepted':False}
+
+
 def verify_result(value: Any) -> dict[str,Any]:
     """Pure receipt admission, called only with the outer observer's owned evidence.
 
@@ -458,12 +477,7 @@ def verify_result(value: Any) -> dict[str,Any]:
     previous=finite(value.get('started'))
     for attempt in attempts:
         if not isinstance(attempt,dict):raise ValueError('actual attempt record required')
-        ceiling=DEADLINE_SECONDS if scenario=='invalid-evidence' and attempt.get('case')=='deadline' else ATTEMPT_SECONDS
-        if (not 0<=finite(attempt.get('finished'))-finite(attempt.get('started'))<=ceiling
-                or attempt.get('error') is not None or attempt.get('executed') is not True
-                or attempt.get('scenario')!=scenario):
-            raise ValueError('an actual attempt failed or exceeded its shared ceiling')
-        _verify_capture_witnesses(attempt,scenario,attempt['case'])
+        verify_attempt(attempt,scenario,attempt['case'])
         if finite(attempt['started'])<previous or finite(attempt['finished'])>finite(value['finished']):
             raise ValueError('actual attempt timing reset or escaped total ceiling')
         previous=finite(attempt['finished'])
@@ -836,6 +850,9 @@ def _load_control_host(g: Any, scenario: str, caller: Any, ci:bool) -> tuple[dic
     budget=g.reserve(storage,g.MEMORY+g.RESERVE,False)
     budget['ancestors']=g.observe_ancestors(parent)
     budget['memory_available']=g.effective_memory(budget,parent)
+    if (ci and all(type(budget.get(key)) is int and budget[key]>=0 for key in ('memory_available','disk_free'))
+            and (budget['memory_available']<g.MEMORY+g.RESERVE or budget['disk_free']<g.DISK)):
+        raise CiPrerequisiteUnavailable('actual initial14GiB headroom/5GiB storage unavailable',budget)
     g.validate_reserve(budget,g.MEMORY+g.RESERVE,storage,parent)
     if not {'memory','cpu','cpuset','pids'}<=set(Path(parent,'cgroup.subtree_control').read_text().split()):
         raise ValueError('protected controllers not already enabled')

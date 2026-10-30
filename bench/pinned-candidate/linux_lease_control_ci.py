@@ -23,6 +23,7 @@ MAX_RAW=128*1024**2
 MAX_STREAM=256*1024**2
 MAX_FRAME=65536
 OUTCOME_KEYS=('schema','status','executed','control_passed','production_capture_accepted')
+OBSERVATIONS=('context','caller','principal','kernel','installation','host','availability')
 
 
 def validate_os_closure(rows:Any,loaded:set[str],control:Any)->dict[str,int]:
@@ -61,7 +62,7 @@ def verify_suite(value:Any,control:Any)->dict[str,Any]:
 
 def export_name(name:Any)->bool:
     if not isinstance(name,str) or '..' in name.split('/') or name.startswith('/'):return False
-    if name in ('suite/start.json','suite/sources.json','suite/installation.json','suite/host.json','suite/result.json'):return True
+    if name in ('suite/start.json','suite/sources.json','suite/result.json',*(f'suite/{name}.json' for name in OBSERVATIONS)):return True
     if name.startswith('source/'):return name[7:] in MEMBERS
     return re.fullmatch(r'cases/(baseline|boundaries|resources|supervisor-loss|guardian-loss|invalid-evidence)/[a-z-]+\.(jsonl|json)',name) is not None or re.fullmatch(
         r'receipts/[0-9a-f]{48}/(preflight|generate)-(sources|native-mappings-[0-9]{6})\.jsonl',name) is not None
@@ -250,7 +251,7 @@ def installed_read(path:str,maximum:int)->bytes:
     """Fixed-root bootstrap reader. No project code has authority before this read."""
     import os,stat
     target=Path(path)
-    if not (path==STORE+'/start.json' or path==STORE+'/source-manifest.json'
+    if not (path in (STORE+'/start.json',STORE+'/source-manifest.json',STORE+'/ci-context.json')
             or path.startswith(STORE+'/source/') and target.name in MEMBERS):
         raise ValueError('closed installed bootstrap path required')
     for member in (target,*target.parents):
@@ -287,6 +288,25 @@ def installed_module(name:str,manifest:dict[str,dict[str,Any]])->Any:
     return module
 
 
+def workflow_context(raw:bytes,manifest:str)->dict[str,Any]:
+    """Public workflow attribution only; native authority is observed separately."""
+    if len(raw)>65536:raise ValueError('bounded workflow attribution required')
+    value=json.loads(raw,object_pairs_hook=unique_object)
+    if (not isinstance(value,dict) or set(value)!={'schema','source_manifest_sha256','workflow_run'}
+            or value['schema']!='TEST_ONLY-ci-context/v1' or value['source_manifest_sha256']!=manifest):
+        raise ValueError('source-bound fixed workflow annotation required')
+    run=value['workflow_run']
+    if (not isinstance(run,dict) or set(run)!={'repository','workflow','job','run_id','attempt','source_commit','event','arch','runner_label'}
+            or any(not isinstance(item,str) for item in run.values()) or run['workflow']!='twin' or run['job']!='determinism'
+            or not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+',run['repository'])
+            or any(re.fullmatch(r'[1-9][0-9]*',run[key]) is None for key in ('run_id','attempt'))
+            or re.fullmatch(r'[0-9a-f]{40}',run['source_commit']) is None
+            or run['event'] not in ('push','pull_request','workflow_dispatch','schedule')
+            or (run['arch'],run['runner_label']) not in (('x86_64-linux','ubuntu-24.04'),('aarch64-linux','ubuntu-24.04-arm'))):
+        raise ValueError('closed attributed public workflow/run/source/job/architecture required')
+    return value
+
+
 def write_fixed(path:Path,raw:bytes)->None:
     import os
     fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW|os.O_CLOEXEC,0o400)
@@ -298,6 +318,20 @@ def write_fixed(path:Path,raw:bytes)->None:
             offset+=count
         os.fsync(fd)
     finally:os.close(fd)
+
+
+def persist_observation(g:Any,base:dict[str,bytes],name:str,value:Any)->None:
+    """Retain original protected bytes before any subsequent work can fail."""
+    if name not in tuple(f'suite/{item}.json' for item in OBSERVATIONS):
+        raise ValueError('fixed observed prerequisite record required')
+    directory=Path(STORE,'ci-evidence')
+    try:directory.mkdir(mode=0o700)
+    except FileExistsError:g.protected_path(str(directory),False)
+    raw=canonical(value)+b'\n';path=directory/Path(name).name
+    write_fixed(path,raw)
+    actual=g.protected_read(str(path),sha(raw),MAX_FILE)
+    if actual!=raw:raise ValueError('persisted original prerequisite bytes differ')
+    base[name]=actual
 
 
 def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,Any]],dict[str,Any]]:
@@ -315,22 +349,22 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
     for line in maps.splitlines():
         fields=line.split(maxsplit=5)
         if len(fields)==6 and fields[5].startswith('/'):
-            if fields[5].endswith(' (deleted)'):raise PrerequisiteUnavailable('deleted native mapping')
+            if fields[5].endswith(' (deleted)'):raise ValueError('deleted native mapping')
             mapped.add(fields[5]);paths.add(fields[5]);loaded.add(fields[5])
     for name in MEMBERS:paths.add(STORE+'/source/'+name)
     records={};identities=set()
     for path in sorted(paths):
         budget.require_work(time.monotonic())
         info=g.protected_path(path,True)
-        if info.st_size<=0 or info.st_size>256*1024**2:raise PrerequisiteUnavailable('unbounded OS closure member')
+        if info.st_size<=0 or info.st_size>256*1024**2:raise ValueError('unbounded OS closure member')
         identity=(info.st_dev,info.st_ino)
-        if identity in identities:raise PrerequisiteUnavailable('ambiguous loaded inode alias')
+        if identity in identities:raise ValueError('ambiguous loaded inode alias')
         identities.add(identity)
         raw=g.protected_read(path,maximum=256*1024**2)
         records[path]={'source':path,'target':'/app/'+Path(path).name if path.startswith(STORE+'/source/') else path,
             'bytes':len(raw),'sha256':sha(raw),'elf':control.elf_dependencies(raw)}
         if len(records)>4096 or sum(row['bytes'] for row in records.values())>256*1024**2:
-            raise PrerequisiteUnavailable('OS closure exceeds fixed file/byte bounds')
+            raise ValueError('OS closure exceeds fixed file/byte bounds')
     # PT_INTERP may be a symlink alias on the host. Pin the actually mapped
     # canonical inode as source, retaining the exact ELF path only as jail target.
     for row in list(records.values()):
@@ -340,13 +374,13 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
         if interpreter is not None:
             canonical_path=os.path.realpath(interpreter)
             if canonical_path not in mapped or canonical_path not in records:
-                raise PrerequisiteUnavailable('actual ELF interpreter not in native mappings')
+                raise ValueError('actual ELF interpreter not in native mappings')
             selected=records[canonical_path]
-            if selected['target'] not in (canonical_path,interpreter):raise PrerequisiteUnavailable('ambiguous ELF loader target')
+            if selected['target'] not in (canonical_path,interpreter):raise ValueError('ambiguous ELF loader target')
             selected['target']=interpreter
         for needed in elf['needed']:
             matches=[path for path in mapped if Path(path).name==needed]
-            if len(matches)!=1:raise PrerequisiteUnavailable('missing/ambiguous actually mapped ELF NEEDED')
+            if len(matches)!=1:raise ValueError('missing/ambiguous actually mapped ELF NEEDED')
     rows=list(records.values());facts:dict[str,Any]=dict(validate_os_closure(rows,loaded,control))
     facts.update({'native_maps_sha256':sha(maps.encode()),'loaded_sources':sorted(loaded),'cached_sources':sorted(caches),
         'identities':[{'source':path,'device':g.protected_path(path,True).st_dev,
@@ -400,10 +434,7 @@ def execute_suite(g:Any,control:Any,caller:Any,budget:SuiteBudget,directory:Path
                 attempt=control.run_attempt(g,host,profile,caller,case,budget.deadline,directory)
                 attempts.append(attempt);checks.update(attempt['checks'])
                 write_fixed(directory/(scenario+'-'+case+'.json'),canonical(attempt)+b'\n')
-                outer=attempt.get('outer')
-                if (attempt['error'] or not isinstance(outer,dict) or set(outer)!={'empty','dead','reaped','removed'}
-                        or any(value is not True for value in outer.values())):
-                    raise ValueError('prior attempt failed or owned leaf removal unverified: '+str(attempt['error']))
+                control.verify_attempt(attempt,scenario,case)
             last=attempts[-1]
             result={'scenario':scenario,'executed':True,'started':began,'finished':time.monotonic(),
                 'attempts':attempts,'checks':checks,'outer':last['outer'],'sentinel':last['sentinel'],
@@ -424,6 +455,11 @@ def execute_suite(g:Any,control:Any,caller:Any,budget:SuiteBudget,directory:Path
 def owned_exports(g:Any,base:dict[str,bytes],directory:Path|None,outcome:dict[str,Any],budget:SuiteBudget)->dict[str,bytes]:
     import time
     files=dict(base);files['suite/result.json']=canonical(outcome)+b'\n'
+    for name,raw in tuple(base.items()):
+        if name in tuple(f'suite/{item}.json' for item in OBSERVATIONS):
+            actual=g.protected_read(str(Path(STORE,'ci-evidence',Path(name).name)),sha(raw),MAX_FILE)
+            if actual!=raw:raise ValueError('protected original prerequisite changed before export')
+            files[name]=actual
     if directory is None:return files
     # Only filenames appointed by this source in this exact created directory.
     # Read even failed attempts' journals. No recursive/private tree discovery.
@@ -486,24 +522,40 @@ def suite_main()->int:
     for name in MEMBERS:
         raw=installed_read(STORE+'/source/'+name,1024**2);check_member(manifest,name,raw);base['source/'+name]=raw
     caller=control.original_caller(g);directory=None;outcome=None
+    caller.verify()
+    persist_observation(g,base,'suite/caller.json',{'pid':caller.pid,'start':caller.start,'uid':caller.uid,'ppid':caller.ppid})
+    context_raw=installed_read(STORE+'/ci-context.json',65536)
+    context=workflow_context(context_raw,sha(source_raw))
+    try:os_release=g.protected_read('/usr/lib/os-release',maximum=65536)
+    except FileNotFoundError:os_release=None
+    persist_observation(g,base,'suite/context.json',{'workflow':context,'workflow_context_sha256':sha(context_raw),
+        'observed_os_release':None if os_release is None else os_release.decode('utf-8'),
+        'os_release_sha256':None if os_release is None else sha(os_release),
+        'kernel':platform.release(),'machine':platform.machine(),'python':sys.version,
+        'runner_image_build_identity':None,
+        'limit':'workflow labels are attribution, not independent native authority; image build identity unobserved'})
     try:
         budget.require_work(time.monotonic())
         # Warm the actual NSS and all fixed inert fixture imports before pinning
         # actual loaded stdlib/native bytes. No code calls a model/runtime loader.
-        control.principal_facts(g,caller)
+        principal=control.principal_facts(g,caller)
+        persist_observation(g,base,'suite/principal.json',principal)
         for name in ('linux_lease_control_child.py','linux_network.py','linux_runtime_filter.py','qwen_backend.py'):
             installed_module(name,manifest)
         kernel=admit_ci_root(g)
+        persist_observation(g,base,'suite/kernel.json',kernel)
         rows,installation=discover_closure(g,control,budget)
+        persist_observation(g,base,'suite/installation.json',installation)
         write_fixed(Path(STORE,'host.json'),canonical({'schema':control.SCHEMA,'files':rows})+b'\n')
-        base['suite/installation.json']=canonical(installation)+b'\n'
         host,profile,prerequisites=control.load_ci_control_host(g,'baseline',caller)
-        base['suite/host.json']=canonical({'kernel':kernel,'host':host,'prerequisites':prerequisites})+b'\n'
+        persist_observation(g,base,'suite/host.json',{'kernel':kernel,'host':host,'prerequisites':prerequisites})
         budget.require_work(time.monotonic())
-    except (OSError,ValueError,KeyError) as failure:
-        # Protected store/source/issuer admission above is outside this SKIP
-        # scope. Here only initial native target prerequisites can be unavailable.
+    except (PrerequisiteUnavailable,control.CiPrerequisiteUnavailable) as failure:
+        # Only explicitly observed initial native absence is neutral. Source,
+        # ownership, closure, issuer and unknown errors propagate as failures.
         elapsed=time.monotonic()>=budget.deadline-10
+        if isinstance(failure,control.CiPrerequisiteUnavailable):
+            persist_observation(g,base,'suite/availability.json',failure.facts)
         outcome={'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL' if elapsed else 'SKIP','executed':False,'control_passed':False,
             'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,
             'finished':time.monotonic(),'reason':type(failure).__name__+': '+str(failure)[:2000]}

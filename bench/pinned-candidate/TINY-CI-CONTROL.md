@@ -82,3 +82,36 @@ Remaining real prerequisites include independently reviewed exact bootstrap/sour
 actual disposable-VM observation/closure/capacity, actual control execution and
 complete terminal/export/artifact evidence. Actual Qwen runtime/assets/acquisition,
 model output review, qualification and natural programme outcomes remain separate.
+
+## Revision01 safety corrections
+
+Checkout DATA is opened nonblocking and admitted as a bounded regular file
+before any read. Each read checks the original deadline. A one-shot default
+SIGALRM timer is armed for the remaining original budget before filesystem setup
+and retained across exec; it is never renewed. Timer expiry is failed/missing
+evidence, never a cleanup witness. Scheduling latency and actual target timer
+behavior remain unmeasured. The17-minute workflow limit grants no extra budget.
+
+The literal bootstrap rereads its protected installed manifest and every one of
+the nine source/entry copies, verifies exact original bytes and hashes, and only
+then executes the first fixed entry. Later coordinator self-checks remain an
+additional check. Unsafe source/ownership/ACL/closure/issuer errors propagate as
+failures; only explicitly typed, observed missing native capabilities/capacity can
+produce initial SKIP. Unknown and malformed readings cannot appoint that status.
+
+Caller, principal, kernel, installation and host observations are written and
+fsynced as immutable protected originals under fixed STORE/ci-evidence names as
+each becomes available, before subsequent phases. Export reads those same bytes
+back under their original hashes; export failure does not erase the originals.
+The source-bound workflow run/attempt/source/job/repository/architecture context
+is recorded alongside separately observed protected OS-release bytes, kernel and
+Python identity. Workflow labels are attribution, not independent native
+proof. The runner image build identity is explicitly unknown. No runner or
+workspace environment is imported into the helper/child.
+
+After persisting every returned attempt, the CI coordinator invokes the existing
+per-attempt terminal/sentinel/removal reader through its public verify_attempt
+interface before permitting the next subcase. Intentional missing terminals in
+the specified guardian-loss/observer controls retain their existing meaning.
+Unexpected missing proof aborts immediately; the legacy single-scenario route
+and all resource bars, profiles and numerical/scenario grading remain unchanged.
