@@ -200,7 +200,7 @@ class TaskParent:
                 target = context['target']
                 validate({'evolution': 'TargetComponent', 'causal': 'TargetEdge',
                           'gameplay': 'TargetMap', 'ethics': 'TargetSensor'}[contract.task], target)
-        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+        except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:
             session.decline_task_run(tuple(protected_job['subjects']), 'human-required: ' + str(exc))
             return run
         for subject in protected_job['subjects']:

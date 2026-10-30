@@ -1,4 +1,4 @@
-"""TEST_ONLY parent serialization controls, never earned task permissions."""
+"""TEST_ONLY parent controls; no operational permission or actual model competence."""
 import base64
 import copy
 import hashlib
@@ -341,3 +341,219 @@ def test_public_registered_task_command_has_no_default_job_or_permission(tmp_pat
     summary = json.loads((output / 'summary.json').read_bytes())
     assert summary['accepted'] is False and summary['human_required'] is True
     assert summary['attempts'] == [] and summary['actual_permission_grant'] is False
+
+
+def restore_task_material(material, session, path):
+    """Import independently pinned TEST_ONLY qualification and host archives through public APIs."""
+    path.mkdir()
+    if material['group']:
+        bundle = material['group'].archive(material['core'], material['assessments'])
+    else:
+        selected = material['selections'][0]
+        metric = selected.population.metric
+        bundle = selected.archive(material['captures'][metric], material['assessments'][metric])
+    raw = session.archive()
+    (path / 'qualification.json').write_bytes(bundle)
+    (path / 'session.json').write_bytes(raw)
+    registry = q.canonical({'schema': 'twin.qualification-registry/v1',
+        'entries': [{'bundle': 'qualification.json', 'sha256': hashlib.sha256(bundle).hexdigest()}],
+        'sessions': [{'bundle': 'session.json', 'sha256': hashlib.sha256(raw).hexdigest()}]})
+    catalogue = path / 'registry.json'; catalogue.write_bytes(registry)
+    host = q.Resolver.from_catalogue(catalogue, hashlib.sha256(registry).hexdigest(), material['scores'],
+        allow_test_only=True, task_policies={policy.digest: policy for policy in (material['policy'], material['host_policy'])})
+    return host, host.task_session(session.task_snapshot()['identity'])
+
+
+def test_actual_evolution_parent_reviews_restores_and_publicly_checks_complete_original_pins(protected_request, tmp_path):
+    from pathlib import Path
+    from test_task_sessions import genuine_task_material, task_review_store, TASK_CALLS
+    from twin.qualified_signals import _validator
+    material = genuine_task_material(protected_request, tmp_path)
+    selected = material['selections'][0]
+    before = len(TASK_CALLS)
+    run = parent.TaskParent(material['resolver'], clock='local').start(material['job'], material['inputs'])
+    pending_state = run.session.task_snapshot()
+    assert len(TASK_CALLS) == before + 1 and len(pending_state['pending_reviews']) == 1
+    pending_summary = run.save(tmp_path / 'pending-parent')
+    assert pending_summary['accepted'] is False and len(pending_summary['declined']) == 1
+    assert pending_summary['attempts'][0]['raw_available'] is True
+    host, restored = restore_task_material(material, run.session, tmp_path / 'pending-import')
+    resumed = parent.TaskParent(host, clock='local').resume(material['job'], restored)
+    pending = restored.task_snapshot()['pending_reviews'][0]
+    store = task_review_store(tmp_path / 'accepted-review', selected.assessment_policy, q.canonical(pending['request']))
+    assert len(resumed.review_pending(store)) == 1
+    assert len(TASK_CALLS) == before + 1 and resumed.validate() == []
+    document = resumed.document()
+    state = restored.task_snapshot()
+    assert document['derived_from'] == [] and document['source_pins'] == state['source_pins']
+    assert document['claims'][0]['source_pins'] == state['attempts'][0]['source_pins']
+    assert len(document['source_pins']) > 2 and 'signal' not in document['claims'][0]
+    validator = _validator()
+    root = str(Path(q.__file__).resolve().parents[1])
+    kinds, roles = validator.twin_facts(root)
+    _, check, lookup = validator.permission_rules(root, host)
+    assert validator.validate(document, kinds, roles, clock='local', permission=(check, lookup)) == []
+    for forgery in ('top pin', 'claim pin', 'basis', 'receipt', 'attempt', 'clock'):
+        changed = copy.deepcopy(document)
+        if forgery == 'top pin': changed['source_pins'].pop()
+        elif forgery == 'claim pin': changed['claims'][0]['source_pins'].pop()
+        elif forgery == 'basis': changed['claims'][0]['evidence'] = 'TEST_ONLY fabricated reasoning'
+        elif forgery == 'receipt': changed['claims'][0]['host_receipt'] = 'TEST_ONLY-forged'
+        elif forgery == 'attempt': changed['run']['attempts'].clear()
+        else: changed['run']['clock'] = 'github'
+        assert validator.validate(changed, kinds, roles, clock='local', permission=(check, lookup)), forgery
+    accepted = resumed.save(tmp_path / 'accepted-parent')
+    assert accepted['accepted'] is True and len(accepted['declined']) == 1
+    assert json.loads((tmp_path / 'accepted-parent' / 'claim.json').read_bytes()) == document
+    final_host, final_session = restore_task_material(material, restored, tmp_path / 'accepted-import')
+    assert parent.TaskParent(final_host, clock='local').resume(material['job'], final_session).validate() == []
+    assert len(TASK_CALLS) == before + 1
+    for decision in ('fail', 'held'):
+        refused = parent.TaskParent(material['resolver'], clock='local').start(material['job'], material['inputs'])
+        request = refused.session.task_snapshot()['pending_reviews'][0]
+        store = task_review_store(tmp_path / ('review-' + decision), selected.assessment_policy,
+            q.canonical(request['request']), decision=decision)
+        refused.review_pending(store)
+        state = refused.session.task_snapshot()
+        assert state['pending_reviews'] == []
+        assert state['attempts'][0]['disposition'] == ('held-review' if decision == 'held' else 'failed-review')
+        calls = len(TASK_CALLS)
+        assert refused.review_pending(store) == [] and len(TASK_CALLS) == calls
+        summary = refused.save(tmp_path / (decision + '-parent'))
+        assert summary['accepted'] is False and summary['attempts'][0]['raw_available'] is True
+        reloaded = q.HostSession.restore(refused.session.archive(), material['resolver'], task_policy=material['host_policy'])
+        assert reloaded.archive() == refused.session.archive() and len(TASK_CALLS) == calls
+
+
+def task_group_review_store(material, requests, path, *, first_decision='pass'):
+    """Combine independently retained TEST_ONLY assessments into one protected acquisition store."""
+    from test_task_sessions import task_review_store
+    from twin.basis_assessment import ReviewStore
+    path.mkdir()
+    entries = []
+    for index, pending in enumerate(requests):
+        selected = next(item for item in material['selections'] if item.assessment_policy.digest == pending['request']['policy'])
+        name = selected.population.metric
+        task_review_store(path / name, selected.assessment_policy, q.canonical(pending['request']),
+                          decision=first_decision if index == 0 else 'pass')
+        entry = json.loads((path / name / 'store.json').read_bytes())['entries'][0]
+        entries.append({**entry, 'record': name + '/' + entry['record']})
+    raw = q.canonical({'schema': 'twin.semantic-review-store/v1', 'entries': entries})
+    target = path / 'store.json'; target.write_bytes(raw)
+    return ReviewStore(target, hashlib.sha256(raw).hexdigest())
+
+
+def test_actual_causal_parent_uses_one_capture_both_permissions_and_complete_proposal(protected_request, tmp_path):
+    from pathlib import Path
+    from test_task_sessions import genuine_task_material, TASK_CALLS
+    from twin.qualified_signals import _validator
+    material = genuine_task_material(protected_request, tmp_path, task='causal')
+    assert all(material['resolver'].permission(metric, material['actor'].model_version).granted
+               for metric in TaskContract.freeze('causal').metrics)
+    before = len(TASK_CALLS)
+    run = parent.TaskParent(material['resolver'], clock='local').start(material['job'], material['inputs'])
+    state = run.session.task_snapshot()
+    assert len(TASK_CALLS) == before + 1 and len(state['attempts']) == 1 and len(state['pending_reviews']) == 2
+    assert len({q.digest(item['request']['rows'][0]['output']) for item in state['pending_reviews']}) == 1
+    pending_summary = run.save(tmp_path / 'causal-pending')
+    assert pending_summary['accepted'] is False and len(pending_summary['declined']) == 1
+    host, session = restore_task_material(material, run.session, tmp_path / 'causal-pending-import')
+    resumed = parent.TaskParent(host, clock='local').resume(material['job'], session)
+    store = task_group_review_store(material, session.task_snapshot()['pending_reviews'], tmp_path / 'causal-reviews')
+    results = resumed.review_pending(store)
+    assert len(results) == 2 and results[0].receipt is None and results[1].receipt
+    assert len(TASK_CALLS) == before + 1 and resumed.validate() == []
+    document = resumed.document()
+    validate('ProposalDocument', document)
+    attempt = session.task_snapshot()['attempts'][0]
+    assert document['judgements'][0]['answer'] == attempt['output']['answer']
+    assert document['judgements'][0]['basis'] == attempt['output']['basis']
+    assert document['judgements'][0]['actual_output_sha256'] == attempt['capture_sha256']
+    assert set(attempt['assessment_outcomes'].values()) == {'pass'}
+    validator = _validator(); root = str(Path(q.__file__).resolve().parents[1])
+    kinds, roles = validator.twin_facts(root)
+    _, check, lookup = validator.permission_rules(root, host)
+    assert validator.validate(document, kinds, roles, clock='local', permission=(check, lookup)) == []
+    changed = copy.deepcopy(document)
+    changed['judgements'][0]['answer']['edge']['lag_days'] += 1
+    assert validator.validate(changed, kinds, roles, clock='local', permission=(check, lookup))
+    accepted = resumed.save(tmp_path / 'causal-accepted')
+    assert accepted['accepted'] is True and accepted['sensor_activation'] is False
+    assert json.loads((tmp_path / 'causal-accepted' / 'proposal.json').read_bytes()) == document
+    final_host, final_session = restore_task_material(material, session, tmp_path / 'causal-accepted-import')
+    assert parent.TaskParent(final_host, clock='local').resume(material['job'], final_session).validate() == []
+    assert len(TASK_CALLS) == before + 1
+    for decision in ('fail', 'held'):
+        refused = parent.TaskParent(material['resolver'], clock='local').start(material['job'], material['inputs'])
+        store = task_group_review_store(material, refused.session.task_snapshot()['pending_reviews'],
+            tmp_path / ('causal-' + decision), first_decision=decision)
+        results = refused.review_pending(store)
+        assert len(results) == 1 and results[0].receipt is None
+        state = refused.session.task_snapshot()
+        assert state['pending_reviews'] == [] and state['attempts'][0]['receipt'] is None
+        assert state['attempts'][0]['raw_available'] is True
+        calls = len(TASK_CALLS)
+        assert refused.review_pending(store) == [] and len(TASK_CALLS) == calls
+        assert refused.save(tmp_path / ('causal-' + decision + '-saved'))['accepted'] is False
+
+
+def test_unreadable_protected_inputs_are_counted_before_any_actor(tmp_path):
+    job, state = snapshot('evolution')
+    resolver = RefusalResolver(state['inputs'])
+    class Inputs:
+        @property
+        def records(self):
+            raise OSError('TEST_ONLY protected source unavailable')
+    run = parent.TaskParent(resolver).start(job, Inputs())
+    summary = run.save(tmp_path / 'unreadable')
+    assert len(summary['declined']) == len(summary['attempts']) == 1
+    assert summary['attempts'][0]['capture_sha256'] is None
+    assert 'protected source unavailable' in summary['declined'][0]['reason']
+
+
+@pytest.mark.parametrize('task', ['gameplay', 'ethics'])
+def test_actual_remaining_parent_preserves_empty_gameplay_and_independent_denied_gate(task, protected_request, tmp_path):
+    from pathlib import Path
+    from test_task_sessions import genuine_task_material, task_review_store, TASK_CALLS
+    from twin.qualified_signals import _validator
+    material = genuine_task_material(protected_request, tmp_path, task=task)
+    selected = material['selections'][0]
+    assert material['resolver'].permission(selected.population.metric, material['actor'].model_version).granted
+    before = len(TASK_CALLS)
+    run = parent.TaskParent(material['resolver'], clock='local').start(material['job'], material['inputs'])
+    state = run.session.task_snapshot()
+    assert len(TASK_CALLS) == before + 1 and len(state['pending_reviews']) == 1
+    attempt = state['attempts'][0]
+    if task == 'gameplay':
+        assert attempt['output']['answer']['opportunities'] == []
+        assert attempt['mandatory_gate'] is None
+    else:
+        assert attempt['output']['answer']['admitted'] is True
+        assert attempt['mandatory_gate']['admitted'] is False
+    pending = run.save(tmp_path / (task + '-pending'))
+    assert pending['accepted'] is False and pending['sensor_activation'] is False
+    request = state['pending_reviews'][0]
+    store = task_review_store(tmp_path / (task + '-review'), selected.assessment_policy, q.canonical(request['request']))
+    assert run.review_pending(store)[0].receipt
+    document = run.document()
+    validate('ProposalDocument', document)
+    assert run.validate() == [] and len(TASK_CALLS) == before + 1
+    judgement = document['judgements'][0]
+    assert judgement['answer'] == attempt['output']['answer'] and judgement['basis'] == attempt['output']['basis']
+    assert judgement['actual_output_sha256'] == attempt['capture_sha256']
+    validator = _validator(); root = str(Path(q.__file__).resolve().parents[1])
+    kinds, roles = validator.twin_facts(root)
+    _, check, lookup = validator.permission_rules(root, material['resolver'])
+    assert validator.validate(document, kinds, roles, clock='local', permission=(check, lookup)) == []
+    changed = copy.deepcopy(document)
+    if task == 'ethics': changed['judgements'][0]['mandatory_gate']['admitted'] = True
+    else: changed['judgements'][0]['basis']['checks'][0]['present'] = not changed['judgements'][0]['basis']['checks'][0]['present']
+    assert validator.validate(changed, kinds, roles, clock='local', permission=(check, lookup))
+    summary = run.save(tmp_path / (task + '-accepted'))
+    assert summary['accepted'] is True and summary['sensor_activation'] is False
+    assert summary['action_authority'] is False and summary['merge_authority'] is False
+    assert summary['mandatory_gate_blocked'] == (material['job']['subjects'] if task == 'ethics' else [])
+    assert json.loads((tmp_path / (task + '-accepted') / 'proposal.json').read_bytes()) == document
+    host, session = restore_task_material(material, run.session, tmp_path / (task + '-import'))
+    assert parent.TaskParent(host, clock='local').resume(material['job'], session).validate() == []
+    assert len(TASK_CALLS) == before + 1
