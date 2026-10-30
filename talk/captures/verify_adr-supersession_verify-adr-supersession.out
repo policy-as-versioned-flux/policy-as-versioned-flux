@@ -11,8 +11,6 @@
 2. ADR-0026 names the three superseded rules, the four reasons and the removal decision
   ok   ADR-0026: ADR-0013
   ok   ADR-0026: ADR-0017
-verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: Broken pipe
-verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write error: Broken pipe
   ok   ADR-0026: ADR-0018.*point 3
   ok   ADR-0026: new-hole refusal|refuses on a \*\*new\*\* hole|new hole refus
   ok   ADR-0026: widening
@@ -26,8 +24,6 @@ verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write erro
   ok   ADR-0026: ticket 38
   ok   ADR-0026: removed-control
   ok   ADR-0026: removal is priced
-verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: Broken pipe
-verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write error: Broken pipe
   ok   ADR-0026: missing instrument
   ok   ADR-0026 consequences: ticket 124 built the priced removal
   ok   ADR-0026 consequences no longer says: check_selected_set.*still refuses
