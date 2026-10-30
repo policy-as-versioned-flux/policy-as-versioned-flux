@@ -174,6 +174,71 @@ def _instant_now() -> str:
     return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 
+def _finish_owned_group(process, waitid, grace: float, group: dict, custody: dict) -> str | None:
+    """One local cleanup continuation, sharing its original deadline and solewait state."""
+    if custody['reaping_started']:
+        return 'direct-child-reap-unverified'
+    if not custody['reservation_checked']:
+        try:
+            waitid(os.P_PID, process.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT)
+        except OSError:
+            group['reservation'] = 'unverified-direct-child'
+            return 'direct-child-reservation-unverified'
+        custody['reservation_checked'] = True
+    deadline = custody['deadline']
+    signals = (signal.SIGTERM, signal.SIGKILL)
+    while custody['next_signal'] < len(signals) and not custody['absent']:
+        sig = signals[custody['next_signal']]
+        # Advance before invocation: an interruption may occur after the signal acted.
+        custody['next_signal'] += 1
+        try:
+            os.killpg(process.pid, sig)
+            outcome = 'sent'
+        except ProcessLookupError:
+            outcome, custody['absent'] = 'absent', True
+        except PermissionError:
+            outcome = 'permission-denied'
+        except OSError:
+            outcome = 'os-error'
+        except BaseException:
+            group['signals'].append({'signal':int(sig),'outcome':'interrupted'})
+            raise
+        group['signals'].append({'signal':int(sig),'outcome':outcome})
+        if sig == signal.SIGTERM and outcome == 'sent':
+            term_deadline = deadline - min(.05, grace / 4)
+            while time.monotonic() < term_deadline:
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    custody['absent'] = True
+                    break
+                except OSError:
+                    break
+                time.sleep(min(.01, max(0, term_deadline-time.monotonic())))
+    # Set BEFORE wait: cancellation may occur after the OS reaped but before return.
+    # No continuation may signal or start another wait after this transition.
+    custody['reaping_started'] = True
+    try:
+        process.wait(timeout=max(0, deadline-time.monotonic()))
+        group['direct_child_reaped'] = True
+    except (subprocess.TimeoutExpired, OSError):
+        return 'direct-child-reap-unverified'
+    while True:
+        try:
+            os.killpg(process.pid, 0)
+        except ProcessLookupError:
+            group['absence_verified'] = True
+            return None
+        except PermissionError:
+            pass
+        except OSError:
+            break
+        if time.monotonic() >= deadline:
+            break
+        time.sleep(min(.005, max(0, deadline-time.monotonic())))
+    return 'owned-group-unverified'
+
+
 def _run(argv: list[str], cwd: str, limits: dict) -> dict:
     """Bounded own session; reserve its leader PID until the last group signal.
 
@@ -188,6 +253,8 @@ def _run(argv: list[str], cwd: str, limits: dict) -> dict:
     streams = {'stdout':bytearray(),'stderr':bytearray()}
     observed = {'stdout':0,'stderr':0}
     failure = None
+    interruption: BaseException | None = None
+    custody: dict[str, Any] = {}
     process = None
     group: dict[str, Any] = {'leader_pid':None,'reservation':'unreaped-direct-child',
         'signals':[], 'direct_child_reaped':False,'absence_verified':False}
@@ -230,72 +297,50 @@ def _run(argv: list[str], cwd: str, limits: dict) -> dict:
                     time.sleep(min(.005, max(0, execution_deadline-time.monotonic())))
         except OSError as exc:
             failure = 'os-error:' + type(exc).__name__
+        except BaseException as exc:
+            interruption = exc
         finally:
             if process is not None:
-                try:
-                    waitid(os.P_PID, process.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT)
-                except OSError:
-                    group['reservation'] = 'unverified-direct-child'
-                    failure = 'direct-child-reservation-unverified'
-            if process is not None and group['reservation'] == 'unreaped-direct-child':
-                cleanup_deadline = min(deadline, time.monotonic() + grace)
-                absent = False
-                term_sent = False
-                # The unreaped child reserves this PID/PGID through both signals.
-                # Permission errors are observations, never proof of group absence.
-                for sig in (signal.SIGTERM, signal.SIGKILL):
-                    if absent:
-                        break
+                custody = {'deadline':min(deadline,time.monotonic()+grace),
+                    'reaping_started':False,'reservation_checked':False,'next_signal':0,'absent':False}
+                # At most one continuation, never a renewed grace or second wait.
+                for attempt in range(2):
                     try:
-                        os.killpg(process.pid, sig)
-                        outcome = 'sent'
-                        term_sent = sig == signal.SIGTERM
-                    except ProcessLookupError:
-                        outcome, absent = 'absent', True
-                    except PermissionError:
-                        outcome = 'permission-denied'
-                    except OSError:
-                        outcome = 'os-error'
-                    group['signals'].append({'signal':int(sig),'outcome':outcome})
-                    if sig == signal.SIGTERM and term_sent:
-                        # Leave part of the SAME budget for final KILL/reap/absence.
-                        term_deadline = cleanup_deadline - min(.05, grace / 4)
-                        while time.monotonic() < term_deadline:
-                            try:
-                                os.killpg(process.pid, 0)
-                            except ProcessLookupError:
-                                absent = True
-                                break
-                            except OSError:
-                                break
-                            time.sleep(min(.01, max(0, term_deadline-time.monotonic())))
-                # No destructive group signal is permitted after releasing the PID.
-                try:
-                    process.wait(timeout=max(0, cleanup_deadline-time.monotonic()))
-                    group['direct_child_reaped'] = True
-                except (subprocess.TimeoutExpired, OSError):
-                    failure = 'direct-child-reap-unverified'
-                if group['direct_child_reaped']:
-                    while True:
-                        try:
-                            os.killpg(process.pid, 0)
-                        except ProcessLookupError:
-                            group['absence_verified'] = True
+                        cleanup_failure = _finish_owned_group(process,waitid,grace,group,custody)
+                        failure = cleanup_failure or failure
+                    except BaseException as exc:
+                        if interruption is None:
+                            interruption = exc
+                        if custody['reaping_started']:
                             break
-                        except PermissionError:
-                            pass  # A dying non-child may still retain the group.
-                        except OSError:
-                            break
-                        if time.monotonic() >= cleanup_deadline:
-                            break
-                        time.sleep(min(.005, max(0, cleanup_deadline-time.monotonic())))
-                if not group['absence_verified']:
-                    failure = failure or 'owned-group-unverified'
-            if process is not None:
+                    else:
+                        break
                 for name in streams:
                     pipe = getattr(process, name)
                     if pipe is not None:
-                        pipe.close()
+                        try:
+                            pipe.close()
+                        except BaseException as exc:
+                            if interruption is None:
+                                interruption = exc
+    if interruption is not None:
+        # A missing return cannot convey custody to the caller. Retain bounded stream
+        # prefixes and facts in the already owned workspace, then propagate the original.
+        try:
+            observation = {'schema':'twin.source-interrupted-execution/v1',
+                'disposition':'interrupted','success':False,
+                'cancellation_type':type(interruption).__name__,'process_group':group,
+                'cleanup_custody':custody,'started_at':start,'ended_at':_instant_now(),
+                'observed_bytes_lower_bound':observed,
+                'stdout':{'bytes':len(streams['stdout']),'sha256':sm.sha256(bytes(streams['stdout']))},
+                'stderr':{'bytes':len(streams['stderr']),'sha256':sm.sha256(bytes(streams['stderr']))}}
+            _write_owned(Path(cwd)/'interrupted-stdout.bin',bytes(streams['stdout']))
+            _write_owned(Path(cwd)/'interrupted-stderr.bin',bytes(streams['stderr']))
+            _write_owned(Path(cwd)/'interrupted-execution.json',sm.canonical(observation))
+        except BaseException:
+            # Interrupted/failed evidence IO cannot justify workspace removal or success.
+            pass
+        raise interruption
     return {'started_at':start,'ended_at':_instant_now(),
         'elapsed_seconds':time.monotonic()-monotonic_start,
         'exit_code':process.returncode if process is not None else None,
@@ -304,11 +349,12 @@ def _run(argv: list[str], cwd: str, limits: dict) -> dict:
         'process_group':group,'failure':failure}
 
 
-def _cleanup_workspace(directory, run: dict | None) -> str:
+def _cleanup_workspace(directory, run: dict | None, *, run_started: bool = False) -> str:
     """Never remove a workspace while an owned group might still use it."""
-    if run is not None and not (run['process_group']['direct_child_reaped']
-                               and run['process_group']['absence_verified']):
-        directory._finalizer.detach()
+    if (run is None and run_started or run is not None
+            and not (run['process_group']['direct_child_reaped']
+                     and run['process_group']['absence_verified'])):
+        getattr(directory, '_finalizer').detach()
         return 'preserved-unverified-group'
     try:
         directory.cleanup()
@@ -347,11 +393,14 @@ def prepare_extraction_plan(profile: str, parent: bytes, *, purpose: str,
     executable = str(Path(sys.executable).resolve())
     directory = tempfile.TemporaryDirectory(prefix='source-metadata-preflight-')
     result = None
+    run_started = False
     try:
+        getattr(directory, '_finalizer').detach()
+        run_started = True
         result = _run(_command(executable, directory.name, inventory=True), directory.name,
             {'wall_seconds':10,'stdout_bytes':MIB,'stderr_bytes':MIB,'termination_grace_seconds':2})
     finally:
-        workspace_cleanup = _cleanup_workspace(directory, result)
+        workspace_cleanup = _cleanup_workspace(directory, result, run_started=run_started)
     if workspace_cleanup != 'removed':
         raise MetadataMigrationHold('preflight workspace ' + workspace_cleanup + ': ' + directory.name)
     if result['failure'] or result['exit_code'] != 0:
@@ -467,6 +516,7 @@ def execute_new_extraction(plan: dict, parent: bytes) -> dict:
     receipts: dict[str,bytes] = {}
     _put(archive, parent)
     run = None
+    run_started = False
     ranges, runtime = [], None
     workspace_cleanup = None
     directory = tempfile.TemporaryDirectory(prefix='source-metadata-run-')
@@ -484,6 +534,8 @@ def execute_new_extraction(plan: dict, parent: bytes) -> dict:
         invocation = {'schema':'twin.source-extraction-invocation/v1','argv':argv,
             'cwd':workdir,'environment':dict(ENVIRONMENT),'stdin':'DEVNULL'}
         invocation_pin = _json_artifact(archive, invocation)
+        getattr(directory, '_finalizer').detach()
+        run_started = True
         run = _run(argv, workdir, config['limits'])
         if native and run['failure'] is None and run['exit_code'] == 0:
             runtime = copy.deepcopy(closure['process_files'])
@@ -507,7 +559,7 @@ def execute_new_extraction(plan: dict, parent: bytes) -> dict:
             raise
         run['failure'] = 'post-run-evidence:' + type(exc).__name__
     finally:
-        workspace_cleanup = _cleanup_workspace(directory, run)
+        workspace_cleanup = _cleanup_workspace(directory, run, run_started=run_started)
     if run is None:
         raise MetadataMigrationHold('child was not invoked')
     if workspace_cleanup != 'removed':

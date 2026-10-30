@@ -63,6 +63,14 @@ is sent after reaping. Only the direct child is reaped by this process; descenda
 claimed reaped. Success requires independently observed group absence and workspace removal.
 If reaping or group absence is unverified, the result holds and its fresh workspace is
 preserved for the custodian; no other workspace or process group is cleaned.
+Before entering the run, callers detach the workspace finalizer and mark custody started.
+A missing return, including `BaseException`, cannot authorize removal in either preflight
+or extraction. Cleanup permits one continuation within the same deadline; interrupted
+signal attempts are not repeated, and once the sole wait begins no continuation may signal
+or start another wait. Original cancellation is re-raised, including when another cleanup
+operation interrupts. Bounded stream prefixes and custody facts are retained in the owned
+workspace where possible; interrupted evidence IO also leaves the workspace held and never
+converts cancellation into a successful receipt or index.
 Failure/truncation is explicit. Zero exit with bounded diagnostic stderr is accepted by the
 fixed v1 diagnostic policy; nonzero exit, overflow, timeout or cleanup failure is not success.
 
