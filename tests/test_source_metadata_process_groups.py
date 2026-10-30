@@ -1,4 +1,5 @@
 """Bounded TEST_ONLY own-group regression probes; no native converter or /proc."""
+import gc
 import json
 import os
 from pathlib import Path
@@ -137,6 +138,7 @@ def test_unverified_group_holds_preserves_workspace_and_never_signals_after_reap
     result = migration.execute_new_extraction(plan, b'A')
     dossier = sm._json(result['receipts'][result['dossier_sha256']])
     workdir = Path(sm._json(result['archive'][dossier['invocation_sha256']])['cwd'])
+    gc.collect()  # The TemporaryDirectory and its finalizer must not erase a hold.
     try:
         assert result['status'] == 'failure' and result['failure'] == 'owned-group-unverified'
         assert 'index_sha256' not in result and dossier['standard_receipt_sha256'] is None
@@ -188,6 +190,7 @@ def test_uncertain_child_ownership_or_reap_holds_without_claiming_cleanup(monkey
     result = migration.execute_new_extraction(plan, b'A')
     dossier = sm._json(result['receipts'][result['dossier_sha256']])
     workdir = Path(sm._json(result['archive'][dossier['invocation_sha256']])['cwd'])
+    gc.collect()
     try:
         assert result['status'] == 'failure' and 'index_sha256' not in result
         assert result['failure'] == 'direct-child-' + uncertainty + '-unverified'
@@ -220,6 +223,7 @@ def test_pinned_execution_with_unestablished_cleanup_cannot_enter_store(claim):
     receipts[sm.sha256(raw)] = raw
     raw = sm.canonical(index)
     pin = sm.sha256(raw)
+    del receipts[result['index_sha256']]
     receipts[pin] = raw
     policy = sm._json(old.description)['policy']
     authority = migration.freeze_migration_authority('TEST_ONLY-parent', 'TEST_ONLY-cleanup', '1',
