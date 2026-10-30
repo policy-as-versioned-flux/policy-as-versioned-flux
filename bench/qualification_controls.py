@@ -70,7 +70,7 @@ def wrong_reference(metric, expected):
 def mechanical_selection(actor_fn=literal_actor):
     pop = population()
     return q.Selection.freeze(q.Actor.freeze(actor_fn, parse_position, {'purpose': 'TEST_ONLY'}),
-        pop, basis_holds, review=q.PopulationReview.test_only(pop))
+        pop, basis_holds, review=q.PopulationReview.test_only(pop), test_only=q.TEST_ONLY_MECHANICS)
 
 
 def host_inputs(org='driftwood', **changes):

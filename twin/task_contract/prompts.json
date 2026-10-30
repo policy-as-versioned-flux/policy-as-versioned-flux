@@ -1,0 +1,46 @@
+{
+  "prompts": [
+    {
+      "bytes": 1303,
+      "encoding": "UTF-8",
+      "line_endings": "LF",
+      "path": "prompts/evolution.txt",
+      "render": "literal single replacement with qualification.canonical(input), with no shortening or dynamic instruction additions",
+      "sha256": "7a7c49f38ef35861bc3252ca042566427abec40cce6b8fb67583181ee8edec4e",
+      "slot_count": 1,
+      "task": "evolution"
+    },
+    {
+      "bytes": 2843,
+      "encoding": "UTF-8",
+      "line_endings": "LF",
+      "path": "prompts/causal.txt",
+      "render": "literal single replacement with qualification.canonical(input), with no shortening or dynamic instruction additions",
+      "sha256": "c25ec90872654c6eb1441e9e3c013143c9d58d1713982921237fa5375ad2a0ef",
+      "slot_count": 1,
+      "task": "causal"
+    },
+    {
+      "bytes": 2576,
+      "encoding": "UTF-8",
+      "line_endings": "LF",
+      "path": "prompts/gameplay.txt",
+      "render": "literal single replacement with qualification.canonical(input), with no shortening or dynamic instruction additions",
+      "sha256": "5ac6a70f1d466da5afe31e9b5cc04fbc9d96aa729cf418bc795ad61582845f16",
+      "slot_count": 1,
+      "task": "gameplay"
+    },
+    {
+      "bytes": 2473,
+      "encoding": "UTF-8",
+      "line_endings": "LF",
+      "path": "prompts/ethics.txt",
+      "render": "literal single replacement with qualification.canonical(input), with no shortening or dynamic instruction additions",
+      "sha256": "db2222a0478c4f12ba71818977bd92322391cf24de085d439115212696f83fc4",
+      "slot_count": 1,
+      "task": "ethics"
+    }
+  ],
+  "restriction": "Independent review this exact hash set before dataset creation. Later substantive change creates new contract/actor and exposure review, not a tuned continuation of the same qualification.",
+  "status": "FROZEN_CASE_FREE_CONTRACT_CANDIDATE"
+}
