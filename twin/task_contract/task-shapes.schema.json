@@ -2417,7 +2417,7 @@
               "type": "string"
             },
             "root": {
-              "minLength": 1,
+              "minLength": 0,
               "type": "string"
             },
             "tree": {
