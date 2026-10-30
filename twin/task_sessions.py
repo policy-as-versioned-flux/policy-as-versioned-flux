@@ -39,25 +39,30 @@ def _raw_rows(session: q.HostSession) -> list[dict[str, Any]]:
 
 def _pins(row: dict[str, Any]) -> list[dict[str, str]]:
     pins = {}
-    for record in row.get('sources', {}).values():
+    sources = row.get('sources', {}) if isinstance(row, dict) else {}
+    for record in sources.values() if isinstance(sources, dict) else ():
         if isinstance(record, dict) and all(isinstance(record.get(key), str) and record[key] for key in ('identity', 'version', 'sha256')):
             item = {key: record[key] for key in ('identity', 'version', 'sha256')}
             pins[q.digest(item)] = item
     return sorted(pins.values(), key=lambda item: (item['identity'], item['version'], item['sha256']))
 
 
+def _input_binding(row: dict[str, Any], model_version: str) -> dict[str, Any]:
+    payload, context = row.get('input'), row.get('context', {})
+    target = context.get('target', payload.get('target') if isinstance(payload, dict) else None) if isinstance(context, dict) else None
+    actor = model_version.removeprefix('actor-') if re.fullmatch(r'actor-[0-9a-f]{64}', model_version) else None
+    return {'target': target, 'context': context or None, 'input_sha256': q.digest(payload), 'target_sha256': q.digest(target),
+            'actor_sha256': actor, 'source_pins': _pins(row)}
+
+
 def _attempt(session: q.HostSession, task: str, metrics: tuple[str, ...], model_version: str,
              subject: str) -> dict[str, Any]:
-    row = next((row for row in _raw_rows(session) if row.get('subject') == subject), {})
-    payload, context = row.get('input'), row.get('context', {})
-    target = context.get('target', payload.get('target') if isinstance(payload, dict) else None)
-    actor = model_version.removeprefix('actor-') if re.fullmatch(r'actor-[0-9a-f]{64}', model_version) else None
+    row = next((row for row in _raw_rows(session) if isinstance(row, dict) and row.get('subject') == subject), {})
     result = {'attempt_id': secrets.token_hex(24), 'subject': subject, 'task': task, 'metrics': list(metrics),
-        'target': target, 'context': context or None, 'input_sha256': q.digest(payload), 'target_sha256': q.digest(target),
-        'actor_sha256': actor, 'capture_sha256': None, 'raw_sha256': None, 'raw_available': False,
+        **_input_binding(row, model_version), 'capture_sha256': None, 'raw_sha256': None, 'raw_available': False,
         'disposition': 'refused-before-invocation', 'reason': 'human required; input not yet invoked',
         'status': 'declined', 'receipt': None, 'output': None, 'assessment_outcomes': {},
-        'mandatory_gate': None, 'source_pins': _pins(row)}
+        'mandatory_gate': None}
     session._task_attempts.append(result)
     return result
 
@@ -162,6 +167,7 @@ def judge(session: q.HostSession, task: str, model_version: str, subject: str, *
     metrics = TaskContract.freeze(task).metrics
     attempt = _attempt(session, task, metrics, model_version, subject)
     output = None
+    invoked = False
     try:
         if task == 'causal' and not paired:
             raise ValueError('registered causal task requires paired judgement and both current permissions; human required')
@@ -182,6 +188,7 @@ def judge(session: q.HostSession, task: str, model_version: str, subject: str, *
         _permissions(session, selections)
         gate = _gate(row, task)
         attempt['mandatory_gate'] = gate
+        invoked = True
         captured = selections[0].actor.invoke(row['input'])
         output = json.loads(captured.packet)
         if captured.failure or output['answer'] is None or output['basis'] is None:
@@ -192,7 +199,7 @@ def judge(session: q.HostSession, task: str, model_version: str, subject: str, *
                 except (ValueError, UnicodeError):
                     pass
             session._failed_outputs.append({'subject': subject, 'attempt': attempt['attempt_id'], 'output': output})
-            _finish(session, attempt, 'failed' if captured.failure else 'declined', str(reason or 'actor declined; human required'), output)
+            _finish(session, attempt, 'failed' if captured.failure else 'declined', str(reason or 'actor declined') + '; human required', output)
             return q.Judgement(None, attempt['reason'], captured)
         record = {'subject': subject, 'metric': metrics[0], 'task_metrics': list(metrics), 'task': task,
             'model_version': model_version, 'selection': selections[0].digest,
@@ -207,20 +214,39 @@ def judge(session: q.HostSession, task: str, model_version: str, subject: str, *
         _finish(session, attempt, 'pending-review', 'independent task semantic assessment required; human required', output)
         return q.Judgement(None, attempt['reason'], captured)
     except Exception as exc:
+        if invoked and output is None:
+            output = {'actor_digest': model_version.removeprefix('actor-'), 'input_digest': attempt['input_sha256'],
+                'raw': '', 'raw_available': False, 'failure': type(exc).__name__ + ': ' + str(exc),
+                'observed_runtime': None, 'observations': {}, 'answer': None, 'basis': None}
+            session._failed_outputs.append({'subject': subject, 'attempt': attempt['attempt_id'], 'output': output})
         _finish(session, attempt, 'refused-before-invocation' if output is None else 'failed', str(exc), output)
         return q.Judgement(None, str(exc))
 
 
 def verify_record(session: q.HostSession, record: dict[str, Any], *, current: bool = False) -> tuple[q.Selection, ...]:
+    required = {'subject', 'metric', 'task_metrics', 'task', 'model_version', 'selection', 'task_selections',
+                'context', 'output', 'attempt', 'mandatory_gate', 'source_pins'}
+    optional = {'task_review_metric', 'task_review_request', 'assessments', 'assessment_digests'}
+    if not isinstance(record, dict) or not required <= set(record) or not set(record) <= required | optional:
+        raise ValueError('registered task metric requires complete protected task receipt/job fields')
+    try:
+        return _verify_record(session, record, current=current)
+    except (KeyError, TypeError, IndexError, AttributeError) as exc:
+        raise ValueError('malformed protected task record') from exc
+
+
+def _verify_record(session: q.HostSession, record: dict[str, Any], *, current: bool = False) -> tuple[q.Selection, ...]:
     selections = _selections(session, record['task'], record['model_version'])
     job = json.loads(session._task_job) if session._task_job else {}
     if (job.get('task') != record['task'] or job.get('model_version') != record['model_version']
             or job.get('task_contract_sha256') != selections[0]._task_contract.digest
             or record['subject'] not in job.get('subjects', [])):
         raise ValueError('task receipt differs from original current protected parent job')
-    if record['task_metrics'] != [item.population.metric for item in selections]:
+    if record['metric'] != selections[0].population.metric or record['task_metrics'] != [item.population.metric for item in selections]:
         raise ValueError('task receipt omits or changes an independently required metric')
     row = session._inputs.resolve(record['subject'])
+    if row['context']['organisation'] != job.get('organisation'):
+        raise ValueError('task receipt adopter differs from original protected parent job')
     for selected in selections:
         selected.verify_input(row)
     if current:
@@ -318,12 +344,144 @@ def restore_record(session: q.HostSession, record: dict[str, Any]) -> None:
         session._live_assessments[assessment.digest] = assessment
 
 
+def verify_session(session: q.HostSession) -> None:
+    try:
+        _verify_session(session)
+    except (KeyError, TypeError, IndexError, AttributeError) as exc:
+        raise ValueError('malformed retained task lifecycle history') from exc
+
+
+def _verify_session(session: q.HostSession) -> None:
+    """Conserve task attempts, events, raw captures and independently acquired reviews.
+
+    Protected archive pinning admits the bytes; it does not excuse an inconsistent
+    count ledger or allow a public attempt row to manufacture a reviewed capture.
+    Failed preflights use retained original rows without trying to resolve them again.
+    """
+    if session._task_job is None:
+        raise ValueError('original protected task job required')
+    job = json.loads(session._task_job)
+    metrics = TaskContract.freeze(job['task']).metrics
+    rows = {row.get('subject'): row for row in _raw_rows(session) if isinstance(row, dict)}
+    attempts = session._task_attempts
+    ids = [item.get('attempt_id') for item in attempts]
+    if len(set(ids)) != len(ids) or any(not isinstance(identity, str) or not re.fullmatch(r'[0-9a-f]{48}', identity) for identity in ids):
+        raise ValueError('task attempt identities must be complete and unique')
+    expected_fields = {'attempt_id', 'subject', 'task', 'metrics', 'target', 'context', 'input_sha256', 'target_sha256',
+        'actor_sha256', 'capture_sha256', 'raw_sha256', 'raw_available', 'disposition', 'reason', 'status', 'receipt',
+        'output', 'assessment_outcomes', 'mandatory_gate', 'source_pins'}
+    events = session._task_events
+    dispositions = {'refused-before-invocation', 'failed', 'declined', 'pending-review', 'accepted', 'held-review', 'failed-review'}
+    if any(not isinstance(event, dict) or set(event) != {'attempt_id', 'disposition', 'reason', 'receipt'}
+           or event['attempt_id'] not in ids or event['disposition'] not in dispositions
+           or not isinstance(event['reason'], str) or not event['reason'] for event in events):
+        raise ValueError('task lifecycle event differs from counted attempt')
+    if list(dict.fromkeys(event['attempt_id'] for event in events)) != ids:
+        raise ValueError('task lifecycle omits or reorders counted attempts')
+    declines = [{'subject': next(item['subject'] for item in attempts if item['attempt_id'] == event['attempt_id']),
+                 'reason': event['reason']} for event in events if event['disposition'] != 'accepted']
+    if declines != session.declines:
+        raise ValueError('task lifecycle omits or rewrites counted declines')
+    records = {json.loads(raw)['attempt']: (token, json.loads(raw)) for token, raw in session._records.items()}
+    if len(records) != len(session._records) or not set(records) <= set(ids) or not set(session._task_reviews) <= set(ids):
+        raise ValueError('task receipt/review has no unique original counted attempt')
+    pending: dict[str, dict[str, Any]] = {}
+    for key, raw in session._pending.items():
+        record = json.loads(raw)
+        identity, metric = record.get('attempt'), record.get('task_review_metric')
+        if identity not in ids or metric not in metrics or metric in pending.setdefault(identity, {}):
+            raise ValueError('task pending review has no unique original metric/attempt')
+        pending[identity][metric] = record
+        if q.digest(review_request(session, record, metric)) != key:
+            raise ValueError('pending task review request changed')
+    observed_subjects = []
+    failed = {}
+    for item in attempts:
+        identity, subject = item['attempt_id'], item['subject']
+        binding = _input_binding(rows.get(subject, {}), job['model_version'])
+        history = [event for event in events if event['attempt_id'] == identity]
+        status = {'refused-before-invocation': 'declined', 'pending-review': 'pending',
+                  'held-review': 'held', 'failed-review': 'failed'}.get(item['disposition'], item['disposition'])
+        if (set(item) != expected_fields or subject not in job['subjects'] or item['task'] != job['task']
+                or item['metrics'] != list(metrics) or any(q.canonical(item[key]) != q.canonical(value) for key, value in binding.items())
+                or item['status'] != status or not history
+                or {key: item[key] for key in ('disposition', 'reason', 'receipt')} != {
+                    key: history[-1][key] for key in ('disposition', 'reason', 'receipt')}):
+            raise ValueError('task attempt differs from original input/target/actor/event binding')
+        output = item['output']
+        reviews = session._task_reviews.get(identity, {})
+        outcomes = {}
+        for metric, value in reviews.items():
+            if metric not in metrics or value['record'].get('attempt') != identity or value['record']['subject'] != subject:
+                raise ValueError('task review belongs to another metric/attempt/subject')
+            if q.canonical(value['record']['output']) != q.canonical(output):
+                raise ValueError('task review changed the original captured output')
+            assessment = session._live_assessments[value['digest']]
+            outcome = assessment.outcome(subject)
+            outcomes[metric] = 'pass' if outcome is True else 'fail' if outcome is False else 'held'
+        if output is None:
+            if (item['disposition'] != 'refused-before-invocation' or item['capture_sha256'] is not None
+                    or item['raw_sha256'] is not None or item['raw_available'] is not False
+                    or item['mandatory_gate'] is not None or item['assessment_outcomes'] or reviews or pending.get(identity)
+                    or identity in records):
+                raise ValueError('pre-invocation task refusal invents capture/review/receipt')
+            continue
+        observed_subjects.append(subject)
+        row = session._inputs.resolve(subject)
+        selections = _selections(session, job['task'], job['model_version'])
+        for selected in selections:
+            selected.verify_input(row)
+        raw = base64.b64decode(output['raw'], validate=True)
+        if (set(output) != {'actor_digest', 'input_digest', 'raw', 'raw_available', 'failure', 'observed_runtime', 'observations', 'answer', 'basis'}
+                or type(output['raw_available']) is not bool or not output['raw_available'] and raw
+                or output['actor_digest'] != job['model_version'].removeprefix('actor-')
+                or output['input_digest'] != item['input_sha256'] or item['capture_sha256'] != q.digest(output)
+                or item['raw_available'] is not output['raw_available'] or item['raw_sha256'] != q.hashlib.sha256(raw).hexdigest()
+                or item['mandatory_gate'] != _gate(row, job['task'])):
+            raise ValueError('task raw capture/digest/gate differs from actual original input')
+        if output['failure'] or output['answer'] is None:
+            if item['disposition'] not in ('failed', 'declined') or reviews or pending.get(identity) or identity in records:
+                raise ValueError('failed/declined task capture cannot invent a review or receipt')
+            if output['failure'] and (output['answer'] is not None or output['basis'] is not None):
+                raise ValueError('failed task capture invents answer/basis')
+            if not output['failure']:
+                parsed = selections[0].actor.parser(raw, json.loads(selections[0].actor.description)['config'])
+                from .task_inputs import verify_output
+                verify_output(row['input'], parsed)
+                if q.canonical({'answer': parsed.answer, 'basis': parsed.basis}) != q.canonical({'answer': output['answer'], 'basis': output['basis']}):
+                    raise ValueError('declined task capture differs from actual raw')
+            failed[identity] = {'subject': subject, 'attempt': identity, 'output': output}
+            continue
+        expected_outcomes = {metric: outcomes.get(metric, 'pending') for metric in metrics}
+        if item['assessment_outcomes'] != expected_outcomes:
+            raise ValueError('task attempt assessment outcomes differ from actual retained reviews')
+        if any(value in ('fail', 'held') for value in outcomes.values()):
+            expected_disposition = 'failed-review' if 'fail' in outcomes.values() else 'held-review'
+            if item['disposition'] != expected_disposition or pending.get(identity) or identity in records:
+                raise ValueError('failed/held task review was not consumed')
+        elif len(outcomes) == len(metrics):
+            token, record = records.get(identity, (None, {}))
+            if (item['disposition'] != 'accepted' or item['receipt'] != token or token is None or pending.get(identity)
+                    or q.canonical(record.get('output')) != q.canonical(output)
+                    or record.get('assessment_digests') != {metric: value['digest'] for metric, value in reviews.items()}):
+                raise ValueError('task acceptance lacks exact independent reviewed receipt')
+        elif (item['disposition'] != 'pending-review' or item['receipt'] is not None or identity in records
+              or set(pending.get(identity, {})) != set(metrics) - set(outcomes)
+              or any(q.canonical(value['output']) != q.canonical(output) for value in pending.get(identity, {}).values())):
+            raise ValueError('task pending attempt omits an independent review/capture')
+    if len(set(observed_subjects)) != len(observed_subjects):
+        raise ValueError('task subject was automatically reinvoked')
+    if session._failed_outputs != list(failed.values()):
+        raise ValueError('task failed raw capture history changed')
+
+
 def check_document(session: q.HostSession, document: dict[str, Any]) -> list[str]:
     """Verify a proposal against original host history and both current authorities."""
     bad = []
     try:
         if session._task_job is None:
             raise ValueError('no original protected task parent job')
+        verify_session(session)
         job = json.loads(session._task_job)
         state = snapshot(session)
         run = document.get('run', {})

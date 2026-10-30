@@ -8,9 +8,11 @@ from twin import qualification as q
 from twin.basis_assessment import BasisPolicy, ReviewStore
 
 
-def retained_review(tmp_path, policy, *, decision='pass', witness=None, mutate=None):
+def retained_review(tmp_path, policy, *, decision='pass', witness=None, mutate=None, output=None):
     original = {'id': 'TEST_ONLY-review', 'input': {'coordinate': 1, 'statement': 'TEST_ONLY retained text'},
                 'context': {}, 'sources': {}, 'output': {'answer': {'evolution_position': .5}, 'basis': {'reason': 'TEST_ONLY'}}}
+    if output is not None:
+        original['output'] = output
     request = q.canonical({'rows': [original]})
     row = {'id': original['id'], 'subject_digest': q.digest(original), 'reason': 'TEST_ONLY retained decision',
         'decisions': {name: decision for name in policy.dimensions}, 'support': {name: {
@@ -48,6 +50,31 @@ def test_foreign_or_type_confused_witness_cannot_pass(tmp_path, witness):
     store, request = retained_review(tmp_path, policy, witness=witness)
     with pytest.raises(ValueError):
         store.assess(policy, request)
+
+
+def test_ethics_na_only_follows_a_verified_failed_ordered_prefix(tmp_path):
+    policy = BasisPolicy.for_task('ethics', 'ethics-gate', ('TEST_ONLY-review',))
+    output = {'answer': {'admitted': False, 'ladder': {'stopped_at': 'purpose', 'rungs': [
+        {'rung': 'purpose', 'passed': False, 'justification': 'TEST_ONLY authored failed purpose'}]}},
+        'basis': {'reason': 'TEST_ONLY actual stopped prefix'}}
+    def later(record):
+        record['rows'][0]['decisions'].update(necessity='not-applicable', proportionality='not-applicable')
+    store, request = retained_review(tmp_path, policy, output=output, mutate=later)
+    assert store.assess(policy, request).outcome('TEST_ONLY-review') is True
+    for forbidden in ('purpose', 'policy_authority', 'dpia', 'ladder_stop'):
+        target = tmp_path / forbidden; target.mkdir()
+        def unavailable(record):
+            later(record); record['rows'][0]['decisions'][forbidden] = 'not-applicable'
+        store, request = retained_review(target, policy, output=output, mutate=unavailable)
+        with pytest.raises(ValueError):
+            store.assess(policy, request)
+
+
+def test_explicit_decline_na_remains_unscoreable(tmp_path):
+    policy = BasisPolicy.for_task('evolution', 'evolution-judge', ('TEST_ONLY-review',))
+    store, request = retained_review(tmp_path, policy, decision='not-applicable',
+        output={'answer': None, 'basis': {'decline': 'TEST_ONLY no checkable answer'}})
+    assert store.assess(policy, request).outcome('TEST_ONLY-review') is None
 
 
 @pytest.mark.parametrize('mutation', ['missing-dimension', 'foreign-dimension', 'missing-support', 'extra-field', 'foreign-request', 'na'])

@@ -120,3 +120,41 @@ def test_independent_metric_baseline_and_variance_are_not_inherited():
     assert set(grades['variance'].values()) == {1}
     assert quantities['population_digest'] != grades['population_digest']
     assert len(CALLS) == before
+
+
+def test_group_rejects_changed_order_scope_or_exposure_before_any_invocation():
+    import copy
+    import pytest
+    quantity, grade = causal_pair()
+    before = len(CALLS)
+    for kind in ('order', 'scope', 'exposure'):
+        value = json.loads(grade.population.description)
+        if kind == 'order':
+            value['selected'].reverse()
+        elif kind == 'scope':
+            value['envelope']['from'] = '2026-10-02'
+        else:
+            value['exposure']['history'].append('TEST_ONLY changed custody/exposure account')
+        population = q.Population(q.canonical(value))
+        changed = q.Selection.freeze(grade.actor, population, basis_holds,
+            review=q.PopulationReview.test_only(population), test_only=q.TEST_ONLY_MECHANICS)
+        with pytest.raises(ValueError, match='differs'):
+            q.CaptureGroup.freeze((quantity, changed))
+    assert len(CALLS) == before
+
+
+def test_protected_catalogue_rejects_partial_or_duplicate_group_members(tmp_path):
+    import hashlib
+    import pytest
+    pair = causal_pair(); group = q.CaptureGroup.freeze(pair)
+    packet = json.loads(group.archive(group.capture()))
+    before = len(CALLS)
+    for members in (packet['members'][:1], [packet['members'][0], packet['members'][0]]):
+        raw = q.canonical({**packet, 'members': members})
+        (tmp_path / 'group.json').write_bytes(raw)
+        catalogue = {'schema': 'twin.qualification-registry/v1', 'entries': [{'bundle': 'group.json',
+            'sha256': hashlib.sha256(raw).hexdigest()}]}
+        path = tmp_path / 'catalogue.json'; path.write_bytes(q.canonical(catalogue))
+        with pytest.raises(ValueError):
+            q.Resolver.from_catalogue(path, q.digest(catalogue), allow_test_only=True)
+    assert len(CALLS) == before
