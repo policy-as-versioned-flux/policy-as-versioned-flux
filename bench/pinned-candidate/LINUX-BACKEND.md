@@ -60,6 +60,11 @@ all credentials/capabilities and bounding capabilities, sets no-new-privileges,
 rearms SIGKILL after the final credential change, checks the inherited guardian pidfd,
 locks death-signal and namespace changes, then executes fixed Python with `-B -I -S`.
 The child retains only three data pipes. No third-party code executes as root.
+The child lifetime keeps the original PID/start/pidfd while explicitly observing the
+trusted root, GID-drop and exact protected candidate credential phases after attach.
+READY seals candidate credentials permanently; supervisor/guardian identity checks
+retain their original strict UID pin. Foreign, preemptive or regressing credentials
+cannot replace the one allowed bootstrap transition.
 
 The existing socket filter is unchanged. A separate architecture-checked filter
 prevents namespace/mount/control/ptrace/process-memory escapes and death-signal
@@ -100,6 +105,15 @@ must retain 5 GiB available; capacity is read through a verified directory descr
 with per-path device/inode/free-byte evidence. Cgroup/proc mounts are not used as
 storage capacity, and the bounded `/attempt` tmpfs remains charged to memory.
 The parent rejects omitted/substituted storage and changed observed directory identity.
+Effective memory headroom is the minimum of host MemAvailable and every finite
+protected ancestor's limit minus current charge. Initial setup and both fresh phases
+require the full 12 GiB plus 2 GiB before child construction. Ongoing samples require
+2 GiB outside the candidate leaf; they do not require unused memory within its 12 GiB.
+Ancestor/control ownership and device/inode identity are renewed and compared with
+the original protected chain. Raw host/max/current/storage readings survive refused
+admission and bad samples; unknown accounting stops the attempt. Phase-start receipts
+bind each renewed admission for the parent. Shared deadlines, limits and already-enabled
+controllers are preserved; headroom remains an estimate vulnerable to unrelated allocations.
 
 Before input release, the guardian independently corroborates the pinned child's
 post-exec zero readback with live sensitive proc ownership and verified nonroot

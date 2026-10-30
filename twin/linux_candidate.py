@@ -551,6 +551,7 @@ class HostCapture:
         self.sources: dict[str, list[dict[str, Any]]] = {}
         self.mappings: dict[str, list[dict[str, Any]]] = {}
         self.initial_cgroup: dict[str, Any] | None = None
+        self.initial_ancestors: list[dict[str, Any]] | None = None
 
     def accept(self, packet: dict[str, Any]) -> None:
         kind, facts = packet['event'], packet.get('facts')
@@ -558,6 +559,8 @@ class HostCapture:
             self.lease = packet['lease']
         elif kind == 'phase_start':
             if not self.lease_proof: raise ValueError('protected host lease proof missing before child')
+            if not isinstance(packet.get('admission'),dict):raise ValueError('actual phase resource admission missing')
+            self._budget(packet['admission'],12884901888+2147483648)
             self.phase, self.identity = packet['phase'], [packet['pid'], packet['start']]
         elif kind == 'proof':
             if not isinstance(facts, dict): raise ValueError('protected host proof object required')
@@ -572,11 +575,8 @@ class HostCapture:
         elif kind == 'resources':
             if not isinstance(facts, dict): raise ValueError('actual host resource object required')
             self.policy.validate_resources(facts, set(self.host['cpus']),
-                self.policy.storage_paths(self.host,self.profile))
-            for row in facts['reserve']['storage']:
-                actual = self.policy.protected_path(row['path'],False)
-                if (actual.st_dev,actual.st_ino) != (row['device'],row['inode']):
-                    raise ValueError('protected storage identity changed after observation')
+                self.policy.storage_paths(self.host,self.profile),self.host['cgroup_parent'])
+            self._budget(facts['reserve'],2147483648)
             gap = facts.get('gap_seconds')
             if gap is not None and (type(gap) not in (int, float) or not 0 <= gap <= 2):
                 raise ValueError('actual host observer gap exceeds frozen bound')
@@ -603,6 +603,24 @@ class HostCapture:
                     or not self.resource_counts[self.phase]):
                 raise ValueError('actual host observation/loaded-runtime mapping receipts incomplete')
             self.phase, self.identity = None, None
+
+    def _budget(self, facts: dict[str, Any], minimum: int) -> None:
+        self.policy.validate_reserve(facts,minimum,self.policy.storage_paths(self.host,self.profile),
+                                     self.host['cgroup_parent'])
+        identities = self.policy.ancestor_identities(facts['ancestors'])
+        if self.initial_ancestors is None:self.initial_ancestors = identities
+        elif self.initial_ancestors != identities:
+            raise ValueError('protected ancestor accounting/control identity changed across capture')
+        for row in facts['ancestors']:
+            for path,identity in [(row['path'],row), *((row['path']+'/'+name,identity)
+                    for name,identity in row['controls'].items())]:
+                actual = self.policy.protected_path(path,path != row['path'])
+                if (actual.st_dev,actual.st_ino) != (identity['device'],identity['inode']):
+                    raise ValueError('protected ancestor identity changed after observation')
+        for row in facts['storage']:
+            actual = self.policy.protected_path(row['path'],False)
+            if (actual.st_dev,actual.st_ino) != (row['device'],row['inode']):
+                raise ValueError('protected storage identity changed after observation')
 
     def _lease(self, facts: dict[str, Any]) -> None:
         import math
@@ -635,6 +653,7 @@ class HostCapture:
             current = actual['ppid']
         if current != self.launcher_pid:
             raise ValueError('actual root guardian did not descend from fixed private launch')
+        self._budget(facts['initial_admission'],12884901888+2147483648)
         self.lease_proof = True
 
     def _receipt(self, facts: dict[str, Any]) -> None:

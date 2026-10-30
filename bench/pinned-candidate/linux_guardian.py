@@ -149,6 +149,64 @@ class Identity:
         os.close(self.fd)
 
 
+class ChildIdentity(Identity):
+    """The one trusted bootstrap credential transition on an unchanged pidfd.
+
+    Supervisor/guardian Identity stays strict. Only the attached namespace child
+    may drop GID then UID to the exact protected host-selected identity; after
+    READY, no bootstrap credential state is accepted again.
+    """
+    def __init__(self, pid: int, candidate_uid: int, candidate_gid: int):
+        super().__init__(pid)
+        self.phase = 'bootstrap'
+        self.stage = 0
+        self.candidate_uid,self.candidate_gid = candidate_uid,candidate_gid
+        state = parse_status(Path(f'/proc/{pid}/status').read_text())
+        self.bootstrap_gid = [int(value) for value in state['Gid'].split()]
+        if (self.uid != [0]*4 or len(self.bootstrap_gid) != 4
+                or type(candidate_uid) is not int or candidate_uid <= 0
+                or type(candidate_gid) is not int or candidate_gid <= 0
+                or self.bootstrap_gid == [candidate_gid]*4):
+            self.close()
+            raise ValueError('trusted root bootstrap and distinct exact candidate credentials required')
+        try:self.verify()
+        except BaseException:
+            self.close()
+            raise
+
+    def verify(self) -> None:
+        before = self.read(self.pid)
+        state = parse_status(Path(f'/proc/{self.pid}/status').read_text())
+        after = self.read(self.pid)
+        if before['start'] != self.start or after['start'] != self.start or self.dead():
+            raise ValueError('pinned child PID/start/pidfd no longer live')
+        pair = ([int(value) for value in state['Uid'].split()],
+                [int(value) for value in state['Gid'].split()])
+        allowed = (([0]*4,self.bootstrap_gid),([0]*4,[self.candidate_gid]*4),
+                   ([self.candidate_uid]*4,[self.candidate_gid]*4))
+        if pair not in allowed:
+            raise ValueError('unexpected trusted child credential transition')
+        stage = allowed.index(pair)
+        if (self.phase == 'bootstrap' and stage != 0 or stage < self.stage
+                or self.phase == 'candidate' and (stage != 2 or state['Groups'].strip())):
+            raise ValueError('trusted child credential phase regressed or changed')
+        self.stage = stage
+
+    def begin_transition(self) -> None:
+        if self.phase != 'bootstrap':raise ValueError('child attach transition already released')
+        self.verify()
+        self.phase = 'dropping'
+
+    def confirm_candidate(self) -> None:
+        if self.phase not in ('dropping','candidate'):
+            raise ValueError('child never crossed trusted attach transition')
+        self.verify()
+        state = parse_status(Path(f'/proc/{self.pid}/status').read_text())
+        if self.stage != 2 or state['Groups'].strip():
+            raise ValueError('exact candidate credential drop is incomplete')
+        self.phase = 'candidate'
+
+
 def parse_status(raw: str) -> dict[str, str]:
     return {key: value.strip() for line in raw.splitlines() if ':' in line
             for key, value in [line.split(':', 1)]}
@@ -410,7 +468,7 @@ def key_values(raw: str) -> dict[str, int]:
 
 
 def validate_resources(facts: dict[str, Any], cpus: set[int],
-                       storage: tuple[str, ...] | None = None) -> None:
+                       storage: tuple[str, ...] | None = None, ancestor_parent: str | None = None) -> None:
     """Public resource-proof seam over independently acquired kernel snapshots."""
     expected = {'memory.max':str(MEMORY),'memory.swap.max':'0','pids.max':'128',
                 'cpu.max':'200000 100000','cpu.max.burst':'0'}
@@ -427,9 +485,15 @@ def validate_resources(facts: dict[str, Any], cpus: set[int],
             or facts['pids.current'] > 128
             or any(facts['memory.events'].get(key,0) for key in ('oom','oom_kill','max'))):
         raise ValueError('actual resource cap/swap/oom failure')
-    if (facts['reserve']['memory_available'] < RESERVE or facts['reserve']['disk_free'] < DISK):
+    validate_reserve(facts['reserve'], RESERVE, storage, ancestor_parent)
+
+
+def validate_reserve(facts: dict[str, Any], minimum: int, storage: tuple[str, ...] | None,
+                     ancestor_parent: str | None) -> None:
+    effective = effective_memory(facts, ancestor_parent)
+    if facts['memory_available'] != effective or effective < minimum or facts['disk_free'] < DISK:
         raise ValueError('actual host reserve unavailable')
-    rows = facts['reserve'].get('storage')
+    rows = facts.get('storage')
     if (not isinstance(rows, list) or not rows
             or any(not isinstance(row, dict) or set(row) != {'path','device','inode','disk_free'}
                    or not isinstance(row['path'], str)
@@ -438,7 +502,7 @@ def validate_resources(facts: dict[str, Any], cpus: set[int],
         raise ValueError('actual protected backing storage records required')
     paths = [row['path'] for row in rows]
     if (len(set(paths)) != len(paths) or storage is not None and set(paths) != set(storage)
-            or min(row['disk_free'] for row in rows) != facts['reserve']['disk_free']
+            or min(row['disk_free'] for row in rows) != facts['disk_free']
             or any(row['disk_free'] < DISK for row in rows)):
         raise ValueError('actual backing storage scope/minimum/reserve differs')
 
@@ -447,12 +511,92 @@ class UnverifiedSetupCleanup(ValueError):
     """Setup created host state whose removal could not be independently verified."""
 
 
+class ResourceAdmissionError(ValueError):
+    """Retain raw host/ancestor/storage readings on a refused or unreadable budget."""
+    def __init__(self, message: str, facts: dict[str, Any]):
+        super().__init__(message)
+        self.facts = facts
+
+
+def ancestor_paths(parent: str) -> tuple[str, ...]:
+    current = Path(parent)
+    root = Path('/sys/fs/cgroup')
+    if str(current) != parent or not current.is_absolute() or '..' in current.parts:
+        raise ValueError('protected canonical cgroup ancestry required')
+    result = []
+    while True:
+        result.append(str(current))
+        if current == root:return tuple(result)
+        if root not in current.parents:raise ValueError('protected cgroup parent lies outside cgroup2 root')
+        current = current.parent
+
+
+def observe_ancestors(parent: str) -> list[dict[str, Any]]:
+    """Re-open protected accounting/control ancestry; never enable or write it."""
+    rows = []
+    for path in ancestor_paths(parent):
+        directory = protected_path(path, False)
+        controls = {}
+        for name in ('cgroup.procs','cgroup.threads','cgroup.subtree_control','memory.max','memory.current',
+                     'memory.swap.max','pids.max','cpu.max','cpu.max.burst','cpuset.cpus','cpuset.mems'):
+            member = Path(path,name)
+            if member.exists():
+                info = protected_path(str(member),True)
+                controls[name] = {'device':info.st_dev,'inode':info.st_ino}
+        rows.append({'path':path,'device':directory.st_dev,'inode':directory.st_ino,'controls':controls,
+            'subtree_control':Path(path,'cgroup.subtree_control').read_text().strip(),
+            'memory.max':Path(path,'memory.max').read_text().strip() if 'memory.max' in controls else None,
+            'memory.current':Path(path,'memory.current').read_text().strip() if 'memory.current' in controls else None})
+    return rows
+
+
+def ancestor_identities(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return json.loads(canonical([{key:row[key] for key in ('path','device','inode','controls')} for row in rows]))
+
+
+def effective_memory(facts: dict[str, Any], parent: str | None) -> int:
+    host = facts.get('host_memory_available')
+    rows = facts.get('ancestors')
+    if type(host) is not int or host < 0 or not isinstance(rows,list) or not rows:
+        raise ValueError('actual host/ancestor reserve readings required')
+    if parent is None:parent = rows[0].get('path') if isinstance(rows[0],dict) else None
+    if not isinstance(parent,str) or [row.get('path') for row in rows] != list(ancestor_paths(parent)):
+        raise ValueError('actual protected ancestor reserve scope differs')
+    remaining = [host]
+    for index,row in enumerate(rows):
+        if (any(type(row.get(key)) is not int or row[key] < 0 for key in ('device','inode'))
+                or not isinstance(row.get('controls'),dict)
+                or not {'cgroup.procs','cgroup.threads','cgroup.subtree_control'} <= set(row['controls'])
+                or any(not isinstance(value,dict) or set(value) != {'device','inode'}
+                       or any(type(value[key]) is not int or value[key] < 0 for key in value)
+                       for value in row['controls'].values())
+                or not isinstance(row.get('subtree_control'),str)):
+            raise ValueError('actual protected ancestor control identity differs')
+        if index == 0 and not {'memory','cpu','cpuset','pids'} <= set(row['subtree_control'].split()):
+            raise ValueError('required ancestor controllers are not already enabled')
+        maximum,current = row.get('memory.max'),row.get('memory.current')
+        if maximum is None:
+            if row['path'] != '/sys/fs/cgroup' or 'memory.max' in row['controls']:
+                raise ValueError('ancestor memory limit unknown')
+            if (('memory.current' in row['controls']) != (current is not None)
+                    or current is not None and (not isinstance(current,str) or not current.isdigit())):
+                raise ValueError('ancestor current charge unknown')
+            continue
+        if (not isinstance(maximum,str) or maximum != 'max' and not maximum.isdigit()
+                or not isinstance(current,str) or not current.isdigit()
+                or not {'memory.max','memory.current'} <= set(row['controls'])):
+            raise ValueError('ancestor memory limit/current charge unknown')
+        if maximum != 'max':remaining.append(int(maximum)-int(current))
+    return min(remaining)
+
+
 class Leaf:
     """Pinned unique cgroup directory; every control access is relative/no-follow."""
     def __init__(self, parent: str, lease: str, cpus: list[int], storage: tuple[str, ...]):
         protected_path(parent, False)
         self.parent_path = parent
         self.storage_paths = storage
+        self.ancestor_identities: list[dict[str, Any]] | None = None
         self.name = 'lease-'+lease
         self.parentfd = os.open(parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
         self.parent_identity = os.fstat(self.parentfd)
@@ -467,22 +611,7 @@ class Leaf:
             needed = {'memory','cpu','cpuset','pids'}
             enabled = set(Path(parent,'cgroup.subtree_control').read_text().split())
             if not needed <= enabled: raise ValueError('required cgroup controllers are not already enabled')
-            ancestor = Path(parent)
-            while True:
-                protected_path(str(ancestor), False)
-                for name in ('cgroup.procs','cgroup.threads','cgroup.subtree_control','memory.max',
-                        'memory.swap.max','pids.max','cpu.max','cpu.max.burst','cpuset.cpus','cpuset.mems'):
-                    if (ancestor/name).exists():protected_path(str(ancestor/name), True)
-                if (ancestor/'memory.max').exists():
-                    maximum = (ancestor/'memory.max').read_text().strip()
-                    current = int((ancestor/'memory.current').read_text())
-                    if maximum != 'max' and int(maximum)-current < MEMORY+RESERVE:
-                        raise ValueError('cgroup ancestor lacks 14GiB headroom')
-                if ancestor == Path('/sys/fs/cgroup'): break
-                if ancestor.parent == ancestor or Path('/sys/fs/cgroup') not in ancestor.parents:
-                    raise ValueError('protected cgroup2 parent must lie beneath /sys/fs/cgroup')
-                ancestor = ancestor.parent
-            reserve(self.storage_paths, MEMORY+RESERVE)
+            self.initial_admission = self.admit()
             os.mkdir(self.name, 0o700, dir_fd=self.parentfd)
             created=True
             self.fd = os.open(self.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC,
@@ -564,6 +693,27 @@ class Leaf:
     def populated(self) -> bool:
         return key_values(self.read('cgroup.events'))['populated'] != 0
 
+    def budget(self, minimum: int) -> dict[str, Any]:
+        facts: dict[str, Any] = {}
+        try:
+            facts = reserve(self.storage_paths,minimum,False)
+            facts['ancestors'] = observe_ancestors(self.parent_path)
+            identities = ancestor_identities(facts['ancestors'])
+            if self.ancestor_identities is None:self.ancestor_identities = identities
+            elif identities != self.ancestor_identities:
+                raise ValueError('protected ancestor accounting/control identity changed')
+            facts['memory_available'] = effective_memory(facts,self.parent_path)
+            return facts
+        except (ValueError,KeyError,OSError,TypeError) as exc:
+            raise ResourceAdmissionError(str(exc),facts) from exc
+
+    def admit(self) -> dict[str, Any]:
+        facts = self.budget(MEMORY+RESERVE)
+        try:validate_reserve(facts,MEMORY+RESERVE,self.storage_paths,self.parent_path)
+        except (ValueError,KeyError,TypeError) as exc:
+            raise ResourceAdmissionError(str(exc),facts) from exc
+        return facts
+
     def sample(self, child: Identity | None, previous: float | None) -> dict[str, Any]:
         now = time.monotonic()
         facts: dict[str, Any] = {'monotonic':now,'gap_seconds':None if previous is None else now-previous,
@@ -571,7 +721,7 @@ class Leaf:
             'memory.peak':int(self.read('memory.peak')),'memory.events':key_values(self.read('memory.events')),
             'memory.swap.current':int(self.read('memory.swap.current')),
             'cpu.stat':key_values(self.read('cpu.stat')),'cgroup.events':key_values(self.read('cgroup.events')),
-            'pids.current':int(self.read('pids.current')),'reserve':reserve(self.storage_paths, RESERVE,False)}
+            'pids.current':int(self.read('pids.current')),'reserve':self.budget(RESERVE)}
         if child is not None and not child.dead():
             child.verify()
             facts['pid'] = child.pid
@@ -626,7 +776,7 @@ def reserve(paths: tuple[str, ...], minimum: int, enforce: bool = True) -> dict[
     free = min(row['disk_free'] for row in storage)
     if enforce and (available < minimum or free < DISK):
         raise ValueError('host memory reserve or 5GiB free disk unavailable')
-    return {'memory_available':available,'disk_free':free,'required_memory':minimum,
+    return {'memory_available':available,'host_memory_available':available,'disk_free':free,'required_memory':minimum,
             'required_disk':DISK,'storage':storage}
 
 
@@ -775,7 +925,7 @@ class Child:
         self.input_r=self.input_w=self.output_r=self.output_w=self.error_r=self.error_w=-1
         self.reaped=True
         self.returncode:int|None=None
-        self.identity:Identity|None=None
+        self.identity:ChildIdentity|None=None
 
     def launch(self,host:dict[str,Any],profile:dict[str,Any],lease:dict[str,Any],leaf:Leaf)->None:
         root=self.root
@@ -802,12 +952,13 @@ class Child:
                 os._exit(126)
             self.pid=pid
             self.reaped=False
-            self.identity = Identity(pid)
+            self.identity = ChildIdentity(pid,host['candidate_uid'],host['candidate_gid'])
             leaf.write('cgroup.procs',str(pid))
             members = [int(value) for value in leaf.read('cgroup.procs').split()]
             if members != [pid]: raise ValueError('exact namespace-init attach readback differs')
             self.identity.verify()
             leaf.verify_limits()
+            self.identity.begin_transition()
             os.write(barrier_w,b'A')
         finally:
             for fd in (self.input_r,self.output_w,self.error_w,barrier_r,barrier_w,guardian_fd): os.close(fd)
@@ -896,6 +1047,7 @@ def verify_ready(child: Child,host:dict[str,Any],profile:dict[str,Any],leaf:Leaf
             or status['NoNewPrivs'] != '1' or status['Seccomp'] != '2'
             or int(status.get('Seccomp_filters','0')) < 2):
         raise ValueError('actual READY credential/capability/PID/filter state differs')
+    identity.confirm_candidate()
     nondumpability = observe_nondumpability(pid,host['candidate_uid'],host['candidate_gid'])
     namespaces = {name:os.readlink(f'/proc/{pid}/ns/{name}') for name in ('mnt','pid')}
     if any(value == os.readlink('/proc/self/ns/'+name) for name,value in namespaces.items()):
@@ -1069,7 +1221,7 @@ class Guardian:
         self.last_sample=facts['monotonic']
         self.emit('resources',phase=self.phase,facts=facts)
         try:
-            validate_resources(facts,self.leaf.cpus,self.leaf.storage_paths)
+            validate_resources(facts,self.leaf.cpus,self.leaf.storage_paths,self.leaf.parent_path)
             if facts['gap_seconds'] is not None and facts['gap_seconds']>2:
                 raise ValueError('observer gap exceeds 2s: '+str(facts['gap_seconds']))
         except ValueError as exc:
@@ -1105,9 +1257,11 @@ class Guardian:
         return empty,bool(child is None or child.reaped),child.returncode if child else None
 
     def run_phase(self,phase:str)->None:
-        self.phase=phase
         if self.leaf is None or self.root is None:raise ValueError('protected phase setup unavailable')
         self.liveness()
+        admission = self.leaf.admit()
+        self.liveness()
+        self.phase=phase
         lease={'schema':'linux-candidate-lease/v1','lease':self.lease,
                'authority':self.request['authority'],'profile_sha256':self.request['profile_sha256'],
                'candidate_uid':self.host['candidate_uid'],'candidate_gid':self.host['candidate_gid'],'phase':phase}
@@ -1117,7 +1271,7 @@ class Guardian:
         self.child=child
         child.launch(self.host,self.profile,lease,self.leaf)
         if child.identity is None:raise ValueError('phase child identity unavailable')
-        self.emit('phase_start',phase=phase,pid=child.identity.pid,start=child.identity.start)
+        self.emit('phase_start',phase=phase,pid=child.identity.pid,start=child.identity.start,admission=admission)
         reader=FrameReader()
         ready=False
         stdout_eof=False
@@ -1222,14 +1376,15 @@ class Guardian:
                 'supervisor_start':self.supervisor.start,'shared_deadline':self.deadline,
                 'work_deadline':self.work_deadline,'source_pins':self.host['support_sources'],
                 'guardian_loaded_closure_sha256':digest(canonical(guardian_closure)),
-                'guardian_loaded_closure_count':len(guardian_closure)})
+                'guardian_loaded_closure_count':len(guardian_closure),'initial_admission':self.leaf.initial_admission})
             self.run_phase('preflight')
             self.run_phase('generate')
             cleanup=True
         except BaseException as exc:
             failed=True
             self.setup_unverified=isinstance(exc,UnverifiedSetupCleanup)
-            try:self.emit('failure',error=type(exc).__name__+': '+str(exc)[:2000])
+            try:self.emit('failure',error=type(exc).__name__+': '+str(exc)[:2000],
+                          **({'budget_reading':exc.facts} if isinstance(exc,ResourceAdmissionError) else {}))
             except Exception:pass
         finally:
             try:

@@ -305,7 +305,8 @@ def test_actual_consumer_refuses_substituted_or_replaced_storage_evidence(monkey
     replaced = [False]
     class Filesystem(PurePosixPath):
         def lstat(self):
-            return SimpleNamespace(st_uid=0,st_mode=0o40755,st_dev=7,
+            return SimpleNamespace(st_uid=0,st_nlink=1,
+                st_mode=0o100444 if self.name.startswith(('cgroup.','memory.')) else 0o40755,st_dev=7,
                 st_ino=18 if replaced[0] and str(self) == '/TEST_ONLY/snapshot' else 17)
     monkeypatch.setattr(capture.policy,'Path',Filesystem)
     monkeypatch.setattr(capture.policy,'os',SimpleNamespace(listxattr=lambda *a,**k: []))
@@ -313,7 +314,8 @@ def test_actual_consumer_refuses_substituted_or_replaced_storage_evidence(monkey
         'cpu.max':'200000 100000','cpu.max.burst':'0','cpuset.cpus.effective':'2,4',
         'cpuset.mems.effective':'0'},'memory.current':100,'memory.peak':200,
         'memory.swap.current':0,'pids.current':1,'memory.events':{},'gap_seconds':None,
-        'reserve':{'memory_available':3000000000,'disk_free':6000000000,
+        'reserve':{'memory_available':3000000000,'host_memory_available':3000000000,
+                'ancestors':synthetic_ancestor_rows(),'disk_free':6000000000,
             'storage':[{'path':'/sys/fs/cgroup/TEST_ONLY','device':7,'inode':17,'disk_free':6000000000}]}}
     packet = {'event':'resources','facts':facts}
     with pytest.raises(ValueError,match='storage scope'):
@@ -324,3 +326,33 @@ def test_actual_consumer_refuses_substituted_or_replaced_storage_evidence(monkey
     replaced[0] = True
     with pytest.raises(ValueError,match='storage identity changed'):
         capture.accept(packet)
+    replaced[0] = False
+    capture.lease_proof = True  # TEST_ONLY pre-authenticated boundary fixture, not an authority proof.
+    phase = {'event':'phase_start','phase':'preflight','pid':100,'start':'42'}
+    with pytest.raises(ValueError,match='admission missing'):capture.accept(phase)
+    budget = copy.deepcopy(facts['reserve'])
+    budget['host_memory_available'] = budget['memory_available'] = 32*1024**3
+    budget['ancestors'][0]['memory.max'] = str(16*1024**3)
+    budget['ancestors'][0]['memory.current'] = str(15*1024**3)
+    budget['memory_available'] = 1024**3
+    with pytest.raises(ValueError,match='reserve'):
+        capture.accept(dict(phase,admission=budget))
+    assert capture.phase is None
+    budget['ancestors'][0]['memory.max'] = 'max'
+    budget['memory_available'] = 32*1024**3
+    capture.accept(dict(phase,admission=budget))
+    changed = copy.deepcopy(facts['reserve'])
+    changed['ancestors'][0]['inode'] = 18
+    with pytest.raises(ValueError,match='ancestor.*identity changed'):
+        capture.accept({'event':'resources','facts':dict(facts,reserve=changed)})
+
+
+def synthetic_ancestor_rows():
+    """TEST_ONLY unlimited fixture, no assertion of a real cgroup/control authority."""
+    common = {'cgroup.procs':{'device':7,'inode':17},'cgroup.threads':{'device':7,'inode':17},
+        'cgroup.subtree_control':{'device':7,'inode':17}}
+    return [{'path':'/sys/fs/cgroup/TEST_ONLY','device':7,'inode':17,
+        'controls':dict(common,**{'memory.max':{'device':7,'inode':17},'memory.current':{'device':7,'inode':17}}),
+        'subtree_control':'memory cpu cpuset pids','memory.max':'max','memory.current':'100'},
+        {'path':'/sys/fs/cgroup','device':7,'inode':17,'controls':common,
+        'subtree_control':'memory cpu cpuset pids','memory.max':None,'memory.current':None}]
