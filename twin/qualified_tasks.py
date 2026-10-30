@@ -200,7 +200,7 @@ class TaskParent:
                 target = context['target']
                 validate({'evolution': 'TargetComponent', 'causal': 'TargetEdge',
                           'gameplay': 'TargetMap', 'ethics': 'TargetSensor'}[contract.task], target)
-        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+        except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:
             session.decline_task_run(tuple(protected_job['subjects']), 'human-required: ' + str(exc))
             return run
         for subject in protected_job['subjects']:
@@ -247,7 +247,7 @@ class TaskRun:
             return ['no accepted task judgement; human-required fallback remains']
         return validate_document(document, self.parent.resolver, self.parent.clock)
 
-    def save(self, output: Path) -> dict[str, Any]:
+    def save(self, output: Path, *, refusal: str | None = None) -> dict[str, Any]:
         output.mkdir(parents=True, exist_ok=False)
         (output / 'host-session.json').write_bytes(self.session.archive())
         state = self.session.task_snapshot()
@@ -259,6 +259,8 @@ class TaskRun:
             bad = self.validate()
         except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:
             bad = ['protected task validation failed; human-required: ' + str(exc)]
+        if refusal:
+            bad.append(refusal)
         if document is not None and not bad:
             (output / ('claim.json' if self.job['task'] == 'evolution' else 'proposal.json')).write_bytes(q.canonical(document))
         blocked = [item['subject'] for item in state['attempts']
@@ -319,14 +321,32 @@ def run_registered(task: str, organisation: str, output: Path, clock: str | None
         inputs_raw = _member(root, bundle['inputs'])
         # Only the original independently supplied handle can restore host inputs.
         inputs = q.HostInputs.restore(inputs_raw, task_policy=policy)
-        store = None
-        if bundle.get('review_store'):
-            from .basis_assessment import ReviewStore
-            _member(root, bundle['review_store'])
-            store = ReviewStore(root / bundle['review_store']['path'], bundle['review_store']['sha256'])
         parent = TaskParent(host, clock=clock)
         run = (parent.resume(bundle['execution'], host.task_session(bundle['resume_session']))
-               if bundle.get('resume_session') else parent.start(bundle['execution'], inputs))
+               if bundle.get('resume_session') else None)
+        if run is not None:
+            try:
+                same_inputs = q.canonical(run.session.task_snapshot()['inputs']) == q.canonical(list(inputs.records))
+            except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:
+                return run.save(output, refusal='human-required: original inputs cannot be verified: ' + str(exc))
+            if not same_inputs:
+                return run.save(output, refusal='human-required: original inputs differ from the retained protected session')
+        store = None
+        if bundle.get('review_store'):
+            try:
+                from .basis_assessment import ReviewStore
+                _member(root, bundle['review_store'])
+                store = ReviewStore(root / bundle['review_store']['path'], bundle['review_store']['sha256'])
+            except (ValueError, KeyError, TypeError, OSError) as exc:
+                reason = 'human-required: registered review acquisition unavailable: ' + str(exc)
+                if run is None:
+                    session = host.host_session(inputs)
+                    session.bind_task_job(bundle['execution'])
+                    session.decline_task_run(tuple(bundle['execution']['subjects']), reason)
+                    run = TaskRun(parent, bundle['execution'], session)
+                return run.save(output, refusal=reason)
+        if run is None:
+            run = parent.start(bundle['execution'], inputs)
         if store is not None:
             run.review_pending(store)
         return run.save(output)
