@@ -1,0 +1,168 @@
+{
+  "schema": "twin.source-metadata/v1",
+  "source": {
+    "url": "https://example.invalid/TEST_ONLY/bulletin",
+    "version": "TEST_ONLY-original-v1",
+    "family": "TEST_ONLY-family",
+    "display_source": "TEST_ONLY bulletin"
+  },
+  "acquisitions": {
+    "fixture-acq": {
+      "id": "fixture-acq",
+      "kind": "TEST_ONLY-fixture",
+      "receipt_artifact_sha256": "d7645a0641a25191279eab7a5b5d69f4af6022d0f5e748ba0c37f1df61dc8b00",
+      "receipt_entry_pointer": "",
+      "requested_url": "https://example.invalid/TEST_ONLY/bulletin",
+      "final_url": "https://example.invalid/TEST_ONLY/bulletin",
+      "response_status": 200,
+      "captured_at": "2026-10-30T00:00:00Z",
+      "body_bytes": 62,
+      "body_sha256": "8e0437e6ed1eaa9ffb19b5ca071ebb52be94ab9ccfe83846267b9022122757f3"
+    }
+  },
+  "members": {
+    "original": {
+      "id": "original",
+      "identity": "https://example.invalid/TEST_ONLY/bulletin",
+      "version": "TEST_ONLY-original-v1",
+      "bytes": 62,
+      "sha256": "8e0437e6ed1eaa9ffb19b5ca071ebb52be94ab9ccfe83846267b9022122757f3",
+      "role": "acquired-original",
+      "purpose": "primary",
+      "acquisition_id": "fixture-acq"
+    },
+    "extraction": {
+      "id": "extraction",
+      "identity": "https://example.invalid/TEST_ONLY/extraction",
+      "version": "TEST_ONLY-v1",
+      "bytes": 50,
+      "sha256": "493beb654b922e960578500f8c0c3bd4489ae3152fd8c8179171bad577023fff",
+      "role": "derived-extraction",
+      "parent": {
+        "member_id": "original",
+        "sha256": "8e0437e6ed1eaa9ffb19b5ca071ebb52be94ab9ccfe83846267b9022122757f3"
+      },
+      "transform": {
+        "lineage_status": "pinned",
+        "identity": "TEST_ONLY-fixed-fixture-slices",
+        "version": "1",
+        "implementation_artifact_sha256": "4febf298b2f7b4b32eaa9457047dafea8b92ce86f0fb6b269988290ff7801fd1",
+        "configuration_sha256": "4fb67fc5b134cd73192896120ef7e9edbff423c1bafa301b3f5e2aa74e26b432",
+        "execution_receipt_artifact_sha256": "7b523f209834eaf8e92a9071f2b30ef10ade103c06a7d2c362f446459a0e1d15"
+      },
+      "lineage": [
+        {
+          "kind": "byte-copy",
+          "output_start": 0,
+          "output_end": 28,
+          "parent_start": 10,
+          "parent_end": 38
+        },
+        {
+          "kind": "syntactic-separator",
+          "output_start": 28,
+          "output_end": 29,
+          "text_utf8": "\n",
+          "origin": "transform-syntax-not-publisher-content"
+        },
+        {
+          "kind": "byte-copy",
+          "output_start": 29,
+          "output_end": 49,
+          "parent_start": 40,
+          "parent_end": 60
+        },
+        {
+          "kind": "syntactic-separator",
+          "output_start": 49,
+          "output_end": 50,
+          "text_utf8": "\n",
+          "origin": "transform-syntax-not-publisher-content"
+        }
+      ]
+    },
+    "qualifier": {
+      "id": "qualifier",
+      "identity": "https://example.invalid/TEST_ONLY/qualifier",
+      "version": "TEST_ONLY-v1",
+      "bytes": 55,
+      "sha256": "d67fc6f779a84c61a77a0cab54f835b86a1b98c8cb54008fb0defe9310a843a5",
+      "role": "producer-qualifier",
+      "authorship": {
+        "kind": "TEST_ONLY",
+        "id": "TEST_ONLY-source-author",
+        "authored_at": "2026-10-30T00:00:00Z"
+      },
+      "method_id": "TEST_ONLY-fixture-authoring",
+      "method_version": "1",
+      "support_members": [
+        {
+          "member_id": "original",
+          "sha256": "8e0437e6ed1eaa9ffb19b5ca071ebb52be94ab9ccfe83846267b9022122757f3"
+        }
+      ],
+      "public_origin": "producer-authored"
+    }
+  },
+  "observations": {
+    "published-month": {
+      "id": "published-month",
+      "observed_kind": "publisher-first-publication",
+      "literal_value": "August 2021",
+      "metadata_key": null,
+      "normalization": "english-month-year",
+      "witness": {
+        "member_id": "extraction",
+        "member_sha256": "493beb654b922e960578500f8c0c3bd4489ae3152fd8c8179171bad577023fff",
+        "start_byte": 0,
+        "end_byte": 28,
+        "text_utf8": "First published: August 2021"
+      }
+    }
+  },
+  "publication": {
+    "precision": "month",
+    "value": "2021-08",
+    "basis": "first-publication",
+    "observation_id": "published-month",
+    "assertion_origin": "captured-publisher-assertion"
+  },
+  "statement": {
+    "text": "TEST_ONLY producer paraphrase of this fixture bulletin.",
+    "origin_role": "producer-authored",
+    "witness": {
+      "member_id": "qualifier",
+      "member_sha256": "d67fc6f779a84c61a77a0cab54f835b86a1b98c8cb54008fb0defe9310a843a5",
+      "start_byte": 0,
+      "end_byte": 55,
+      "text_utf8": "TEST_ONLY producer paraphrase of this fixture bulletin."
+    }
+  },
+  "visible_excerpts": [
+    {
+      "id": "fixture-publication",
+      "origin_role": "publisher-quotation",
+      "witness": {
+        "member_id": "extraction",
+        "member_sha256": "493beb654b922e960578500f8c0c3bd4489ae3152fd8c8179171bad577023fff",
+        "start_byte": 0,
+        "end_byte": 28,
+        "text_utf8": "First published: August 2021"
+      }
+    }
+  ],
+  "bounded_review": {
+    "reviewer_id": "TEST_ONLY-reviewer",
+    "reviewer_role": "TEST_ONLY-fixture-custodian",
+    "method_id": "TEST_ONLY-metadata-review",
+    "method_version": "1",
+    "reviewed_member_ids": [
+      "original",
+      "extraction",
+      "qualifier"
+    ],
+    "scope_qualification": "Noncase syntax/bytealgebra only; no actualnetwork, publisher authentication, productionmetadata or operational authority.",
+    "publisher_authentication_claim": false,
+    "historical_first_publication_proof_claim": false
+  }
+}

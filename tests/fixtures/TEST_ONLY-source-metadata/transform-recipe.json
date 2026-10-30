@@ -1,0 +1,1 @@
+{"identity":"TEST_ONLY-fixed-fixture-slices","schema":"TEST_ONLY-declarative-transform/v1","steps":[{"copy_parent_end":38,"copy_parent_start":10},{"insert_utf8":"\n","origin":"syntactic-separator-not-publisher-content"},{"copy_parent_end":60,"copy_parent_start":40},{"insert_utf8":"\n","origin":"syntactic-separator-not-publisher-content"}],"version":"1"}

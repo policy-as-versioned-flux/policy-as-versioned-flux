@@ -1,0 +1,808 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:proposal:twin:source-metadata:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "twin.source-metadata/v1"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "acquisitions": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/acquisition"
+      }
+    },
+    "members": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/member"
+      }
+    },
+    "observations": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "publication": {
+      "$ref": "#/$defs/publication"
+    },
+    "statement": {
+      "$ref": "#/$defs/statement"
+    },
+    "visible_excerpts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/visible_excerpt"
+      }
+    },
+    "bounded_review": {
+      "$ref": "#/$defs/bounded_review"
+    }
+  },
+  "required": [
+    "schema",
+    "source",
+    "acquisitions",
+    "members",
+    "observations",
+    "publication",
+    "statement",
+    "visible_excerpts",
+    "bounded_review"
+  ],
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_source": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "url",
+        "version",
+        "family",
+        "display_source"
+      ]
+    },
+    "witness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "member_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "member_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "start_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "text_utf8": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "member_id",
+        "member_sha256",
+        "start_byte",
+        "end_byte",
+        "text_utf8"
+      ]
+    },
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "retained-http",
+            "TEST_ONLY-fixture"
+          ]
+        },
+        "receipt_artifact_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "receipt_entry_pointer": {
+          "type": "string",
+          "pattern": "^(|/.*)$"
+        },
+        "requested_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "final_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "response_status": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 599
+        },
+        "captured_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "body_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "body_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "receipt_artifact_sha256",
+        "receipt_entry_pointer",
+        "requested_url",
+        "final_url",
+        "response_status",
+        "captured_at",
+        "body_bytes",
+        "body_sha256"
+      ]
+    },
+    "acquired_member": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "role": {
+          "const": "acquired-original"
+        },
+        "purpose": {
+          "enum": [
+            "primary",
+            "supporting"
+          ]
+        },
+        "acquisition_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "identity",
+        "version",
+        "bytes",
+        "sha256",
+        "role",
+        "purpose",
+        "acquisition_id"
+      ]
+    },
+    "parent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "member_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "member_id",
+        "sha256"
+      ]
+    },
+    "transform": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lineage_status": {
+          "enum": [
+            "pinned",
+            "unestablished"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "implementation_artifact_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "configuration_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "execution_receipt_artifact_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "lineage_status",
+        "identity",
+        "version",
+        "implementation_artifact_sha256",
+        "configuration_sha256",
+        "execution_receipt_artifact_sha256"
+      ]
+    },
+    "lineage_span": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "byte-copy"
+            },
+            "output_start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "output_end": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "parent_start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "parent_end": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "kind",
+            "output_start",
+            "output_end",
+            "parent_start",
+            "parent_end"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "whole-transform-output"
+            },
+            "output_start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "output_end": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "parent_scope": {
+              "const": "complete-exact-parent-artifact"
+            },
+            "claim": {
+              "const": "disclosed-transformation-not-raw-byte-equivalence"
+            }
+          },
+          "required": [
+            "kind",
+            "output_start",
+            "output_end",
+            "parent_scope",
+            "claim"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "output_start",
+            "output_end",
+            "text_utf8",
+            "origin"
+          ],
+          "properties": {
+            "kind": {
+              "const": "syntactic-separator"
+            },
+            "output_start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "output_end": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "text_utf8": {
+              "type": "string",
+              "minLength": 1
+            },
+            "origin": {
+              "const": "transform-syntax-not-publisher-content"
+            }
+          }
+        }
+      ]
+    },
+    "derived_member": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "role": {
+          "const": "derived-extraction"
+        },
+        "parent": {
+          "$ref": "#/$defs/parent"
+        },
+        "transform": {
+          "$ref": "#/$defs/transform"
+        },
+        "lineage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/lineage_span"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "identity",
+        "version",
+        "bytes",
+        "sha256",
+        "role",
+        "parent",
+        "transform",
+        "lineage"
+      ]
+    },
+    "authorship": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "agent",
+            "human",
+            "TEST_ONLY"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authored_at": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "authored_at"
+      ]
+    },
+    "qualifier_member": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "role": {
+          "const": "producer-qualifier"
+        },
+        "authorship": {
+          "$ref": "#/$defs/authorship"
+        },
+        "method_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "support_members": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/parent"
+          }
+        },
+        "public_origin": {
+          "const": "producer-authored"
+        }
+      },
+      "required": [
+        "id",
+        "identity",
+        "version",
+        "bytes",
+        "sha256",
+        "role",
+        "authorship",
+        "method_id",
+        "method_version",
+        "support_members",
+        "public_origin"
+      ]
+    },
+    "member": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/acquired_member"
+        },
+        {
+          "$ref": "#/$defs/derived_member"
+        },
+        {
+          "$ref": "#/$defs/qualifier_member"
+        }
+      ]
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed_kind": {
+          "enum": [
+            "publisher-first-publication",
+            "publisher-publication",
+            "publisher-release",
+            "publisher-update",
+            "publisher-review",
+            "event",
+            "generator",
+            "capture",
+            "other"
+          ]
+        },
+        "literal_value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metadata_key": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "normalization": {
+          "enum": [
+            "literal-iso-day",
+            "source-local-calendar-day",
+            "english-month-year",
+            "none"
+          ]
+        },
+        "witness": {
+          "$ref": "#/$defs/witness"
+        }
+      },
+      "required": [
+        "id",
+        "observed_kind",
+        "literal_value",
+        "metadata_key",
+        "normalization",
+        "witness"
+      ]
+    },
+    "publication_known": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "precision": {
+          "enum": [
+            "day",
+            "month"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "basis": {
+          "enum": [
+            "first-publication",
+            "publication",
+            "release"
+          ]
+        },
+        "observation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assertion_origin": {
+          "const": "captured-publisher-assertion"
+        }
+      },
+      "required": [
+        "precision",
+        "value",
+        "basis",
+        "observation_id",
+        "assertion_origin"
+      ]
+    },
+    "publication_unknown": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "precision": {
+          "const": "unknown"
+        },
+        "value": {
+          "type": "null"
+        },
+        "basis": {
+          "const": "unestablished"
+        },
+        "observation_id": {
+          "type": "null"
+        },
+        "assertion_origin": {
+          "const": "unestablished"
+        },
+        "qualification": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "precision",
+        "value",
+        "basis",
+        "observation_id",
+        "assertion_origin",
+        "qualification"
+      ]
+    },
+    "publication": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/publication_known"
+        },
+        {
+          "$ref": "#/$defs/publication_unknown"
+        }
+      ]
+    },
+    "visible_excerpt": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "origin_role": {
+          "enum": [
+            "publisher-quotation",
+            "producer-authored"
+          ]
+        },
+        "witness": {
+          "$ref": "#/$defs/witness"
+        }
+      },
+      "required": [
+        "id",
+        "origin_role",
+        "witness"
+      ]
+    },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "origin_role": {
+          "enum": [
+            "publisher-quotation",
+            "producer-authored"
+          ]
+        },
+        "witness": {
+          "$ref": "#/$defs/witness"
+        }
+      },
+      "required": [
+        "text",
+        "origin_role",
+        "witness"
+      ]
+    },
+    "bounded_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_member_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "scope_qualification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publisher_authentication_claim": {
+          "const": false
+        },
+        "historical_first_publication_proof_claim": {
+          "const": false
+        }
+      },
+      "required": [
+        "reviewer_id",
+        "reviewer_role",
+        "method_id",
+        "method_version",
+        "reviewed_member_ids",
+        "scope_qualification",
+        "publisher_authentication_claim",
+        "historical_first_publication_proof_claim"
+      ]
+    }
+  },
+  "$comment": "Proposal only. Cross-record byte/role/authority/semantic-kind/normalization/transform receipt invariants are mandatory as defined in CONTRACT-REVISION; JSON Schema alone is not sufficient."
+}
