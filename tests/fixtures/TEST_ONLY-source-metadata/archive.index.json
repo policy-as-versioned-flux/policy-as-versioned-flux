@@ -1,0 +1,33 @@
+{
+  "scope": "Noncase TEST_ONLY fixture archive, no actualsourceacquisition or operationalauthority. Manifest supplied separately; no circular receipt/manifesthash dependency.",
+  "files": {
+    "original.txt": {
+      "bytes": 62,
+      "sha256": "8e0437e6ed1eaa9ffb19b5ca071ebb52be94ab9ccfe83846267b9022122757f3"
+    },
+    "extraction.txt": {
+      "bytes": 50,
+      "sha256": "493beb654b922e960578500f8c0c3bd4489ae3152fd8c8179171bad577023fff"
+    },
+    "producer-qualifier.txt": {
+      "bytes": 55,
+      "sha256": "d67fc6f779a84c61a77a0cab54f835b86a1b98c8cb54008fb0defe9310a843a5"
+    },
+    "acquisition-receipt.json": {
+      "bytes": 252,
+      "sha256": "d7645a0641a25191279eab7a5b5d69f4af6022d0f5e748ba0c37f1df61dc8b00"
+    },
+    "transform-recipe.json": {
+      "bytes": 355,
+      "sha256": "4febf298b2f7b4b32eaa9457047dafea8b92ce86f0fb6b269988290ff7801fd1"
+    },
+    "transform-config.json": {
+      "bytes": 21,
+      "sha256": "4fb67fc5b134cd73192896120ef7e9edbff423c1bafa301b3f5e2aa74e26b432"
+    },
+    "extraction-receipt.json": {
+      "bytes": 541,
+      "sha256": "7b523f209834eaf8e92a9071f2b30ef10ade103c06a7d2c362f446459a0e1d15"
+    }
+  }
+}

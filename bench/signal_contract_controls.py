@@ -17,10 +17,10 @@ def choices():
 
 
 def model_context():
-    from twin import signal_inputs
+    from twin import signal_inputs, source_metadata
     return {'candidate_universe_digest': q.digest(choices()), 'model_pins': {'TEST_ONLY': 'fixture-model-pins'},
             'model_as_of': '2026-10-30',
-            'input_construction_sha256': hashlib.sha256(Path(signal_inputs.__file__).read_bytes()).hexdigest()}
+            'input_construction_sha256': source_metadata.construction_identity(Path(signal_inputs.__file__))}
 
 
 def signal_input(statement, organisation):
@@ -65,7 +65,8 @@ def selection():
         {'status': 'development', 'history': ['TEST_ONLY openly authored'], 'training_provenance': 'unknown'})
     policy = BasisPolicy.freeze({'claim': 'TEST_ONLY review mechanics'}, ('TEST_ONLY-independent-review',))
     return q.Selection.freeze(q.Actor.freeze(signal_actor, parse, {'purpose': 'TEST_ONLY'}),
-        pop, basis_holds, review=q.PopulationReview.test_only(pop), assessment_policy=policy)
+        pop, basis_holds, review=q.PopulationReview.test_only(pop), assessment_policy=policy,
+        test_only=q.TEST_ONLY_MECHANICS)
 
 
 def review_store(path: Path, policy: BasisPolicy, request: bytes, decision: str = 'pass') -> ReviewStore:
@@ -100,7 +101,7 @@ def inputs():
             'provenance': {'url': 'https://test.invalid/fixture'}}}
     context.update(model_context())
     return q.HostInputs.freeze(({'subject': 'TEST_ONLY-live', 'input': payload, 'context': context,
-        'source': source, 'issuer': 'TEST_ONLY-host'},), ('TEST_ONLY-host',))
+        'source': source, 'issuer': 'TEST_ONLY-host'},), ('TEST_ONLY-host',), test_only=q.TEST_ONLY_MECHANICS)
 
 
 def public_controls():

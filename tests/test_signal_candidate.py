@@ -48,11 +48,13 @@ def test_only_the_frozen_terminal_token_can_be_removed():
 
 def full_input():
     from bench.signal_contract_controls import choices
-    return {'statement': 'TEST_ONLY proposal, not an event', 'source': 'TEST_ONLY original',
-        'source_context': {'excerpts': ['TEST_ONLY proposal'], 'url': 'https://test.invalid/source',
-            'family': 'TEST_ONLY', 'version': 'v1', 'publication_date': '2026-10-30', 'as_of': '2026-10-30',
-            'original_source_manifest_digest': 'TEST_ONLY-source', 'original_sources': {'one': {
-                'identity': 'https://test.invalid/source', 'version': 'v1', 'bytes': 18, 'sha256': 'TEST_ONLY'}}},
+    from test_source_metadata import acquire_fixture
+    _, acquired, _ = acquire_fixture(statement_text='TEST_ONLY proposal, not an event')
+    public = acquired.public
+    return {'statement': public['statement']['text'], 'source': public['source']['display_source'],
+        'source_context': {**{key: public['source'][key] for key in ('url', 'version', 'family')},
+            'as_of': '2026-10-30', 'metadata': public,
+            'visible_excerpt_ids': [item['id'] for item in public['visible_excerpts']]},
         'model_context': {'organisation': 'driftwood', 'domain': 'TEST_ONLY domain', 'capability': 'TEST_ONLY task',
             'frame': 'TEST_ONLY primary subject', 'as_of': '2026-10-30', 'pins': {'TEST_ONLY': 'pins'}},
         'candidates': choices()}
