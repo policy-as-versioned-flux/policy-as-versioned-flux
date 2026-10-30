@@ -116,7 +116,8 @@ def test_a_well_shaped_serialized_snapshot_cannot_create_a_protected_receipt():
 
 
 def test_protected_caller_clock_and_role_are_not_chosen_by_the_document(monkeypatch):
-    monkeypatch.delenv('GITHUB_ACTIONS', raising=False)
+    for marker in ('GITHUB_ACTIONS', 'GITHUB_RUN_ID', 'GITHUB_WORKFLOW'):
+        monkeypatch.delenv(marker, raising=False)
     job, state = snapshot('gameplay')
     document = parent.document_from_snapshot(job, state, role='TEST_ONLY-nonrole', clock='local')
     reasons = parent.validate_document(document, q.Resolver(), clock='github')
@@ -313,15 +314,20 @@ def test_registered_job_restores_only_with_actual_original_private_policy(protec
 
 
 @pytest.mark.parametrize('task', ['evolution', 'causal', 'gameplay', 'ethics'])
-@pytest.mark.parametrize(('requested_clock', 'github_actions', 'expected_clock'), [
-    ('local', False, 'local'), ('human', False, 'human'), ('local', True, 'github'),
+@pytest.mark.parametrize(('requested_clock', 'github_markers', 'expected_clock'), [
+    ('local', {}, 'local'), ('human', {}, 'human'),
+    ('local', {'GITHUB_ACTIONS': 'true'}, 'github'),
+    ('local', {'GITHUB_RUN_ID': 'TEST_ONLY-run'}, 'github'),
+    ('local', {'GITHUB_WORKFLOW': 'TEST_ONLY-workflow'}, 'github'),
+    ('local', {'GITHUB_ACTIONS': 'true', 'GITHUB_RUN_ID': 'TEST_ONLY-run',
+               'GITHUB_WORKFLOW': 'TEST_ONLY-workflow'}, 'github'),
 ])
 def test_public_validator_requires_the_actual_task_session_for_every_clock(
-        task, monkeypatch, requested_clock, github_actions, expected_clock):
-    if github_actions:
-        monkeypatch.setenv('GITHUB_ACTIONS', 'true')
-    else:
-        monkeypatch.delenv('GITHUB_ACTIONS', raising=False)
+        task, monkeypatch, requested_clock, github_markers, expected_clock):
+    for marker in ('GITHUB_ACTIONS', 'GITHUB_RUN_ID', 'GITHUB_WORKFLOW'):
+        monkeypatch.delenv(marker, raising=False)
+    for marker, value in github_markers.items():
+        monkeypatch.setenv(marker, value)
     from pathlib import Path
     from twin.qualified_signals import _validator
     validator = _validator()
@@ -387,7 +393,8 @@ def restore_task_material(material, session, path):
 
 
 def test_actual_evolution_parent_reviews_restores_and_publicly_checks_complete_original_pins(protected_request, tmp_path, monkeypatch):
-    monkeypatch.delenv('GITHUB_ACTIONS', raising=False)
+    for marker in ('GITHUB_ACTIONS', 'GITHUB_RUN_ID', 'GITHUB_WORKFLOW'):
+        monkeypatch.delenv(marker, raising=False)
     from pathlib import Path
     from test_task_sessions import genuine_task_material, task_review_store, TASK_CALLS
     from twin.qualified_signals import _validator
