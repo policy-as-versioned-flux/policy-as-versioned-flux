@@ -204,7 +204,10 @@ def validate(doc, kinds, roles, headless=False, clock=None, permission=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("claim")
+    parser.add_argument("claim", nargs="?")
+    parser.add_argument("--run-registered-signals", metavar="ADOPTER",
+                        help="protected parent execution of this judge package's registered signal job")
+    parser.add_argument("--output", help="new host evidence directory for registered signal execution")
     parser.add_argument("--twin", default=".",
                         help="the hub checkout holding the twin package and roles.yaml")
     parser.add_argument("--headless", action="store_true",
@@ -216,6 +219,18 @@ def main(argv=None):
                              "passed. Only a github clock is graded against the model-judging "
                              "permission")
     args = parser.parse_args(argv)
+
+    if args.run_registered_signals:
+        if args.claim or not args.output:
+            parser.error('registered execution needs --output and no model-written claim input')
+        sys.path.insert(0, os.path.abspath(args.twin))
+        from pathlib import Path
+        from twin.qualified_signals import run_registered
+        result = run_registered(args.run_registered_signals, Path(args.output), args.clock)
+        print(yaml.safe_dump(result, sort_keys=True))
+        return 0 if result['accepted'] else 2
+    if not args.claim or args.output:
+        parser.error('claim validation needs a claim path; --output belongs to registered parent execution')
 
     kinds, roles = twin_facts(args.twin)
     derive_clock, check_claim_document, lookup = permission_rules(args.twin)

@@ -422,6 +422,9 @@ out(mp.check_claim_document(claim_doc(), "github", lookup_granted) == [],
 from bench.qualification_controls import public_controls
 for name, passed in public_controls().items():
     out(passed, "protected actor/population/host-session control: " + name)
+from bench.signal_contract_controls import public_controls as signal_contract_controls
+for name, passed in signal_contract_controls().items():
+    out(passed, "TEST_ONLY independent signal assessment control: " + name)
 
 # -- reported, never graded: the thresholds against their own corpora ----------------------------
 print("THRESHOLDS AGAINST THEIR OWN CORPUS'S BEST CONSTANT ANSWER (reported, not graded):")
