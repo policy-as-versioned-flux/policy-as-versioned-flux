@@ -161,8 +161,14 @@ A reviewed signal selection freezes each adopter's exact universe digest, model 
 model date and input-construction source hash in its population envelope. A self-consistent
 new live packet cannot borrow a qualified frame from another closure. The adapter parses a
 flat `component` into the existing scorer's `claim.component` without an alias lookup or
-incumbent prediction. Missing basis remains missing. Structured quote lists and reasons are
-retained from actual output; their canonical JSON representation supplies the existing claim
+incumbent prediction. Before capture, selection checks every actual qualification input's
+full universe, model pins/date and construction identity against its adopter's envelope, and
+checks its namespace, domain, capability, frame, source family and task date. The same
+`binding_context` reader is used by source construction and prompt rendering; changed
+definitions or a five-choice substitute refuse before runner invocation. It is not a substitute
+for custody's independent byte-for-byte input compatibility receipt. Missing basis remains
+missing. Structured quote lists and reasons are retained from actual output; their canonical
+JSON representation supplies the existing claim
 schema's evidence text. A malformed response, foreign member or absent literal witness is a
 counted refusal, never repaired into an answer.
 

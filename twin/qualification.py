@@ -460,12 +460,33 @@ class Selection:
         if assessment_policy:
             assessment_policy.verify()
             if population.metric == 'signal-classify':
-                contexts = population.envelope.get('signal_contexts', {})
-                if (set(contexts) != set(population.envelope['adopters'])
+                from .signal_inputs import binding_context
+                envelope = population.envelope
+                contexts = envelope.get('signal_contexts', {})
+                if (set(contexts) != set(envelope['adopters'])
                         or any(not isinstance(value, dict) or set(value) != {
                             'candidate_universe_digest', 'model_pins', 'model_as_of',
                             'input_construction_sha256'} for value in contexts.values())):
                     raise ValueError('reviewed signal selection requires every adopter exact model/universe/construction context')
+                for packet in json.loads(population.description)['selected']:
+                    case = packet['case']
+                    try:
+                        actual = binding_context(case['input'])
+                        model = case['input']['model_context']
+                        if (actual != contexts.get(case['context']['organisation'])
+                                or any(model[field] != case['context'][field]
+                                       for field in ('organisation', 'domain', 'capability', 'frame'))
+                                or any(model[field] not in envelope[allowed] for field, allowed in (
+                                    ('domain', 'domains'), ('capability', 'capabilities'), ('frame', 'frames')))
+                                or case['input']['source_context']['family'] not in envelope['sources']
+                                or case['input']['source_context']['as_of'] != case['context']['as_of']
+                                or not date.fromisoformat(envelope['from']) <= date.fromisoformat(case['context']['as_of'])
+                                    <= date.fromisoformat(envelope['until'])):
+                            raise ValueError('model/universe/date/construction or declared scope differs')
+                    except (ValueError, KeyError, TypeError) as exc:
+                        raise ValueError('qualification input differs from qualified signal context: ' + str(exc)) from exc
+                source = Path(inspect.getfile(binding_context))
+                sources[_source_name(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
             description['assessment_policy'] = json.loads(assessment_policy.description)
         return cls(actor, population, basis_checker, reference_projection,
                    canonical(description), secrets.token_bytes(32), review, assessment_policy)

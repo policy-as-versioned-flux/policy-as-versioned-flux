@@ -83,6 +83,46 @@ def _original_sources(context: dict[str, Any]) -> dict[str, Any]:
     return originals
 
 
+def binding_context(payload: dict[str, Any]) -> dict[str, Any]:
+    """Validate the complete input-only projection and derive its qualification identity.
+
+    The protected constructor authenticates source bytes/closure separately. This shared
+    reader prevents a qualification packet from claiming another live universe or model.
+    """
+    if (not isinstance(payload, dict) or set(payload) != {
+            'statement', 'source', 'source_context', 'model_context', 'candidates'}
+            or any(not isinstance(payload[key], str) or not payload[key] for key in ('statement', 'source'))):
+        raise ValueError('exact input-only signal projection required')
+    choices = payload['candidates']
+    if (not isinstance(choices, list) or len(choices) != 20
+            or any(not isinstance(item, dict) or set(item) != {'id', 'name', 'definition'}
+                   or not isinstance(item['id'], str) or not item['id']
+                   or not isinstance(item['name'], str) or not item['name']
+                   or not isinstance(item['definition'], dict)
+                   or item['definition'].get('id') != item['id']
+                   or item['definition'].get('name') != item['name'] for item in choices)
+            or len({item['id'] for item in choices}) != 20):
+        raise ValueError('all twenty distinct full source definitions required')
+    model = _object(payload['model_context'], 'model context',
+        {'organisation', 'domain', 'capability', 'frame', 'as_of', 'pins'})
+    for field in ('organisation', 'domain', 'capability', 'frame'):
+        _text(model[field], 'model context ' + field)
+    _date(model['as_of'], 'model context as_of')
+    if not isinstance(model['pins'], dict) or not model['pins']:
+        raise ValueError('model context requires actual closure pins')
+    source = _object(payload['source_context'], 'candidate source context',
+        {'url', 'version', 'family', 'excerpts', 'publication_date', 'as_of',
+         'original_sources', 'original_source_manifest_digest'}, {'event_date'})
+    _date(source['as_of'], 'source context as_of')
+    if (not isinstance(source['original_sources'], dict) or not source['original_sources']
+            or any(not isinstance(item, dict) or set(item) != {'identity', 'version', 'bytes', 'sha256'}
+                   for item in source['original_sources'].values())):
+        raise ValueError('candidate input receives source metadata and declared excerpts, not hidden body/annotation fields')
+    return {'candidate_universe_digest': q.digest(choices), 'model_pins': model['pins'],
+            'model_as_of': model['as_of'],
+            'input_construction_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+
+
 @dataclass(frozen=True)
 class ResolvedSignalInput:
     """Immutable retained bytes; every public projection is a fresh object."""
@@ -166,6 +206,6 @@ def resolve_signal_input(repo: ModelRepo, org: str, source_packet: bytes, source
         'model_as_of': policy['model_as_of'], 'original_source_manifest_digest': manifest_digest,
         'original_sources': originals, 'source_packet_sha256': source_pin,
         'party_sha256': party_pin, 'signal': packet['signal']})
-    context['input_construction_sha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    context.update(binding_context(payload))
     return ResolvedSignalInput(q.canonical({'subject': packet['signal']['id'], 'input': payload,
         'source': canonical_source, 'context': context, 'issuer': policy['issuer']}))

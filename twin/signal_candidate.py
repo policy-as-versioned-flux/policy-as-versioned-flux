@@ -102,31 +102,8 @@ def run(payload: dict[str, Any], config: dict[str, Any]) -> RuntimeResult:
 
 def render_prompt(payload: dict[str, Any], config: dict[str, Any]) -> bytes:
     """Render the predeclared input-only template; never shorten the task to fit a cap."""
-    if (not isinstance(payload, dict) or set(payload) != {
-            'statement', 'source', 'source_context', 'model_context', 'candidates'}
-            or any(not isinstance(payload[key], str) or not payload[key] for key in ('statement', 'source'))):
-        raise ValueError('exact input-only signal projection required')
-    choices = payload['candidates']
-    if (not isinstance(choices, list) or len(choices) != 20
-            or any(not isinstance(item, dict) or set(item) != {'id', 'name', 'definition'}
-                   or not isinstance(item['id'], str) or not isinstance(item['name'], str)
-                   or not isinstance(item['definition'], dict)
-                   or item['definition'].get('id') != item['id']
-                   or item['definition'].get('name') != item['name'] for item in choices)
-            or len({item['id'] for item in choices}) != 20):
-        raise ValueError('all twenty distinct full source definitions required')
-    model = payload['model_context']
-    source = payload['source_context']
-    if (not isinstance(model, dict) or set(model) != {'organisation', 'domain', 'capability', 'frame', 'as_of', 'pins'}
-            or not isinstance(source, dict) or not {'url', 'version', 'family', 'excerpts', 'publication_date',
-                'as_of', 'original_sources', 'original_source_manifest_digest'} <= set(source)
-            or set(source) - {'url', 'version', 'family', 'excerpts', 'publication_date', 'as_of',
-                             'original_sources', 'original_source_manifest_digest', 'event_date'}):
-        raise ValueError('input source/model context differs from the frozen task projection')
-    if (not isinstance(source['original_sources'], dict) or not source['original_sources']
-            or any(not isinstance(item, dict) or set(item) != {'identity', 'version', 'bytes', 'sha256'}
-                   for item in source['original_sources'].values())):
-        raise ValueError('candidate input receives source metadata and declared excerpts, not hidden body/annotation fields')
+    from .signal_inputs import binding_context
+    binding_context(payload)
     template = Path(__file__).with_name('signal-candidate-prompt.txt').read_bytes()
     if hashlib.sha256(template).hexdigest() != config.get('prompt_sha256'):
         raise ValueError('frozen signal prompt source changed')

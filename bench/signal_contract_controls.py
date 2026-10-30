@@ -23,6 +23,16 @@ def model_context():
             'input_construction_sha256': hashlib.sha256(Path(signal_inputs.__file__).read_bytes()).hexdigest()}
 
 
+def signal_input(statement, organisation):
+    return {'statement': statement, 'source': 'TEST_ONLY', 'candidates': choices(),
+        'model_context': {'organisation': organisation, 'domain': 'estate cloud', 'capability': 'delivery',
+            'frame': 'TEST_ONLY Wardley axis', 'as_of': '2026-10-30', 'pins': model_context()['model_pins']},
+        'source_context': {'url': 'https://test.invalid/fixture', 'version': 'v1', 'family': 'TEST_ONLY',
+            'excerpts': [statement], 'publication_date': '2026-10-30', 'as_of': '2026-10-30',
+            'original_source_manifest_digest': 'TEST_ONLY', 'original_sources': {'literal': {
+                'identity': 'https://test.invalid/fixture', 'version': 'v1', 'bytes': 1, 'sha256': 'TEST_ONLY'}}}}
+
+
 def signal_actor(payload, config):
     component = payload['statement'].split()[1]
     selected = next(item for item in payload['candidates'] if item['id'] == component)
@@ -40,8 +50,7 @@ def selection():
         scope['metric'] = 'signal-classify'
         case['context'] = scope
         steep = 'social' if index % 2 else 'economic'
-        case['input'] = {'statement': f'{steep} TEST_ONLY-{index} authored fixture {index}',
-            'source': 'TEST_ONLY', 'candidates': choices()}
+        case['input'] = signal_input(f'{steep} TEST_ONLY-{index} authored fixture {index}', scope['organisation'])
         case['expected'] = {'steep': steep, 'component': f'TEST_ONLY-{index}'}
         support = case['field_support']['evolution_position']
         case['field_support'] = {'steep': support, 'component': support}
@@ -81,8 +90,7 @@ def review_store(path: Path, policy: BasisPolicy, request: bytes, decision: str 
 
 
 def inputs():
-    payload = {'statement': 'social TEST_ONLY-19 literal supplied witness', 'source': 'TEST_ONLY',
-               'candidates': choices()}
+    payload = signal_input('social TEST_ONLY-19 literal supplied witness', 'driftwood')
     source = source_record(q.canonical(payload), 'TEST_ONLY', 'v1')
     context = {'organisation': 'driftwood', 'domain': 'estate cloud', 'capability': 'delivery',
         'as_of': '2026-10-30', 'frame': 'TEST_ONLY Wardley axis', 'source': 'TEST_ONLY',

@@ -156,3 +156,52 @@ def test_signal_eligible_set_cannot_replace_an_evolution_fixed_target(tmp_path):
     selected, resolver, session = host_setup(tmp_path, inputs)
     result = session.judge('evolution-judge', selected.actor.model_version, 'live-one')
     assert result.receipt is None and 'fixed' in result.reason
+
+
+@pytest.mark.parametrize('change', ['definition', 'model pins', 'foreign namespace',
+                                  'model date', 'construction', 'five choices', 'foreign domain', 'task date'])
+def test_qualification_input_cannot_borrow_a_different_declared_live_context(change):
+    from bench import signal_contract_controls as controls
+    from twin.reference_cases import admit_reference, binding_for
+    selected = controls.selection()
+    value = json.loads(selected.population.description)
+    admissions = []
+    for index, packet in enumerate(value['selected']):
+        case = packet['case']
+        core = value['envelope']['signal_contexts'][case['context']['organisation']]
+        case['input'].update({'model_context': {
+            **{field: case['context'][field] for field in ('organisation', 'domain', 'capability', 'frame')},
+            'as_of': core['model_as_of'], 'pins': core['model_pins']},
+            'source_context': {'url': 'https://test.invalid/fixture', 'version': 'v1',
+                'family': 'TEST_ONLY', 'excerpts': [case['input']['statement']],
+                'publication_date': case['context']['as_of'], 'as_of': case['context']['as_of'],
+                'original_source_manifest_digest': 'TEST_ONLY-fixture', 'original_sources': {
+                    'literal': {'identity': 'https://test.invalid/fixture', 'version': 'v1',
+                                'bytes': 1, 'sha256': 'TEST_ONLY-fixture'}}}})
+        if index == 0:
+            if change == 'definition':
+                case['input']['candidates'][19]['definition']['description'] = 'TEST_ONLY different actual definition'
+            elif change == 'model pins':
+                case['input']['model_context']['pins'] = {'TEST_ONLY': 'different actual closure'}
+            elif change == 'foreign namespace':
+                case['input']['model_context']['organisation'] = 'foreign-org'
+            elif change == 'model date':
+                case['input']['model_context']['as_of'] = '2026-10-29'
+            elif change == 'construction':
+                value['envelope']['signal_contexts'][case['context']['organisation']]['input_construction_sha256'] = 'an older constructor'
+            elif change == 'five choices':
+                case['input']['candidates'] = case['input']['candidates'][:5]
+            elif change == 'foreign domain':
+                case['context']['domain'] = 'a different actual domain'
+                case['input']['model_context']['domain'] = case['context']['domain']
+            else:
+                case['context']['as_of'] = '2027-01-01'
+                case['input']['source_context']['as_of'] = '2027-01-01'
+        case['basis_binding'] = binding_for(case)
+        admission = admit_reference(case, case['context'])
+        assert admission.admitted, admission.reasons
+        admissions.append(admission)
+    population = q.Population.freeze('signal-classify', tuple(admissions), value['envelope'], value['exposure'])
+    with pytest.raises(ValueError, match='qualification input|qualified signal'):
+        q.Selection.freeze(selected.actor, population, controls.basis_holds,
+            review=q.PopulationReview.test_only(population), assessment_policy=selected.assessment_policy)
