@@ -130,3 +130,45 @@ else:
     config['TEST_ONLY_build'] = 'different actual backend build'
     mismatch = candidate.freeze_actor(config).invoke(full_input())
     assert mismatch.raw.startswith(b'{"steep":') and 'runtime differs' in mismatch.failure
+
+
+def test_real_signal_profile_cannot_fall_back_to_unprotected_two_call_transport(tmp_path):
+    import hashlib
+    import sys
+    from pathlib import Path
+    backend = tmp_path/'TEST_ONLY_never_run.py'
+    marker = tmp_path/'TEST_ONLY_was_run'
+    backend.write_text('from pathlib import Path\nPath('+repr(str(marker))+').touch()\n')
+    template = Path(candidate.__file__).with_name('signal-candidate-prompt.txt')
+    config = {'profile': 'signal-linux-bf16-v1', 'purpose': 'TEST_ONLY',
+        'prompt_sha256': hashlib.sha256(template.read_bytes()).hexdigest(),
+        'backend': {'script': str(backend), 'sha256': hashlib.sha256(backend.read_bytes()).hexdigest(),
+            'python': sys.executable, 'python_sha256': hashlib.sha256(Path(sys.executable).read_bytes()).hexdigest()},
+        'max_input_tokens':4096,'max_new_tokens':512,'timeout_seconds':900,
+        'threads':2,'interop_threads':1,'runtime_contract': {'TEST_ONLY':'unacquired'}}
+    with pytest.raises(ValueError, match='protected host authority'):
+        candidate.run(full_input(), config)
+    assert not marker.exists()
+
+
+def test_omitted_operational_profile_cannot_reuse_the_test_only_transport(tmp_path):
+    import hashlib
+    import sys
+    from pathlib import Path
+    backend = tmp_path/'TEST_ONLY_operational_fallback.py'
+    marker = tmp_path/'TEST_ONLY_fallback_was_run'
+    backend.write_text('import json,sys\nfrom pathlib import Path\nPath('+repr(str(marker))+').touch()\n'
+        'json.load(sys.stdin)\n'
+        'print(json.dumps({\"input_tokens\":1} if sys.argv[1]==\"--preflight\" else '
+        '{\"raw_base64\":\"e30=\",\"output_tokens\":1,\"stop_reason\":\"eos\",\"observed_runtime\":{\"TEST_ONLY\":True}}))\n')
+    template = Path(candidate.__file__).with_name('signal-candidate-prompt.txt')
+    config = {'purpose':'operational', 'prompt_sha256':hashlib.sha256(template.read_bytes()).hexdigest(),
+        'backend':{'script':str(backend),'sha256':hashlib.sha256(backend.read_bytes()).hexdigest(),
+            'python':sys.executable,'python_sha256':hashlib.sha256(Path(sys.executable).read_bytes()).hexdigest()},
+        'max_input_tokens':4096,'max_new_tokens':512,'timeout_seconds':5,'threads':2,'interop_threads':1,
+        'runtime_contract':{'TEST_ONLY':True}}
+    with pytest.raises(ValueError, match='TEST_ONLY'):
+        candidate.run(full_input(), config)
+    assert not marker.exists()
+    with pytest.raises(ValueError, match='reviewed Linux profile'):
+        candidate.run(full_input(), {'purpose': 'TEST_ONLY', 'profile': 'unknown-linux-profile'})

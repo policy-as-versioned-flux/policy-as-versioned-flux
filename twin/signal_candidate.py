@@ -17,6 +17,10 @@ from .schema import STEEP
 
 
 def _backend(config: dict[str, Any]) -> tuple[str, str]:
+    if config.get('profile') is None and config.get('purpose') != 'TEST_ONLY':
+        raise ValueError('unprotected host transport is TEST_ONLY; operational profile/authority required')
+    if config.get('profile') is not None and config['profile'] != 'signal-linux-bf16-v1':
+        raise ValueError('signal adapter requires its exact reviewed Linux profile')
     backend = config.get('backend')
     if not isinstance(backend, dict) or set(backend) != {'script', 'sha256', 'python', 'python_sha256'}:
         raise ValueError('no pinned reviewed target backend; actual runtime acquisition/measurement remains required')
@@ -39,7 +43,12 @@ def freeze_actor(config: dict[str, Any], *, source_metadata_authority: Any = Non
     """Bind the whole adapter/config/support computation; this performs no inference."""
     from . import qualification as q, signal_inputs, basis_assessment, qualified_signals, source_metadata
     executable, backend = _backend(config)
-    support = []
+    support: list[Path] = []
+    if config.get('profile') is not None:
+        from .linux_candidate import support_sources
+        if config['profile'] != 'signal-linux-bf16-v1':
+            raise ValueError('signal adapter requires its exact reviewed Linux profile')
+        support.extend(support_sources(config))
     for module in (signal_inputs, basis_assessment, qualified_signals, source_metadata):
         if module.__file__ is None:
             raise ValueError('host support module has no source file')
@@ -52,12 +61,18 @@ def freeze_actor(config: dict[str, Any], *, source_metadata_authority: Any = Non
 def run(payload: dict[str, Any], config: dict[str, Any]) -> RuntimeResult:
     """Transport to a pinned HOST program, never interpret identity fields in model output.
 
-    No Qwen/runtime implementation is installed. A real backend must earn independent
+    The concrete Linux profile uses one protected paired invocation. Its actual
+    assets/runtime/resources remain unmeasured. A real backend must earn independent
     source/cage/assets/resource review and actual target measurement before registration.
     Preflight must tokenize without loading a model; generation must observe the actual
     loaded build/assets/dtype/device and process-resource/cage facts. Controlled TEST_ONLY
     subprocesses prove this transport, not those outstanding real backend obligations.
     """
+    if config.get('profile') is not None:
+        if config['profile'] != 'signal-linux-bf16-v1':
+            raise ValueError('signal adapter requires its exact reviewed Linux profile')
+        from .linux_candidate import invoke_pair
+        return invoke_pair({'input': payload, 'prompt_utf8': render_prompt(payload, config).decode()}, config)
     executable, backend = _backend(config)
     prompt = render_prompt(payload, config)
     request = canonical({'input': payload, 'prompt_utf8': prompt.decode(), 'config': config})
