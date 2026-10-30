@@ -35,17 +35,18 @@ def _backend(config: dict[str, Any]) -> tuple[str, str]:
     return backend['python'], backend['script']
 
 
-def freeze_actor(config: dict[str, Any]) -> Actor:
+def freeze_actor(config: dict[str, Any], *, source_metadata_authority: Any = None) -> Actor:
     """Bind the whole adapter/config/support computation; this performs no inference."""
-    from . import qualification as q, signal_inputs, basis_assessment, qualified_signals
+    from . import qualification as q, signal_inputs, basis_assessment, qualified_signals, source_metadata
     executable, backend = _backend(config)
     support = []
-    for module in (signal_inputs, basis_assessment, qualified_signals):
+    for module in (signal_inputs, basis_assessment, qualified_signals, source_metadata):
         if module.__file__ is None:
             raise ValueError('host support module has no source file')
         support.append(Path(module.__file__))
     return q.Actor.freeze(run, parse, config, support=(*support, Path(backend), Path(executable),
-        Path(__file__).with_name('signal-candidate-prompt.txt')))
+        source_metadata.SCHEMA_PATH, Path(__file__).with_name('signal-candidate-prompt.txt')),
+        source_metadata_authority=source_metadata_authority)
 
 
 def run(payload: dict[str, Any], config: dict[str, Any]) -> RuntimeResult:
