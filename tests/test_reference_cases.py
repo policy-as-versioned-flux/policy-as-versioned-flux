@@ -247,3 +247,42 @@ def test_malformed_support_witness_declarations_return_retained_holds(witnesses:
             == witnesses)
     with pytest.raises(ValueError, match='reference held'):
         decision.evaluator_item()
+
+
+@pytest.mark.parametrize('section,field,value', [
+    ('rights', 'uses', None), ('rights', 'uses', 'development'),
+    ('rights', 'uses', {'development': True}), ('rights', 'uses', [None]),
+    ('rights', 'evidence', None), ('rights', 'evidence', 'rights'),
+    ('rights', 'evidence', [['unhashable']]),
+    ('rights', 'covered_sources', None), ('rights', 'covered_sources', 'account'),
+    ('rights', 'covered_sources', [{'source': 'account'}]),
+    ('basis', 'source_hashes', None), ('basis', 'source_hashes', ['bad']),
+    ('basis', 'source_hashes', 'bad'), ('basis', 'source_hashes', {'account': None}),
+])
+def test_malformed_nested_rights_and_basis_declarations_are_conserved_as_holds(
+    section: str, field: str, value: Any,
+) -> None:
+    import json
+    from copy import deepcopy
+    case, scope = example()
+    case[section][field] = deepcopy(value)
+    decision = admit_reference(case, scope)
+    assert not decision.admitted
+    assert 'invalid-shape:' + section + '.' + field in decision.reasons
+    assert json.loads(decision.packet_bytes)['case'][section][field] == value
+    with pytest.raises(ValueError, match='reference held'):
+        decision.evaluator_item()
+
+
+@pytest.mark.parametrize('claim', [['bad'], {'bad': 'claim'}])
+def test_malformed_requested_claim_is_held_before_reference_kind_lookup(claim: Any) -> None:
+    import json
+    from twin.reference_cases import binding_for
+    case, scope = example()
+    scope['claim'] = claim
+    case['context'] = scope.copy()
+    case['basis_binding'] = binding_for(case)
+    decision = admit_reference(case, scope)
+    assert not decision.admitted
+    assert 'missing-context:claim' in decision.reasons
+    assert json.loads(decision.packet_bytes)['requested_scope']['claim'] == claim
