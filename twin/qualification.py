@@ -21,6 +21,7 @@ import secrets
 import types
 from typing import Any, Callable
 from datetime import date
+from enum import Enum
 
 from .skills import Stated, EvalResult, evaluate, record_score, load_scores, threshold_for, min_items_for
 from .reference_cases import Admission
@@ -28,6 +29,14 @@ from . import record_skill_scores as rss
 from . import model_permission as mp
 from .canon import digest_of
 from .basis_assessment import BasisPolicy, BasisAssessment, ReviewStore, _restore_assessment
+
+
+class TestOnlyPurpose(Enum):
+    """Explicit protected parent purpose, never inferred from serialized packet text."""
+    MECHANICS = 'TEST_ONLY-legacy-mechanics'
+
+
+TEST_ONLY_MECHANICS = TestOnlyPurpose.MECHANICS
 
 
 def canonical(value: Any) -> bytes:
@@ -155,17 +164,28 @@ class Actor:
     description: bytes
     runner: Callable[[Any, dict[str, Any]], bytes | RuntimeResult]
     parser: Callable[[bytes, dict[str, Any]], Stated]
+    _source_metadata_authority: Any = field(default=None, repr=False, compare=False)
 
     @classmethod
     def freeze(cls, runner: Callable[[Any, dict[str, Any]], bytes | RuntimeResult],
                parser: Callable[[bytes, dict[str, Any]], Stated], config: dict[str, Any],
-               *, support: tuple[Path, ...] = ()) -> Actor:
+               *, support: tuple[Path, ...] = (), source_metadata_authority: Any = None) -> Actor:
         paths = {Path(__file__).resolve(), *(Path(inspect.getfile(fn)).resolve() for fn in (runner, parser))} | {
             path.resolve() for path in support}
+        authority = None
+        if source_metadata_authority is not None:
+            from . import source_metadata, signal_inputs
+            source_metadata_authority.verify()
+            authority = json.loads(source_metadata_authority.description)
+            paths |= {_source_path(path) for path in authority['sources']}
+            paths |= {Path(source_metadata.__file__), source_metadata.SCHEMA_PATH, Path(signal_inputs.__file__)}
         sources = {_source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
-        return cls(canonical({'config': config, 'runtime': _runtime(), 'sources': sources,
+        description = {'config': config, 'runtime': _runtime(), 'sources': sources,
                               'runner': _callable_identity(runner),
-                              'parser': _callable_identity(parser)}), runner, parser)
+                              'parser': _callable_identity(parser)}
+        if authority is not None:
+            description['source_metadata_authority'] = authority
+        return cls(canonical(description), runner, parser, source_metadata_authority)
 
     @property
     def digest(self) -> str:
@@ -177,6 +197,12 @@ class Actor:
 
     def verify(self) -> None:
         value = json.loads(self.description)
+        if value.get('source_metadata_authority') is not None:
+            if self._source_metadata_authority is None:
+                raise ValueError('actor requires protected metadata authority handle')
+            self._source_metadata_authority.verify()
+            if value['source_metadata_authority'] != json.loads(self._source_metadata_authority.description):
+                raise ValueError('actor metadata authority changed')
         if (value['runtime'] != _runtime() or value['runner'] != _callable_identity(self.runner)
                 or value['parser'] != _callable_identity(self.parser)):
             raise ValueError('actor runtime or adapter changed')
@@ -443,53 +469,87 @@ class Selection:
     _capture_key: bytes = field(repr=False, compare=False)
     review: PopulationReview | None = None
     assessment_policy: BasisPolicy | None = None
+    _metadata_store: Any = field(default=None, repr=False, compare=False)
+    _metadata_policy: bytes | None = field(default=None, repr=False, compare=False)
+    _test_only: TestOnlyPurpose | None = field(default=None, repr=False, compare=False)
 
     @classmethod
     def freeze(cls, actor: Actor, population: Population,
                basis_checker: Callable[[Any, Any], bool], *,
                reference_projection: Callable[[str, Any], Any] = project_reference,
                review: PopulationReview | None = None,
-               assessment_policy: BasisPolicy | None = None) -> Selection:
+               assessment_policy: BasisPolicy | None = None,
+               source_metadata_policy: dict[str, Any] | None = None, metadata_store: Any = None,
+               test_only: TestOnlyPurpose | None = None) -> Selection:
         identity = _callable_identity(basis_checker)
         functions = (basis_checker, reference_projection, rss.scorer_for(population.metric))
         sources = {_source_name(Path(inspect.getfile(fn))): hashlib.sha256(
             Path(inspect.getfile(fn)).read_bytes()).hexdigest() for fn in functions}
+        if population.metric == 'substrate-generator':
+            from . import substrate_generation, substrate_recipe_basis
+            if basis_checker is not substrate_recipe_basis.check or reference_projection is not project_reference:
+                raise ValueError('generator requires the reviewed independent checker and approved reference projection')
+            substrate_generation.validate_population(actor, population)
+            for module in (substrate_generation, substrate_recipe_basis):
+                path = Path(inspect.getfile(module))
+                sources[_source_name(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
         description = {'actor': actor.digest, 'population': population.digest,
                               'basis_checker': identity, 'projection': _callable_identity(reference_projection),
                               'sources': sources, 'review': review.digest if review else None}
+        if test_only is not None:
+            if (test_only is not TEST_ONLY_MECHANICS or json.loads(actor.description)['config'].get('purpose') != 'TEST_ONLY'
+                    or source_metadata_policy is not None or metadata_store is not None):
+                raise ValueError('legacy selection requires protected TEST_ONLY actor purpose')
+            description['purpose'] = test_only.value
         if assessment_policy:
             assessment_policy.verify()
-            if population.metric == 'signal-classify':
-                from .signal_inputs import binding_context
-                envelope = population.envelope
-                contexts = envelope.get('signal_contexts', {})
-                if (set(contexts) != set(envelope['adopters'])
-                        or any(not isinstance(value, dict) or set(value) != {
-                            'candidate_universe_digest', 'model_pins', 'model_as_of',
-                            'input_construction_sha256'} for value in contexts.values())):
-                    raise ValueError('reviewed signal selection requires every adopter exact model/universe/construction context')
-                for packet in json.loads(population.description)['selected']:
-                    case = packet['case']
-                    try:
-                        actual = binding_context(case['input'])
-                        model = case['input']['model_context']
-                        if (actual != contexts.get(case['context']['organisation'])
-                                or any(model[field] != case['context'][field]
-                                       for field in ('organisation', 'domain', 'capability', 'frame'))
-                                or any(model[field] not in envelope[allowed] for field, allowed in (
-                                    ('domain', 'domains'), ('capability', 'capabilities'), ('frame', 'frames')))
-                                or case['input']['source_context']['family'] not in envelope['sources']
-                                or case['input']['source_context']['as_of'] != case['context']['as_of']
-                                or not date.fromisoformat(envelope['from']) <= date.fromisoformat(case['context']['as_of'])
-                                    <= date.fromisoformat(envelope['until'])):
-                            raise ValueError('model/universe/date/construction or declared scope differs')
-                    except (ValueError, KeyError, TypeError) as exc:
-                        raise ValueError('qualification input differs from qualified signal context: ' + str(exc)) from exc
-                source = Path(inspect.getfile(binding_context))
-                sources[_source_name(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
             description['assessment_policy'] = json.loads(assessment_policy.description)
+        if population.metric == 'signal-classify' and (test_only is not TEST_ONLY_MECHANICS or assessment_policy is not None):
+            from .signal_inputs import binding_context
+            from . import source_metadata as sm
+            if test_only is not TEST_ONLY_MECHANICS:
+                sm.validate_parent_policy(source_metadata_policy, metadata_store)
+                assert source_metadata_policy is not None
+                authority = metadata_store.authority(source_metadata_policy['authority_digest'])
+                if (json.loads(actor.description).get('source_metadata_authority') != json.loads(authority.description)
+                        or source_metadata_policy['purpose'] == 'TEST_ONLY'
+                        and json.loads(actor.description)['config'].get('purpose') != 'TEST_ONLY'):
+                    raise ValueError('signal actor lacks exact protected metadata authority/support identity')
+                description['source_metadata_policy'] = source_metadata_policy
+                for path in (*[_source_path(path) for path in json.loads(authority.description)['sources']],
+                             Path(sm.__file__), sm.SCHEMA_PATH):
+                    sources[_source_name(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
+            envelope = population.envelope
+            contexts = envelope.get('signal_contexts', {})
+            if (set(contexts) != set(envelope['adopters'])
+                    or any(not isinstance(value, dict) or set(value) != {
+                        'candidate_universe_digest', 'model_pins', 'model_as_of',
+                        'input_construction_sha256'} for value in contexts.values())):
+                raise ValueError('reviewed signal selection requires every adopter exact model/universe/construction context')
+            for packet in json.loads(population.description)['selected']:
+                case = packet['case']
+                try:
+                    actual = binding_context(case['input'], test_only=test_only)
+                    if test_only is not TEST_ONLY_MECHANICS:
+                        sm.verify_host_metadata(case, metadata_store, source_metadata_policy)
+                    model = case['input']['model_context']
+                    if (actual != contexts.get(case['context']['organisation'])
+                            or any(model[field] != case['context'][field]
+                                   for field in ('organisation', 'domain', 'capability', 'frame'))
+                            or any(model[field] not in envelope[allowed] for field, allowed in (
+                                ('domain', 'domains'), ('capability', 'capabilities'), ('frame', 'frames')))
+                            or case['input']['source_context']['family'] not in envelope['sources']
+                            or case['input']['source_context']['as_of'] != case['context']['as_of']
+                            or not date.fromisoformat(envelope['from']) <= date.fromisoformat(case['context']['as_of'])
+                                <= date.fromisoformat(envelope['until'])):
+                        raise ValueError('model/universe/date/construction or declared scope differs')
+                except (ValueError, KeyError, TypeError) as exc:
+                    raise ValueError('qualification input differs from qualified signal context: ' + str(exc)) from exc
+            source = Path(inspect.getfile(binding_context))
+            sources[_source_name(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
         return cls(actor, population, basis_checker, reference_projection,
-                   canonical(description), secrets.token_bytes(32), review, assessment_policy)
+                   canonical(description), secrets.token_bytes(32), review, assessment_policy,
+                   metadata_store, canonical(source_metadata_policy) if source_metadata_policy else None, test_only)
 
     @property
     def digest(self) -> str:
@@ -500,6 +560,23 @@ class Selection:
         if self.assessment_policy:
             self.assessment_policy.verify()
         value = json.loads(self.description)
+        if value.get('purpose') != (self._test_only.value if self._test_only else None):
+            raise ValueError('selection requires original protected TEST_ONLY purpose')
+        if value.get('source_metadata_policy') != (json.loads(self._metadata_policy) if self._metadata_policy else None):
+            raise ValueError('selection requires original protected metadata policy')
+        if self.population.metric == 'signal-classify' and self._test_only is not TEST_ONLY_MECHANICS:
+            # Reapply the mandatory constructor/acquisition/actor invariants using the
+            # retained protected handles, including for restored public descriptions.
+            rebound = Selection.freeze(self.actor, self.population, self.basis_checker,
+                reference_projection=self.reference_projection, review=self.review,
+                assessment_policy=self.assessment_policy, metadata_store=self._metadata_store,
+                source_metadata_policy=json.loads(self._metadata_policy) if self._metadata_policy else None)
+            if rebound.description != self.description:
+                raise ValueError('selection protected metadata/construction binding changed')
+        elif self._metadata_policy:
+            from .source_metadata import verify_host_metadata
+            for packet in json.loads(self.population.description)['selected']:
+                verify_host_metadata(packet['case'], self._metadata_store, json.loads(self._metadata_policy))
         if (value['actor'] != self.actor.digest or value['population'] != self.population.digest
                 or value['basis_checker'] != _callable_identity(self.basis_checker)
                 or value['projection'] != _callable_identity(self.reference_projection)
@@ -510,6 +587,29 @@ class Selection:
         if any(hashlib.sha256(_source_path(path).read_bytes()).hexdigest() != expected
                for path, expected in value['sources'].items()):
             raise ValueError('selection support source changed')
+
+    def verify_input(self, row: dict[str, Any]) -> None:
+        """Recompute the complete live signal binding for the selected task."""
+        self.verify()
+        if self.population.metric == 'signal-classify' and self._test_only is not TEST_ONLY_MECHANICS:
+            from .signal_inputs import binding_context
+            from .source_metadata import verify_host_metadata
+            verify_host_metadata(row, self._metadata_store,
+                json.loads(self._metadata_policy) if self._metadata_policy else None)
+            try:
+                actual = binding_context(row['input'])
+                context = row['context']
+                model, source = row['input']['model_context'], row['input']['source_context']
+                qualified = self.population.envelope['signal_contexts'].get(context['organisation'])
+                if (actual != qualified or any(context.get(key) != value for key, value in actual.items())
+                        or context.get('eligible_components') != [item['id'] for item in row['input']['candidates']]
+                        or 'component' in context
+                        or any(model[key] != context[key] for key in ('organisation', 'domain', 'capability', 'frame'))
+                        or source['family'] != context['source'] or source['as_of'] != context['as_of']
+                        or _scope_reasons(self.population, context)):
+                    raise ValueError('actual model/universe/date/construction or declared scope differs')
+            except (ValueError, KeyError, TypeError) as exc:
+                raise ValueError('live input differs from qualified signal context: ' + str(exc)) from exc
 
     def capture(self) -> Capture:
         self.verify()
@@ -629,6 +729,9 @@ class Selection:
     def record(self, capture: Capture, recorded_at: str, path: Path,
                assessment: BasisAssessment | None = None) -> dict[str, Any]:
         """Append one complete host-bound row; no official destination is implicit."""
+        if (self._test_only is TEST_ONLY_MECHANICS or json.loads(self.actor.description)['config'].get('purpose') == 'TEST_ONLY'
+                or self._metadata_policy and json.loads(self._metadata_policy)['purpose'] == 'TEST_ONLY') and path.resolve() == Path(__file__).with_name('skill-scores.jsonl').resolve():
+            raise ValueError('TEST_ONLY mechanics cannot record official scores')
         result = self.evaluate(capture, assessment)
         self.facts(capture, assessment)  # invalid reference projection must not produce an official row
         return record_score(result, self.actor.model_version, recorded_at, path,
@@ -678,7 +781,8 @@ class Resolver:
 
     @classmethod
     def from_catalogue(cls, catalogue: Path, expected_digest: str, scores_path: Path | None = None,
-                       *, allow_test_only: bool = False) -> Resolver:
+                       *, allow_test_only: bool = False, metadata_store: Any = None,
+                       source_metadata_policy: dict[str, Any] | None = None) -> Resolver:
         """Import a durable host snapshot, not a model-provided path or checksum.
 
         The caller must obtain expected_digest from its protected source/configuration before
@@ -699,7 +803,9 @@ class Resolver:
             bundle = path.read_bytes()
             if hashlib.sha256(bundle).hexdigest() != entry['sha256']:
                 raise ValueError('protected bundle digest differs')
-            bindings.append(_restore_bundle(bundle))
+            bindings.append(_restore_bundle(bundle, metadata_store=metadata_store,
+                source_metadata_policy=source_metadata_policy,
+                test_only=TEST_ONLY_MECHANICS if allow_test_only else None))
         resolver = cls(tuple(bindings), scores_path, allow_test_only=allow_test_only)
         for entry in document.get('sessions', []):
             path = catalogue.parent / entry['bundle']
@@ -708,7 +814,10 @@ class Resolver:
             session_bytes = path.read_bytes()
             if hashlib.sha256(session_bytes).hexdigest() != entry['sha256']:
                 raise ValueError('protected session bundle digest differs')
-            session = HostSession.restore(session_bytes, resolver)
+            legacy = json.loads(session_bytes).get('inputs', {}).get('purpose')
+            session = HostSession.restore(session_bytes, resolver, metadata_store=metadata_store,
+                metadata_policy=source_metadata_policy,
+                test_only=TEST_ONLY_MECHANICS if allow_test_only and legacy else None)
             if session.identity in resolver._sessions:
                 raise ValueError('duplicate host session')
             resolver._sessions[session.identity] = session
@@ -788,6 +897,8 @@ class Resolver:
 
     def check_claim_document(self, doc: dict[str, Any], clock: str,
                              _lookup: Callable[[str, str], mp.Permission] | None = None) -> list[str]:
+        if doc.get('schema') == 'twin.substrate-generation/v1':
+            return self.check_generation_document(doc, clock)
         bad = mp.check_claim_document(doc, clock, self.permission)
         if clock != mp.GOVERNED_CLOCK:
             return bad
@@ -796,6 +907,14 @@ class Resolver:
         if session is None:
             return bad + ['no protected host session for this claim; model-provided identity is insufficient']
         return bad + session.check_document(doc)
+
+    def check_generation_document(self, doc: dict[str, Any], clock: str) -> list[str]:
+        from .substrate_generation import check_document
+        identity = (doc.get('run') or {}).get('host_session')
+        session = self._sessions.get(identity) if isinstance(identity, str) else None
+        if session is None:
+            return ['no protected host session for generation document']
+        return check_document(session, doc, clock)
 
 
 @dataclass(frozen=True)
@@ -807,16 +926,57 @@ class HostInputs:
     A canonical input source must actually match the projected input bytes and context hash.
     """
     description: bytes
+    _metadata_store: Any = field(default=None, repr=False, compare=False)
+    _metadata_policy: bytes | None = field(default=None, repr=False, compare=False)
+    _test_only: TestOnlyPurpose | None = field(default=None, repr=False, compare=False)
 
     @classmethod
-    def freeze(cls, records: tuple[dict[str, Any], ...], issuers: tuple[str, ...]) -> HostInputs:
+    def freeze(cls, records: tuple[dict[str, Any], ...], issuers: tuple[str, ...], *,
+               metadata_store: Any = None, metadata_policy: dict[str, Any] | None = None,
+               test_only: TestOnlyPurpose | None = None) -> HostInputs:
         subjects = [row.get('subject') for row in records]
         if any(not isinstance(subject, str) or not subject for subject in subjects) or len(set(subjects)) != len(subjects):
             raise ValueError('host inputs need unique nonempty subjects')
-        return cls(canonical({'records': records, 'issuers': issuers}))
+        if test_only is not None and test_only is not TEST_ONLY_MECHANICS:
+            raise ValueError('invalid protected TEST_ONLY host purpose')
+        description: dict[str, Any] = {'records': records, 'issuers': issuers}
+        if test_only is TEST_ONLY_MECHANICS:
+            if metadata_store is not None or metadata_policy is not None or any(
+                    not row.get('issuer', '').startswith('TEST_ONLY') for row in records):
+                raise ValueError('legacy mechanics require protected TEST_ONLY host purpose')
+            description['purpose'] = test_only.value
+        if metadata_policy is not None:
+            from .source_metadata import validate_parent_policy
+            validate_parent_policy(metadata_policy, metadata_store)
+            if metadata_policy['purpose'] == 'TEST_ONLY' and any(not row.get('issuer', '').startswith('TEST_ONLY') for row in records):
+                raise ValueError('TEST_ONLY source authority cannot enter an actual host import')
+            description['source_metadata_policy'] = metadata_policy
+        return cls(canonical(description), metadata_store,
+                   canonical(metadata_policy) if metadata_policy is not None else None, test_only)
+
+    @classmethod
+    def restore(cls, archive: bytes, *, metadata_store: Any = None,
+                metadata_policy: dict[str, Any] | None = None,
+                test_only: TestOnlyPurpose | None = None) -> HostInputs:
+        value = json.loads(archive)
+        # A catalogue's signal handles must not add a binding to unrelated inputs.
+        # Actual signal rows still require their protected handles in resolve below.
+        if 'source_metadata_policy' not in value:
+            metadata_store, metadata_policy = None, None
+        restored = cls.freeze(tuple(value['records']), tuple(value['issuers']), metadata_store=metadata_store,
+                              metadata_policy=metadata_policy, test_only=test_only)
+        if restored.description != archive:
+            raise ValueError('host restore differs from independently selected protected store/policy/purpose')
+        for record in value['records']:
+            restored.resolve(record['subject'])
+        return restored
 
     def resolve(self, subject: str) -> dict[str, Any]:
         value = json.loads(self.description)
+        if value.get('purpose') != (self._test_only.value if self._test_only else None):
+            raise ValueError('host archive requires the same protected TEST_ONLY purpose')
+        if value.get('source_metadata_policy') != (json.loads(self._metadata_policy) if self._metadata_policy else None):
+            raise ValueError('host archive requires independently selected metadata store/policy')
         row = next((row for row in value['records'] if row['subject'] == subject), None)
         if row is None:
             raise ValueError('host has no source/input provenance for subject ' + subject)
@@ -832,7 +992,13 @@ class HostInputs:
             for name in ('organisation', 'domain', 'capability', 'as_of', 'frame', 'source'):
                 if not isinstance(context.get(name), str) or not context[name]:
                     raise ValueError('missing host context: ' + name)
-            if 'eligible_components' in context:
+            # A v2 source projection cannot opt into generic component routing by
+            # removing public signal flags or its serialized metadata policy.
+            source_context = row['input'].get('source_context') if isinstance(row['input'], dict) else None
+            public_metadata = source_context.get('metadata') if isinstance(source_context, dict) else None
+            if ('eligible_components' in context or 'source_metadata' in context
+                    or isinstance(public_metadata, dict)
+                    and public_metadata.get('schema') == 'twin.source-metadata-public/v1'):
                 candidates = row['input'].get('candidates')
                 if (not isinstance(candidates, list) or not candidates
                         or any(not isinstance(item, dict) or not isinstance(item.get('id'), str)
@@ -843,6 +1009,15 @@ class HostInputs:
                         or context.get('candidate_universe_digest') != digest(candidates)
                         or 'component' in context):
                     raise ValueError('signal host universe differs from actual input or preselects an answer')
+                if 'source_metadata' in context:
+                    from .signal_inputs import binding_context
+                    from .source_metadata import verify_host_metadata
+                    verify_host_metadata(row, self._metadata_store,
+                        json.loads(self._metadata_policy) if self._metadata_policy else None)
+                    if any(context.get(key) != item for key, item in binding_context(row['input']).items()):
+                        raise ValueError('signal host input construction/model context differs')
+                elif self._test_only is not TEST_ONLY_MECHANICS:
+                    raise ValueError('signal host requires actual protected metadata acquisition')
             elif not isinstance(context.get('component'), str) or not context['component']:
                 raise ValueError('missing fixed host component')
         except (KeyError, TypeError) as exc:
@@ -853,6 +1028,9 @@ class HostInputs:
 def _scope_reasons(population: Population, context: dict[str, Any]) -> list[str]:
     envelope = population.envelope
     reasons = []
+    if population.metric == 'substrate-generator':
+        from .substrate_generation import scope_reasons
+        reasons.extend(scope_reasons(population, context))
     for field, allowed in (('organisation', 'adopters'), ('domain', 'domains'),
                            ('capability', 'capabilities'), ('frame', 'frames'), ('source', 'sources')):
         if context.get(field) not in envelope[allowed]:
@@ -895,6 +1073,8 @@ class HostSession:
         self._pending: dict[str, bytes] = {}
         self._live_assessments: dict[str, BasisAssessment] = {}
         self._reviewed_outputs: list[dict[str, Any]] = []
+        self._generation_dispositions: list[dict[str, Any]] = []
+        self._generation_blobs: dict[str, str] = {}
 
     @property
     def declines(self) -> list[dict[str, str]]:
@@ -920,7 +1100,7 @@ class HostSession:
     def _verify_record(self, record: dict[str, Any]) -> None:
         row = self._inputs.resolve(record['subject'])
         selected, _ = self._resolver._bindings[(record['metric'], record['model_version'])]
-        selected.verify()
+        selected.verify_input(row)
         output = record['output']
         parsed = selected.actor.parser(base64.b64decode(output['raw'], validate=True),
                                       json.loads(selected.actor.description)['config'])
@@ -974,11 +1154,15 @@ class HostSession:
             if bound is None or not permission.granted:
                 raise ValueError(permission.why())
             selected, _ = bound
+            selected.verify_input(row)
             reasons = _scope_reasons(selected.population, row['context'])
             if reasons:
                 raise ValueError('; '.join(reasons))
             if metric != 'signal-classify' and not row['context'].get('component'):
                 raise ValueError('non-signal judgement requires its fixed host component')
+            if metric == 'substrate-generator':
+                from .substrate_generation import validate_row
+                validate_row(row, selected.actor.model_version)
             if metric == 'signal-classify':
                 if selected.assessment_policy and 'eligible_components' not in row['context']:
                     raise ValueError('reviewed signal actor requires the full protected eligible universe')
@@ -1047,6 +1231,7 @@ class HostSession:
                 bad.append('claim host receipt has a stale selection')
                 continue
             selected, _ = bound
+            selected.verify_input(row)
             bad.extend(_scope_reasons(selected.population, row['context']))
             if selected.assessment_policy:
                 assessment = self._live_assessments.get(record.get('assessment_digest', ''))
@@ -1093,22 +1278,28 @@ class HostSession:
             'records': {token: json.loads(packet) for token, packet in self._records.items()},
             'declines': self.declines, 'failed_outputs': self._failed_outputs,
             'pending_reviews': {key: json.loads(value) for key, value in self._pending.items()},
-            'reviewed_outputs': self._reviewed_outputs})
+            'reviewed_outputs': self._reviewed_outputs,
+            'generation_dispositions': self._generation_dispositions,
+            'generation_blobs': self._generation_blobs})
 
     @classmethod
-    def restore(cls, archive: bytes, resolver: Resolver) -> HostSession:
+    def restore(cls, archive: bytes, resolver: Resolver, *, metadata_store: Any = None,
+                metadata_policy: dict[str, Any] | None = None,
+                test_only: TestOnlyPurpose | None = None) -> HostSession:
         value = json.loads(archive)
         if value.get('schema') != 'twin.host-session/v1':
             raise ValueError('unknown protected session schema')
-        session = cls(resolver, HostInputs(canonical(value['inputs'])))
+        session = cls(resolver, HostInputs.restore(canonical(value['inputs']), metadata_store=metadata_store,
+            metadata_policy=metadata_policy, test_only=test_only))
         session.identity = value['identity']
         session._declines = value['declines']
         session._failed_outputs = value.get('failed_outputs', [])
         session._reviewed_outputs = value.get('reviewed_outputs', [])
+        session._generation_dispositions = value.get('generation_dispositions', [])
+        session._generation_blobs = value.get('generation_blobs', {})
         for key, record in value.get('pending_reviews', {}).items():
             session._verify_record(record)
             selected, _ = resolver._bindings[(record['metric'], record['model_version'])]
-            selected.verify()
             request = session._review_request(record)
             if digest(request) != key:
                 raise ValueError('pending host review request differs from protected capture')
@@ -1116,7 +1307,7 @@ class HostSession:
         for token, record in value['records'].items():
             row = session._inputs.resolve(record['subject'])
             selected, _ = resolver._bindings[(record['metric'], record['model_version'])]
-            selected.verify()
+            selected.verify_input(row)
             output = record['output']
             parsed = selected.actor.parser(base64.b64decode(output['raw'], validate=True),
                                             json.loads(selected.actor.description)['config'])
@@ -1139,6 +1330,9 @@ class HostSession:
                     raise ValueError('live receipt semantic assessment does not pass for actual output')
                 session._live_assessments[assessment.digest] = assessment
             session._records[token] = canonical(record)
+        if session._generation_dispositions or session._generation_blobs:
+            from .substrate_generation import verify_session
+            verify_session(session)
         return session
 
 
@@ -1154,13 +1348,23 @@ def _restore_callable(identity: dict[str, Any]) -> Callable[..., Any]:
     return value
 
 
-def _restore_bundle(bundle: bytes) -> tuple[Selection, Capture] | tuple[Selection, Capture, BasisAssessment]:
+def _restore_bundle(bundle: bytes, *, metadata_store: Any = None,
+                    source_metadata_policy: dict[str, Any] | None = None,
+                    test_only: TestOnlyPurpose | None = None) -> tuple[Selection, Capture] | tuple[Selection, Capture, BasisAssessment]:
     value = json.loads(bundle)
     if value.get('schema') != 'twin.qualification-bundle/v1':
         raise ValueError('unknown host bundle schema')
     actor_value = value['actor']
+    authority = None
+    if actor_value.get('source_metadata_authority') is not None:
+        from .source_metadata import validate_parent_policy
+        validate_parent_policy(source_metadata_policy, metadata_store)
+        assert source_metadata_policy is not None
+        authority = metadata_store.authority(source_metadata_policy['authority_digest'])
+        if actor_value['source_metadata_authority'] != json.loads(authority.description):
+            raise ValueError('restored actor protected metadata authority differs')
     actor = Actor(canonical(actor_value), _restore_callable(actor_value['runner']),
-                  _restore_callable(actor_value['parser']))
+                  _restore_callable(actor_value['parser']), authority)
     population = Population(canonical(value['population']))
     review_value = value['review']
     review = None
@@ -1170,9 +1374,15 @@ def _restore_bundle(bundle: bytes) -> tuple[Selection, Capture] | tuple[Selectio
             _restore_callable(json.loads(checker_identity)['callable']) if checker_identity else None,
             checker_identity)
     selection_value = value['selection']
+    legacy = selection_value.get('purpose')
+    if legacy and test_only is not TEST_ONLY_MECHANICS:
+        raise ValueError('ordinary operational catalogue cannot restore TEST_ONLY legacy mechanics')
     policy = BasisPolicy(canonical(selection_value['assessment_policy'])) if selection_value.get('assessment_policy') else None
     selected = Selection.freeze(actor, population, _restore_callable(selection_value['basis_checker']),
-        reference_projection=_restore_callable(selection_value['projection']), review=review, assessment_policy=policy)
+        reference_projection=_restore_callable(selection_value['projection']), review=review, assessment_policy=policy,
+        source_metadata_policy=source_metadata_policy if population.metric == 'signal-classify' else None,
+        metadata_store=metadata_store if population.metric == 'signal-classify' else None,
+        test_only=TEST_ONLY_MECHANICS if legacy and test_only is TEST_ONLY_MECHANICS else None)
     if selected.description != canonical(selection_value):
         raise ValueError('archived selection differs from current host binding')
     packet = canonical(value['capture'])
