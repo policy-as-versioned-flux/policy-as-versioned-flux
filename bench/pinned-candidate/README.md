@@ -94,3 +94,30 @@ modified weight refusal after a valid snapshot, real sandboxed versus
 unsandboxed network controls, and termination of a small controlled child that
 crosses the supervisor's RSS cap. They do not load a model or certify its competence.
 The macOS kernel control test skips on other platforms; a skip is no Linux proof.
+
+## Separate Linux kernel control
+
+`linux_network.py --control` uses only the standard library and does not fetch or
+load a model. Run it in a disposable unprivileged Linux x86_64 or aarch64 process.
+It refuses pre-existing sockets/io_uring descriptors, effective capabilities and
+runtime threads. It installs `no_new_privs` plus an architecture-checked seccomp
+filter denying socket/socketpair creation, io_uring setup and pidfd descriptor
+imports. The x86_64 filter also refuses x32 ABI aliases. Unknown platforms refuse.
+
+Eight real socket/syscall controls must return kernel `EPERM`, both immediately
+and after executing a fresh Python child. Pipes and ordinary file I/O remain
+available. The existing Linux determinism runners execute this tiny control;
+the macOS runner does not claim Linux coverage. No schedule, runner, provider or
+model job is added. Source review or a Mac skip alone is not Linux execution proof.
+
+Install the filter in the future dedicated runtime child before loading packages;
+never install it in the parent supervisor or a shared process. It is irreversible
+until that child exits. This is a network control, not general filesystem or
+host isolation. It does not replace independent memory, disk, timeout, package,
+model/source identity or semantic qualification controls. The old Mac smoke and
+its resource bounds remain unchanged; no Linux model feasibility is claimed.
+
+The filter uses the [kernel seccomp interface](https://www.kernel.org/doc/html/next/userspace-api/seccomp_filter.html)
+and [no_new_privs](https://www.kernel.org/doc/html/latest/userspace-api/no_new_privs.html),
+with constants from the Linux v6.16 [x86 syscall table](https://github.com/torvalds/linux/blob/v6.16/arch/x86/entry/syscalls/syscall_64.tbl)
+and [generic syscall definitions](https://github.com/torvalds/linux/blob/v6.16/include/uapi/asm-generic/unistd.h).
