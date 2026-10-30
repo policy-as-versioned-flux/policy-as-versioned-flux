@@ -29,7 +29,7 @@ test_publisher_identity_is_preserved (__main__.FeedEnvelopeTests.test_publisher_
 test_wrong_directory_major_is_refused (__main__.FeedEnvelopeTests.test_wrong_directory_major_is_refused) ... ok
 
 ----------------------------------------------------------------------
-Ran 8 tests in 0.824s
+Ran 8 tests in 0.761s
 
 OK
 
@@ -96,12 +96,12 @@ ok  (f1) the scenario names what each priced figure rests on
 ok  (d) the sized triple never tops the statutory maximum max(cap, rate x turnover)
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 1.657s
+Ran 10 tests in 1.474s
 
 OK
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 4.279s
+Ran 11 tests in 3.529s
 
 OK
 {"synthetic_wrong_target": {"pre_sign": {"exit": 1, "stdout": "", "stderr": "REFUSED: publisher native release gate: ICO publishes only penalty-schema; another cage target cannot authorize this release\n"}, "direct_verify": {"exit": 1, "stdout": "", "stderr": "REFUSED: publisher native release gate: ICO publishes only penalty-schema; another cage target cannot authorize this release\n"}, "original_selected_gate": {"exit": 1, "stdout": "", "stderr": "FAIL: penalty-schema/bump.yaml declares 'patch' but the computed bump for the next release is 'major' (v3.0.0 -> v3.0.1; rule: 'fixture'). The gate has two declarations of one fact and no rule for choosing between them.\n"}}}
