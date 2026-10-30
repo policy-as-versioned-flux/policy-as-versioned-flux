@@ -115,7 +115,8 @@ def test_a_well_shaped_serialized_snapshot_cannot_create_a_protected_receipt():
     assert reasons and any('session' in reason for reason in reasons)
 
 
-def test_protected_caller_clock_and_role_are_not_chosen_by_the_document():
+def test_protected_caller_clock_and_role_are_not_chosen_by_the_document(monkeypatch):
+    monkeypatch.delenv('GITHUB_ACTIONS', raising=False)
     job, state = snapshot('gameplay')
     document = parent.document_from_snapshot(job, state, role='TEST_ONLY-nonrole', clock='local')
     reasons = parent.validate_document(document, q.Resolver(), clock='github')
@@ -312,14 +313,22 @@ def test_registered_job_restores_only_with_actual_original_private_policy(protec
 
 
 @pytest.mark.parametrize('task', ['evolution', 'causal', 'gameplay', 'ethics'])
-def test_public_validator_requires_the_actual_task_session_for_every_clock(task, monkeypatch):
+@pytest.mark.parametrize(('requested_clock', 'github_actions', 'expected_clock'), [
+    ('local', False, 'local'), ('human', False, 'human'), ('local', True, 'github'),
+])
+def test_public_validator_requires_the_actual_task_session_for_every_clock(
+        task, monkeypatch, requested_clock, github_actions, expected_clock):
+    if github_actions:
+        monkeypatch.setenv('GITHUB_ACTIONS', 'true')
+    else:
+        monkeypatch.delenv('GITHUB_ACTIONS', raising=False)
     from pathlib import Path
     from twin.qualified_signals import _validator
     validator = _validator()
     root = str(Path(q.__file__).resolve().parents[1])
     kinds, roles = validator.twin_facts(root)
     job, state = snapshot(task)
-    document = parent.document_from_snapshot(job, state, role='model-steward', clock='local')
+    document = parent.document_from_snapshot(job, state, role='model-steward', clock=requested_clock)
     calls = []
     def deny(doc, resolver, clock):
         calls.append((doc, resolver, clock))
@@ -327,8 +336,8 @@ def test_public_validator_requires_the_actual_task_session_for_every_clock(task,
     monkeypatch.setattr(parent, 'validate_document', deny)
     host = q.Resolver()
     derive, check, lookup = validator.permission_rules(root, host)
-    bad = validator.validate(document, kinds, roles, clock=derive('local')[0], permission=(check, lookup))
-    assert calls == [(document, host, 'local')]
+    bad = validator.validate(document, kinds, roles, clock=derive(requested_clock)[0], permission=(check, lookup))
+    assert calls == [(document, host, expected_clock)]
     assert bad == ['TEST_ONLY protected session denial']
     assert validator.validate(document, kinds, roles)
 
@@ -378,6 +387,7 @@ def restore_task_material(material, session, path):
 
 
 def test_actual_evolution_parent_reviews_restores_and_publicly_checks_complete_original_pins(protected_request, tmp_path, monkeypatch):
+    monkeypatch.delenv('GITHUB_ACTIONS', raising=False)
     from pathlib import Path
     from test_task_sessions import genuine_task_material, task_review_store, TASK_CALLS
     from twin.qualified_signals import _validator

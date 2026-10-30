@@ -10,7 +10,8 @@ from test_task_sessions import genuine_task_material, TASK_CALLS
 from test_task_inputs import protected_request
 
 
-def test_task_document_dispatch_cannot_drop_counted_refusals_on_local_clock():
+def test_task_document_dispatch_cannot_drop_counted_refusals_on_local_clock(monkeypatch):
+    monkeypatch.delenv('GITHUB_ACTIONS', raising=False)
     inputs = q.HostInputs.freeze(({'subject': 'TEST_ONLY-unresolved', 'issuer': 'TEST_ONLY',
         'input': {}, 'context': {}, 'source': {}},), ('TEST_ONLY',))
     resolver = q.Resolver(); session = resolver.host_session(inputs)
