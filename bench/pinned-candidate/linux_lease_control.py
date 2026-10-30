@@ -777,6 +777,15 @@ def original_caller(g: Any) -> Any:
 
 
 def load_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any],dict[str,Any],dict[str,Any]]:
+    return _load_control_host(g,scenario,caller,False)
+
+
+def load_ci_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any],dict[str,Any],dict[str,Any]]:
+    """Separate source-appointed fresh-VM laboratory route, never JSON selection."""
+    return _load_control_host(g,scenario,caller,True)
+
+
+def _load_control_host(g: Any, scenario: str, caller: Any, ci:bool) -> tuple[dict[str,Any],dict[str,Any],dict[str,Any]]:
     validate_descriptor({'schema':SCHEMA,'scenario':scenario})
     anchor_raw=g.protected_read(ANCHOR,maximum=1024*1024)
     anchor=json.loads(anchor_raw)
@@ -807,7 +816,7 @@ def load_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any]
         raise ValueError('fixed installed entry and OS interpreter required')
     facts=principal_facts(g,caller)
     uid,gid=validate_principal(facts)
-    parent='/sys/fs/cgroup/policy-as-versioned-flux-linux-control'
+    parent='/sys/fs/cgroup' if ci else '/sys/fs/cgroup/policy-as-versioned-flux-linux-control'
     g.protected_path(parent,False)
     available=g.parse_set(Path(parent,'cpuset.cpus.effective').read_text()) & os.sched_getaffinity(0)
     if len(available)<2:raise ValueError('two actual eligible CPUs unavailable')
