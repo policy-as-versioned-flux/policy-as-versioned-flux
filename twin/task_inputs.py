@@ -379,7 +379,9 @@ def verify_output(payload: dict[str, Any], stated: q.Stated) -> None:
     """Mechanical target/witness consistency only; never semantic entailment."""
     if stated.answer is None:
         if stated.basis is not None:
-            raise ValueError('declined task cannot invent basis')
+            validate('Decline', stated.basis)
+            if not stated.basis['decline'].strip():
+                raise ValueError('factual task decline requires actual reason')
         return
     schema = payload.get('schema')
     task = next((name for name in ('evolution', 'causal', 'gameplay', 'ethics') if schema == f'twin.{name}-input/v2'), None)
@@ -398,7 +400,8 @@ def verify_output(payload: dict[str, Any], stated: q.Stated) -> None:
                           'elasticity_definition': measurement['elasticity_definition']}
         if (any(edge[key] != target[key] for key in ('from', 'to')) or answer['units'] != expected_units
                 or not edge['elasticity']['min'] <= edge['elasticity']['mode'] <= edge['elasticity']['max']
-                or [item['id'] for item in answer['confounders']] != [item['id'] for item in payload['task']['candidate_confounders']]):
+                or len({item['id'] for item in answer['confounders']}) != len(answer['confounders'])
+                or {item['id'] for item in answer['confounders']} != {item['id'] for item in payload['task']['candidate_confounders']}):
             raise ValueError('complete causal target/units/confounder/PERT binding differs')
     elif task == 'gameplay':
         checks = stated.basis['checks']
