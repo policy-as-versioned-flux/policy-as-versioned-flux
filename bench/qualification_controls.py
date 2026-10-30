@@ -128,6 +128,50 @@ def observed_runtime_actor(payload, config):
     return q.RuntimeResult(literal_actor(payload, config), {'build': 'TEST_ONLY observed build-A'})
 
 
+def defaulted_runner(payload, config, offset=0):
+    return literal_actor({**payload, 'position': payload['position'] + offset}, config)
+
+
+def nested_default_runner(payload, config, offsets=(0, {'fallback': [0]})):
+    return literal_actor({**payload, 'position': payload['position'] + offsets[0] + offsets[1]['fallback'][0]}, config)
+
+
+def defaulted_parser(raw, config, keys=('position', {'basis': ['evidence']})):
+    value = json.loads(raw)
+    return Stated({'evolution_position': value[keys[0]]}, value[keys[1]['basis'][0]])
+
+
+def keyword_default_parser(raw, config, *, keys={'position': ('position',), 'basis': ['evidence']}):
+    value = json.loads(raw)
+    return Stated({'evolution_position': value[keys['position'][0]]}, value[keys['basis'][0]])
+
+
+def defaulted_basis_checker(actual, expected, prefixes=('TEST_ONLY',)):
+    return actual == expected['witness'] and actual.startswith(prefixes)
+
+
+def defaulted_review_checker(record, population, *, issuer=('TEST_ONLY-population-custodian',)):
+    return json.loads(record).get('issuer') == issuer[0]
+
+
+def defaulted_reference_projection(metric, expected, version=(1,)):
+    if version != (1,):
+        return {'evolution_position': -1}
+    return q.project_reference(metric, expected)
+
+
+def changed_defaulted_runner(payload, config, offset=0):
+    return literal_actor({**payload, 'position': payload['position'] + offset + 1}, config)
+
+
+def defaulted_selection():
+    original = reviewed_mechanical_selection()
+    review = q.PopulationReview.freeze(original.population, original.review.record, defaulted_review_checker)
+    actor = q.Actor.freeze(defaulted_runner, keyword_default_parser, {'purpose': 'TEST_ONLY'})
+    return q.Selection.freeze(actor, original.population, defaulted_basis_checker,
+        reference_projection=defaulted_reference_projection, review=review)
+
+
 def wrong_basis_actor(payload, config):
     return json.dumps({'position': payload['position'], 'evidence': 'foreign witness'}).encode()
 

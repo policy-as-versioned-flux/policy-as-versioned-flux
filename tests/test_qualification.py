@@ -15,6 +15,9 @@ from bench.qualification_controls import signal_selection
 from bench.qualification_controls import intermittent_actor, failing_actor, wrong_basis_actor
 from bench.qualification_controls import reviewed_mechanical_selection
 from bench.qualification_controls import observed_runtime_actor
+from bench.qualification_controls import (defaulted_runner, nested_default_runner, defaulted_parser,
+    keyword_default_parser, defaulted_basis_checker, defaulted_review_checker, changed_defaulted_runner,
+    defaulted_reference_projection, defaulted_selection)
 
 
 
@@ -497,3 +500,90 @@ def test_response_identity_strings_cannot_supply_missing_host_runtime_observatio
     output = actor.invoke({'position': 0.25, 'evidence': 'literal supplied witness',
                            'model_version': 'claimed model', 'runtime': {'build': 'declared build'}})
     assert output.failure and 'host runtime' in output.failure
+
+
+@pytest.mark.parametrize('runner,parser', [(defaulted_runner, parse_position),
+    (literal_actor, defaulted_parser), (nested_default_runner, keyword_default_parser)])
+def test_unchanged_defaulted_module_adapters_invoke_the_actual_callable(runner, parser):
+    actor = q.Actor.freeze(runner, parser, {'purpose': 'TEST_ONLY'})
+    output = actor.invoke({'position': 0.25, 'evidence': 'literal supplied witness'})
+    assert not output.failure
+    assert output.stated == Stated({'evolution_position': 0.25}, 'literal supplied witness')
+
+
+def test_defaulted_runner_parser_basis_and_custody_checker_restore_in_a_separate_process(tmp_path):
+    import subprocess
+    import sys
+    selected = defaulted_selection()
+    captured = selected.capture()
+    scores = tmp_path / 'scores.jsonl'
+    selected.record(captured, '2026-10-30T00:00:00Z', scores)
+    resolver = q.Resolver(((selected, captured),), scores, allow_test_only=True)
+    assert resolver.permission('evolution-judge', selected.actor.model_version).granted
+    bundle = selected.archive(captured)
+    (tmp_path / 'selection.json').write_bytes(bundle)
+    catalogue = q.canonical({'schema': 'twin.qualification-registry/v1', 'entries': [
+        {'bundle': 'selection.json', 'sha256': hashlib.sha256(bundle).hexdigest()}]})
+    path = tmp_path / 'catalogue.json'
+    path.write_bytes(catalogue)
+    child = subprocess.run([sys.executable, '-c',
+        'import json,sys; from pathlib import Path; from twin.qualification import Resolver; '
+        'r=Resolver.from_catalogue(Path(sys.argv[1]),sys.argv[2],Path(sys.argv[3]),allow_test_only=True); '
+        'print(json.dumps(r.permission("evolution-judge",sys.argv[4]).granted))',
+        str(path), hashlib.sha256(catalogue).hexdigest(), str(scores), selected.actor.model_version],
+        text=True, capture_output=True)
+    assert child.returncode == 0, child.stderr
+    assert json.loads(child.stdout) is True
+
+
+@pytest.mark.parametrize('target,attribute,replacement', [
+    (defaulted_runner, '__defaults__', (0.25,)),
+    (keyword_default_parser, '__kwdefaults__', {'keys': {'position': ('evidence',), 'basis': ['position']}}),
+    (defaulted_basis_checker, '__defaults__', (('foreign-prefix',),)),
+    (defaulted_review_checker, '__kwdefaults__', {'issuer': ('foreign-custodian',)}),
+    (defaulted_reference_projection, '__defaults__', ((2,),)),
+    (defaulted_runner, '__code__', changed_defaulted_runner.__code__),
+])
+def test_actual_default_or_code_mutations_revoke_the_frozen_selection(tmp_path, target, attribute, replacement):
+    selected = defaulted_selection()
+    captured = selected.capture()
+    path = tmp_path / 'scores.jsonl'
+    selected.record(captured, '2026-10-30T00:00:00Z', path)
+    resolver = q.Resolver(((selected, captured),), path, allow_test_only=True)
+    assert resolver.permission('evolution-judge', selected.actor.model_version).granted
+    original = getattr(target, attribute)
+    try:
+        setattr(target, attribute, replacement)
+        assert not resolver.permission('evolution-judge', selected.actor.model_version).granted
+    finally:
+        setattr(target, attribute, original)
+
+
+def test_nested_mutable_default_values_and_tuple_list_types_remain_identity_relevant():
+    import copy
+    actor = q.Actor.freeze(nested_default_runner, parse_position, {'purpose': 'TEST_ONLY'})
+    original = nested_default_runner.__defaults__
+    try:
+        changed = copy.deepcopy(original)
+        changed[0][1]['fallback'][0] = 0.25
+        nested_default_runner.__defaults__ = changed
+        with pytest.raises(ValueError, match='adapter changed'):
+            actor.invoke({'position': 0.25, 'evidence': 'literal'})
+        nested_default_runner.__defaults__ = ([0, {'fallback': [0]}],)
+        with pytest.raises(ValueError, match='adapter changed'):
+            actor.invoke({'position': 0.25, 'evidence': 'literal'})
+    finally:
+        nested_default_runner.__defaults__ = original
+
+
+def test_a_signed_zero_default_change_cannot_hide_behind_python_numeric_equality():
+    original = defaulted_runner.__defaults__
+    try:
+        defaulted_runner.__defaults__ = (-0.0,)
+        actor = q.Actor.freeze(defaulted_runner, parse_position, {'purpose': 'TEST_ONLY'})
+        assert b'-0.0' in actor.invoke({'position': -0.0, 'evidence': 'literal'}).raw
+        defaulted_runner.__defaults__ = (0.0,)
+        with pytest.raises(ValueError, match='adapter changed'):
+            actor.invoke({'position': -0.0, 'evidence': 'literal'})
+    finally:
+        defaulted_runner.__defaults__ = original

@@ -21,6 +21,11 @@ actual runtime against that configuration. An arbitrary provider's reported mode
 not attestation. The historical smoke adapter demonstrates asset/build verification; this
 change does not install a general model provider.
 
+Callable defaults have one JSON-safe comparison identity across freezing, verification and
+durable import. It preserves scalar types, nested tuples/lists, mapping order and shared default
+state; changing those defaults still changes the actor. Built-in JSON-compatible defaults are
+supported. Custom objects or cyclic defaults require explicit invocation configuration.
+
 A live runner returns `RuntimeResult(raw, observed_runtime)` using observations obtained by
 trusted backend code from the actual loaded assets/build/computation. Those observations must
 match `config.runtime_contract`, the same immutable contract used for invocation, before parsing
