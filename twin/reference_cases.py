@@ -246,6 +246,16 @@ def _fraction(value: Any) -> bool:
 
 def _contains_reference_fields(value: Any) -> bool:
     if isinstance(value, dict):
+        if value.get('schema') == 'twin.source-metadata-public/v1':
+            # Publication basis describes a retained publisher date assertion. Only the
+            # complete closed source schema gets this vocabulary; hidden answer fields
+            # and malformed/extra fields retain the ordinary reference guard below.
+            from .source_metadata import validate_public_projection
+            try:
+                validate_public_projection(value)
+                return False
+            except (ValueError, KeyError, TypeError):
+                return True
         return bool({'expected', 'basis', 'field_support', 'reference_kind'} & value.keys()) or any(
             _contains_reference_fields(v) for v in value.values())
     return isinstance(value, list) and any(_contains_reference_fields(v) for v in value)

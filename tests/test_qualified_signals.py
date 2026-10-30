@@ -19,7 +19,7 @@ def signal_inputs(**changes):
             'provenance': {'url': 'https://test.invalid/fixture'}}}
     context.update(changes)
     return q.HostInputs.freeze(({'subject': 'TEST_ONLY-live', 'input': payload, 'context': context,
-        'source': source, 'issuer': 'TEST_ONLY-host'},), ('TEST_ONLY-host',))
+        'source': source, 'issuer': 'TEST_ONLY-host'},), ('TEST_ONLY-host',), test_only=q.TEST_ONLY_MECHANICS)
 
 
 def test_host_resolves_the_eligible_universe_without_preselecting_the_answer():
@@ -132,7 +132,7 @@ def test_self_consistent_changed_host_closure_cannot_borrow_the_qualified_frame(
     row['input']['model_context'] = {'pins': row['context']['model_pins']}
     row['source'] = source_record(q.canonical(row['input']), 'TEST_ONLY', 'v2')
     row['context']['source_sha256'] = row['source']['sha256']
-    inputs = q.HostInputs(q.canonical(value))
+    inputs = q.HostInputs(q.canonical(value), _test_only=q.TEST_ONLY_MECHANICS)
     inputs.resolve('TEST_ONLY-live')
     session = resolver.host_session(inputs)
     result = session.judge('signal-classify', selected.actor.model_version, 'TEST_ONLY-live')
@@ -151,7 +151,8 @@ def test_signal_eligible_set_cannot_replace_an_evolution_fixed_target(tmp_path):
     row['context']['candidate_universe_digest'] = q.digest(row['input']['candidates'])
     row['source'] = source_record(q.canonical(row['input']), 'TEST_ONLY', 'v1')
     row['context']['source_sha256'] = row['source']['sha256']
-    inputs = q.HostInputs(q.canonical(value))
+    value['purpose'] = q.TEST_ONLY_MECHANICS.value
+    inputs = q.HostInputs(q.canonical(value), _test_only=q.TEST_ONLY_MECHANICS)
     inputs.resolve('live-one')
     selected, resolver, session = host_setup(tmp_path, inputs)
     result = session.judge('evolution-judge', selected.actor.model_version, 'live-one')
@@ -204,4 +205,5 @@ def test_qualification_input_cannot_borrow_a_different_declared_live_context(cha
     population = q.Population.freeze('signal-classify', tuple(admissions), value['envelope'], value['exposure'])
     with pytest.raises(ValueError, match='qualification input|qualified signal'):
         q.Selection.freeze(selected.actor, population, controls.basis_holds,
-            review=q.PopulationReview.test_only(population), assessment_policy=selected.assessment_policy)
+            review=q.PopulationReview.test_only(population), assessment_policy=selected.assessment_policy,
+            test_only=q.TEST_ONLY_MECHANICS)
