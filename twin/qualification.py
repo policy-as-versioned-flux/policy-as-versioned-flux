@@ -454,6 +454,14 @@ class Selection:
         functions = (basis_checker, reference_projection, rss.scorer_for(population.metric))
         sources = {_source_name(Path(inspect.getfile(fn))): hashlib.sha256(
             Path(inspect.getfile(fn)).read_bytes()).hexdigest() for fn in functions}
+        if population.metric == 'substrate-generator':
+            from . import substrate_generation, substrate_recipe_basis
+            if basis_checker is not substrate_recipe_basis.check or reference_projection is not project_reference:
+                raise ValueError('generator requires the reviewed independent checker and approved reference projection')
+            substrate_generation.validate_population(actor, population)
+            for module in (substrate_generation, substrate_recipe_basis):
+                path = Path(inspect.getfile(module))
+                sources[_source_name(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
         description = {'actor': actor.digest, 'population': population.digest,
                               'basis_checker': identity, 'projection': _callable_identity(reference_projection),
                               'sources': sources, 'review': review.digest if review else None}
@@ -788,6 +796,8 @@ class Resolver:
 
     def check_claim_document(self, doc: dict[str, Any], clock: str,
                              _lookup: Callable[[str, str], mp.Permission] | None = None) -> list[str]:
+        if doc.get('schema') == 'twin.substrate-generation/v1':
+            return self.check_generation_document(doc, clock)
         bad = mp.check_claim_document(doc, clock, self.permission)
         if clock != mp.GOVERNED_CLOCK:
             return bad
@@ -796,6 +806,14 @@ class Resolver:
         if session is None:
             return bad + ['no protected host session for this claim; model-provided identity is insufficient']
         return bad + session.check_document(doc)
+
+    def check_generation_document(self, doc: dict[str, Any], clock: str) -> list[str]:
+        from .substrate_generation import check_document
+        identity = (doc.get('run') or {}).get('host_session')
+        session = self._sessions.get(identity) if isinstance(identity, str) else None
+        if session is None:
+            return ['no protected host session for generation document']
+        return check_document(session, doc, clock)
 
 
 @dataclass(frozen=True)
@@ -853,6 +871,9 @@ class HostInputs:
 def _scope_reasons(population: Population, context: dict[str, Any]) -> list[str]:
     envelope = population.envelope
     reasons = []
+    if population.metric == 'substrate-generator':
+        from .substrate_generation import scope_reasons
+        reasons.extend(scope_reasons(population, context))
     for field, allowed in (('organisation', 'adopters'), ('domain', 'domains'),
                            ('capability', 'capabilities'), ('frame', 'frames'), ('source', 'sources')):
         if context.get(field) not in envelope[allowed]:
@@ -895,6 +916,8 @@ class HostSession:
         self._pending: dict[str, bytes] = {}
         self._live_assessments: dict[str, BasisAssessment] = {}
         self._reviewed_outputs: list[dict[str, Any]] = []
+        self._generation_dispositions: list[dict[str, Any]] = []
+        self._generation_blobs: dict[str, str] = {}
 
     @property
     def declines(self) -> list[dict[str, str]]:
@@ -979,6 +1002,9 @@ class HostSession:
                 raise ValueError('; '.join(reasons))
             if metric != 'signal-classify' and not row['context'].get('component'):
                 raise ValueError('non-signal judgement requires its fixed host component')
+            if metric == 'substrate-generator':
+                from .substrate_generation import validate_row
+                validate_row(row, selected.actor.model_version)
             if metric == 'signal-classify':
                 if selected.assessment_policy and 'eligible_components' not in row['context']:
                     raise ValueError('reviewed signal actor requires the full protected eligible universe')
@@ -1093,7 +1119,9 @@ class HostSession:
             'records': {token: json.loads(packet) for token, packet in self._records.items()},
             'declines': self.declines, 'failed_outputs': self._failed_outputs,
             'pending_reviews': {key: json.loads(value) for key, value in self._pending.items()},
-            'reviewed_outputs': self._reviewed_outputs})
+            'reviewed_outputs': self._reviewed_outputs,
+            'generation_dispositions': self._generation_dispositions,
+            'generation_blobs': self._generation_blobs})
 
     @classmethod
     def restore(cls, archive: bytes, resolver: Resolver) -> HostSession:
@@ -1105,6 +1133,8 @@ class HostSession:
         session._declines = value['declines']
         session._failed_outputs = value.get('failed_outputs', [])
         session._reviewed_outputs = value.get('reviewed_outputs', [])
+        session._generation_dispositions = value.get('generation_dispositions', [])
+        session._generation_blobs = value.get('generation_blobs', {})
         for key, record in value.get('pending_reviews', {}).items():
             session._verify_record(record)
             selected, _ = resolver._bindings[(record['metric'], record['model_version'])]
@@ -1139,6 +1169,9 @@ class HostSession:
                     raise ValueError('live receipt semantic assessment does not pass for actual output')
                 session._live_assessments[assessment.digest] = assessment
             session._records[token] = canonical(record)
+        if session._generation_dispositions or session._generation_blobs:
+            from .substrate_generation import verify_session
+            verify_session(session)
         return session
 
 
