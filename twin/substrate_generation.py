@@ -299,7 +299,23 @@ class GenerationParent:
     def start(self, inputs: q.HostInputs) -> GenerationRun:
         session = self.resolver.host_session(inputs)
         run = GenerationRun(self, session)
-        for row in json.loads(inputs.description)['records']:
+        rows = json.loads(inputs.description)['records']
+        try:
+            organisations = {inputs.resolve(row['subject'])['context']['organisation'] for row in rows}
+            if len(organisations) > 1:
+                raise ValueError('cross-adopter generation runs are outside the protected envelope')
+            if len(organisations) != 1 or not organisations <= set(SCOPES):
+                raise ValueError('generation run requires one established supported adopter')
+        except (ValueError, KeyError, TypeError) as exc:
+            scope_reason = 'unsupported generation run scope: ' + str(exc)
+            for row in rows:
+                session._declines.append({'subject': row['subject'], 'reason': scope_reason})
+                run.results.append(q.Judgement(None, scope_reason))
+                session._generation_dispositions.append({
+                    'attempt_index': len(session._generation_dispositions), 'subject': row['subject'],
+                    'state': 'host-decline', 'host_decline_index': len(session.declines) - 1, 'reason': scope_reason})
+            return run
+        for row in rows:
             result = session.judge(METRIC, self.model_version, row['subject'])
             run.results.append(result)
             final: dict[str, Any] = {'attempt_index': len(session._generation_dispositions), 'subject': row['subject']}
