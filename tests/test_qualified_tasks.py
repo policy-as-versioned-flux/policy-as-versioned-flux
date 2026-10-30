@@ -287,6 +287,19 @@ def test_registered_job_restores_only_with_actual_original_private_policy(protec
     assert (tmp_path / 'stale-contract' / 'host-session.json').is_file()
     (tmp_path / 'job.json').write_bytes(bundle)
     catalogue.write_bytes(registry)
+    missing_review = json.loads(bundle)
+    missing_review['review_store'] = {'path': 'missing-review.json', 'sha256': '0' * 64}
+    missing_raw = q.canonical(missing_review)
+    (tmp_path / 'job.json').write_bytes(missing_raw)
+    missing_registry = json.loads(registry)
+    missing_registry['task_jobs']['evolution']['driftwood']['sha256'] = hashlib.sha256(missing_raw).hexdigest()
+    catalogue.write_bytes(q.canonical(missing_registry))
+    unavailable = parent.run_registered('evolution', 'driftwood', tmp_path / 'unavailable-review', resolver=host)
+    assert len(unavailable['attempts']) == len(unavailable['declined']) == 1
+    assert unavailable['attempts'][0]['capture_sha256'] is None and unavailable['accepted'] is False
+    assert (tmp_path / 'unavailable-review' / 'host-session.json').is_file()
+    (tmp_path / 'job.json').write_bytes(bundle)
+    catalogue.write_bytes(registry)
     without = parent.run_registered('evolution', 'driftwood', tmp_path / 'without-handles', resolver=q.Resolver())
     assert without['accepted'] is False and without['attempts'] == []
     assert 'policy' in without['reasons'][0]
@@ -364,7 +377,7 @@ def restore_task_material(material, session, path):
     return host, host.task_session(session.task_snapshot()['identity'])
 
 
-def test_actual_evolution_parent_reviews_restores_and_publicly_checks_complete_original_pins(protected_request, tmp_path):
+def test_actual_evolution_parent_reviews_restores_and_publicly_checks_complete_original_pins(protected_request, tmp_path, monkeypatch):
     from pathlib import Path
     from test_task_sessions import genuine_task_material, task_review_store, TASK_CALLS
     from twin.qualified_signals import _validator
@@ -407,6 +420,33 @@ def test_actual_evolution_parent_reviews_restores_and_publicly_checks_complete_o
     assert json.loads((tmp_path / 'accepted-parent' / 'claim.json').read_bytes()) == document
     final_host, final_session = restore_task_material(material, restored, tmp_path / 'accepted-import')
     assert parent.TaskParent(final_host, clock='local').resume(material['job'], final_session).validate() == []
+    assert len(TASK_CALLS) == before + 1
+    registered = tmp_path / 'registered-resume'; registered.mkdir()
+    (registered / 'inputs.json').write_bytes(material['inputs'].description)
+    bundle = {'schema': 'twin.protected-task-job/v1', 'execution': material['job'],
+        'task_policy_sha256': material['host_policy'].digest, 'resume_session': final_session.identity,
+        'inputs': {'path': 'inputs.json', 'sha256': hashlib.sha256(material['inputs'].description).hexdigest()},
+        'review_store': {'path': 'missing-review.json', 'sha256': '0' * 64}}
+    def install_bundle():
+        raw = q.canonical(bundle); (registered / 'job.json').write_bytes(raw)
+        catalogue = registered / 'registry.json'
+        catalogue.write_bytes(q.canonical({'schema': 'twin.qualification-registry/v1', 'entries': [],
+            'task_jobs': {'evolution': {'driftwood': {'path': 'job.json', 'sha256': hashlib.sha256(raw).hexdigest()}}}}))
+        monkeypatch.setattr(parent, 'CATALOGUE', catalogue)
+    install_bundle()
+    missing = parent.run_registered('evolution', 'driftwood', tmp_path / 'resume-missing-review', 'local', resolver=final_host)
+    assert missing['accepted'] is False and missing['attempts'] == final_session.task_snapshot()['attempts']
+    assert (tmp_path / 'resume-missing-review' / 'host-session.json').read_bytes() == final_session.archive()
+    other = material['resolved'][3].host_record
+    other_inputs = q.HostInputs.freeze((other,), (other['issuer'],), task_policy=material['policy'])
+    (registered / 'inputs.json').write_bytes(other_inputs.description)
+    del bundle['review_store']
+    bundle['task_policy_sha256'] = material['policy'].digest
+    bundle['inputs']['sha256'] = hashlib.sha256(other_inputs.description).hexdigest()
+    install_bundle()
+    mismatched = parent.run_registered('evolution', 'driftwood', tmp_path / 'resume-different-inputs', 'local', resolver=final_host)
+    assert mismatched['accepted'] is False and any('original inputs' in reason for reason in mismatched['reasons'])
+    assert mismatched['attempts'] == final_session.task_snapshot()['attempts']
     assert len(TASK_CALLS) == before + 1
     for decision in ('fail', 'held'):
         refused = parent.TaskParent(material['resolver'], clock='local').start(material['job'], material['inputs'])
