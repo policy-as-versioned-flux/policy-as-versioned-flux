@@ -103,13 +103,13 @@ def _probes() -> list[dict[str, Any]]:
             observed.append({'probe': family_name + '/' + kind_name, 'errno': actual_errno})
     libc = ctypes.CDLL(None, use_errno=True)
     libc.syscall.restype = ctypes.c_long
-    for name, number, args in [('raw-socket', socket_nr, (2, 1, 0)),
+    for name, number, args in [('socket-syscall', socket_nr, (2, 1, 0)),
                                ('io-uring', 425, (0, 0)),
                                ('pidfd-getfd', 438, (-1, 0, 0))]:
         ctypes.set_errno(0)
         result = libc.syscall(ctypes.c_long(number), *args)
         observed.append({'probe': name, 'errno': ctypes.get_errno() if result == -1 else 0})
-        if name == 'raw-socket' and result >= 0:
+        if name == 'socket-syscall' and result >= 0:
             os.close(result)
     try:
         left, right = socket.socketpair()
@@ -122,7 +122,9 @@ def _probes() -> list[dict[str, Any]]:
     return observed
 
 
-def _observed() -> dict[str, Any]:
+def observe_network_denial() -> dict[str, Any]:
+    """Check the actual kernel state and socket/syscall denials without installing a filter."""
+    _profile()
     record: dict[str, Any] = {
         'state': {key: _state()[key].strip() for key in ('NoNewPrivs', 'Seccomp')},
         'probes': _probes()}
@@ -142,13 +144,13 @@ def main() -> int:
     try:
         _profile()
         if args.probe:
-            record = _observed()
+            record = observe_network_denial()
         else:
             # Show that the disposable process initially has a working local socket syscall.
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM):
                 pass  # creation only: no connection, listener, packet or external contact
             policy = install_network_denial()
-            record = dict(_observed(), policy=policy)
+            record = dict(observe_network_denial(), policy=policy)
             child = subprocess.run([sys.executable, '-I', str(Path(__file__).resolve()), '--probe'],
                                    stdin=subprocess.DEVNULL, capture_output=True, text=True,
                                    timeout=10, check=False)

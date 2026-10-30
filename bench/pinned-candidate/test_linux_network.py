@@ -22,6 +22,8 @@ class LinuxNetworkTests(unittest.TestCase):
     def test_an_actual_non_linux_host_is_refused(self):
         with self.assertRaisesRegex(RuntimeError, 'Linux'):
             network.install_network_denial()
+        with self.assertRaisesRegex(RuntimeError, 'Linux'):
+            network.observe_network_denial()
 
     @unittest.skipUnless(UNPRIVILEGED_LINUX, 'requires an unprivileged actual Linux child')
     def test_real_kernel_denies_network_and_exec_child_inherits_it(self):

@@ -112,7 +112,10 @@ model job is added. Source review or a Mac skip alone is not Linux execution pro
 
 Install the filter in the future dedicated runtime child before loading packages;
 never install it in the parent supervisor or a shared process. It is irreversible
-until that child exits. This is a network control, not general filesystem or
+until that child exits. `install_network_denial()` returns the installed policy
+identity; `observe_network_denial()` checks actual kernel state and eight denials.
+Call both in that child before loading the runtime. The direct socket syscall
+probe creates a TCP socket, not a `SOCK_RAW` socket. This is a network control, not general filesystem or
 host isolation. It does not replace independent memory, disk, timeout, package,
 model/source identity or semantic qualification controls. The old Mac smoke and
 its resource bounds remain unchanged; no Linux model feasibility is claimed.
