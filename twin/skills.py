@@ -341,7 +341,8 @@ def _verdict(item: dict[str, Any], output: Any, scorer: Scorer, basis_scorer: Ba
 
 
 def record_score(
-    result: EvalResult, model_version: str, recorded_at: str, path: Path | None = None
+    result: EvalResult, model_version: str, recorded_at: str, path: Path | None = None,
+    *, binding: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Append one eval to the score-over-time log. `recorded_at` is supplied by the caller rather
     than read from the clock — the same discipline `drift.report(now, ...)` uses — so recording is
@@ -370,6 +371,8 @@ def record_score(
         "measured_count": result.measured_count,
     }
     target = path or SCORES_PATH
+    if binding is not None:
+        entry['qualification'] = dict(binding)
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(entry, sort_keys=True) + "\n")

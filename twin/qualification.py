@@ -1,0 +1,945 @@
+"""Host-owned actor/population bindings around the existing skill evaluator.
+
+Bindings identify measured computation, not the truth of a custodian's references. The host
+owns adapters/configuration and keeps its session outside the model child. Model output and
+claim documents cannot register an actor or manufacture a host invocation receipt.
+"""
+from __future__ import annotations
+
+import base64
+from dataclasses import dataclass, field
+import hashlib
+import hmac
+import importlib
+import inspect
+import json
+import marshal
+from pathlib import Path
+import platform
+import sys
+import secrets
+import types
+from typing import Any, Callable
+from datetime import date
+
+from .skills import Stated, EvalResult, evaluate, record_score, load_scores, threshold_for, min_items_for
+from .reference_cases import Admission
+from . import record_skill_scores as rss
+from . import model_permission as mp
+from .canon import digest_of
+
+
+def canonical(value: Any) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False,
+                      allow_nan=False).encode()
+
+
+def digest(value: Any) -> str:
+    return hashlib.sha256(canonical(value)).hexdigest()
+
+
+def _runtime() -> dict[str, str]:
+    return {'platform': platform.platform(), 'python': sys.version,
+            'executable_sha256': hashlib.sha256(Path(sys.executable).read_bytes()).hexdigest()}
+
+
+def _source_name(path: Path) -> str:
+    try:
+        return 'repo:' + path.resolve().relative_to(Path(__file__).resolve().parents[1]).as_posix()
+    except ValueError:
+        return 'external:' + str(path.resolve())
+
+
+def _source_path(name: str) -> Path:
+    kind, value = name.split(':', 1)
+    if kind == 'repo':
+        root = Path(__file__).resolve().parents[1]
+        path = root / value
+        if not path.resolve().is_relative_to(root):
+            raise ValueError('support source escapes the protected checkout')
+        return path
+    if kind == 'external':
+        return Path(value)
+    raise ValueError('unknown source identity')
+
+
+def _code_identity(code: types.CodeType) -> types.CodeType:
+    return code.replace(co_filename='<host-source>', co_consts=tuple(
+        _code_identity(value) if isinstance(value, types.CodeType) else value for value in code.co_consts))
+
+
+def _default_identity(value: Any) -> dict[str, Any]:
+    """JSON-safe defaults without losing tuple/list types, mapping order or shared state.
+
+    The actual imported function retains its Python defaults; this is only their comparison
+    identity. Built-in JSON scalars/collections are supported, including nested tuples. Custom
+    objects and cycles require explicit invocation config instead of implicit captured state.
+    """
+    seen: dict[int, int] = {}
+    active: set[int] = set()
+    def encode(item: Any) -> dict[str, Any]:
+        kind = type(item)
+        if kind is float:
+            return {'kind': 'float', 'value': canonical(item).decode()}
+        if kind in (type(None), bool, int, str):
+            return {'kind': kind.__name__, 'value': item}
+        if kind not in (tuple, list, dict):
+            raise ValueError('unsupported callable default; use explicit config')
+        identity = id(item)
+        if identity in active:
+            raise ValueError('cyclic callable default; use explicit config')
+        if identity in seen:
+            return {'kind': 'alias', 'index': seen[identity]}
+        index = seen[identity] = len(seen)
+        active.add(identity)
+        values: list[Any]
+        if kind is dict:
+            if any(type(key) not in (type(None), bool, int, float, str) for key in item):
+                raise ValueError('unsupported callable default mapping key; use explicit config')
+            values = [[encode(key), encode(child)] for key, child in item.items()]
+        else:
+            values = [encode(child) for child in item]
+        active.remove(identity)
+        return {'kind': kind.__name__, 'index': index, 'items': values}
+    return encode(value)
+
+
+def _callable_identity(fn: Callable[..., Any]) -> dict[str, Any]:
+    if not inspect.isfunction(fn) or fn.__closure__:
+        raise ValueError('host adapters must be module functions without captured state; use config')
+    return {'module': fn.__module__, 'name': fn.__qualname__,
+            'code_sha256': hashlib.sha256(marshal.dumps(_code_identity(fn.__code__))).hexdigest(),
+            'defaults': _default_identity({'positional': fn.__defaults__, 'keyword': fn.__kwdefaults__})}
+
+
+@dataclass(frozen=True)
+class Output:
+    packet: bytes
+
+    @property
+    def raw(self) -> bytes:
+        return base64.b64decode(json.loads(self.packet)['raw'])
+
+    @property
+    def stated(self) -> Stated:
+        value = json.loads(self.packet)
+        return Stated(value['answer'], value['basis'])
+
+    @property
+    def actor_digest(self) -> str:
+        return str(json.loads(self.packet)['actor_digest'])
+
+    @property
+    def failure(self) -> str | None:
+        return json.loads(self.packet).get('failure')
+
+
+@dataclass(frozen=True)
+class RuntimeResult:
+    """Trusted runner observations, kept outside model-produced response bytes.
+
+    A backend adapter obtains these from its actual assets/build/loaded computation. A parser
+    cannot construct them after reading the response, and their required shape is frozen in
+    the same runtime_contract that the runner receives for invocation.
+    """
+    raw: bytes
+    observed_runtime: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class Actor:
+    """Actual adapters plus immutable invocation config; neither comes from a model response."""
+    description: bytes
+    runner: Callable[[Any, dict[str, Any]], bytes | RuntimeResult]
+    parser: Callable[[bytes, dict[str, Any]], Stated]
+
+    @classmethod
+    def freeze(cls, runner: Callable[[Any, dict[str, Any]], bytes | RuntimeResult],
+               parser: Callable[[bytes, dict[str, Any]], Stated], config: dict[str, Any],
+               *, support: tuple[Path, ...] = ()) -> Actor:
+        paths = {Path(__file__).resolve(), *(Path(inspect.getfile(fn)).resolve() for fn in (runner, parser))} | {
+            path.resolve() for path in support}
+        sources = {_source_name(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+        return cls(canonical({'config': config, 'runtime': _runtime(), 'sources': sources,
+                              'runner': _callable_identity(runner),
+                              'parser': _callable_identity(parser)}), runner, parser)
+
+    @property
+    def digest(self) -> str:
+        return hashlib.sha256(self.description).hexdigest()
+
+    @property
+    def model_version(self) -> str:
+        return 'actor-' + self.digest
+
+    def verify(self) -> None:
+        value = json.loads(self.description)
+        if (value['runtime'] != _runtime() or value['runner'] != _callable_identity(self.runner)
+                or value['parser'] != _callable_identity(self.parser)):
+            raise ValueError('actor runtime or adapter changed')
+        for name, expected in value['sources'].items():
+            if hashlib.sha256(_source_path(name).read_bytes()).hexdigest() != expected:
+                raise ValueError('actor support source changed')
+
+    def invoke(self, payload: Any) -> Output:
+        self.verify()
+        original = canonical(payload)
+        config = json.loads(self.description)['config']
+        raw = None
+        observed_runtime = None
+        failure = None
+        stated = Stated(None, None)
+        try:
+            produced = self.runner(json.loads(original), config)
+            if isinstance(produced, RuntimeResult):
+                raw = produced.raw
+                observed_runtime = json.loads(canonical(produced.observed_runtime))
+                if not config.get('runtime_contract') or canonical(observed_runtime) != canonical(config['runtime_contract']):
+                    raise ValueError('observed host runtime differs from the immutable invocation contract')
+            else:
+                raw = produced
+                if (config.get('runtime_contract') or
+                        config.get('purpose') != 'TEST_ONLY' and not config.get('capture_replay')):
+                    raise ValueError('trusted host runtime observations required; response identity strings do not attest execution')
+            if not isinstance(raw, bytes):
+                raw = None
+                raise ValueError('actor must retain raw output bytes')
+            stated = self.parser(raw, json.loads(self.description)['config'])
+            if not isinstance(stated, Stated):
+                raise ValueError('actor parser must retain stated answer and actual basis')
+            canonical({'answer': stated.answer, 'basis': stated.basis})
+        except Exception as exc:  # an attempted item stays in the denominator, including parser failure
+            failure = type(exc).__name__ + ': ' + str(exc)
+            stated = Stated(None, None)
+        if not isinstance(raw, bytes):
+            raw = None
+        self.verify()
+        return Output(canonical({'actor_digest': self.digest, 'input_digest': hashlib.sha256(original).hexdigest(),
+                                 'raw': base64.b64encode(raw or b'').decode(), 'raw_available': raw is not None,
+                                 'failure': failure, 'observed_runtime': observed_runtime,
+                                 'answer': stated.answer, 'basis': stated.basis}))
+
+
+@dataclass(frozen=True)
+class Population:
+    """Conserved case decisions, exposure and scope, frozen before an actor sees inputs.
+
+    Current reference admission supports development only. Qualification needs a separately
+    checked population review, never inferred from a case count or a model's display name.
+    """
+    description: bytes
+
+    @classmethod
+    def freeze(cls, metric: str, admissions: tuple[Admission, ...], envelope: dict[str, Any],
+               exposure: dict[str, Any], *, held: tuple[Admission, ...] = ()) -> Population:
+        return cls._freeze(metric, admissions, envelope, exposure, held, trace=False)
+
+    @classmethod
+    def held_development_trace(cls, metric: str, observations: tuple[Admission, ...],
+                               envelope: dict[str, Any], exposure: dict[str, Any]) -> Population:
+        """Report already exposed captures against retained proposed references, never qualify.
+
+        Original hold decisions and proposed bases survive intact. The evaluator projection
+        deliberately supplies no independently checked basis; its rate therefore stays null.
+        """
+        return cls._freeze(metric, observations, envelope, exposure, (), trace=True)
+
+    @classmethod
+    def _freeze(cls, metric: str, admissions: tuple[Admission, ...], envelope: dict[str, Any],
+                exposure: dict[str, Any], held: tuple[Admission, ...], *, trace: bool) -> Population:
+        if metric not in rss.METRICS or not admissions:
+            raise ValueError('a supported metric and nonempty admitted population are required')
+        packets = []
+        for admission in admissions:
+            packet = json.loads(admission.packet_bytes)
+            if not trace and (not admission.admitted or not packet['admitted']):
+                raise ValueError('held reference cannot enter selected population')
+            if trace and (admission.admitted or packet['admitted']
+                          or packet['requested_scope'].get('purpose') != 'development'):
+                raise ValueError('held development observations required; no qualification admission')
+            if packet['requested_scope']['metric'] != metric:
+                raise ValueError('reference metric differs from population')
+            packets.append(packet)
+        ids = [packet['case']['id'] for packet in packets]
+        inputs = [digest(packet['case']['input']) for packet in packets]
+        if len(set(ids)) != len(ids) or len(set(inputs)) != len(inputs):
+            raise ValueError('duplicate case or input cannot inflate a population')
+        for name in ('adopters', 'domains', 'capabilities', 'frames', 'sources'):
+            values = envelope.get(name)
+            if not isinstance(values, list) or not values or any(not isinstance(v, str) or not v for v in values):
+                raise ValueError('nonempty applicability envelope required: ' + name)
+        if date.fromisoformat(envelope['from']) > date.fromisoformat(envelope['until']):
+            raise ValueError('applicability dates reversed')
+        return cls(canonical({'metric': metric, 'selected': [] if trace else packets,
+                              'observations': packets if trace else [], 'trace_only': trace,
+                              'held': packets if trace else [json.loads(item.packet_bytes) for item in held],
+                              'envelope': envelope, 'exposure': exposure,
+                              'population_review': None}))
+
+    @property
+    def digest(self) -> str:
+        return hashlib.sha256(self.description).hexdigest()
+
+    @property
+    def metric(self) -> str:
+        return str(json.loads(self.description)['metric'])
+
+    @property
+    def corpus(self) -> list[dict[str, Any]]:
+        value = json.loads(self.description)
+        rows = value['observations'] if value.get('trace_only') else value['selected']
+        return [{**{key: row['case'][key] for key in ('id', 'input', 'expected')},
+                 'basis': None if value.get('trace_only') else row['case']['basis']} for row in rows]
+
+    @property
+    def envelope(self) -> dict[str, Any]:
+        return dict(json.loads(self.description)['envelope'])
+
+    @property
+    def qualification_admitted(self) -> bool:
+        return False  # case admission is explicitly development-only; see PopulationReview
+
+
+@dataclass(frozen=True)
+class Capture:
+    packet: bytes
+    authentication: bytes = field(repr=False, default=b'')
+
+    @property
+    def digest(self) -> str:
+        return hashlib.sha256(self.packet).hexdigest()
+
+
+@dataclass(frozen=True)
+class PopulationReview:
+    """A separate custodian decision, checked by a host-selected authority adapter.
+
+    This does not widen reference_cases' development admission. The retained review must
+    explicitly reassess this entire population's rights, split, authority and applicability.
+    A checker's own provenance is part of the selection; a model cannot select that checker.
+    """
+    record: bytes
+    checker: Callable[[bytes, Population], bool] | None
+    checker_identity: bytes
+
+    @classmethod
+    def freeze(cls, population: Population, record: bytes,
+               checker: Callable[[bytes, Population], bool]) -> PopulationReview:
+        path = Path(inspect.getfile(checker)).resolve()
+        return cls(bytes(record), checker, canonical({'callable': _callable_identity(checker),
+            'path': _source_name(path), 'source': hashlib.sha256(path.read_bytes()).hexdigest(),
+            'population': population.digest}))
+
+    @classmethod
+    def test_only(cls, population: Population) -> PopulationReview:
+        """Explicit fabricated positive control; unavailable to default operational resolution."""
+        return cls(canonical({'schema': 'TEST_ONLY-qualification-mechanics',
+                              'population_digest': population.digest}), None, b'')
+
+    @property
+    def digest(self) -> str:
+        return digest({'record': base64.b64encode(self.record).decode(),
+                       'checker': base64.b64encode(self.checker_identity).decode()})
+
+    def reasons(self, population: Population, *, allow_test_only: bool, actor: Actor) -> list[str]:
+        value = json.loads(self.record)
+        if value.get('population_digest') != population.digest:
+            return ['population review names a different population']
+        if value.get('schema') == 'TEST_ONLY-qualification-mechanics':
+            if allow_test_only and json.loads(actor.description)['config'].get('purpose') == 'TEST_ONLY':
+                return []
+            return ['TEST_ONLY review cannot authorise an operational actor']
+        reasons = []
+        identity = json.loads(self.checker_identity)
+        if (self.checker is None or _callable_identity(self.checker) != identity['callable']
+                or hashlib.sha256(_source_path(identity['path']).read_bytes()).hexdigest() != identity['source']
+                or not self.checker(self.record, population)):
+            return ['population review authority was not established by the host checker']
+        if value.get('schema') != 'twin.population-review/v1' or value.get('decision') != 'admitted':
+            reasons.append('population review did not admit qualification')
+        for name in ('issuer', 'authority', 'reference_authority', 'rights', 'limitations'):
+            if not value.get(name):
+                reasons.append('population review omits ' + name)
+        pop = json.loads(population.description)
+        groups = {row['case']['group'] for row in pop['selected']}
+        split = value.get('source_family_split', {})
+        if (set(split.get('qualification_groups', [])) != groups
+                or groups & set(split.get('development_groups', []))):
+            reasons.append('population source-family split is missing or overlaps development')
+        if set(value.get('coverage', [])) != set(population.envelope['adopters']):
+            reasons.append('qualification review must account for every covered adopter')
+        if set(population.envelope['adopters']) != {'driftwood', 'tuppence', 'ludlow'}:
+            reasons.append('estate qualification must account for all three adopters')
+        exposure = pop['exposure']
+        if exposure.get('status') != 'held-out' or not exposure.get('history') or not exposure.get('training_provenance'):
+            reasons.append('explicit held-out exposure/history and disclosed training provenance required')
+        for row in pop['selected']:
+            case = row['case']
+            if case['exposure'].get('status') != 'held-out' or 'qualification' not in case['rights'].get('uses', []):
+                reasons.append('case exposure or rights do not support qualification: ' + case['id'])
+        return reasons
+
+
+def project_reference(metric: str, expected: Any) -> Any:
+    """Shape supported labels for the existing scorer; no candidate predictions enter here."""
+    if metric == 'signal-classify':
+        return {'steep': expected['steep'], 'claim': {'component': expected['component']}}
+    if metric == 'evolution-judge':
+        return {'evolution_position': expected['evolution_position']}
+    if metric in ('causal-claims', 'causal-claims-grade-accuracy'):
+        return {'edge': {**({'sign': expected['sign'], 'lag_days': expected['lag_days'],
+                           'elasticity': {'mode': expected['elasticity_mode']}}
+                          if metric == 'causal-claims' else {}),
+                         **({'evidence_grade': expected['evidence_grade']}
+                            if 'evidence_grade' in expected else {})}}
+    if metric == 'gameplay-lens':
+        return {'opportunities': [{'play': play, 'component': component}
+                                 for play, component in expected['opportunities']]}
+    if metric == 'ethics-gate':
+        return {'admitted': expected['admitted'], 'ladder': {'stopped_at': expected['stopped_at']}}
+    if metric == 'substrate-generator':
+        # A declared constraint's scorer-shaped witness, not a claim to realistic generation.
+        channels = expected['channels']
+        plants = [{'signal': signal} for signal in expected['planted_signals']]
+        floor = expected['min_mundane_fraction']
+        if not channels:
+            raise ValueError('reference projection needs a channel for its witnesses')
+        if floor >= 1 and plants:
+            raise ValueError('reference projection cannot meet a unit mundane floor with plants')
+        lines = max(1, int(len(plants) / max(1 - floor, 1e-12)) + 1)
+        signals = set(expected['planted_signals'])
+        mundane = 'reference constraint witness'
+        while mundane in signals:
+            mundane += '.'
+        # A fresh decoration prevents a signal which already has a prefix from also
+        # crediting another declared signal. Its identity carries no graded meaning.
+        prefix = 'reference'
+        while any(signal.startswith(f'[{prefix}] ') for signal in signals):
+            prefix += '.'
+        bodies = {channel: [mundane] * lines for channel in channels}
+        for index, plant in enumerate(plants):
+            channel = channels[index % len(channels)]
+            plant.update(channel=channel, index=len(bodies[channel]))
+            bodies[channel].append(f'[{prefix}] {plant["signal"]}')
+        return {'channels': bodies, 'plants': plants}
+    raise ValueError('unsupported reference metric')
+
+
+@dataclass(frozen=True)
+class Selection:
+    actor: Actor
+    population: Population
+    basis_checker: Callable[[Any, Any], bool]
+    reference_projection: Callable[[str, Any], Any]
+    description: bytes
+    _capture_key: bytes = field(repr=False, compare=False)
+    review: PopulationReview | None = None
+
+    @classmethod
+    def freeze(cls, actor: Actor, population: Population,
+               basis_checker: Callable[[Any, Any], bool], *,
+               reference_projection: Callable[[str, Any], Any] = project_reference,
+               review: PopulationReview | None = None) -> Selection:
+        identity = _callable_identity(basis_checker)
+        functions = (basis_checker, reference_projection, rss.scorer_for(population.metric))
+        sources = {_source_name(Path(inspect.getfile(fn))): hashlib.sha256(
+            Path(inspect.getfile(fn)).read_bytes()).hexdigest() for fn in functions}
+        return cls(actor, population, basis_checker, reference_projection,
+                   canonical({'actor': actor.digest, 'population': population.digest,
+                              'basis_checker': identity, 'projection': _callable_identity(reference_projection),
+                              'sources': sources, 'review': review.digest if review else None}),
+                   secrets.token_bytes(32), review)
+
+    @property
+    def digest(self) -> str:
+        return hashlib.sha256(self.description).hexdigest()
+
+    def verify(self) -> None:
+        self.actor.verify()
+        value = json.loads(self.description)
+        if (value['actor'] != self.actor.digest or value['population'] != self.population.digest
+                or value['basis_checker'] != _callable_identity(self.basis_checker)
+                or value['projection'] != _callable_identity(self.reference_projection)
+                or value['review'] != (self.review.digest if self.review else None)):
+            raise ValueError('selection or basis checker changed')
+        if any(hashlib.sha256(_source_path(path).read_bytes()).hexdigest() != expected
+               for path, expected in value['sources'].items()):
+            raise ValueError('selection support source changed')
+
+    def capture(self) -> Capture:
+        self.verify()
+        rows = []
+        for item in self.population.corpus:
+            output = self.actor.invoke(item['input'])
+            rows.append({'id': item['id'], 'output': json.loads(output.packet)})
+        packet = canonical({'selection': self.digest, 'rows': rows})
+        return Capture(packet, hmac.digest(self._capture_key, packet, 'sha256'))
+
+    def evaluate(self, capture: Capture) -> EvalResult:
+        self.verify()
+        value = json.loads(capture.packet)
+        if value['selection'] != self.digest:
+            raise ValueError('capture belongs to a different selection')
+        if not hmac.compare_digest(capture.authentication, hmac.digest(self._capture_key, capture.packet, 'sha256')):
+            raise ValueError('host capture authentication failed')
+        corpus = self.population.corpus
+        rows = value['rows']
+        if [row['id'] for row in rows] != [item['id'] for item in corpus]:
+            raise ValueError('capture must cover exact ordered population')
+        outputs = []
+        for row, item in zip(rows, corpus):
+            output = row['output']
+            if (output['actor_digest'] != self.actor.digest or output['input_digest'] != digest(item['input'])):
+                raise ValueError('capture actor or input changed')
+            raw = base64.b64decode(output['raw'], validate=True)
+            if output.get('failure'):
+                if output['answer'] is not None or output['basis'] is not None:
+                    raise ValueError('failed host capture cannot invent an answer or basis')
+                stated = Stated(None, None)
+            else:
+                config = json.loads(self.actor.description)['config']
+                if config.get('runtime_contract') and output.get('observed_runtime') != config['runtime_contract']:
+                    raise ValueError('capture host runtime differs from the immutable contract')
+                stated = self.actor.parser(raw, json.loads(self.actor.description)['config'])
+            if canonical({'answer': stated.answer, 'basis': stated.basis}) != canonical({
+                    'answer': output['answer'], 'basis': output['basis']}):
+                raise ValueError('capture raw output and stated answer differ')
+            outputs.append(stated)
+        stream = iter(outputs)
+        scorer = rss.scorer_for(self.population.metric)
+        def valid_answer(actual: Any, expected: Any) -> bool:
+            if actual is None:
+                return False
+            try:
+                return bool(scorer(actual, expected))
+            except (KeyError, TypeError, AttributeError, ValueError, OverflowError):
+                return False
+        return evaluate(self.population.metric, lambda _: next(stream), corpus,
+                        scorer=valid_answer, basis_scorer=self.basis_checker)
+
+    def facts(self, capture: Capture) -> dict[str, Any]:
+        result = self.evaluate(capture)
+        corpus = self.population.corpus
+        metric = self.population.metric
+        scorer = rss.scorer_for(metric)
+        references = [self.reference_projection(metric, item['expected']) for item in corpus]
+        if any(not mp.scores_item(scorer, answer, item['expected']) for answer, item in zip(references, corpus)):
+            raise ValueError('reference projection must score correctly before baseline derivation')
+        baseline = mp.frozen_field_baseline(references, corpus, scorer)
+        answers = [row['output']['answer'] for row in json.loads(capture.packet)['rows']]
+        variance = mp.answer_variance(answers, baseline.reads)
+        return {'skill': metric, 'model_version': self.actor.model_version,
+                'reference_admission': 'held development trace' if json.loads(self.population.description).get('trace_only')
+                                       else 'development case admission; population review separate',
+                'selection_digest': self.digest, 'population_digest': self.population.digest,
+                'capture_digest': capture.digest, 'actor_digest': self.actor.digest,
+                'corpus_digest': digest_of(corpus), 'reference_score': 1.0,
+                'baseline': baseline, 'variance': variance, 'evaluation': result,
+                'readings': tuple(mp.HeadReading(self.actor.model_version, name, len(answers), distinct,
+                                                'capture:' + capture.digest)
+                                  for name, distinct in variance.items())}
+
+    def binding(self, capture: Capture) -> dict[str, str]:
+        return {'selection_digest': self.digest, 'population_digest': self.population.digest,
+                'capture_digest': capture.digest, 'actor_digest': self.actor.digest}
+
+    def record(self, capture: Capture, recorded_at: str, path: Path) -> dict[str, Any]:
+        """Append one complete host-bound row; no official destination is implicit."""
+        result = self.evaluate(capture)
+        self.facts(capture)  # invalid reference projection must not produce an official row
+        return record_score(result, self.actor.model_version, recorded_at, path,
+                            binding=self.binding(capture))
+
+    def archive(self, capture: Capture) -> bytes:
+        """Export public evidence without the ephemeral host key.
+
+        Export alone does not authorise later import. A protected, reviewed catalogue must
+        independently pin these exact bytes before a later verifier can rebind the capture.
+        """
+        self.evaluate(capture)
+        return canonical({'schema': 'twin.qualification-bundle/v1',
+            'actor': json.loads(self.actor.description), 'population': json.loads(self.population.description),
+            'selection': json.loads(self.description), 'capture': json.loads(capture.packet),
+            'review': {'record': base64.b64encode(self.review.record).decode(),
+                       'checker_identity': base64.b64encode(self.review.checker_identity).decode()}
+                      if self.review else None})
+
+
+def _refuse(permission: mp.Permission, item: int, detail: str) -> mp.Permission:
+    old = next(condition for condition in permission.conditions if condition.item == item)
+    return mp.Permission(permission.skill, permission.model_version, tuple(
+        mp.Condition(condition.item, condition.name, False, detail) if condition is old else condition
+        for condition in permission.conditions))
+
+
+class Resolver:
+    """The same host registry resolves recording, validation and public verification facts.
+
+    Only the incumbent receives historical mechanism facts. An unregistered actor cannot
+    borrow them. TEST_ONLY registries are explicit test controls and never the default.
+    """
+    def __init__(self, bindings: tuple[tuple[Selection, Capture], ...] = (),
+                 scores_path: Path | None = None, *, allow_test_only: bool = False):
+        self._bindings = {(selection.population.metric, selection.actor.model_version): (selection, capture)
+                          for selection, capture in bindings}
+        if len(self._bindings) != len(bindings):
+            raise ValueError('one current selection/capture per actor and metric is required')
+        self._scores_path = scores_path
+        self._allow_test_only = allow_test_only
+        self._facts: dict[tuple[str, str], dict[str, Any]] = {}
+        self._sessions: dict[str, HostSession] = {}
+
+    @classmethod
+    def from_catalogue(cls, catalogue: Path, expected_digest: str, scores_path: Path | None = None,
+                       *, allow_test_only: bool = False) -> Resolver:
+        """Import a durable host snapshot, not a model-provided path or checksum.
+
+        The caller must obtain expected_digest from its protected source/configuration before
+        starting the model child. CLI claim validation exposes no catalogue/path override.
+        The normal entrypoint below reads its versioned judge checkout, never claim output.
+        """
+        raw = catalogue.read_bytes()
+        if catalogue.is_symlink() or hashlib.sha256(raw).hexdigest() != expected_digest:
+            raise ValueError('protected catalogue digest differs')
+        document = json.loads(raw)
+        if document.get('schema') != 'twin.qualification-registry/v1':
+            raise ValueError('unknown host catalogue schema')
+        bindings = []
+        for entry in document['entries']:
+            path = catalogue.parent / entry['bundle']
+            if path.is_symlink() or not path.resolve().is_relative_to(catalogue.parent.resolve()):
+                raise ValueError('bundle escapes protected catalogue')
+            bundle = path.read_bytes()
+            if hashlib.sha256(bundle).hexdigest() != entry['sha256']:
+                raise ValueError('protected bundle digest differs')
+            bindings.append(_restore_bundle(bundle))
+        resolver = cls(tuple(bindings), scores_path, allow_test_only=allow_test_only)
+        for entry in document.get('sessions', []):
+            path = catalogue.parent / entry['bundle']
+            if path.is_symlink() or not path.resolve().is_relative_to(catalogue.parent.resolve()):
+                raise ValueError('session bundle escapes protected catalogue')
+            session_bytes = path.read_bytes()
+            if hashlib.sha256(session_bytes).hexdigest() != entry['sha256']:
+                raise ValueError('protected session bundle digest differs')
+            session = HostSession.restore(session_bytes, resolver)
+            if session.identity in resolver._sessions:
+                raise ValueError('duplicate host session')
+            resolver._sessions[session.identity] = session
+        return resolver
+
+    @classmethod
+    def from_checkout(cls, scores_path: Path | None = None) -> Resolver:
+        """Only the current protected judge package supplies operational registrations."""
+        path = Path(__file__).with_name('qualification-registry.json')
+        snapshot = path.read_bytes()
+        return cls.from_catalogue(path, hashlib.sha256(snapshot).hexdigest(), scores_path)
+
+    def permission(self, metric: str, model_version: str) -> mp.Permission:
+        rows = load_scores(self._scores_path)
+        bound = self._bindings.get((metric, model_version))
+        if bound is None and model_version == rss.HEURISTIC_MODEL_VERSION:
+            facts = rss.corpus_facts(metric)
+            return mp.permission_for(metric, model_version, scores=rows,
+                corpus_digest_now=facts['corpus_digest'], threshold_now=threshold_for(metric),
+                min_items_now=min_items_for(metric), baseline=facts['baseline'], variance=facts['variance'],
+                readings=mp.load_head_readings(), fitted_models=rss.fitted_models())
+        if bound is None:
+            permission = mp.permission_for(metric, model_version, scores=[], corpus_digest_now='',
+                threshold_now=threshold_for(metric), min_items_now=min_items_for(metric),
+                baseline=None, variance=None, seam_crossed=False)
+            return _refuse(permission, 10, 'no host-registered actor/population/exposure binding')
+        selected, capture = bound
+        try:
+            selected.evaluate(capture)  # verify current sources/runtime and host capture even on a cache hit
+            key = (selected.digest, capture.digest)
+            if key not in self._facts:
+                self._facts[key] = selected.facts(capture)
+            facts = self._facts[key]
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            permission = mp.permission_for(metric, model_version, scores=[], corpus_digest_now='',
+                threshold_now=threshold_for(metric), min_items_now=min_items_for(metric),
+                baseline=None, variance=None, seam_crossed=False)
+            return _refuse(permission, 2, 'current host selection/capture failed verification: ' + str(exc))
+        permission = mp.permission_for(metric, model_version, scores=rows,
+            corpus_digest_now=facts['corpus_digest'], threshold_now=threshold_for(metric),
+            min_items_now=min_items_for(metric), baseline=facts['baseline'], variance=facts['variance'],
+            readings=facts['readings'], fitted_models={})
+        latest = mp.newest_score(metric, model_version, rows)
+        result = facts['evaluation']
+        if (latest is None or latest.get('qualification') != selected.binding(capture)
+                or any(latest.get(name) != value for name, value in {
+                    'score': result.score, 'attributable_rate': result.attributable_rate,
+                    'measured_count': result.measured_count, 'total': len(result.items),
+                    'wrong_basis': result.wrong_basis, 'unscoreable': result.unscoreable,
+                    'outcome': result.outcome}.items())):
+            permission = _refuse(permission, 5, 'newest recorded row is not the exact host-bound capture evaluation')
+        try:
+            reasons = (selected.review.reasons(selected.population, allow_test_only=self._allow_test_only,
+                                               actor=selected.actor) if selected.review else
+                       ['no separately checked qualification population review; development admission is insufficient'])
+        except (ValueError, KeyError, TypeError, OSError) as exc:
+            reasons = ['population review could not establish qualification: ' + str(exc)]
+        exposure = json.loads(selected.population.description)['exposure']
+        if not exposure.get('status') or not exposure.get('history') or not exposure.get('training_provenance'):
+            reasons.append('missing explicit exposure/history or training-provenance disclosure')
+        if json.loads(selected.population.description).get('trace_only'):
+            reasons.append('held development traces cannot qualify, including under a TEST_ONLY review')
+        if json.loads(selected.actor.description)['config'].get('capture_replay'):
+            reasons.append('historical capture-only replay cannot earn live-actor permission')
+        if not self._allow_test_only and json.loads(selected.actor.description)['config'].get('purpose') == 'TEST_ONLY':
+            reasons.append('TEST_ONLY actors are unavailable to default operational resolution')
+        if reasons:
+            permission = _refuse(permission, 10, '; '.join(reasons))
+        return permission
+
+    def host_session(self, inputs: HostInputs) -> HostSession:
+        """Create before the child starts, from protected host-resolved source projections."""
+        session = HostSession(self, inputs)
+        self._sessions[session.identity] = session
+        return session
+
+    def check_claim_document(self, doc: dict[str, Any], clock: str,
+                             _lookup: Callable[[str, str], mp.Permission] | None = None) -> list[str]:
+        bad = mp.check_claim_document(doc, clock, self.permission)
+        if clock != mp.GOVERNED_CLOCK:
+            return bad
+        identity = (doc.get('run') or {}).get('host_session')
+        session = self._sessions.get(identity) if isinstance(identity, str) else None
+        if session is None:
+            return bad + ['no protected host session for this claim; model-provided identity is insufficient']
+        return bad + session.check_document(doc)
+
+
+@dataclass(frozen=True)
+class HostInputs:
+    """Trusted host data, not fields read from a candidate's claim or response.
+
+    The host creates this before the child starts, or imports it from an independently pinned
+    host-session archive. Its explicit issuer allowlist is protected host configuration.
+    A canonical input source must actually match the projected input bytes and context hash.
+    """
+    description: bytes
+
+    @classmethod
+    def freeze(cls, records: tuple[dict[str, Any], ...], issuers: tuple[str, ...]) -> HostInputs:
+        subjects = [row.get('subject') for row in records]
+        if any(not isinstance(subject, str) or not subject for subject in subjects) or len(set(subjects)) != len(subjects):
+            raise ValueError('host inputs need unique nonempty subjects')
+        return cls(canonical({'records': records, 'issuers': issuers}))
+
+    def resolve(self, subject: str) -> dict[str, Any]:
+        value = json.loads(self.description)
+        row = next((row for row in value['records'] if row['subject'] == subject), None)
+        if row is None:
+            raise ValueError('host has no source/input provenance for subject ' + subject)
+        if row.get('issuer') not in value['issuers']:
+            raise ValueError('input provenance issuer is not registered by the host')
+        try:
+            source, context = row['source'], row['context']
+            raw = base64.b64decode(source['content_base64'], validate=True)
+            if (len(raw) != source['bytes'] or hashlib.sha256(raw).hexdigest() != source['sha256']
+                    or raw != canonical(row['input']) or not source['version']
+                    or context['source'] != source['identity'] or context['source_sha256'] != source['sha256']):
+                raise ValueError('host source/input/context provenance conflict')
+            for name in ('organisation', 'domain', 'capability', 'as_of', 'frame', 'source', 'component'):
+                if not isinstance(context.get(name), str) or not context[name]:
+                    raise ValueError('missing host context: ' + name)
+        except (KeyError, TypeError) as exc:
+            raise ValueError('missing host source provenance') from exc
+        return row
+
+
+def _scope_reasons(population: Population, context: dict[str, Any]) -> list[str]:
+    envelope = population.envelope
+    reasons = []
+    for field, allowed in (('organisation', 'adopters'), ('domain', 'domains'),
+                           ('capability', 'capabilities'), ('frame', 'frames'), ('source', 'sources')):
+        if context.get(field) not in envelope[allowed]:
+            reasons.append('host ' + field + ' is outside the predeclared applicability envelope')
+    try:
+        as_of = date.fromisoformat(context['as_of'])
+        if not date.fromisoformat(envelope['from']) <= as_of <= date.fromisoformat(envelope['until']):
+            reasons.append('host date is outside the predeclared applicability envelope')
+    except (KeyError, TypeError, ValueError):
+        reasons.append('host date is missing or invalid')
+    return reasons
+
+
+@dataclass(frozen=True)
+class Judgement:
+    receipt: str | None
+    reason: str | None
+    output: Output | None = None
+
+
+class HostSession:
+    """A protected parent owns invocation and receipts; a child can only echo receipt tokens.
+
+    Live receipts are held in parent memory. Later validation accepts only an exact session
+    archive independently pinned in the protected judge catalogue, never a child-written file.
+    No secret or ephemeral authentication key is exported.
+    """
+    def __init__(self, resolver: Resolver, inputs: HostInputs):
+        self._resolver = resolver
+        self._inputs = inputs
+        self.identity = secrets.token_hex(24)
+        self._records: dict[str, bytes] = {}
+        self._declines: list[dict[str, str]] = []
+        self._failed_outputs: list[dict[str, Any]] = []
+
+    @property
+    def declines(self) -> list[dict[str, str]]:
+        return json.loads(canonical(self._declines))
+
+    def judge(self, metric: str, model_version: str, subject: str) -> Judgement:
+        try:
+            row = self._inputs.resolve(subject)
+            bound = self._resolver._bindings.get((metric, model_version))
+            permission = self._resolver.permission(metric, model_version)
+            if bound is None or not permission.granted:
+                raise ValueError(permission.why())
+            selected, _ = bound
+            reasons = _scope_reasons(selected.population, row['context'])
+            if reasons:
+                raise ValueError('; '.join(reasons))
+            if metric == 'signal-classify':
+                metadata = row['context'].get('signal', {})
+                if (metadata.get('id') != subject or metadata.get('date') != row['context']['as_of']
+                        or not metadata.get('from') or not metadata.get('provenance', {}).get('url')):
+                    raise ValueError('host signal identity/date/pin/provenance is missing')
+            output = selected.actor.invoke(row['input'])
+            if output.failure:
+                self._failed_outputs.append({'subject': subject, 'metric': metric,
+                                             'output': json.loads(output.packet)})
+                raise ValueError('actor declined: ' + output.failure)
+            if not isinstance(output.stated.answer, dict) or output.stated.basis is None:
+                self._failed_outputs.append({'subject': subject, 'metric': metric,
+                                             'output': json.loads(output.packet)})
+                raise ValueError('live actor output lacks an answer object or actual stated basis')
+            receipt = secrets.token_hex(24)
+            self._records[receipt] = canonical({'subject': subject, 'metric': metric,
+                'model_version': model_version, 'selection': selected.digest,
+                'context': row['context'], 'output': json.loads(output.packet)})
+            return Judgement(receipt, None, output)
+        except Exception as exc:  # every attempted operation/decline remains counted
+            reason = str(exc)
+            self._declines.append({'subject': subject, 'reason': reason})
+            return Judgement(None, reason)
+
+    def check_document(self, doc: dict[str, Any]) -> list[str]:
+        run = doc.get('run') or {}
+        bad = []
+        if run.get('declined') != self.declines:
+            bad.append('document does not preserve the host counted declines')
+        seen = []
+        for claim in doc.get('claims') or []:
+            token = claim.get('host_receipt')
+            packet = self._records.get(token) if isinstance(token, str) else None
+            if packet is None:
+                bad.append('claim has no matching protected host receipt')
+                continue
+            seen.append(token)
+            record = json.loads(packet)
+            metric = mp.SKILL_FOR_CLAIM_KIND.get(claim.get('kind'))
+            if (record['metric'] != metric or record['model_version'] != run.get('model_version')
+                    or doc.get('org') != record['context']['organisation']
+                    or claim.get('host_subject') != record['subject']):
+                bad.append('claim actor/metric/adopter/subject differs from host receipt')
+            row = self._inputs.resolve(record['subject'])
+            bound = self._resolver._bindings.get((record['metric'], record['model_version']))
+            if bound is None or record['selection'] != bound[0].digest:
+                bad.append('claim host receipt has a stale selection')
+                continue
+            selected, _ = bound
+            bad.extend(_scope_reasons(selected.population, row['context']))
+            output = record['output']
+            answer = output['answer']
+            matches = claim.get('component') == row['context']['component'] and claim.get('evidence') == output['basis']
+            if metric == 'evolution-judge':
+                matches = matches and claim.get('evolution_position') == answer.get('evolution_position')
+            elif metric == 'signal-classify':
+                signal = claim.get('signal', {})
+                matches = (matches and claim.get('component') == answer.get('claim', {}).get('component')
+                           and signal.get('steep') == answer.get('steep')
+                           and signal.get('statement') == row['input'].get('statement')
+                           and signal.get('source') == row['input'].get('source')
+                           and all(signal.get(field) == row['context'].get('signal', {}).get(field)
+                                   for field in ('id', 'date', 'from', 'provenance')))
+            else:
+                matches = False
+            if not matches:
+                bad.append('claim semantic assertion differs from actual host output/input')
+        if len(set(seen)) != len(seen) or set(seen) != set(self._records):
+            bad.append('document omits or duplicates host counted judgements')
+        return bad
+
+    def archive(self) -> bytes:
+        return canonical({'schema': 'twin.host-session/v1', 'identity': self.identity,
+            'inputs': json.loads(self._inputs.description),
+            'records': {token: json.loads(packet) for token, packet in self._records.items()},
+            'declines': self.declines, 'failed_outputs': self._failed_outputs})
+
+    @classmethod
+    def restore(cls, archive: bytes, resolver: Resolver) -> HostSession:
+        value = json.loads(archive)
+        if value.get('schema') != 'twin.host-session/v1':
+            raise ValueError('unknown protected session schema')
+        session = cls(resolver, HostInputs(canonical(value['inputs'])))
+        session.identity = value['identity']
+        session._declines = value['declines']
+        session._failed_outputs = value.get('failed_outputs', [])
+        for token, record in value['records'].items():
+            row = session._inputs.resolve(record['subject'])
+            selected, _ = resolver._bindings[(record['metric'], record['model_version'])]
+            selected.verify()
+            output = record['output']
+            parsed = selected.actor.parser(base64.b64decode(output['raw'], validate=True),
+                                            json.loads(selected.actor.description)['config'])
+            runtime_contract = json.loads(selected.actor.description)['config'].get('runtime_contract')
+            if (record['selection'] != selected.digest or record['context'] != row['context']
+                    or _scope_reasons(selected.population, row['context'])
+                    or output['actor_digest'] != selected.actor.digest or output['input_digest'] != digest(row['input'])
+                    or runtime_contract and output.get('observed_runtime') != runtime_contract
+                    or canonical({'answer': parsed.answer, 'basis': parsed.basis}) != canonical({
+                        'answer': output['answer'], 'basis': output['basis']})):
+                raise ValueError('protected session no longer matches current host binding')
+            session._records[token] = canonical(record)
+        return session
+
+
+def _restore_callable(identity: dict[str, Any]) -> Callable[..., Any]:
+    """Only called after an independently pinned host bundle was verified."""
+    value: Any = importlib.import_module(identity['module'])
+    for name in identity['name'].split('.'):
+        if name == '<locals>':
+            raise ValueError('archived adapters must be importable host functions')
+        value = getattr(value, name)
+    if _callable_identity(value) != identity:
+        raise ValueError('archived adapter differs from current host source')
+    return value
+
+
+def _restore_bundle(bundle: bytes) -> tuple[Selection, Capture]:
+    value = json.loads(bundle)
+    if value.get('schema') != 'twin.qualification-bundle/v1':
+        raise ValueError('unknown host bundle schema')
+    actor_value = value['actor']
+    actor = Actor(canonical(actor_value), _restore_callable(actor_value['runner']),
+                  _restore_callable(actor_value['parser']))
+    population = Population(canonical(value['population']))
+    review_value = value['review']
+    review = None
+    if review_value:
+        checker_identity = base64.b64decode(review_value['checker_identity'], validate=True)
+        review = PopulationReview(base64.b64decode(review_value['record'], validate=True),
+            _restore_callable(json.loads(checker_identity)['callable']) if checker_identity else None,
+            checker_identity)
+    selection_value = value['selection']
+    selected = Selection.freeze(actor, population, _restore_callable(selection_value['basis_checker']),
+        reference_projection=_restore_callable(selection_value['projection']), review=review)
+    if selected.description != canonical(selection_value):
+        raise ValueError('archived selection differs from current host binding')
+    packet = canonical(value['capture'])
+    captured = Capture(packet, hmac.digest(selected._capture_key, packet, 'sha256'))
+    selected.evaluate(captured)
+    return selected, captured

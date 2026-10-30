@@ -51,48 +51,21 @@ def twin_facts(hub):
     return tuple(CLAIM_KINDS), {str(role["id"]) for role in register["roles"]}
 
 
-def permission_rules(hub):
-    """The model-judging permission, read off the twin package itself -- never copied here, the
-    same reason `twin_facts` gives: a copy is how a check goes on passing after the thing it
-    checks has moved. Returns (derive_clock, check_claim_document, permission_lookup)."""
+def permission_rules(hub, resolver=None):
+    """Resolve the protected host registry shared by recording and public verification.
+
+    The model-written claim supplies no registry path, exposure facts, context or receipt
+    archive. The ordinary CLI reads only this judge package's versioned catalogue; a protected
+    parent may supply its already running resolver/session before starting its child.
+    """
     sys.path.insert(0, os.path.abspath(hub))
     try:
         from twin import model_permission as mp
-        from twin import record_skill_scores as rss
-        from twin.skills import load_scores, min_items_for, threshold_for
-    except Exception as exc:  # noqa: BLE001 - any import failure is "cannot look"
-        raise SystemExit(f"SKIP: no twin package at {hub!r} to read the model permission from ({exc})")
-
-    scores = load_scores()
-    readings = mp.load_head_readings()
-    fitted = rss.fitted_models()
-    measured = {}
-
-    def lookup(skill, model_version):
-        """One skill's permission for one model. The corpus digest, the baseline and the
-        variance are DERIVED from the corpus in the tree, so a stale scoring run cannot grant
-        anything (item 2) and a constant field cannot hide (item 8). The threshold and the minimum corpus it
-        states are the tree's too (ticket 112), so a row that met a minimum the tree has since
-        raised clears nothing at item 1."""
-        if skill not in measured:
-            measured[skill] = rss.corpus_facts(skill)
-        facts = measured[skill]
-        return mp.permission_for(
-            skill,
-            model_version,
-            scores=scores,
-            corpus_digest_now=facts["corpus_digest"],
-            threshold_now=threshold_for(skill),
-            min_items_now=min_items_for(skill),
-            baseline=facts["baseline"],
-            variance=facts["variance"],
-            readings=readings,
-            seam_crossed=True,
-            seam_detail=f"the seam ran: {mp.SEAM}",
-            fitted_models=fitted,
-        )
-
-    return mp.derive_clock, mp.check_claim_document, lookup
+        from twin.qualification import Resolver
+        bound = resolver if resolver is not None else Resolver.from_checkout()
+    except Exception as exc:  # noqa: BLE001 - failure to establish host facts refuses validation
+        raise SystemExit(f"FAIL: cannot establish the protected model registry at {hub!r} ({exc})")
+    return mp.derive_clock, bound.check_claim_document, bound.permission
 
 
 def pin_key(pin):

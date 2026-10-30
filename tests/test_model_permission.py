@@ -442,72 +442,61 @@ _VALIDATOR = (
 )
 
 
-def _seam_lookup(monkeypatch, rows):
-    """The lookup the seam builds, over `rows` as the score log. Everything else is the tree's:
-    the corpus facts, the threshold and the minimum. Readings and fitted models are emptied so
-    item 1 is the only condition in question."""
-    import importlib.util
+def _seam_lookup(tmp_path, selected, captured, change=None):
+    """Exercise the real validator using an explicit TEST_ONLY registered capture.
 
-    from twin import skills
+    Arithmetic-only fabricated rows above still test the historical permission rule. They
+    cannot enter the official seam by giving an unknown model a convenient name.
+    """
+    import importlib.util
+    import json
+    from twin.qualification import Resolver
 
     spec = importlib.util.spec_from_file_location("validate_claim_seam", _VALIDATOR)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    monkeypatch.setattr(skills, "load_scores", lambda *a, **k: list(rows))
-    monkeypatch.setattr(mp, "load_head_readings", lambda *a, **k: [])
-    monkeypatch.setattr(rss, "fitted_models", lambda *a, **k: {})
-    _clock, _check, lookup = module.permission_rules(str(_VALIDATOR.parents[4]))
+    path = tmp_path / "scores.jsonl"
+    row = selected.record(captured, "2026-10-30T00:00:00Z", path)
+    if change:
+        row.update(change)
+        with path.open("a") as stream:
+            stream.write(json.dumps(row) + "\n")
+    resolver = Resolver(((selected, captured),), path, allow_test_only=True)
+    _clock, _check, lookup = module.permission_rules(str(_VALIDATOR.parents[4]), resolver=resolver)
     return lookup
 
 
-def test_the_seam_refuses_a_row_that_met_a_minimum_the_tree_has_since_raised(monkeypatch, facts) -> None:
-    """The reviewer's reproduction: the row states min_items 3 and counted 3, so it met its own
-    minimum. The tree states 9 for gameplay-lens. The seam must read the tree's, as the gate
-    script does, or a short run earns a permission where it matters."""
+def test_the_seam_refuses_a_row_that_met_a_minimum_the_tree_has_since_raised(tmp_path) -> None:
+    from bench.qualification_controls import mechanical_selection
     from twin.skills import min_items_for
 
-    assert min_items_for(_FACTS_SKILL) > 3
-    row = {
-        "skill": _FACTS_SKILL, "model_version": "fixture-model-1.0.0", "score": 1.0,
-        "threshold": 0.65, "corpus_digest": facts["corpus_digest"],
-        "recorded_at": "2026-09-22T00:00:00Z", "min_items": 3, "measured_count": 3, "total": 3,
-        "outcome": "pass", "attributable_rate": 1.0,
-    }
-    perm = _seam_lookup(monkeypatch, [row])(_FACTS_SKILL, "fixture-model-1.0.0")
-    assert not perm.granted
-    assert 1 in _refused_items(perm), perm.why()
+    selected = mechanical_selection()
+    metric = selected.population.metric
+    assert min_items_for(metric) > 3
+    captured = selected.capture()
+    lookup = _seam_lookup(tmp_path, selected, captured,
+        {"min_items": 3, "measured_count": 3, "total": 3})
+    permission = lookup(metric, selected.actor.model_version)
+    assert not permission.granted
+    assert 1 in _refused_items(permission), permission.why()
 
 
-def test_the_seam_grants_a_row_that_meets_the_trees_minimum(monkeypatch, facts) -> None:
-    """The positive control at the seam: the same row at the tree's minimum is granted, so the
-    refusal above is item 1 reading the minimum, not the seam refusing everything."""
-    from twin.skills import min_items_for
+def test_the_seam_grants_a_row_that_meets_the_trees_minimum(tmp_path) -> None:
+    """A complete genuine TEST_ONLY capture clears the mechanical path; no real actor does."""
+    from bench.qualification_controls import mechanical_selection
 
-    need = min_items_for(_FACTS_SKILL)
-    row = {
-        "skill": _FACTS_SKILL, "model_version": "fixture-model-1.0.0", "score": 1.0,
-        "threshold": 0.65, "corpus_digest": facts["corpus_digest"],
-        "recorded_at": "2026-09-22T00:00:00Z", "min_items": need, "measured_count": need,
-        "total": need, "outcome": "pass", "attributable_rate": 1.0,
-    }
-    perm = _seam_lookup(monkeypatch, [row])(_FACTS_SKILL, "fixture-model-1.0.0")
-    assert perm.granted, perm.why()
+    selected = mechanical_selection()
+    lookup = _seam_lookup(tmp_path, selected, selected.capture())
+    permission = lookup(selected.population.metric, selected.actor.model_version)
+    assert permission.granted, permission.why()
 
 
-def test_the_seam_refuses_a_row_whose_score_rests_on_luck(monkeypatch, facts) -> None:
-    """Ticket 118 at the live seam: a row at the tree's minimum with a perfect score and a low
-    attributable rate is refused at item 1, where the same row with its rate at 1.0 is granted
-    (the test above), so the refusal is the rate and not the seam refusing everything."""
-    from twin.skills import min_items_for
+def test_the_seam_refuses_a_row_whose_score_rests_on_luck(tmp_path) -> None:
+    from bench.qualification_controls import mechanical_selection, wrong_basis_actor
 
-    need = min_items_for(_FACTS_SKILL)
-    row = {
-        "skill": _FACTS_SKILL, "model_version": "fixture-model-1.0.0", "score": 1.0,
-        "threshold": 0.65, "corpus_digest": facts["corpus_digest"],
-        "recorded_at": "2026-09-22T00:00:00Z", "min_items": need, "measured_count": need,
-        "total": need, "outcome": "pass", "attributable_rate": 0.5,
-    }
-    perm = _seam_lookup(monkeypatch, [row])(_FACTS_SKILL, "fixture-model-1.0.0")
-    assert not perm.granted
-    assert 1 in _refused_items(perm), perm.why()
+    selected = mechanical_selection(wrong_basis_actor)
+    lookup = _seam_lookup(tmp_path, selected, selected.capture())
+    permission = lookup(selected.population.metric, selected.actor.model_version)
+    assert not permission.granted
+    assert 1 in _refused_items(permission), permission.why()

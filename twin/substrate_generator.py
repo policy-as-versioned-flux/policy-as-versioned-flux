@@ -43,6 +43,8 @@ records in its own output (`resolution`) rather than leaving as prose here.
 from __future__ import annotations
 
 import random
+import re
+from collections import Counter
 from typing import Any
 
 from .substrate import SubstrateRecipe, generate_deterministic
@@ -179,19 +181,60 @@ def generate_from_recipe_yaml_stated(text: str) -> Stated:
     return Stated(answer, basis)
 
 
-def scorer(actual: dict[str, Any], expected: dict[str, Any]) -> bool:
+def scorer(actual: Any, expected: dict[str, Any]) -> bool:
     """A pass needs every expected channel populated, exactly the expected set of planted signals
     present (no more, no fewer — the same discipline `gameplay_lens.scorer` applies), and the
-    mundane fraction at or above the expected floor."""
+    mundane fraction at or above the expected floor.
+
+    Channels are nonempty line lists. Each plant record witnesses its exact text (optionally
+    decorated with one prefix) at a distinct channel/index; every actual occurrence of a
+    declared signal must be accounted for, with ambiguous witness reuse refused. This checks
+    structural recipe conformance, not prefix identity, prose quality or undeclared signals.
+    """
     channels = expected["channels"]
-    if set(actual.get("channels", {})) != set(channels):
+    if not isinstance(actual, dict) or not isinstance(actual.get("channels"), dict):
         return False
-    if any(not actual["channels"].get(c) for c in channels):
+    bodies = actual["channels"]
+    plants = actual.get("plants")
+    if set(bodies) != set(channels) or not isinstance(plants, list):
         return False
-    found = sorted(p["signal"] for p in actual.get("plants", []))
-    if found != sorted(expected["planted_signals"]):
+    if any(not isinstance(lines, list) or not lines or any(not isinstance(line, str) for line in lines)
+           for lines in bodies.values()):
+        return False
+    locations: set[tuple[str, int]] = set()
+    found: list[str] = []
+    for plant in plants:
+        if not isinstance(plant, dict):
+            return False
+        channel, index, signal = plant.get("channel"), plant.get("index"), plant.get("signal")
+        if (not isinstance(channel, str) or channel not in bodies or type(index) is not int
+                or not isinstance(signal, str)):
+            return False
+        location = (channel, index)
+        if not 0 <= index < len(bodies[channel]) or location in locations:
+            return False
+        locations.add(location)
+        if not _matches_plant(bodies[channel][index], signal):
+            return False
+        found.append(signal)
+    if sorted(found) != sorted(expected["planted_signals"]):
+        return False
+    declared = Counter(found)
+    observed: Counter[str] = Counter()
+    for lines in bodies.values():
+        for line in lines:
+            matching = [signal for signal in declared if _matches_plant(line, signal)]
+            if len(matching) > 1:
+                return False
+            observed.update(matching)
+    if observed != declared:
         return False
     return mundane_fraction(actual) >= float(expected["min_mundane_fraction"])
+
+
+def _matches_plant(line: str, signal: str) -> bool:
+    """Only an exact line or one syntactically valid decoration witnesses a plant."""
+    return line == signal or re.fullmatch(r"\[[^\[\]\r\n]+\] " + re.escape(signal), line) is not None
 
 
 # -- the labelled corpus: recipes with a known plant schedule, from none to one-per-channel -----
