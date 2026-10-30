@@ -319,7 +319,8 @@ def metadata_selection(protected_request):
         case['input'] = row['input']
         case['context'] = {**case['context'], **{key: row['context'][key] for key in (
             'organisation', 'domain', 'capability', 'frame', 'as_of', 'source',
-            'source_metadata', 'source_metadata_public_sha256')}}
+            'source_metadata', 'source_metadata_public_sha256', 'eligible_components',
+            'candidate_universe_digest', 'model_pins', 'model_as_of', 'input_construction_sha256')}}
         case['basis_binding'] = binding_for(case)
         admitted = admit_reference(case, case['context'])
         assert admitted.admitted, admitted.reasons

@@ -69,12 +69,13 @@ def test_generator_bundle_restore_is_unchanged_by_signal_metadata(catalogue_mate
 
 
 @pytest.mark.parametrize('reverse', [False, True])
-def test_combined_catalogue_restores_actual_signal_and_generator_sessions(catalogue_material, reverse):
+@pytest.mark.parametrize('reverse_sessions', [False, True])
+def test_combined_catalogue_restores_actual_signal_and_generator_sessions(catalogue_material, reverse, reverse_sessions):
     from bench import substrate_contract_controls as generator_controls
     before = (len(generator_controls.CALLS), len(METADATA_REVISION_CALLS))
     bundles = ['signal', 'generator'][::(-1 if reverse else 1)]
-    sessions = ['signal-session', 'generator-session'][::(-1 if reverse else 1)]
-    restored = load_catalogue(catalogue_material, 'combined-with-sessions-' + str(reverse), bundles, sessions)
+    sessions = ['signal-session', 'generator-session'][::(-1 if reverse_sessions else 1)]
+    restored = load_catalogue(catalogue_material, f'combined-with-sessions-{reverse}-{reverse_sessions}', bundles, sessions)
     assert restored.check_generation_document(catalogue_material['generator_document'], 'github') == []
     config = catalogue_material['signal_config']
     for name in sessions:

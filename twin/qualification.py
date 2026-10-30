@@ -589,12 +589,27 @@ class Selection:
             raise ValueError('selection support source changed')
 
     def verify_input(self, row: dict[str, Any]) -> None:
-        """Check live source acquisition against this selection's protected authority."""
+        """Recompute the complete live signal binding for the selected task."""
         self.verify()
         if self.population.metric == 'signal-classify' and self._test_only is not TEST_ONLY_MECHANICS:
+            from .signal_inputs import binding_context
             from .source_metadata import verify_host_metadata
             verify_host_metadata(row, self._metadata_store,
                 json.loads(self._metadata_policy) if self._metadata_policy else None)
+            try:
+                actual = binding_context(row['input'])
+                context = row['context']
+                model, source = row['input']['model_context'], row['input']['source_context']
+                qualified = self.population.envelope['signal_contexts'].get(context['organisation'])
+                if (actual != qualified or any(context.get(key) != value for key, value in actual.items())
+                        or context.get('eligible_components') != [item['id'] for item in row['input']['candidates']]
+                        or 'component' in context
+                        or any(model[key] != context[key] for key in ('organisation', 'domain', 'capability', 'frame'))
+                        or source['family'] != context['source'] or source['as_of'] != context['as_of']
+                        or _scope_reasons(self.population, context)):
+                    raise ValueError('actual model/universe/date/construction or declared scope differs')
+            except (ValueError, KeyError, TypeError) as exc:
+                raise ValueError('live input differs from qualified signal context: ' + str(exc)) from exc
 
     def capture(self) -> Capture:
         self.verify()
@@ -977,7 +992,13 @@ class HostInputs:
             for name in ('organisation', 'domain', 'capability', 'as_of', 'frame', 'source'):
                 if not isinstance(context.get(name), str) or not context[name]:
                     raise ValueError('missing host context: ' + name)
-            if 'eligible_components' in context:
+            # A v2 source projection cannot opt into generic component routing by
+            # removing public signal flags or its serialized metadata policy.
+            source_context = row['input'].get('source_context') if isinstance(row['input'], dict) else None
+            public_metadata = source_context.get('metadata') if isinstance(source_context, dict) else None
+            if ('eligible_components' in context or 'source_metadata' in context
+                    or isinstance(public_metadata, dict)
+                    and public_metadata.get('schema') == 'twin.source-metadata-public/v1'):
                 candidates = row['input'].get('candidates')
                 if (not isinstance(candidates, list) or not candidates
                         or any(not isinstance(item, dict) or not isinstance(item.get('id'), str)
