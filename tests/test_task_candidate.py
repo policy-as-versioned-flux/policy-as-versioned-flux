@@ -299,3 +299,23 @@ def test_gameplay_full_twenty_definition_input_and_reported_pairs_are_never_filt
     assert len(calls) == 1 and calls[0]['input'] == payload
     assert len(json.loads(calls[0]['prompt_utf8'].split('INPUT:\n', 1)[1])['task']['components']) == 20
     assert task_candidate.parse(result.raw, config).answer == answer
+
+
+@pytest.mark.parametrize('failure', [None, 'TEST_ONLY paired host observed an incomplete capture'])
+def test_actual_decline_and_host_failure_keep_their_original_capture_disposition(monkeypatch, protected_request, failure):
+    payload = resolve_task_input(**task_request(protected_request)).payload
+    raw = b'{"decline":"TEST_ONLY original source cannot support this frame"}' if failure is None else b'{"answer":'
+    original = RuntimeResult(raw, {'purpose': 'TEST_ONLY'}, {'capture': 'TEST_ONLY original disposition'}, failure)
+    calls = []
+    def pair(request, config):
+        calls.append(request)
+        return original
+    monkeypatch.setitem(sys.modules, 'twin.linux_candidate', SimpleNamespace(
+        validate_profile=lambda config: config, invoke_pair=pair))
+    result = task_candidate.run(payload, profile_for('evolution'))
+    assert len(calls) == 1
+    assert result == original
+    if failure is None:
+        stated = task_candidate.parse(result.raw, config_for('evolution'))
+        assert stated.answer is None
+        assert stated.basis == {'decline': 'TEST_ONLY original source cannot support this frame'}
