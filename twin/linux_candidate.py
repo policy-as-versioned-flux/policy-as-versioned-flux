@@ -571,7 +571,12 @@ class HostCapture:
             else: raise ValueError('unknown protected host proof role')
         elif kind == 'resources':
             if not isinstance(facts, dict): raise ValueError('actual host resource object required')
-            self.policy.validate_resources(facts, set(self.host['cpus']))
+            self.policy.validate_resources(facts, set(self.host['cpus']),
+                self.policy.storage_paths(self.host,self.profile))
+            for row in facts['reserve']['storage']:
+                actual = self.policy.protected_path(row['path'],False)
+                if (actual.st_dev,actual.st_ino) != (row['device'],row['inode']):
+                    raise ValueError('protected storage identity changed after observation')
             gap = facts.get('gap_seconds')
             if gap is not None and (type(gap) not in (int, float) or not 0 <= gap <= 2):
                 raise ValueError('actual host observer gap exceeds frozen bound')
@@ -586,6 +591,9 @@ class HostCapture:
             if body['type'] == 'observation':
                 self.observations[self.phase] += 1
                 # The guardian snapshots maps after this frame and sends a fixed ACK.
+            elif body['type'] == 'ready':
+                if type(body['facts'].get('dumpable')) is not int or body['facts']['dumpable'] != 0:
+                    raise ValueError('pinned post-exec child dumpability readback missing')
             elif body['type'] == 'complete':
                 self._native_match(body['observed_runtime'].get('native_mappings'))
         elif kind == 'phase_end':
@@ -679,6 +687,12 @@ class HostCapture:
                 or facts.get('native_mapping_count') != len(self.mappings[self.phase])):
             raise ValueError('actual host READY source/native/process binding incomplete')
         status = facts['status']
+        # Guardian acquired these live proc facts before releasing READY/input.
+        # Reopening child proc here would race with a fast phase's verified exit.
+        expected_dumpability = {'proc_owners':{'mem':{'uid':0,'gid':0},'auxv':{'uid':0,'gid':0}},
+            'user_namespace':os.readlink('/proc/self/ns/user')}
+        if facts.get('nondumpability') != expected_dumpability:
+            raise ValueError('independent post-exec nondumpability observation differs')
         if (list(map(int, status['Uid'].split())) != [self.host['candidate_uid']]*4
                 or list(map(int, status['Gid'].split())) != [self.host['candidate_gid']]*4
                 or status['Groups'].strip() or status['NSpid'].split()[-1] != '1'

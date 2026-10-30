@@ -162,3 +162,69 @@ def test_overlong_full_input_retains_actual_count_without_claiming_truncated_bin
     assert error.value.facts['full_input_tokens'] == 9
     assert error.value.facts['max_input_tokens'] == 8
     assert error.value.facts['truncated'] is False
+
+
+def synthetic_bootstrap(set_result=0, sticky_dumpable=False):
+    """Compile only the bootstrap decision, replacing every OS/ctypes boundary."""
+    import ast
+    import hashlib
+    from types import SimpleNamespace
+    path = Path(__file__).parents[1]/'bench/pinned-candidate/qwen_backend.py'
+    tree = ast.parse(path.read_text())
+    check = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'check_bootstrap')
+    check.body = [node for node in check.body if not isinstance(node, (ast.Import, ast.ImportFrom))]
+    operations = []
+    dumpable = [1]  # Linux ordinary exec resets the earlier bootstrap setting.
+    status = '\n'.join([*(key+': 00000000' for key in ('CapEff','CapPrm','CapInh','CapAmb','CapBnd')),
+        'NoNewPrivs: 1','Seccomp: 2'])
+    mounts = ('1 0 0:1 / / ro,nosuid,nodev - tmpfs tmpfs ro\n'
+        '2 1 0:2 / /proc ro,nosuid,nodev,noexec - proc proc ro\n'
+        '3 1 0:3 / /attempt rw,nosuid,nodev,noexec - tmpfs tmpfs rw,size=131072k\n')
+    class FakePath:
+        def __init__(self, name): self.name = name
+        def read_text(self): return {'/proc/self/status':status,'/proc/self/mountinfo':mounts}[self.name]
+        def read_bytes(self): return self.read_text().encode()
+        def iterdir(self):
+            assert self.name == '/proc/self/task'
+            return iter(['TEST_ONLY-one-thread'])
+    class Integer:
+        value = 0
+    class LibC:
+        def prctl(self, operation, argument, *unused):
+            operations.append(operation)
+            if operation == 4:
+                assert argument == 0
+                if not set_result and not sticky_dumpable: dumpable[0] = 0
+                return set_result
+            if operation == 3: return dumpable[0]
+            if operation == 2:
+                argument.value = 9
+                return 0
+            raise AssertionError('unexpected kernel request')
+    namespace = {'Any':object,'Path':FakePath,
+        'protected_json':lambda _: {'candidate_uid':65534,'candidate_gid':65534},
+        'sha':lambda raw: hashlib.sha256(raw).hexdigest(),
+        'os':SimpleNamespace(getresuid=lambda: (65534,)*3,getresgid=lambda: (65534,)*3,
+            getgroups=lambda: [],getpid=lambda: 1,readlink=lambda path: 'TEST_ONLY-private-'+path),
+        'platform':SimpleNamespace(machine=lambda: 'x86_64'),
+        'sys':SimpleNamespace(platform='linux',byteorder='little',
+            flags=SimpleNamespace(isolated=True,no_site=True),dont_write_bytecode=True),
+        'signal':SimpleNamespace(SIGKILL=9),
+        'ctypes':SimpleNamespace(sizeof=lambda _: 8,c_void_p=object,CDLL=lambda *a,**k: LibC(),
+            c_int=Integer,byref=lambda value: value)}
+    exec(compile(ast.Module(body=[check],type_ignores=[]),str(path),'exec'),namespace)
+    return namespace['check_bootstrap'], operations
+
+
+def test_post_exec_bootstrap_restores_and_reads_nondumpability_before_ready():
+    check, operations = synthetic_bootstrap()
+    result = check()
+    assert operations[:2] == [4,3]
+    assert result['observed']['dumpable'] == 0
+
+
+@pytest.mark.parametrize('set_result,sticky', [(-1,False),(0,True)])
+def test_post_exec_dumpability_reset_or_readback_failure_refuses(set_result, sticky):
+    check, _ = synthetic_bootstrap(set_result, sticky)
+    with pytest.raises(ValueError, match='post-exec.*nondumpability'):
+        check()

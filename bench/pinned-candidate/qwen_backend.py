@@ -160,6 +160,10 @@ def check_bootstrap() -> dict[str, Any]:
             or not sys.flags.isolated or not sys.flags.no_site or not sys.dont_write_bytecode):
         raise ValueError('actual dedicated namespace/drop/capability/bootstrap state differs')
     libc = ctypes.CDLL(None, use_errno=True)
+    # Ordinary exec resets dumpability even after the trusted pre-exec drop.
+    # Restore and read it back before READY, input release or runtime imports.
+    if libc.prctl(4, 0, 0, 0, 0) or libc.prctl(3, 0, 0, 0, 0) != 0:
+        raise ValueError('actual post-exec child nondumpability could not be enforced')
     death = ctypes.c_int()
     if libc.prctl(2, ctypes.byref(death), 0, 0, 0) or death.value != signal.SIGKILL:
         raise ValueError('actual guardian death protection missing')
@@ -177,7 +181,8 @@ def check_bootstrap() -> dict[str, Any]:
             ('CapEff', 'CapPrm', 'CapInh', 'CapAmb', 'CapBnd', 'NoNewPrivs', 'Seccomp')},
         'mountinfo_sha256': sha(Path('/proc/self/mountinfo').read_bytes()),
         'pid_namespace': os.readlink('/proc/self/ns/pid'),
-        'mount_namespace': os.readlink('/proc/self/ns/mnt'), 'parent_death_signal': death.value}
+        'mount_namespace': os.readlink('/proc/self/ns/mnt'), 'parent_death_signal': death.value,
+        'dumpable': 0}
     return lease
 
 

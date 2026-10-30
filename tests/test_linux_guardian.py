@@ -50,7 +50,8 @@ class GuardianProtocolTests(unittest.TestCase):
             'cpu.max':'200000 100000','cpu.max.burst':'0','cpuset.cpus.effective':'2,4',
             'cpuset.mems.effective':'0'}, 'memory.current':100, 'memory.peak':200,
             'memory.swap.current':0,'pids.current':1,'memory.events':{'max':0,'oom':0,'oom_kill':0},
-            'reserve':{'memory_available':3000000000,'disk_free':6000000000}}
+            'reserve':{'memory_available':3000000000,'disk_free':6000000000,
+                'storage':[{'path':'/TEST_ONLY/anchor','device':7,'inode':17,'disk_free':6000000000}]}}
         guardian.validate_resources(fixture, {2,4})
         for changed in ({'memory.swap.current':1}, {'pids.current':129},
                 {'limits':dict(fixture['limits'], **{'cpuset.cpus.effective':'2-4'})},
@@ -100,3 +101,127 @@ def test_shared_parent_deadline_cannot_reset_after_privileged_setup_or_widen_pro
     for deadline in (999.,1005.,float('nan'),float('inf'),True,'1050'):
         with unittest.TestCase().assertRaises(ValueError):
             guardian.attempt_deadlines(1000.,900,deadline)
+
+
+def test_actual_admission_and_sampling_use_all_protected_backing_storage(monkeypatch):
+    """Evaluate the actual reserve call sites with synthetic OS filesystem facts only."""
+    import ast
+    from types import SimpleNamespace
+    tree = ast.parse(PATH.read_text())
+    calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name) and node.func.id == 'reserve']
+    assert len(calls) == 2  # Admission and recurring sampling must both conserve this check.
+    surfaces = ('/TEST_ONLY/anchor', '/TEST_ONLY/snapshot')
+    free_blocks = dict.fromkeys(surfaces, 3*1024**2)
+    def filesystem(path):
+        return SimpleNamespace(f_frsize=4096, f_bavail=free_blocks.get(path, 0))
+    class MemoryInfo:
+        def __init__(self, path): assert path == '/proc/meminfo'
+        def read_text(self): return 'MemAvailable: 33554432 kB\n'
+    monkeypatch.setattr(guardian, 'Path', MemoryInfo)
+    monkeypatch.setattr(guardian, 'protected_path', lambda path, regular: SimpleNamespace(st_dev=7, st_ino=17))
+    descriptors = {}
+    def opened(path, flags):
+        descriptors[len(descriptors)+10] = path
+        return len(descriptors)+9
+    monkeypatch.setattr(guardian, 'os', SimpleNamespace(statvfs=filesystem, open=opened,
+        fstat=lambda fd: SimpleNamespace(st_dev=7, st_ino=17),
+        fstatvfs=lambda fd: filesystem(descriptors[fd]), close=lambda fd: None,
+        O_RDONLY=0, O_DIRECTORY=0, O_NOFOLLOW=0, O_CLOEXEC=0))
+    for call in calls:
+        namespace = {'reserve': guardian.reserve, 'parent': '/sys/fs/cgroup/TEST_ONLY',
+            'self': SimpleNamespace(parent_path='/sys/fs/cgroup/TEST_ONLY', storage_paths=surfaces),
+            'MEMORY': guardian.MEMORY, 'RESERVE': guardian.RESERVE}
+        result = eval(compile(ast.Expression(call), str(PATH), 'eval'), namespace)
+        assert result['disk_free'] == 12884901888
+        assert {row['path'] for row in result['storage']} == set(surfaces)
+    # A second backing filesystem losing space cannot hide behind the first.
+    import pytest
+    free_blocks['/TEST_ONLY/snapshot'] = 0
+    for call in calls:
+        if len(call.args) == 3:
+            result = eval(compile(ast.Expression(call), str(PATH), 'eval'), namespace)
+            assert result['disk_free'] == 0
+            assert result['storage'][1]['disk_free'] == 0
+        else:
+            with pytest.raises(ValueError, match='disk unavailable'):
+                eval(compile(ast.Expression(call), str(PATH), 'eval'), namespace)
+
+
+def test_storage_scope_is_derived_from_anchor_and_complete_protected_closure():
+    host = {'guardian_entry':'/TEST_ONLY/entry/guardian', 'guardian_python':'/TEST_ONLY/python/bin/python',
+        'support_sources':{'/TEST_ONLY/support/filter.py':'a'*64},
+        'cgroup_parent':'/sys/fs/cgroup/TEST_ONLY'}
+    profile = {'readonly_mounts':[{'source':'/TEST_ONLY/assets/weights', 'target':'/model/weights'},
+        {'source':'/TEST_ONLY/runtime/libtorch.so', 'target':'/runtime/libtorch.so'}]}
+    assert guardian.storage_paths(host, profile) == (
+        '/TEST_ONLY/assets', '/TEST_ONLY/entry', '/TEST_ONLY/python/bin',
+        '/TEST_ONLY/runtime', '/TEST_ONLY/support', '/run/policy-as-versioned-flux-candidate')
+
+
+def test_observed_storage_cannot_omit_a_backing_filesystem_or_hide_its_exhaustion():
+    import pytest
+    facts = {'limits':{'memory.max':'12884901888','memory.swap.max':'0','pids.max':'128',
+        'cpu.max':'200000 100000','cpu.max.burst':'0','cpuset.cpus.effective':'2,4',
+        'cpuset.mems.effective':'0'}, 'memory.current':100,'memory.peak':200,
+        'memory.swap.current':0,'pids.current':1,'memory.events':{},
+        'reserve':{'memory_available':3000000000,'disk_free':6000000000,
+            'storage':[{'path':'/TEST_ONLY/anchor','device':7,'inode':17,'disk_free':6000000000}]}}
+    with pytest.raises(ValueError, match='storage'):
+        guardian.validate_resources(facts, {2,4}, ('/TEST_ONLY/anchor','/TEST_ONLY/snapshot'))
+    facts['reserve']['storage'].append({'path':'/TEST_ONLY/snapshot','device':8,'inode':18,'disk_free':6000000000})
+    guardian.validate_resources(facts, {2,4}, ('/TEST_ONLY/anchor','/TEST_ONLY/snapshot'))
+    facts['reserve']['storage'][1]['disk_free'] = 0
+    with pytest.raises(ValueError, match='storage'):
+        guardian.validate_resources(facts, {2,4}, ('/TEST_ONLY/anchor','/TEST_ONLY/snapshot'))
+
+
+def test_host_ready_cannot_accept_dumpable_child_with_otherwise_valid_kernel_state():
+    """Actual READY function with synthetic proc/OS boundaries; no helper/kernel call."""
+    import ast
+    import hashlib
+    import pytest
+    from types import SimpleNamespace
+    source = ast.parse(PATH.read_text())
+    names = {'verify_ready','host_mappings','inspect_mounts','parse_status','observe_nondumpability'}
+    functions = [node for node in source.body if isinstance(node, ast.FunctionDef) and node.name in names]
+    status = '\n'.join(['Uid: 65534 65534 65534 65534','Gid: 65534 65534 65534 65534',
+        'Groups:', 'NSpid: 100 1','NoNewPrivs: 1','Seccomp: 2','Seccomp_filters: 2',
+        *(key+': 00000000' for key in ('CapEff','CapPrm','CapInh','CapAmb','CapBnd'))])
+    mounts = ('1 0 0:1 / / ro,nosuid,nodev - tmpfs tmpfs ro\n'
+        '2 1 0:2 / /proc ro,nosuid,nodev,noexec - proc proc ro\n'
+        '3 1 0:3 / /attempt rw,nosuid,nodev,noexec - tmpfs tmpfs rw,size=131072k\n')
+    owner = [65534]  # TEST_ONLY post-exec dumpable=1 yields candidate-owned proc members.
+    class FakePath:
+        def __init__(self, path): self.path = path
+        def read_text(self):
+            return {'/proc/100/status':status,'/proc/100/mountinfo':mounts,'/proc/100/maps':''}[self.path]
+        def stat(self):
+            assert self.path in ('/proc/100/mem','/proc/100/auxv')
+            return SimpleNamespace(st_uid=owner[0],st_gid=owner[0])
+        def read_bytes(self):
+            assert self.path == '/proc/100/exe'
+            return b'TEST_ONLY interpreter'
+        def iterdir(self):
+            assert self.path == '/proc/100/fd'
+            return []
+    def readlink(path):
+        if path.endswith('/ns/user'): return 'TEST_ONLY-same-user-namespace'
+        return 'TEST_ONLY-'+path
+    namespace = {'Path':FakePath,'Any':object,'Callable':object,'digest':lambda raw: hashlib.sha256(raw).hexdigest(),
+        'os':SimpleNamespace(readlink=readlink,getsid=lambda pid: pid,getpgid=lambda pid: pid,
+            statvfs=lambda path: SimpleNamespace(f_blocks=32768,f_frsize=4096))}
+    module = ast.Module(body=[ast.ImportFrom(module='__future__',names=[ast.alias(name='annotations')],level=0),
+        *functions],type_ignores=[])
+    exec(compile(ast.fix_missing_locations(module),str(PATH),'exec'),namespace)
+    identity = SimpleNamespace(pid=100,start='42',verify=lambda: None)
+    child = SimpleNamespace(identity=identity)
+    leaf = SimpleNamespace(identity=SimpleNamespace(st_dev=7,st_ino=17),mount_id=5,name='lease-TEST_ONLY',
+        read=lambda name: '100',verify_limits=lambda: {})
+    host = {'candidate_uid':65534,'candidate_gid':65534}
+    profile = {'readonly_mounts':[],'config':{'backend':{'python_sha256':hashlib.sha256(b'TEST_ONLY interpreter').hexdigest()}}}
+    with pytest.raises(ValueError, match='dumpab'):
+        namespace['verify_ready'](child,host,profile,leaf,lambda: None)
+    owner[0] = 0
+    facts = namespace['verify_ready'](child,host,profile,leaf,lambda: None)
+    assert facts['nondumpability']['proc_owners'] == {'mem':{'uid':0,'gid':0},'auxv':{'uid':0,'gid':0}}

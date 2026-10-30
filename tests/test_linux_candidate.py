@@ -250,3 +250,77 @@ def test_unknown_or_omitted_profile_identity_never_borrows_an_approved_actor(nam
     value['profile'] = name
     with pytest.raises(ValueError, match='reviewed Linux profile'):
         validate_profile(value)
+
+
+def test_actual_consumer_requires_independent_post_exec_ownership_and_child_readback(monkeypatch):
+    from twin import linux_candidate as candidate
+    from types import SimpleNamespace
+    host = {'candidate_uid':65534,'candidate_gid':65534,'cpus':[2,4]}
+    capture = candidate.HostCapture(candidate.HostAuthority(b'{"TEST_ONLY":"synthetic host"}'),
+        host, {'config':profile()}, 1, {}, 1000.)
+    capture.phase, capture.identity, capture.lease = 'preflight', [100,'42'], 'a'*48
+    capture.sources['preflight'] = []
+    capture.mappings['preflight'] = []
+    capture.mapping_counts['preflight'] = 1
+    state = {'Uid':'65534 65534 65534 65534','Gid':'65534 65534 65534 65534','Groups':'',
+        'NSpid':'100 1','NoNewPrivs':'1','Seccomp':'2','Seccomp_filters':'2',
+        **{key:'00000000' for key in ('CapEff','CapPrm','CapInh','CapAmb','CapBnd')}}
+    def readlink(path):
+        return 'TEST_ONLY-same' if path.endswith('/ns/user') else 'TEST_ONLY-'+path
+    monkeypatch.setattr(candidate.os,'readlink',readlink)
+    corroboration = {'proc_owners':{'mem':{'uid':0,'gid':0},'auxv':{'uid':0,'gid':0}},
+        'user_namespace':'TEST_ONLY-same'}
+    facts = {'role':'ready','pid':100,'start':'42','source_count':0,'native_mapping_count':0,
+        'status':state,'nondumpability':corroboration,'root_readonly':True,'proc_readonly':True,
+        'tmpfs_bytes':134217728,'writable_mounts':[{'path':'/attempt','fstype':'tmpfs',
+            'flags':['rw','nosuid','nodev','noexec']}],
+        'namespaces':{'pid':'TEST_ONLY-private-pid','mnt':'TEST_ONLY-private-mnt'},
+        'limits':{'memory.max':'12884901888','memory.swap.max':'0','pids.max':'128',
+            'cpu.max':'200000 100000','cpu.max.burst':'0','cpuset.cpus.effective':'2,4',
+            'cpuset.mems.effective':'0'},'cgroup_identity':{'name':'lease-'+'a'*48}}
+    packet = {'event':'proof','facts':facts}
+    facts['nondumpability'] = dict(corroboration,proc_owners={'mem':{'uid':65534,'gid':65534},'auxv':{'uid':0,'gid':0}})
+    with pytest.raises(ValueError,match='nondumpability observation'):
+        capture.accept(packet)
+    facts['nondumpability'] = dict(corroboration,user_namespace='TEST_ONLY-foreign')
+    with pytest.raises(ValueError,match='nondumpability observation'):
+        capture.accept(packet)
+    facts['nondumpability'] = corroboration
+    capture.accept(packet)
+    with pytest.raises(ValueError,match='dumpability readback'):
+        capture.accept({'event':'frame','body':{'type':'ready','facts':{'dumpable':1}}})
+    capture.accept({'event':'frame','body':{'type':'ready','facts':{'dumpable':0}}})
+
+
+def test_actual_consumer_refuses_substituted_or_replaced_storage_evidence(monkeypatch):
+    from twin import linux_candidate as candidate
+    from pathlib import PurePosixPath
+    from types import SimpleNamespace
+    host = {'cpus':[2,4],'guardian_entry':'/TEST_ONLY/control/entry',
+        'guardian_python':'/TEST_ONLY/control/python','support_sources':{},
+        'cgroup_parent':'/sys/fs/cgroup/TEST_ONLY'}
+    selected = {'readonly_mounts':[{'source':'/TEST_ONLY/snapshot/model'}]}
+    capture = candidate.HostCapture(candidate.HostAuthority(b'{"TEST_ONLY":"synthetic host"}'),
+        host, selected, 1, {}, 1000.)
+    replaced = [False]
+    class Filesystem(PurePosixPath):
+        def lstat(self):
+            return SimpleNamespace(st_uid=0,st_mode=0o40755,st_dev=7,
+                st_ino=18 if replaced[0] and str(self) == '/TEST_ONLY/snapshot' else 17)
+    monkeypatch.setattr(capture.policy,'Path',Filesystem)
+    monkeypatch.setattr(capture.policy,'os',SimpleNamespace(listxattr=lambda *a,**k: []))
+    facts = {'limits':{'memory.max':'12884901888','memory.swap.max':'0','pids.max':'128',
+        'cpu.max':'200000 100000','cpu.max.burst':'0','cpuset.cpus.effective':'2,4',
+        'cpuset.mems.effective':'0'},'memory.current':100,'memory.peak':200,
+        'memory.swap.current':0,'pids.current':1,'memory.events':{},'gap_seconds':None,
+        'reserve':{'memory_available':3000000000,'disk_free':6000000000,
+            'storage':[{'path':'/sys/fs/cgroup/TEST_ONLY','device':7,'inode':17,'disk_free':6000000000}]}}
+    packet = {'event':'resources','facts':facts}
+    with pytest.raises(ValueError,match='storage scope'):
+        capture.accept(packet)
+    facts['reserve']['storage'] = [{'path':path,'device':7,'inode':17,'disk_free':6000000000}
+        for path in ('/TEST_ONLY/control','/TEST_ONLY/snapshot','/run/policy-as-versioned-flux-candidate')]
+    capture.accept(packet)
+    replaced[0] = True
+    with pytest.raises(ValueError,match='storage identity changed'):
+        capture.accept(packet)

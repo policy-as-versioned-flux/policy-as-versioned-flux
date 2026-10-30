@@ -409,7 +409,8 @@ def key_values(raw: str) -> dict[str, int]:
     return {key: int(value) for line in raw.splitlines() for key, value in [line.split()]}
 
 
-def validate_resources(facts: dict[str, Any], cpus: set[int]) -> None:
+def validate_resources(facts: dict[str, Any], cpus: set[int],
+                       storage: tuple[str, ...] | None = None) -> None:
     """Public resource-proof seam over independently acquired kernel snapshots."""
     expected = {'memory.max':str(MEMORY),'memory.swap.max':'0','pids.max':'128',
                 'cpu.max':'200000 100000','cpu.max.burst':'0'}
@@ -428,6 +429,18 @@ def validate_resources(facts: dict[str, Any], cpus: set[int]) -> None:
         raise ValueError('actual resource cap/swap/oom failure')
     if (facts['reserve']['memory_available'] < RESERVE or facts['reserve']['disk_free'] < DISK):
         raise ValueError('actual host reserve unavailable')
+    rows = facts['reserve'].get('storage')
+    if (not isinstance(rows, list) or not rows
+            or any(not isinstance(row, dict) or set(row) != {'path','device','inode','disk_free'}
+                   or not isinstance(row['path'], str)
+                   or any(type(row[key]) is not int or row[key] < 0 for key in ('device','inode','disk_free'))
+                   for row in rows)):
+        raise ValueError('actual protected backing storage records required')
+    paths = [row['path'] for row in rows]
+    if (len(set(paths)) != len(paths) or storage is not None and set(paths) != set(storage)
+            or min(row['disk_free'] for row in rows) != facts['reserve']['disk_free']
+            or any(row['disk_free'] < DISK for row in rows)):
+        raise ValueError('actual backing storage scope/minimum/reserve differs')
 
 
 class UnverifiedSetupCleanup(ValueError):
@@ -436,9 +449,10 @@ class UnverifiedSetupCleanup(ValueError):
 
 class Leaf:
     """Pinned unique cgroup directory; every control access is relative/no-follow."""
-    def __init__(self, parent: str, lease: str, cpus: list[int]):
+    def __init__(self, parent: str, lease: str, cpus: list[int], storage: tuple[str, ...]):
         protected_path(parent, False)
         self.parent_path = parent
+        self.storage_paths = storage
         self.name = 'lease-'+lease
         self.parentfd = os.open(parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
         self.parent_identity = os.fstat(self.parentfd)
@@ -468,7 +482,7 @@ class Leaf:
                 if ancestor.parent == ancestor or Path('/sys/fs/cgroup') not in ancestor.parents:
                     raise ValueError('protected cgroup2 parent must lie beneath /sys/fs/cgroup')
                 ancestor = ancestor.parent
-            reserve(parent, MEMORY+RESERVE)
+            reserve(self.storage_paths, MEMORY+RESERVE)
             os.mkdir(self.name, 0o700, dir_fd=self.parentfd)
             created=True
             self.fd = os.open(self.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC,
@@ -557,7 +571,7 @@ class Leaf:
             'memory.peak':int(self.read('memory.peak')),'memory.events':key_values(self.read('memory.events')),
             'memory.swap.current':int(self.read('memory.swap.current')),
             'cpu.stat':key_values(self.read('cpu.stat')),'cgroup.events':key_values(self.read('cgroup.events')),
-            'pids.current':int(self.read('pids.current')),'reserve':reserve(self.parent_path, RESERVE,False)}
+            'pids.current':int(self.read('pids.current')),'reserve':reserve(self.storage_paths, RESERVE,False)}
         if child is not None and not child.dead():
             child.verify()
             facts['pid'] = child.pid
@@ -578,14 +592,42 @@ class Leaf:
         os.close(self.parentfd)
 
 
-def reserve(path: str, minimum: int, enforce: bool = True) -> dict[str, int]:
+def storage_paths(host: dict[str, Any], profile: dict[str, Any]) -> tuple[str, ...]:
+    """Derive storage solely from the fixed anchor and its protected read closure.
+
+    The anchor parent holds receipts, locks and private-root scaffolding. Acquired
+    model/runtime/support files may occupy other backing filesystems. /attempt is
+    separately bounded memory-backed tmpfs, not evidence storage or disk capacity.
+    No reserve path is accepted from the candidate or the invocation request.
+    """
+    sources = [host['guardian_entry'], host['guardian_python'], *host['support_sources'],
+               *(entry['source'] for entry in profile['readonly_mounts'])]
+    return tuple(sorted({str(Path(ANCHOR).parent), *(str(Path(source).parent) for source in sources)}))
+
+
+def reserve(paths: tuple[str, ...], minimum: int, enforce: bool = True) -> dict[str, Any]:
     info = parse_status(Path('/proc/meminfo').read_text())
     available = int(info['MemAvailable'].split()[0])*1024
-    disk = os.statvfs(path)
-    free = disk.f_bavail*disk.f_frsize
+    if not isinstance(paths, tuple) or not paths or len(set(paths)) != len(paths):
+        raise ValueError('complete protected backing storage paths required')
+    storage: list[dict[str, Any]] = []
+    for path in paths:
+        before = protected_path(path, False)
+        fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+        try:
+            current = os.fstat(fd)
+            if (current.st_dev, current.st_ino) != (before.st_dev, before.st_ino):
+                raise ValueError('protected backing storage replaced during acquisition')
+            disk = os.fstatvfs(fd)
+            storage.append({'path':path,'device':current.st_dev,'inode':current.st_ino,
+                            'disk_free':disk.f_bavail*disk.f_frsize})
+        finally:
+            os.close(fd)
+    free = min(row['disk_free'] for row in storage)
     if enforce and (available < minimum or free < DISK):
         raise ValueError('host memory reserve or 5GiB free disk unavailable')
-    return {'memory_available':available,'disk_free':free,'required_memory':minimum,'required_disk':DISK}
+    return {'memory_available':available,'disk_free':free,'required_memory':minimum,
+            'required_disk':DISK,'storage':storage}
 
 
 def libc_call(name: str, *args: Any) -> int:
@@ -817,6 +859,29 @@ def inspect_mounts(raw: str, targets: set[str]) -> dict[str, Any]:
             'mountinfo_sha256':digest(raw.encode())}
 
 
+def observe_nondumpability(pid: int, uid: int, gid: int) -> dict[str, Any]:
+    """Corroborate the pinned child's PR_GET_DUMPABLE=0 with host proc facts.
+
+    Linux proc ownership distinguishes dumpable=1 from other values, not 0 from
+    2. Same user namespace and verified nonroot credentials are therefore required;
+    this observation never claims an independent numerical prctl read of the child.
+    """
+    state = parse_status(Path(f'/proc/{pid}/status').read_text())
+    user_namespace = os.readlink(f'/proc/{pid}/ns/user')
+    if (type(uid) is not int or uid <= 0 or type(gid) is not int or gid <= 0
+            or [int(x) for x in state['Uid'].split()] != [uid]*4
+            or [int(x) for x in state['Gid'].split()] != [gid]*4
+            or user_namespace != os.readlink('/proc/self/ns/user')):
+        raise ValueError('nondumpability observation has foreign credentials/user namespace')
+    owners = {}
+    for name in ('mem','auxv'):
+        info = Path(f'/proc/{pid}/{name}').stat()
+        if info.st_uid != 0 or info.st_gid != 0:
+            raise ValueError('actual post-exec child remains ordinarily dumpable')
+        owners[name] = {'uid':info.st_uid,'gid':info.st_gid}
+    return {'proc_owners':owners,'user_namespace':user_namespace}
+
+
 def verify_ready(child: Child,host:dict[str,Any],profile:dict[str,Any],leaf:Leaf,
                  checkpoint:Callable[[],None]) -> dict[str,Any]:
     identity = child.identity
@@ -831,6 +896,7 @@ def verify_ready(child: Child,host:dict[str,Any],profile:dict[str,Any],leaf:Leaf
             or status['NoNewPrivs'] != '1' or status['Seccomp'] != '2'
             or int(status.get('Seccomp_filters','0')) < 2):
         raise ValueError('actual READY credential/capability/PID/filter state differs')
+    nondumpability = observe_nondumpability(pid,host['candidate_uid'],host['candidate_gid'])
     namespaces = {name:os.readlink(f'/proc/{pid}/ns/{name}') for name in ('mnt','pid')}
     if any(value == os.readlink('/proc/self/ns/'+name) for name,value in namespaces.items()):
         raise ValueError('actual child namespace is not private')
@@ -863,6 +929,7 @@ def verify_ready(child: Child,host:dict[str,Any],profile:dict[str,Any],leaf:Leaf
     mapped=host_mappings(child,profile,sources)
     identity.verify()
     return {'role':'ready','pid':pid,'start':identity.start,'status':status,'namespaces':namespaces,
+            'nondumpability':nondumpability,
             'limits':leaf.verify_limits(),'sources':sources,'native_mappings':mapped,
             **mount_facts,
             'cgroup_identity':{'device':leaf.identity.st_dev,'inode':leaf.identity.st_ino,
@@ -1002,7 +1069,7 @@ class Guardian:
         self.last_sample=facts['monotonic']
         self.emit('resources',phase=self.phase,facts=facts)
         try:
-            validate_resources(facts,self.leaf.cpus)
+            validate_resources(facts,self.leaf.cpus,self.leaf.storage_paths)
             if facts['gap_seconds'] is not None and facts['gap_seconds']>2:
                 raise ValueError('observer gap exceeds 2s: '+str(facts['gap_seconds']))
         except ValueError as exc:
@@ -1141,7 +1208,8 @@ class Guardian:
             os.write(self.lockfd,self.lease.encode())
             candidate_unused(self.host['candidate_uid'],self.host['candidate_gid'])
             guardian_closure=verify_guardian_closure(self.host,self.liveness)
-            self.leaf=Leaf(self.host['cgroup_parent'],self.lease,self.host['cpus'])
+            self.leaf=Leaf(self.host['cgroup_parent'],self.lease,self.host['cpus'],
+                           storage_paths(self.host,self.profile))
             root_parent=str(Path(ANCHOR).parent)
             protected_path(root_parent,False)
             self.root=root_parent+'/root-'+self.lease

@@ -69,6 +69,7 @@ native/thread compatibility remains to be observed.
 ## Capture and teardown
 
 The child checks actual credentials, mounts, namespace-init identity and controls,
+restores post-exec nondumpability and requires an exact zero prctl readback,
 then installs and observes kernel network denial before enabling rehashed runtime
 paths. It verifies the complete model/runtime closure and full untruncated tokenized
 input before loading weights. Generation repeats that exact input/token binding in
@@ -92,7 +93,21 @@ resource facts and errors; they cannot provide a completed answer or semantic ba
 
 The cgroup enforces 12 GiB memory, zero swap, 128 PIDs, two effective CPUs and quota;
 the guardian checks 2 GiB reserve and 5 GiB disk, actual counters/peaks/events and
-observer gaps. Each phase is killed empty, observed dead and reaped before proceeding.
+observer gaps. Admission and every sample inspect all backing storage derived from
+the fixed anchor parent (receipts, lock and root scaffolding) and the parent directories
+of protected acquired files, including model/runtime/support/interpreter files. Each
+must retain 5 GiB available; capacity is read through a verified directory descriptor,
+with per-path device/inode/free-byte evidence. Cgroup/proc mounts are not used as
+storage capacity, and the bounded `/attempt` tmpfs remains charged to memory.
+The parent rejects omitted/substituted storage and changed observed directory identity.
+
+Before input release, the guardian independently corroborates the pinned child's
+post-exec zero readback with live sensitive proc ownership and verified nonroot
+credentials in the same user namespace. The parent validates those protected guardian
+facts; it does not reopen a child that may already have exited. Linux proc ownership distinguishes dumpable value one
+from other values; these receipts do not claim an independent numeric prctl read of
+another process. Actual Linux enforcement remains a required tiny-control observation.
+Each phase is killed empty, observed dead and reaped before proceeding.
 Supervisor death/control EOF/deadline also use that pinned-leaf cleanup. Guardian
 loss kills locked namespace init, causing kernel termination of detached descendants.
 Verified populated-zero/dead/reaped/removed evidence is required; a kill request or
