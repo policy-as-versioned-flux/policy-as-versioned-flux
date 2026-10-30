@@ -5,6 +5,8 @@ This module owns counts and retained mechanical output, never sensing or action 
 from __future__ import annotations
 
 import base64
+from dataclasses import dataclass
+import hmac
 import json
 import re
 import secrets
@@ -15,6 +17,76 @@ from .task_contracts import TaskContract, METRIC_TASK, validate
 
 ATTEMPT_FIELDS = ('attempt_id', 'subject', 'input_sha256', 'target_sha256', 'actor_sha256',
                   'capture_sha256', 'raw_available', 'disposition', 'reason')
+_REFUSAL_KEY = secrets.token_bytes(32)
+
+
+@dataclass(frozen=True)
+class _ReviewRefusal:
+    packet: bytes
+    authentication: bytes
+
+    @property
+    def digest(self) -> str:
+        return q.hashlib.sha256(self.packet).hexdigest()
+
+    def verify(self) -> None:
+        if not hmac.compare_digest(self.authentication, hmac.digest(_REFUSAL_KEY, self.packet, 'sha256')):
+            raise ValueError('task review refusal requires original private transaction authentication')
+
+
+def _refusal(resolver: q.Resolver, identity: str) -> _ReviewRefusal:
+    result = resolver._task_refusal_receipts.get(identity)
+    if not isinstance(result, _ReviewRefusal) or result.digest != identity:
+        raise ValueError('no independently retained private task refusal receipt')
+    result.verify()
+    return result
+
+
+def archive_refusals(session: q.HostSession) -> dict[str, Any]:
+    return {attempt: {'digest': identity, 'record': json.loads(_refusal(session._resolver, identity).packet)}
+            for attempt, identity in session._task_refusals.items()}
+
+
+def restore_refusals(session: q.HostSession, records: dict[str, Any]) -> None:
+    if not isinstance(records, dict):
+        raise ValueError('protected task refusal receipt map required')
+    for attempt, value in records.items():
+        if not isinstance(value, dict) or set(value) != {'digest', 'record'}:
+            raise ValueError('exact retained task refusal receipt required')
+        receipt = _refusal(session._resolver, value['digest'])
+        if receipt.packet != q.canonical(value['record']):
+            raise ValueError('task refusal record differs from original private transaction')
+        session._task_refusals[attempt] = receipt.digest
+    # The original protected resolver also remembers consumed transactions that
+    # a public archive tries to erase or relabel after permission returns.
+    for identity, receipt in session._resolver._task_refusal_receipts.items():
+        if not isinstance(receipt, _ReviewRefusal):
+            raise ValueError('protected task refusal store contains no authenticated transaction')
+        receipt.verify()
+        bindings = json.loads(receipt.packet).get('bindings')
+        if isinstance(bindings, dict) and bindings.get('session') == session.identity:
+            original_attempt = bindings.get('attempt')
+            if not isinstance(original_attempt, str) or session._task_refusals.get(original_attempt) != identity:
+                raise ValueError('public task history cannot erase an original consumed refusal')
+
+
+def _import_refusals_from_pinned_archive(archive: bytes, resolver: q.Resolver) -> None:
+    """Only after Resolver verifies independently pinned catalogue AND session bytes.
+
+    Public dictionaries cannot invoke this import through HostSession.restore. The
+    host's protected catalogue pin supplies cross-process provenance, as for the
+    existing capture and independent-assessment import paths. No key is exported.
+    """
+    records = json.loads(archive).get('task_refusals', {})
+    if not isinstance(records, dict):
+        raise ValueError('protected task refusal receipt map required')
+    for value in records.values():
+        if not isinstance(value, dict) or set(value) != {'digest', 'record'}:
+            raise ValueError('exact protected task refusal receipt required')
+        raw = q.canonical(value['record'])
+        if q.hashlib.sha256(raw).hexdigest() != value['digest']:
+            raise ValueError('protected task refusal receipt digest differs')
+        resolver._task_refusal_receipts[value['digest']] = _ReviewRefusal(raw, hmac.digest(_REFUSAL_KEY, raw, 'sha256'))
 
 
 def bind_job(session: q.HostSession, job: dict[str, Any]) -> None:
@@ -128,11 +200,126 @@ def _selections(session: q.HostSession, task: str, model_version: str) -> tuple[
     return tuple(selections)
 
 
-def _permissions(session: q.HostSession, selections: tuple[q.Selection, ...]) -> None:
+class _PermissionRefused(ValueError):
+    def __init__(self, permissions: list[dict[str, Any]], reason: str):
+        super().__init__(reason)
+        self.permissions = permissions
+
+
+def _permission_record(permission: Any, selected: q.Selection) -> dict[str, Any]:
+    native = isinstance(permission, q.mp.Permission)
+    if native and (permission.skill != selected.population.metric or permission.model_version != selected.actor.model_version):
+        raise ValueError('current permission belongs to another task metric or actor')
+    if not native and json.loads(selected.actor.description)['config'].get('purpose') != 'TEST_ONLY':
+        raise ValueError('operational task permission requires actual host permission facts')
+    return {'metric': selected.population.metric, 'model_version': selected.actor.model_version,
+        'kind': 'native' if native else 'TEST_ONLY-precondition', 'granted': bool(permission.granted),
+        'conditions': [{'item': item.item, 'name': item.name, 'passed': item.passed, 'detail': item.detail}
+                       for item in permission.conditions] if native else []}
+
+
+def _permissions(session: q.HostSession, selections: tuple[q.Selection, ...]) -> list[dict[str, Any]]:
+    records, reasons = [], []
     for selected in selections:
         permission = session._resolver.permission(selected.population.metric, selected.actor.model_version)
+        records.append(_permission_record(permission, selected))
         if not permission.granted:
-            raise ValueError(permission.why() + '; human required')
+            reasons.append(permission.why())
+    if reasons:
+        raise _PermissionRefused(records, '; '.join(reasons) + '; human required')
+    return records
+
+
+def _refusal_bindings(session: q.HostSession, attempt: dict[str, Any], selections: tuple[q.Selection, ...]) -> dict[str, Any]:
+    return {'session': session.identity, 'attempt': attempt['attempt_id'], 'subject': attempt['subject'],
+        'job_sha256': q.hashlib.sha256(session._task_job or b'').hexdigest(), 'actor_sha256': selections[0].actor.digest,
+        'selection_digests': {item.population.metric: item.digest for item in selections},
+        'task_policy_digests': {item.population.metric: item._task_policy.digest for item in selections},
+        'input_sha256': attempt['input_sha256'], 'output_sha256': attempt['capture_sha256'],
+        'assessment_digests': {metric: value['digest'] for metric, value in session._task_reviews[attempt['attempt_id']].items()}}
+
+
+def _retain_refusal(session: q.HostSession, attempt: dict[str, Any], selections: tuple[q.Selection, ...],
+                    pending: dict[str, Any], request_digest: str, start: list[dict[str, Any]],
+                    refused: Exception, reason: str) -> None:
+    permission_loss = isinstance(refused, _PermissionRefused)
+    value = {'schema': 'twin.task-review-refusal/v1', 'bindings': _refusal_bindings(session, attempt, selections),
+        'request': {'metric': pending['task_review_metric'], 'sha256': request_digest},
+        'failure': {'kind': 'current-permission-refused' if permission_loss else 'post-consumption-verification-error',
+                    'exception_type': type(refused).__module__ + '.' + type(refused).__qualname__, 'message': str(refused)},
+        'permissions_before_acquisition': start,
+        'permissions_after_acquisition': refused.permissions if isinstance(refused, _PermissionRefused) else None,
+        'prior_event_count': len(session._task_events), 'prior_events_sha256': q.digest(session._task_events), 'reason': reason}
+    raw = q.canonical(value)
+    receipt = _ReviewRefusal(raw, hmac.digest(_REFUSAL_KEY, raw, 'sha256'))
+    session._resolver._task_refusal_receipts[receipt.digest] = receipt
+    session._task_refusals[attempt['attempt_id']] = receipt.digest
+
+
+def _verify_refusal(session: q.HostSession, attempt: dict[str, Any], selections: tuple[q.Selection, ...]) -> None:
+    receipt = _refusal(session._resolver, session._task_refusals.get(attempt['attempt_id'], ''))
+    value = json.loads(receipt.packet)
+    if (set(value) != {'schema', 'bindings', 'request', 'failure', 'permissions_before_acquisition', 'permissions_after_acquisition',
+                       'prior_event_count', 'prior_events_sha256', 'reason'}
+            or value['schema'] != 'twin.task-review-refusal/v1'
+            or q.canonical(value['bindings']) != q.canonical(_refusal_bindings(session, attempt, selections))
+            or value['reason'] != attempt['reason']):
+        raise ValueError('task refusal differs from original private review transaction')
+    failure = value['failure']
+    if (not isinstance(failure, dict) or set(failure) != {'kind', 'exception_type', 'message'}
+            or not isinstance(failure['exception_type'], str) or not failure['exception_type']
+            or not isinstance(failure['message'], str)):
+        raise ValueError('task refusal lacks the actual typed transaction failure')
+    permission_loss = failure['kind'] == 'current-permission-refused'
+    permission_type = _PermissionRefused.__module__ + '.' + _PermissionRefused.__qualname__
+    if permission_loss:
+        expected_reason = 'current task permission refused after acquired reviews were consumed: ' + failure['message']
+        if failure['exception_type'] != permission_type:
+            raise ValueError('task permission refusal exception type differs')
+    else:
+        expected_reason = ('task verification failed after acquired reviews were consumed: ' + failure['exception_type']
+                           + ': ' + failure['message'] + '; human required')
+        if (failure['kind'] != 'post-consumption-verification-error' or failure['exception_type'] == permission_type
+                or value['permissions_after_acquisition'] is not None):
+            raise ValueError('task verification error cannot invent a current permission observation')
+    if value['reason'] != expected_reason:
+        raise ValueError('task refusal reason differs from the authenticated typed failure')
+    request = value['request']; reviews = session._task_reviews[attempt['attempt_id']]
+    if (not isinstance(request, dict) or set(request) != {'metric', 'sha256'} or request['metric'] not in reviews
+            or request['sha256'] != q.digest(review_request(session, reviews[request['metric']]['record'], request['metric']))):
+        raise ValueError('task refusal does not bind the actual consumed review request')
+    offset = value['prior_event_count']
+    if (type(offset) is not int or offset < 1 or offset >= len(session._task_events)
+            or value['prior_events_sha256'] != q.digest(session._task_events[:offset])
+            or session._task_events[offset] != {'attempt_id': attempt['attempt_id'], 'disposition': 'failed-review',
+                'reason': value['reason'], 'receipt': None}):
+        raise ValueError('task refusal event history differs from original private transaction')
+    for phase in ('before', 'after'):
+        records = value['permissions_' + phase + '_acquisition']
+        if phase == 'after' and not permission_loss:
+            continue
+        if not isinstance(records, list) or len(records) != len(selections):
+            raise ValueError('task refusal omits an independent current permission observation')
+        for record, selected in zip(records, selections):
+            if (set(record) != {'metric', 'model_version', 'kind', 'granted', 'conditions'}
+                    or record['metric'] != selected.population.metric or record['model_version'] != selected.actor.model_version
+                    or type(record['granted']) is not bool):
+                raise ValueError('task refusal permission actor/metric observation differs')
+            conditions = record['conditions']
+            if record['kind'] == 'native':
+                # Items 3/4/7 are checked at the claim/exercise seam; the native
+                # Permission carries the seven measured permission conditions.
+                if (not isinstance(conditions, list) or [item['item'] for item in conditions] != [1, 2, 5, 6, 8, 9, 10]
+                        or any(set(item) != {'item', 'name', 'passed', 'detail'} or type(item['passed']) is not bool
+                               or not isinstance(item['name'], str) or not isinstance(item['detail'], str) for item in conditions)
+                        or record['granted'] != all(item['passed'] for item in conditions)):
+                    raise ValueError('task refusal differs from actual native permission facts')
+            elif (record['kind'] != 'TEST_ONLY-precondition' or conditions != []
+                  or json.loads(selected.actor.description)['config'].get('purpose') != 'TEST_ONLY'):
+                raise ValueError('public permission claims cannot authenticate a task refusal')
+        if (phase == 'before' and not all(item['granted'] for item in records)
+                or phase == 'after' and all(item['granted'] for item in records)):
+            raise ValueError('task refusal lacks acquired-review current-permission loss')
 
 
 def _gate(row: dict[str, Any], task: str) -> dict[str, Any] | None:
@@ -268,10 +455,14 @@ def _verify_record(session: q.HostSession, record: dict[str, Any], *, current: b
 
 
 def review_pending(session: q.HostSession, request_digest: str, store: q.ReviewStore) -> q.Judgement:
+    if request_digest not in session._pending:
+        return q.Judgement(None, 'original task review absent or already consumed; human required')
     pending = json.loads(session._pending[request_digest])
     attempt = next(item for item in session._task_attempts if item['attempt_id'] == pending['attempt'])
+    consumed = False
     try:
-        selections = verify_record(session, pending, current=True)
+        selections = verify_record(session, pending)
+        permission_start = _permissions(session, selections)
         request = review_request(session, pending)
         if request != pending['task_review_request'] or q.digest(request) != request_digest:
             raise ValueError('pending task review request/source/capture changed')
@@ -280,14 +471,15 @@ def review_pending(session: q.HostSession, request_digest: str, store: q.ReviewS
         if policy is None:
             raise ValueError('task independent assessment policy absent')
         assessment = store.assess(policy, q.canonical(request))
-        del session._pending[request_digest]
         outcome = assessment.outcome(pending['subject'])
         status = 'pass' if outcome is True else 'fail' if outcome is False else 'held'
+        del session._pending[request_digest]
         attempt['assessment_outcomes'][selected.population.metric] = status
         session._reviewed_outputs.append({'record': pending, 'assessment': json.loads(assessment.packet)})
         session._task_reviews.setdefault(pending['attempt'], {})[selected.population.metric] = {
             'record': _base(pending), 'assessment': json.loads(assessment.packet), 'digest': assessment.digest}
         session._live_assessments[assessment.digest] = assessment
+        consumed = True
         if outcome is not True:
             for key, raw in list(session._pending.items()):
                 if json.loads(raw).get('attempt') == pending['attempt']:
@@ -307,8 +499,17 @@ def review_pending(session: q.HostSession, request_digest: str, store: q.ReviewS
         _finish(session, attempt, 'accepted', 'independent task assessments passed; recommendation only', receipt=receipt)
         return q.Judgement(receipt, None, q.Output(q.canonical(record['output'])))
     except Exception as exc:
-        # A stale/missing acquisition is counted and cannot mint a receipt. An
-        # acquired fail/held was consumed above; absent acquisition remains pending.
+        if consumed and set(attempt['assessment_outcomes'].values()) == {'pass'}:
+            if isinstance(exc, _PermissionRefused):
+                reason = 'current task permission refused after acquired reviews were consumed: ' + str(exc)
+            else:
+                reason = ('task verification failed after acquired reviews were consumed: ' + type(exc).__module__
+                          + '.' + type(exc).__qualname__ + ': ' + str(exc) + '; human required')
+            _retain_refusal(session, attempt, selections, pending, request_digest, permission_start, exc, reason)
+            _finish(session, attempt, 'failed-review', reason)
+            return q.Judgement(None, reason)
+        # No assessment was consumed on an absent/stale acquisition. Its original
+        # pending request and raw capture remain available without reinvocation.
         _finish(session, attempt, 'pending-review', str(exc) + '; human required')
         return q.Judgement(None, attempt['reason'])
 
@@ -383,7 +584,8 @@ def _verify_session(session: q.HostSession) -> None:
     if declines != session.declines:
         raise ValueError('task lifecycle omits or rewrites counted declines')
     records = {json.loads(raw)['attempt']: (token, json.loads(raw)) for token, raw in session._records.items()}
-    if len(records) != len(session._records) or not set(records) <= set(ids) or not set(session._task_reviews) <= set(ids):
+    if (len(records) != len(session._records) or not set(records) <= set(ids) or not set(session._task_reviews) <= set(ids)
+            or not set(session._task_refusals) <= set(ids)):
         raise ValueError('task receipt/review has no unique original counted attempt')
     pending: dict[str, dict[str, Any]] = {}
     for key, raw in session._pending.items():
@@ -455,7 +657,14 @@ def _verify_session(session: q.HostSession) -> None:
         expected_outcomes = {metric: outcomes.get(metric, 'pending') for metric in metrics}
         if item['assessment_outcomes'] != expected_outcomes:
             raise ValueError('task attempt assessment outcomes differ from actual retained reviews')
-        if any(value in ('fail', 'held') for value in outcomes.values()):
+        authority_refused = len(outcomes) == len(metrics) and set(outcomes.values()) == {'pass'} and item['disposition'] == 'failed-review'
+        if authority_refused:
+            if item['receipt'] is not None or identity in records or pending.get(identity):
+                raise ValueError('consumed authority refusal cannot invent receipt or pending work')
+            _verify_refusal(session, item, selections)
+        elif identity in session._task_refusals:
+            raise ValueError('task refusal receipt cannot replace another lifecycle disposition')
+        elif any(value in ('fail', 'held') for value in outcomes.values()):
             expected_disposition = 'failed-review' if 'fail' in outcomes.values() else 'held-review'
             if item['disposition'] != expected_disposition or pending.get(identity) or identity in records:
                 raise ValueError('failed/held task review was not consumed')

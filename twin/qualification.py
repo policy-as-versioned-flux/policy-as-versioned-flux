@@ -529,15 +529,16 @@ class Selection:
             description['assessment_policy'] = json.loads(assessment_policy.description)
         from .task_contracts import METRIC_TASK, validate
         if population.metric in METRIC_TASK and test_only is not TEST_ONLY_MECHANICS:
-            from .task_inputs import support_sources, reference_row
-            if task_contract is None or task_policy is None:
+            from .task_inputs import TaskPolicy, support_sources, reference_row
+            if task_contract is None or not isinstance(task_policy, TaskPolicy):
                 raise ValueError('registered metric requires independently selected protected task contract/policy')
             task_contract.verify(); task_policy.verify()
             config = json.loads(actor.description)['config']
             if (task_contract.task != METRIC_TASK[population.metric]
                     or task_policy.contract.description != task_contract.description
-                    or config.get('task') != task_contract.task or config.get('task_contract_digest') != task_contract.digest):
-                raise ValueError('actor/metric/protected task contract differs')
+                    or config.get('task') != task_contract.task or config.get('task_contract_digest') != task_contract.digest
+                    or config.get('task_policy_digest') != task_policy.digest):
+                raise ValueError('actor/metric/protected task contract or policy differs')
             actor_sources = json.loads(actor.description)['sources']
             for path in support_sources():
                 pin = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -977,6 +978,7 @@ class Resolver:
         self._facts: dict[tuple[str, str, str], dict[str, Any]] = {}
         self._sessions: dict[str, HostSession] = {}
         self._task_policies: dict[str, Any] = {}
+        self._task_refusal_receipts: dict[str, Any] = {}
         self._groups: dict[str, CaptureGroup] = {}
         for selected, captured in self._bindings.values():
             if selected._task_policy is not None:
@@ -1037,6 +1039,8 @@ class Resolver:
             session_bytes = path.read_bytes()
             if hashlib.sha256(session_bytes).hexdigest() != entry['sha256']:
                 raise ValueError('protected session bundle digest differs')
+            from .task_sessions import _import_refusals_from_pinned_archive
+            _import_refusals_from_pinned_archive(session_bytes, resolver)
             legacy = json.loads(session_bytes).get('inputs', {}).get('purpose')
             session = HostSession.restore(session_bytes, resolver, metadata_store=metadata_store,
                 metadata_policy=source_metadata_policy,
@@ -1359,6 +1363,7 @@ class HostSession:
         self._task_attempts: list[dict[str, Any]] = []
         self._task_events: list[dict[str, Any]] = []
         self._task_reviews: dict[str, Any] = {}
+        self._task_refusals: dict[str, str] = {}
 
     def bind_task_job(self, job: dict[str, Any]) -> None:
         from .task_sessions import bind_job
@@ -1431,7 +1436,7 @@ class HostSession:
 
     def review_pending(self, request_digest: str, store: ReviewStore) -> Judgement:
         """Resume the retained actual output after host acquisition, never rerun inference."""
-        if request_digest in self._pending and self._uses_task_record(json.loads(self._pending[request_digest])):
+        if self._task_job is not None or request_digest in self._pending and self._uses_task_record(json.loads(self._pending[request_digest])):
             from .task_sessions import review_pending
             return review_pending(self, request_digest, store)
         subject = request_digest
@@ -1601,6 +1606,7 @@ class HostSession:
         return bad
 
     def archive(self) -> bytes:
+        from .task_sessions import archive_refusals
         return canonical({'schema': 'twin.host-session/v1', 'identity': self.identity,
             'inputs': json.loads(self._inputs.description),
             'records': {token: json.loads(packet) for token, packet in self._records.items()},
@@ -1610,7 +1616,8 @@ class HostSession:
             'generation_dispositions': self._generation_dispositions,
             'generation_blobs': self._generation_blobs,
             **({'task_job': json.loads(self._task_job), 'task_attempts': self._task_attempts,
-                'task_events': self._task_events, 'task_reviews': self._task_reviews} if self._task_job is not None else {})})
+                'task_events': self._task_events, 'task_reviews': self._task_reviews,
+                'task_refusals': archive_refusals(self)} if self._task_job is not None else {})})
 
     @classmethod
     def restore(cls, archive: bytes, resolver: Resolver, *, metadata_store: Any = None,
@@ -1619,7 +1626,7 @@ class HostSession:
         value = json.loads(archive)
         if value.get('schema') != 'twin.host-session/v1':
             raise ValueError('unknown protected session schema')
-        if 'task_job' not in value and any(name in value for name in ('task_attempts', 'task_events', 'task_reviews')):
+        if 'task_job' not in value and any(name in value for name in ('task_attempts', 'task_events', 'task_reviews', 'task_refusals')):
             raise ValueError('retained task lifecycle requires its original protected task job')
         session = cls(resolver, HostInputs.restore(canonical(value['inputs']), metadata_store=metadata_store,
             metadata_policy=metadata_policy, test_only=test_only, task_policy=task_policy))
@@ -1636,6 +1643,10 @@ class HostSession:
             session._task_reviews = value['task_reviews']
             from .task_sessions import restore_assessments
             restore_assessments(session)
+        # A known consumed transaction cannot disappear by erasing every public
+        # task marker while retaining the original protected session identity.
+        from .task_sessions import restore_refusals
+        restore_refusals(session, value.get('task_refusals', {}))
         for key, record in value.get('pending_reviews', {}).items():
             session._verify_record(record)
             selected, _ = resolver._bindings[(record['metric'], record['model_version'])]

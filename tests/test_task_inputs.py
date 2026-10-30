@@ -10,9 +10,13 @@ from test_signal_inputs import protected_request
 from test_source_metadata import fixture_import
 
 
-def task_request(protected_request, task='evolution', org='driftwood'):
+def task_request(protected_request, task='evolution', org='driftwood', *, metadata_policy_version='1'):
     request = protected_request(org)
     manifest, archive, receipts, authority = fixture_import()
+    if metadata_policy_version != '1':
+        value = json.loads(authority.description)
+        authority = sm.MetadataAuthority.freeze(value['issuer'], value['policy_id'], metadata_policy_version,
+            value['policy_sha256'], authority.acquire_adapter, authority.source_checker, policy=value['policy'])
     store = sm.MetadataStore(purpose='TEST_ONLY')
     acquired = store.acquire('TEST_ONLY-task-import', sm.canonical(manifest), archive, receipts,
                              sm.sha256(sm.canonical(manifest)), authority)

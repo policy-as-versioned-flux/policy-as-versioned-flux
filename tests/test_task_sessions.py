@@ -101,7 +101,7 @@ def task_review_store(path, policy, request, decision='pass'):
     return ReviewStore(target, hashlib.sha256(target.read_bytes()).hexdigest())
 
 
-def genuine_task_material(protected_request, tmp_path, task='evolution', count=16, *, runner=None, actor_config=None, support=()):
+def genuine_task_material(protected_request, tmp_path, task='evolution', count=16, *, runner=None, actor_config=None, support=(), metadata_policy_version='1'):
     """Actual protected software mechanisms on openly authored TEST_ONLY inputs only."""
     import json
     from bench.qualification_controls import reference, basis_holds
@@ -113,14 +113,15 @@ def genuine_task_material(protected_request, tmp_path, task='evolution', count=1
     resolved = []
     for index in range(count):
         org = ('driftwood', 'tuppence', 'ludlow')[index % 3]
-        args = task_request(protected_request, task, org)
+        args = task_request(protected_request, task, org, metadata_policy_version=metadata_policy_version)
         job = args['protected_job']; packet = json.loads(job['source_packet'])
         packet['subject'] = job['subject'] = f'TEST_ONLY-{task}-{index}'
         packet['as_of'] = job['as_of'] = f'2026-10-{index + 1:02}'
         job['source_packet'] = q.canonical(packet); job['source_pin'] = q.digest(packet)
         resolved.append(resolve_task_input(**args))
     policy = TaskPolicy.freeze(contract, tuple(resolved))
-    config = {'purpose': 'TEST_ONLY', 'task': task, 'task_contract_digest': contract.digest}
+    config = {'purpose': 'TEST_ONLY', 'task': task, 'task_contract_digest': contract.digest,
+              'task_policy_digest': policy.digest}
     if set(actor_config or {}) & set(config):
         raise ValueError('TEST_ONLY fault controls cannot replace protected task config')
     config.update(actor_config or {})
