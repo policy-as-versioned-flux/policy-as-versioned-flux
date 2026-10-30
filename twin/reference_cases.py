@@ -76,6 +76,9 @@ def admit_reference(case: dict[str, Any], scope: dict[str, Any]) -> Admission:
             reasons.append('invalid-shape:' + field)
     if reasons:
         return _decision(case, scope, reasons)
+    reasons.extend(_support_shape_reasons(case.get('field_support', {})))
+    if reasons:
+        return _decision(case, scope, reasons)
     if 'input' not in case or case['input'] is None:
         reasons.append('missing-input')
     if case.get('context') != scope:
@@ -110,7 +113,7 @@ def admit_reference(case: dict[str, Any], scope: dict[str, Any]) -> Admission:
         reasons.append('unsupported-metric')
     expected = case.get('expected', {})
     for field in targets.get(metric, ()):
-        if field not in expected or (expected[field] is None and not (field == 'stopped_at' and expected.get('admitted') is True)):
+        if field not in expected or (expected[field] is None and field != 'stopped_at'):
             reasons.append('missing-target:' + field)
     sources = case.get('sources', {})
     for name, source in sources.items():
@@ -189,6 +192,32 @@ def admit_reference(case: dict[str, Any], scope: dict[str, Any]) -> Admission:
             if not valid:
                 reasons.append('invalid-support-witness:' + field)
     return _decision(case, scope, reasons)
+
+
+def _support_shape_reasons(supports: dict[str, dict[str, Any]]) -> list[str]:
+    """Parse nested collections before source lookup, set comparison or byte slicing.
+
+    Originals stay untouched in the packet. Missing/empty support is diagnosed by admission;
+    malformed declarations are held here instead of being treated as an empty declaration.
+    """
+    reasons: list[str] = []
+    for field, support in supports.items():
+        sources = support.get('sources', [])
+        if not isinstance(sources, list) or any(not isinstance(name, str) for name in sources):
+            reasons.append('invalid-shape:field-support-sources:' + field)
+        witnesses = support.get('witnesses', [])
+        if not isinstance(witnesses, list):
+            reasons.append('invalid-shape:field-support-witnesses:' + field)
+            continue
+        for witness in witnesses:
+            if (not isinstance(witness, dict)
+                    or not isinstance(witness.get('source'), str)
+                    or type(witness.get('start')) is not int
+                    or type(witness.get('end')) is not int
+                    or not isinstance(witness.get('sha256'), str)):
+                reasons.append('invalid-shape:field-support-witnesses:' + field)
+                break
+    return reasons
 
 
 def _decision(case: dict[str, Any], scope: dict[str, Any], reasons: list[str]) -> Admission:

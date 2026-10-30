@@ -4,6 +4,8 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
+import pytest
+
 from twin.reference_cases import admit_reference, source_record
 from twin.skills import Stated, evaluate
 from twin import evolution_judge
@@ -194,3 +196,54 @@ def test_witnesses_must_cover_declared_sources_and_bad_shapes_are_retained() -> 
         decision = admit_reference(malformed, scope)
         assert not decision.admitted
         assert 'invalid-shape:' + field in decision.reasons
+
+
+def test_existing_ethics_dpia_refusal_retains_explicit_null_ladder_stop() -> None:
+    """The existing scorer distinguishes overall DPIA refusal from a failed ladder rung."""
+    from copy import deepcopy
+    from twin import ethics_gate
+    from twin.reference_cases import binding_for
+    case, scope = example()
+    contract = next(row for row in ethics_gate.labelled_corpus()
+                    if row['id'] == 'keystroke-monitoring-no-dpia')
+    scope.update(metric='ethics-gate', claim='task-conformance')
+    case.update(context=scope.copy(), input=contract['input'],
+                expected={'admitted': False, 'stopped_at': None}, reference_kind='declared-constraints')
+    support = case['field_support']['evolution_position']
+    case['field_support'] = {field: deepcopy(support) for field in ('admitted', 'stopped_at')}
+    case['basis']['contract'] = {'last_ladder_rung': 'proportionality',
+                               'channels': ['keystroke'], 'complete': False}
+    case['basis_binding'] = binding_for(case)
+    decision = admit_reference(case, scope)
+    assert decision.admitted, decision.reasons
+    assert decision.evaluator_item()['expected'] == {'admitted': False, 'stopped_at': None}
+
+    def basis_holds(actual, expected):
+        return {'last_ladder_rung': actual['rung_checks'][-1]['rung'],
+                'channels': actual['dpia_readings']['channels'],
+                'complete': actual['dpia_readings']['complete']} == expected['contract']
+
+    result = evaluate('ethics-gate', ethics_gate.admit_stated, [decision.evaluator_item()],
+                      scorer=ethics_gate.scorer, basis_scorer=basis_holds)
+    assert result.items[0].verdict == 'right'
+    assert result.outcome == 'not-measurable'
+    missing = deepcopy(case)
+    missing['expected'].pop('stopped_at')
+    missing['basis_binding'] = binding_for(missing)
+    assert 'missing-target:stopped_at' in admit_reference(missing, scope).reasons
+
+
+@pytest.mark.parametrize('witnesses', [None, ['bad'], {'source': 'account'},
+                                       [{'source': ['unhashable']}], [{'source': None}]])
+def test_malformed_support_witness_declarations_return_retained_holds(witnesses: Any) -> None:
+    import json
+    from copy import deepcopy
+    case, scope = example()
+    case['field_support']['evolution_position']['witnesses'] = deepcopy(witnesses)
+    decision = admit_reference(case, scope)
+    assert not decision.admitted
+    assert 'invalid-shape:field-support-witnesses:evolution_position' in decision.reasons
+    assert (json.loads(decision.packet_bytes)['case']['field_support']['evolution_position']['witnesses']
+            == witnesses)
+    with pytest.raises(ValueError, match='reference held'):
+        decision.evaluator_item()
