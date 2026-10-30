@@ -68,12 +68,48 @@ def _code_identity(code: types.CodeType) -> types.CodeType:
         _code_identity(value) if isinstance(value, types.CodeType) else value for value in code.co_consts))
 
 
+def _default_identity(value: Any) -> dict[str, Any]:
+    """JSON-safe defaults without losing tuple/list types, mapping order or shared state.
+
+    The actual imported function retains its Python defaults; this is only their comparison
+    identity. Built-in JSON scalars/collections are supported, including nested tuples. Custom
+    objects and cycles require explicit invocation config instead of implicit captured state.
+    """
+    seen: dict[int, int] = {}
+    active: set[int] = set()
+    def encode(item: Any) -> dict[str, Any]:
+        kind = type(item)
+        if kind is float:
+            return {'kind': 'float', 'value': canonical(item).decode()}
+        if kind in (type(None), bool, int, str):
+            return {'kind': kind.__name__, 'value': item}
+        if kind not in (tuple, list, dict):
+            raise ValueError('unsupported callable default; use explicit config')
+        identity = id(item)
+        if identity in active:
+            raise ValueError('cyclic callable default; use explicit config')
+        if identity in seen:
+            return {'kind': 'alias', 'index': seen[identity]}
+        index = seen[identity] = len(seen)
+        active.add(identity)
+        values: list[Any]
+        if kind is dict:
+            if any(type(key) not in (type(None), bool, int, float, str) for key in item):
+                raise ValueError('unsupported callable default mapping key; use explicit config')
+            values = [[encode(key), encode(child)] for key, child in item.items()]
+        else:
+            values = [encode(child) for child in item]
+        active.remove(identity)
+        return {'kind': kind.__name__, 'index': index, 'items': values}
+    return encode(value)
+
+
 def _callable_identity(fn: Callable[..., Any]) -> dict[str, Any]:
     if not inspect.isfunction(fn) or fn.__closure__:
         raise ValueError('host adapters must be module functions without captured state; use config')
     return {'module': fn.__module__, 'name': fn.__qualname__,
             'code_sha256': hashlib.sha256(marshal.dumps(_code_identity(fn.__code__))).hexdigest(),
-            'defaults': fn.__defaults__, 'keyword_defaults': fn.__kwdefaults__}
+            'defaults': _default_identity({'positional': fn.__defaults__, 'keyword': fn.__kwdefaults__})}
 
 
 @dataclass(frozen=True)
