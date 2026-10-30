@@ -296,6 +296,18 @@ def validate_reviewed_profile(config: dict[str,Any])->None:
     """Even protected host installation cannot silently widen these reviewed actors."""
     profiles={'signal-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':512,
         'timeout_seconds':900,'threads':2,'interop_threads':1},
+        'causal-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':2048,
+        'timeout_seconds':1200,'threads':2,'interop_threads':1,'context_tokens':8192,
+        'raw_output_max_bytes':131072},
+        'gameplay-linux-bf16-v1':{'max_input_tokens':6144,'max_new_tokens':2048,
+        'timeout_seconds':1200,'threads':2,'interop_threads':1,'context_tokens':8192,
+        'raw_output_max_bytes':131072},
+        'ethics-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':1024,
+        'timeout_seconds':900,'threads':2,'interop_threads':1,'context_tokens':8192,
+        'raw_output_max_bytes':131072},
+        'evolution-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':768,
+        'timeout_seconds':900,'threads':2,'interop_threads':1,'context_tokens':8192,
+        'raw_output_max_bytes':131072},
         'substrate-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':2048,
         'timeout_seconds':600,'threads':2,'interop_threads':1,'context_tokens':8192,
         'raw_output_max_bytes':131072}}
@@ -306,6 +318,10 @@ def validate_reviewed_profile(config: dict[str,Any])->None:
             for key,value in limits.items()) or any(key in config for key in
                 {'context_tokens','raw_output_max_bytes'}-set(limits))):
         raise ValueError('reviewed numerical profile differs; no widening or fallback')
+    if profile_id not in ('signal-linux-bf16-v1','substrate-linux-bf16-v1'):
+        if (config.get('task') != profile_id.removesuffix('-linux-bf16-v1')
+                or not pin(config.get('task_contract_digest'))):
+            raise ValueError('reviewed task profile needs exact task and frozen task contract digest')
     expected={'model_id':'Qwen/Qwen3-4B-Instruct-2507',
         'revision':'cdbee75f17c01a7cc42f958dc650907174af0554',
         'model_manifest_sha256':'409410d7d41d7e62aafb27c18f049fe3c62d66383b3a5b89d5fadfd3b773fd7e',
@@ -328,7 +344,8 @@ def control_checkpoint(deadline: float) -> None:
 
 
 def load_host(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
-    setup_deadline = min(request['deadline_monotonic'], time.monotonic()+900)-10
+    setup_started = time.monotonic()
+    setup_deadline = min(request['deadline_monotonic'], setup_started+1200)-10
     control_checkpoint(setup_deadline)
     host = json.loads(protected_read(ANCHOR, request['authority'], 64*1024**2))
     control_checkpoint(setup_deadline)
@@ -353,7 +370,7 @@ def load_host(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
             or digest(canonical(profile['config'])) != request['profile_sha256']):
         raise ValueError('full frozen profile digest differs')
     validate_reviewed_profile(profile['config'])
-    setup_deadline = min(setup_deadline,time.monotonic()+profile['config']['timeout_seconds']-10)
+    setup_deadline = min(setup_deadline,setup_started+profile['config']['timeout_seconds']-10)
     def checkpoint() -> None: control_checkpoint(setup_deadline)
     if (not isinstance(host['support_sources'], dict) or not host['support_sources']
             or host['support_sources'].get(str(Path(__file__).absolute())) != digest(Path(__file__).read_bytes())
@@ -1137,12 +1154,13 @@ def attempt_deadlines(started: float, timeout: int, requested: Any) -> tuple[flo
 
 class Guardian:
     def __init__(self,request:dict[str,Any],host:dict[str,Any],profile:dict[str,Any],supervisor:Identity):
+        validate_reviewed_profile(profile['config'])
         self.request,self.host,self.profile,self.supervisor = request,host,profile,supervisor
         self.lease=os.urandom(24).hex()
         self.wire=Wire(self.lease)
         self.started=time.monotonic()
         timeout=profile['config']['timeout_seconds']
-        if timeout not in (600,900): raise ValueError('unreviewed shared attempt deadline')
+        if timeout not in (600,900,1200): raise ValueError('unreviewed shared attempt deadline')
         self.work_deadline,self.deadline=attempt_deadlines(self.started,timeout,request['deadline_monotonic'])
         self.child:Child|None=None
         self.leaf:Leaf|None=None

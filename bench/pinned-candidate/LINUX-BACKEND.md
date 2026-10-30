@@ -15,14 +15,26 @@ The signal adapter routes its operational profile here. The generator consumer u
 the same case-free interface when integrated. Unprotected signal transport requires
 an explicit `purpose: TEST_ONLY`, and never supplies Linux authority.
 
-Two separately named, unmeasured profiles are supported:
+Six separately named, unmeasured profiles are supported:
 
 | Profile | Full input cap | Generated cap | Context cap | Raw cap | Whole attempt |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | `signal-linux-bf16-v1` | 4096 | 512 | actual pinned model capacity | 131072 bytes | 900 s |
 | `substrate-linux-bf16-v1` | 4096 | 2048 | 8192 | 131072 bytes | 600 s |
+| `evolution-linux-bf16-v1` | 4096 | 768 | 8192 | 131072 bytes | 900 s |
+| `causal-linux-bf16-v1` | 4096 | 2048 | 8192 | 131072 bytes | 1200 s |
+| `gameplay-linux-bf16-v1` | 6144 | 2048 | 8192 | 131072 bytes | 1200 s |
+| `ethics-linux-bf16-v1` | 4096 | 1024 | 8192 | 131072 bytes | 900 s |
 
-Both require two CPU threads, one interop thread, direct CPU BF16, eager attention,
+The four task profiles additionally require the exact host-frozen `task` and a
+lowercase SHA256 `task_contract_digest`. Their complete config binds both through
+the existing protected allowlist, paired lease and receipt digest. The task consumer
+owns comparison with its actual frozen contract; pin syntax alone proves no authority.
+Parent, guardian and direct child validate the exact caps/task/pins. Child validation
+precedes input and runtime processing. Unknown aliases, borrowed caps and metadata
+fail closed. Existing signal/substrate configs keep their original behavior.
+
+All require two CPU threads, one interop thread, direct CPU BF16, eager attention,
 seed zero, greedy one-beam/one-sequence decoding, dynamic cache, explicit EOS/pad
 IDs and the original pinned model manifest. Bounds cannot be widened, aliased,
 truncated or repaired. The larger generator context must also fit the actual model's

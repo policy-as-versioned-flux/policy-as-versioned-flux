@@ -186,6 +186,52 @@ def check_bootstrap() -> dict[str, Any]:
     return lease
 
 
+def validate_runtime_profile(config: dict[str,Any])->None:
+    """Even protected host installation cannot silently widen these reviewed actors."""
+    def profile_pin(value: Any) -> bool:
+        return isinstance(value,str) and len(value)==64 and all(char in '0123456789abcdef' for char in value)
+    profiles={'signal-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':512,
+        'timeout_seconds':900,'threads':2,'interop_threads':1},
+        'causal-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':2048,
+        'timeout_seconds':1200,'threads':2,'interop_threads':1,'context_tokens':8192,
+        'raw_output_max_bytes':131072},
+        'gameplay-linux-bf16-v1':{'max_input_tokens':6144,'max_new_tokens':2048,
+        'timeout_seconds':1200,'threads':2,'interop_threads':1,'context_tokens':8192,
+        'raw_output_max_bytes':131072},
+        'ethics-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':1024,
+        'timeout_seconds':900,'threads':2,'interop_threads':1,'context_tokens':8192,
+        'raw_output_max_bytes':131072},
+        'evolution-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':768,
+        'timeout_seconds':900,'threads':2,'interop_threads':1,'context_tokens':8192,
+        'raw_output_max_bytes':131072},
+        'substrate-linux-bf16-v1':{'max_input_tokens':4096,'max_new_tokens':2048,
+        'timeout_seconds':600,'threads':2,'interop_threads':1,'context_tokens':8192,
+        'raw_output_max_bytes':131072}}
+    profile_id=config.get('profile')
+    if not isinstance(profile_id,str):raise ValueError('reviewed profile ID required')
+    limits=profiles.get(profile_id)
+    if (limits is None or any(type(config.get(key)) is not int or config[key]!=value
+            for key,value in limits.items()) or any(key in config for key in
+                {'context_tokens','raw_output_max_bytes'}-set(limits))):
+        raise ValueError('reviewed numerical profile differs; no widening or fallback')
+    if profile_id not in ('signal-linux-bf16-v1','substrate-linux-bf16-v1'):
+        if (config.get('task') != profile_id.removesuffix('-linux-bf16-v1')
+                or not profile_pin(config.get('task_contract_digest'))):
+            raise ValueError('reviewed task profile needs exact task and frozen task contract digest')
+    expected={'model_id':'Qwen/Qwen3-4B-Instruct-2507',
+        'revision':'cdbee75f17c01a7cc42f958dc650907174af0554',
+        'model_manifest_sha256':'409410d7d41d7e62aafb27c18f049fe3c62d66383b3a5b89d5fadfd3b773fd7e',
+        'chat_template_sha256':'64f85b198065d0fba2a81f37e10ed68161ce2c19a754c7100e67e0ca2ee9c326',
+        'dtype':'torch.bfloat16','device':'cpu','attention':'eager','do_sample':False,
+        'num_beams':1,'num_return_sequences':1,'seed':0,'use_cache':True,
+        'cache_implementation':'dynamic','eos_token_ids':[151645,151643],'pad_token_id':151643}
+    actual=config.get('linux_profile')
+    if (not isinstance(actual,dict) or set(actual)!=set(expected)|{'runtime_manifest_sha256'}
+            or any(canonical(actual[key])!=canonical(value) for key,value in expected.items())
+            or not profile_pin(actual['runtime_manifest_sha256'])):
+        raise ValueError('reviewed exact CPU BF16 greedy decode/model pins differ')
+
+
 def verify_runtime_closure(manifest: dict[str, Any]) -> set[str]:
     """Rehash acquired files; hashes bind bytes, and never grant host/acquisition authority."""
     import hashlib
@@ -328,6 +374,7 @@ def main() -> int:
         config, paths = protected_json('/app/actor-config.json'), protected_json('/app/paths.json')
         if lease.get('phase') != phase or sha(canonical(config)) != lease.get('profile_sha256'):
             raise ValueError('protected phase/config lease binding differs')
+        validate_runtime_profile(config)
         required_paths = {'assets', 'model_manifest', 'runtime_manifest', 'network_module',
                           'smoke_module', 'site_packages', 'support_sources'}
         if set(paths) != required_paths or not isinstance(paths['support_sources'], dict):

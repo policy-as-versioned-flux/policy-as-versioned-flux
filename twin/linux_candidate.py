@@ -20,6 +20,18 @@ HOST_ANCHOR = Path('/run/policy-as-versioned-flux-candidate/host.json')
 PROFILES = {
     'signal-linux-bf16-v1': {'max_input_tokens': 4096, 'max_new_tokens': 512,
         'timeout_seconds': 900, 'threads': 2, 'interop_threads': 1},
+    'causal-linux-bf16-v1': {'max_input_tokens': 4096, 'max_new_tokens': 2048,
+        'timeout_seconds': 1200, 'context_tokens': 8192, 'raw_output_max_bytes': 131072,
+        'threads': 2, 'interop_threads': 1},
+    'gameplay-linux-bf16-v1': {'max_input_tokens': 6144, 'max_new_tokens': 2048,
+        'timeout_seconds': 1200, 'context_tokens': 8192, 'raw_output_max_bytes': 131072,
+        'threads': 2, 'interop_threads': 1},
+    'ethics-linux-bf16-v1': {'max_input_tokens': 4096, 'max_new_tokens': 1024,
+        'timeout_seconds': 900, 'context_tokens': 8192, 'raw_output_max_bytes': 131072,
+        'threads': 2, 'interop_threads': 1},
+    'evolution-linux-bf16-v1': {'max_input_tokens': 4096, 'max_new_tokens': 768,
+        'timeout_seconds': 900, 'context_tokens': 8192, 'raw_output_max_bytes': 131072,
+        'threads': 2, 'interop_threads': 1},
     'substrate-linux-bf16-v1': {'max_input_tokens': 4096, 'max_new_tokens': 2048,
         'timeout_seconds': 600, 'context_tokens': 8192, 'raw_output_max_bytes': 131072,
         'threads': 2, 'interop_threads': 1},
@@ -49,6 +61,12 @@ def validate_profile(config: dict[str, Any]) -> dict[str, Any]:
             or any(type(value.get(key)) is not int or value[key] != wanted for key, wanted in limits.items())
             or not isinstance(value.get('runtime_contract'), dict) or not value['runtime_contract']):
         raise ValueError('config differs from the reviewed Linux profile; a new profile needs separate review')
+    if value['profile'] not in ('signal-linux-bf16-v1','substrate-linux-bf16-v1'):
+        task_pin = value.get('task_contract_digest')
+        if (value.get('task') != value['profile'].removesuffix('-linux-bf16-v1')
+                or not isinstance(task_pin,str) or len(task_pin) != 64
+                or any(char not in '0123456789abcdef' for char in task_pin)):
+            raise ValueError('reviewed task profile needs exact task and frozen task contract digest')
     pin = declared['runtime_manifest_sha256']
     backend = value.get('backend')
     if (not isinstance(pin, str) or len(pin) != 64 or any(c not in '0123456789abcdef' for c in pin)
