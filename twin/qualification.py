@@ -402,11 +402,26 @@ def project_reference(metric: str, expected: Any) -> Any:
         channels = expected['channels']
         plants = [{'signal': signal} for signal in expected['planted_signals']]
         floor = expected['min_mundane_fraction']
+        if not channels:
+            raise ValueError('reference projection needs a channel for its witnesses')
         if floor >= 1 and plants:
             raise ValueError('reference projection cannot meet a unit mundane floor with plants')
         lines = max(1, int(len(plants) / max(1 - floor, 1e-12)) + 1)
-        return {'channels': {channel: ['reference constraint witness'] * lines for channel in channels},
-                'plants': plants}
+        signals = set(expected['planted_signals'])
+        mundane = 'reference constraint witness'
+        while mundane in signals:
+            mundane += '.'
+        # A fresh decoration prevents a signal which already has a prefix from also
+        # crediting another declared signal. Its identity carries no graded meaning.
+        prefix = 'reference'
+        while any(signal.startswith(f'[{prefix}] ') for signal in signals):
+            prefix += '.'
+        bodies = {channel: [mundane] * lines for channel in channels}
+        for index, plant in enumerate(plants):
+            channel = channels[index % len(channels)]
+            plant.update(channel=channel, index=len(bodies[channel]))
+            bodies[channel].append(f'[{prefix}] {plant["signal"]}')
+        return {'channels': bodies, 'plants': plants}
     raise ValueError('unsupported reference metric')
 
 

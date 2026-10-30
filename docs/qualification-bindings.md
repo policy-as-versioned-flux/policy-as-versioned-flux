@@ -55,6 +55,39 @@ The existing frozen-field baseline is unchanged. A reference layout it cannot me
 closed rather than understating its bar. A baseline tie, constant field or insufficient
 population remains a refusal even when the actor returns every supplied answer correctly.
 
+## Approved substrate plant coherence
+
+On 2026-10-30 the owner answered “Approve stronger plant checks” to the reviewed contract
+exception (proposal manifest `6396010e123ec7e826998cefc9d5a173aeb62f0d1b9b834fe0faedcfeaa0a2fd`;
+independent review manifest `d0dd24f08d236aaf20a1a8ae8b268f5d45caa7ffd3a2f4cee9a393dadbdfcdd7`).
+This strengthens the substrate scorer while retaining all its previous checks. Channels must
+contain nonempty lists of string lines, and plants must be a list of records naming a required
+channel, a genuine integer nonnegative in-range index and a string signal. Each record points
+to exact plant text at its own location. A line may be the literal signal or have one nonempty
+`[prefix] ` decoration, without brackets or line breaks inside the prefix. Prefix identity is
+ungraded. Actual occurrence counts for each declared signal must equal the metadata
+multiplicities; repeated signal entries pass when each has a distinct occurrence. A line
+matching multiple distinct declared signals refuses.
+
+The claim covers structural recipe conformance and actual occurrence witnesses. It supplies
+no general prose-quality, realism, focus-identity or undeclared-signal judgement. Reference
+projection constructs those constraint witnesses from the labels alone, with distinct
+locations and enough mundane lines for the declared floor. It never repairs candidate output
+or supplies a missing candidate basis. A fresh decoration and filler avoid incidental credits
+when labels themselves contain prefix syntax or the ordinary filler text.
+
+Threshold 0.80, measured minimum 16, all ten permission conditions, the frozen-field baseline
+algorithm, variance checks and the other six metric scorers are unchanged. Sixteen TEST_ONLY
+dense controls demonstrate a baseline of 0.0625; the original three fixtures still give 1.0.
+Neither result certifies a real population, actor, model quality or universal corpus feasibility.
+No new official score or permission follows from the approval or these software controls.
+
+Selections bind current scorer and projection source hashes. This change makes selections
+bound to the old source stale; historical captures, scores and their source identities remain
+unchanged. A host must freeze and evaluate a selection under the new source before making a
+current claim. The existing development-only admission, custody, runtime, host-context and
+default TEST_ONLY refusal rules still apply.
+
 ## Reference admission is separate from qualification custody
 
 Current `reference_cases.admit_reference` admits development references only. A separate
