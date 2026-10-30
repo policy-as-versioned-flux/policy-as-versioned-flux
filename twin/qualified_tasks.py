@@ -6,8 +6,10 @@ No actor, job, reviewer, backend or acquisition is registered by this module.
 from __future__ import annotations
 
 import base64
+import hashlib
+from pathlib import Path
 import re
-from typing import Any
+from typing import Any, Protocol, cast
 
 from . import qualification as q
 from .task_contracts import TaskContract, decode, validate
@@ -126,3 +128,185 @@ def document_from_snapshot(job: dict[str, Any], snapshot: dict[str, Any], *, rol
         return decode(q.canonical(document))
     except (KeyError, TypeError, AttributeError) as exc:
         raise ValueError('incomplete protected task snapshot') from exc
+
+
+class TaskInputs(Protocol):
+    @property
+    def records(self) -> tuple[dict[str, Any], ...]: ...
+
+
+class TaskSession(Protocol):
+    def bind_task_job(self, job: dict[str, Any]) -> None: ...
+    def decline_task_run(self, subjects: tuple[str, ...], reason: str) -> None: ...
+    def judge(self, metric: str, model_version: str, subject: str) -> q.Judgement: ...
+    def judge_group(self, model_version: str, subject: str) -> q.Judgement: ...
+    def review_pending(self, request_digest: str, store: Any) -> q.Judgement: ...
+    def task_snapshot(self) -> dict[str, Any]: ...
+    def check_task_document(self, document: dict[str, Any]) -> list[str]: ...
+    def archive(self) -> bytes: ...
+
+
+class TaskResolver(Protocol):
+    def host_session(self, inputs: Any) -> TaskSession: ...
+    def task_session(self, identity: str) -> TaskSession: ...
+    def task_policy(self, digest: str) -> Any: ...
+
+
+class TaskParent:
+    """A protected parent invokes only the host's registered task or paired causal seam."""
+    def __init__(self, resolver: TaskResolver, *, role: str = 'model-steward', clock: str | None = None):
+        self.resolver, self.role = resolver, role
+        self.clock = q.mp.derive_clock(clock)[0]
+
+    def start(self, protected_job: dict[str, Any], inputs: TaskInputs) -> TaskRun:
+        session = self.resolver.host_session(inputs)
+        session.bind_task_job(protected_job)
+        run = TaskRun(self, protected_job, session)
+        try:
+            contract = _job(protected_job)
+            rows = inputs.records
+            if ([row['subject'] for row in rows] != protected_job['subjects']
+                    or {row['context']['organisation'] for row in rows} != {protected_job['organisation']}
+                    or protected_job['organisation'] not in ('driftwood', 'tuppence', 'ludlow')):
+                raise ValueError('mixed or mismatched adopter/subject scope is outside the protected task run')
+            for row in rows:
+                context = row['context']
+                if context['task_contract_sha256'] != contract.digest:
+                    raise ValueError('host input names a stale or foreign task contract')
+                target = context['target']
+                validate({'evolution': 'TargetComponent', 'causal': 'TargetEdge',
+                          'gameplay': 'TargetMap', 'ethics': 'TargetSensor'}[contract.task], target)
+        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+            session.decline_task_run(tuple(protected_job['subjects']), 'human-required: ' + str(exc))
+            return run
+        for subject in protected_job['subjects']:
+            result = (session.judge_group(protected_job['model_version'], subject) if contract.task == 'causal'
+                else session.judge(contract.metrics[0], protected_job['model_version'], subject))
+            run.results.append(result)
+        return run
+
+    def resume(self, protected_job: dict[str, Any], session: TaskSession) -> TaskRun:
+        _job(protected_job)
+        if q.canonical(session.task_snapshot()['job']) != q.canonical(protected_job):
+            raise ValueError('restored task session names a different protected job')
+        return TaskRun(self, protected_job, session)
+
+
+class TaskRun:
+    def __init__(self, parent: TaskParent, job: dict[str, Any], session: TaskSession):
+        self.parent, self.session = parent, session
+        self._job_bytes = q.canonical(job)
+        self.results: list[q.Judgement] = []
+
+    @property
+    def job(self) -> dict[str, Any]:
+        return decode(self._job_bytes)
+
+    def review_pending(self, protected_store: Any) -> list[q.Judgement]:
+        results = []
+        original = self.session.task_snapshot()['pending_reviews']
+        for request in original:
+            key = request['request_digest']
+            current = {item['request_digest'] for item in self.session.task_snapshot()['pending_reviews']}
+            if key in current:
+                result = self.session.review_pending(key, protected_store)
+                results.append(result)
+                self.results.append(result)
+        return results
+
+    def document(self) -> dict[str, Any] | None:
+        return document_from_snapshot(self.job, self.session.task_snapshot(), role=self.parent.role, clock=self.parent.clock)
+
+    def validate(self) -> list[str]:
+        document = self.document()
+        if document is None:
+            return ['no accepted task judgement; human-required fallback remains']
+        return self.session.check_task_document(document)
+
+    def save(self, output: Path) -> dict[str, Any]:
+        output.mkdir(parents=True, exist_ok=False)
+        (output / 'host-session.json').write_bytes(self.session.archive())
+        state = self.session.task_snapshot()
+        (output / 'task-snapshot.json').write_bytes(q.canonical(state))
+        (output / 'review-requests.json').write_bytes(q.canonical(state['pending_reviews']))
+        document = None
+        try:
+            document = self.document()
+            bad = self.validate()
+        except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:
+            bad = ['protected task validation failed; human-required: ' + str(exc)]
+        if document is not None and not bad:
+            (output / ('claim.json' if self.job['task'] == 'evolution' else 'proposal.json')).write_bytes(q.canonical(document))
+        blocked = [item['subject'] for item in state['attempts']
+                   if isinstance(item.get('mandatory_gate'), dict) and item['mandatory_gate'].get('admitted') is False]
+        summary = {'accepted': document is not None and not bad, 'human_required': bool(bad), 'reasons': bad,
+            'declined': state['declines'], 'attempts': state['attempts'], 'events': state.get('events', []),
+            'pending_reviews': len(state['pending_reviews']), 'mandatory_gate_blocked': blocked,
+            'sensor_activation': False, 'action_authority': False, 'merge_authority': False,
+            'actual_permission_grant': False, 'target_runtime_measured_by_this_command': False}
+        (output / 'summary.json').write_bytes(q.canonical(summary))
+        return summary
+
+
+def _member(root: Path, descriptor: dict[str, Any]) -> bytes:
+    if (not isinstance(descriptor, dict) or set(descriptor) != {'path', 'sha256'}
+            or not isinstance(descriptor['path'], str) or not descriptor['path']
+            or not isinstance(descriptor['sha256'], str) or not re.fullmatch('[0-9a-f]{64}', descriptor['sha256'])):
+        raise ValueError('exact pinned protected member descriptor required')
+    relative = Path(descriptor['path'])
+    if relative.is_absolute() or '..' in relative.parts:
+        raise ValueError('protected task member escapes catalogue')
+    path = root
+    for part in relative.parts:
+        path /= part
+        if path.is_symlink():
+            raise ValueError('protected task member traverses a symlink')
+    if not path.resolve().is_relative_to(root.resolve()):
+        raise ValueError('protected task member escapes catalogue')
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != descriptor['sha256']:
+        raise ValueError('protected task member digest changed')
+    return raw
+
+
+def run_registered(task: str, organisation: str, output: Path, clock: str | None = None,
+                   *, resolver: TaskResolver | None = None) -> dict[str, Any]:
+    """Use only fixed protected-package jobs and original independently supplied handles."""
+    if output.exists():
+        raise FileExistsError('historical task output already exists')
+    catalogue = Path(q.__file__).with_name('qualification-registry.json')
+    try:
+        TaskContract.freeze(task)
+        raw = catalogue.read_bytes()
+        entry = decode(raw).get('task_jobs', {}).get(task, {}).get(organisation)
+        if entry is None:
+            raise ValueError('no registered task job; qualification, acquisition and target prerequisites remain')
+        root = catalogue.parent
+        bundle = decode(_member(root, entry))
+        if (not isinstance(bundle, dict) or not {'schema', 'execution', 'task_policy_sha256', 'inputs'} <= set(bundle)
+                or set(bundle) - {'schema', 'execution', 'task_policy_sha256', 'inputs', 'resume_session', 'review_store'}
+                or bundle['schema'] != 'twin.protected-task-job/v1'
+                or bundle['execution']['task'] != task or bundle['execution']['organisation'] != organisation):
+            raise ValueError('registered task job shape or route differs')
+        _job(bundle['execution'])
+        host = resolver or cast(TaskResolver, q.Resolver.from_catalogue(catalogue, hashlib.sha256(raw).hexdigest()))
+        policy = host.task_policy(bundle['task_policy_sha256'])
+        inputs_raw = _member(root, bundle['inputs'])
+        # Only the original independently supplied handle can restore host inputs.
+        inputs = q.HostInputs.restore(inputs_raw, task_policy=policy)
+        parent = TaskParent(host, clock=clock)
+        run = (parent.resume(bundle['execution'], host.task_session(bundle['resume_session']))
+               if bundle.get('resume_session') else parent.start(bundle['execution'], inputs))
+        if bundle.get('review_store'):
+            from .basis_assessment import ReviewStore
+            _member(root, bundle['review_store'])
+            store = ReviewStore(root / bundle['review_store']['path'], bundle['review_store']['sha256'])
+            run.review_pending(store)
+        return run.save(output)
+    except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:
+        output.mkdir(parents=True, exist_ok=True)
+        summary = {'accepted': False, 'human_required': True, 'reasons': [str(exc)],
+            'declined': [], 'attempts': [], 'pending_reviews': 0, 'actual_permission_grant': False,
+            'target_runtime_measured_by_this_command': False, 'sensor_activation': False}
+        (output / 'summary.json').write_bytes(q.canonical(summary))
+        return summary

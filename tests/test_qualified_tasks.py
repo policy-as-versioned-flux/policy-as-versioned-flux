@@ -103,3 +103,73 @@ def test_snapshot_job_cannot_be_relabelled_by_the_document_caller():
     job, state = snapshot('evolution')
     job['organisation'] = 'tuppence'
     with pytest.raises(ValueError): parent.document_from_snapshot(job, state, role='model-steward', clock='human')
+
+
+def test_fixed_default_registered_route_has_no_job_or_permission(tmp_path):
+    result = parent.run_registered('causal', 'driftwood', tmp_path / 'unregistered')
+    assert result['accepted'] is False and result['human_required'] is True
+    assert 'no registered task job' in result['reasons'][0]
+    assert (tmp_path / 'unregistered' / 'summary.json').is_file()
+
+
+class RefusalSession:
+    """TEST_ONLY preflight adapter: it has no permission or inference implementation."""
+    identity = 'TEST_ONLY-refused-session'
+
+    def __init__(self, rows):
+        self.rows, self.job, self.declines = rows, None, []
+
+    def bind_task_job(self, job):
+        self.job = copy.deepcopy(job)
+
+    def decline_task_run(self, subjects, reason):
+        self.declines.extend({'subject': subject, 'reason': reason} for subject in subjects)
+
+    def judge(self, *args):
+        raise AssertionError('unsupported run must never reach judge')
+
+    def judge_group(self, *args):
+        raise AssertionError('unsupported run must never reach paired judge')
+
+    def task_snapshot(self):
+        attempts = []
+        by_subject = {row['subject']: row for row in self.rows}
+        for index, declined in enumerate(self.declines):
+            row = by_subject[declined['subject']]
+            attempts.append({'attempt_id': f'TEST_ONLY-refused-{index}', 'subject': declined['subject'],
+                'task': self.job['task'], 'metrics': list(TaskContract.freeze(self.job['task']).metrics),
+                'input_sha256': q.digest(row['input']), 'target_sha256': q.digest(None),
+                'actor_sha256': self.job['model_version'][6:], 'capture_sha256': None,
+                'raw_available': False, 'disposition': 'refused-before-invocation', 'reason': declined['reason'],
+                'status': 'declined', 'receipt': None, 'output': None, 'mandatory_gate': None, 'source_pins': []})
+        return {'schema': 'twin.task-session-snapshot/v1', 'identity': self.identity, 'job': self.job,
+            'inputs': self.rows, 'attempts': attempts,
+            'declines': self.declines, 'pending_reviews': [], 'events': [], 'source_pins': []}
+
+    def archive(self):
+        return q.canonical(self.task_snapshot())
+
+
+class RefusalResolver:
+    def __init__(self, rows):
+        self.session = RefusalSession(rows)
+
+    def host_session(self, inputs):
+        return self.session
+
+
+def test_mixed_scope_is_counted_before_any_judge_even_without_a_granted_adapter(tmp_path):
+    job, _ = snapshot('causal')
+    job['subjects'] = ['TEST_ONLY-a', 'TEST_ONLY-b']
+    rows = [{'subject': subject, 'input': {}, 'context': {'organisation': org}}
+        for subject, org in zip(job['subjects'], ('driftwood', 'tuppence'))]
+    resolver = RefusalResolver(rows)
+    class Inputs:
+        records = tuple(rows)
+    run = parent.TaskParent(resolver).start(job, Inputs())
+    assert [item['subject'] for item in resolver.session.declines] == job['subjects']
+    summary = run.save(tmp_path / 'mixed-refusal')
+    assert summary['accepted'] is False and summary['human_required'] is True
+    assert len(summary['declined']) == 2
+    assert summary['reasons'] == ['no accepted task judgement; human-required fallback remains']
+    assert (tmp_path / 'mixed-refusal' / 'host-session.json').is_file()
