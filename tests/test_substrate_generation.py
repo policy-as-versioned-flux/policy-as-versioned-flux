@@ -57,6 +57,50 @@ def test_one_protected_invocation_supplies_the_authored_blob_and_replay(protecte
     assert len(controls.CALLS) == before + 1
 
 
+@pytest.mark.parametrize('organisations', [('driftwood', 'tuppence'), ('tuppence', 'driftwood')])
+def test_mixed_adopter_run_declines_every_request_before_invocation_and_saves_fallback(protected_system, tmp_path, organisations):
+    selected, resolver, requests = protected_system
+    rows = tuple(controls.resolve(requests[org], selected.actor, 800 + index).host_record
+                 for index, org in enumerate(organisations))
+    inputs = q.HostInputs.freeze(rows, ('TEST_ONLY-host',))
+    before = len(controls.CALLS)
+    run = generation.GenerationParent(resolver, selected.actor.model_version).start(inputs)
+    output = tmp_path / 'unsupported-run'
+    save_error = None
+    try:
+        run.save(output)
+    except ValueError as exc:
+        save_error = str(exc)
+    archived = json.loads(run.session.archive())
+    observed = {'raw_calls': len(controls.CALLS) - before,
+        'states': [item['state'] for item in archived['generation_dispositions']],
+        'host_declines': len(archived['declines']), 'summary_exists': (output / 'summary.json').exists(),
+        'save_error': save_error}
+    assert observed == {'raw_calls': 0, 'states': ['host-decline', 'host-decline'],
+        'host_declines': 2, 'summary_exists': True, 'save_error': None}
+    assert [item['subject'] for item in archived['generation_dispositions']] == [row['subject'] for row in rows]
+    assert len(run.results) == 2 and all(result.receipt is None and result.reason for result in run.results)
+    assert archived['records'] == {} and archived['generation_blobs'] == {}
+    generation.verify_session(run.session)
+    assert json.loads((output / 'host-session.json').read_bytes()) == archived
+    summary = json.loads((output / 'summary.json').read_bytes())
+    assert summary['accepted'] is False and summary['declined'] == archived['declines']
+    assert summary['generation_dispositions'] == archived['generation_dispositions']
+    assert any('fallback' in reason for reason in summary['reasons'])
+    assert all('cross-adopter' in item['reason'] for item in summary['declined'])
+    assert not (output / 'generation.json').exists()
+
+
+def test_multiple_requests_for_one_adopter_keep_the_supported_run_path(protected_system):
+    selected, resolver, requests = protected_system
+    rows = tuple(controls.resolve(requests['driftwood'], selected.actor, index).host_record for index in (810, 811))
+    before = len(controls.CALLS)
+    run = generation.GenerationParent(resolver, selected.actor.model_version).start(q.HostInputs.freeze(rows, ('TEST_ONLY-host',)))
+    assert len(controls.CALLS) == before + 2
+    assert [item['state'] for item in run.document()['run']['generation_dispositions']] == ['delivered', 'delivered']
+    assert len(run.document()['batches']) == 2 and run.validate() == []
+
+
 @pytest.mark.parametrize('mode,reason', [('bad-structure', 'structural'), ('bad-basis', 'actual basis')])
 def test_permitted_actor_cannot_deliver_invalid_live_output_and_internal_receipt_survives(protected_system, mode, reason):
     selected, resolver, requests = protected_system
