@@ -944,6 +944,10 @@ class HostInputs:
                 metadata_policy: dict[str, Any] | None = None,
                 test_only: TestOnlyPurpose | None = None) -> HostInputs:
         value = json.loads(archive)
+        # A catalogue's signal handles must not add a binding to unrelated inputs.
+        # Actual signal rows still require their protected handles in resolve below.
+        if 'source_metadata_policy' not in value:
+            metadata_store, metadata_policy = None, None
         restored = cls.freeze(tuple(value['records']), tuple(value['issuers']), metadata_store=metadata_store,
                               metadata_policy=metadata_policy, test_only=test_only)
         if restored.description != archive:
@@ -1355,7 +1359,8 @@ def _restore_bundle(bundle: bytes, *, metadata_store: Any = None,
     policy = BasisPolicy(canonical(selection_value['assessment_policy'])) if selection_value.get('assessment_policy') else None
     selected = Selection.freeze(actor, population, _restore_callable(selection_value['basis_checker']),
         reference_projection=_restore_callable(selection_value['projection']), review=review, assessment_policy=policy,
-        source_metadata_policy=source_metadata_policy, metadata_store=metadata_store,
+        source_metadata_policy=source_metadata_policy if population.metric == 'signal-classify' else None,
+        metadata_store=metadata_store if population.metric == 'signal-classify' else None,
         test_only=TEST_ONLY_MECHANICS if legacy and test_only is TEST_ONLY_MECHANICS else None)
     if selected.description != canonical(selection_value):
         raise ValueError('archived selection differs from current host binding')

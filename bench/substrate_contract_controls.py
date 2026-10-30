@@ -2,6 +2,7 @@
 from pathlib import Path
 import hashlib
 import json
+from typing import Any
 
 import yaml
 
@@ -31,6 +32,7 @@ def request(root: Path, org: str = 'driftwood') -> dict:
     fixtures.git(root, 'add', '--', 'world')
     fixtures.git(root, 'commit', '-q', '-m', 'TEST_ONLY world')
     world = fixtures.git(root, 'rev-parse', 'HEAD').strip()
+    scope: Any
     for adopter, scope in SCOPES.items():
         put(f'orgs/{adopter}/meta.yaml', {'id': adopter, 'unit': 'overlay', 'org': adopter, 'world_ref': world})
         for ident in [scope['component'], scope['additional'][0], 'test-only-local-a', 'test-only-local-b', 'test-only-local-c']:
@@ -78,12 +80,12 @@ def runner(payload: str, config: dict) -> bytes:
         index = len(channels['events'])
         channels['events'].append('[TEST_ONLY arbitrary prefix] ' + signal)
         plants.append({'channel': 'events', 'index': index, 'signal': signal})
-    answer = {'channels': channels, 'plants': plants}
+    answer: dict[str, Any] = {'channels': channels, 'plants': plants}
     tree = yaml.compose(payload)
     quotes = [{'field': key.value, 'quote': payload[key.start_mark.index:value.end_mark.index]}
               for key, value in tree.value if key.value in ('templates', 'planted_signals')]
     counts = {key: len(lines) for key, lines in channels.items()}
-    basis = {'recipe_quotes': quotes,
+    basis: dict[str, Any] = {'recipe_quotes': quotes,
         'occurrences': [{**plant, 'line_quote': channels[plant['channel']][plant['index']]} for plant in plants],
         'counts': {'channel_lines': counts, 'total_lines': sum(counts.values()), 'plant_count': len(plants),
                    'mundane_lines': sum(counts.values()) - len(plants)}}
