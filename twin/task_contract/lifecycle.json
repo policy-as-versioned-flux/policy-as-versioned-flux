@@ -1,0 +1,43 @@
+{
+  "protected_parents": {
+    "causal_live": "HostSession.judge_group(actor_version, subject) resolves both current metrics, same actor/task contracts/scope before one invocation. One absent/stale/failed permission refuses with zero model invocation. Postcapture both basis outcomes pass before one paired receipt. Protected registered causal task prohibits ordinary single-metric judge even if public context/group/policy fields are stripped.",
+    "counting": "One logical operation attempt id; causal metric exercise dispositions each reference it, never claim two invocations. Append all lifecycle events, retain exact declines, unique attempts and accepted receipts. Do not erase initial pending declines after acceptance or silently omit empty gameplay answers.",
+    "durable": "Pinned protected jobs/catalogue only; no model-selected paths/checksums. Restore pending/accepted task and group sessions with complete raw/parser/assessment/context verification and zero inference. Independently supply original MetadataStore/registered authority policy handles; resolve every per-source binding and compare exact public projection/digest before reauthentication. Public receipt dictionaries cannot recreate private acquisition. Reject symlinks/escapes/changed sources, metadata lineage or actor/runtime contracts.",
+    "ethics": "Always independently run existing mandatory sensor/policy/DPIA gates against original host input. Document their source/result digests and actual disposition. Verified denied model judgements may be retained; model-admitted judgement cannot make gate-blocked sensing effective. No task parent activates a sensor.",
+    "fallback": "Every refusal/pending/failed/held disposition states human-required; no implicit incumbent run under candidate name.",
+    "interface": "TaskParent.start(protected_job, HostInputs) -> TaskRun; TaskRun.review_pending(protected_store); TaskRun.save(new_directory)",
+    "other_live": "Existing HostSession.judge uses reviewed typed target/task guards, exact current single-metric permission and each source independently resolved through the protected metadata store/policy. Typed public metadata alone never establishes acquisition.",
+    "pending": "Retain full actual output and request; initial pending refusal remains in counted history. Review resumes without inference. Failed/held review is consumed and cannot be selectively replaced.",
+    "registration": "Empty defaults. No registered actor/job/reviewer/acquisition/permission/backend allowlist entry is created here.",
+    "source_pins": "All original accumulated evidence/policy/map/source pins are cited explicitly; evolution extends existing headline source-pin accounting instead of inventing a signal.",
+    "validator": "Protected schema dispatch routes headline positions and new causal/gameplay/ethics proposal documents. Match original subject/target/context, complete answer/basis and receipt; preserve every attempt/decline and current permission, including both causal metrics. Derived GitHub clock overrides local declaration; local/human existing semantics unchanged."
+  },
+  "schema": "case-free.protected-task-lifecycle/v1",
+  "shared_capture_group": {
+    "authentication": "Host process authenticates group core with nonexported key. A per-selection authenticated view binds exact selection digest and group digest, with raw row references, not a translated answer. Capture parser replay checks complete identical answer/basis for both metrics.",
+    "descriptor": [
+      "schema",
+      "actor_digest",
+      "task_contract_digest",
+      "ordered_batch_digest",
+      "allowed_selection_digests"
+    ],
+    "durable": "Export a versioned group bundle with core once and both selection/population/review/assessment bindings. Protected catalogue pins exact bundle. Import verifies all actors, sources, runtime and membership before new process-local authentication. Old single-metric bundles remain v1, never promoted to paired proof.",
+    "facts": "Existing Selection.evaluate/facts/record reads same raw complete answer for each unchanged scorer; correct independent reference projections produce each baseline; same actual capture produces per-metric read-field variance/head readings and attributable rate.",
+    "inference": "Exactly once per ordered subject; runtime/parser/decline failures stay in both views; no view can invoke or repair.",
+    "interface": "CaptureGroup.freeze((quantity_selection,grade_selection)).capture() -> GroupCapture; group.view(selection) -> authenticated Capture view",
+    "metric_neutral_core": [
+      "schema",
+      "group_digest",
+      "actor_digest",
+      "batch_digest",
+      "rows[{id,input_digest,target_digest,attempt_id,raw,raw_available,answer,basis,observed_runtime,observations,failure}]"
+    ],
+    "preconditions": [
+      "Exactly causal-claims and causal-claims-grade-accuracy; same actual Actor digest/parser/config/task contract.",
+      "Same ordered unique IDs and canonical full task inputs, typed targets, original source/custody/exposure/selection identities and applicability envelope. Compare exact metric-neutral admission/custody projection defined by host, never approximate similarity.",
+      "Each selection conserves its own admitted reference packets, expected fields, authority/custody review, scorer/projection/basis policy and population digest; quantity references include complete grade support as current admission requires.",
+      "Freeze both selections and ordered batch before capture; no results-selected membership or references."
+    ]
+  }
+}

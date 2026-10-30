@@ -1,0 +1,3513 @@
+{
+  "$defs": {
+    "AssessmentRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "issuer": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "policy_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "request_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/AssessmentRow"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "schema": {
+          "const": "twin.task-basis-assessment/v2"
+        }
+      },
+      "required": [
+        "schema",
+        "policy_digest",
+        "request_digest",
+        "issuer",
+        "rows"
+      ],
+      "type": "object"
+    },
+    "AssessmentRow": {
+      "additionalProperties": false,
+      "properties": {
+        "decisions": {
+          "additionalProperties": {
+            "enum": [
+              "pass",
+              "fail",
+              "held",
+              "not-applicable"
+            ]
+          },
+          "minProperties": 1,
+          "type": "object"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "subject_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "support": {
+          "additionalProperties": {
+            "$ref": "#/$defs/AssessmentSupport"
+          },
+          "minProperties": 1,
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "subject_digest",
+        "reason",
+        "decisions",
+        "support"
+      ],
+      "type": "object"
+    },
+    "AssessmentSupport": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "witnesses": {
+          "items": {
+            "$ref": "#/$defs/Witness"
+          },
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "reason",
+        "witnesses"
+      ],
+      "type": "object"
+    },
+    "Attempt": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "attempt_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "capture_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "disposition": {
+          "enum": [
+            "refused-before-invocation",
+            "failed",
+            "declined",
+            "pending-review",
+            "accepted",
+            "held-review",
+            "failed-review"
+          ]
+        },
+        "input_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "raw_available": {
+          "type": "boolean"
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "subject": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "target_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "attempt_id",
+        "subject",
+        "input_sha256",
+        "target_sha256",
+        "actor_sha256",
+        "capture_sha256",
+        "raw_available",
+        "disposition",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "Basis": {
+      "additionalProperties": false,
+      "properties": {
+        "calculations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "witnesses": {
+          "items": {
+            "$ref": "#/$defs/Witness"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "reason",
+        "witnesses",
+        "calculations"
+      ],
+      "type": "object"
+    },
+    "CapturedCausalOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "answer": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/CausalAnswer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "basis": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Basis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "failure": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "input_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "observations": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "observed_runtime": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "raw": {
+          "type": "string"
+        },
+        "raw_available": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "actor_digest",
+        "input_digest",
+        "raw",
+        "raw_available",
+        "failure",
+        "observed_runtime",
+        "observations",
+        "answer",
+        "basis"
+      ],
+      "type": "object"
+    },
+    "CausalAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "alternatives": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "confounders": {
+          "items": {
+            "$ref": "#/$defs/Confounder"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "edge": {
+          "$ref": "#/$defs/EdgeAnswer"
+        },
+        "units": {
+          "additionalProperties": false,
+          "properties": {
+            "elasticity_definition": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "from": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "lag": {
+              "const": "days"
+            },
+            "to": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "from",
+            "to",
+            "lag",
+            "elasticity_definition"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "edge",
+        "confounders",
+        "alternatives",
+        "units"
+      ],
+      "type": "object"
+    },
+    "CausalInput": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/PublicContext"
+        },
+        "schema": {
+          "const": "twin.causal-input/v2"
+        },
+        "target": {
+          "$ref": "#/$defs/TargetEdge"
+        },
+        "task": {
+          "$ref": "#/$defs/CausalTask"
+        }
+      },
+      "required": [
+        "schema",
+        "target",
+        "context",
+        "task"
+      ],
+      "type": "object"
+    },
+    "CausalResponse": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Decline"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "answer": {
+              "$ref": "#/$defs/CausalAnswer"
+            },
+            "basis": {
+              "$ref": "#/$defs/Basis"
+            },
+            "schema": {
+              "const": "twin.causal-response/v1"
+            }
+          },
+          "required": [
+            "schema",
+            "answer",
+            "basis"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "CausalTask": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_confounders": {
+          "items": {
+            "$ref": "#/$defs/NamedId"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "from": {
+          "$ref": "#/$defs/ComponentDefinition"
+        },
+        "measurement": {
+          "$ref": "#/$defs/Measurement"
+        },
+        "to": {
+          "$ref": "#/$defs/ComponentDefinition"
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "evidence",
+        "candidate_confounders",
+        "measurement"
+      ],
+      "type": "object"
+    },
+    "ComponentDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "evolution": {
+          "enum": [
+            "genesis",
+            "custom-built",
+            "product",
+            "commodity"
+          ]
+        },
+        "evolution_position": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "capability",
+            "activity",
+            "practice",
+            "data"
+          ]
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "needs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "visibility": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "Confounder": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "not-ruled-out",
+            "discounted"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "Decline": {
+      "additionalProperties": false,
+      "properties": {
+        "decline": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "decline"
+      ],
+      "type": "object"
+    },
+    "DeclinedRow": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "subject": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "subject",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "EdgeAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "elasticity": {
+          "$ref": "#/$defs/Pert"
+        },
+        "evidence_grade": {
+          "maximum": 5,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "from": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lag_days": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sign": {
+          "enum": [
+            "positive",
+            "negative"
+          ]
+        },
+        "to": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "type": {
+          "const": "influences"
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "type",
+        "sign",
+        "lag_days",
+        "elasticity",
+        "evidence_grade"
+      ],
+      "type": "object"
+    },
+    "Envelope": {
+      "additionalProperties": false,
+      "properties": {
+        "adopters": {
+          "const": [
+            "driftwood",
+            "tuppence",
+            "ludlow"
+          ]
+        },
+        "capabilities": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "domains": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "estate_scope_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "frames": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "from": {
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "task_contexts": {
+          "additionalProperties": false,
+          "properties": {
+            "driftwood": {
+              "$ref": "#/$defs/ExactTaskContext"
+            },
+            "ludlow": {
+              "$ref": "#/$defs/ExactTaskContext"
+            },
+            "tuppence": {
+              "$ref": "#/$defs/ExactTaskContext"
+            }
+          },
+          "required": [
+            "driftwood",
+            "tuppence",
+            "ludlow"
+          ],
+          "type": "object"
+        },
+        "until": {
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "adopters",
+        "domains",
+        "capabilities",
+        "frames",
+        "sources",
+        "from",
+        "until",
+        "estate_scope_sha256",
+        "task_contexts"
+      ],
+      "type": "object"
+    },
+    "EthicsAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "admitted": {
+          "type": "boolean"
+        },
+        "ladder": {
+          "additionalProperties": false,
+          "properties": {
+            "rungs": {
+              "items": {
+                "$ref": "#/$defs/Rung"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "stopped_at": {
+              "enum": [
+                "purpose",
+                "necessity",
+                "proportionality",
+                null
+              ]
+            }
+          },
+          "required": [
+            "stopped_at",
+            "rungs"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "admitted",
+        "ladder"
+      ],
+      "type": "object"
+    },
+    "EthicsInput": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/PublicContext"
+        },
+        "schema": {
+          "const": "twin.ethics-input/v2"
+        },
+        "target": {
+          "$ref": "#/$defs/TargetSensor"
+        },
+        "task": {
+          "$ref": "#/$defs/EthicsTask"
+        }
+      },
+      "required": [
+        "schema",
+        "target",
+        "context",
+        "task"
+      ],
+      "type": "object"
+    },
+    "EthicsResponse": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Decline"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "answer": {
+              "$ref": "#/$defs/EthicsAnswer"
+            },
+            "basis": {
+              "$ref": "#/$defs/Basis"
+            },
+            "schema": {
+              "const": "twin.ethics-response/v1"
+            }
+          },
+          "required": [
+            "schema",
+            "answer",
+            "basis"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "EthicsTask": {
+      "additionalProperties": false,
+      "properties": {
+        "dpia": {
+          "additionalProperties": false,
+          "properties": {
+            "channels": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 0,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "complete": {
+              "type": "boolean"
+            },
+            "completion_source_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "financial_loss_risk": {
+              "type": "boolean"
+            },
+            "profiling": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "channels",
+            "profiling",
+            "financial_loss_risk",
+            "complete",
+            "completion_source_id"
+          ],
+          "type": "object"
+        },
+        "necessity": {
+          "$ref": "#/$defs/Necessity"
+        },
+        "policy": {
+          "additionalProperties": false,
+          "properties": {
+            "as_of": {
+              "format": "date",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+              "type": "string"
+            },
+            "identity": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "text": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "version": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "identity",
+            "version",
+            "sha256",
+            "text",
+            "as_of"
+          ],
+          "type": "object"
+        },
+        "proportionality": {
+          "additionalProperties": false,
+          "properties": {
+            "intrusion_cost": {
+              "type": "number"
+            },
+            "value_illuminated": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "intrusion_cost",
+            "value_illuminated"
+          ],
+          "type": "object"
+        },
+        "purpose": {
+          "additionalProperties": false,
+          "properties": {
+            "scenario": {
+              "type": "string"
+            },
+            "will_act": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "scenario",
+            "will_act"
+          ],
+          "type": "object"
+        },
+        "sensor": {
+          "$ref": "#/$defs/NamedId"
+        },
+        "sensor_table": {
+          "items": {
+            "$ref": "#/$defs/SensorTableRow"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "sensor_table_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sensor",
+        "sensor_table",
+        "sensor_table_sha256",
+        "policy",
+        "purpose",
+        "necessity",
+        "proportionality",
+        "dpia"
+      ],
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "visible_excerpt_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "statement",
+        "source_id",
+        "visible_excerpt_id"
+      ],
+      "type": "object"
+    },
+    "EvolutionAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "evolution_position": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "evolution_position"
+      ],
+      "type": "object"
+    },
+    "EvolutionInput": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/PublicContext"
+        },
+        "schema": {
+          "const": "twin.evolution-input/v2"
+        },
+        "target": {
+          "$ref": "#/$defs/TargetComponent"
+        },
+        "task": {
+          "$ref": "#/$defs/EvolutionTask"
+        }
+      },
+      "required": [
+        "schema",
+        "target",
+        "context",
+        "task"
+      ],
+      "type": "object"
+    },
+    "EvolutionResponse": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Decline"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "answer": {
+              "$ref": "#/$defs/EvolutionAnswer"
+            },
+            "basis": {
+              "$ref": "#/$defs/Basis"
+            },
+            "schema": {
+              "const": "twin.evolution-response/v1"
+            }
+          },
+          "required": [
+            "schema",
+            "answer",
+            "basis"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "EvolutionTask": {
+      "additionalProperties": false,
+      "properties": {
+        "component": {
+          "$ref": "#/$defs/ComponentDefinition"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "component",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "ExactTaskContext": {
+      "additionalProperties": false,
+      "properties": {
+        "input_constructor_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "metadata_policy_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "model_as_of": {
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": "string"
+        },
+        "model_pins": {
+          "$ref": "#/$defs/ModelPins"
+        },
+        "party_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "policy_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "task_contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "universe_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_pins",
+        "model_as_of",
+        "party_sha256",
+        "input_constructor_sha256",
+        "task_contract_sha256",
+        "universe_sha256",
+        "policy_sha256",
+        "metadata_policy_sha256"
+      ],
+      "type": "object"
+    },
+    "GameplayAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "opportunities": {
+          "items": {
+            "$ref": "#/$defs/Opportunity"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "opportunities"
+      ],
+      "type": "object"
+    },
+    "GameplayBasis": {
+      "additionalProperties": false,
+      "properties": {
+        "calculations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/PlayCheck"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "witnesses": {
+          "items": {
+            "$ref": "#/$defs/Witness"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "reason",
+        "witnesses",
+        "calculations",
+        "checks"
+      ],
+      "type": "object"
+    },
+    "GameplayInput": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/PublicContext"
+        },
+        "schema": {
+          "const": "twin.gameplay-input/v2"
+        },
+        "target": {
+          "$ref": "#/$defs/TargetMap"
+        },
+        "task": {
+          "$ref": "#/$defs/GameplayTask"
+        }
+      },
+      "required": [
+        "schema",
+        "target",
+        "context",
+        "task"
+      ],
+      "type": "object"
+    },
+    "GameplayResponse": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Decline"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "answer": {
+              "$ref": "#/$defs/GameplayAnswer"
+            },
+            "basis": {
+              "$ref": "#/$defs/GameplayBasis"
+            },
+            "schema": {
+              "const": "twin.gameplay-response/v1"
+            }
+          },
+          "required": [
+            "schema",
+            "answer",
+            "basis"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "GameplayTask": {
+      "additionalProperties": false,
+      "properties": {
+        "catalogue": {
+          "const": [
+            "exploit-commoditisation",
+            "land-grab"
+          ]
+        },
+        "catalogue_source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "components": {
+          "items": {
+            "$ref": "#/$defs/ComponentDefinition"
+          },
+          "maxItems": 20,
+          "minItems": 20,
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/$defs/GraphEdge"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "org_components": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "positions": {
+          "items": {
+            "$ref": "#/$defs/GraphPosition"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "components",
+        "positions",
+        "edges",
+        "org_components",
+        "catalogue",
+        "catalogue_source_sha256"
+      ],
+      "type": "object"
+    },
+    "GraphEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration": {
+          "type": "object"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "degenerate_elasticity": {
+          "type": "boolean"
+        },
+        "elasticity": {
+          "$ref": "#/$defs/Pert"
+        },
+        "evidence_grade": {
+          "maximum": 5,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "evidence_grade_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "from": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lag_days": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "may_price": {
+          "type": "boolean"
+        },
+        "sign": {
+          "enum": [
+            "positive",
+            "negative"
+          ]
+        },
+        "to": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "needs",
+            "maintains",
+            "knows",
+            "owns",
+            "influences"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "from",
+        "to"
+      ],
+      "type": "object"
+    },
+    "GraphPosition": {
+      "additionalProperties": false,
+      "properties": {
+        "commodity_leverage": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "component": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "differentiation_pressure": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "evolution": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "evolution_position_authored": {
+          "type": "boolean"
+        },
+        "stage": {
+          "enum": [
+            "genesis",
+            "custom-built",
+            "product",
+            "commodity"
+          ]
+        },
+        "visibility": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "component",
+        "stage",
+        "evolution",
+        "evolution_position_authored",
+        "visibility",
+        "differentiation_pressure",
+        "commodity_leverage"
+      ],
+      "type": "object"
+    },
+    "GroupCore": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "batch_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "group_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "attempt_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "output": {
+                "$ref": "#/$defs/CapturedCausalOutput"
+              },
+              "target_digest": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "target_digest",
+              "attempt_id",
+              "output"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "schema": {
+          "const": "twin.invocation-capture/v1"
+        }
+      },
+      "required": [
+        "schema",
+        "group_digest",
+        "actor_digest",
+        "batch_digest",
+        "rows"
+      ],
+      "type": "object"
+    },
+    "GroupDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "allowed_selection_digests": {
+          "additionalProperties": false,
+          "properties": {
+            "causal-claims": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "causal-claims-grade-accuracy": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "causal-claims",
+            "causal-claims-grade-accuracy"
+          ],
+          "type": "object"
+        },
+        "ordered_batch_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "schema": {
+          "const": "twin.causal-capture-group/v1"
+        },
+        "task_contract_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "actor_digest",
+        "task_contract_digest",
+        "ordered_batch_digest",
+        "allowed_selection_digests"
+      ],
+      "type": "object"
+    },
+    "GroupView": {
+      "additionalProperties": false,
+      "properties": {
+        "group_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "row_refs": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "index": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "index"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "schema": {
+          "const": "twin.group-capture-view/v1"
+        },
+        "selection_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "selection_digest",
+        "group_digest",
+        "row_refs"
+      ],
+      "type": "object"
+    },
+    "HostContext": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": "string"
+        },
+        "capability": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "domain": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "estate_scope_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "frame": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "input_constructor_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "model_as_of": {
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": "string"
+        },
+        "model_pins": {
+          "$ref": "#/$defs/ModelPins"
+        },
+        "organisation": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "original_sources_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "party_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_families": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "source_metadata_bindings": {
+          "additionalProperties": {
+            "additionalProperties": false,
+            "properties": {
+              "expected_acquisition_receipt_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "expected_authority_digest": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "expected_manifest_sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "import_id": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "import_id",
+              "expected_manifest_sha256",
+              "expected_authority_digest",
+              "expected_acquisition_receipt_sha256"
+            ],
+            "type": "object"
+          },
+          "minProperties": 1,
+          "type": "object"
+        },
+        "source_metadata_public_sha256": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "minProperties": 1,
+          "type": "object"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "target": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/TargetComponent"
+            },
+            {
+              "$ref": "#/$defs/TargetEdge"
+            },
+            {
+              "$ref": "#/$defs/TargetMap"
+            },
+            {
+              "$ref": "#/$defs/TargetSensor"
+            }
+          ]
+        },
+        "task_contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "estate_scope_sha256",
+        "organisation",
+        "domain",
+        "capability",
+        "frame",
+        "source",
+        "as_of",
+        "model_as_of",
+        "source_families",
+        "source_sha256",
+        "party_sha256",
+        "model_pins",
+        "input_constructor_sha256",
+        "task_contract_sha256",
+        "target",
+        "original_sources_sha256",
+        "source_metadata_bindings",
+        "source_metadata_public_sha256"
+      ],
+      "type": "object"
+    },
+    "Measurement": {
+      "additionalProperties": false,
+      "properties": {
+        "elasticity_definition": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "from_unit": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lag_unit": {
+          "const": "days"
+        },
+        "temporal_interpretation": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "to_unit": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_unit",
+        "to_unit",
+        "lag_unit",
+        "elasticity_definition",
+        "temporal_interpretation"
+      ],
+      "type": "object"
+    },
+    "Metadata_acquired_member": {
+      "additionalProperties": false,
+      "properties": {
+        "acquisition_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "identity": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "purpose": {
+          "enum": [
+            "primary",
+            "supporting"
+          ]
+        },
+        "role": {
+          "const": "acquired-original"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "identity",
+        "version",
+        "bytes",
+        "sha256",
+        "role",
+        "purpose",
+        "acquisition_id"
+      ],
+      "type": "object"
+    },
+    "Metadata_acquisition": {
+      "additionalProperties": false,
+      "properties": {
+        "body_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "body_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "captured_at": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "final_url": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "retained-http",
+            "TEST_ONLY-fixture"
+          ]
+        },
+        "receipt_artifact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "receipt_entry_pointer": {
+          "pattern": "^(|/.*)$",
+          "type": "string"
+        },
+        "requested_url": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "response_status": {
+          "maximum": 599,
+          "minimum": 100,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "receipt_artifact_sha256",
+        "receipt_entry_pointer",
+        "requested_url",
+        "final_url",
+        "response_status",
+        "captured_at",
+        "body_bytes",
+        "body_sha256"
+      ],
+      "type": "object"
+    },
+    "Metadata_authorship": {
+      "additionalProperties": false,
+      "properties": {
+        "authored_at": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "agent",
+            "human",
+            "TEST_ONLY"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "authored_at"
+      ],
+      "type": "object"
+    },
+    "Metadata_bounded_review": {
+      "additionalProperties": false,
+      "properties": {
+        "historical_first_publication_proof_claim": {
+          "const": false
+        },
+        "method_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "method_version": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "publisher_authentication_claim": {
+          "const": false
+        },
+        "reviewed_member_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "reviewer_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reviewer_role": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "scope_qualification": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "reviewer_id",
+        "reviewer_role",
+        "method_id",
+        "method_version",
+        "reviewed_member_ids",
+        "scope_qualification",
+        "publisher_authentication_claim",
+        "historical_first_publication_proof_claim"
+      ],
+      "type": "object"
+    },
+    "Metadata_derived_member": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "identity": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lineage": {
+          "items": {
+            "$ref": "#/$defs/Metadata_lineage_span"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "parent": {
+          "$ref": "#/$defs/Metadata_parent"
+        },
+        "role": {
+          "const": "derived-extraction"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "transform": {
+          "$ref": "#/$defs/Metadata_transform"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "identity",
+        "version",
+        "bytes",
+        "sha256",
+        "role",
+        "parent",
+        "transform",
+        "lineage"
+      ],
+      "type": "object"
+    },
+    "Metadata_lineage_span": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "byte-copy"
+            },
+            "output_end": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "output_start": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "parent_end": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "parent_start": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "output_start",
+            "output_end",
+            "parent_start",
+            "parent_end"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "claim": {
+              "const": "disclosed-transformation-not-raw-byte-equivalence"
+            },
+            "kind": {
+              "const": "whole-transform-output"
+            },
+            "output_end": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "output_start": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "parent_scope": {
+              "const": "complete-exact-parent-artifact"
+            }
+          },
+          "required": [
+            "kind",
+            "output_start",
+            "output_end",
+            "parent_scope",
+            "claim"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "syntactic-separator"
+            },
+            "origin": {
+              "const": "transform-syntax-not-publisher-content"
+            },
+            "output_end": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "output_start": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "text_utf8": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "output_start",
+            "output_end",
+            "text_utf8",
+            "origin"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Metadata_member": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Metadata_acquired_member"
+        },
+        {
+          "$ref": "#/$defs/Metadata_derived_member"
+        },
+        {
+          "$ref": "#/$defs/Metadata_qualifier_member"
+        }
+      ]
+    },
+    "Metadata_observation": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "literal_value": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "metadata_key": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "normalization": {
+          "enum": [
+            "literal-iso-day",
+            "source-local-calendar-day",
+            "english-month-year",
+            "none"
+          ]
+        },
+        "observed_kind": {
+          "enum": [
+            "publisher-first-publication",
+            "publisher-publication",
+            "publisher-release",
+            "publisher-update",
+            "publisher-review",
+            "event",
+            "generator",
+            "capture",
+            "other"
+          ]
+        },
+        "witness": {
+          "$ref": "#/$defs/Metadata_witness"
+        }
+      },
+      "required": [
+        "id",
+        "observed_kind",
+        "literal_value",
+        "metadata_key",
+        "normalization",
+        "witness"
+      ],
+      "type": "object"
+    },
+    "Metadata_parent": {
+      "additionalProperties": false,
+      "properties": {
+        "member_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "member_id",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "Metadata_publication": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Metadata_publication_known"
+        },
+        {
+          "$ref": "#/$defs/Metadata_publication_unknown"
+        }
+      ]
+    },
+    "Metadata_publication_known": {
+      "additionalProperties": false,
+      "properties": {
+        "assertion_origin": {
+          "const": "captured-publisher-assertion"
+        },
+        "basis": {
+          "enum": [
+            "first-publication",
+            "publication",
+            "release"
+          ]
+        },
+        "observation_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "precision": {
+          "enum": [
+            "day",
+            "month"
+          ]
+        },
+        "value": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "precision",
+        "value",
+        "basis",
+        "observation_id",
+        "assertion_origin"
+      ],
+      "type": "object"
+    },
+    "Metadata_publication_unknown": {
+      "additionalProperties": false,
+      "properties": {
+        "assertion_origin": {
+          "const": "unestablished"
+        },
+        "basis": {
+          "const": "unestablished"
+        },
+        "observation_id": {
+          "type": "null"
+        },
+        "precision": {
+          "const": "unknown"
+        },
+        "qualification": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "value": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "precision",
+        "value",
+        "basis",
+        "observation_id",
+        "assertion_origin",
+        "qualification"
+      ],
+      "type": "object"
+    },
+    "Metadata_qualifier_member": {
+      "additionalProperties": false,
+      "properties": {
+        "authorship": {
+          "$ref": "#/$defs/Metadata_authorship"
+        },
+        "bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "identity": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "method_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "method_version": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "public_origin": {
+          "const": "producer-authored"
+        },
+        "role": {
+          "const": "producer-qualifier"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "support_members": {
+          "items": {
+            "$ref": "#/$defs/Metadata_parent"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "identity",
+        "version",
+        "bytes",
+        "sha256",
+        "role",
+        "authorship",
+        "method_id",
+        "method_version",
+        "support_members",
+        "public_origin"
+      ],
+      "type": "object"
+    },
+    "Metadata_source": {
+      "additionalProperties": false,
+      "properties": {
+        "display_source": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "family": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "url": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "url",
+        "version",
+        "family",
+        "display_source"
+      ],
+      "type": "object"
+    },
+    "Metadata_statement": {
+      "additionalProperties": false,
+      "properties": {
+        "origin_role": {
+          "enum": [
+            "publisher-quotation",
+            "producer-authored"
+          ]
+        },
+        "text": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "witness": {
+          "$ref": "#/$defs/Metadata_witness"
+        }
+      },
+      "required": [
+        "text",
+        "origin_role",
+        "witness"
+      ],
+      "type": "object"
+    },
+    "Metadata_transform": {
+      "additionalProperties": false,
+      "properties": {
+        "configuration_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "execution_receipt_artifact_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "identity": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "implementation_artifact_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lineage_status": {
+          "enum": [
+            "pinned",
+            "unestablished"
+          ]
+        },
+        "version": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "lineage_status",
+        "identity",
+        "version",
+        "implementation_artifact_sha256",
+        "configuration_sha256",
+        "execution_receipt_artifact_sha256"
+      ],
+      "type": "object"
+    },
+    "Metadata_visible_excerpt": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "origin_role": {
+          "enum": [
+            "publisher-quotation",
+            "producer-authored"
+          ]
+        },
+        "witness": {
+          "$ref": "#/$defs/Metadata_witness"
+        }
+      },
+      "required": [
+        "id",
+        "origin_role",
+        "witness"
+      ],
+      "type": "object"
+    },
+    "Metadata_witness": {
+      "additionalProperties": false,
+      "properties": {
+        "end_byte": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "member_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "member_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "start_byte": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "text_utf8": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "member_id",
+        "member_sha256",
+        "start_byte",
+        "end_byte",
+        "text_utf8"
+      ],
+      "type": "object"
+    },
+    "ModelPins": {
+      "additionalProperties": false,
+      "properties": {
+        "model_repo": {
+          "additionalProperties": false,
+          "properties": {
+            "commit": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "committed": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "root": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "tree": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "root",
+            "commit",
+            "tree",
+            "committed"
+          ],
+          "type": "object"
+        },
+        "overlay": {
+          "additionalProperties": false,
+          "properties": {
+            "commit": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "tree": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "commit",
+            "tree"
+          ],
+          "type": "object"
+        },
+        "world": {
+          "additionalProperties": false,
+          "properties": {
+            "commit": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "tree": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "commit",
+            "tree"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "model_repo",
+        "overlay",
+        "world"
+      ],
+      "type": "object"
+    },
+    "NamedId": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "type": "object"
+    },
+    "Necessity": {
+      "additionalProperties": false,
+      "properties": {
+        "alternatives": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "enum": [
+                  "structural",
+                  "behavioural"
+                ]
+              },
+              "level": {
+                "enum": [
+                  "aggregate",
+                  "cohort",
+                  "individual"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "level"
+            ],
+            "type": "object"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "structural",
+            "behavioural"
+          ]
+        },
+        "level": {
+          "enum": [
+            "aggregate",
+            "cohort",
+            "individual"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "level",
+        "alternatives"
+      ],
+      "type": "object"
+    },
+    "Opportunity": {
+      "additionalProperties": false,
+      "properties": {
+        "component": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "play": {
+          "enum": [
+            "land-grab",
+            "exploit-commoditisation"
+          ]
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "play",
+        "component",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "Pert": {
+      "additionalProperties": false,
+      "properties": {
+        "max": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "min": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "mode": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "min",
+        "mode",
+        "max"
+      ],
+      "type": "object"
+    },
+    "PlayCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "component": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "incumbency_checked": {
+          "const": false
+        },
+        "play": {
+          "enum": [
+            "land-grab",
+            "exploit-commoditisation"
+          ]
+        },
+        "present": {
+          "type": "boolean"
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "witnesses": {
+          "items": {
+            "$ref": "#/$defs/Witness"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "play",
+        "component",
+        "present",
+        "reason",
+        "witnesses",
+        "incumbency_checked"
+      ],
+      "type": "object"
+    },
+    "ProposalDocument": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "schema": {
+                "const": "twin.causal-proposal/v1"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "judgements": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "actual_output_sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "answer": {
+                      "$ref": "#/$defs/CausalAnswer"
+                    },
+                    "attempt_id": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "basis": {
+                      "$ref": "#/$defs/Basis"
+                    },
+                    "host_receipt": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "mandatory_gate": {
+                      "type": "null"
+                    },
+                    "subject": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target": {
+                      "$ref": "#/$defs/TargetEdge"
+                    }
+                  },
+                  "required": [
+                    "subject",
+                    "attempt_id",
+                    "host_receipt",
+                    "target",
+                    "answer",
+                    "basis",
+                    "actual_output_sha256",
+                    "mandatory_gate"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 0,
+                "type": "array"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "schema": {
+                "const": "twin.gameplay-proposal/v1"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "judgements": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "actual_output_sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "answer": {
+                      "$ref": "#/$defs/GameplayAnswer"
+                    },
+                    "attempt_id": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "basis": {
+                      "$ref": "#/$defs/GameplayBasis"
+                    },
+                    "host_receipt": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "mandatory_gate": {
+                      "type": "null"
+                    },
+                    "subject": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target": {
+                      "$ref": "#/$defs/TargetMap"
+                    }
+                  },
+                  "required": [
+                    "subject",
+                    "attempt_id",
+                    "host_receipt",
+                    "target",
+                    "answer",
+                    "basis",
+                    "actual_output_sha256",
+                    "mandatory_gate"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 0,
+                "type": "array"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "schema": {
+                "const": "twin.ethics-judgement/v1"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "judgements": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "actual_output_sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "answer": {
+                      "$ref": "#/$defs/EthicsAnswer"
+                    },
+                    "attempt_id": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "basis": {
+                      "$ref": "#/$defs/Basis"
+                    },
+                    "host_receipt": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "mandatory_gate": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "admitted": {
+                          "type": "boolean"
+                        },
+                        "result_sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "source_sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "admitted",
+                        "result_sha256",
+                        "source_sha256"
+                      ],
+                      "type": "object"
+                    },
+                    "subject": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "target": {
+                      "$ref": "#/$defs/TargetSensor"
+                    }
+                  },
+                  "required": [
+                    "subject",
+                    "attempt_id",
+                    "host_receipt",
+                    "target",
+                    "answer",
+                    "basis",
+                    "actual_output_sha256",
+                    "mandatory_gate"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 0,
+                "type": "array"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "judgements": {
+          "items": {
+            "$ref": "#/$defs/ProposalRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "org": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "run": {
+          "additionalProperties": false,
+          "properties": {
+            "action_authority": {
+              "const": false
+            },
+            "attempts": {
+              "items": {
+                "$ref": "#/$defs/Attempt"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "clock": {
+              "enum": [
+                "human",
+                "local",
+                "github"
+              ]
+            },
+            "declined": {
+              "items": {
+                "$ref": "#/$defs/DeclinedRow"
+              },
+              "minItems": 0,
+              "type": "array"
+            },
+            "headless": {
+              "type": "boolean"
+            },
+            "host_session": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "merge_authority": {
+              "const": false
+            },
+            "model_version": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "operator_role": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "override_authority": {
+              "const": false
+            },
+            "price_eligible": {
+              "const": false
+            },
+            "task_contract_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "task_contract_sha256",
+            "model_version",
+            "host_session",
+            "clock",
+            "operator_role",
+            "headless",
+            "declined",
+            "attempts",
+            "action_authority",
+            "merge_authority",
+            "override_authority",
+            "price_eligible"
+          ],
+          "type": "object"
+        },
+        "schema": {
+          "enum": [
+            "twin.causal-proposal/v1",
+            "twin.gameplay-proposal/v1",
+            "twin.ethics-judgement/v1"
+          ]
+        },
+        "source_pins": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "identity": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "sha256": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "identity",
+              "version",
+              "sha256"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema",
+        "org",
+        "source_pins",
+        "run",
+        "judgements"
+      ],
+      "type": "object"
+    },
+    "ProposalRow": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_output_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "answer": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/CausalAnswer"
+            },
+            {
+              "$ref": "#/$defs/GameplayAnswer"
+            },
+            {
+              "$ref": "#/$defs/EthicsAnswer"
+            }
+          ]
+        },
+        "attempt_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "basis": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Basis"
+            },
+            {
+              "$ref": "#/$defs/GameplayBasis"
+            }
+          ]
+        },
+        "host_receipt": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mandatory_gate": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "admitted": {
+                  "type": "boolean"
+                },
+                "result_sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "source_sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "admitted",
+                "result_sha256",
+                "source_sha256"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "subject": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "target": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/TargetComponent"
+            },
+            {
+              "$ref": "#/$defs/TargetEdge"
+            },
+            {
+              "$ref": "#/$defs/TargetMap"
+            },
+            {
+              "$ref": "#/$defs/TargetSensor"
+            }
+          ]
+        }
+      },
+      "required": [
+        "subject",
+        "attempt_id",
+        "host_receipt",
+        "target",
+        "answer",
+        "basis",
+        "actual_output_sha256",
+        "mandatory_gate"
+      ],
+      "type": "object"
+    },
+    "PublicContext": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": "string"
+        },
+        "capability": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "domain": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "event_date": {
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": "string"
+        },
+        "frame": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PublicSourceMetadata"
+          },
+          "minProperties": 1,
+          "type": "object"
+        },
+        "model_as_of": {
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "type": "string"
+        },
+        "model_pins": {
+          "$ref": "#/$defs/ModelPins"
+        },
+        "organisation": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "party_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organisation",
+        "domain",
+        "capability",
+        "frame",
+        "as_of",
+        "model_as_of",
+        "model_pins",
+        "party_sha256",
+        "metadata"
+      ],
+      "type": "object"
+    },
+    "PublicSourceMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "acquisitions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metadata_acquisition"
+          },
+          "minProperties": 1,
+          "type": "object"
+        },
+        "binding": {
+          "additionalProperties": false,
+          "properties": {
+            "expected_acquisition_receipt_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "expected_authority_digest": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "expected_manifest_sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "import_id": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "import_id",
+            "expected_manifest_sha256",
+            "expected_authority_digest",
+            "expected_acquisition_receipt_sha256"
+          ],
+          "type": "object"
+        },
+        "bounded_review": {
+          "$ref": "#/$defs/Metadata_bounded_review"
+        },
+        "input_construction_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "members": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metadata_member"
+          },
+          "minProperties": 1,
+          "type": "object"
+        },
+        "metadata_acquisition_receipt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "metadata_authority_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "observations": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Metadata_observation"
+          },
+          "type": "object"
+        },
+        "publication": {
+          "$ref": "#/$defs/Metadata_publication"
+        },
+        "schema": {
+          "const": "twin.source-metadata-public/v1"
+        },
+        "source": {
+          "$ref": "#/$defs/Metadata_source"
+        },
+        "source_archive_closure_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source_metadata_manifest_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "statement": {
+          "$ref": "#/$defs/Metadata_statement"
+        },
+        "visible_excerpts": {
+          "items": {
+            "$ref": "#/$defs/Metadata_visible_excerpt"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema",
+        "source",
+        "acquisitions",
+        "members",
+        "observations",
+        "publication",
+        "statement",
+        "visible_excerpts",
+        "bounded_review",
+        "binding",
+        "source_metadata_manifest_sha256",
+        "source_archive_closure_digest",
+        "metadata_authority_digest",
+        "metadata_acquisition_receipt_sha256",
+        "input_construction_sha256"
+      ],
+      "type": "object"
+    },
+    "Rung": {
+      "additionalProperties": false,
+      "properties": {
+        "justification": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "rung": {
+          "enum": [
+            "purpose",
+            "necessity",
+            "proportionality"
+          ]
+        }
+      },
+      "required": [
+        "rung",
+        "passed",
+        "justification"
+      ],
+      "type": "object"
+    },
+    "SensorTableRow": {
+      "additionalProperties": false,
+      "properties": {
+        "granularity": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "observes": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sensor": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "sensor",
+        "name",
+        "kind",
+        "granularity",
+        "observes"
+      ],
+      "type": "object"
+    },
+    "TargetComponent": {
+      "additionalProperties": false,
+      "properties": {
+        "component": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "const": "component"
+        }
+      },
+      "required": [
+        "kind",
+        "component"
+      ],
+      "type": "object"
+    },
+    "TargetEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "const": "edge"
+        },
+        "to": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "from",
+        "to"
+      ],
+      "type": "object"
+    },
+    "TargetMap": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "map"
+        },
+        "organisation": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "organisation"
+      ],
+      "type": "object"
+    },
+    "TargetSensor": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "sensor"
+        },
+        "policy_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "sensor": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "sensor",
+        "policy_sha256"
+      ],
+      "type": "object"
+    },
+    "TextWitness": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "items": {
+            "oneOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "minimum": 0,
+                "type": "integer"
+              }
+            ]
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "quote": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "quote"
+      ],
+      "type": "object"
+    },
+    "ValueWitness": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "items": {
+            "oneOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "minimum": 0,
+                "type": "integer"
+              }
+            ]
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "value": {}
+      },
+      "required": [
+        "path",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Witness": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/TextWitness"
+        },
+        {
+          "$ref": "#/$defs/ValueWitness"
+        }
+      ]
+    }
+  },
+  "$id": "urn:case-free:remaining-judgement-contract:revision01",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/EvolutionInput"
+    },
+    {
+      "$ref": "#/$defs/CausalInput"
+    },
+    {
+      "$ref": "#/$defs/GameplayInput"
+    },
+    {
+      "$ref": "#/$defs/EthicsInput"
+    },
+    {
+      "$ref": "#/$defs/EvolutionResponse"
+    },
+    {
+      "$ref": "#/$defs/CausalResponse"
+    },
+    {
+      "$ref": "#/$defs/GameplayResponse"
+    },
+    {
+      "$ref": "#/$defs/EthicsResponse"
+    },
+    {
+      "$ref": "#/$defs/ProposalDocument"
+    },
+    {
+      "$ref": "#/$defs/Envelope"
+    },
+    {
+      "$ref": "#/$defs/HostContext"
+    },
+    {
+      "$ref": "#/$defs/GroupDescriptor"
+    },
+    {
+      "$ref": "#/$defs/GroupCore"
+    },
+    {
+      "$ref": "#/$defs/GroupView"
+    },
+    {
+      "$ref": "#/$defs/AssessmentRecord"
+    }
+  ],
+  "title": "Reviewed-contract revision01; source-only"
+}
