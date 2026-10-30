@@ -68,9 +68,12 @@ def freeze_actor(task: str, config: dict[str, Any]) -> Actor:
     paired = _backend(config)
     # Authority acquisition must precede Actor.freeze; source-only plans cannot be Actors.
     support = paired.support_sources(config)
-    from . import task_inputs
+    from . import task_inputs, qualified_tasks
+    if qualified_tasks.__file__ is None:
+        raise ValueError('actual qualified task parent source unavailable')
     return Actor.freeze(run, parse, config, support=(*support, *task_inputs.support_sources(),
-        *task_contracts.support_sources(), Path(__file__).with_name('task_prompts').joinpath(task + '.txt')))
+        *task_contracts.support_sources(), Path(qualified_tasks.__file__),
+        Path(__file__).with_name('task_prompts').joinpath(task + '.txt')))
 
 
 def run(payload: dict[str, Any], config: dict[str, Any]) -> RuntimeResult:
