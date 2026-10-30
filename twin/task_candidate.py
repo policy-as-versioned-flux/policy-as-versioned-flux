@@ -60,15 +60,23 @@ def render_prompt(payload: dict[str, Any], config: dict[str, Any]) -> bytes:
     return template.replace(b'{{INPUT_JSON}}', canonical(payload))
 
 
-def freeze_actor(task: str, config: dict[str, Any]) -> Actor:
+def freeze_actor(task: str, config: dict[str, Any], *, task_policy: Any = None) -> Actor:
     """Bind all task/support bytes only under the actual acquired backend authority."""
-    if _task_profile(config).task != task:
+    contract = _task_profile(config)
+    if contract.task != task:
         raise ValueError('explicit task differs from frozen invocation config')
-    _template(_contract(config), config)
+    from . import task_inputs
+    if not isinstance(task_policy, task_inputs.TaskPolicy):
+        raise ValueError('actual private task policy required before backend authority acquisition')
+    task_policy.verify()
+    if (task_policy.contract.description != contract.description
+            or config.get('task_policy_digest') != task_policy.digest):
+        raise ValueError('frozen actor task policy differs from actual protected construction')
+    _template(contract, config)
     paired = _backend(config)
     # Authority acquisition must precede Actor.freeze; source-only plans cannot be Actors.
     support = paired.support_sources(config)
-    from . import task_inputs, qualified_tasks
+    from . import qualified_tasks
     if qualified_tasks.__file__ is None:
         raise ValueError('actual qualified task parent source unavailable')
     return Actor.freeze(run, parse, config, support=(*support, *task_inputs.support_sources(),

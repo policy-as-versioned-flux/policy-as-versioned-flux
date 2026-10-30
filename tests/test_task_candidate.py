@@ -10,7 +10,7 @@ import pytest
 from twin import task_candidate
 from twin.task_contracts import TaskContract
 from twin.qualification import RuntimeResult
-from twin.task_inputs import resolve_task_input
+from twin.task_inputs import resolve_task_input, TaskPolicy
 from test_signal_inputs import protected_request
 from test_task_inputs import task_request
 
@@ -319,3 +319,36 @@ def test_actual_decline_and_host_failure_keep_their_original_capture_disposition
         stated = task_candidate.parse(result.raw, config_for('evolution'))
         assert stated.answer is None
         assert stated.basis == {'decline': 'TEST_ONLY original source cannot support this frame'}
+
+
+def test_public_task_policy_description_cannot_freeze_an_actor(protected_request):
+    args = task_request(protected_request)
+    resolved = resolve_task_input(**args)
+    policy = TaskPolicy.freeze(args['contract'], (resolved,))
+    config = {**profile_for('evolution'), 'task_policy_digest': policy.digest}
+    with pytest.raises(ValueError, match='private.*policy'):
+        task_candidate.freeze_actor('evolution', config, task_policy=json.loads(policy.description))
+
+
+def test_frozen_actor_config_cannot_borrow_another_constructor_policy(monkeypatch, protected_request):
+    args = task_request(protected_request)
+    resolved = resolve_task_input(**args)
+    policy = TaskPolicy.freeze(args['contract'], (resolved,))
+    config = {**profile_for('evolution'), 'task_policy_digest': '0' * 64}
+    def forbidden(*args, **kwargs):
+        pytest.fail('wrong task policy reached backend authority acquisition')
+    monkeypatch.setitem(sys.modules, 'twin.linux_candidate', SimpleNamespace(validate_profile=forbidden))
+    with pytest.raises(ValueError, match='policy'):
+        task_candidate.freeze_actor('evolution', config, task_policy=policy)
+
+
+def test_actual_private_task_policy_still_requires_protected_backend_authority(monkeypatch, protected_request):
+    args = task_request(protected_request)
+    resolved = resolve_task_input(**args)
+    policy = TaskPolicy.freeze(args['contract'], (resolved,))
+    config = {**profile_for('evolution'), 'task_policy_digest': policy.digest}
+    def forbidden(*args, **kwargs):
+        pytest.fail('unacquired actor attempted a process launch')
+    monkeypatch.setattr(subprocess, 'Popen', forbidden)
+    with pytest.raises(ValueError, match='protected host authority'):
+        task_candidate.freeze_actor('evolution', config, task_policy=policy)
