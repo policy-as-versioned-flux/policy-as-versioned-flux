@@ -32,6 +32,8 @@ original nonroot caller derived from stable protected ancestry, an existing
 unaliased unused `nobody` UID/GID distinct from root/caller, an inaccessible or
 nonexistent home, and protected pre-enabled memory/cpu/cpuset/pids controllers
 under the fixed `/sys/fs/cgroup/policy-as-versioned-flux-linux-control` parent.
+The ancestry check permits only the canonical protected `/usr/bin/sudo` launcher
+to retain setuid; candidate closure validation still rejects all privilege bits.
 Require two actual eligible CPUs, 14GiB initial effective host/ancestor headroom,
 2GiB recurring reserve outside the 12GiB leaf, and 5GiB on protected backing
 storage. Unavailable facts produce explicit refusal/SKIP (77), never PASS, another
@@ -100,8 +102,11 @@ The six actual scenario routes are:
 
 Protected attempt journals and immutable result files retain actual raw frames,
 source/anchor/closure/native identities, measured deadlines, denials, kernel
-counters, custody and terminal witnesses. The strict reader verifies each exact
-subcase and aggregate. SKIP/unexecuted/missing/partial evidence cannot pass.
+counters, custody and terminal witnesses. The strict reader requires every exact
+subcase in order and checks each one's own terminal, sentinel and outer cleanup
+witnesses before the aggregate. Expected terminal absence must be explicitly
+recorded and is confined to guardian loss and the fixed sampler-fd fault.
+SKIP/unexecuted/missing/partial evidence cannot pass.
 `production_capture_accepted` is always false. The actual existing Linux matrix
 route, target suitability and eventual artifact collection remain separate
 reviewed work; no workflow dispatch or provider action is implied.

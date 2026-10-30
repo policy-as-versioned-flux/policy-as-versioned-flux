@@ -416,6 +416,28 @@ def terminal_ok(value:Any)->bool:
     return isinstance(value,dict) and set(value)=={'empty','reaped','removed'} and all(x is True for x in value.values())
 
 
+def _verify_capture_witnesses(value:dict[str,Any],scenario:str,case:str)->None:
+    if 'guardian_terminal' not in value:
+        raise ValueError('explicit guardian terminal observation required, including expected absence')
+    verify_outer_witness(value.get('outer'))
+    sentinel=value.get('sentinel',{})
+    if (not isinstance(sentinel,dict) or sentinel.get('alive') is not True
+            or not isinstance(sentinel.get('before'),dict)
+            or sentinel.get('before')!=sentinel.get('after')
+            or set(sentinel['before'])!={'pid','start'}
+            or type(sentinel['before']['pid']) is not int or sentinel['before']['pid']<=1
+            or not isinstance(sentinel['before']['start'],str) or not sentinel['before']['start'].isdigit()):
+        raise ValueError('unrelated sentinel identity/liveness changed')
+    terminal=value.get('guardian_terminal')
+    if terminal is not None and not terminal_ok(terminal):
+        raise ValueError('partial guardian terminal is not completion')
+    expected_missing=scenario=='guardian-loss' or scenario=='invalid-evidence' and case=='observer'
+    if expected_missing and terminal is not None:
+        raise ValueError('fixed loss/fault terminal must remain missing')
+    if not expected_missing and terminal is None:
+        raise ValueError('guardian terminal receipt missing')
+
+
 def verify_result(value: Any) -> dict[str,Any]:
     """Pure receipt admission, called only with the outer observer's owned evidence.
 
@@ -428,51 +450,37 @@ def verify_result(value: Any) -> dict[str,Any]:
     if not isinstance(scenario,str) or scenario not in SCENARIOS:raise ValueError('fixed scenario required')
     elapsed=finite(value.get('finished'))-finite(value.get('started'))
     attempts=value.get('attempts')
-    ceiling=ATTEMPT_SECONDS
-    if attempts is not None:
-        ceiling=TOTAL_SECONDS
-        if not isinstance(attempts,list) or not attempts:raise ValueError('actual attempts missing')
-        if [attempt.get('case') for attempt in attempts if isinstance(attempt,dict)]!=list(CASES[scenario]):
-            raise ValueError('actual attempt coverage/order incomplete')
-        merged={}
-        previous=finite(value.get('started'))
-        for attempt in attempts:
-            if (not isinstance(attempt,dict) or not 0<=finite(attempt.get('finished'))-finite(attempt.get('started'))<=ATTEMPT_SECONDS
-                    or attempt.get('error') is not None or attempt.get('executed') is not True
-                    or attempt.get('scenario')!=scenario):
-                raise ValueError('an actual attempt failed or exceeded its shared ceiling')
-            verify_outer_witness(attempt.get('outer'))
-            if finite(attempt['started'])<previous or finite(attempt['finished'])>finite(value['finished']):
-                raise ValueError('actual attempt timing reset or escaped total ceiling')
-            previous=finite(attempt['finished'])
-            actual=attempt.get('checks')
-            expected=set(CHECKS[scenario]) if scenario in ('baseline','boundaries') else (
-                {'limits','affinity','tmpfs'} if scenario=='resources' and attempt['case']=='standard'
-                else set(CHECKS[scenario]) if scenario=='supervisor-loss' else {attempt['case']})
-            if not isinstance(actual,dict) or set(actual)!=expected or any(x is not True for x in actual.values()):
-                raise ValueError('actual attempt checks failed or incomplete')
-            merged.update(actual)
-        if merged!=value.get('checks'):raise ValueError('aggregate differs from actual attempt checks')
-    if not 0<=elapsed<=ceiling:raise ValueError('shared attempt ceiling exceeded')
-    verify_outer_witness(value.get('outer'))
-    sentinel=value.get('sentinel',{})
-    if (not isinstance(sentinel,dict) or sentinel.get('alive') is not True
-            or not isinstance(sentinel.get('before'),dict)
-            or sentinel.get('before')!=sentinel.get('after')
-            or set(sentinel['before'])!={'pid','start'}
-            or type(sentinel['before']['pid']) is not int or sentinel['before']['pid']<=1
-            or not isinstance(sentinel['before']['start'],str) or not sentinel['before']['start'].isdigit()):
-        raise ValueError('unrelated sentinel identity/liveness changed')
+    if not isinstance(attempts,list) or not attempts:raise ValueError('actual attempts missing')
+    if [attempt.get('case') for attempt in attempts if isinstance(attempt,dict)]!=list(CASES[scenario]):
+        raise ValueError('actual attempt coverage/order incomplete')
+    merged={}
+    previous=finite(value.get('started'))
+    for attempt in attempts:
+        if (not isinstance(attempt,dict) or not 0<=finite(attempt.get('finished'))-finite(attempt.get('started'))<=ATTEMPT_SECONDS
+                or attempt.get('error') is not None or attempt.get('executed') is not True
+                or attempt.get('scenario')!=scenario):
+            raise ValueError('an actual attempt failed or exceeded its shared ceiling')
+        _verify_capture_witnesses(attempt,scenario,attempt['case'])
+        if finite(attempt['started'])<previous or finite(attempt['finished'])>finite(value['finished']):
+            raise ValueError('actual attempt timing reset or escaped total ceiling')
+        previous=finite(attempt['finished'])
+        actual=attempt.get('checks')
+        expected=set(CHECKS[scenario]) if scenario in ('baseline','boundaries') else (
+            {'limits','affinity','tmpfs'} if scenario=='resources' and attempt['case']=='standard'
+            else set(CHECKS[scenario]) if scenario=='supervisor-loss' else {attempt['case']})
+        if not isinstance(actual,dict) or set(actual)!=expected or any(x is not True for x in actual.values()):
+            raise ValueError('actual attempt checks failed or incomplete')
+        merged.update(actual)
+    if merged!=value.get('checks'):raise ValueError('aggregate differs from actual attempt checks')
+    if not 0<=elapsed<=TOTAL_SECONDS:raise ValueError('shared attempt ceiling exceeded')
+    _verify_capture_witnesses(value,scenario,attempts[-1]['case'])
+    if any(value.get(name)!=attempts[-1].get(name) for name in ('outer','sentinel','guardian_terminal')):
+        raise ValueError('aggregate differs from actual final attempt witnesses')
     checks=value.get('checks')
     if not isinstance(checks,dict) or set(checks)!=set(CHECKS[scenario]) or any(x is not True for x in checks.values()):
         raise ValueError('complete actual scenario checks required')
-    terminal=value.get('guardian_terminal')
-    if terminal is not None and not terminal_ok(terminal):
-        raise ValueError('partial guardian terminal is not completion')
-    if scenario not in ('guardian-loss','invalid-evidence') and terminal is None:
-        raise ValueError('guardian terminal receipt missing')
     return {'control_passed':True,'production_capture_accepted':False,
-            'guardian_terminal_missing':terminal is None,'scenario':scenario}
+            'guardian_terminal_missing':value.get('guardian_terminal') is None,'scenario':scenario}
 
 
 def validate_principal(facts: dict[str,Any]) -> tuple[int,int]:
@@ -733,6 +741,18 @@ def control_guardian(g: Any, request: dict[str,Any], host: dict[str,Any],
     return guardian
 
 
+def _protected_launcher(g:Any,executable:str)->None:
+    # An ancestry executable is not a candidate closure member. Only the fixed
+    # OS sudo launcher may retain setuid; production protected_path(..., True)
+    # still refuses every privileged source copied into a candidate closure.
+    info=g.protected_path(executable)
+    privileges=info.st_mode & 0o6000
+    if (not stat.S_ISREG(info.st_mode) or info.st_nlink!=1
+            or 'security.capability' in os.listxattr(executable,follow_symlinks=False)
+            or privileges and (executable!='/usr/bin/sudo' or privileges!=0o4000)):
+        raise ValueError('unsafe or unrecognised privileged launcher ancestry')
+
+
 def original_caller(g: Any) -> Any:
     """Actual stable ancestry, never SUDO_UID, environment or request assertions."""
     chain=[];visited=set();pid=os.getppid()
@@ -741,7 +761,7 @@ def original_caller(g: Any) -> Any:
             visited.add(pid)
             identity=g.Identity(pid);chain.append(identity)
             executable=os.readlink(f'/proc/{pid}/exe')
-            g.protected_path(executable,True)
+            _protected_launcher(g,executable)
             if identity.uid==[identity.uid[0]]*4 and identity.uid[0]>0:
                 for pinned in chain:pinned.verify()
                 result=chain.pop()

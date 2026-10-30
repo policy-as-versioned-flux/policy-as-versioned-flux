@@ -39,15 +39,18 @@ def test_guardian_loss_cleanup_does_not_fabricate_a_production_receipt():
         'sentinel':{'before':{'pid':701,'start':'91'},'after':{'pid':701,'start':'91'},'alive':True},
         'checks':{'raw-clone':True,'attached':True,'dropped':True,'armed':True,'ready':True,
                   'descendants':True},'error':None}
+    import copy
+    evidence['attempts']=[dict(copy.deepcopy(evidence),case=stage,
+        started=100.0+index*3,finished=103.0+index*3,checks={stage:True})
+        for index,stage in enumerate(('raw-clone','attached','dropped','armed','ready','descendants'))]
     result=m.verify_result(evidence)
     assert result['control_passed'] is True
     assert result['production_capture_accepted'] is False
     assert result['guardian_terminal_missing'] is True
-    import copy
     for altered in ({'executed':False},{'outer':dict(evidence['outer'],reaped=False)},
                     {'sentinel':dict(evidence['sentinel'],alive=False)},
                     {'checks':dict(evidence['checks'],dropped=False)},
-                    {'finished':161.0},{'guardian_terminal':{'empty':True,'reaped':True}},
+                    {'finished':1001.0},{'guardian_terminal':{'empty':True,'reaped':True}},
                     {'outer':{'empty':1,'dead':1,'reaped':1,'removed':1}}):
         value=copy.deepcopy(evidence);value.update(altered)
         with pytest.raises(ValueError):m.verify_result(value)
