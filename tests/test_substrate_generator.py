@@ -154,6 +154,125 @@ def test_a_degraded_generator_fails_the_threshold() -> None:
     assert not result.clears_threshold
 
 
+def test_plant_metadata_cannot_credit_a_channel_body_without_the_actual_signal() -> None:
+    batch = generate(_recipe(planted_signals=("unexpected finance access",)))
+    batch["channels"]["events"] = ["ordinary meeting"] * 7
+    expected = {"channels": list(CHANNELS), "planted_signals": ["unexpected finance access"],
+                "min_mundane_fraction": 0.7}
+    assert not scorer(batch, expected)
+
+
+@pytest.mark.parametrize("channel_lines", ["ordinary line", [17], [], None])
+def test_channels_must_be_nonempty_lists_of_string_lines(channel_lines: object) -> None:
+    batch = {"channels": {"events": channel_lines}, "plants": []}
+    expected = {"channels": ["events"], "planted_signals": [], "min_mundane_fraction": 0.7}
+    assert not scorer(batch, expected)
+
+
+def test_repeated_metadata_cannot_credit_the_same_occurrence_twice() -> None:
+    plant = {"channel": "events", "index": 0, "signal": "access anomaly"}
+    batch = {"channels": {"events": ["access anomaly"] + ["ordinary"] * 9},
+             "plants": [plant, dict(plant)]}
+    expected = {"channels": ["events"], "planted_signals": ["access anomaly"] * 2,
+                "min_mundane_fraction": 0.7}
+    assert not scorer(batch, expected)
+
+
+def test_repeated_signal_entries_pass_with_distinct_actual_occurrences() -> None:
+    batch = generate(_recipe(planted_signals=("access anomaly", "access anomaly")))
+    expected = {"channels": list(CHANNELS), "planted_signals": ["access anomaly"] * 2,
+                "min_mundane_fraction": 0.7}
+    assert scorer(batch, expected)
+
+
+def test_distinct_occurrences_can_share_a_channel_without_sharing_an_index() -> None:
+    batch = {"channels": {"events": ["access anomaly", "[another] access anomaly"] + ["ordinary"] * 8},
+             "plants": [{"channel": "events", "index": 0, "signal": "access anomaly"},
+                        {"channel": "events", "index": 1, "signal": "access anomaly"}]}
+    expected = {"channels": ["events"], "planted_signals": ["access anomaly"] * 2,
+                "min_mundane_fraction": 0.7}
+    assert scorer(batch, expected)
+
+
+@pytest.mark.parametrize("extra", ["access anomaly", "[different-prefix] access anomaly"])
+def test_each_declared_signal_occurrence_must_be_accounted_for(extra: str) -> None:
+    batch = {"channels": {"events": ["access anomaly", extra] + ["ordinary"] * 8},
+             "plants": [{"channel": "events", "index": 0, "signal": "access anomaly"}]}
+    expected = {"channels": ["events"], "planted_signals": ["access anomaly"],
+                "min_mundane_fraction": 0.7}
+    assert not scorer(batch, expected)
+
+
+def test_one_line_cannot_witness_two_distinct_declared_signals() -> None:
+    batch = {"channels": {"events": ["[x] access anomaly", "[x] access anomaly"] + ["ordinary"] * 8},
+             "plants": [{"channel": "events", "index": 0, "signal": "access anomaly"},
+                        {"channel": "events", "index": 1, "signal": "[x] access anomaly"}]}
+    expected = {"channels": ["events"], "planted_signals": ["access anomaly", "[x] access anomaly"],
+                "min_mundane_fraction": 0.7}
+    assert not scorer(batch, expected)
+
+
+@pytest.mark.parametrize("index,position", [(-1, 9), (True, 1), (1.0, 1), ("0", 0),
+                                          (10, 0), (None, 0), ([], 0)])
+def test_plant_index_must_be_a_genuine_nonnegative_in_range_integer(index: object, position: int) -> None:
+    lines = ["ordinary"] * 10
+    lines[position] = "access anomaly"
+    batch = {"channels": {"events": lines},
+             "plants": [{"channel": "events", "index": index, "signal": "access anomaly"}]}
+    expected = {"channels": ["events"], "planted_signals": ["access anomaly"],
+                "min_mundane_fraction": 0.7}
+    assert not scorer(batch, expected)
+
+
+@pytest.mark.parametrize("actual", [None, [], "batch", {}, {"channels": []},
+    {"channels": "events"}, {"channels": {"events": ["ordinary"]}},
+    {"channels": {"events": ["ordinary"]}, "plants": None},
+    {"channels": {"events": ["ordinary"]}, "plants": {}},
+    {"channels": {"events": ["ordinary"]}, "plants": [None]},
+    {"channels": {"events": ["ordinary"]}, "plants": [{}]},
+    {"channels": {"events": ["ordinary"]}, "plants": [{"signal": []}]},
+    {"channels": {"events": ["ordinary"]}, "plants": [{"channel": [], "index": 0, "signal": "x"}]},
+    {"channels": {"events": ["ordinary"]}, "plants": [{"channel": "other", "index": 0, "signal": "x"}]},
+])
+def test_malformed_batches_refuse_instead_of_raising(actual: object) -> None:
+    expected = {"channels": ["events"], "planted_signals": [], "min_mundane_fraction": 0.7}
+    assert not scorer(actual, expected)
+
+
+@pytest.mark.parametrize("line,accepted", [
+    ("access anomaly", True), ("[any-focus] access anomaly", True),
+    ("[a different identity] access anomaly", True),
+    ("access anomaly later", False), ("earlier access anomaly", False),
+    ("[[nested] access anomaly", False), ("[x] [y] access anomaly", False),
+    ("[] access anomaly", False), ("[x\ny] access anomaly", False),
+    ("[x]access anomaly", False),
+])
+def test_only_exact_text_or_a_single_prefix_witnesses_a_declared_plant(line: str, accepted: bool) -> None:
+    batch = {"channels": {"events": [line] + ["ordinary"] * 9},
+             "plants": [{"channel": "events", "index": 0, "signal": "access anomaly"}]}
+    expected = {"channels": ["events"], "planted_signals": ["access anomaly"],
+                "min_mundane_fraction": 0.7}
+    assert scorer(batch, expected) is accepted
+
+
+@pytest.mark.parametrize("change", ["missing channel", "extra channel", "missing signal", "extra signal", "mundane floor"])
+def test_plant_coherence_preserves_all_original_constraints(change: str) -> None:
+    batch = generate(_recipe(planted_signals=("access anomaly",)))
+    expected = {"channels": list(CHANNELS), "planted_signals": ["access anomaly"],
+                "min_mundane_fraction": 0.7}
+    if change == "missing channel":
+        del batch["channels"]["hr"]
+    elif change == "extra channel":
+        batch["channels"]["other"] = ["ordinary"]
+    elif change == "missing signal":
+        expected["planted_signals"] = ["access anomaly", "another"]
+    elif change == "extra signal":
+        expected["planted_signals"] = []
+    else:
+        expected["min_mundane_fraction"] = 1.0
+    assert not scorer(batch, expected)
+
+
 # -- the depth grade: ticket 49 ticks no new criterion ---------------------------------------------
 
 

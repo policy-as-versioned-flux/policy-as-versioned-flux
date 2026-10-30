@@ -440,6 +440,65 @@ def test_substrate_reference_projection_meets_declared_constraints_without_claim
     assert rss.scorer_for('substrate-generator')(q.project_reference('substrate-generator', expected), expected)
 
 
+@pytest.mark.parametrize('signals', [
+    ['same signal', 'same signal'],
+    ['reference constraint witness'],
+    ['one', '[prefix] one', '[reference] one'],
+])
+def test_substrate_reference_witnesses_have_distinct_locations_without_accidental_credits(signals):
+    from twin.substrate_generator import mundane_fraction
+    expected = {'channels': ['chat', 'mail'], 'planted_signals': signals, 'min_mundane_fraction': 0.9}
+    projected = q.project_reference('substrate-generator', expected)
+    assert rss.scorer_for('substrate-generator')(projected, expected)
+    assert len({(p['channel'], p['index']) for p in projected['plants']}) == len(signals)
+    assert mundane_fraction(projected) >= 0.9
+
+
+def test_impossible_substrate_reference_constraints_refuse_without_manufacturing_an_answer():
+    with pytest.raises(ValueError, match='reference projection'):
+        q.project_reference('substrate-generator',
+            {'channels': [], 'planted_signals': ['one'], 'min_mundane_fraction': 0.8})
+    with pytest.raises(ValueError, match='reference projection'):
+        q.project_reference('substrate-generator',
+            {'channels': ['chat'], 'planted_signals': ['one'], 'min_mundane_fraction': 1.0})
+
+
+def test_dense_test_only_recipe_controls_use_actual_occurrences_in_evaluate_and_unchanged_baseline():
+    from copy import deepcopy
+    from twin import model_permission as mp, substrate_generator as sg
+    from twin.substrate import SubstrateRecipe
+    from twin.skills import evaluate
+    corpus = []
+    for index in range(16):
+        recipe = SubstrateRecipe(id=f'TEST_ONLY-plant-control-{index}', seed=800 + index,
+            model_version='TEST_ONLY-mechanics', templates=('ordinary A', 'ordinary B', 'ordinary C', 'ordinary D'),
+            planted_signals=tuple(f'TEST_ONLY-signal-{index}-{channel}' for channel in sg.CHANNELS))
+        corpus.append({'id': recipe.id, 'input': recipe.to_yaml(), 'expected': {
+            'channels': list(sg.CHANNELS), 'planted_signals': list(recipe.planted_signals),
+            'min_mundane_fraction': sg.MIN_MUNDANE_FRACTION}})
+    references = [q.project_reference(sg.SKILL, item['expected']) for item in corpus]
+    assert all(sg.scorer(answer, item['expected']) for answer, item in zip(references, corpus))
+    baseline = mp.frozen_field_baseline(references, corpus, sg.scorer)
+    assert baseline.score == 0.0625
+    assert set(baseline.reads) == {'channels.events', 'channels.communications', 'channels.hr',
+                                   'channels.telemetry', 'plants'}
+    generated = [sg.generate_from_recipe_yaml(item['input']) for item in corpus]
+    assert mp.frozen_field_baseline(generated, corpus, sg.scorer).score == 0.0625
+    assert evaluate(sg.SKILL, sg.generate_from_recipe_yaml, corpus, scorer=sg.scorer).score == 1.0
+
+    def stale_event_body(text):
+        answer = deepcopy(sg.generate_from_recipe_yaml(text))
+        answer['channels']['events'] = generated[0]['channels']['events']
+        return answer
+
+    result = evaluate(sg.SKILL, stale_event_body, corpus, scorer=sg.scorer)
+    assert result.score == 0.0625 and not result.clears_threshold
+    # This controlled population is not a universal feasibility or qualification result.
+    original = sg.labelled_corpus()
+    original_references = [q.project_reference(sg.SKILL, item['expected']) for item in original]
+    assert mp.frozen_field_baseline(original_references, original, sg.scorer).score == 1.0
+
+
 def test_historical_smoke_import_requires_the_host_held_manifest_pin(tmp_path):
     from twin.development_capture import import_smoke
     (tmp_path / 'EVIDENCE-MANIFEST.json').write_text('{"files": []}')
