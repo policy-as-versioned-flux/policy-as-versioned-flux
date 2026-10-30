@@ -7,7 +7,7 @@
   --   TRUTH 2026-09-05T01:20Z run=88: committed on origin/ticket-64-the-twin-is-three-adopters and its line is in the default branch's log (commit 2545d1a was rescued, or the branch merged with it)
   --   TRUTH 2026-09-04T20:35Z run=84: committed on origin/ticket-62-and-77-pins-are-checked-for-content and its line is in the default branch's log (commit fd0722f was rescued, or the branch merged with it)
   --   TRUTH 2026-09-04T16:34Z run=76: committed on origin/ticket-56-and-85-the-clocks-are-graded and its line is in the default branch's log (commit 7335de8 was rescued, or the branch merged with it)
-  ok   no clock line is stranded off the default branch, among the 289 other ref(s) this checkout carries (a branch already deleted cannot be looked at from here)
+  ok   no clock line is stranded off the default branch, among the 291 other ref(s) this checkout carries (a branch already deleted cannot be looked at from here)
 [1;36m==>[0m 2. truth.yml still has the shape ticket 100 decided
   ok   the guard runs before measurement; the cage publishes its original source-parent object on the exact run/attempt pending ref through create-only publication without producer integration, direct default-branch push or self-merge
 [1;36m==>[0m 3. actual workflow shell: create-only original publication precedes separate review and conflicts stay pending

@@ -67,6 +67,11 @@ PASS: protected actor/population/host-session control: default operational regis
 PASS: protected actor/population/host-session control: later protected catalogue import accepted
 PASS: protected actor/population/host-session control: forged model receipt refused
 PASS: protected actor/population/host-session control: foreign estate refused and counted
+PASS: TEST_ONLY independent signal assessment control: missing live independent assessment refused and counted
+PASS: TEST_ONLY independent signal assessment control: reviewed nonfirst-of20 TEST_ONLY binding passes actual validator
+PASS: TEST_ONLY independent signal assessment control: durable actual basis/assessment/host receipt import accepted
+PASS: TEST_ONLY independent signal assessment control: default operational mode refuses TEST_ONLY semantic receipts
+PASS: TEST_ONLY independent signal assessment control: missing qualification assessment cannot borrow recorded pass
 THRESHOLDS AGAINST THEIR OWN CORPUS'S BEST CONSTANT ANSWER (reported, not graded):
   signal-classify                n=23  threshold=0.80  baseline=0.913  CANNOT DETECT A MODEL THAT LEARNED NOTHING   [always steep="economic", every other field the scorer reads granted correct]
   evolution-judge                n=4   threshold=0.75  baseline=0.750  CANNOT DETECT A MODEL THAT LEARNED NOTHING   [always evolution_position=0.55, every other field the scorer reads granted correct]
