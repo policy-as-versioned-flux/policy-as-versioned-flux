@@ -249,12 +249,27 @@ class Actor:
             stated = Stated(None, None)
         if not isinstance(raw, bytes):
             raw = None
-        self.verify()
+        try:
+            self.verify()
+        except Exception as exc:
+            revoked = 'post-invocation verification failed: ' + type(exc).__name__ + ': ' + str(exc)
+            failure = failure + '; ' + revoked if failure else revoked
+            stated = Stated(None, None)
         return Output(canonical({'actor_digest': self.digest, 'input_digest': hashlib.sha256(original).hexdigest(),
                                  'raw': base64.b64encode(raw or b'').decode(), 'raw_available': raw is not None,
                                  'failure': failure, 'observed_runtime': observed_runtime,
                                  'observations': observations,
                                  'answer': stated.answer, 'basis': stated.basis}))
+
+
+def _capture_output(actor: Actor, payload: Any) -> Output:
+    """Retain prior raw rows if a later subject is refused before invocation."""
+    try:
+        return actor.invoke(payload)
+    except Exception as exc:
+        return Output(canonical({'actor_digest': actor.digest, 'input_digest': digest(payload),
+            'raw': '', 'raw_available': False, 'failure': 'pre-invocation refusal: ' + type(exc).__name__ + ': ' + str(exc),
+            'observed_runtime': None, 'observations': None, 'answer': None, 'basis': None}))
 
 
 @dataclass(frozen=True)
@@ -672,7 +687,7 @@ class Selection:
             raise ValueError('registered causal task requires authenticated paired CaptureGroup')
         rows = []
         for item in self.population.corpus:
-            output = self.actor.invoke(item['input'])
+            output = _capture_output(self.actor, item['input'])
             rows.append({'id': item['id'], 'output': json.loads(output.packet)})
         packet = canonical({'selection': self.digest, 'rows': rows})
         return Capture(packet, hmac.digest(self._capture_key, packet, 'sha256'))
@@ -886,7 +901,7 @@ class CaptureGroup:
         self.verify()
         rows = []
         for item in self.selections[0].population.corpus:
-            output = self.selections[0].actor.invoke(item['input'])
+            output = _capture_output(self.selections[0].actor, item['input'])
             rows.append({'id': item['id'], 'target_digest': digest(item['input'].get('target')),
                          'attempt_id': secrets.token_hex(24), 'output': json.loads(output.packet)})
         packet = canonical({'schema': 'twin.invocation-capture/v1', 'group_digest': self.digest,
@@ -1122,6 +1137,16 @@ class Resolver:
                              _lookup: Callable[[str, str], mp.Permission] | None = None) -> list[str]:
         if doc.get('schema') == 'twin.substrate-generation/v1':
             return self.check_generation_document(doc, clock)
+        identity = (doc.get('run') or {}).get('host_session')
+        session = self._sessions.get(identity) if isinstance(identity, str) else None
+        if (doc.get('schema') in ('twin.causal-proposal/v1', 'twin.gameplay-proposal/v1', 'twin.ethics-judgement/v1')
+                or session is not None and session._task_job is not None
+                or (doc.get('run') or {}).get('task_contract_sha256') is not None):
+            if session is None or session._task_job is None:
+                return ['no original protected task session for this document']
+            if (doc.get('run') or {}).get('clock') != mp.derive_clock(clock)[0]:
+                return ['task document clock differs from actual derived clock']
+            return session.check_task_document(doc)
         bad = mp.check_claim_document(doc, clock, self.permission)
         if clock != mp.GOVERNED_CLOCK:
             return bad
@@ -1364,8 +1389,13 @@ class HostSession:
         return [{'request_digest': key, 'request': json.loads(record).get('task_review_request') or self._review_request(json.loads(record))}
                 for key, record in self._pending.items()]
 
+    def _uses_task_record(self, record: dict[str, Any]) -> bool:
+        metric, version = record.get('metric'), record.get('model_version')
+        bound = self._resolver._bindings.get((metric, version)) if isinstance(metric, str) and isinstance(version, str) else None
+        return 'task_metrics' in record or bound is not None and bound[0]._task_contract is not None
+
     def _review_request(self, record: dict[str, Any]) -> dict[str, Any]:
-        if 'task_metrics' in record:
+        if self._uses_task_record(record):
             from .task_sessions import review_request
             return review_request(self, record)
         selected, _ = self._resolver._bindings[(record['metric'], record['model_version'])]
@@ -1380,7 +1410,7 @@ class HostSession:
                 'output': record['output']}]}
 
     def _verify_record(self, record: dict[str, Any]) -> None:
-        if 'task_metrics' in record:
+        if self._uses_task_record(record):
             from .task_sessions import verify_record
             verify_record(self, record)
             return
@@ -1401,7 +1431,7 @@ class HostSession:
 
     def review_pending(self, request_digest: str, store: ReviewStore) -> Judgement:
         """Resume the retained actual output after host acquisition, never rerun inference."""
-        if request_digest in self._pending and 'task_metrics' in json.loads(self._pending[request_digest]):
+        if request_digest in self._pending and self._uses_task_record(json.loads(self._pending[request_digest])):
             from .task_sessions import review_pending
             return review_pending(self, request_digest, store)
         subject = request_digest
@@ -1503,6 +1533,8 @@ class HostSession:
             return Judgement(None, reason)
 
     def check_document(self, doc: dict[str, Any]) -> list[str]:
+        if self._task_job is not None or any(self._uses_task_record(json.loads(raw)) for raw in self._records.values()):
+            return self.check_task_document(doc)
         run = doc.get('run') or {}
         bad = []
         if run.get('declined') != self.declines:
@@ -1587,6 +1619,8 @@ class HostSession:
         value = json.loads(archive)
         if value.get('schema') != 'twin.host-session/v1':
             raise ValueError('unknown protected session schema')
+        if 'task_job' not in value and any(name in value for name in ('task_attempts', 'task_events', 'task_reviews')):
+            raise ValueError('retained task lifecycle requires its original protected task job')
         session = cls(resolver, HostInputs.restore(canonical(value['inputs']), metadata_store=metadata_store,
             metadata_policy=metadata_policy, test_only=test_only, task_policy=task_policy))
         session.identity = value['identity']
@@ -1610,7 +1644,7 @@ class HostSession:
                 raise ValueError('pending host review request differs from protected capture')
             session._pending[key] = canonical(record)
         for token, record in value['records'].items():
-            if 'task_metrics' in record:
+            if session._uses_task_record(record):
                 from .task_sessions import restore_record
                 restore_record(session, record)
                 session._records[token] = canonical(record)
@@ -1643,6 +1677,9 @@ class HostSession:
         if session._generation_dispositions or session._generation_blobs:
             from .substrate_generation import verify_session
             verify_session(session)
+        if session._task_job is not None:
+            from .task_sessions import verify_session as verify_task_session
+            verify_task_session(session)
         return session
 
 
