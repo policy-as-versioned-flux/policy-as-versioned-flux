@@ -467,3 +467,122 @@ def test_test_only_metadata_store_cannot_enter_actual_constructor_policy(protect
     request['policy']['issuer'] = 'actual-protected-parent'
     with pytest.raises(ValueError, match='TEST_ONLY metadata authority'):
         resolve_signal_input(**request)
+
+
+def test_reviewed_signal_metadata_is_mandatory_without_semantic_assessment(protected_request):
+    request = metadata_selection(protected_request)
+    request.pop('assessment_policy')
+    request.pop('metadata_store')
+    request.pop('source_metadata_policy')
+    with pytest.raises(ValueError, match='protected metadata'):
+        q.Selection.freeze(**request)
+
+
+METADATA_REVISION_CALLS = []
+
+
+def metadata_revision_runner(payload, config):
+    """TEST_ONLY input-only mechanical capture; no model or competence claim."""
+    METADATA_REVISION_CALLS.append(payload['statement'])
+    return q.canonical({'steep': 'economic', 'component': payload['candidates'][0]['id'],
+        'basis': {'statement_quotes': [payload['statement']],
+            'component_quotes': [payload['candidates'][0]['name']], 'reason': 'TEST_ONLY mechanical control'}})
+
+
+def metadata_revision_selection(protected_request):
+    from bench import signal_contract_controls as controls
+    request = metadata_selection(protected_request)
+    request.pop('assessment_policy')
+    authority = request['metadata_store'].authority(request['source_metadata_policy']['authority_digest'])
+    request['actor'] = q.Actor.freeze(metadata_revision_runner, controls.parse, {'purpose': 'TEST_ONLY'},
+                                    source_metadata_authority=authority)
+    return request
+
+
+def test_acquired_v2_without_semantic_assessment_preserves_capture_and_durable_boundary(protected_request, tmp_path):
+    request = metadata_revision_selection(protected_request)
+    selected = q.Selection.freeze(**request)
+    selected.verify()
+    row = json.loads(selected.population.description)['selected'][0]['case']
+    selected.verify_input(row)
+    captured = selected.capture()
+    assert len(json.loads(captured.packet)['rows']) == 3
+    recorded = selected.record(captured, '2026-10-30T00:00:00Z', tmp_path / 'local-mechanical-scores.jsonl')
+    assert recorded['outcome'] == 'not-measurable'
+    bundle = selected.archive(captured)
+    (tmp_path / 'bundle.json').write_bytes(bundle)
+    catalogue = {'schema': 'twin.qualification-registry/v1',
+        'entries': [{'bundle': 'bundle.json', 'sha256': sm.sha256(bundle)}]}
+    (tmp_path / 'catalogue.json').write_bytes(q.canonical(catalogue))
+    with pytest.raises(ValueError, match='protected metadata'):
+        q.Resolver.from_catalogue(tmp_path / 'catalogue.json', q.digest(catalogue), allow_test_only=True)
+    restored = q.Resolver.from_catalogue(tmp_path / 'catalogue.json', q.digest(catalogue),
+        allow_test_only=True, metadata_store=request['metadata_store'],
+        source_metadata_policy=request['source_metadata_policy'])
+    assert not restored.permission('signal-classify', selected.actor.model_version).granted
+    # A serialized actor/public selection cannot supply the protected handles, even
+    # when it removes its authority claim and consistently rehashes the public packet.
+    public_only = json.loads(bundle)
+    public_only['actor'].pop('source_metadata_authority')
+    actor_digest = q.digest(public_only['actor'])
+    public_only['selection']['actor'] = actor_digest
+    public_only['selection'].pop('source_metadata_policy')
+    public_only['capture']['selection'] = q.digest(public_only['selection'])
+    for item in public_only['capture']['rows']:
+        item['output']['actor_digest'] = actor_digest
+    raw = q.canonical(public_only)
+    (tmp_path / 'public-only.json').write_bytes(raw)
+    catalogue['entries'] = [{'bundle': 'public-only.json', 'sha256': sm.sha256(raw)}]
+    (tmp_path / 'public-only-catalogue.json').write_bytes(q.canonical(catalogue))
+    with pytest.raises(ValueError, match='protected metadata'):
+        q.Resolver.from_catalogue(tmp_path / 'public-only-catalogue.json', q.digest(catalogue), allow_test_only=True)
+
+
+def test_public_selection_without_handles_cannot_verify_capture_or_record(protected_request, tmp_path):
+    from dataclasses import replace
+    request = metadata_revision_selection(protected_request)
+    selected = q.Selection.freeze(**request)
+    captured = selected.capture()
+    public = json.loads(selected.description)
+    public.pop('source_metadata_policy')
+    public_only = replace(selected, description=q.canonical(public), _metadata_store=None, _metadata_policy=None)
+    before = len(METADATA_REVISION_CALLS)
+    with pytest.raises(ValueError, match='protected metadata'):
+        public_only.verify()
+    with pytest.raises(ValueError, match='protected metadata'):
+        public_only.capture()
+    with pytest.raises(ValueError, match='protected metadata'):
+        public_only.record(captured, '2026-10-30T00:00:00Z', tmp_path / 'must-not-exist.jsonl')
+    assert len(METADATA_REVISION_CALLS) == before
+    assert not (tmp_path / 'must-not-exist.jsonl').exists()
+
+
+def test_live_source_import_is_checked_without_semantic_assessment(protected_request):
+    request = metadata_revision_selection(protected_request)
+    selected = q.Selection.freeze(**request)
+    row = json.loads(selected.population.description)['selected'][0]['case']
+    _, foreign, _ = unknown_fixture()
+    source = row['input']['source_context']
+    source.update({key: foreign.public['source'][key] for key in ('url', 'version', 'family')})
+    source['visible_excerpt_ids'] = [item['id'] for item in foreign.public['visible_excerpts']]
+    source['metadata'] = foreign.public
+    row['context']['source_metadata'] = sm.policy_for(foreign)
+    row['context']['source_metadata_public_sha256'] = q.digest(foreign.public)
+    with pytest.raises(ValueError, match='actual protected metadata acquisition'):
+        selected.verify_input(row)
+
+
+@pytest.mark.parametrize('change', ['actor-authority', 'full-construction'])
+def test_optional_assessment_cannot_skip_actor_or_constructor_identity(protected_request, change):
+    from bench import signal_contract_controls as controls
+    request = metadata_revision_selection(protected_request)
+    if change == 'actor-authority':
+        request['actor'] = q.Actor.freeze(metadata_revision_runner, controls.parse, {'purpose': 'TEST_ONLY'})
+        reason = 'actor lacks exact protected metadata'
+    else:
+        public = json.loads(request['population'].description)
+        public['envelope']['signal_contexts']['driftwood']['input_construction_sha256'] = '0' * 64
+        request['population'] = q.Population(q.canonical(public))
+        reason = 'qualification input differs'
+    with pytest.raises(ValueError, match=reason):
+        q.Selection.freeze(**request)

@@ -503,50 +503,50 @@ class Selection:
             description['purpose'] = test_only.value
         if assessment_policy:
             assessment_policy.verify()
-            if population.metric == 'signal-classify':
-                from .signal_inputs import binding_context
-                from . import source_metadata as sm
-                if test_only is not TEST_ONLY_MECHANICS:
-                    sm.validate_parent_policy(source_metadata_policy, metadata_store)
-                    assert source_metadata_policy is not None
-                    authority = metadata_store.authority(source_metadata_policy['authority_digest'])
-                    if (json.loads(actor.description).get('source_metadata_authority') != json.loads(authority.description)
-                            or source_metadata_policy['purpose'] == 'TEST_ONLY'
-                            and json.loads(actor.description)['config'].get('purpose') != 'TEST_ONLY'):
-                        raise ValueError('signal actor lacks exact protected metadata authority/support identity')
-                    description['source_metadata_policy'] = source_metadata_policy
-                    for path in (*[_source_path(path) for path in json.loads(authority.description)['sources']],
-                                 Path(sm.__file__), sm.SCHEMA_PATH):
-                        sources[_source_name(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
-                envelope = population.envelope
-                contexts = envelope.get('signal_contexts', {})
-                if (set(contexts) != set(envelope['adopters'])
-                        or any(not isinstance(value, dict) or set(value) != {
-                            'candidate_universe_digest', 'model_pins', 'model_as_of',
-                            'input_construction_sha256'} for value in contexts.values())):
-                    raise ValueError('reviewed signal selection requires every adopter exact model/universe/construction context')
-                for packet in json.loads(population.description)['selected']:
-                    case = packet['case']
-                    try:
-                        actual = binding_context(case['input'], test_only=test_only)
-                        if test_only is not TEST_ONLY_MECHANICS:
-                            sm.verify_host_metadata(case, metadata_store, source_metadata_policy)
-                        model = case['input']['model_context']
-                        if (actual != contexts.get(case['context']['organisation'])
-                                or any(model[field] != case['context'][field]
-                                       for field in ('organisation', 'domain', 'capability', 'frame'))
-                                or any(model[field] not in envelope[allowed] for field, allowed in (
-                                    ('domain', 'domains'), ('capability', 'capabilities'), ('frame', 'frames')))
-                                or case['input']['source_context']['family'] not in envelope['sources']
-                                or case['input']['source_context']['as_of'] != case['context']['as_of']
-                                or not date.fromisoformat(envelope['from']) <= date.fromisoformat(case['context']['as_of'])
-                                    <= date.fromisoformat(envelope['until'])):
-                            raise ValueError('model/universe/date/construction or declared scope differs')
-                    except (ValueError, KeyError, TypeError) as exc:
-                        raise ValueError('qualification input differs from qualified signal context: ' + str(exc)) from exc
-                source = Path(inspect.getfile(binding_context))
-                sources[_source_name(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
             description['assessment_policy'] = json.loads(assessment_policy.description)
+        if population.metric == 'signal-classify' and (test_only is not TEST_ONLY_MECHANICS or assessment_policy is not None):
+            from .signal_inputs import binding_context
+            from . import source_metadata as sm
+            if test_only is not TEST_ONLY_MECHANICS:
+                sm.validate_parent_policy(source_metadata_policy, metadata_store)
+                assert source_metadata_policy is not None
+                authority = metadata_store.authority(source_metadata_policy['authority_digest'])
+                if (json.loads(actor.description).get('source_metadata_authority') != json.loads(authority.description)
+                        or source_metadata_policy['purpose'] == 'TEST_ONLY'
+                        and json.loads(actor.description)['config'].get('purpose') != 'TEST_ONLY'):
+                    raise ValueError('signal actor lacks exact protected metadata authority/support identity')
+                description['source_metadata_policy'] = source_metadata_policy
+                for path in (*[_source_path(path) for path in json.loads(authority.description)['sources']],
+                             Path(sm.__file__), sm.SCHEMA_PATH):
+                    sources[_source_name(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
+            envelope = population.envelope
+            contexts = envelope.get('signal_contexts', {})
+            if (set(contexts) != set(envelope['adopters'])
+                    or any(not isinstance(value, dict) or set(value) != {
+                        'candidate_universe_digest', 'model_pins', 'model_as_of',
+                        'input_construction_sha256'} for value in contexts.values())):
+                raise ValueError('reviewed signal selection requires every adopter exact model/universe/construction context')
+            for packet in json.loads(population.description)['selected']:
+                case = packet['case']
+                try:
+                    actual = binding_context(case['input'], test_only=test_only)
+                    if test_only is not TEST_ONLY_MECHANICS:
+                        sm.verify_host_metadata(case, metadata_store, source_metadata_policy)
+                    model = case['input']['model_context']
+                    if (actual != contexts.get(case['context']['organisation'])
+                            or any(model[field] != case['context'][field]
+                                   for field in ('organisation', 'domain', 'capability', 'frame'))
+                            or any(model[field] not in envelope[allowed] for field, allowed in (
+                                ('domain', 'domains'), ('capability', 'capabilities'), ('frame', 'frames')))
+                            or case['input']['source_context']['family'] not in envelope['sources']
+                            or case['input']['source_context']['as_of'] != case['context']['as_of']
+                            or not date.fromisoformat(envelope['from']) <= date.fromisoformat(case['context']['as_of'])
+                                <= date.fromisoformat(envelope['until'])):
+                        raise ValueError('model/universe/date/construction or declared scope differs')
+                except (ValueError, KeyError, TypeError) as exc:
+                    raise ValueError('qualification input differs from qualified signal context: ' + str(exc)) from exc
+            source = Path(inspect.getfile(binding_context))
+            sources[_source_name(source)] = hashlib.sha256(source.read_bytes()).hexdigest()
         return cls(actor, population, basis_checker, reference_projection,
                    canonical(description), secrets.token_bytes(32), review, assessment_policy,
                    metadata_store, canonical(source_metadata_policy) if source_metadata_policy else None, test_only)
@@ -564,7 +564,16 @@ class Selection:
             raise ValueError('selection requires original protected TEST_ONLY purpose')
         if value.get('source_metadata_policy') != (json.loads(self._metadata_policy) if self._metadata_policy else None):
             raise ValueError('selection requires original protected metadata policy')
-        if self._metadata_policy:
+        if self.population.metric == 'signal-classify' and self._test_only is not TEST_ONLY_MECHANICS:
+            # Reapply the mandatory constructor/acquisition/actor invariants using the
+            # retained protected handles, including for restored public descriptions.
+            rebound = Selection.freeze(self.actor, self.population, self.basis_checker,
+                reference_projection=self.reference_projection, review=self.review,
+                assessment_policy=self.assessment_policy, metadata_store=self._metadata_store,
+                source_metadata_policy=json.loads(self._metadata_policy) if self._metadata_policy else None)
+            if rebound.description != self.description:
+                raise ValueError('selection protected metadata/construction binding changed')
+        elif self._metadata_policy:
             from .source_metadata import verify_host_metadata
             for packet in json.loads(self.population.description)['selected']:
                 verify_host_metadata(packet['case'], self._metadata_store, json.loads(self._metadata_policy))
@@ -582,7 +591,7 @@ class Selection:
     def verify_input(self, row: dict[str, Any]) -> None:
         """Check live source acquisition against this selection's protected authority."""
         self.verify()
-        if self.population.metric == 'signal-classify' and self.assessment_policy and self._test_only is not TEST_ONLY_MECHANICS:
+        if self.population.metric == 'signal-classify' and self._test_only is not TEST_ONLY_MECHANICS:
             from .source_metadata import verify_host_metadata
             verify_host_metadata(row, self._metadata_store,
                 json.loads(self._metadata_policy) if self._metadata_policy else None)

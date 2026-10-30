@@ -200,7 +200,7 @@ def signal_selection():
         {'status': 'development', 'history': ['TEST_ONLY literal fixture exposure'],
          'training_provenance': 'unknown'})
     return q.Selection.freeze(q.Actor.freeze(signal_actor, parse_signal, {'purpose': 'TEST_ONLY'}),
-        pop, basis_holds, review=q.PopulationReview.test_only(pop))
+        pop, basis_holds, review=q.PopulationReview.test_only(pop), test_only=q.TEST_ONLY_MECHANICS)
 
 
 def public_controls():
