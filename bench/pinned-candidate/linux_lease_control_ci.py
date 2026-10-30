@@ -23,7 +23,15 @@ MAX_RAW=128*1024**2
 MAX_STREAM=256*1024**2
 MAX_FRAME=65536
 OUTCOME_KEYS=('schema','status','executed','control_passed','production_capture_accepted')
-OBSERVATIONS=('context','caller','principal','kernel','installation','host','availability')
+OBSERVATIONS=('context','caller','principal','kernel','installation','host','availability','admission-failure')
+
+
+def admission_reference(value:Any)->dict[str,Any]:
+    if (not isinstance(value,dict) or set(value)!={'name','bytes','sha256'}
+            or value['name']!='suite/admission-failure.json' or type(value['bytes']) is not int
+            or not 0<value['bytes']<=MAX_FILE or not pin(value['sha256'])):
+        raise ValueError('fixed original failed-admission reference required')
+    return value
 
 
 def validate_os_closure(rows:Any,loaded:set[str],control:Any)->dict[str,int]:
@@ -44,7 +52,7 @@ def verify_suite(value:Any,control:Any)->dict[str,Any]:
     if (not isinstance(value,dict) or value.get('schema')!='TEST_ONLY-ci-suite/v1'
             or value.get('status')!='PASS' or value.get('executed') is not True
             or value.get('control_passed') is not True or value.get('production_capture_accepted') is not False
-            or value.get('error') is not None):raise ValueError('complete executed suite required')
+            or value.get('error') is not None or value.get('admission_failure') is not None):raise ValueError('complete executed suite required')
     began,deadline,finished=(finite(value.get(key)) for key in ('started','deadline','finished'))
     if deadline!=began+900 or not began<=finished<=deadline:raise ValueError('original whole-control ceiling differs')
     rows=value.get('scenarios')
@@ -144,6 +152,11 @@ def receive_export(raw:bytes)->dict[str,Any]:
     if not isinstance(original,dict) or {key:original.get(key) for key in OUTCOME_KEYS}!=outcome:
         raise ValueError('stream outcome differs from actual exported result')
     outcome=original
+    if outcome.get('admission_failure') is not None:
+        reference=admission_reference(outcome['admission_failure']);admission_raw=files.get(reference['name'])
+        if (outcome['status']=='PASS' or admission_raw is None or len(admission_raw)!=reference['bytes']
+                or sha(admission_raw)!=reference['sha256']):
+            raise ValueError('original failed-admission evidence missing, changed or falsely passed')
     if outcome['status']=='PASS':
         required={'suite/start.json','suite/sources.json','suite/installation.json','suite/host.json',
                   *('source/'+name for name in MEMBERS)}
@@ -245,6 +258,8 @@ class SuiteBudget:
 
 class PrerequisiteUnavailable(ValueError):
     """Initial observed native capability unavailable; never an executed PASS."""
+    def __init__(self,message:str,facts:dict[str,Any]|None=None):
+        super().__init__(message);self.facts=facts
 
 
 def installed_read(path:str,maximum:int)->bytes:
@@ -392,7 +407,13 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
 def admit_ci_root(g:Any)->dict[str,Any]:
     """Observe only the fixed disposable-VM lab parent; never enable a controller."""
     import ctypes,os
-    parent='/sys/fs/cgroup';g.protected_path(parent,False)
+    parent='/sys/fs/cgroup'
+    try:g.protected_path(parent,False)
+    except FileNotFoundError as failure:
+        raise PrerequisiteUnavailable('fixed initial cgroup root absent',{
+            'stage':'initial-cgroup-root-presence','path':parent,'operation':'protected_path',
+            'error_type':type(failure).__name__,'args':list(failure.args),
+            'errno':failure.errno,'filename':failure.filename}) from failure
     fd=os.open(parent,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC)
     try:
         info=os.fstat(fd);block=(ctypes.c_long*32)()
@@ -423,13 +444,15 @@ def admit_ci_root(g:Any)->dict[str,Any]:
 def execute_suite(g:Any,control:Any,caller:Any,budget:SuiteBudget,directory:Path)->dict[str,Any]:
     """One foreground operation. Each prior exact leaf is removed before next."""
     import time
-    scenarios=[];executed=False;error=None
+    scenarios=[];executed=False;error=None;phase='suite-setup'
     try:
         for scenario in control.SCENARIOS:
             budget.require_work(time.monotonic())
+            phase='host-admission'
             host,profile,prerequisites=control.load_ci_control_host(g,scenario,caller)
             began=time.monotonic();attempts=[];checks={}
             for case in control.CASES[scenario]:
+                phase='subcase'
                 budget.require_work(time.monotonic());caller.verify();executed=True
                 attempt=control.run_attempt(g,host,profile,caller,case,budget.deadline,directory)
                 attempts.append(attempt);checks.update(attempt['checks'])
@@ -447,9 +470,16 @@ def execute_suite(g:Any,control:Any,caller:Any,budget:SuiteBudget,directory:Path
         return outcome
     except BaseException as failure:
         error=type(failure).__name__+': '+str(failure)[:2000]
+        reference=None
+        if isinstance(failure,control.CiPrerequisiteUnavailable):
+            records:dict[str,bytes]={};name='suite/admission-failure.json'
+            persist_observation(g,records,name,{'schema':'TEST_ONLY-ci-admission-failure/v1','scenario':scenario,
+                'phase':phase,'executed_before_failure':executed,'started':budget.started,'deadline':budget.deadline,
+                'observed_monotonic':time.monotonic(),'error_type':type(failure).__name__,'facts':failure.facts})
+            raw=records[name];reference={'name':name,'bytes':len(raw),'sha256':sha(raw)}
         return {'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL','executed':executed,'control_passed':False,
             'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,
-            'finished':time.monotonic(),'scenarios':scenarios,'error':error}
+            'finished':time.monotonic(),'scenarios':scenarios,'error':error,'admission_failure':reference}
 
 
 def owned_exports(g:Any,base:dict[str,bytes],directory:Path|None,outcome:dict[str,Any],budget:SuiteBudget)->dict[str,bytes]:
@@ -460,6 +490,11 @@ def owned_exports(g:Any,base:dict[str,bytes],directory:Path|None,outcome:dict[st
             actual=g.protected_read(str(Path(STORE,'ci-evidence',Path(name).name)),sha(raw),MAX_FILE)
             if actual!=raw:raise ValueError('protected original prerequisite changed before export')
             files[name]=actual
+    if outcome.get('admission_failure') is not None:
+        reference=admission_reference(outcome['admission_failure'])
+        raw=g.protected_read(str(Path(STORE,'ci-evidence','admission-failure.json')),reference['sha256'],MAX_FILE)
+        if len(raw)!=reference['bytes']:raise ValueError('original failed-admission byte count changed')
+        files[reference['name']]=raw
     if directory is None:return files
     # Only filenames appointed by this source in this exact created directory.
     # Read even failed attempts' journals. No recursive/private tree discovery.
@@ -538,7 +573,7 @@ def suite_main()->int:
         budget.require_work(time.monotonic())
         # Warm the actual NSS and all fixed inert fixture imports before pinning
         # actual loaded stdlib/native bytes. No code calls a model/runtime loader.
-        principal=control.principal_facts(g,caller)
+        principal=control.ci_principal_facts(g,caller)
         persist_observation(g,base,'suite/principal.json',principal)
         for name in ('linux_lease_control_child.py','linux_network.py','linux_runtime_filter.py','qwen_backend.py'):
             installed_module(name,manifest)
@@ -554,7 +589,7 @@ def suite_main()->int:
         # Only explicitly observed initial native absence is neutral. Source,
         # ownership, closure, issuer and unknown errors propagate as failures.
         elapsed=time.monotonic()>=budget.deadline-10
-        if isinstance(failure,control.CiPrerequisiteUnavailable):
+        if failure.facts is not None:
             persist_observation(g,base,'suite/availability.json',failure.facts)
         outcome={'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL' if elapsed else 'SKIP','executed':False,'control_passed':False,
             'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,

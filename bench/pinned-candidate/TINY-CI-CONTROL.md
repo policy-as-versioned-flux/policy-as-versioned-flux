@@ -115,3 +115,20 @@ interface before permitting the next subcase. Intentional missing terminals in
 the specified guardian-loss/observer controls retain their existing meaning.
 Unexpected missing proof aborts immediately; the legacy single-scenario route
 and all resource bars, profiles and numerical/scenario grading remain unchanged.
+
+## Revision02 availability and failed-admission originals
+
+Only the initial presence check of literal `/sys/fs/cgroup` converts its actual
+FileNotFoundError into typed availability. The CI-only literal `nobody` lookup
+similarly converts only its own missing-account KeyError. Original error type,
+arguments and fixed lookup/path facts are retained in the protected availability
+record. Legacy lookup behavior is unchanged. Unsafe ACL/ownership, shared/active/
+malformed identity and later source/integrity errors remain failures.
+
+A capacity admission refusal after initial setup remains FAIL. Before returning,
+the coordinator persists its current raw readings, actual phase/scenario and
+original deadline as an immutable protected failed-admission record. The outcome
+references those exact bytes/hash; export reopens that fixed record under its
+original pin, and the receiver refuses missing or changed referenced evidence.
+Neither an earlier successful host record nor an exception string substitutes
+for the current failed readings. There is no reset, retry, fallback or new lease.

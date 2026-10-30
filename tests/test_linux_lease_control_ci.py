@@ -233,7 +233,7 @@ def test_coordinator_serializes_all_twenty_and_aborts_before_next_leaf_on_failed
         row=next(row for row in receipt(scenario)['attempts'] if row['case']==case)
         row['started']=clock[0];clock[0]+=10.;row['finished']=clock[0]
         return row
-    transport=SimpleNamespace(SCENARIOS=c.SCENARIOS,CASES=c.CASES,verify_result=c.verify_result,verify_attempt=c.verify_attempt,
+    transport=SimpleNamespace(SCENARIOS=c.SCENARIOS,CASES=c.CASES,verify_result=c.verify_result,verify_attempt=c.verify_attempt,CiPrerequisiteUnavailable=c.CiPrerequisiteUnavailable,
         load_ci_control_host=lambda g,scenario,caller:({}, {'config':{'scenario':scenario}}, {'TEST_ONLY':True}),run_attempt=run)
     caller=SimpleNamespace(verify=lambda:None)
     result=m.execute_suite(None,transport,caller,m.SuiteBudget(100.,1000.),tmp_path)
@@ -340,7 +340,7 @@ def test_initial_source_integrity_failure_is_not_a_neutral_skip():
     stage=next(node for node in main.body if isinstance(node,ast.Try) and any(
         isinstance(call,ast.Call) and isinstance(call.func,ast.Name) and call.func.id=='installed_module' for call in ast.walk(node)))
     class MissingNative(ValueError):pass
-    control=SimpleNamespace(principal_facts=lambda *args:None,CiPrerequisiteUnavailable=MissingNative)
+    control=SimpleNamespace(ci_principal_facts=lambda *args:None,CiPrerequisiteUnavailable=MissingNative)
     def namespace(error):
         def refused(*args):raise error
         return {'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),
@@ -401,7 +401,7 @@ def test_missing_required_terminal_aborts_before_the_next_subcase(monkeypatch,tm
         row['started']=clock[0];clock[0]+=10.;row['finished']=clock[0]
         if case=='eof':row['guardian_terminal']=None
         return row
-    transport=SimpleNamespace(SCENARIOS=('invalid-evidence',),CASES=c.CASES,verify_result=c.verify_result,
+    transport=SimpleNamespace(SCENARIOS=('invalid-evidence',),CASES=c.CASES,verify_result=c.verify_result,CiPrerequisiteUnavailable=c.CiPrerequisiteUnavailable,
         load_ci_control_host=lambda *args:({}, {'config':{'scenario':'invalid-evidence'}}, {}),run_attempt=run)
     if hasattr(c,'verify_attempt'):transport.verify_attempt=c.verify_attempt
     result=m.execute_suite(None,transport,SimpleNamespace(verify=lambda:None),m.SuiteBudget(100.,1000.),tmp_path)
@@ -448,7 +448,7 @@ def test_initial_stage_keeps_observed_kernel_and_principal_when_later_discovery_
     class MissingNative(ValueError):pass
     def refused(*args):raise ValueError('TEST_ONLY later native mapping integrity refusal')
     scope={'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),'g':g,'caller':None,
-        'control':SimpleNamespace(principal_facts=lambda *args:{'TEST_ONLY_principal':65534},CiPrerequisiteUnavailable=MissingNative),
+        'control':SimpleNamespace(ci_principal_facts=lambda *args:{'TEST_ONLY_principal':65534},CiPrerequisiteUnavailable=MissingNative),
         'installed_module':lambda *args:None,'manifest':{},'base':base,'outcome':None,
         'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'persist_observation':m.persist_observation,
         'admit_ci_root':lambda *args:{'TEST_ONLY_controllers':['memory','cpu','cpuset','pids']},
@@ -458,3 +458,109 @@ def test_initial_stage_keeps_observed_kernel_and_principal_when_later_discovery_
     assert (tmp_path/'ci-evidence/kernel.json').read_bytes()==base['suite/kernel.json']
     (tmp_path/'ci-evidence/kernel.json').chmod(0o600);(tmp_path/'ci-evidence/kernel.json').write_bytes(b'TEST_ONLY tampered original')
     with pytest.raises(ValueError,match='changed'):m.owned_exports(g,base,None,{'status':'FAIL'},m.SuiteBudget(100.,1000.))
+
+
+def test_initial_missing_fixed_cgroup_root_is_typed_absence_but_unsafe_root_is_failure():
+    import errno
+    from types import SimpleNamespace
+    m=ci()
+    def absent(path,*args):
+        assert path=='/sys/fs/cgroup'
+        raise FileNotFoundError(errno.ENOENT,'TEST_ONLY fixed root absent',path)
+    with pytest.raises(m.PrerequisiteUnavailable) as caught:m.admit_ci_root(SimpleNamespace(protected_path=absent))
+    assert caught.value.facts['path']=='/sys/fs/cgroup'
+    assert caught.value.facts['error_type']=='FileNotFoundError' and caught.value.facts['errno']==errno.ENOENT
+    def unsafe(path,*args):raise PermissionError(errno.EACCES,'TEST_ONLY unsafe root ACL',path)
+    with pytest.raises(PermissionError):m.admit_ci_root(SimpleNamespace(protected_path=unsafe))
+
+
+def test_initial_missing_nobody_is_typed_without_converting_later_identity_or_integrity_errors(monkeypatch):
+    from types import SimpleNamespace
+    from test_linux_lease_control import control
+    c=control()
+    def absent(name):
+        assert name=='nobody'
+        raise KeyError('TEST_ONLY existing nobody absent')
+    monkeypatch.setattr(c.pwd,'getpwnam',absent)
+    with pytest.raises(c.CiPrerequisiteUnavailable) as caught:c.ci_principal_facts(None,None)
+    assert caught.value.facts['name']=='nobody' and caught.value.facts['args']==['TEST_ONLY existing nobody absent']
+    with pytest.raises(KeyError):c.principal_facts(None,None)
+    monkeypatch.setattr(c.pwd,'getpwnam',lambda name:SimpleNamespace(pw_uid=65534,pw_gid=65534))
+    monkeypatch.setattr(c.pwd,'getpwall',lambda:[]);monkeypatch.setattr(c.grp,'getgrall',lambda:[])
+    monkeypatch.setattr(Path,'read_text',lambda *args,**kwargs:'TEST_ONLY caller metadata')
+    for error in (ValueError('TEST_ONLY active/shared principal'),KeyError('TEST_ONLY malformed later identity fact')):
+        def failed(*args):raise error
+        g=SimpleNamespace(parse_status=lambda value:{'Gid':'1001'},candidate_unused=failed)
+        with pytest.raises(type(error)):c.ci_principal_facts(g,SimpleNamespace(pid=201,uid=[1001]*4))
+
+
+def test_poststart_capacity_failure_retains_current_raw_admission_facts_before_export(monkeypatch,tmp_path):
+    import copy,hashlib,json,time
+    from types import SimpleNamespace
+    from test_linux_lease_control import control
+    from test_linux_lease_control_admission import receipt
+    m=ci();c=control();monkeypatch.setattr(m,'STORE',str(tmp_path));clock=[120.];calls=[]
+    monkeypatch.setattr(time,'monotonic',lambda:clock[0])
+    facts={'TEST_ONLY':True,'memory_available':123,'disk_free':456,
+        'ancestors':[{'TEST_ONLY_raw':'current-low-admission'}],'raw_marker':'TEST_ONLY-original-failed-current-capacity'}
+    expected=copy.deepcopy(facts)
+    def load(g,scenario,caller):
+        calls.append(scenario)
+        if scenario=='boundaries':raise c.CiPrerequisiteUnavailable('TEST_ONLY current capacity lost',facts)
+        return {},{'config':{'scenario':scenario}},{}
+    def run(*args):
+        row=receipt('baseline')['attempts'][0];row['started']=120.;row['finished']=130.;clock[0]=130.;return row
+    def protected(path,pin=None,maximum=16*1024**2):
+        raw=Path(path).read_bytes()
+        if pin is not None and hashlib.sha256(raw).hexdigest()!=pin:raise ValueError('original capacity bytes changed')
+        return raw
+    g=SimpleNamespace(protected_path=lambda *args:None,protected_read=protected)
+    transport=SimpleNamespace(SCENARIOS=('baseline','boundaries'),CASES=c.CASES,CiPrerequisiteUnavailable=c.CiPrerequisiteUnavailable,
+        load_ci_control_host=load,run_attempt=run,verify_attempt=c.verify_attempt,verify_result=c.verify_result)
+    directory=tmp_path/'attempts';directory.mkdir()
+    outcome=m.execute_suite(g,transport,SimpleNamespace(verify=lambda:None),m.SuiteBudget(100.,1000.),directory)
+    assert outcome['status']=='FAIL' and outcome['executed'] is True and calls==['baseline','boundaries']
+    reference=outcome['admission_failure'];raw=(tmp_path/'ci-evidence/admission-failure.json').read_bytes();saved=json.loads(raw)
+    assert saved['facts']==expected and saved['scenario']=='boundaries' and saved['phase']=='host-admission'
+    assert saved['started']==100. and saved['deadline']==1000. and saved['observed_monotonic']==130.
+    assert reference=={'name':'suite/admission-failure.json','bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
+    facts['raw_marker']='TEST_ONLY later mutation';assert json.loads(raw)['facts']==expected
+    files=m.owned_exports(g,{},directory,outcome,m.SuiteBudget(100.,1000.))
+    assert files['suite/admission-failure.json']==raw
+    assert m.receive_export(b''.join(m.export_frames(files,outcome)))['outcome']['status']=='FAIL'
+    files.pop('suite/admission-failure.json')
+    with pytest.raises(ValueError,match='admission|original'):m.receive_export(b''.join(m.export_frames(files,outcome)))
+
+
+@pytest.mark.parametrize('absent',('root','nobody'))
+def test_initial_literal_absence_is_neutral_skip_with_original_absence_record(monkeypatch,tmp_path,absent):
+    import ast,errno,hashlib,time
+    from types import SimpleNamespace
+    from test_linux_lease_control import control
+    m=ci();c=control();monkeypatch.setattr(m,'STORE',str(tmp_path));monkeypatch.setattr(time,'monotonic',lambda:150.);base={}
+    def metadata(path,*args):
+        if path=='/sys/fs/cgroup':raise FileNotFoundError(errno.ENOENT,'TEST_ONLY fixed root absent',path)
+    def protected(path,pin,maximum):
+        raw=Path(path).read_bytes();assert hashlib.sha256(raw).hexdigest()==pin;return raw
+    g=SimpleNamespace(protected_path=metadata,protected_read=protected)
+    if absent=='root':monkeypatch.setattr(c,'ci_principal_facts',lambda *args:{'TEST_ONLY_principal':65534})
+    else:
+        def missing(name):
+            assert name=='nobody'
+            raise KeyError('TEST_ONLY nobody genuinely absent')
+        monkeypatch.setattr(c.pwd,'getpwnam',missing)
+    tree=ast.parse((Path(__file__).parents[1]/'bench/pinned-candidate/linux_lease_control_ci.py').read_text())
+    main=next(node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name=='suite_main')
+    stage=next(node for node in main.body if isinstance(node,ast.Try) and any(
+        isinstance(call,ast.Call) and isinstance(call.func,ast.Name) and call.func.id=='installed_module' for call in ast.walk(node)))
+    scope={'time':time,'budget':m.SuiteBudget(100.,1000.),'g':g,'caller':None,'control':c,'installed_module':lambda *args:None,
+        'manifest':{},'base':base,'outcome':None,'PrerequisiteUnavailable':m.PrerequisiteUnavailable,
+        'persist_observation':m.persist_observation,'admit_ci_root':m.admit_ci_root}
+    exec(compile(ast.Module(body=[stage],type_ignores=[]),'TEST_ONLY-initial-absence-stage','exec'),scope)
+    assert scope['outcome']['status']=='SKIP' and scope['outcome']['executed'] is False
+    assert scope['outcome']['control_passed'] is False and scope['outcome']['deadline']==1000.
+    import json
+    original=(tmp_path/'ci-evidence/availability.json').read_bytes()
+    facts=json.loads(original);assert base['suite/availability.json']==original
+    assert facts['error_type']==('FileNotFoundError' if absent=='root' else 'KeyError')
+    assert facts.get('path',facts.get('name'))==('/sys/fs/cgroup' if absent=='root' else 'nobody')

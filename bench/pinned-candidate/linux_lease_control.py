@@ -567,6 +567,19 @@ def _guardian(protected:bool=False) -> Any:
 
 def principal_facts(g: Any, caller: Any) -> dict[str,Any]:
     record=pwd.getpwnam('nobody')
+    return _principal_facts(g,caller,record)
+
+
+def ci_principal_facts(g:Any,caller:Any)->dict[str,Any]:
+    try:record=pwd.getpwnam('nobody')
+    except KeyError as failure:
+        raise CiPrerequisiteUnavailable('existing nobody account absent',{
+            'stage':'initial-principal-lookup','name':'nobody','operation':'pwd.getpwnam',
+            'error_type':type(failure).__name__,'args':list(failure.args)}) from failure
+    return _principal_facts(g,caller,record)
+
+
+def _principal_facts(g:Any,caller:Any,record:Any)->dict[str,Any]:
     users=pwd.getpwall();groups=grp.getgrall()
     caller_state=g.parse_status(Path(f'/proc/{caller.pid}/status').read_text())
     caller_gid=int(caller_state['Gid'].split()[0])
@@ -828,7 +841,7 @@ def _load_control_host(g: Any, scenario: str, caller: Any, ci:bool) -> tuple[dic
         raise ValueError('actual fixed OS interpreter required, no runtime alias')
     if str(Path(__file__))!=STORE+'/source/linux_lease_control.py' or sys.executable!='/usr/bin/python3.12':
         raise ValueError('fixed installed entry and OS interpreter required')
-    facts=principal_facts(g,caller)
+    facts=ci_principal_facts(g,caller) if ci else principal_facts(g,caller)
     uid,gid=validate_principal(facts)
     parent='/sys/fs/cgroup' if ci else '/sys/fs/cgroup/policy-as-versioned-flux-linux-control'
     g.protected_path(parent,False)
