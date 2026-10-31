@@ -1,0 +1,72 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "twin.xpdf-linux-build-files/v1"
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 32768,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 268435456
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "role": {
+            "enum": [
+              "archive",
+              "source",
+              "package",
+              "notice",
+              "bootstrap",
+              "tool",
+              "candidate",
+              "config",
+              "object",
+              "library",
+              "binary",
+              "raw-log",
+              "metadata"
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256",
+          "role"
+        ]
+      }
+    },
+    "logical_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483648
+    },
+    "self_included": {
+      "const": false
+    }
+  },
+  "required": [
+    "schema",
+    "files",
+    "logical_bytes",
+    "self_included"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Semantic checker rejects unsafe/duplicate paths, exact byte/hash mismatch, wrong set, special files and >2GiB total regardless of claimed logical_bytes."
+}

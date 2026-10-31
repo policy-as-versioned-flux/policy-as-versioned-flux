@@ -1,0 +1,86 @@
+{
+  "schema": "PROPOSAL_ONLY-linux-tool-discovery-queries/v1",
+  "selectors": [
+    "/usr/bin/cmake",
+    "/usr/bin/make",
+    "/usr/bin/gcc",
+    "/usr/bin/g++",
+    "/usr/bin/patch",
+    "/usr/bin/as",
+    "/usr/bin/ld",
+    "/usr/bin/ar",
+    "/usr/bin/ranlib",
+    "/usr/bin/readelf",
+    "/bin/sh"
+  ],
+  "ordered_query_argv": [
+    [
+      "/usr/bin/cmake",
+      "--version"
+    ],
+    [
+      "/usr/bin/make",
+      "--version"
+    ],
+    [
+      "/usr/bin/gcc",
+      "--version"
+    ],
+    [
+      "/usr/bin/g++",
+      "--version"
+    ],
+    [
+      "/usr/bin/patch",
+      "--version"
+    ],
+    [
+      "/usr/bin/as",
+      "--version"
+    ],
+    [
+      "/usr/bin/ld",
+      "--version"
+    ],
+    [
+      "/usr/bin/ar",
+      "--version"
+    ],
+    [
+      "/usr/bin/ranlib",
+      "--version"
+    ],
+    [
+      "/usr/bin/readelf",
+      "--version"
+    ],
+    [
+      "/usr/bin/gcc",
+      "-dumpmachine"
+    ],
+    [
+      "/usr/bin/gcc",
+      "-dumpspecs"
+    ],
+    [
+      "/usr/bin/gcc",
+      "-print-prog-name=cc1"
+    ],
+    [
+      "/usr/bin/g++",
+      "-print-prog-name=cc1plus"
+    ],
+    [
+      "/usr/bin/gcc",
+      "-print-prog-name=collect2"
+    ]
+  ],
+  "cmake_modules_path": "/usr/share/cmake-<canonical major>.<canonical minor>/Modules",
+  "GCC_internal_parent": "/usr/lib/gcc/x86_64-linux-gnu/<canonical version>/",
+  "internal_tools_never_executed": [
+    "cc1",
+    "cc1plus",
+    "collect2"
+  ],
+  "forbidden_extra_queries": true
+}

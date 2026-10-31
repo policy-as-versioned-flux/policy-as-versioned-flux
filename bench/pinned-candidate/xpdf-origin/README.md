@@ -35,3 +35,12 @@ public raw records and successful builds cannot enroll themselves.
 Upstream license/copyright notices are retained under upstream-notices/. The
 upstream README describes GPLv2/GPLv3 choices; these source records are not a legal
 opinion about a proposed distribution.
+# Build-only source capability
+
+The fixed, currently unappointed Linux build capability and its pure checker are
+documented in [BUILD-ONLY.md](BUILD-ONLY.md). No workflow or actual build/native
+execution is enabled by that source.
+
+The separately appointed inventory-only interfaces and their DATA/held result
+meaning are documented in [DISCOVERY-ONLY.md](DISCOVERY-ONLY.md). Their private
+appointment is also absent; inventory cannot grant a full build or native run.

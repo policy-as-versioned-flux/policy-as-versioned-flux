@@ -1,0 +1,100 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "twin.xpdf-linux-build-selection/v1"
+    },
+    "scope": {
+      "const": "BUILD_ONLY"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "source_tree": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "workflow_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "driver_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "preparer_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_package_sha256": {
+      "const": "37b3903b671b49c2d75efa7e2ab0694e64dde6affd0df7208df176aa86152adc"
+    },
+    "bootstrap_selection_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "tool_module_review_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "limits_profile": {
+      "const": "checkpoint-A-1800/v1"
+    },
+    "expected_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "os": {
+          "const": "ubuntu-24.04"
+        },
+        "arch": {
+          "const": "x86_64-linux"
+        }
+      },
+      "required": [
+        "os",
+        "arch"
+      ]
+    },
+    "official_archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "const": "https://dl.xpdfreader.com/xpdf-4.06.tar.gz"
+        },
+        "bytes": {
+          "const": 999317
+        },
+        "sha256": {
+          "const": "1c38f527c46caee0f712386d42a885b96a31ed9ce11904e872559859894d137e"
+        }
+      },
+      "required": [
+        "url",
+        "bytes",
+        "sha256"
+      ]
+    }
+  },
+  "required": [
+    "schema",
+    "scope",
+    "source_commit",
+    "source_tree",
+    "workflow_sha256",
+    "driver_sha256",
+    "preparer_sha256",
+    "source_package_sha256",
+    "bootstrap_selection_sha256",
+    "tool_module_review_sha256",
+    "limits_profile",
+    "expected_row",
+    "official_archive"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:twin:proposal:xpdf-linux-build-selection:v1",
+  "description": "Closed build DATA selection. Presence does not authorize execution; independently selected parent/root decision is required. No arbitrary tool/argv/env/flag/callback accepted."
+}
