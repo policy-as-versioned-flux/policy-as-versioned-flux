@@ -856,7 +856,7 @@ def validate_ci_caller_record(value:Any)->None:
         return {'ppid':_CallerRoute.number(fields[1],2**31-1),'start':fields[19]}
     def file(item:Any)->None:
         keys(item,'device inode mode owner_uid owner_gid nlink size mtime_ns ctime_ns')
-        for field in item:integer(item[field],0,2**64-1)
+        for field in item:integer(item[field],1 if field=='inode' else 0,2**64-1)
         import stat
         if item['owner_uid']!=0 or item['nlink']!=1 or not stat.S_ISREG(item['mode']):raise ValueError('protected executable metadata required')
     keys(value,'schema route status reason started finished deadline snapshots final_live invoker_uid selected_pid next_pid faults custody')
