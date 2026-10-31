@@ -166,17 +166,18 @@ def test_ci_root_parent_is_fixed_and_does_not_change_legacy_or_production(monkey
         effective_memory=lambda *args:20000000000,validate_reserve=lambda *args:None,
         verify_guardian_closure=lambda *args:None,digest=lambda value:hashlib.sha256(value).hexdigest(),MEMORY=12884901888,RESERVE=2147483648)
     nobody=SimpleNamespace(pw_name='nobody',pw_uid=65534,pw_gid=65534,pw_dir='/TEST_ONLY-no-home')
-    monkeypatch.setattr(c.pwd,'getpwnam',lambda name:nobody);monkeypatch.setattr(c.pwd,'getpwall',lambda:[nobody])
-    monkeypatch.setattr(c.grp,'getgrall',lambda:[SimpleNamespace(gr_name='nogroup',gr_gid=65534,gr_mem=[])])
+    irc=SimpleNamespace(pw_name='irc',pw_uid=39,pw_gid=39,pw_dir='/TEST_ONLY-no-irc-home')
+    monkeypatch.setattr(c.pwd,'getpwnam',lambda name:irc if name=='irc' else nobody);monkeypatch.setattr(c.pwd,'getpwall',lambda:[nobody,irc])
+    monkeypatch.setattr(c.grp,'getgrall',lambda:[SimpleNamespace(gr_name='nogroup',gr_gid=65534,gr_mem=[]),SimpleNamespace(gr_name='irc',gr_gid=39,gr_mem=[])])
     monkeypatch.setattr(c.os,'sched_getaffinity',lambda pid:{2,3},raising=False)
     monkeypatch.setattr(Path,'read_text',lambda path,*args,**kwargs:'memory cpu cpuset pids' if path.name=='cgroup.subtree_control' else '2-3')
     monkeypatch.setattr(Path,'exists',lambda path:False)
     monkeypatch.setattr(c,'__file__',m.STORE+'/source/linux_lease_control.py')
     monkeypatch.setattr(c.sys,'executable','/usr/bin/python3.12')
     host,profile,_=c.load_ci_control_host(g,'baseline',caller)
-    assert host['cgroup_parent']=='/sys/fs/cgroup' and host['candidate_uid']==65534
+    assert host['cgroup_parent']=='/sys/fs/cgroup' and host['candidate_uid']==39 and host['candidate_gid']==39
     legacy,oldprofile,_=c.load_control_host(g,'baseline',caller)
-    assert legacy['cgroup_parent']=='/sys/fs/cgroup/policy-as-versioned-flux-linux-control'
+    assert legacy['cgroup_parent']=='/sys/fs/cgroup/policy-as-versioned-flux-linux-control' and legacy['candidate_uid']==65534
     assert oldprofile==profile
     with pytest.raises(ValueError):c.load_ci_control_host(g,'/arbitrary/cgroup',caller)
     from twin.linux_candidate import validate_profile
@@ -474,16 +475,16 @@ def test_initial_missing_fixed_cgroup_root_is_typed_absence_but_unsafe_root_is_f
     with pytest.raises(PermissionError):m.admit_ci_root(SimpleNamespace(protected_path=unsafe))
 
 
-def test_initial_missing_nobody_is_typed_without_converting_later_identity_or_integrity_errors(monkeypatch):
+def test_initial_missing_fixed_ci_account_is_typed_without_converting_later_identity_or_integrity_errors(monkeypatch):
     from types import SimpleNamespace
     from test_linux_lease_control import control
     c=control()
     def absent(name):
-        assert name=='nobody'
+        assert name in ('irc','nobody')
         raise KeyError('TEST_ONLY existing nobody absent')
     monkeypatch.setattr(c.pwd,'getpwnam',absent)
     with pytest.raises(c.CiPrerequisiteUnavailable) as caught:c.ci_principal_facts(None,None)
-    assert caught.value.facts['name']=='nobody' and caught.value.facts['args']==['TEST_ONLY existing nobody absent']
+    assert caught.value.facts['name']=='irc' and caught.value.facts['args']==['TEST_ONLY existing nobody absent']
     with pytest.raises(KeyError):c.principal_facts(None,None)
     monkeypatch.setattr(c.pwd,'getpwnam',lambda name:SimpleNamespace(pw_uid=65534,pw_gid=65534))
     monkeypatch.setattr(c.pwd,'getpwall',lambda:[]);monkeypatch.setattr(c.grp,'getgrall',lambda:[])
@@ -546,7 +547,7 @@ def test_initial_literal_absence_is_neutral_skip_with_original_absence_record(mo
     if absent=='root':monkeypatch.setattr(c,'ci_principal_facts',lambda *args:{'TEST_ONLY_principal':65534})
     else:
         def missing(name):
-            assert name=='nobody'
+            assert name in ('irc','nobody')
             raise KeyError('TEST_ONLY nobody genuinely absent')
         monkeypatch.setattr(c.pwd,'getpwnam',missing)
     tree=ast.parse((Path(__file__).parents[1]/'bench/pinned-candidate/linux_lease_control_ci.py').read_text())
@@ -563,4 +564,4 @@ def test_initial_literal_absence_is_neutral_skip_with_original_absence_record(mo
     original=(tmp_path/'ci-evidence/availability.json').read_bytes()
     facts=json.loads(original);assert base['suite/availability.json']==original
     assert facts['error_type']==('FileNotFoundError' if absent=='root' else 'KeyError')
-    assert facts.get('path',facts.get('name'))==('/sys/fs/cgroup' if absent=='root' else 'nobody')
+    assert facts.get('path',facts.get('name'))==('/sys/fs/cgroup' if absent=='root' else 'irc')

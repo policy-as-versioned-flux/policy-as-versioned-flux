@@ -49,7 +49,7 @@ Discovery pins actual loaded OS stdlib/cache/native bytes, their identities and
 ELF PT_INTERP/DT_NEEDED closure from current mappings. No ldd, package discovery,
 installation or model import occurs. Ambiguous/missing dependencies, mutable or
 foreign toolcache sources, aliases or more than256MiB/4096 files refuse admission.
-Existing distinct unused nobody,14GiB initial headroom, recurring2GiB outside the
+Existing fixed distinct unused irc39/39,14GiB initial headroom, recurring2GiB outside the
 12GiB leaf and5GiB backing storage remain genuine prerequisites, enforced again
 by the existing leaf/phase/sample mechanisms. No existing target is presumed to
 satisfy them.
@@ -119,7 +119,7 @@ and all resource bars, profiles and numerical/scenario grading remain unchanged.
 ## Revision02 availability and failed-admission originals
 
 Only the initial presence check of literal `/sys/fs/cgroup` converts its actual
-FileNotFoundError into typed availability. The CI-only literal `nobody` lookup
+FileNotFoundError into typed availability. The CI-only literal `irc` lookup
 similarly converts only its own missing-account KeyError. Original error type,
 arguments and fixed lookup/path facts are retained in the protected availability
 record. Legacy lookup behavior is unchanged. Unsafe ACL/ownership, shared/active/
@@ -196,3 +196,12 @@ UID shape `[1001,0,0,0]`. Full parent chains, file bindings, genuine pidfd/descr
 custody, original-budget compatibility and all twenty actual subcases remain
 unproved by this source implementation and its pure models. Independent review,
 fresh-main replay and exact new execution/publication GO are still required.
+
+The CI-only principal is source-fixed to the already existing `irc` account,
+UID39/GID39. This is a prospective selection, not proof that a runner supplies a
+suitable account. UID/GID aliases, shared primary or supplementary membership,
+active tasks, caller collisions and exposed homes still refuse. There is no
+account creation, mutation, fallback or public selector. Ordinary production
+retains its existing `nobody` policy; a neutral initial lookup absence cannot
+count as an executed control pass. Both warmup and every actual attempt
+reacquire and validate the same fixed CI identity.

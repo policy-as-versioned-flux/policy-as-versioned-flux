@@ -111,10 +111,15 @@ SKIP/unexecuted/missing/partial evidence cannot pass.
 route, target suitability and eventual artifact collection remain separate
 reviewed work; no workflow dispatch or provider action is implied.
 
-An observed rejection of the existing CI `nobody` identity remains a failure.
+An observed rejection of the fixed existing CI identity remains a failure.
 The CI-only diagnostic retains the original account/group/home observations in
 the protected `suite/principal.json` refusal record before exporting that failed
 outcome. It does not select another account, relax the principal predicate, or
 turn unsafe identity into neutral absence. A changed/unproved caller or an
 unretained observation still prevents a complete diagnostic export. The ordinary
 production principal route retains its existing rejection behavior.
+
+The separately source-appointed CI route uses existing `irc` UID39/GID39, with
+exact name/group and all existing safety checks. Its suitability must be
+observed before any actual attempt. The ordinary production route continues
+to select `nobody`; neither route creates an account or falls back to another.

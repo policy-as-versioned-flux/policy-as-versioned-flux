@@ -520,6 +520,19 @@ def validate_principal(facts: dict[str,Any]) -> tuple[int,int]:
     return uid,gid
 
 
+def validate_ci_principal(facts:dict[str,Any])->tuple[int,int]:
+    """Fixed existing CI irc39/39 only; no account selector or fallback."""
+    uid,gid=facts.get('uid'),facts.get('gid')
+    if (facts.get('name')!='irc' or type(uid) is not int or uid!=39
+            or type(gid) is not int or gid!=39 or uid==facts.get('caller_uid')
+            or gid==facts.get('caller_gid') or facts.get('uid_names')!=['irc']
+            or facts.get('gid_names')!=['irc'] or facts.get('primary_names')!=['irc']
+            or facts.get('supplementary_names')!=[] or facts.get('active') is not False
+            or facts.get('home_exposed') is not False):
+        raise ValueError('fixed CI irc identity is unsafe, shared, active or unproved')
+    return uid,gid
+
+
 def _bootstrap_read(path:str,maximum:int)->bytes:
     """Small fixed-root bootstrap before importing the protected guardian source."""
     target=Path(path)
@@ -578,15 +591,15 @@ def principal_facts(g: Any, caller: Any) -> dict[str,Any]:
 
 
 def ci_principal_facts(g:Any,caller:Any)->dict[str,Any]:
-    try:record=pwd.getpwnam('nobody')
+    try:record=pwd.getpwnam('irc')
     except KeyError as failure:
-        raise CiPrerequisiteUnavailable('existing nobody account absent',{
-            'stage':'initial-principal-lookup','name':'nobody','operation':'pwd.getpwnam',
+        raise CiPrerequisiteUnavailable('existing fixed CI irc account absent',{
+            'stage':'initial-principal-lookup','name':'irc','operation':'pwd.getpwnam',
             'error_type':type(failure).__name__,'args':list(failure.args)}) from failure
-    return _principal_facts(g,caller,record,ci_refusal=True)
+    return _principal_facts(g,caller,record,ci=True)
 
 
-def _principal_facts(g:Any,caller:Any,record:Any,*,ci_refusal:bool=False)->dict[str,Any]:
+def _principal_facts(g:Any,caller:Any,record:Any,*,ci:bool=False)->dict[str,Any]:
     users=pwd.getpwall();groups=grp.getgrall()
     caller_state=g.parse_status(Path(f'/proc/{caller.pid}/status').read_text())
     caller_gid=int(caller_state['Gid'].split()[0])
@@ -606,9 +619,11 @@ def _principal_facts(g:Any,caller:Any,record:Any,*,ci_refusal:bool=False)->dict[
         'primary_names':sorted(p.pw_name for p in users if p.pw_gid==record.pw_gid),
         'supplementary_names':sorted(name for group in groups if group.gr_gid==record.pw_gid for name in group.gr_mem),
         'active':False,'home_exposed':exposed}
-    try:validate_principal(facts)
+    try:
+        if ci:validate_ci_principal(facts)
+        else:validate_principal(facts)
     except ValueError as failure:
-        if not ci_refusal:raise
+        if not ci:raise
         caller.verify()
         raise CiPrincipalRejected(str(failure),facts) from failure
     caller.verify()
@@ -870,7 +885,7 @@ def _load_control_host(g: Any, scenario: str, caller: Any, ci:bool) -> tuple[dic
     if str(Path(__file__))!=STORE+'/source/linux_lease_control.py' or sys.executable!='/usr/bin/python3.12':
         raise ValueError('fixed installed entry and OS interpreter required')
     facts=ci_principal_facts(g,caller) if ci else principal_facts(g,caller)
-    uid,gid=validate_principal(facts)
+    uid,gid=validate_ci_principal(facts) if ci else validate_principal(facts)
     parent='/sys/fs/cgroup' if ci else '/sys/fs/cgroup/policy-as-versioned-flux-linux-control'
     g.protected_path(parent,False)
     available=g.parse_set(Path(parent,'cpuset.cpus.effective').read_text()) & os.sched_getaffinity(0)
