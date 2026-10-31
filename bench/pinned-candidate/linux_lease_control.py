@@ -45,6 +45,19 @@ WRITE_PATHS=('/TEST_ONLY-root-write','/app/actor-config.json','/app/lease.json',
     '/app/linux_lease_control_child.py','/evidence/write','/sys/fs/cgroup/cgroup.procs','/sys/fs/cgroup/memory.max')
 
 
+class CiPrerequisiteUnavailable(ValueError):
+    """Known initial capacity absence; carries the actual protected readings."""
+    def __init__(self,message:str,facts:dict[str,Any]):
+        super().__init__(message);self.facts=facts
+
+
+class CiPrincipalRejected(ValueError):
+    """CI-only diagnostic for an observed refusal, never neutral absence."""
+    def __init__(self, reason:str, facts:dict[str,Any]):
+        super().__init__(reason)
+        self.facts=facts
+
+
 def finite(value: Any) -> float:
     if type(value) not in (int,float) or not math.isfinite(value):
         raise ValueError('finite actual monotonic timestamp required')
@@ -439,6 +452,19 @@ def _verify_capture_witnesses(value:dict[str,Any],scenario:str,case:str)->None:
         raise ValueError('guardian terminal receipt missing')
 
 
+def verify_attempt(value:Any,scenario:str,case:str)->dict[str,Any]:
+    """Admit this original attempt's existing terminal/sentinel/removal proof."""
+    if scenario not in SCENARIOS or case not in CASES[scenario]:raise ValueError('fixed actual attempt required')
+    if not isinstance(value,dict):raise ValueError('actual attempt record required')
+    ceiling=DEADLINE_SECONDS if scenario=='invalid-evidence' and case=='deadline' else ATTEMPT_SECONDS
+    if (not 0<=finite(value.get('finished'))-finite(value.get('started'))<=ceiling
+            or value.get('error') is not None or value.get('executed') is not True
+            or value.get('scenario')!=scenario or value.get('case')!=case):
+        raise ValueError('an actual attempt failed or exceeded its shared ceiling')
+    _verify_capture_witnesses(value,scenario,case)
+    return {'control_passed':True,'production_capture_accepted':False}
+
+
 def verify_result(value: Any) -> dict[str,Any]:
     """Pure receipt admission, called only with the outer observer's owned evidence.
 
@@ -458,12 +484,7 @@ def verify_result(value: Any) -> dict[str,Any]:
     previous=finite(value.get('started'))
     for attempt in attempts:
         if not isinstance(attempt,dict):raise ValueError('actual attempt record required')
-        ceiling=DEADLINE_SECONDS if scenario=='invalid-evidence' and attempt.get('case')=='deadline' else ATTEMPT_SECONDS
-        if (not 0<=finite(attempt.get('finished'))-finite(attempt.get('started'))<=ceiling
-                or attempt.get('error') is not None or attempt.get('executed') is not True
-                or attempt.get('scenario')!=scenario):
-            raise ValueError('an actual attempt failed or exceeded its shared ceiling')
-        _verify_capture_witnesses(attempt,scenario,attempt['case'])
+        verify_attempt(attempt,scenario,attempt['case'])
         if finite(attempt['started'])<previous or finite(attempt['finished'])>finite(value['finished']):
             raise ValueError('actual attempt timing reset or escaped total ceiling')
         previous=finite(attempt['finished'])
@@ -496,6 +517,19 @@ def validate_principal(facts: dict[str,Any]) -> tuple[int,int]:
             or facts.get('supplementary_names')!=[] or facts.get('active') is not False
             or facts.get('home_exposed') is not False):
         raise ValueError('existing nobody identity is unsafe, shared, active or unproved')
+    return uid,gid
+
+
+def validate_ci_principal(facts:dict[str,Any])->tuple[int,int]:
+    """Fixed existing CI irc39/39 only; no account selector or fallback."""
+    uid,gid=facts.get('uid'),facts.get('gid')
+    if (facts.get('name')!='irc' or type(uid) is not int or uid!=39
+            or type(gid) is not int or gid!=39 or uid==facts.get('caller_uid')
+            or gid==facts.get('caller_gid') or facts.get('uid_names')!=['irc']
+            or facts.get('gid_names')!=['irc'] or facts.get('primary_names')!=['irc']
+            or facts.get('supplementary_names')!=[] or facts.get('active') is not False
+            or facts.get('home_exposed') is not False):
+        raise ValueError('fixed CI irc identity is unsafe, shared, active or unproved')
     return uid,gid
 
 
@@ -553,6 +587,19 @@ def _guardian(protected:bool=False) -> Any:
 
 def principal_facts(g: Any, caller: Any) -> dict[str,Any]:
     record=pwd.getpwnam('nobody')
+    return _principal_facts(g,caller,record)
+
+
+def ci_principal_facts(g:Any,caller:Any)->dict[str,Any]:
+    try:record=pwd.getpwnam('irc')
+    except KeyError as failure:
+        raise CiPrerequisiteUnavailable('existing fixed CI irc account absent',{
+            'stage':'initial-principal-lookup','name':'irc','operation':'pwd.getpwnam',
+            'error_type':type(failure).__name__,'args':list(failure.args)}) from failure
+    return _principal_facts(g,caller,record,ci=True)
+
+
+def _principal_facts(g:Any,caller:Any,record:Any,*,ci:bool=False)->dict[str,Any]:
     users=pwd.getpwall();groups=grp.getgrall()
     caller_state=g.parse_status(Path(f'/proc/{caller.pid}/status').read_text())
     caller_gid=int(caller_state['Gid'].split()[0])
@@ -572,7 +619,13 @@ def principal_facts(g: Any, caller: Any) -> dict[str,Any]:
         'primary_names':sorted(p.pw_name for p in users if p.pw_gid==record.pw_gid),
         'supplementary_names':sorted(name for group in groups if group.gr_gid==record.pw_gid for name in group.gr_mem),
         'active':False,'home_exposed':exposed}
-    validate_principal(facts)
+    try:
+        if ci:validate_ci_principal(facts)
+        else:validate_principal(facts)
+    except ValueError as failure:
+        if not ci:raise
+        caller.verify()
+        raise CiPrincipalRejected(str(failure),facts) from failure
     caller.verify()
     return facts
 
@@ -654,6 +707,47 @@ def validate_closure(rows: Any) -> dict[str,int]:
         for needed in elf['needed']:
             if not isinstance(needed,str) or len([p for p in targets if Path(p).name==needed])!=1:
                 raise ValueError('missing or ambiguous actual ELF NEEDED member')
+    if '/usr/bin/python3.12' not in targets or targets['/usr/bin/python3.12']['elf'] is None:
+        raise ValueError('actual OS Python3.12 ELF required')
+    return {'files':len(rows),'bytes':total}
+
+
+# CI keeps every ordinary closure invariant; only the one retained module may be empty.
+def _ci_empty_urllib(row: Any) -> bool:
+    return (type(row) is dict and type(row.get('bytes')) is int and row=={
+        'source':'/usr/lib/python3.12/urllib/__init__.py','target':'/usr/lib/python3.12/urllib/__init__.py',
+        'bytes':0,'sha256':'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855','elf':None})
+
+
+def validate_ci_closure(rows: Any) -> dict[str,int]:
+    if not isinstance(rows,list) or not rows or len(rows)>MAX_FILES:raise ValueError('bounded actual file closure required')
+    targets={};sources=set();total=0
+    for row in rows:
+        if not isinstance(row,dict) or set(row)!={'source','target','bytes','sha256','elf'}:
+            raise ValueError('closed actual closure member required')
+        source,target=row['source'],row['target']
+        if (not isinstance(source,str) or not isinstance(target,str) or not target.startswith('/')
+                or str(Path(target))!=target or '..' in Path(target).parts or target in targets
+                or source in sources or type(row['bytes']) is not int or (row['bytes']<=0 and not _ci_empty_urllib(row))
+                or not isinstance(row['sha256'],str) or len(row['sha256'])!=64
+                or any(c not in '0123456789abcdef' for c in row['sha256'])):
+            raise ValueError('canonical unique actual closure bytes/pins required')
+        targets[target]=row;sources.add(source);total+=row['bytes']
+    if total>MAX_BYTES:raise ValueError('tiny closure exceeds 256MiB')
+    for row in rows:
+        elf=row['elf']
+        if elf is None:continue
+        if not isinstance(elf,dict) or set(elf)!={'interpreter','needed'} or not isinstance(elf['needed'],list):
+            raise ValueError('actual ELF dependency facts required')
+        if elf['interpreter'] is not None and elf['interpreter'] not in targets:
+            raise ValueError('actual ELF interpreter absent from closure')
+        if _ci_empty_urllib(targets.get('/usr/lib/python3.12/urllib/__init__.py')) and elf['interpreter']=='/usr/lib/python3.12/urllib/__init__.py':
+            raise ValueError('empty urllib module cannot be an ELF interpreter')
+        for needed in elf['needed']:
+            if not isinstance(needed,str) or len([p for p in targets if Path(p).name==needed])!=1:
+                raise ValueError('missing or ambiguous actual ELF NEEDED member')
+            if needed=='__init__.py' and _ci_empty_urllib(targets.get('/usr/lib/python3.12/urllib/__init__.py')):
+                raise ValueError('empty urllib module cannot be an ELF dependency')
     if '/usr/bin/python3.12' not in targets or targets['/usr/bin/python3.12']['elf'] is None:
         raise ValueError('actual OS Python3.12 ELF required')
     return {'files':len(rows),'bytes':total}
@@ -756,20 +850,37 @@ def _protected_launcher(g:Any,executable:str)->None:
         raise ValueError('unsafe or unrecognised privileged launcher ancestry')
 
 
+class CallerAncestryError(ValueError):
+    """Passive bounded observations of a refused route, never caller authority."""
+    def __init__(self, facts: dict[str,Any]):
+        super().__init__('ambiguous launcher credential ancestry')
+        self.facts=facts
+
+
 def original_caller(g: Any) -> Any:
     """Actual stable ancestry, never SUDO_UID, environment or request assertions."""
-    chain=[];visited=set();pid=os.getppid()
+    chain=[];observed=[];visited=set();pid=os.getppid()
     try:
         while pid>1 and pid not in visited:
             visited.add(pid)
             identity=g.Identity(pid);chain.append(identity)
             executable=os.readlink(f'/proc/{pid}/exe')
             _protected_launcher(g,executable)
+            observed.append((identity,executable))
+            if len(observed)>32:observed.pop(0)
             if identity.uid==[identity.uid[0]]*4 and identity.uid[0]>0:
                 for pinned in chain:pinned.verify()
                 result=chain.pop()
                 return result
-            if identity.uid!=[0]*4:raise ValueError('ambiguous launcher credential ancestry')
+            if identity.uid!=[0]*4:
+                # These are observations at pin/readlink time, not a successful
+                # final chain verification. Keep a bounded tail and the exact
+                # omission count; a rejected transition never acquires a caller.
+                raise CallerAncestryError({'schema':'TEST_ONLY-caller-ancestry-failure/v1',
+                    'observed_ancestors':len(chain),'omitted_prefix':len(chain)-len(observed),
+                    'observations':[{'pid':pinned.pid,'start':pinned.start,'ppid':pinned.ppid,
+                        'uid':list(pinned.uid),'executable':path[:4096],
+                        'executable_truncated':len(path)>4096} for pinned,path in observed]})
             pid=identity.ppid
         raise ValueError('no actual nonroot caller ancestry')
     finally:
@@ -777,17 +888,30 @@ def original_caller(g: Any) -> Any:
 
 
 def load_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any],dict[str,Any],dict[str,Any]]:
+    return _load_control_host(g,scenario,caller,False)
+
+
+def load_ci_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any],dict[str,Any],dict[str,Any]]:
+    """Separate source-appointed fresh-VM laboratory route, never JSON selection."""
+    return _load_control_host(g,scenario,caller,True)
+
+
+def _load_control_host(g: Any, scenario: str, caller: Any, ci:bool) -> tuple[dict[str,Any],dict[str,Any],dict[str,Any]]:
     validate_descriptor({'schema':SCHEMA,'scenario':scenario})
     anchor_raw=g.protected_read(ANCHOR,maximum=1024*1024)
     anchor=json.loads(anchor_raw)
     if not isinstance(anchor,dict) or set(anchor)!={'schema','files'} or anchor['schema']!=SCHEMA:
         raise ValueError('fixed TEST_ONLY anchor schema required')
     rows=anchor['files']
-    validate_closure(rows)
+    if ci:validate_ci_closure(rows)
+    else:validate_closure(rows)
     observed=[];inodes=set()
     for row in rows:
         raw=g.protected_read(row['source'],row['sha256'],MAX_BYTES)
         info=g.protected_path(row['source'],True)
+        if ci and _ci_empty_urllib(row) and (type(info.st_size) is not int or info.st_size!=0
+                or type(raw) is not bytes or raw!=b'' or hashlib.sha256(raw).hexdigest()!=row['sha256']):
+            raise ValueError('fixed empty urllib stat/bytes association changed')
         if len(raw)!=row['bytes'] or elf_dependencies(raw)!=row['elf']:
             raise ValueError('actual closure bytes/ELF dependency metadata differ')
         identity=(info.st_dev,info.st_ino)
@@ -805,9 +929,9 @@ def load_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any]
         raise ValueError('actual fixed OS interpreter required, no runtime alias')
     if str(Path(__file__))!=STORE+'/source/linux_lease_control.py' or sys.executable!='/usr/bin/python3.12':
         raise ValueError('fixed installed entry and OS interpreter required')
-    facts=principal_facts(g,caller)
-    uid,gid=validate_principal(facts)
-    parent='/sys/fs/cgroup/policy-as-versioned-flux-linux-control'
+    facts=ci_principal_facts(g,caller) if ci else principal_facts(g,caller)
+    uid,gid=validate_ci_principal(facts) if ci else validate_principal(facts)
+    parent='/sys/fs/cgroup' if ci else '/sys/fs/cgroup/policy-as-versioned-flux-linux-control'
     g.protected_path(parent,False)
     available=g.parse_set(Path(parent,'cpuset.cpus.effective').read_text()) & os.sched_getaffinity(0)
     if len(available)<2:raise ValueError('two actual eligible CPUs unavailable')
@@ -827,6 +951,9 @@ def load_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any]
     budget=g.reserve(storage,g.MEMORY+g.RESERVE,False)
     budget['ancestors']=g.observe_ancestors(parent)
     budget['memory_available']=g.effective_memory(budget,parent)
+    if (ci and all(type(budget.get(key)) is int and budget[key]>=0 for key in ('memory_available','disk_free'))
+            and (budget['memory_available']<g.MEMORY+g.RESERVE or budget['disk_free']<g.DISK)):
+        raise CiPrerequisiteUnavailable('actual initial14GiB headroom/5GiB storage unavailable',budget)
     g.validate_reserve(budget,g.MEMORY+g.RESERVE,storage,parent)
     if not {'memory','cpu','cpuset','pids'}<=set(Path(parent,'cgroup.subtree_control').read_text().split()):
         raise ValueError('protected controllers not already enabled')
