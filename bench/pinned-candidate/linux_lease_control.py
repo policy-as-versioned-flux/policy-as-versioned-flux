@@ -783,20 +783,37 @@ def _protected_launcher(g:Any,executable:str)->None:
         raise ValueError('unsafe or unrecognised privileged launcher ancestry')
 
 
+class CallerAncestryError(ValueError):
+    """Passive bounded observations of a refused route, never caller authority."""
+    def __init__(self, facts: dict[str,Any]):
+        super().__init__('ambiguous launcher credential ancestry')
+        self.facts=facts
+
+
 def original_caller(g: Any) -> Any:
     """Actual stable ancestry, never SUDO_UID, environment or request assertions."""
-    chain=[];visited=set();pid=os.getppid()
+    chain=[];observed=[];visited=set();pid=os.getppid()
     try:
         while pid>1 and pid not in visited:
             visited.add(pid)
             identity=g.Identity(pid);chain.append(identity)
             executable=os.readlink(f'/proc/{pid}/exe')
             _protected_launcher(g,executable)
+            observed.append((identity,executable))
+            if len(observed)>32:observed.pop(0)
             if identity.uid==[identity.uid[0]]*4 and identity.uid[0]>0:
                 for pinned in chain:pinned.verify()
                 result=chain.pop()
                 return result
-            if identity.uid!=[0]*4:raise ValueError('ambiguous launcher credential ancestry')
+            if identity.uid!=[0]*4:
+                # These are observations at pin/readlink time, not a successful
+                # final chain verification. Keep a bounded tail and the exact
+                # omission count; a rejected transition never acquires a caller.
+                raise CallerAncestryError({'schema':'TEST_ONLY-caller-ancestry-failure/v1',
+                    'observed_ancestors':len(chain),'omitted_prefix':len(chain)-len(observed),
+                    'observations':[{'pid':pinned.pid,'start':pinned.start,'ppid':pinned.ppid,
+                        'uid':list(pinned.uid),'executable':path[:4096],
+                        'executable_truncated':len(path)>4096} for pinned,path in observed]})
             pid=identity.ppid
         raise ValueError('no actual nonroot caller ancestry')
     finally:

@@ -132,3 +132,16 @@ references those exact bytes/hash; export reopens that fixed record under its
 original pin, and the receiver refuses missing or changed referenced evidence.
 Neither an earlier successful host record nor an exception string substitutes
 for the current failed readings. There is no reset, retry, fallback or new lease.
+
+## Refused caller ancestry diagnostics
+
+A mixed-credential launcher ancestry remains refused. The fixed source retains at
+most 32 observed ancestor PID/start/PPID/UID/executable rows with an exact omitted
+prefix count; executable prefixes are capped at 4096 characters and explicitly
+marked when truncated. These are pin/readlink-time observations, not a successful
+final chain verification or a new sudo/environment authorization route. The CI
+suite persists and hash-rereads the refused ancestry through its existing protected
+caller record, then exports `FAIL` / `executed: false` under the original 900-second budget
+before principal/kernel/leaf setup. A failed protected write/readback or changed
+record cannot become a complete export. No actual CI UID tuple or valid privilege
+transition is inferred from the original ambiguous-ancestry traceback alone.

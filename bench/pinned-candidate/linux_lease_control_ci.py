@@ -556,7 +556,19 @@ def suite_main()->int:
     base={'suite/start.json':start_raw,'suite/sources.json':source_raw}
     for name in MEMBERS:
         raw=installed_read(STORE+'/source/'+name,1024**2);check_member(manifest,name,raw);base['source/'+name]=raw
-    caller=control.original_caller(g);directory=None;outcome=None
+    directory=None;outcome=None
+    try:caller=control.original_caller(g)
+    except control.CallerAncestryError as failure:
+        # Refusal is unchanged. Preserve observed pinned UID/executable facts
+        # before bounded export; never guess a CI privilege-transition exception.
+        persist_observation(g,base,'suite/caller.json',failure.facts)
+        outcome={'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL','executed':False,'control_passed':False,
+            'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,
+            'finished':time.monotonic(),'reason':type(failure).__name__+': '+str(failure)[:2000]}
+        files=owned_exports(g,base,None,outcome,budget)
+        write_fixed(Path(STORE,'result.json'),files['suite/result.json'])
+        send_export(files,outcome,budget)
+        return 1
     caller.verify()
     persist_observation(g,base,'suite/caller.json',{'pid':caller.pid,'start':caller.start,'uid':caller.uid,'ppid':caller.ppid})
     context_raw=installed_read(STORE+'/ci-context.json',65536)
