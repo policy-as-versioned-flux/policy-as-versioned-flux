@@ -862,6 +862,9 @@ def _bootstrap(collection: _Collection, appointed: dict[str, Any]) -> None:
 
 
 def _modules(collection: _Collection, root: str) -> None:
+    # An empty tree still traverses this fixed chain; no file snapshot may supply it.
+    for parent in reversed(PurePosixPath(root).parents):
+        collection.directory(str(parent))
     def visit(path: str) -> None:
         for name in collection.directory(path):
             current = posixpath.join(path, name)

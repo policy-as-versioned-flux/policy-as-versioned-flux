@@ -205,3 +205,49 @@ def test_collector_retains_original_file_cancellation_before_close_uncertainty(m
     assert result['faults'][0]['error_type'] == 'KeyboardInterrupt'
     assert result['faults'][1]['error_type'] == 'OSError' and result['faults'][1]['at'] is None
     assert result['custody']['known_terminal'] is False
+
+
+@pytest.mark.parametrize('fault', ['owner', 'stability', 'deadline'])
+def test_empty_root_ancestor_observations_obey_existing_guards(monkeypatch, tmp_path, fault):
+    selected, root, calls, clock, host, mapped = whole_model(monkeypatch, tmp_path)
+    module_root = mapped('/usr/share/cmake-3.28/Modules')
+    module_root.chmod(0o755)
+    for path in module_root.rglob('*'):
+        if path.is_dir(): path.chmod(0o755)
+    for path in sorted(module_root.rglob('*'), key=lambda item: len(item.parts), reverse=True):
+        path.unlink() if path.is_file() else path.rmdir()
+    module_root.chmod(0o555)
+    if fault == 'owner':
+        fstat = host.fstat
+        def untrusted(fd):
+            info = fstat(fd)
+            if host.descriptors.get(fd) == '/usr/share': info.st_uid = 501
+            return info
+        monkeypatch.setattr(host, 'fstat', untrusted)
+    elif fault == 'deadline':
+        scandir = host.scandir
+        def late(fd):
+            if host.descriptors.get(fd) == '/usr/share': clock.now = 61
+            return scandir(fd)
+        monkeypatch.setattr(host, 'scandir', late)
+    else:
+        popen = module._build.subprocess.Popen
+        def changed(argv, **kwargs):
+            if len(calls) == 1:
+                parent = mapped('/usr/share')
+                parent.chmod(0o755)
+                (parent / 'TEST_ONLY-observed-drift').write_bytes(b'TEST_ONLY data')
+                parent.chmod(0o555)
+            return popen(argv, **kwargs)
+        monkeypatch.setattr(module._build.subprocess, 'Popen', changed)
+    result = module.discover_linux_tools(selected, root)
+    assert result['inventory_state'] == 'PARTIAL_DATA'
+    assert result['original_started'] == 0 and result['deadline'] == 60
+    assert result['build_complete'] is False and result['native_execution'] is False
+    if fault == 'stability':
+        assert len(calls) == 15
+        observed = next(item for item in result['directory_snapshots'] if item['path'] == '/usr/share')
+        assert observed['before'] != observed['after']
+    else:
+        assert len(calls) == 1
+        if fault == 'deadline': assert result['finished'] > 61

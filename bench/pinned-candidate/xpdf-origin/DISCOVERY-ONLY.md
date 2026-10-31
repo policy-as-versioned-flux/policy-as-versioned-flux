@@ -48,6 +48,8 @@ The pure checker reconstructs the rooted module-directory child-name graph,
 including empty leaves/nested directories. Each module file must appear in its
 observed parent's list. Missing/unrooted paths, traversal/cycles, conflicting
 file/directory roles and unsafe identities cannot form complete DATA.
+The fixed module-root ancestor chain is acquired independently of regular files,
+using the same bounded directory observations even when the tree is empty.
 
 Parent T0 precedes startup. D is exactly `min(T0+60, original A deadline)` and
 includes setup, reads, queries, custody and export. Each query has its original
