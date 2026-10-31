@@ -59,6 +59,8 @@ def _driver_inventory() -> list[dict]:
 def _validate_profile_config(plan: dict, archive: dict, closure: dict) -> dict:
     from . import source_metadata_migration as migration
     config=sm._json(_raw(archive,plan['configuration_sha256']));_closed(config,CONFIG_KEYS)
+    _closed(config['limits'],set(migration.PROFILES[PROFILE]))
+    if any(type(value) is not int for value in config['limits'].values()): raise PdfBridgeHold('fixed PDF limits require exact integers')
     if config!={'schema':'twin.source-extraction-config/v2','profile':PROFILE,'purpose':plan['purpose'],
             'limits':migration.PROFILES[PROFILE],'environment':migration.ENVIRONMENT,'diagnostic_policy':'accept-bounded-on-zero',
             'test_only_behavior':'normal','native_config_sha256':config['native_config_sha256'],'pdf_origin':config['pdf_origin']}:
@@ -157,10 +159,14 @@ def _streams(observation: dict, archive: dict) -> dict:
         initial=next(r for r in start['fds'] if r['fd']==fd)
         eof=next(e for e in events if e['kind']=='pipe-eof' and e['data']['channel']==name)
         closure={'kind':'kernel-exit','exit_stop_seq':exit_event['seq'],'terminal_seq':events[-1]['seq']}
-        for i,event in enumerate(events[:-1]):
-            if event['kind']=='enter' and event['data']['nr']==3 and event['data']['args'][0]==fd and events[i+1]['kind']=='leave' and events[i+1]['data']['result']==0:
-                if fd==3: raise PdfBridgeHold('origin explicit close forbidden')
-                closure={'kind':'explicit-close','enter_seq':event['seq'],'leave_seq':events[i+1]['seq']}
+        pending=None
+        for event in events[:-1]:
+            if event['kind']=='enter': pending=event
+            elif event['kind']=='leave':
+                if pending is not None and pending['data']['nr']==3 and pending['data']['args'][0]==fd and event['data']['result']==0:
+                    if fd==3: raise PdfBridgeHold('origin explicit close forbidden')
+                    closure={'kind':'explicit-close','enter_seq':pending['seq'],'leave_seq':event['seq']}
+                pending=None
         pin=terminal[name+'_sha256'];raw=_raw(archive,pin)
         streams[name]={'fd':fd,'generation':0,'identity':initial['identity'],'sha256':pin,'bytes':len(raw),'eof_event_seq':eof['seq'],'closure':closure}
     return streams

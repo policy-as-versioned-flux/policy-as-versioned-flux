@@ -467,6 +467,9 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
         raise ValueError('native spec differs')
     _path(spec['cwd'])
     from . import source_metadata_migration as migration
+    if v2:
+        _closed(spec['limits'],set(migration.PROFILES[spec['profile']]))
+        if any(type(value) is not int for value in spec['limits'].values()): raise ValueError('fixed native limits require exact integers')
     if spec['limits']!=migration.PROFILES[spec['profile']]: raise ValueError('fixed native profile limits differ')
     if type(spec['plan_sha256']) is not str or len(spec['plan_sha256'])!=64: raise ValueError('native plan pin differs')
     if not isinstance(spec['argv'],list) or not spec['argv'] or _path(spec['argv'][0]) not in files: raise ValueError('native executable missing')
@@ -482,6 +485,7 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
     if type(events) is not list or not events or len(events)>MAX_EVENTS or len(sm.canonical(events))>MAX_EVENT_BYTES: raise ValueError('native event limit')
     fds: dict[int,dict]={}; generations: dict[int,int]={}; descriptions: dict[int,dict]={}; created: set[str]=set(); writes={'stdout':bytearray(),'stderr':bytearray()}; eof_events={}
     if v2: writes['pdf-origin']=bytearray()
+    closed_channels: set[int]=set();pending_close_eof: set[int]=set()
     pending=None; executed=False; exit_seen=False; terminal=False; current_maps: list[dict]=[]; used=set(); start=None; previous=-1
     for seq,event in enumerate(events):
         _closed(event,{'seq','at_ns','kind','data'})
@@ -587,7 +591,11 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
                 elif v2 and fds[args[0]]['kind']=='pdf-origin' and result!=-errno.EINTR: raise ValueError('origin write error')
             elif name=='close':
                 _closed(detail,set())
-                if result==0: del fds[args[0]]
+                if result==0:
+                    if v2 and args[0] in (1,2) and fds[args[0]]['generation']==0:
+                        closed_channels.add(args[0]);pending_close_eof.discard(args[0])
+                    del fds[args[0]]
+                elif v2 and args[0] in pending_close_eof: raise ValueError('EOF requires successful original channel closure')
                 elif fds[args[0]]['kind']=='sidecar': raise ValueError('uncertain sidecar close')
             elif name in ('dup','dup2','dup3'):
                 _closed(detail,set())
@@ -636,6 +644,14 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
             _closed(data,{'channel','fd','generation','identity','request_bytes','result','captured_bytes'})
             channel=data['channel'];expected_fd={'stdout':1,'stderr':2,'origin':3}.get(channel)
             if expected_fd is None or channel in eof_events or data['fd']!=expected_fd or type(data['fd']) is not int or _integer(data['generation'],0,0)!=0 or data['identity']!=start['fds'][expected_fd]['identity'] or _integer(data['request_bytes'],1,65536)<1 or _integer(data['result'],0,0)!=0 or _integer(data['captured_bytes'])!=len(writes['pdf-origin' if channel=='origin' else channel]): raise ValueError('original positive-capacity pipe EOF differs')
+            if not exit_seen and expected_fd not in closed_channels:
+                # The kernel may close stdio before the tracer consumes its leave.
+                # This provisional EOF must be discharged by that exact close's
+                # successful result; origin remains kernel-exit-only.
+                if (expected_fd==3 or pending is None or pending['name']!='close'
+                        or pending['args'][0]!=expected_fd or fds[expected_fd]['generation']!=0):
+                    raise ValueError('original channel EOF precedes checked closure')
+                pending_close_eof.add(expected_fd)
             eof_events[channel]=seq
         elif kind=='terminal':
             _closed(data,{'returncode','stdout_sha256','stderr_sha256','sidecars','eof','reaped','cleanup','custody'} | ({'origin_sha256','origin_bytes','wait'} if v2 else set()))
@@ -645,7 +661,7 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
             for name in ('stdout','stderr'):
                 if _raw(artifacts,data[name+'_sha256'])!=bytes(writes[name]): raise ValueError('observed stream/write replay differs')
             if v2:
-                if set(eof_events)!={'stdout','stderr','origin'} or _raw(artifacts,data['origin_sha256'])!=bytes(writes['pdf-origin']) or _integer(data['origin_bytes'])!=len(writes['pdf-origin']): raise ValueError('complete origin write/capture/EOF relation differs')
+                if pending_close_eof or set(eof_events)!={'stdout','stderr','origin'} or _raw(artifacts,data['origin_sha256'])!=bytes(writes['pdf-origin']) or _integer(data['origin_bytes'])!=len(writes['pdf-origin']): raise ValueError('complete origin write/capture/EOF relation differs')
                 _validate_wait(data['wait'],data['returncode'],success=True)
             wanted=set() if spec['profile'] in ('pdf-text-xpdf/1','pdf-text-xpdf-origin/2') else {spec['cwd']+'/runtime',spec['cwd']+'/syntax'}
             if created!=wanted or set(data['sidecars'])!=wanted: raise ValueError('both fixed sidecars required')
