@@ -22,6 +22,7 @@ import types
 from typing import Any
 
 from . import source_metadata as sm
+from . import pdf_output_origin
 
 MIGRATION_CONTRACT_VERSION = 'source-metadata-migration/v1'
 COMMON = {'at_utc':'string','bytes':'integer','derived_text':'object','final_url':'string',
@@ -672,7 +673,7 @@ def freeze_migration_authority(issuer: str, policy_id: str, policy_version: str,
     adapter = _bind(retained_legacy_receipt_adapter, 'layout_config', layout_config)
     checker = _bind(migration_source_checker, 'execution_contract', execution_contract)
     return sm.MetadataAuthority.freeze(issuer,policy_id,policy_version,policy_sha256,adapter,checker,
-        policy=policy,helper_modules=(sys.modules[__name__],))
+        policy=policy,helper_modules=(sys.modules[__name__],pdf_output_origin))
 
 
 def _syntax_check(syntax: Any, profile: str, parent_pin: str, output: bytes) -> list[dict]:

@@ -1,0 +1,185 @@
+--- a/xpdf/CMakeLists.txt
++++ b/xpdf/CMakeLists.txt
+@@ -100,0 +101 @@
++  TwinOrigin.cc
+@@ -150,0 +152 @@
++  TwinOrigin.cc
+@@ -170,0 +173 @@
++  TwinOrigin.cc
+--- a/xpdf/TextOutputDev.h
++++ b/xpdf/TextOutputDev.h
+@@ -17,0 +18 @@
++#include "TwinOrigin.h"
+@@ -60,0 +62 @@
++  TwinOrigin *twinOrigin;  // optional owned raw origin recorder; no authority
+@@ -191,0 +194 @@
++  TwinOriginRef *twinRefs;
+@@ -255,0 +259 @@
++  TwinOriginRef *twinRefs;
+@@ -558 +562,2 @@
+-		      GBool primaryLR, GString *s);
++		      GBool primaryLR, GString *s,
++                      const TwinOriginRef *refs = NULL);
+@@ -650,0 +656 @@
++  GBool twinReplacement;
+--- a/xpdf/TextOutputDev.cc
++++ b/xpdf/TextOutputDev.cc
+@@ -16,0 +17 @@
++#include <stdexcept>
+@@ -225,0 +227 @@
++  TwinOriginRef twinRef;
+@@ -254,0 +257 @@
++  twinRef = {0, 0, 0};
+@@ -704,0 +708 @@
++  twinOrigin = NULL;
+@@ -819,0 +824 @@
++  twinRefs = (TwinOriginRef *)gmallocn(len, sizeof(TwinOriginRef));
+@@ -839,0 +845 @@
++    twinRefs[i] = ch->twinRef;
+@@ -888,0 +895 @@
++  twinRefs = (TwinOriginRef *)gmallocn(len, sizeof(TwinOriginRef));
+@@ -890,0 +898 @@
++  memcpy(twinRefs, word->twinRefs, len * sizeof(TwinOriginRef));
+@@ -897,0 +906 @@
++  gfree(twinRefs);
+@@ -1031,0 +1041 @@
++  twinRefs = (TwinOriginRef *)gmallocn(len, sizeof(TwinOriginRef));
+@@ -1040,0 +1051 @@
++      twinRefs[j] = word->twinRefs[k];
+@@ -1046,0 +1058 @@
++      twinRefs[j] = {0, 0, 1};
+@@ -1057,0 +1070 @@
++  gfree(twinRefs);
+@@ -1270,0 +1284 @@
++  twinReplacement = gFalse;
+@@ -1492,0 +1507,2 @@
++    if (control.twinOrigin) control.twinOrigin->decode(nBytes, u, uLen, u, uLen,
++        twinReplacement, actualText != NULL);
+@@ -1499,0 +1516,2 @@
++    if (control.twinOrigin) control.twinOrigin->decode(nBytes, u, uLen, u, uLen,
++        twinReplacement, actualText != NULL);
+@@ -1522,0 +1541,2 @@
++    if (control.twinOrigin) control.twinOrigin->decode(nBytes, u, uLen, u, uLen,
++        twinReplacement, actualText != NULL);
+@@ -1531 +1551,3 @@
+-      return;
++      if (control.twinOrigin) control.twinOrigin->decode(nBytes, u, uLen, u, uLen,
++        twinReplacement, actualText != NULL);
++    return;
+@@ -1559,0 +1582,2 @@
++    if (control.twinOrigin) control.twinOrigin->decode(nBytes, u, uLen, u, uLen,
++        twinReplacement, actualText != NULL);
+@@ -1571,0 +1596,3 @@
++
++  uint64_t twinItem = control.twinOrigin ? control.twinOrigin->decode(
++      nBytes, u, uLen, uBuf, uBufLen, twinReplacement, false) : 0;
+@@ -1670 +1697 @@
+-      chars->append(new TextChar(uBuf[j], charPos, nBytes,
++      TextChar *twinChar = new TextChar(uBuf[j], charPos, nBytes,
+@@ -1674 +1701,3 @@
+-				 colorR, colorG, colorB, colorK));
++				 colorR, colorG, colorB, colorK);
++      twinChar->twinRef = {twinItem, unsigned(j), 0};
++      chars->append(twinChar);
+@@ -1739,0 +1769 @@
++    twinReplacement = gTrue;
+@@ -1742,0 +1773 @@
++    twinReplacement = gFalse;
+@@ -1787,0 +1819,3 @@
++
++  if (control.twinOrigin && control.mode != textOutReadingOrder)
++    throw std::runtime_error("pdf-origin-unsupported-output-mode");
+@@ -1839,0 +1874 @@
++    if (control.twinOrigin) control.twinOrigin->generated(eop, eopLen, "pagebreak");
+@@ -1908 +1943 @@
+-	encodeFragment(line->text, n, uMap, primaryLR, s);
++	encodeFragment(line->text, n, uMap, primaryLR, s, line->twinRefs);
+@@ -1910,0 +1946 @@
++          if (control.twinOrigin) control.twinOrigin->generated(space, spaceLen, "spacing");
+@@ -1914,0 +1951 @@
++      if (control.twinOrigin) control.twinOrigin->generated(eol, eolLen, "linebreak");
+@@ -1917 +1954,2 @@
+-    (*outputFunc)(outputStream, eol, eolLen);
++    if (control.twinOrigin) control.twinOrigin->generated(eol, eolLen, "linebreak");
++      (*outputFunc)(outputStream, eol, eolLen);
+@@ -2405 +2443,3 @@
+-			      GBool primaryLR, GString *s) {
++			      GBool primaryLR, GString *s,
++                              const TwinOriginRef *refs) {
++  if (control.twinOrigin && !refs) throw std::runtime_error("pdf-origin-untyped-fragment");
+@@ -2430,0 +2471 @@
++          if (control.twinOrigin) control.twinOrigin->emit(refs[k], buf, n);
+@@ -2440,0 +2482 @@
++      if (control.twinOrigin) control.twinOrigin->generated(rle, rleLen, "bidi");
+@@ -2441,0 +2484 @@
++          bool twinMirror = false;
+@@ -2442,0 +2486 @@
++            twinMirror = true;
+@@ -2447,0 +2492 @@
++          if (control.twinOrigin) control.twinOrigin->emit(refs[k], buf, n, twinMirror);
+@@ -2449,0 +2495 @@
++      if (control.twinOrigin) control.twinOrigin->generated(popdf, popdfLen, "bidi");
+@@ -2456,0 +2503 @@
++      if (control.twinOrigin) control.twinOrigin->generated(rle, rleLen, "bidi");
+@@ -2465,0 +2513 @@
++        bool twinMirror = false;
+@@ -2466,0 +2515 @@
++            twinMirror = true;
+@@ -2471,0 +2521 @@
++          if (control.twinOrigin) control.twinOrigin->emit(refs[k], buf, n, twinMirror);
+@@ -2481,0 +2532 @@
++      if (control.twinOrigin) control.twinOrigin->generated(lre, lreLen, "bidi");
+@@ -2484,0 +2536 @@
++          if (control.twinOrigin) control.twinOrigin->emit(refs[k], buf, n);
+@@ -2486,0 +2539 @@
++      if (control.twinOrigin) control.twinOrigin->generated(popdf, popdfLen, "bidi");
+@@ -2490,0 +2544 @@
++      if (control.twinOrigin) control.twinOrigin->generated(popdf, popdfLen, "bidi");
+@@ -2496,0 +2551 @@
++          if (control.twinOrigin) control.twinOrigin->emit(refs[i], buf, n);
+@@ -7026,0 +7082 @@
++    if (control.twinOrigin) control.twinOrigin->generated(bom, bomLen, "bom");
+@@ -7031,0 +7088 @@
++  if (control.twinOrigin) control.twinOrigin->page(pageNum);
+@@ -7049,0 +7107 @@
++  if (control.twinOrigin) control.twinOrigin->begin(s->getCString(), s->getLength());
+@@ -7052,0 +7111 @@
++  if (control.twinOrigin) control.twinOrigin->end();
+--- a/xpdf/pdftotext.cc
++++ b/xpdf/pdftotext.cc
+@@ -12,0 +13,2 @@
++#include <memory>
++#include <stdexcept>
+@@ -38,0 +41 @@
++static int twinOriginFd = -1;
+@@ -68,0 +72 @@
++  {"-twin-origin-fd", argInt, &twinOriginFd, 0, "owned raw origin pipe (fixed profile only)"},
+@@ -148,0 +153,13 @@
++  std::unique_ptr<TwinOrigin> twinOrigin;
++  bool twinRequested = false;
++  for (int i = 1; i < argc; ++i)
++    if (!strcmp(argv[i], "-twin-origin-fd")) twinRequested = true;
++  bool twinShape = argc == 12 && !strcmp(argv[1], "-cfg") &&
++    !strcmp(argv[3], "-enc") && !strcmp(argv[4], "UTF-8") &&
++    !strcmp(argv[5], "-eol") && !strcmp(argv[6], "unix") &&
++    !strcmp(argv[7], "-nopgbrk") && !strcmp(argv[8], "-twin-origin-fd") &&
++    !strcmp(argv[9], "3") && !strcmp(argv[11], "-");
++  if (twinRequested && !twinShape) {
++    fprintf(stderr, "pdf-origin-fixed-argv-required\n");
++    return 97;
++  }
+@@ -169,0 +187,5 @@
++  if (twinRequested) {
++    if (!ok || twinOriginFd != 3) return 97;
++    twinOrigin.reset(new TwinOrigin(3));
++    textOutControl.twinOrigin = twinOrigin.get();
++  }
+@@ -337,0 +360,4 @@
++  if (twinOrigin.get() && exitCode == 0) {
++    if (fflush(stdout) != 0 || ferror(stdout)) return 97;
++    twinOrigin->finish();
++  }
+@@ -340,0 +367,3 @@
++  } catch (const std::exception &e) {
++    fprintf(stderr, "pdf-origin-failed: %s\n", e.what());
++    return 97;

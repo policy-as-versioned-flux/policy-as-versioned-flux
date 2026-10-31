@@ -1,0 +1,352 @@
+{
+  "$id": "twin.pdf-output-origin-event/v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "emitter_protocol_version": {
+          "const": 1
+        },
+        "profile": {
+          "const": "pdf-text-xpdf-origin/2"
+        },
+        "schema": {
+          "const": "twin.pdf-output-origin-events/v1"
+        }
+      },
+      "required": [
+        "schema",
+        "profile",
+        "emitter_protocol_version"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "code_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "code_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "fragment": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "page": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "record": {
+          "const": "fragment_open"
+        },
+        "seq": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "record",
+        "seq",
+        "code_bytes",
+        "code_sha256",
+        "fragment",
+        "page"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "code_end": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "code_hex": {
+          "maxLength": 128,
+          "pattern": "^(?:[a-f0-9]{2})*$",
+          "type": "string"
+        },
+        "code_start": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fragment": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "input_scalars": {
+          "items": {
+            "anyOf": [
+              {
+                "maximum": 55295,
+                "minimum": 0
+              },
+              {
+                "maximum": 1114111,
+                "minimum": 57344
+              }
+            ],
+            "type": "integer"
+          },
+          "maxItems": 4096,
+          "type": "array"
+        },
+        "item": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "record": {
+          "const": "item"
+        },
+        "scalars": {
+          "items": {
+            "anyOf": [
+              {
+                "maximum": 55295,
+                "minimum": 0
+              },
+              {
+                "maximum": 1114111,
+                "minimum": 57344
+              }
+            ],
+            "type": "integer"
+          },
+          "maxItems": 4096,
+          "type": "array"
+        },
+        "seq": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "taint": {
+          "enum": [
+            "none",
+            "unicode-remap",
+            "actualtext",
+            "unmapped"
+          ]
+        }
+      },
+      "required": [
+        "record",
+        "seq",
+        "code_end",
+        "code_hex",
+        "code_start",
+        "fragment",
+        "input_scalars",
+        "item",
+        "scalars",
+        "taint"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "consumed_code_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fragment": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "record": {
+          "const": "fragment_close"
+        },
+        "seq": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "record",
+        "seq",
+        "consumed_code_bytes",
+        "fragment"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "operation": {
+          "enum": [
+            "decoded",
+            "generated",
+            "modified"
+          ]
+        },
+        "origin_item": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "origin_scalar": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "reason": {
+          "enum": [
+            "source",
+            "spacing",
+            "linebreak",
+            "bidi",
+            "bom",
+            "pagebreak",
+            "unmapped",
+            "mirror",
+            "remap",
+            "actualtext",
+            "duplicate"
+          ]
+        },
+        "record": {
+          "const": "emit"
+        },
+        "seq": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "start": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "utf8_hex": {
+          "pattern": "^(?:[a-f0-9]{2})*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record",
+        "seq",
+        "end",
+        "operation",
+        "origin_item",
+        "origin_scalar",
+        "reason",
+        "start",
+        "utf8_hex"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "reason": {
+          "enum": [
+            "fragment",
+            "source-gap",
+            "scalar-order",
+            "duplicate"
+          ]
+        },
+        "record": {
+          "const": "barrier"
+        },
+        "seq": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "record",
+        "seq",
+        "at",
+        "reason"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "item": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "reason": {
+          "const": "not-emitted-by-reading-order"
+        },
+        "record": {
+          "const": "omit"
+        },
+        "scalar": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "seq": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "record",
+        "seq",
+        "item",
+        "reason",
+        "scalar"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "closed_fragment_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "emitted_stdout_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "emitted_stdout_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "event_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "event_prefix_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "event_prefix_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "intended_exit_code": {
+          "const": 0
+        },
+        "record": {
+          "const": "footer"
+        }
+      },
+      "required": [
+        "record",
+        "closed_fragment_count",
+        "emitted_stdout_bytes",
+        "emitted_stdout_sha256",
+        "event_count",
+        "event_prefix_bytes",
+        "event_prefix_sha256",
+        "intended_exit_code"
+      ],
+      "type": "object"
+    }
+  ]
+}

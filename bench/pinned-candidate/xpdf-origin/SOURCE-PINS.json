@@ -1,0 +1,57 @@
+{
+  "archive_sha256": "1c38f527c46caee0f712386d42a885b96a31ed9ce11904e872559859894d137e",
+  "archive_url": "https://dl.xpdfreader.com/xpdf-4.06.tar.gz",
+  "package_files": {
+    "TwinOrigin.cc": {
+      "bytes": 9377,
+      "sha256": "0ab2cb97259a79ff3238857d68696a5d3f87b2b2e39297ad7edb93b12edf53a1"
+    },
+    "TwinOrigin.h": {
+      "bytes": 2261,
+      "sha256": "63894284b7cb1d92c408a2a4524656435549204eaa115b14251170f40a09acbe"
+    },
+    "upstream-notices/COPYING": {
+      "bytes": 17982,
+      "sha256": "91df39d1816bfb17a4dda2d3d2c83b1f6f2d38d53e53e41e8f97ad5ac46a0cad"
+    },
+    "upstream-notices/COPYING3": {
+      "bytes": 35147,
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+    },
+    "upstream-notices/README": {
+      "bytes": 13778,
+      "sha256": "680aa3d935860a0c69c4d33af2a3b444567a4e4133e33ff5b1c2e5220cb9848b"
+    },
+    "xpdf-4.06-origin.patch": {
+      "bytes": 7047,
+      "sha256": "ce4d927e34922b737552a605ae8332651031c8b77893264e72699215ed181395"
+    }
+  },
+  "patched_sources": {
+    "xpdf/CMakeLists.txt": {
+      "bytes": 8152,
+      "sha256": "936e3a8cc386af30ea38d7cc7feb2beb50a31575fdfdcfc4d6806676f6ba1e11"
+    },
+    "xpdf/TextOutputDev.cc": {
+      "bytes": 200442,
+      "sha256": "f0a8ad17cdaab4b98f1f2724fa326eaf28d454b8ebb2f0ae52eece39d346888e"
+    },
+    "xpdf/TextOutputDev.h": {
+      "bytes": 28649,
+      "sha256": "5bcea0c5bb22a3e43934d111226595df6e8598a09d7cc342761adfab2cc8f8df"
+    },
+    "xpdf/TwinOrigin.cc": {
+      "bytes": 9377,
+      "sha256": "0ab2cb97259a79ff3238857d68696a5d3f87b2b2e39297ad7edb93b12edf53a1"
+    },
+    "xpdf/TwinOrigin.h": {
+      "bytes": 2261,
+      "sha256": "63894284b7cb1d92c408a2a4524656435549204eaa115b14251170f40a09acbe"
+    },
+    "xpdf/pdftotext.cc": {
+      "bytes": 11348,
+      "sha256": "fbc361ea11aee789ee4a5751df8df05cf77c136f4e2821e5b9621cf0c5dd3074"
+    }
+  },
+  "schema": "twin.xpdf-origin-source-package/v1"
+}
