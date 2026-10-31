@@ -46,24 +46,13 @@ def test_causal_exact_profile_keeps_its_shared_1200_second_budget():
     source_module('qwen_backend').validate_runtime_profile(config)
 
 
-def test_shared_deadline_supports_approved_1200_without_phase_or_setup_reset():
-    import ast
-    from types import SimpleNamespace
-    path = Path(__file__).parents[1]/'bench/pinned-candidate/linux_guardian.py'
-    tree = ast.parse(path.read_text())
-    cls = next(node for node in tree.body if isinstance(node,ast.ClassDef) and node.name=='Guardian')
-    initialize = next(node for node in cls.body if isinstance(node,ast.FunctionDef) and node.name=='__init__')
+def test_shared_deadline_supports_approved_1200_without_phase_or_setup_reset(monkeypatch):
     policy = source_module('linux_guardian')
-    namespace = {'os':SimpleNamespace(urandom=lambda count:b'x'*count),
-        'time':SimpleNamespace(monotonic=lambda:1000.),'Wire':policy.Wire,
-        'attempt_deadlines':policy.attempt_deadlines,'validate_reviewed_profile':policy.validate_reviewed_profile}
-    future = ast.ImportFrom(module='__future__',names=[ast.alias(name='annotations')],level=0)
-    exec(compile(ast.fix_missing_locations(ast.Module(body=[future,initialize],type_ignores=[])),str(path),'exec'),namespace)
-    data = SimpleNamespace()
-    namespace['__init__'](data,{'deadline_monotonic':2200.},{},
+    monkeypatch.setattr(policy.time,'monotonic',lambda:1000.)
+    data = policy.Guardian({'deadline_monotonic':2200.},{},
         {'config':task_config('causal',4096,2048,1200)},None)
     assert (data.work_deadline,data.deadline) == (2190.,2200.)
-    namespace['__init__'](data,{'deadline_monotonic':1050.},{},
+    data = policy.Guardian({'deadline_monotonic':1050.},{},
         {'config':task_config('causal',4096,2048,1200)},None)
     assert (data.work_deadline,data.deadline) == (1040.,1050.)
 
