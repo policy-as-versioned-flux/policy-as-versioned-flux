@@ -23,6 +23,7 @@ from typing import Any
 
 from . import source_metadata as sm
 from . import pdf_output_origin
+from . import pdf_native_bridge
 
 MIGRATION_CONTRACT_VERSION = 'source-metadata-migration/v1'
 COMMON = {'at_utc':'string','bytes':'integer','derived_text':'object','final_url':'string',
@@ -157,6 +158,7 @@ PROFILES = {
         'syntax_bytes':64*MIB,'wall_seconds':30,'termination_grace_seconds':2},
     'pdf-text-xpdf/1': {'input_bytes':256*MIB,'stdout_bytes':128*MIB,'stderr_bytes':4*MIB,
         'syntax_bytes':64*MIB,'wall_seconds':120,'termination_grace_seconds':2}}
+PROFILES['pdf-text-xpdf-origin/2'] = dict(PROFILES['pdf-text-xpdf/1'])
 CHILD = str(Path(__file__).with_name('_source_metadata_extract_child.py').resolve())
 ENVIRONMENT = {'LC_ALL':'C','LANG':'C','TZ':'UTC'}
 
@@ -395,7 +397,7 @@ def prepare_extraction_plan(profile: str, parent: bytes, *, purpose: str,
         raise MetadataMigrationHold('unsupported extraction profile')
     if purpose != 'TEST_ONLY':
         raise MetadataMigrationHold('complete approved actual platform closure unestablished')
-    if profile == 'pdf-text-xpdf/1':
+    if profile in ('pdf-text-xpdf/1','pdf-text-xpdf-origin/2'):
         raise MetadataMigrationHold('real PDF native closure/execution unproved')
     if type(parent) is not bytes or len(parent) > PROFILES[profile]['input_bytes']:
         raise MetadataMigrationHold('input-limit/type')
@@ -529,9 +531,12 @@ def execute_new_extraction(plan: dict, parent: bytes, *, observation_store=None)
             return native.resolve_native_observation(observation_store, acquired)
         except native.NativeObservationFailure as exc:
             return exc.result
+    if type(plan) is dict and plan.get('profile')=='pdf-text-xpdf-origin/2': raise MetadataMigrationHold('no TEST_ONLY profile2 execute/adopt API')
     if observation_store is not None:
         raise MetadataMigrationHold('TEST_ONLY executor cannot adopt an actual observer')
-    return _execute_prepared_extraction(plan,parent)
+    result=_execute_prepared_extraction(plan,parent)
+    if type(result) is not dict: raise MetadataMigrationHold('internal native completion cannot escape TEST_ONLY execute')
+    return result
 
 
 def _observed_command(executable: str, workdir: str) -> list[str]:
@@ -540,11 +545,12 @@ def _observed_command(executable: str, workdir: str) -> list[str]:
         str(Path(workdir)/'syntax'),str(Path(workdir)/'runtime')]
 
 
-def _execute_prepared_extraction(plan: dict, parent: bytes, *, observation_store=None) -> dict:
+def _execute_prepared_extraction(plan: dict, parent: bytes, *, observation_store=None) -> dict | tuple[dict,dict]:
     from . import source_native_observation as native_observer
     observed = observation_store is not None
     config, closure = (native_observer.validate_native_candidate_plan(plan,parent) if observed else _validate_plan(plan,parent))
-    native = plan['profile'] == 'pdf-text-xpdf/1'
+    pdf2 = plan['profile'] == 'pdf-text-xpdf-origin/2'
+    native = plan['profile'] in ('pdf-text-xpdf/1','pdf-text-xpdf-origin/2')
     archive = dict(plan['archive'])
     receipts: dict[str,bytes] = {}
     _put(archive, parent)
@@ -564,7 +570,7 @@ def _execute_prepared_extraction(plan: dict, parent: bytes, *, observation_store
             _write_owned(Path(workdir)/'native-config',sm._artifact(archive,config['native_config_sha256']))
         if observed and not native:
             _write_owned(Path(workdir)/'helper.py', Path(CHILD).read_bytes())
-        argv = (_pdf_command(closure['process_files']['executable'],workdir) if native
+        argv = (_pdf_origin_command(closure['process_files']['executable'],workdir) if pdf2 else _pdf_command(closure['process_files']['executable'],workdir) if native
                 else _observed_command(closure['process_files']['executable'],workdir) if observed
                 else _command(closure['process_files']['executable'], workdir))
         invocation = {'schema':'twin.source-extraction-invocation/v1','argv':argv,
@@ -572,7 +578,7 @@ def _execute_prepared_extraction(plan: dict, parent: bytes, *, observation_store
         invocation_pin = _json_artifact(archive, invocation)
         getattr(directory, '_finalizer').detach()
         run_started = True
-        run = (native_observer.run_native_extraction(observation_store,plan,parent,argv,workdir) if observed
+        run = (native_observer._run_native_extraction(observation_store,plan,parent,argv,workdir) if observed
                else _run(argv, workdir, config['limits']))
         if native and run['failure'] is None and run['exit_code'] == 0:
             runtime = copy.deepcopy(closure['process_files'])
@@ -610,6 +616,24 @@ def _execute_prepared_extraction(plan: dict, parent: bytes, *, observation_store
     if workspace_cleanup != 'removed':
         run['failure'] = ('cleanup-failed' if workspace_cleanup == 'failed'
                           else run['failure'] or 'owned-group-unverified')
+    if pdf2:
+        observation_store._guard.verify()
+        try:
+            observation,artifacts=native_observer._finalize_pdf_native_run(run,workspace_cleanup)
+        except (ValueError,OSError) as exc:
+            run['failure']='native-independent-replay:'+type(exc).__name__
+            observation=run['native_observation'];artifacts=run['native_artifacts']
+        if run['failure'] is not None or observation['schema']!='twin.native-file-observation/v2':
+            return pdf_native_bridge._failed_pdf_extraction(plan,parent,run,observation,artifacts,workspace_cleanup),copy.deepcopy(observation)
+        try:
+            result=pdf_native_bridge._complete_pdf_extraction(plan,parent,observation,artifacts)
+        except (ValueError,OSError) as exc:
+            run['failure']='pdf-origin-completion:'+type(exc).__name__
+            observation_store._guard.verify()
+            return pdf_native_bridge._failed_pdf_extraction(plan,parent,run,observation,artifacts,workspace_cleanup),copy.deepcopy(observation)
+        observation_store._guard.verify()
+        pdf_native_bridge.verify_pdf_extraction_bundle(plan,parent,result)
+        return result,copy.deepcopy(observation)
     native_observation_pin = None
     if observed and 'native_observation' in run:
         try:
@@ -727,7 +751,7 @@ def freeze_migration_authority(issuer: str, policy_id: str, policy_version: str,
     checker = _bind(migration_source_checker, 'execution_contract', execution_contract)
     from . import source_native_observation as native_observer
     return sm.MetadataAuthority.freeze(issuer,policy_id,policy_version,policy_sha256,adapter,checker,
-        policy=policy,helper_modules=(sys.modules[__name__],native_observer,pdf_output_origin))
+        policy=policy,helper_modules=(sys.modules[__name__],native_observer,pdf_output_origin,pdf_native_bridge))
 
 
 def _syntax_check(syntax: Any, profile: str, parent_pin: str, output: bytes) -> list[dict]:
@@ -762,6 +786,17 @@ def _checked_execution(member: dict, parent: dict, index_pin: str, archive: dict
         raise MetadataMigrationHold('observed custody index binding differs')
     _hash(index['predecessor_sha256'])
     dossier = sm._json(sm._artifact(receipts,index['dossier_sha256']))
+    if dossier.get('schema')=='twin.source-extraction-execution/v3':
+        if policy['purpose']!='actual': raise MetadataMigrationHold('profile2 actual custody selection required')
+        plan={'schema':'twin.source-extraction-plan/v1','purpose':policy['purpose'],'profile':dossier['profile'],
+            'parent_sha256':parent['sha256'],'parent_bytes':parent['bytes'],'member_id':member['id'],
+            'predecessor_sha256':index['predecessor_sha256'],'implementation_artifact_sha256':dossier['implementation_artifact_sha256'],
+            'configuration_sha256':dossier['configuration_sha256'],'archive':archive}
+        if {key:member['transform'][key] for key in ('identity','version','implementation_artifact_sha256','configuration_sha256')} not in policy['allowed_transforms']:
+            raise MetadataMigrationHold('execution transform not independently approved')
+        pdf_native_bridge.verify_pdf_extraction_bundle(plan,sm._artifact(archive,parent['sha256']),
+            {'status':'success','failure':None,'archive':archive,'receipts':receipts,'dossier_sha256':index['dossier_sha256'],'member':member,'index_sha256':index_pin})
+        return []
     _closed(dossier, {'schema','purpose','profile','disposition','relation','predecessor_sha256',
         'parent_sha256','parent_bytes','output_sha256','output_bytes','standard_receipt_sha256',
         'identity','version','implementation_artifact_sha256','configuration_sha256','invocation_sha256',
@@ -884,6 +919,7 @@ def migration_source_checker(manifest: dict, archive: dict, receipts: dict, poli
     _execution_contract(execution_contract,policy['purpose'])
     syntax_by_member = {}
     native_members = set()
+    pdf_maps = {}
     indexes = []
     for pin, raw in receipts.items():
         # Receipt collections can contain arbitrary retained non-JSON logs. Only a valid
@@ -904,6 +940,11 @@ def migration_source_checker(manifest: dict, archive: dict, receipts: dict, poli
         if member['transform']['identity'] == 'pdf-text-xpdf':
             native_members.add(member['id'])
         syntax_by_member[member['id']] = _checked_execution(member,parent,matches[0][0],archive,receipts,policy)
+        if member['transform']['identity']=='pdf-text-xpdf-origin':
+            dossier=sm._json(sm._artifact(receipts,matches[0][1]['dossier_sha256']))
+            pdf_maps[member['id']]=pdf_output_origin.check_pdf_origin_events(sm._artifact(archive,member['sha256']),sm._artifact(archive,dossier['origin']['sha256']))
+    for member_id,mapping in pdf_maps.items():
+        pdf_output_origin.check_pdf_publisher_witnesses(mapping,manifest,member_id)
     witnesses = [observation['witness'] for observation in manifest['observations'].values()]
     if manifest['statement']['origin_role'] == 'publisher-quotation':
         witnesses.append(manifest['statement']['witness'])
@@ -916,6 +957,11 @@ def migration_source_checker(manifest: dict, archive: dict, receipts: dict, poli
                 raise MetadataMigrationHold('publisher witness intersects generated syntax')
     # Unconditionally preserve all stock source/semantic/lineage/role/precision checks.
     sm.retained_source_checker(manifest,archive,receipts,policy)
+
+
+def _pdf_origin_command(executable: str, workdir: str) -> list[str]:
+    return [executable,'-cfg',str(Path(workdir)/'native-config'),'-enc','UTF-8','-eol','unix',
+            '-nopgbrk','-twin-origin-fd','3',str(Path(workdir)/'input'),'-']
 
 
 def _pdf_command(executable: str, workdir: str) -> list[str]:
