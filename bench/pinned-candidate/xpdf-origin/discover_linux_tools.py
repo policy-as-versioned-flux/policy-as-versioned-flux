@@ -22,6 +22,8 @@ MAX_METADATA = 1024 * 1024
 FAILURE_RESERVE = 16 * MAX_METADATA
 DATA_LIMIT = MAX_TOTAL - FAILURE_RESERVE - 2 * MAX_METADATA
 MAX_FILES = 8192
+# Thirty query-stream prefixes, one partial-file prefix, and first-failure metadata.
+FAILURE_FILES = 32
 _PINS = {
     'QUERY-PROFILE.json': '80decb0cbcb0780746754311962ce67c36e2c6a73202fbf0a87a7bb9fc4b84b6',
     'RECORDS.json': 'f3f7f30a4b548b6a6834077e7244d61b4caa136a91e88eae98f437e9806c3622',
@@ -367,6 +369,7 @@ def _check_bootstrap(bundle: Mapping[str, bytes], selection: dict[str, Any], res
 
 def _check_complete(bundle: Mapping[str, bytes], selection: dict[str, Any], result: dict[str, Any], by_hash: dict[str, bytes], roles: dict[str, set[str]]) -> None:
     _require(sum(map(len, bundle.values())) <= MAX_TOTAL - FAILURE_RESERVE, 'complete DATA consumed its reserved failure capacity')
+    _require(len(bundle) <= MAX_FILES - FAILURE_FILES, 'complete DATA consumed its reserved failure file count')
     _require(not result['faults'] and result['custody']['known_terminal'] is True and result['files_manifest_sha256'] is not None, 'complete inventory cannot contain faults/unknown custody/export')
     _require(all(result[k] is not None for k in ('original_started', 'deadline', 'entered', 'finished', 'run_identity', 'bootstrap', 'module_root')), 'complete observed facts required')
     _require(result['original_started'] <= result['entered'] <= result['finished'] <= result['deadline'], 'complete original inclusive clock')
@@ -507,7 +510,7 @@ class _Collection:
         return now
 
     def room(self, extra: int = 0, files: int = 0) -> None:
-        if len(self.payload) + files > MAX_FILES - 2 or sum(len(raw) for raw, _ in self.payload.values()) + extra > DATA_LIMIT:
+        if len(self.payload) + files > MAX_FILES - 2 - FAILURE_FILES or sum(len(raw) for raw, _ in self.payload.values()) + extra > DATA_LIMIT:
             raise DiscoveryHold('capacity', 'retained-cap', 'discovery payload exceeds fixed retained bounds/reserve')
 
     def add(self, path: str, raw: bytes, role: str) -> None:

@@ -63,6 +63,10 @@ Bounds are 256 MiB retained logical DATA, 8192 regular files, 1 MiB per metadata
 record, 16 MiB per query stream, 4096-byte paths and sixteen bounded faults with
 the original first. Sixteen MiB remains reserved inside the total for failure
 evidence; two further metadata records are reserved before normal payload growth.
+Thirty-two regular-file slots are also reserved for all thirty possible query
+stream prefixes, the sole partial-file prefix and first-failure metadata. Normal
+payload is therefore at most 8158 files; even an interrupted export retaining both
+terminal files can retain every failure file within the original 8192-file cap.
 Before a query the collector conservatively reserves 32 MiB for its two streams.
 These checks are not a live disk quota or a measured fit claim. Fifteen worst-case
 queries cannot fit sixty seconds. Slow inventory stops with its actual prefix.

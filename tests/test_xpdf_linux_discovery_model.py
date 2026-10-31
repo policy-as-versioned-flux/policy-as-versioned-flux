@@ -477,3 +477,31 @@ def test_stable_selected_relative_symlink_route_is_data_not_an_extra_query(monke
     observed = next(item for item in result['tools'] if item['path'] == '/bin/sh')
     assert observed['resolved'] == '/usr/bin/sh' and observed['links'][0]['target'] == '../usr/bin/sh'
     assert len(calls) == 15 and all(argv[0] != '/bin/sh' for argv in calls)
+
+
+def test_failed_near_cap_export_has_precharged_all_emergency_regular_files(monkeypatch, tmp_path):
+    result = module._new_result(selection())
+    result['deadline'] = 60
+    monkeypatch.setattr(module, 'time', SimpleNamespace(monotonic=lambda: 1))
+    collection = module._Collection(result, tmp_path)
+    # 8159 normal payload files + FILES + interrupted RESULT + 31 failure
+    # prefixes + FIRST-FAILURE would be8193. Refuse before accumulating this state.
+    collection.payload = {f'files/{index:05}.bin': (b'', 'selector') for index in range(8159)}
+    with pytest.raises(module.DiscoveryHold): collection.room()
+
+
+def test_exact_neighbor_reserves_every_failure_prefix_and_metadata_file(monkeypatch, tmp_path):
+    result = module._new_result(selection())
+    result['deadline'] = 60
+    monkeypatch.setattr(module, 'time', SimpleNamespace(monotonic=lambda: 1))
+    (tmp_path / 'journal').mkdir()
+    collection = module._Collection(result, tmp_path)
+    collection.payload = {f'files/{index:05}.bin': (b'', 'selector') for index in range(8127)}
+    for index in range(30): collection.payload[f'journal/{index:03}.log'] = (b'', 'raw-log')
+    collection.payload['journal/partial-file.bin'] = (b'', 'failure-prefix')
+    collection.room()
+    module._retain_failure(collection)
+    emergency = [path for path in tmp_path.rglob('*') if path.is_file()]
+    assert len(collection.payload) == 8158 and len(emergency) == 32
+    assert len(collection.payload) + 2 + len(emergency) == 8192
+    assert json.loads((tmp_path / 'FIRST-FAILURE.json').read_bytes())['files_manifest_sha256'] is None
