@@ -84,8 +84,9 @@ def _record(custody: dict[str, Any], kind: str, at: float | None, detail: dict[s
 
 
 def _supervise(result: dict[str, Any], phase: str, argv: list[str], cwd: Path,
-               environment: dict[str, str], allowance: float, payload: dict[str, tuple[bytes, str]]) -> dict[str, Any]:
+               environment: dict[str, str], allowance: float, payload: dict[str, tuple[bytes, str]], *, terminal_reserve: int = 0) -> dict[str, Any]:
     """One private fixed-command route; all OS effects modeled in source-only tests."""
+    _require(type(terminal_reserve) is int and terminal_reserve in (0, 10), 'fixed private terminal reserve')
     limits = _load_json(_contract('LIMITS-AND-RECIPE.json'))
     _require(_permitted_dispatch(argv, phase), 'forbidden executable/target/worker dispatch')
     if len(result['commands']) >= 256:
@@ -103,7 +104,7 @@ def _supervise(result: dict[str, Any], phase: str, argv: list[str], cwd: Path,
         command['started'] = started
         original = result['clock']['started']
         deadline = started + allowance
-        if deadline > min(original + budget['cumulative_end_seconds'], result['clock']['deadline']):
+        if deadline + terminal_reserve > min(original + budget['cumulative_end_seconds'], result['clock']['deadline']):
             raise BuildHold('H_DEADLINE', 'original phase allowance unavailable')
         command['deadline'] = deadline
     except BaseException as error:
