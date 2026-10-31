@@ -3,6 +3,9 @@ import importlib.util
 import os
 from pathlib import Path
 import sys
+import hashlib
+import io
+import tarfile
 
 import pytest
 
@@ -40,6 +43,55 @@ def test_broken_destination_symlink_is_not_followed(tmp_path):
     with pytest.raises(FileExistsError):
         module.prepare_source(tmp_path / 'not-needed.tar.gz', target)
     assert target.is_symlink() and not (tmp_path / 'absent').exists()
+
+
+def test_shared_archive_validation_rejects_duplicate_alias_before_writes(tmp_path, monkeypatch):
+    raw = io.BytesIO()
+    with tarfile.open(fileobj=raw, mode='w:gz') as archive:
+        for name in ('xpdf-4.06/A', 'xpdf-4.06/./A'):
+            info = tarfile.TarInfo(name)
+            info.size = 1
+            archive.addfile(info, io.BytesIO(b'A'))
+    content = raw.getvalue()
+    monkeypatch.setattr(module, 'ARCHIVE_SHA256', hashlib.sha256(content).hexdigest())
+    with pytest.raises(ValueError, match='archive'):
+        module.archive_files(content)
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_shared_materialization_cannot_follow_an_existing_parent_link(tmp_path):
+    elsewhere = tmp_path / 'elsewhere'
+    elsewhere.mkdir()
+    parent = tmp_path / 'parent'
+    parent.symlink_to(elsewhere, target_is_directory=True)
+    with pytest.raises(ValueError, match='symlink'):
+        module.materialize_source({'A': b'TEST_ONLY'}, parent / 'new')
+    assert not (elsewhere / 'new').exists()
+
+
+@pytest.mark.parametrize('name,kind,mode,size', [
+    ('/xpdf-4.06/A', tarfile.REGTYPE, 0o644, 0),
+    ('xpdf-4.06/../A', tarfile.REGTYPE, 0o644, 0),
+    ('xpdf-4.06//A', tarfile.REGTYPE, 0o644, 0),
+    ('other/A', tarfile.REGTYPE, 0o644, 0),
+    ('xpdf-4.06/A', tarfile.SYMTYPE, 0o644, 0),
+    ('xpdf-4.06/A', tarfile.LNKTYPE, 0o644, 0),
+    ('xpdf-4.06/A', tarfile.FIFOTYPE, 0o644, 0),
+    ('xpdf-4.06/A', tarfile.CHRTYPE, 0o644, 0),
+    ('xpdf-4.06/A', tarfile.REGTYPE, 0o4755, 0),
+    ('xpdf-4.06/A', tarfile.REGTYPE, 0o644, 4 * 1024 * 1024 + 1),
+])
+def test_shared_archive_grammar_refuses_unsafe_or_excessive_members(monkeypatch, name, kind, mode, size):
+    stream = io.BytesIO()
+    with tarfile.open(fileobj=stream, mode='w:gz') as archive:
+        info = tarfile.TarInfo(name)
+        info.type, info.mode, info.size = kind, mode, size
+        info.linkname = '../TEST_ONLY-outside'
+        archive.addfile(info, io.BytesIO(bytes(size)) if size else None)
+    raw = stream.getvalue()
+    monkeypatch.setattr(module, 'ARCHIVE_SHA256', hashlib.sha256(raw).hexdigest())
+    with pytest.raises(ValueError, match='archive'):
+        module.archive_files(raw)
 
 
 def test_pinned_archive_prepares_the_instrumented_build_source(tmp_path):

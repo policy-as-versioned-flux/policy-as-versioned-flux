@@ -1,0 +1,76 @@
+{
+  "schema": "PROPOSAL_ONLY-linux-xpdf-build-A-holds/v1",
+  "execution_go": false,
+  "holds": [
+    {
+      "id": "H_EXECUTION_SELECTION",
+      "reason": "Exact source/workflow/bootstrap/run/attempt/root build decision absent or mismatched; public flags cannot authorize."
+    },
+    {
+      "id": "H_BOOTSTRAP",
+      "reason": "Actual checkout/Python/action identities or trusted-host/writer condition not independently selected."
+    },
+    {
+      "id": "H_SOURCE_TRANSPORT",
+      "reason": "Unsupported TLS/redirect/proxy/status/encoding, timeout, partial/overflow/wrong archive bytes; no fallback."
+    },
+    {
+      "id": "H_SOURCE_MEMBERS",
+      "reason": "Unsafe path/link/special/duplicate/member/byte cap or unstable input/source copy."
+    },
+    {
+      "id": "H_SOURCE_CONSERVATION",
+      "reason": "Unaccepted patch/fuzz/offset/reject/path delta or full-tree mismatch."
+    },
+    {
+      "id": "H_TOOLS",
+      "reason": "Missing/unsupported/unreviewed tool/route/spec/launcher/module or environment injection."
+    },
+    {
+      "id": "H_PROBE_EXECUTION_UNESTABLISHED",
+      "reason": "Actual selected Linux CMake/tool-module closure and compile-only/no-emulator semantics not independently reviewed; local docs do not prove it."
+    },
+    {
+      "id": "H_GENERATED_EXECUTION",
+      "reason": "Any attempted generated probe/converter/install/custom executable route; stop before supported launch when known."
+    },
+    {
+      "id": "H_CONFIG_EQUIVALENCE",
+      "reason": "Variant config/features/tool/link choices differ beyond declared source/build path roles and accepted patch linkage."
+    },
+    {
+      "id": "H_DEADLINE",
+      "reason": "Phase/original1800/cleanup reserve insufficient or exceeded; no renewal."
+    },
+    {
+      "id": "H_STREAM_LIMIT",
+      "reason": "Per-stream/global log cap or incomplete stream; preserve bounded prefix/lower bound."
+    },
+    {
+      "id": "H_CUSTODY",
+      "reason": "Leader/group/descendant terminal state unknown, cancellation or cleanup failure; workspace preserved and no next phase."
+    },
+    {
+      "id": "H_CAPACITY",
+      "reason": "Unknown/unaccepted environment fit; scratch growth/file count/retention limit/unstable file/export overflow."
+    },
+    {
+      "id": "H_ELF_ASSOCIATION",
+      "reason": "Unsupported/non-Linux-x86_64 target/interpreter/link association or missing required build artifact facts."
+    },
+    {
+      "id": "H_EXPORT",
+      "reason": "Wrong relative file set, symlink, writer still live, missing/partial/hash-mismatched manifest/result/readback."
+    },
+    {
+      "id": "H_TRANSPORT",
+      "reason": "Artifact tail failed/missing/truncated/timeout; no retry or execution extension."
+    },
+    {
+      "id": "H_NATIVE_SELECTION",
+      "reason": "Build output is data; independent root review/H/native/config/runtime closure still required and never supplied by A."
+    }
+  ],
+  "actual_build": null,
+  "actual_N01_N08": "UNRUN"
+}
