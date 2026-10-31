@@ -45,6 +45,12 @@ WRITE_PATHS=('/TEST_ONLY-root-write','/app/actor-config.json','/app/lease.json',
     '/app/linux_lease_control_child.py','/evidence/write','/sys/fs/cgroup/cgroup.procs','/sys/fs/cgroup/memory.max')
 
 
+class CiPrerequisiteUnavailable(ValueError):
+    """Known initial capacity absence; carries the actual protected readings."""
+    def __init__(self,message:str,facts:dict[str,Any]):
+        super().__init__(message);self.facts=facts
+
+
 def finite(value: Any) -> float:
     if type(value) not in (int,float) or not math.isfinite(value):
         raise ValueError('finite actual monotonic timestamp required')
@@ -439,6 +445,19 @@ def _verify_capture_witnesses(value:dict[str,Any],scenario:str,case:str)->None:
         raise ValueError('guardian terminal receipt missing')
 
 
+def verify_attempt(value:Any,scenario:str,case:str)->dict[str,Any]:
+    """Admit this original attempt's existing terminal/sentinel/removal proof."""
+    if scenario not in SCENARIOS or case not in CASES[scenario]:raise ValueError('fixed actual attempt required')
+    if not isinstance(value,dict):raise ValueError('actual attempt record required')
+    ceiling=DEADLINE_SECONDS if scenario=='invalid-evidence' and case=='deadline' else ATTEMPT_SECONDS
+    if (not 0<=finite(value.get('finished'))-finite(value.get('started'))<=ceiling
+            or value.get('error') is not None or value.get('executed') is not True
+            or value.get('scenario')!=scenario or value.get('case')!=case):
+        raise ValueError('an actual attempt failed or exceeded its shared ceiling')
+    _verify_capture_witnesses(value,scenario,case)
+    return {'control_passed':True,'production_capture_accepted':False}
+
+
 def verify_result(value: Any) -> dict[str,Any]:
     """Pure receipt admission, called only with the outer observer's owned evidence.
 
@@ -458,12 +477,7 @@ def verify_result(value: Any) -> dict[str,Any]:
     previous=finite(value.get('started'))
     for attempt in attempts:
         if not isinstance(attempt,dict):raise ValueError('actual attempt record required')
-        ceiling=DEADLINE_SECONDS if scenario=='invalid-evidence' and attempt.get('case')=='deadline' else ATTEMPT_SECONDS
-        if (not 0<=finite(attempt.get('finished'))-finite(attempt.get('started'))<=ceiling
-                or attempt.get('error') is not None or attempt.get('executed') is not True
-                or attempt.get('scenario')!=scenario):
-            raise ValueError('an actual attempt failed or exceeded its shared ceiling')
-        _verify_capture_witnesses(attempt,scenario,attempt['case'])
+        verify_attempt(attempt,scenario,attempt['case'])
         if finite(attempt['started'])<previous or finite(attempt['finished'])>finite(value['finished']):
             raise ValueError('actual attempt timing reset or escaped total ceiling')
         previous=finite(attempt['finished'])
@@ -553,6 +567,19 @@ def _guardian(protected:bool=False) -> Any:
 
 def principal_facts(g: Any, caller: Any) -> dict[str,Any]:
     record=pwd.getpwnam('nobody')
+    return _principal_facts(g,caller,record)
+
+
+def ci_principal_facts(g:Any,caller:Any)->dict[str,Any]:
+    try:record=pwd.getpwnam('nobody')
+    except KeyError as failure:
+        raise CiPrerequisiteUnavailable('existing nobody account absent',{
+            'stage':'initial-principal-lookup','name':'nobody','operation':'pwd.getpwnam',
+            'error_type':type(failure).__name__,'args':list(failure.args)}) from failure
+    return _principal_facts(g,caller,record)
+
+
+def _principal_facts(g:Any,caller:Any,record:Any)->dict[str,Any]:
     users=pwd.getpwall();groups=grp.getgrall()
     caller_state=g.parse_status(Path(f'/proc/{caller.pid}/status').read_text())
     caller_gid=int(caller_state['Gid'].split()[0])
@@ -777,6 +804,15 @@ def original_caller(g: Any) -> Any:
 
 
 def load_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any],dict[str,Any],dict[str,Any]]:
+    return _load_control_host(g,scenario,caller,False)
+
+
+def load_ci_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any],dict[str,Any],dict[str,Any]]:
+    """Separate source-appointed fresh-VM laboratory route, never JSON selection."""
+    return _load_control_host(g,scenario,caller,True)
+
+
+def _load_control_host(g: Any, scenario: str, caller: Any, ci:bool) -> tuple[dict[str,Any],dict[str,Any],dict[str,Any]]:
     validate_descriptor({'schema':SCHEMA,'scenario':scenario})
     anchor_raw=g.protected_read(ANCHOR,maximum=1024*1024)
     anchor=json.loads(anchor_raw)
@@ -805,9 +841,9 @@ def load_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any]
         raise ValueError('actual fixed OS interpreter required, no runtime alias')
     if str(Path(__file__))!=STORE+'/source/linux_lease_control.py' or sys.executable!='/usr/bin/python3.12':
         raise ValueError('fixed installed entry and OS interpreter required')
-    facts=principal_facts(g,caller)
+    facts=ci_principal_facts(g,caller) if ci else principal_facts(g,caller)
     uid,gid=validate_principal(facts)
-    parent='/sys/fs/cgroup/policy-as-versioned-flux-linux-control'
+    parent='/sys/fs/cgroup' if ci else '/sys/fs/cgroup/policy-as-versioned-flux-linux-control'
     g.protected_path(parent,False)
     available=g.parse_set(Path(parent,'cpuset.cpus.effective').read_text()) & os.sched_getaffinity(0)
     if len(available)<2:raise ValueError('two actual eligible CPUs unavailable')
@@ -827,6 +863,9 @@ def load_control_host(g: Any, scenario: str, caller: Any) -> tuple[dict[str,Any]
     budget=g.reserve(storage,g.MEMORY+g.RESERVE,False)
     budget['ancestors']=g.observe_ancestors(parent)
     budget['memory_available']=g.effective_memory(budget,parent)
+    if (ci and all(type(budget.get(key)) is int and budget[key]>=0 for key in ('memory_available','disk_free'))
+            and (budget['memory_available']<g.MEMORY+g.RESERVE or budget['disk_free']<g.DISK)):
+        raise CiPrerequisiteUnavailable('actual initial14GiB headroom/5GiB storage unavailable',budget)
     g.validate_reserve(budget,g.MEMORY+g.RESERVE,storage,parent)
     if not {'memory','cpu','cpuset','pids'}<=set(Path(parent,'cgroup.subtree_control').read_text().split()):
         raise ValueError('protected controllers not already enabled')
