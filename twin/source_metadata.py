@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 import re
 from typing import Any, Callable
+from types import ModuleType
 
 
 def canonical(value: Any) -> bytes:
@@ -281,16 +282,101 @@ def retained_source_checker(manifest: dict[str, Any], archive: dict[str, bytes],
         raise ValueError('protected source custodian/review scope differs')
 
 
+def _runtime_helper_inventory(modules: tuple[ModuleType, ...]) -> tuple[list[dict[str, Any]], tuple[tuple[str, Any], ...]]:
+    """Core-owned self-contained guard; dependencies are trusted Python/stdlib only.
+
+    Return both a canonical description and actual dispatch targets. The authority
+    privately retains the latter; supplied JSON cannot substitute for live bindings.
+    """
+    import hashlib
+    import inspect
+    import json
+    import marshal
+    import types
+    from pathlib import Path
+
+    bindings: list[tuple[str, Any]] = []
+    active: set[int] = set()
+    seen_containers: dict[int, int] = {}
+    def code_identity(code: types.CodeType) -> types.CodeType:
+        return code.replace(co_filename='<host-source>', co_consts=tuple(
+            code_identity(v) if isinstance(v, types.CodeType) else v for v in code.co_consts))
+    def encode(value: Any, name: str) -> dict[str, Any]:
+        if type(value) is bytes:
+            return {'type':'bytes','sha256':hashlib.sha256(value).hexdigest(),'bytes':len(value)}
+        if value is None or type(value) in (str, int, bool):
+            return {'type': type(value).__name__, 'value': value}
+        if type(value) is float:
+            json.dumps(value, allow_nan=False)
+            return {'type': 'float', 'value': value}
+        if inspect.isfunction(value):
+            if value.__closure__:
+                raise ValueError('runtime helper closure is unsupported')
+            bindings.append((name, value))
+            return {'type': 'function', 'module': value.__module__, 'name': value.__name__, 'qualname':value.__qualname__,
+                'code': hashlib.sha256(marshal.dumps(code_identity(value.__code__))).hexdigest(),
+                'defaults': encode(value.__defaults__, name + ':defaults'),
+                'kwdefaults': encode(value.__kwdefaults__, name + ':kwdefaults')}
+        if isinstance(value, types.ModuleType):
+            bindings.append((name, value))
+            return {'type': 'module', 'name': value.__name__}
+        if type(value) not in (dict, list, tuple):
+            raise ValueError('unsupported runtime helper dispatch/config')
+        if id(value) in active:
+            raise ValueError('cyclic runtime helper config')
+        if id(value) in seen_containers:
+            return {'type':'alias','index':seen_containers[id(value)]}
+        index = seen_containers[id(value)] = len(seen_containers)
+        active.add(id(value))
+        try:
+            contents: list[Any]
+            if type(value) is dict:
+                if any(type(k) is not str for k in value):
+                    raise ValueError('runtime helper config keys must be strings')
+                contents = [[k, encode(v, name + '/' + k)] for k, v in value.items()]
+            else:
+                contents = [encode(v, name + '/' + str(i)) for i, v in enumerate(value)]
+            return {'type': type(value).__name__, 'index':index,'items': contents}
+        finally:
+            active.remove(id(value))
+    inventory: list[dict[str, Any]] = []
+    for module in modules:
+        if not isinstance(module, types.ModuleType) or not isinstance(module.__file__, str):
+            raise ValueError('actual helper module with source required')
+        namespace = {}
+        for name, value in sorted(vars(module).items()):
+            if name in ('__name__','__doc__','__package__','__loader__','__spec__',
+                        '__file__','__cached__','__builtins__','__annotations__'):
+                continue
+            if (inspect.isfunction(value) or isinstance(value, types.ModuleType)
+                    or value is None or type(value) in (str, int, bool, float, bytes, dict, list, tuple)):
+                namespace[name] = encode(value, module.__name__ + ':' + name)
+            elif isinstance(value, type):
+                # Data-only constructors are held by identity; arbitrary class-method
+                # replacement is outside this explicit helper/function seam.
+                bindings.append((module.__name__ + ':' + name, value))
+            elif callable(value):
+                raise ValueError('unsupported runtime helper callable dispatch')
+        path = Path(module.__file__).resolve()
+        inventory.append({'module': module.__name__, 'source': str(path),
+            'source_sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'namespace': namespace})
+    return inventory, tuple(bindings)
+
+
 @dataclass(frozen=True)
 class MetadataAuthority:
     description: bytes
     acquire_adapter: Callable[..., None] = field(repr=False)
     source_checker: Callable[..., None] = field(repr=False)
+    _helper_modules: tuple[ModuleType, ...] = field(default=(), repr=False, compare=False)
+    _runtime_bindings: tuple[tuple[str, Any], ...] = field(default=(), repr=False, compare=False)
+    _guard: Any = field(default=None, repr=False, compare=False)
+    _guard_code: Any = field(default=None, repr=False, compare=False)
 
     @classmethod
     def freeze(cls, issuer: str, policy_id: str, policy_version: str, policy_sha256: str,
                acquire_adapter: Callable[..., None], source_checker: Callable[..., None], *,
-               policy: dict[str, Any]) -> MetadataAuthority:
+               policy: dict[str, Any], helper_modules: tuple[ModuleType, ...] = ()) -> MetadataAuthority:
         from .qualification import _callable_identity, _source_name
         if (any(not isinstance(item, str) or not item for item in (issuer, policy_id, policy_version))
                 or set(policy) != {'purpose', 'allowed_transforms', 'reviewer_id', 'reviewer_role'}
@@ -300,6 +386,11 @@ class MetadataAuthority:
             raise ValueError('invalid protected metadata policy')
         if sha256(canonical(policy)) != policy_sha256:
             raise ValueError('independently pinned metadata authority policy differs')
+        if (type(helper_modules) is not tuple
+                or any(not isinstance(module, ModuleType) for module in helper_modules)
+                or len({id(module) for module in helper_modules}) != len(helper_modules)
+                or len({module.__name__ for module in helper_modules}) != len(helper_modules)):
+            raise ValueError('unique actual helper module tuple required')
         functions = (acquire_adapter, source_checker)
         value = {'issuer': issuer, 'policy_id': policy_id, 'policy_version': policy_version,
             'policy': policy, 'policy_sha256': policy_sha256,
@@ -307,16 +398,39 @@ class MetadataAuthority:
             'helpers': _helper_identities(),
             'sources': {_source_name(Path(inspect.getfile(fn))): sha256(Path(inspect.getfile(fn)).read_bytes()) for fn in functions},
             'schema_sha256': sha256(SCHEMA_PATH.read_bytes()), 'module_sha256': sha256(Path(__file__).read_bytes())}
-        return cls(canonical(value), acquire_adapter, source_checker)
+        bindings: tuple[tuple[str, Any], ...] = ()
+        guard: Any = None
+        if helper_modules:
+            guard = _runtime_helper_inventory
+            inventory, bindings = guard(helper_modules)
+            for fn in functions:
+                if not any(fn.__globals__ is vars(module) for module in helper_modules):
+                    raise ValueError('callback is outside actual protected helper namespace')
+            value['runtime_helper_bindings'] = {'schema': 'runtime-helper-bindings/v1',
+                'modules': inventory, 'guard': _callable_identity(guard), 'guard_name':guard.__name__,
+                'callback_names':[fn.__name__ for fn in functions]}
+        return cls(canonical(value), acquire_adapter, source_checker, helper_modules, bindings,
+                   guard, guard.__code__ if guard is not None else None)
 
     @property
     def digest(self) -> str:
         return sha256(self.description)
 
     def verify(self) -> None:
+        if self._helper_modules:
+            guard = self._guard
+            if (globals().get('_runtime_helper_inventory') is not guard
+                    or guard.__code__ is not self._guard_code or guard.__closure__
+                    or guard.__defaults__ is not None or guard.__kwdefaults__ is not None):
+                raise ValueError('protected runtime helper guard binding changed')
+            _, bindings = guard(self._helper_modules)
+            if (len(bindings) != len(self._runtime_bindings)
+                    or any(name != old_name or obj is not old_obj
+                           for (name, obj), (old_name, old_obj) in zip(bindings, self._runtime_bindings))):
+                raise ValueError('protected runtime helper binding changed')
         value = _json(self.description)
         current = self.freeze(value['issuer'], value['policy_id'], value['policy_version'], value['policy_sha256'],
-                              self.acquire_adapter, self.source_checker, policy=value['policy'])
+                              self.acquire_adapter, self.source_checker, policy=value['policy'], helper_modules=self._helper_modules)
         if current.description != self.description:
             raise ValueError('protected metadata authority/helper source changed')
 
@@ -428,8 +542,16 @@ class MetadataStore:
         for key, acquisition in manifest['acquisitions'].items():
             if key != acquisition['id']:
                 raise ValueError('acquisition map ID differs')
+            if authority._helper_modules:
+                authority.verify()
             authority.acquire_adapter(acquisition, receipts, policy)
+            if authority._helper_modules:
+                authority.verify()
+        if authority._helper_modules:
+            authority.verify()
         authority.source_checker(manifest, archive, receipts, policy)
+        if authority._helper_modules:
+            authority.verify()
         closure = sha256(canonical({'archive': sorted(archive), 'receipts': sorted(receipts)}))
         identities = [{**identity, 'source_sha256': sha256(Path(inspect.getfile(fn)).read_bytes())}
             for identity, fn in zip(_json(authority.description)['functions'],
@@ -463,6 +585,7 @@ class MetadataStore:
         check = MetadataStore(purpose=self._purpose).acquire(import_id, manifest, archive, receipts, expected_manifest_sha256, authority)
         if check.description != result.description:
             raise ValueError('retained metadata acquisition changed')
+        authority.verify()
         return result
 
     def receipt(self, pin: str) -> bytes:
@@ -504,7 +627,7 @@ def require_known_age(public: dict[str, Any]) -> None:
 def construction_identity(constructor_path: Path) -> str:
     from .qualification import _callable_identity
     from . import signal_inputs
-    return sha256(canonical({'version': 'protected-source-construction/v2', 'sources': {
+    return sha256(canonical({'version': 'protected-source-construction/v3', 'sources': {
         path.name: sha256(path.read_bytes()) for path in (constructor_path, Path(__file__), SCHEMA_PATH)},
         'helpers': _helper_identities(), 'constructor_callables': {
             'constructor': _callable_identity(signal_inputs.resolve_signal_input),
