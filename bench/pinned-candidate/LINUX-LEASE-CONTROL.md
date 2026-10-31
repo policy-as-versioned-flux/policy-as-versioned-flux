@@ -110,3 +110,11 @@ SKIP/unexecuted/missing/partial evidence cannot pass.
 `production_capture_accepted` is always false. The actual existing Linux matrix
 route, target suitability and eventual artifact collection remain separate
 reviewed work; no workflow dispatch or provider action is implied.
+
+An observed rejection of the existing CI `nobody` identity remains a failure.
+The CI-only diagnostic retains the original account/group/home observations in
+the protected `suite/principal.json` refusal record before exporting that failed
+outcome. It does not select another account, relax the principal predicate, or
+turn unsafe identity into neutral absence. A changed/unproved caller or an
+unretained observation still prevents a complete diagnostic export. The ordinary
+production principal route retains its existing rejection behavior.

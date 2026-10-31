@@ -340,7 +340,7 @@ def test_initial_source_integrity_failure_is_not_a_neutral_skip():
     stage=next(node for node in main.body if isinstance(node,ast.Try) and any(
         isinstance(call,ast.Call) and isinstance(call.func,ast.Name) and call.func.id=='installed_module' for call in ast.walk(node)))
     class MissingNative(ValueError):pass
-    control=SimpleNamespace(ci_principal_facts=lambda *args:None,CiPrerequisiteUnavailable=MissingNative)
+    control=SimpleNamespace(ci_principal_facts=lambda *args:None,CiPrerequisiteUnavailable=MissingNative,CiPrincipalRejected=type("PrincipalRejected",(ValueError,),{}))
     def namespace(error):
         def refused(*args):raise error
         return {'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),
@@ -448,7 +448,7 @@ def test_initial_stage_keeps_observed_kernel_and_principal_when_later_discovery_
     class MissingNative(ValueError):pass
     def refused(*args):raise ValueError('TEST_ONLY later native mapping integrity refusal')
     scope={'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),'g':g,'caller':None,
-        'control':SimpleNamespace(ci_principal_facts=lambda *args:{'TEST_ONLY_principal':65534},CiPrerequisiteUnavailable=MissingNative),
+        'control':SimpleNamespace(ci_principal_facts=lambda *args:{'TEST_ONLY_principal':65534},CiPrerequisiteUnavailable=MissingNative,CiPrincipalRejected=type("PrincipalRejected",(ValueError,),{})),
         'installed_module':lambda *args:None,'manifest':{},'base':base,'outcome':None,
         'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'persist_observation':m.persist_observation,
         'admit_ci_root':lambda *args:{'TEST_ONLY_controllers':['memory','cpu','cpuset','pids']},

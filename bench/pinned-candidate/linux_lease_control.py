@@ -51,6 +51,13 @@ class CiPrerequisiteUnavailable(ValueError):
         super().__init__(message);self.facts=facts
 
 
+class CiPrincipalRejected(ValueError):
+    """CI-only diagnostic for an observed refusal, never neutral absence."""
+    def __init__(self, reason:str, facts:dict[str,Any]):
+        super().__init__(reason)
+        self.facts=facts
+
+
 def finite(value: Any) -> float:
     if type(value) not in (int,float) or not math.isfinite(value):
         raise ValueError('finite actual monotonic timestamp required')
@@ -576,10 +583,10 @@ def ci_principal_facts(g:Any,caller:Any)->dict[str,Any]:
         raise CiPrerequisiteUnavailable('existing nobody account absent',{
             'stage':'initial-principal-lookup','name':'nobody','operation':'pwd.getpwnam',
             'error_type':type(failure).__name__,'args':list(failure.args)}) from failure
-    return _principal_facts(g,caller,record)
+    return _principal_facts(g,caller,record,ci_refusal=True)
 
 
-def _principal_facts(g:Any,caller:Any,record:Any)->dict[str,Any]:
+def _principal_facts(g:Any,caller:Any,record:Any,*,ci_refusal:bool=False)->dict[str,Any]:
     users=pwd.getpwall();groups=grp.getgrall()
     caller_state=g.parse_status(Path(f'/proc/{caller.pid}/status').read_text())
     caller_gid=int(caller_state['Gid'].split()[0])
@@ -599,7 +606,11 @@ def _principal_facts(g:Any,caller:Any,record:Any)->dict[str,Any]:
         'primary_names':sorted(p.pw_name for p in users if p.pw_gid==record.pw_gid),
         'supplementary_names':sorted(name for group in groups if group.gr_gid==record.pw_gid for name in group.gr_mem),
         'active':False,'home_exposed':exposed}
-    validate_principal(facts)
+    try:validate_principal(facts)
+    except ValueError as failure:
+        if not ci_refusal:raise
+        caller.verify()
+        raise CiPrincipalRejected(str(failure),facts) from failure
     caller.verify()
     return facts
 

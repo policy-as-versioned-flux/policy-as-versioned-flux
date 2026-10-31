@@ -1067,6 +1067,16 @@ def suite_main()->int:
         host,profile,prerequisites=control.load_ci_control_host(g,'baseline',caller)
         persist_observation(g,base,'suite/host.json',{'kernel':kernel,'host':host,'prerequisites':prerequisites})
         budget.require_work(time.monotonic())
+    except control.CiPrincipalRejected as failure:
+        # Retain the actual rejected NSS/home facts without weakening admission
+        # or translating an unsafe identity into neutral prerequisite absence.
+        persist_observation(g,base,'suite/principal.json',{
+            'schema':'TEST_ONLY-ci-principal-refusal/v1','status':'REFUSED',
+            'started':budget.started,'deadline':budget.deadline,
+            'observed_monotonic':time.monotonic(),'reason':str(failure),'facts':failure.facts},budget=budget)
+        outcome={'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL','executed':False,'control_passed':False,
+            'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,
+            'finished':time.monotonic(),'reason':type(failure).__name__+': '+str(failure)}
     except (PrerequisiteUnavailable,control.CiPrerequisiteUnavailable) as failure:
         # Only explicitly observed initial native absence is neutral. Source,
         # ownership, closure, issuer and unknown errors propagate as failures.
