@@ -272,7 +272,7 @@ def check_remap_control(packet:dict,baseline:dict,patched:dict)->dict:
     for bundle in (baseline,patched):_closed(bundle,{'observation','archive','plan'})
     left,left_archive=baseline['observation'],baseline['archive'];right,right_archive=patched['observation'],patched['archive']
     if baseline['plan']!=packet['comparison_plan']:raise RemapHold('same preselected v2 pristine plan required')
-    mode='SIMULATED_DATA' if left['purpose']=='TEST_ONLY' else 'actual'
+    mode='SIMULATED_DATA' if left['host_policy_sha256'] is None else 'actual'
     c.check_comparison_events(left,left_archive,observation_mode=mode)
     if (left['spec']['plan_sha256']!=sm.sha256(sm.canonical(baseline['plan']))
             or left['spec']['candidates']!=c._candidate_rows(baseline['plan'],selected,left['spec']['cwd'])):
@@ -287,7 +287,7 @@ def check_remap_control(packet:dict,baseline:dict,patched:dict)->dict:
     projection=remap_native_projection(packet,c._raw(native_plan['archive'],native_plan['configuration_sha256']))
     if [row for row in closure['platform_files'] if row['path']==resource['path']]!=[projection['platform_file']]:raise RemapHold('patched external platform candidate absent/substituted')
     n.verify_native_observation(right,right_archive,purpose=right['purpose'])
-    if right['purpose']!=left['purpose']:raise RemapHold('same comparative observation purpose required')
+    if right['purpose']!=('actual' if mode=='actual' else 'TEST_ONLY'):raise RemapHold('same actual/simulated comparative observation mode required')
     read_facts=[]
     for observation,archive in ((left,left_archive),(right,right_archive)):
         config_path=observation['spec']['cwd']+'/native-config'
@@ -299,7 +299,7 @@ def check_remap_control(packet:dict,baseline:dict,patched:dict)->dict:
                     or identity is not None and row['identity']!=identity
                     or c._raw(archive,blob['sha256'])!=c._raw(selected,blob['sha256'])):raise RemapHold('independently observed original candidate bytes/identity differ')
             wanted[path]=row
-        if observation['purpose']=='actual':
+        if mode=='actual':
             policy=c._json(archive,observation['host_policy_sha256'])
             wrapper=c._raw(native_plan['archive'],native_plan['configuration_sha256']) if observation is right else None
             check_remap_host_evidence(packet,policy,archive,wrapper)
@@ -330,6 +330,30 @@ def check_remap_control(packet:dict,baseline:dict,patched:dict)->dict:
 
 # These fixed bodies are reachable only through a held original carrier. There is
 # deliberately no selector, public stage constructor, importer or driver wiring.
+class _RemapFlow:
+    """One private original-owned cell, never an appointment or copied session."""
+    def __new__(cls,*args:Any,**kwargs:Any)->Any:raise RemapHold('private original remap flow required')
+    def __copy__(self)->Any:raise RemapHold('private remap flow cannot be copied')
+    def __deepcopy__(self,memo:Any)->Any:raise RemapHold('private remap flow cannot be copied')
+    def __reduce__(self)->Any:raise RemapHold('private remap flow cannot be serialized')
+    def __setattr__(self,name:str,value:Any)->None:
+        if name=='owner' and hasattr(self,name):raise RemapHold('immutable remap owner')
+        if name=='reserved' and getattr(self,'reserved',False) and value is not True:raise RemapHold('normal reservation cannot reset')
+        if name=='phase' and getattr(self,'phase',None)=='STOPPED' and value!='STOPPED':raise RemapHold('remap flow cannot resume')
+        object.__setattr__(self,name,value)
+    owner:c.OriginalComparisonSuite
+    phase:str
+    reserved:bool
+    packets:tuple
+    entries:list[dict]
+    records:dict[str,bytes]
+    metadata_bytes:int
+    failure:dict|None
+    failure_raw:bytes|None
+    secondary:list[dict]
+    guard:Any
+
+
 class _StageState:
     def __new__(cls,*args:Any,**kwargs:Any)->Any:
         raise RemapHold('private original-suite technical custody required')
@@ -338,6 +362,12 @@ class _StageState:
     def __deepcopy__(self,memo:Any)->Any:raise RemapHold('technical custody cannot be copied')
     def __reduce__(self)->Any:raise RemapHold('technical custody cannot be serialized')
 
+    def __setattr__(self,name:str,value:Any)->None:
+        if name in ('_original_owner','_remap_flow') and hasattr(self,name) and value is not getattr(self,name):raise RemapHold('original technical owner/flow cannot reset')
+        object.__setattr__(self,name,value)
+
+    _original_owner:c.OriginalComparisonSuite
+    _remap_flow:_RemapFlow
     phase:str
     root:str
     deadline:float|None
@@ -365,9 +395,10 @@ def _guard_callback(*args:Any)->None:
 
 def _source_guard()->Any:
     import sys
+    from . import pdf_remap_driver
     policy={'purpose':'TEST_ONLY','allowed_transforms':[],'reviewer_id':'remap-source-binding','reviewer_role':'source-binding-only'}
     return sm.MetadataAuthority.freeze('remap-source-guard','remap-source-bindings','1',sm.sha256(sm.canonical(policy)),
-        _guard_callback,_guard_callback,policy=policy,helper_modules=(sys.modules[__name__],c,n,bridge,origin))
+        _guard_callback,_guard_callback,policy=policy,helper_modules=(sys.modules[__name__],c,n,bridge,origin,pdf_remap_driver))
 
 
 def _stat_identity(value:Any)->list[int]:
@@ -500,12 +531,7 @@ def _success_data(state:_StageState,deadline:float|None)->dict:
     return data
 
 
-def _stage_remap_resources(original:c.OriginalComparisonSuite,fixture_root:str)->dict:
-    """Unappointed fixed source seam; passive paths/records cannot authorize OS.
-
-    The placeholder survives every failure. No reset, adoption or second attempt
-    exists. A future reviewed selector must hold the original source capability.
-    """
+def _allocate_stage(original:c.OriginalComparisonSuite)->_StageState:
     c._check_original_suite(original)
     if (original._technical_state is not None or original._stopped or original._next!=0
             or original._active_slot is not None or not original._target_custody_known or original._awaiting_comparison):raise RemapHold('initial original suite staging slot required')
@@ -514,7 +540,32 @@ def _stage_remap_resources(original:c.OriginalComparisonSuite,fixture_root:str)-
     state.root_removal_known=False;state.clock_observation={'at':None,'deadline':None,'status':'NOT_OBSERVED'}
     state.guard=None;state.fds=set();state.uncertain=False;state.parent_fd=None;state.root_fd=None
     state.parent_identity=None;state.root_identity=None;state.owned={};state.identities={};state.facts=[];state.failure=None
-    original._technical_state=state  # Before root parsing, source reads or clocks.
+    state._original_owner=original
+    flow=object.__new__(_RemapFlow);flow.owner=original;flow.phase='ALLOCATED';flow.reserved=False;flow.packets=();flow.entries=[];flow.records={};flow.metadata_bytes=0;flow.failure=None;flow.failure_raw=None;flow.secondary=[];flow.guard=None
+    state._remap_flow=flow
+    original._technical_state=state  # Both owner/flow placeholders precede charge/clock.
+    return state
+
+
+def _stage_remap_resources(original:c.OriginalComparisonSuite,fixture_root:str)->dict:
+    """Unappointed original helper route; no public bytes create technical custody."""
+    return _stage_body(original,_allocate_stage(original),fixture_root)
+
+
+def _stage_for_remap_driver(original:c.OriginalComparisonSuite,fixture_root:str)->dict:
+    """Fixed private driver prologue: no callback, reset or ordinary API reuse."""
+    state=_allocate_stage(original)
+    try:
+        c._charge_technical_bytes(original,4*MIB)
+        state._remap_flow.reserved=True
+        return _stage_body(original,state,fixture_root)
+    except BaseException as error:
+        state.failure=state.failure or _fault(error);original._stopped=True
+        if state.phase=='ALLOCATED':state.phase='FAILED'
+        raise
+
+
+def _stage_body(original:c.OriginalComparisonSuite,state:_StageState,fixture_root:str)->dict:
     try:
         # Reserve the complete finite custody/three-blob bound before retention;
         # never refund, including a rejected stage. No independent byte ledger.
@@ -579,14 +630,14 @@ def _stage_remap_resources(original:c.OriginalComparisonSuite,fixture_root:str)-
 
 def _held_stage_data(original:c.OriginalComparisonSuite)->dict:
     c._check_original_suite(original);state=original._technical_state
-    if type(state) is not _StageState:raise RemapHold('one private original technical state required')
+    if type(state) is not _StageState or state._original_owner is not original or type(state._remap_flow) is not _RemapFlow or state._remap_flow.owner is not original:raise RemapHold('one exact original-owned technical state required')
     return _stage_data(state)
 
 
 def _cleanup_remap_resources(original:c.OriginalComparisonSuite)->dict:
     """Once final-suite cleanup, never a retry of failed/partial stage cleanup."""
     c._check_original_suite(original);state=original._technical_state
-    if type(state) is not _StageState:raise RemapHold('one private original technical state required')
+    if type(state) is not _StageState or state._original_owner is not original or type(state._remap_flow) is not _RemapFlow or state._remap_flow.owner is not original:raise RemapHold('one exact original-owned technical state required')
     if (state.phase!='COMPLETE_STAGE' or state.final_attempted or original._active_slot is not None
             or original._target_custody_known is not True):raise RemapHold('complete stage and independently known terminal targets required')
     original._stopped=True;state.final_attempted=True
