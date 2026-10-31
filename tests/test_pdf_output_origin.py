@@ -302,7 +302,8 @@ def test_selected_member_binding_cannot_substitute_output(field,value):
 
 def test_p23_p26_old_pdf_profile_and_actual_dependency_gate_remain_held():
     from twin import source_metadata_migration as m
-    assert p.PROFILE not in m.PROFILES
+    assert m.PROFILES[p.PROFILE]==m.PROFILES['pdf-text-xpdf/1']
+    with pytest.raises(ValueError):m.execute_new_extraction({'purpose':'TEST_ONLY','profile':p.PROFILE},b'AB')
     syntax={'schema':'twin.source-extraction-generated-syntax/v1','profile':'pdf-text-xpdf/1',
         'parent_sha256':'a'*64,'output_sha256':digest(b'AB'),'output_bytes':2,'ranges':[],
         'coverage':'complete-generated-syntax'}

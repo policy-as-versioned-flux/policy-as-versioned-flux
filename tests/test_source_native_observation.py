@@ -435,7 +435,7 @@ def test_migration_freezes_native_module_and_only_independent_json_index_pins(mo
     authority.verify()
     held=authority.source_checker.__kwdefaults__['execution_contract']
     assert held['index_sha256s']==['a'*64]
-    assert [row['module'] for row in sm._json(authority.description)['runtime_helper_bindings']['modules']]==['twin.source_metadata_migration','twin.source_native_observation','twin.pdf_output_origin']
+    assert [row['module'] for row in sm._json(authority.description)['runtime_helper_bindings']['modules']]==['twin.source_metadata_migration','twin.source_native_observation','twin.pdf_output_origin','twin.pdf_native_bridge']
     monkeypatch.setitem(n.SYSCALLS,'56','clone')
     with pytest.raises(ValueError):authority.verify()
 
