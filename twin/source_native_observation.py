@@ -920,9 +920,9 @@ def _finish_native_custody(pid: int | None, descendants: set[int], reaped: list[
                 if got and (os.WIFEXITED(status) or os.WIFSIGNALED(status)):
                     reaped.append(child)
                     if child==pid: returncode=os.waitstatus_to_exitcode(status)
-                elif got:
-                    try: _ptrace(24,child,0,sig)
-                    except OSError: pass
+                # Never resume a stopped doomed target: it may be at a refused
+                # syscall or unsafe mapping. SIGKILL does not require a ptrace
+                # userspace continuation; absent terminal wait remains a hold.
             if any(child not in reaped for child in targets): time.sleep(min(.001,max(0,until-time.monotonic())))
     probe='not-observed'
     if pid is not None and all(child in reaped for child in targets) and time.monotonic()<deadline:

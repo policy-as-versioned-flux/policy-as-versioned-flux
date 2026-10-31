@@ -155,3 +155,16 @@ def test_metadata_unsupported_extents_hold_before_dispatch_or_memory_capture(mon
     monkeypatch.setattr(n,'_memory',forbidden)
     with pytest.raises(ValueError):
         n._result_buffer({'name':'readlink','args':[4096,8192,1,0,0,0]},200,123)
+
+
+def test_rejected_stopped_native_target_is_never_resumed_during_teardown(monkeypatch):
+    clock={'now':120.0};resumed=[]
+    fake_os=types.SimpleNamespace(killpg=lambda *args:None,kill=lambda *args:None,
+        waitpid=lambda pid,*args:(pid,1),WNOHANG=1,WUNTRACED=2,
+        WIFEXITED=lambda status:False,WIFSIGNALED=lambda status:False)
+    monkeypatch.setattr(n,'os',fake_os)
+    monkeypatch.setattr(n,'time',types.SimpleNamespace(monotonic=lambda:clock['now'],sleep=lambda seconds:clock.update(now=clock['now']+.25)))
+    monkeypatch.setattr(n,'_ptrace',lambda *args:resumed.append(args))
+    custody,_=n._finish_native_custody(100,set(),[],None,deadline=122.0)
+    assert not resumed,'cleanup released a target stopped at a rejected syscall'
+    assert not custody['absence_verified'] and not custody['direct_child_reaped']
