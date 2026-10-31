@@ -40,4 +40,3 @@ opinion about a proposed distribution.
 The fixed, currently unappointed Linux build capability and its pure checker are
 documented in [BUILD-ONLY.md](BUILD-ONLY.md). No workflow or actual build/native
 execution is enabled by that source.
-
