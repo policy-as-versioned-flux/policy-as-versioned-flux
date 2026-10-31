@@ -1,0 +1,4 @@
+#!/bin/sh
+# Fixed root-installed TEST_ONLY whole suite. No selectable paths/UID/caps/clock.
+[ "$#:$1" = '1:ci-suite' ] || exit 64
+exec /usr/bin/env -i LANG=C.UTF-8 LC_ALL=C.UTF-8 /usr/bin/python3.12 -B -I -S /var/lib/policy-as-versioned-flux-linux-control/source/linux_lease_control_ci.py --ci-suite

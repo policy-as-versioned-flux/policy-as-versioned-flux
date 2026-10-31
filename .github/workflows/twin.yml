@@ -5,9 +5,9 @@ on:
     # `.scratch/twin/**` is in the filter on purpose: three guards read the constitution, the
     # build-ticket statuses and the decision tickets' acceptance criteria. Excluding them would
     # mean the commit that makes a guard true never runs the guard.
-    paths: ['twin/**', 'tests/**', 'conftest.py', 'pytest.ini', '.scratch/twin/**', '.github/workflows/twin.yml']
+    paths: ['bench/pinned-candidate/**', 'twin/**', 'tests/**', 'conftest.py', 'pytest.ini', '.scratch/twin/**', '.github/workflows/twin.yml']
   pull_request:
-    paths: ['twin/**', 'tests/**', 'conftest.py', 'pytest.ini', '.scratch/twin/**', '.github/workflows/twin.yml']
+    paths: ['bench/pinned-candidate/**', 'twin/**', 'tests/**', 'conftest.py', 'pytest.ini', '.scratch/twin/**', '.github/workflows/twin.yml']
   workflow_dispatch:
   schedule:
     - cron: '17 5 * * *'   # daily: the suite is a clock, not a push hook (GAPS 2.1, 2.2)
@@ -132,6 +132,178 @@ jobs:
         with:
           name: emitted-${{ matrix.arch }}
           path: /tmp/score-card.json
+
+      - name: native tiny lease controls; no model
+        if: runner.os == 'Linux'
+        timeout-minutes: 17
+        shell: bash
+        run: |
+          set -eu
+          umask 077
+          stage="$RUNNER_TEMP/tiny-linux-lease-control"
+          mkdir -m 700 "$stage"
+          printf '%s\n' '{"status":"UNEXECUTED","control_passed":false,"production_capture_accepted":false}' > "$stage/unexecuted.json"
+          if [ ! -x /usr/bin/python3.12 ]; then
+            printf '%s\n' '{"status":"SKIP","executed":false,"control_passed":false,"production_capture_accepted":false,"reason":"existing literal OS Python3.12 unavailable; no installation"}' > "$stage/native-outcome.json"
+            exit 0
+          fi
+          set +e
+          sudo -n -- /usr/bin/env -i LANG=C.UTF-8 LC_ALL=C.UTF-8 /usr/bin/python3.12 -B -I -S - > "$stage/root-export.jsonl" 2> "$stage/root-error.txt" <<'FIXED_ROOT_BOOTSTRAP'
+          import time
+          started=time.monotonic()
+          import hashlib,json,os,signal,stat,sys
+          STORE='/var/lib/policy-as-versioned-flux-linux-control'
+          REVIEWED_MANIFEST='b0d931524739a70e873cc57c561b6e71606182b96053aa7b1eb657adac107cb6'
+          NAMES=('linux_guardian.py','linux_lease_control.py','linux_lease_control_child.py','linux_lease_control_entry','linux_lease_control_ci.py','linux_lease_control_ci_entry','linux_network.py','linux_runtime_filter.py','qwen_backend.py')
+          deadline=started+900
+
+          def check():
+              if time.monotonic()>=deadline-10:raise ValueError('original900 bootstrap budget exhausted')
+
+          def arm_budget():
+              remaining=deadline-time.monotonic()
+              if remaining<=10:raise ValueError('original900 bootstrap work budget exhausted')
+              signal.signal(signal.SIGALRM,signal.SIG_DFL)
+              signal.pthread_sigmask(signal.SIG_UNBLOCK,{signal.SIGALRM})
+              signal.setitimer(signal.ITIMER_REAL,remaining)
+
+          def safe(path,regular=False):
+              components=path.split('/')
+              current='/'
+              for part in components[1:]:
+                  current=os.path.join(current,part)
+                  info=os.lstat(current)
+                  if stat.S_ISLNK(info.st_mode) or info.st_uid!=0 or info.st_mode&0o022 or info.st_mode&0o6000:
+                      raise ValueError('unprotected actual OS/store path')
+                  if any(key in os.listxattr(current,follow_symlinks=False) for key in ('system.posix_acl_access','system.posix_acl_default','security.capability')):
+                      raise ValueError('unexpected OS/store ACL/capability')
+              if regular and (not stat.S_ISREG(info.st_mode) or info.st_nlink!=1):raise ValueError('single-link OS regular file required')
+              return info
+
+          def readat(directory,name):
+              check()
+              fd=os.open(name,os.O_RDONLY|os.O_NONBLOCK|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=directory)
+              try:
+                  info=os.fstat(fd)
+                  if not stat.S_ISREG(info.st_mode) or info.st_nlink!=1 or info.st_size>1048576:raise ValueError('bounded regular checkout DATA required')
+                  raw=b''
+                  while True:
+                      check()
+                      part=os.read(fd,min(65536,1048577-len(raw)))
+                      if not part:break
+                      raw+=part
+                      if len(raw)>1048576:raise ValueError('source DATA byte cap exceeded')
+                  return raw
+              finally:os.close(fd)
+
+          def verify_installed(manifest_raw,sources):
+              check()
+              safe(STORE)
+              directory=os.open(STORE,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC)
+              copied=-1
+              try:
+                  safe(STORE+'/source-manifest.json',True)
+                  actual=readat(directory,'source-manifest.json')
+                  if actual!=manifest_raw or hashlib.sha256(actual).hexdigest()!=REVIEWED_MANIFEST:
+                      raise ValueError('installed manifest bytes differ')
+                  safe(STORE+'/source')
+                  copied=os.open('source',os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=directory)
+                  manifest=json.loads(actual)['files']
+                  for name in NAMES:
+                      check()
+                      safe(STORE+'/source/'+name,True)
+                      raw=readat(copied,name)
+                      if raw!=sources[name] or manifest[name]!={'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}:
+                          raise ValueError('installed source/entry copy bytes differ')
+              finally:
+                  if copied>=0:os.close(copied)
+                  os.close(directory)
+              check()
+
+          def write(name,raw,mode):
+              check()
+              fd=os.open(name,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW|os.O_CLOEXEC,mode)
+              try:
+                  offset=0
+                  while offset<len(raw):
+                      count=os.write(fd,raw[offset:])
+                      if count<=0:raise ValueError('short protected source write')
+                      offset+=count
+                  os.fsync(fd)
+              finally:os.close(fd)
+
+          if os.getresuid()!=(0,0,0) or sys.executable!='/usr/bin/python3.12' or not sys.flags.isolated or not sys.flags.no_site or not sys.dont_write_bytecode:
+              raise ValueError('literal isolated OS root bootstrap required')
+          # Default SIGALRM/ITIMER_REAL survives exec; never renewed. Expiry is
+          # failed/missing evidence, never teardown proof or a fresh17min lease.
+          arm_budget()
+          for path in ('/usr/bin/python3.12','/usr/bin/env','/usr/bin/dash'):safe(path,True)
+          if os.path.realpath('/proc/self/exe')!='/usr/bin/python3.12' or os.path.realpath('/bin/sh')!='/usr/bin/dash':
+              raise ValueError('actual literal OS interpreter/shell differs')
+          safe('/var/lib')
+          check()
+          # Checkout sources are DATA only. Pin a directory fd, reject symlinks and hash
+          # every exact byte against this independently reviewed literal manifest pin.
+          fds=[]
+          try:
+              directory=os.open('.',os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC);fds.append(directory)
+              for part in ('bench','pinned-candidate'):
+                  directory=os.open(part,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=directory);fds.append(directory)
+              manifest_raw=readat(directory,'linux_lease_control_ci_sources.json')
+              if hashlib.sha256(manifest_raw).hexdigest()!=REVIEWED_MANIFEST:raise ValueError('literal reviewed manifest mismatch')
+              manifest=json.loads(manifest_raw)
+              if set(manifest)!={'schema','files'} or manifest['schema']!='TEST_ONLY-ci-sources/v1' or set(manifest['files'])!=set(NAMES):raise ValueError('closed reviewed source list differs')
+              sources={}
+              for name in NAMES:
+                  raw=readat(directory,name);row=manifest['files'][name]
+                  if row!={'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}:raise ValueError('reviewed source bytes differ')
+                  sources[name]=raw
+          finally:
+              for fd in reversed(fds):os.close(fd)
+          check()
+          # Exclusive creation refuses ALL pre-existing/stale state. Never chown, replace,
+          # recursively remove or sweep a prior store/leaf/lease.
+          os.umask(0o022)
+          os.mkdir(STORE,0o755)
+          os.mkdir(STORE+'/source',0o755)
+          write(STORE+'/source-manifest.json',manifest_raw,0o444)
+          start=os.getpid()
+          start_ticks=open('/proc/self/stat').read().rsplit(')',1)[1].split()[19]
+          receipt={'schema':'TEST_ONLY-ci-start/v1','pid':start,'start':start_ticks,'started':started,'deadline':deadline,'source_manifest_sha256':REVIEWED_MANIFEST}
+          write(STORE+'/start.json',(json.dumps(receipt,sort_keys=True,separators=(',',':'))+'\n').encode(),0o400)
+          public_context={'schema':'TEST_ONLY-ci-context/v1','source_manifest_sha256':REVIEWED_MANIFEST,
+              'workflow_run':{'repository':'${{ github.repository }}','workflow':'twin','job':'determinism',
+                  'run_id':'${{ github.run_id }}','attempt':'${{ github.run_attempt }}','source_commit':'${{ github.sha }}',
+                  'event':'${{ github.event_name }}','arch':'${{ matrix.arch }}','runner_label':'${{ matrix.os }}'}}
+          # Public workflow attribution only. No caller environment is forwarded
+          # into the root helper or child, and labels are not native proof.
+          write(STORE+'/ci-context.json',(json.dumps(public_context,sort_keys=True,separators=(',',':'))+'\n').encode(),0o400)
+          for name,raw in sources.items():write(STORE+'/source/'+name,raw,0o555 if name.endswith('_entry') else 0o444)
+          check()
+          verify_installed(manifest_raw,sources)
+          os.chdir(STORE)
+          os.execve(STORE+'/source/linux_lease_control_ci_entry',['linux_lease_control_ci_entry','ci-suite'],{'LANG':'C.UTF-8','LC_ALL':'C.UTF-8'})
+          FIXED_ROOT_BOOTSTRAP
+          native_exit=$?
+          set -e
+          printf '%s\n' "$native_exit" > "$stage/native-exit.txt"
+          # Nonroot receiver executes ONLY the protected, already pinned installed copy.
+          # Root never opens a runner-selected staging/export path.
+          cd "$stage"
+          set +e
+          /usr/bin/python3.12 -B -I -S /var/lib/policy-as-versioned-flux-linux-control/source/linux_lease_control_ci.py --receive < root-export.jsonl > receiver-output.txt 2> receiver-error.txt
+          receiver_exit=$?
+          set -e
+          printf '%s\n' "$receiver_exit" > receiver-exit.txt
+          /usr/bin/python3.12 -B -I -S /var/lib/policy-as-versioned-flux-linux-control/source/linux_lease_control_ci.py --disposition
+      - name: retain native tiny lease evidence
+        if: always() && runner.os == 'Linux'
+        timeout-minutes: 5
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiny-linux-lease-${{ matrix.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/tiny-linux-lease-control
+          if-no-files-found: error
 
   # Build ticket 10: verification runs on a *different machine* from the one that produced the
   # artefact. The x86 Linux runner emits; this job recomputes it from its pins on arm64 macOS,

@@ -110,3 +110,76 @@ SKIP/unexecuted/missing/partial evidence cannot pass.
 `production_capture_accepted` is always false. The actual existing Linux matrix
 route, target suitability and eventual artifact collection remain separate
 reviewed work; no workflow dispatch or provider action is implied.
+
+An observed rejection of the fixed existing CI identity remains a failure.
+The CI-only diagnostic retains the original account/group/home observations in
+the protected `suite/principal.json` refusal record before exporting that failed
+outcome. It does not select another account, relax the principal predicate, or
+turn unsafe identity into neutral absence. A changed/unproved caller or an
+unretained observation still prevents a complete diagnostic export. The ordinary
+production principal route retains its existing rejection behavior.
+
+The separately source-appointed CI route uses existing `irc` UID39/GID39, with
+exact name/group and all existing safety checks. Its suitability must be
+observed before any actual attempt. The ordinary production route continues
+to select `nobody`; neither route creates an account or falls back to another.
+
+The existing-CI coordinator retains a narrow typed diagnostic when an already
+protected closure member fails the unchanged `0 < size <= 256MiB` predicate.
+It records the asked source, initial jail target, observed roles and stat facts
+before reading that member, then persists protected `suite/installation.json`
+as REFUSED and exports FAIL with prior source/caller/context/principal/kernel
+records. Other zero-size files remain refused. Unknown stat/read/close, caller,
+persistence, tamper and deadline errors do not enter that diagnostic branch.
+The actual refused member and size remain unknown until a separately authorized
+original capture retains them; portable models do not establish that cause.
+
+The CI-only closure validator admits exactly one observed empty Python source:
+`/usr/lib/python3.12/urllib/__init__.py`, with identical source/target, integer
+zero bytes, the empty SHA256 and null ELF metadata. Discovery requires its sole
+observed role to be loaded-module, reads the actual protected empty bytes, and
+retains the row and inode checks. Later CI host loading reacquires and matches
+zero stat, bytes and hash. The zero module cannot satisfy ELF loader/NEEDED
+relations. All ordinary closure validation and ordinary guardian bootstrap stay
+strict; the CI path passes the installed guardian directly. This source does
+not establish any native subcase, runtime qualification or execution permission.
+
+A separate narrow CI diagnostic retains a failed ELF NEEDED basename-match
+predicate without accepting another alias. For zero or multiple mapped basename
+matches, it records the already-read owner/ELF row, needed name, sorted mapped
+paths/matches, previously acquired full stat/role facts, maps digest and
+original clock. It performs no extra filesystem/proc/tool query, bounds metadata
+before persistence, and uses the same protected installation REFUSED/FAIL export.
+Unknown errors still propagate. The actual dependency/matches remain unknown
+until a separately authorized original capture retains those facts.
+
+## CI-only mapped SONAME projection
+
+The fixed CI collector parses DT_SONAME from each mapped ELF object's bytes already
+returned by its protected read, after the unchanged ordinary ELF parse. It resolves
+NEEDED by the exact union of mapped basenames and held-byte SONAMEs, requiring one
+identity. A canonical host source may receive a same-directory jail target with
+the exact requested name; this is a constructed readonly projection, not an
+observation of a host symlink. Fixed PT_INTERP targets remain fixed. Ambiguous
+identities, conflicting required names or target collisions refuse. No dependency
+search, new host acquisition, tool, import or process supplies this identity.
+
+The separate closed `TEST_ONLY-ci-elf-soname-projections/v1` DATA binds original
+manifest/maps/clock and protected source bytes/hash/stat facts. Its pure checker
+confers no acquisition or execution authority. The original 900-second suite,
+4096-file/256MiB closure, diagnostic/export caps, irc39 control principal and
+ordinary nobody policy remain. Ordinary ELF/closure validators, host loader and
+guardian are unchanged. Known new parser/projection refusals use the narrow
+ClosureProjectionRefused path; ordinary parse errors and unknown custody/source/
+read/close failures propagate. Existing size/NEEDED diagnostic grammars remain.
+
+These changes have pure modeled coverage only. Actual library SONAME and complete
+native closure outcomes remain unobserved until separately authorized execution.
+
+The pure projection checker additionally requires separate already-held DATA: the
+verified closure/hash/stat/maps/SONAME results, initial targets, actually observed
+interpreter resolutions and original manifest/clock. The public record grammar is
+unchanged. Complete records must match the full exact identity and target plan;
+known failure records match only their legitimately held prefix. A malformed early
+prefix cannot become a complete positive record. This context performs no new
+acquisition and grants no authority or appointment.
