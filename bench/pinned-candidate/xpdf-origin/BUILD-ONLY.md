@@ -73,3 +73,10 @@ checker has the same installation path. Static ELF observations additionally ret
 retention. Neither addition establishes runtime access closure. Exact raw terminal
 statuses exclude impossible extra bits. Appointed staging and child inheritance
 use umask 077, with explicit 0600 patch creation and caller-mask restoration.
+If restoration raises, the original pending cancellation still reaches the caller;
+bounded separate fault evidence records restoration as UNOBSERVED without replacing
+the first failure. Without a pending cancellation the restoration fault propagates,
+never a successful return. Any existing terminal export is marked incomplete on a
+best-effort basis; an unobserved operation stays unknown and its workspace retained.
+The secondary fault has an 8KiB cap reserved inside the existing 1MiB failure
+metadata allowance; the original 16MiB total failure reserve is not increased.

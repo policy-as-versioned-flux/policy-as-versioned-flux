@@ -28,6 +28,7 @@ PACKAGE = Path(__file__).resolve().parent
 _APPOINTED_EXECUTION: Mapping[str, Any] | None = None
 MAX_FILE = 256 * 1024 * 1024
 MAX_METADATA = 1024 * 1024
+MAX_UMASK_FAULT = 8192  # Within the original 1MiB failure-metadata allowance.
 MAX_BUNDLE = 2 * 1024 * 1024 * 1024
 MAX_STREAM = 16 * 1024 * 1024
 _UNSETTLED: list[subprocess.Popen[bytes]] = []
@@ -1440,6 +1441,7 @@ def build_linux_pair(selection: Mapping[str, Any], owned_parent: Path) -> dict[s
     payload: dict[str, tuple[bytes, str]] = {}
     created = False
     previous_umask = None
+    original_cancellation: BaseException | None = None
     try:
         if _APPOINTED_EXECUTION is None:
             raise BuildHold('H_EXECUTION_SELECTION', 'actual execution source selection is not appointed')
@@ -1470,8 +1472,9 @@ def build_linux_pair(selection: Mapping[str, Any], owned_parent: Path) -> dict[s
               result['commands'][-1]['id'] if result['commands'] else None)
     except Exception as error:
         _hold(result, 'H_CUSTODY' if result['commands'] else 'H_EXECUTION_SELECTION', type(error).__name__ + ': ' + str(error))
-    except BaseException:
+    except BaseException as error:
         # The explicit owned workspace has no destructor/finalizer. Preserve original interruption.
+        original_cancellation = error
         _hold(result, 'H_CUSTODY', 'original interruption; workspace retained')
         if created:
             try:
@@ -1481,7 +1484,17 @@ def build_linux_pair(selection: Mapping[str, Any], owned_parent: Path) -> dict[s
         raise
     finally:
         if previous_umask is not None:
-            os.umask(previous_umask)
+            try:
+                os.umask(previous_umask)
+            except BaseException as error:
+                _hold(result, 'H_CUSTODY', 'umask restoration unobserved; workspace retained', 'local-export-readback')
+                if created:
+                    try:
+                        _retain_umask_fault(owned_parent, result, payload, error, original_cancellation)
+                    except BaseException:
+                        pass  # Never replace the pending original cancellation with evidence failure.
+                if original_cancellation is None:
+                    raise  # A new restoration failure cannot return success.
     if result['status'] != 'COMPLETE_BUILD_PAIR':
         try:
             result['clock']['ended'] = time.monotonic()
@@ -1490,6 +1503,33 @@ def build_linux_pair(selection: Mapping[str, Any], owned_parent: Path) -> dict[s
         if created:
             _retain_failure(owned_parent, result, payload)
     return result
+
+
+def _retain_umask_fault(root: Path, result: dict[str, Any], payload: dict[str, tuple[bytes, str]],
+                       secondary: BaseException, original: BaseException | None) -> None:
+    terminal = 'UNOBSERVED'
+    try:
+        (root / 'export/RESULT.json').rename(root / 'export/RESULT-INCOMPLETE.json')
+        terminal = 'RENAMED_INCOMPLETE'
+    except FileNotFoundError:
+        terminal = 'NOT_OBSERVED'
+    except BaseException:
+        pass
+    fault = {'schema': 'twin.xpdf-build-umask-restore-fault/v1', 'restoration': 'UNOBSERVED',
+             'secondary_type': type(secondary).__name__[:128],
+             'original_type': None if original is None else type(original).__name__[:128],
+             'first_failure': result['first_failure'], 'workspace': 'RETAINED', 'export_terminal': terminal}
+    raw = _json(fault)
+    if len(raw) > MAX_UMASK_FAULT:
+        raise BuildHold('H_CUSTODY', 'secondary restoration evidence exceeds its reserved metadata allowance')
+    parent = _output_parent(root, 'UMASK-RESTORE-FAULT.json')
+    try:
+        fd = os.open('UMASK-RESTORE-FAULT.json', os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=parent)
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write(raw)
+    finally:
+        os.close(parent)
+    _retain_failure(root, result, payload)
 
 
 def _retain_failure(root: Path, result: dict[str, Any], payload: dict[str, tuple[bytes, str]]) -> None:
@@ -1525,7 +1565,7 @@ def _retain_failure(root: Path, result: dict[str, Any], payload: dict[str, tuple
         # A partial stage is never advertised as a verified complete export.
         result['files_manifest_sha256'] = None
         failure = _json(result)
-        if len(failure) <= MAX_METADATA:
+        if len(failure) <= MAX_METADATA - MAX_UMASK_FAULT:
             parent = _output_parent(root, 'FIRST-FAILURE.json')
             try:
                 fd = os.open('FIRST-FAILURE.json', os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=parent)
