@@ -61,3 +61,15 @@ no discovery selection, inventory-only activation or discovery execution is supp
 here. A later exact parent/source appointment and execution decision are required
 before this build body can run. N01–N08 remain UNRUN and the old PDF/native holds
 are unchanged.
+
+The complete-data checker requires every fixed selector and the exact ordered tool
+queries, supported CMake/GNU observations, selected GCC internals, target and specs.
+The bootstrap observation additionally retains `driver_path`: the actual resolved
+driver path whose bytes are already pinned by the selection and retained package.
+This binds the acquisition argv across transferred bundles without assuming the
+checker has the same installation path. Static ELF observations additionally retain
+`soname`; needed libraries bind to preselected resolved bytes and their ELF SONAME
+(or resolved filename when absent), with the actual symlink route rechecked before
+retention. Neither addition establishes runtime access closure. Exact raw terminal
+statuses exclude impossible extra bits. Appointed staging and child inheritance
+use umask 077, with explicit 0600 patch creation and caller-mask restoration.

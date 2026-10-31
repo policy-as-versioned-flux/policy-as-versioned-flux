@@ -498,6 +498,13 @@ def _tool_inventory(result: dict[str, Any], root: Path, environment: dict[str, s
     result['tool_manifest_sha256'] = _sha(raw)
 
 
+def _fixed_tool_queries() -> list[list[str]]:
+    selectors = _load_json(_contract('LIMITS-AND-RECIPE.json'))['tools']['fixed_selectors']
+    return [[name, '--version'] for name in selectors if name != '/bin/sh'] + [
+        ['/usr/bin/gcc', '-print-prog-name=cc1'], ['/usr/bin/g++', '-print-prog-name=cc1plus'],
+        ['/usr/bin/gcc', '-print-prog-name=collect2'], ['/usr/bin/gcc', '-dumpmachine'], ['/usr/bin/gcc', '-dumpspecs']]
+
+
 def _fixed_fetch(output: Any) -> None:
     """Internal fixed data child; unavailable until a new reviewed source appointment."""
     if _APPOINTED_EXECUTION is None or not _APPOINTED_EXECUTION.get('source_transport'):
@@ -583,7 +590,8 @@ def _source_pair(root: Path, raw: bytes, result: dict[str, Any], environment: di
         instrumented_files['xpdf/' + name] = package[name]
     instrumented = _source.materialize_source(instrumented_files, root / 'instrumented-source')
     patch_path = root / 'inputs' / 'xpdf-4.06-origin.patch'
-    with patch_path.open('xb') as stream:
+    fd = os.open(patch_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(fd, 'wb') as stream:
         stream.write(package['xpdf-4.06-origin.patch'])
     command = _supervise(result, 'two-source-preparations', ['/usr/bin/patch', '--batch', '--forward', '--fuzz=0', '-p1', '-i', str(patch_path)], instrumented, environment, 30, payload)
     if re.search(rb'offset|fuzz|reject', _command_output(command, payload) + _command_output(command, payload, 'stderr'), re.I):
@@ -676,9 +684,9 @@ def _elf(raw: bytes) -> dict[str, Any]:
             raise BuildHold('H_ELF_ASSOCIATION', 'ELF string table mapping unknown')
         strings = raw[matches[0]:matches[0] + table[10]]
     associations: dict[str, Any] = {'class': 'ELF64', 'endian': 'little', 'machine': 'x86_64', 'OSABI': raw[7],
-                                    'interpreter': interpreter, 'needed': [], 'rpath': None, 'runpath': None}
+                                    'interpreter': interpreter, 'needed': [], 'soname': None, 'rpath': None, 'runpath': None}
     for key, string_offset in dynamic:
-        if key not in (1, 15, 29):
+        if key not in (1, 14, 15, 29):
             continue
         end = strings.find(b'\0', string_offset)
         if string_offset >= len(strings) or end < 0:
@@ -687,8 +695,19 @@ def _elf(raw: bytes) -> dict[str, Any]:
         if key == 1:
             associations['needed'].append(decoded)
         else:
-            associations['rpath' if key == 15 else 'runpath'] = decoded
+            field = {14: 'soname', 15: 'rpath', 29: 'runpath'}[key]
+            if associations[field] is not None:
+                raise BuildHold('H_ELF_ASSOCIATION', 'duplicate ELF dynamic name')
+            associations[field] = decoded
     return associations
+
+
+def _candidate_library_name(raw: bytes, resolved: str) -> str | None:
+    # Archives/linker scripts remain retained DATA, but cannot stand in for an ELF library.
+    if not raw.startswith(b'\x7fELF'):
+        return None
+    observed = _elf(raw)
+    return observed['soname'] if observed['soname'] is not None else Path(resolved).name
 
 
 def _link_association(binary: bytes, root: Path, variant: str, logs: bytes, appointed: Mapping[str, Any], payload: dict[str, tuple[bytes, str]]) -> tuple[str, str]:
@@ -699,19 +718,34 @@ def _link_association(binary: bytes, root: Path, variant: str, logs: bytes, appo
     paths = {line.decode('utf-8') for line in logs.splitlines() if re.fullmatch(rb'/[^\s\x00]+', line)}
     paths.add(interpreter)
     candidates: dict[str, Any] = {}
+    library_names = set()
     for path in sorted(paths):
         candidate = Path(path)
         if candidate.is_relative_to(root):
             continue
         if path not in appointed['tools']:
             raise BuildHold('H_ELF_ASSOCIATION', 'unselected actual link candidate: ' + path)
-        value = _stable_read(candidate.resolve(strict=True))
-        if _sha(value) != appointed['tools'][path]['sha256']:
+        selected = appointed['tools'][path]
+        resolved = candidate.resolve(strict=True)
+        value = _stable_read(resolved)
+        route = []
+        current = candidate
+        for _ in range(32):
+            if not current.is_symlink():
+                break
+            target = os.readlink(current)
+            route.append({'path': str(current), 'target': target})
+            current = Path(target) if target.startswith('/') else current.parent / target
+        else:
+            raise BuildHold('H_ELF_ASSOCIATION', 'link candidate route overflow')
+        if _sha(value) != selected['sha256'] or str(resolved) != selected['resolved'] or route != selected['links']:
             raise BuildHold('H_ELF_ASSOCIATION', 'link candidate drift')
         name = f'{variant}/candidates/{len(candidates):04}.bin'
         _payload_add(payload, name, value, 'candidate')
         candidates[path] = {'sha256': _sha(value), 'bytes': len(value), 'payload': name}
-    if any(name not in {Path(p).name for p in candidates} for name in association['needed']):
+        if path != interpreter:
+            library_names.add(_candidate_library_name(value, selected['resolved']))
+    if any(name not in library_names for name in association['needed']):
         raise BuildHold('H_ELF_ASSOCIATION', 'DT_NEEDED candidate association unestablished')
     raw = _json({'schema': 'twin.xpdf-build-link-candidates/v1', 'paths': candidates, 'runtime_access_closure': 'UNESTABLISHED'})
     _payload_add(payload, variant + '/LINK-CANDIDATES.json', raw, 'metadata')
@@ -807,6 +841,7 @@ def _build_appointed(selection: Mapping[str, Any], root: Path, result: dict[str,
     if os_release.get('ID') != 'ubuntu' or os_release.get('VERSION_ID') != '24.04':
         raise BuildHold('H_BOOTSTRAP', 'actual selected Ubuntu24 row unestablished')
     _payload_add(payload, 'BOOTSTRAP-OBSERVATION.json', _json({'executable': sys.executable, 'version': sys.version,
+                 'driver_path': str(Path(__file__).resolve()),
                  'isolated': bool(sys.flags.isolated), 'no_site': bool(sys.flags.no_site),
                  'dont_write_bytecode': bool(sys.dont_write_bytecode), 'runtime_access_closure': 'UNESTABLISHED',
                  'uname': {'system': uname.sysname, 'machine': uname.machine, 'release': uname.release},
@@ -1066,9 +1101,12 @@ def _check_custody(result: dict[str, Any], command: dict[str, Any]) -> bool:
         details = terminal['detail']
         raw = details['raw_wait']
         if details['wait_kind'] == 'EXITED':
-            _require((raw & 127) == 0 and details['exit_code'] == ((raw >> 8) & 255) and details['signal'] is None, 'raw exit decoding')
+            _require(type(details['exit_code']) is int and 0 <= details['exit_code'] <= 255
+                     and raw == details['exit_code'] << 8 and details['signal'] is None, 'raw exit decoding')
         else:
-            _require(0 < (raw & 127) < 127 and details['signal'] == (raw & 127) and details['exit_code'] is None, 'raw signal decoding')
+            _require(type(details['signal']) is int and 0 < details['signal'] < 127
+                     and raw in (details['signal'], details['signal'] | 128)
+                     and details['exit_code'] is None, 'raw signal decoding')
         _require(custody['direct_reap'] == 'OBSERVED' and all(custody[k] == details[k] for k in ('wait_kind', 'raw_wait', 'exit_code', 'signal')), 'terminal projection')
     else:
         _require(custody['direct_reap'] == 'UNOBSERVED' and custody['wait_kind'] == 'UNOBSERVED' and all(custody[k] is None for k in ('raw_wait', 'exit_code', 'signal')), 'invented terminal reap')
@@ -1227,13 +1265,16 @@ def _check_complete_bundle(bundle: Mapping[str, bytes], result: dict[str, Any], 
     _require(all(changed[n] == p for n, p in pins['patched_sources'].items()), 'accepted six patched source pins')
     _require(all(changed[n] == pin for n, pin in expected_original.items() if n not in pins['patched_sources']), 'unaccepted source semantic repair')
     tool = _load_json(by_hash[result['tool_manifest_sha256']][1])
+    selectors = _load_json(recipe_raw)['tools']['fixed_selectors']
+    _require(set(selectors).issubset(tool), 'required fixed selector observations absent')
     _require(re.fullmatch(r'x86_64-(?:[A-Za-z0-9_]+-)?linux(?:-[A-Za-z0-9_]+)*', tool.get('compiler_target', '')) is not None, 'compiler target association')
     _require(tool.get('specs_sha256') in by_hash, 'retained GCC specs absent')
     module_files = _load_json(bundle['TOOL-SELECTION.json'])['files']
     for name, record in tool.items():
         if name in ('compiler_target', 'specs_sha256'):
             continue
-        _require(set(record) == {'sha256', 'resolved', 'links', 'observation'} and record['sha256'] in by_hash and module_files.get(record['resolved']) == record['sha256'], 'actual tool bytes/review association missing')
+        _require(set(record) == {'sha256', 'resolved', 'links', 'observation'} and record['sha256'] in by_hash and module_files.get(record['resolved']) == record['sha256']
+                 and by_hash[record['sha256']][1].startswith(b'\x7fELF'), 'actual tool bytes/review association missing')
         observed = record['observation']
         _require(set(observed) == {'uid', 'mode', 'dev', 'ino', 'size', 'mtime_ns', 'ctime_ns'}
                  and all(type(v) is int and v >= 0 for v in observed.values())
@@ -1243,10 +1284,12 @@ def _check_complete_bundle(bundle: Mapping[str, bytes], result: dict[str, Any], 
     transport = _load_json(bundle['SOURCE-TRANSPORT-SELECTION.json'])
     _require(set(transport) == {'selection_sha256', 'ssl_files', 'ca_file'} and transport['ca_file'] in transport['ssl_files'] and re.fullmatch('[a-f0-9]{64}', transport['selection_sha256']) is not None and transport['ssl_files'] and all(pin in by_hash for pin in transport['ssl_files'].values()), 'actual SSL/trust association')
     bootstrap_observation = _load_json(bundle['BOOTSTRAP-OBSERVATION.json'])
-    _require(set(bootstrap_observation) == {'executable', 'version', 'isolated', 'no_site', 'dont_write_bytecode', 'runtime_access_closure', 'uname', 'os_release'}
+    _require(set(bootstrap_observation) == {'executable', 'version', 'driver_path', 'isolated', 'no_site', 'dont_write_bytecode', 'runtime_access_closure', 'uname', 'os_release'}
              and all(bootstrap_observation[k] is True for k in ('isolated', 'no_site', 'dont_write_bytecode'))
              and bootstrap_observation['runtime_access_closure'] == 'UNESTABLISHED'
              and bootstrap_observation['executable'] in _load_json(bundle['BOOTSTRAP-SELECTION.json'])['files'], 'actual isolated bootstrap observation')
+    driver_path = Path(bootstrap_observation['driver_path'])
+    _require(driver_path.is_absolute() and '..' not in driver_path.parts and driver_path.name == 'build_linux_pair.py', 'observed acquisition source path')
     _require(bootstrap_observation['uname']['system'] == 'Linux' and bootstrap_observation['uname']['machine'] == 'x86_64'
              and bootstrap_observation['os_release']['ID'] == 'ubuntu' and bootstrap_observation['os_release']['VERSION_ID'] == '24.04'
              and bootstrap_observation['os_release']['sha256'] in by_hash
@@ -1285,7 +1328,10 @@ def _check_complete_bundle(bundle: Mapping[str, bytes], result: dict[str, Any], 
         _require(set(candidates) == {'schema', 'paths', 'runtime_access_closure'} and candidates['schema'] == 'twin.xpdf-build-link-candidates/v1' and candidates['runtime_access_closure'] == 'UNESTABLISHED', 'link candidate record')
         for path, pin in candidates['paths'].items():
             _require(set(pin) == {'bytes', 'sha256', 'payload'} and pin['payload'] in bundle and _sha(bundle[pin['payload']]) == pin['sha256'] and len(bundle[pin['payload']]) == pin['bytes'], 'link candidate bytes')
-        _require(elf['interpreter'] in candidates['paths'] and all(n in {Path(p).name for p in candidates['paths']} for n in elf['needed']), 'Linux loader/needed candidate association')
+            _require(path in tool and pin['sha256'] == tool[path]['sha256'], 'link candidate not independently preselected')
+        library_names = {_candidate_library_name(bundle[pin['payload']], tool[path]['resolved'])
+                         for path, pin in candidates['paths'].items() if path != elf['interpreter']}
+        _require(elf['interpreter'] in candidates['paths'] and all(n in library_names for n in elf['needed']), 'Linux loader/needed candidate association')
         config_raw = by_hash[variant['configuration_manifest_sha256']][1]
         config = _load_json(config_raw)
         _require(set(config) == {'schema', 'logical_cache'} and config['schema'] == 'twin.xpdf-build-configuration/v1', 'configuration association shape')
@@ -1305,6 +1351,8 @@ def _check_complete_bundle(bundle: Mapping[str, bytes], result: dict[str, Any], 
         _require(config['logical_cache'] == expected_cache, 'raw cache and selected configuration differ')
         configurations.append(config_raw)
     _require(configurations[0] == configurations[1], 'variant configuration/optional features differ')
+    required_queries = _fixed_tool_queries()
+    _require([c['argv'] for c in result['commands'][:len(required_queries)]] == required_queries, 'exact required fixed query sequence')
     kinds: list[tuple[str, str]] = []
     for command in result['commands']:
         argv = command['argv']
@@ -1324,16 +1372,31 @@ def _check_complete_bundle(bundle: Mapping[str, bytes], result: dict[str, Any], 
             _require(re.search(rb'offset|fuzz|reject', output, re.I) is None, 'patch diagnostic refusal')
             kinds.append((phase, 'patch'))
         elif len(argv) == 6 and argv[1:4] == ['-I', '-S', '-B'] and argv[-1] == '--internal-fetch':
-            _require(phase == 'bootstrap-input-tools' and argv[0] == bootstrap_observation['executable'], 'fixed source acquisition phase/bootstrap')
+            _require(phase == 'bootstrap-input-tools' and argv[0] == bootstrap_observation['executable']
+                     and argv[4] == bootstrap_observation['driver_path'], 'fixed source acquisition phase/bootstrap/source')
             _require(by_hash[command['stdout']['sha256']][1] == archives[0], 'actual acquisition output differs')
             kinds.append((phase, 'acquire'))
         else:
-            allowed_tools = _load_json(recipe_raw)['tools']['fixed_selectors']
-            _require(phase == 'bootstrap-input-tools' and len(argv) == 2 and argv[0] in allowed_tools and argv[1] in ('--version', '-dumpmachine', '-dumpspecs', '-print-prog-name=cc1', '-print-prog-name=cc1plus', '-print-prog-name=collect2'), 'unsupported executable/target/query')
+            _require(phase == 'bootstrap-input-tools' and argv in required_queries, 'unsupported executable/target/query')
+            output = by_hash[command['stdout']['sha256']][1]
+            if argv[1] == '--version':
+                if argv[0] == '/usr/bin/cmake':
+                    match = re.search(rb'cmake version (\d+)\.(\d+)\.', output)
+                    _require(match is not None and (int(match[1]), int(match[2])) >= (3, 24), 'CMake guard semantics unsupported')
+                else:
+                    _require(b'GNU' in output, 'required GNU tool observation')
+            elif argv[1].startswith('-print-prog-name='):
+                selected_path = output.decode('ascii').strip()
+                _require(selected_path in tool and Path(selected_path).name == argv[1].split('=')[1], 'GCC internal selector association')
+            elif argv[1] == '-dumpmachine':
+                _require(output.decode('ascii').strip() == tool['compiler_target'], 'compiler target/query association')
+            else:
+                _require(_sha(output) == tool['specs_sha256'], 'GCC specs/query association')
             kinds.append((phase, 'query'))
         duration = {'query': 5, 'acquire': 30, 'patch': 30, 'configure': 120, 'build': 480}[kinds[-1][1]]
         _require(command['deadline'] == command['started'] + duration, 'command allowance changed/renewed')
     meaningful = [kind for kind in kinds if kind[1] != 'query']
+    _require(sum(kind[1] == 'query' for kind in kinds) == len(required_queries), 'missing/duplicate fixed queries')
     _require(meaningful == [('bootstrap-input-tools', 'acquire'), ('two-source-preparations', 'patch'), ('pristine', 'configure'), ('pristine', 'build'), ('instrumented', 'configure'), ('instrumented', 'build')], 'exact first-failure/no-retry stage order')
 
 
@@ -1376,6 +1439,7 @@ def build_linux_pair(selection: Mapping[str, Any], owned_parent: Path) -> dict[s
     result = _new_result(selection, started)
     payload: dict[str, tuple[bytes, str]] = {}
     created = False
+    previous_umask = None
     try:
         if _APPOINTED_EXECUTION is None:
             raise BuildHold('H_EXECUTION_SELECTION', 'actual execution source selection is not appointed')
@@ -1391,6 +1455,7 @@ def build_linux_pair(selection: Mapping[str, Any], owned_parent: Path) -> dict[s
                 or owned_parent.absolute().parent != Path(run['runner_temp']).absolute()
                 or owned_parent.name != f'A-{run["id"]}-{run["attempt"]}'):
             raise BuildHold('H_EXECUTION_SELECTION', 'actual run/attempt/workflow/owned path differs')
+        previous_umask = os.umask(0o077)
         parent = _source._directory_fd(owned_parent.parent)
         try:
             os.mkdir(owned_parent.name, 0o700, dir_fd=parent)
@@ -1414,6 +1479,9 @@ def build_linux_pair(selection: Mapping[str, Any], owned_parent: Path) -> dict[s
             except BaseException:
                 pass
         raise
+    finally:
+        if previous_umask is not None:
+            os.umask(previous_umask)
     if result['status'] != 'COMPLETE_BUILD_PAIR':
         try:
             result['clock']['ended'] = time.monotonic()

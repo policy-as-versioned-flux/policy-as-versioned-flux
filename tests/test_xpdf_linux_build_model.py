@@ -55,7 +55,7 @@ def fake_binary():
     return header + program + interpreter
 
 
-def whole_model(monkeypatch, tmp_path, archive, *, fail_stage=None, source_extra=False):
+def whole_model(monkeypatch, tmp_path, archive, *, fail_stage=None, source_extra=False, link_library=None):
     selection = __import__('json').loads(held_bundle()[0]['SELECTION.json'])
     selection.update(driver_sha256=sha(module.SCRIPT.read_bytes()) if hasattr(module, 'SCRIPT') else sha(Path(module.__file__).read_bytes()),
                      preparer_sha256=sha((module.PACKAGE / 'prepare_source.py').read_bytes()))
@@ -85,6 +85,15 @@ def whole_model(monkeypatch, tmp_path, archive, *, fail_stage=None, source_extra
         actual.write_bytes(b'\x7fELFTEST_ONLY existing-tool identity ' + name.encode())
         tool_paths[name] = actual
         tools[name] = {'sha256': sha(actual.read_bytes()), 'resolved': str(actual), 'links': []}
+    if link_library is not None:
+        library, soname = link_library
+        actual = fixtures / soname
+        actual.write_bytes(library)
+        alias = fixtures / 'libTEST_ONLY.so'
+        alias.symlink_to(soname)
+        tool_paths[str(alias)] = actual
+        tools[str(alias)] = {'sha256': sha(library), 'resolved': str(actual),
+                             'links': [{'path': str(alias), 'target': soname}]}
     modules['files'].update({str(path): sha(path.read_bytes()) for path in tool_paths.values()})
     selection['tool_module_review_sha256'] = sha(encoded(modules))
     appointed = {'selection_sha256': sha(encoded(selection)), 'bootstrap': bootstrap, 'modules': modules, 'tools': tools,
@@ -104,7 +113,14 @@ def whole_model(monkeypatch, tmp_path, archive, *, fail_stage=None, source_extra
             return SimpleNamespace(**values, st_uid=0, st_mode=stat.S_IFREG | 0o555)
         return result
     monkeypatch.setattr(Path, 'stat', modeled_stat)
-    monkeypatch.setattr(Path, 'lstat', lambda self, *a, **k: SimpleNamespace(st_uid=0, st_mode=stat.S_IFREG | 0o555) if str(self) in tool_paths else original_lstat(self, *a, **k))
+    def modeled_lstat(path, *args, **kwargs):
+        if str(path) in tool_paths:
+            mode = stat.S_IFLNK | 0o777 if tools[str(path)]['links'] else stat.S_IFREG | 0o555
+            return SimpleNamespace(st_uid=0, st_mode=mode)
+        if path in tool_paths.values():
+            return SimpleNamespace(st_uid=0, st_mode=stat.S_IFREG | 0o555)
+        return original_lstat(path, *args, **kwargs)
+    monkeypatch.setattr(Path, 'lstat', modeled_lstat)
     monkeypatch.setattr(module.os, 'statvfs', lambda *a: SimpleNamespace(f_bavail=2**30, f_frsize=4096))
     clock = [0.0]
     def monotonic():
@@ -144,6 +160,8 @@ def whole_model(monkeypatch, tmp_path, archive, *, fail_stage=None, source_extra
             (build / 'TEST_ONLY.o').write_bytes(b'TEST_ONLY object bytes, never executed')
             (build / 'TEST_ONLY.a').write_bytes(b'TEST_ONLY archive bytes, never linked')
             stdout = b'/lib64/ld-linux-x86-64.so.2\n'
+            if link_library is not None:
+                stdout += (str(fixtures / 'libTEST_ONLY.so') + '\n').encode()
             if source_extra and 'instrumented-build' in str(build):
                 (build.parent / 'instrumented-source/TEST_ONLY-extra').write_bytes(b'unaccepted source path')
         elif argv[1].startswith('-print-prog-name='): stdout = ('/usr/lib/gcc/TEST_ONLY/' + argv[1].split('=')[1] + '\n').encode()
