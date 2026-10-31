@@ -1,5 +1,6 @@
 """Held-entry source authentication and genuine transport revocation models."""
 import pytest
+from typing import Any
 from test_pdf_capture_storage import born,host_model,model_terminal
 from twin import pdf_capture_storage as s,pdf_comparison_capture as c
 
@@ -119,7 +120,7 @@ class RevokeDuringHeldHClock:
     elif self.target=='setter':
      def changed_setter(owner,key,value):
       self.effects.append(('unverified setter',key));return self.setter(owner,key,value)
-     s._Allocation.__setattr__=changed_setter
+     setattr(s._Allocation,'__setattr__',changed_setter)
     else:
      def changed_raw(*args,**kwargs):
       self.effects.append('unverified raw helper');return self.raw(*args,**kwargs)
@@ -131,6 +132,7 @@ class RevokeDuringHeldHClock:
 @pytest.mark.parametrize('clock_position',(None,1,2,3))
 @pytest.mark.parametrize('route',('capture','close'))
 def test_capture_reauthenticates_after_held_H_clock_before_admission(monkeypatch,target,clock_position,route):
+ entry:Any;args:tuple[Any,...]
  def window(ctx,**kw):
   c.time.monotonic()
   return c.sm._json(ctx._policy)
