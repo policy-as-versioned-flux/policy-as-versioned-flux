@@ -100,7 +100,12 @@ def whole_model(monkeypatch, tmp_path, *, outputs=None, raw_waits=None, query_de
         assert argv == profile['ordered_query_argv'][len(calls)]
         assert kwargs['stdin'] == module._build.subprocess.DEVNULL and kwargs['close_fds'] and kwargs['start_new_session']
         calls.append(list(argv))
-        output = b'GNU TEST_ONLY existing tool version DATA\n'
+        # Public synthetic syntax examples, never observations of an installed tool.
+        versions = {1: b'GNU Make 4.3\n', 2: b'gcc (GNU) 13.3.0\n', 3: b'g++ (GNU) 13.3.0\n',
+            4: b'GNU patch 2.7.6\n', 5: b'GNU assembler (GNU Binutils) 2.42\n',
+            6: b'GNU ld (GNU Binutils) 2.42\n', 7: b'GNU ar (GNU Binutils) 2.42\n',
+            8: b'GNU ranlib (GNU Binutils) 2.42\n', 9: b'GNU readelf (GNU Binutils) 2.42\n'}
+        output = versions.get(len(calls) - 1, b'TEST_ONLY no version query')
         if argv == ['/usr/bin/cmake', '--version']: output = b'cmake version 3.28.3\n'
         elif argv[-1] == '-dumpmachine': output = b'x86_64-linux-gnu\n'
         elif argv[-1] == '-dumpspecs': output = b'TEST_ONLY opaque GCC specs DATA\n'
@@ -396,7 +401,7 @@ def test_interrupted_query_stops_all_later_actions_and_preserves_first_fault(mon
 
 def test_capacity_and_metadata_limits_refuse_without_acquisition(monkeypatch, tmp_path):
     result = module._new_result(selection())
-    result['deadline'] = 60
+    result.update(original_started=0, deadline=60)
     monkeypatch.setattr(module, 'time', SimpleNamespace(monotonic=lambda: 1))
     collection = module._Collection(result, tmp_path)
     with pytest.raises(module.DiscoveryHold): collection.room(module.DATA_LIMIT + 1)
@@ -408,7 +413,7 @@ def test_capacity_and_metadata_limits_refuse_without_acquisition(monkeypatch, tm
 def test_directory_enumeration_stops_at_its_finite_input_bound(monkeypatch, tmp_path):
     _, root, _, _, host, _ = whole_model(monkeypatch, tmp_path)
     result = module._new_result(selection())
-    result['deadline'] = 60
+    result.update(original_started=0, deadline=60)
     collection = module._Collection(result, root)
     consumed = []
     class Entries:
@@ -469,7 +474,7 @@ def test_stable_selected_relative_symlink_route_is_data_not_an_extra_query(monke
     mapped('/usr/bin/sh').chmod(0o555)
     mapped('/bin/sh').symlink_to('../usr/bin/sh')
     probe_result = module._new_result(selected)
-    probe_result['deadline'] = 60
+    probe_result.update(original_started=0, deadline=60)
     candidate = module._Collection(probe_result, root).snapshot('/bin/sh', 'selector')
     module._DISCOVERY_APPOINTMENT['query_acceptance']['selectors']['/bin/sh'] = candidate
     result = module.discover_linux_tools(selected, root)

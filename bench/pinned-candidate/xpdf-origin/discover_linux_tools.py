@@ -40,9 +40,10 @@ _spec.loader.exec_module(_build)
 
 
 class DiscoveryHold(ValueError):
-    def __init__(self, stage: str, operation: str, message: str):
+    def __init__(self, stage: str, operation: str, message: str, *, observed_at: float | None = None):
         super().__init__(message)
         self.stage, self.operation = stage, operation
+        self.observed_at = observed_at
 
 
 def _json(value: Any) -> bytes:
@@ -86,9 +87,34 @@ def _fault(result: dict[str, Any], stage: str, operation: str, error: BaseExcept
         message = str(error).encode('utf-8')[:2048].decode('utf-8', 'ignore')
         result['faults'].append(dict(stage=stage, operation=operation[:64], error_type=type(error).__name__.encode('ascii', 'replace')[:128].decode(),
             errno=error.errno if isinstance(error, OSError) else None, message=message, at=at))
+    for secondary in getattr(error, '_discovery_close_faults', ()):
+        if len(result['faults']) < 16:
+            result['faults'].append(dict(secondary))
     result['custody'] = dict(known_terminal=False, workspace_preserved=True, reason='partial or unknown discovery facts')
     if result['inventory_state'] != 'NOT_STARTED':
         result['inventory_state'] = 'PARTIAL_DATA'
+
+
+def _close_files(descriptors: list[int | None], primary: BaseException | None, stage: str) -> None:
+    """One attempt per owned descriptor; a failed close is an unknown outcome."""
+    first = primary
+    for descriptor in descriptors:
+        if descriptor is None:
+            continue
+        try:
+            os.close(descriptor)
+        except BaseException as error:
+            if first is None:
+                first = error
+            else:
+                faults = getattr(first, '_discovery_close_faults', [])
+                if len(faults) < 4:
+                    message = ('descriptor close unestablished: ' + str(error)).encode('utf-8')[:2048].decode('utf-8', 'ignore')
+                    faults.append(dict(stage=stage, operation=f'close-fd-{descriptor}', error_type=type(error).__name__.encode('ascii', 'replace')[:128].decode(),
+                        errno=error.errno if isinstance(error, OSError) else None, message=message, at=None))
+                    setattr(first, '_discovery_close_faults', faults)
+    if primary is None and first is not None:
+        raise first
 
 
 def _closed(value: Any, keys: str) -> None:
@@ -178,6 +204,36 @@ def _projection(result: dict[str, Any], query: dict[str, Any]) -> tuple[dict[str
     return context, command
 
 
+def _gnu_version(index: int, raw: bytes) -> None:
+    # A deliberately finite DATA syntax, not executable trust or actual compatibility.
+    # GCC's Ubuntu banner identifies the compiler without a literal "GNU" token.
+    version = rb'(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)){1,3}'
+    vendor = rb'\((?:GCC|GNU|Ubuntu [0-9][A-Za-z0-9.+~:-]*)\)'
+    headings = {
+        1: rb'GNU Make ', 2: rb'gcc ' + vendor + rb' ', 3: rb'g\+\+ ' + vendor + rb' ',
+        4: rb'GNU patch ', 5: rb'GNU assembler \(GNU Binutils(?: for Ubuntu)?\) ',
+        6: rb'GNU ld \(GNU Binutils(?: for Ubuntu)?\) ', 7: rb'GNU ar \(GNU Binutils(?: for Ubuntu)?\) ',
+        8: rb'GNU ranlib \(GNU Binutils(?: for Ubuntu)?\) ', 9: rb'GNU readelf \(GNU Binutils(?: for Ubuntu)?\) ',
+    }
+    _require(index in headings and raw.endswith(b'\n') and b'\r' not in raw, 'unsupported version DATA framing')
+    lines = raw.split(b'\n')[:-1]
+    _require(bool(lines) and re.fullmatch(headings[index] + version, lines[0]) is not None, 'unsupported intended GNU tool/version')
+    notices = (
+        rb'', rb'Copyright \(C\) [0-9, -]+ Free Software Foundation, Inc\.',
+        rb'License GPLv[23]\+: GNU GPL version [23] or later <https?://gnu\.org/licenses/gpl\.html>',
+        rb'This is free software: you are free to change and redistribute it\.',
+        rb'There is NO WARRANTY, to the extent permitted by law\.',
+        rb'This is free software; see the source for copying conditions\.  There is NO',
+        rb'warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE\.',
+        rb'This program is free software; you may redistribute it under the terms of',
+        rb'the GNU General Public License version [23] or \(at your option\) a later version\.',
+        rb'This program has absolutely no warranty\.', rb'Built for x86_64[-A-Za-z0-9_]*',
+        rb"This assembler was configured for a target of [`']x86_64[-A-Za-z0-9_]*'\.",
+        rb'Written by [A-Za-z .,\-]+\.',
+    )
+    _require(all(any(re.fullmatch(pattern, line) is not None for pattern in notices) for line in lines[1:]), 'unsupported or ambiguous version DATA tail')
+
+
 def _query(query: Any, index: int, result: dict[str, Any], bundle: Mapping[str, bytes], by_hash: dict[str, bytes]) -> bool:
     _closed(query, 'index argv environment command_binding_sha256 started deadline finished stdout stderr raw_wait_status returncode custody')
     _integer(query['index'], 0, 14)
@@ -234,7 +290,7 @@ def _query(query: Any, index: int, result: dict[str, Any], bundle: Mapping[str, 
             if index == 0:
                 _cmake_root(output)
             elif index < 10:
-                _require(b'GNU' in output, 'unsupported GNU observation')
+                _gnu_version(index, output)
             elif index == 10:
                 _require(re.fullmatch(rb'x86_64-(?:[A-Za-z0-9_]+-)?linux(?:-[A-Za-z0-9_]+)*\n?', output) is not None, 'unsupported target observation')
             elif index == 11:
@@ -422,7 +478,8 @@ def _check_complete(bundle: Mapping[str, bytes], selection: dict[str, Any], resu
     _integer(capacity['observed_free_bytes'], capacity['selection']['minimum_free_bytes'], 2**63 - 1)
     outputs = [by_hash[q['stdout']['sha256']] for q in result['commands']]
     _require(result['module_root'] == _cmake_root(outputs[0]), 'sole fixed prospective module root')
-    _require(all(b'GNU' in raw for raw in outputs[1:10]), 'supported GNU version observations')
+    for index in range(1, 10):
+        _gnu_version(index, outputs[index])
     _require(re.fullmatch(rb'x86_64-(?:[A-Za-z0-9_]+-)?linux(?:-[A-Za-z0-9_]+)*\n?', outputs[10]) is not None and bool(outputs[11]), 'target/specs raw DATA')
     internals = [_internal_path(outputs[index + 12], name) for index, name in enumerate(('cc1', 'cc1plus', 'collect2'))]
     _require([v['path'] for v in result['gcc_internals']] == internals and len({str(PurePosixPath(p).parent) for p in internals}) == 1, 'fixed GCC reply/candidate association')
@@ -457,7 +514,6 @@ def _check_directory_snapshots(bundle: Mapping[str, bytes], result: dict[str, An
     for item in directories:
         _closed(item, 'path before after child_names_sha256')
         _absolute(item['path'])
-        _require(item['path'] in expected_parents, 'unrelated directory snapshot')
         _identity(item['before'], 'directory')
         _identity(item['after'], 'directory')
         _pin(item['child_names_sha256'])
@@ -470,10 +526,32 @@ def _check_directory_snapshots(bundle: Mapping[str, bytes], result: dict[str, An
         _require(item['child_names_sha256'] == _sha(_json(data['before_names'])), 'actual directory child-name digest')
         if complete:
             _require(item['before'] == item['after'] and data['before_names'] == data['after_names'], 'complete directory snapshot changed')
+    # Module directories are a rooted observed graph, not just ancestors of files:
+    # stable empty leaves have no file descendant from which to infer their path.
+    module_dirs: set[str] = set()
+    if result['module_root'] is not None:
+        pending = [result['module_root']]
+        while pending:
+            directory = pending.pop()
+            if directory in module_dirs or directory not in artifacts:
+                continue
+            module_dirs.add(directory)
+            names = artifacts[directory]['before_names']
+            if not complete:
+                names = sorted(set(names) | set(artifacts[directory]['after_names']))
+            for child in names:
+                candidate = posixpath.join(directory, child)
+                if candidate in artifacts:
+                    pending.append(candidate)
+    _require(set(paths).issubset(expected_parents | module_dirs), 'unrelated directory snapshot')
     if complete:
-        _require(set(paths) == expected_parents, 'missing traversed candidate directory snapshot')
+        _require(set(paths) == expected_parents | module_dirs, 'missing traversed candidate directory snapshot')
         module_files = {v['path'] for v in result['modules']}
-        module_dirs = {path for path in paths if PurePosixPath(path).is_relative_to(result['module_root'])}
+        _require({path for path in paths if PurePosixPath(path).is_relative_to(result['module_root'])} == module_dirs
+                 and module_files.isdisjoint(module_dirs), 'unrooted or conflicting module directory/file')
+        for path in module_files:
+            parent = str(PurePosixPath(path).parent)
+            _require(parent in module_dirs and PurePosixPath(path).name in artifacts[parent]['before_names'], 'module file missing from observed parent child set')
         for directory in module_dirs:
             for child in artifacts[directory]['before_names']:
                 _require(posixpath.join(directory, child) in module_files | module_dirs, 'omitted module file/subdirectory or unsupported entry')
@@ -485,11 +563,11 @@ def _directory_fd(path: str) -> int:
     try:
         for part in PurePosixPath(path).parts[1:]:
             next_fd = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
-            os.close(fd)
-            fd = next_fd
+            old_fd, fd = fd, next_fd
+            _close_files([old_fd], None, 'snapshot')
         return fd
-    except BaseException:
-        os.close(fd)
+    except BaseException as error:
+        _close_files([fd], error, 'snapshot')
         raise
 
 
@@ -505,8 +583,11 @@ class _Collection:
         now = time.monotonic()
         if type(now) not in (int, float) or not math.isfinite(now):
             raise DiscoveryHold('clock', 'monotonic', 'unknown original clock')
+        started = self.result['original_started']
+        if started is None or now < started:
+            raise DiscoveryHold('clock', 'original-start', 'observation before or without immutable original start', observed_at=now)
         if now > self.result['deadline']:
-            raise DiscoveryHold('clock', 'original-deadline', 'original discovery bound exhausted')
+            raise DiscoveryHold('clock', 'original-deadline', 'original discovery bound exhausted', observed_at=now)
         return now
 
     def room(self, extra: int = 0, files: int = 0) -> None:
@@ -540,6 +621,7 @@ class _Collection:
     def directory(self, path: str) -> list[str]:
         self.tick()
         fd = _directory_fd(path)
+        primary = None
         try:
             before = _vector(os.fstat(fd))
             _identity(before, 'directory')
@@ -547,8 +629,11 @@ class _Collection:
             after = _vector(os.fstat(fd))
             self.tick()
             _require(before == after and after == _vector(os.lstat(path)), 'directory identity changed during snapshot')
+        except BaseException as error:
+            primary = error
+            raise
         finally:
-            os.close(fd)
+            _close_files([fd], primary, 'snapshot')
         if path in self.directories:
             _require(self.directories[path] == (before, names), 'directory changed between candidates')
         else:
@@ -587,6 +672,7 @@ class _Collection:
         parent = _directory_fd(str(PurePosixPath(path).parent))
         fd = None
         raw = bytearray()
+        primary = None
         try:
             fd = os.open(PurePosixPath(path).name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent)
             before = _vector(os.fstat(fd))
@@ -607,14 +693,13 @@ class _Collection:
             current = _vector(os.stat(PurePosixPath(path).name, dir_fd=parent, follow_symlinks=False))
             _require(before == after == current and len(raw) == before[5], 'file identity/hash-length observation unstable')
             return bytes(raw), before, after
-        except BaseException:
+        except BaseException as error:
+            primary = error
             if raw and 'journal/partial-file.bin' not in self.payload:
                 self.payload['journal/partial-file.bin'] = (bytes(raw[:15 * MAX_METADATA]), 'failure-prefix')
             raise
         finally:
-            if fd is not None:
-                os.close(fd)
-            os.close(parent)
+            _close_files([fd, parent], primary, 'snapshot')
 
     def snapshot(self, path: str, role: str, roots: list[str] | None = None) -> dict[str, Any]:
         resolved, links = self.resolve(path)
@@ -636,11 +721,15 @@ class _Collection:
         for index, (path, (before, names)) in enumerate(sorted(self.directories.items())):
             self.tick()
             fd = _directory_fd(path)
+            primary = None
             try:
                 after = _vector(os.fstat(fd))
                 after_names = self.names(fd)
+            except BaseException as error:
+                primary = error
+                raise
             finally:
-                os.close(fd)
+                _close_files([fd], primary, 'snapshot')
             changed |= before != after or names != after_names
             self.result['directory_snapshots'].append(dict(path=path, before=before, after=after, child_names_sha256=_sha(_json(names))))
             self.add(f'directories/{index:05}.json', _json(dict(path=path, before_names=names, after_names=after_names)), 'metadata')
@@ -844,7 +933,7 @@ def _collect(collection: _Collection, selection: dict[str, Any], appointed: dict
             result['module_root'] = _cmake_root(output)
             _modules(collection, result['module_root'])
         elif index < 10:
-            _require(b'GNU' in output, 'unsupported fixed GNU version observation')
+            _gnu_version(index, output)
         elif index == 10:
             _require(re.fullmatch(rb'x86_64-(?:[A-Za-z0-9_]+-)?linux(?:-[A-Za-z0-9_]+)*\n?', output) is not None, 'unsupported compiler target DATA')
         elif index == 11:
@@ -864,15 +953,17 @@ def _collect(collection: _Collection, selection: dict[str, Any], appointed: dict
 def _write(root: Path, relative: str, raw: bytes, tick: Any = None) -> None:
     _require(_build._safe_name(relative), 'safe owned output path')
     parent = _directory_fd(str(root))
+    primary = None
     try:
         parts = relative.split('/')
         for part in parts[:-1]:
             try: os.mkdir(part, 0o700, dir_fd=parent)
             except FileExistsError: pass
             next_fd = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
-            os.close(parent)
-            parent = next_fd
+            old_parent, parent = parent, next_fd
+            _close_files([old_parent], None, 'export')
         fd = os.open(parts[-1], os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=parent)
+        write_error = None
         try:
             for offset in range(0, len(raw), 65536):
                 if tick is not None: tick()
@@ -882,9 +973,13 @@ def _write(root: Path, relative: str, raw: bytes, tick: Any = None) -> None:
                     _require(count > 0, 'output writer made no progress')
                     block = block[count:]
                 if tick is not None: tick()
+        except BaseException as error:
+            write_error = error
+            raise
         finally:
-            os.close(fd)
+            _close_files([fd], write_error, 'export')
         fd = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent)
+        readback_error = None
         try:
             before, observed = _vector(os.fstat(fd)), bytearray()
             while True:
@@ -896,10 +991,16 @@ def _write(root: Path, relative: str, raw: bytes, tick: Any = None) -> None:
                 _require(len(observed) <= len(raw), 'output readback grew')
             _require(bytes(observed) == raw and before == _vector(os.fstat(fd)), 'stable exact owned output readback')
             os.fchmod(fd, 0o444)
+        except BaseException as error:
+            readback_error = error
+            raise
         finally:
-            os.close(fd)
+            _close_files([fd], readback_error, 'export')
+    except BaseException as error:
+        primary = error
+        raise
     finally:
-        os.close(parent)
+        _close_files([parent], primary, 'export')
 
 
 def _export(collection: _Collection) -> None:
@@ -986,8 +1087,14 @@ def discover_linux_tools(selection: Mapping[str, Any], owned_parent: Path) -> di
         usage = os.statvfs(owned_parent.parent)
         _require(usage.f_bavail * usage.f_frsize >= appointed['capacity']['minimum_free_bytes'], 'independently selected capacity unestablished')
         parent = _directory_fd(str(owned_parent.parent))
-        try: os.mkdir(owned_parent.name, 0o700, dir_fd=parent)
-        finally: os.close(parent)
+        setup_error = None
+        try:
+            os.mkdir(owned_parent.name, 0o700, dir_fd=parent)
+        except BaseException as error:
+            setup_error = error
+            raise
+        finally:
+            _close_files([parent], setup_error, 'setup')
         result['inventory_state'] = 'PARTIAL_DATA'
         for name in ('home', 'tmp', 'journal', 'export'):
             os.mkdir(str(owned_parent / name), 0o700)
@@ -1003,7 +1110,8 @@ def discover_linux_tools(selection: Mapping[str, Any], owned_parent: Path) -> di
             _number(at, False)
         except BaseException:
             at = None
-        _fault(result, error.stage if isinstance(error, DiscoveryHold) else stage, error.operation if isinstance(error, DiscoveryHold) else 'discovery', error, at)
+        fault_at = error.observed_at if isinstance(error, DiscoveryHold) and error.observed_at is not None else at
+        _fault(result, error.stage if isinstance(error, DiscoveryHold) else stage, error.operation if isinstance(error, DiscoveryHold) else 'discovery', error, fault_at)
         result['finished'] = at
         if collection is not None and result['inventory_state'] != 'NOT_STARTED':
             try:

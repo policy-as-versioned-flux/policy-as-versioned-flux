@@ -30,11 +30,24 @@ internal replies are retained canonical DATA under the sole selected GCC version
 directory and are never executed. Already-loaded bootstrap candidates under
 independently selected roots are DATA, without runtime-closure inference.
 
+Version DATA uses finite per-selector syntax: GNU Make/patch, the precise Binutils
+tool name, or gcc/g++ with GCC, GNU or an explicitly shaped Ubuntu package heading,
+followed by a canonical dotted numeric version. No new minimum is imposed. Only
+the selected notice-line grammar may follow the unique heading; wrong tools,
+duplicate headings, unknown tails and unsupported variants hold with raw bytes
+preserved. A substring `GNU` is insufficient, and Ubuntu compiler headings need
+not contain it. This syntax is prospective: actual output compatibility remains
+unproved until separately appointed observation. Banner matching is not trust.
+
 The nine-integer stat vector is, in order:
 `dev, ino, mode, uid, gid, size, mtime_ns, ctime_ns, nlink`. Candidate routes include
 ordered raw symlink targets and link vectors. Stable no-follow descriptor reads,
 pre/post vectors, path readback, hashes and lengths bind candidate bytes. Directory
 names are bounded while enumerated, sorted, retained and compared before/after.
+The pure checker reconstructs the rooted module-directory child-name graph,
+including empty leaves/nested directories. Each module file must appear in its
+observed parent's list. Missing/unrooted paths, traversal/cycles, conflicting
+file/directory roles and unsafe identities cannot form complete DATA.
 
 Parent T0 precedes startup. D is exactly `min(T0+60, original A deadline)` and
 includes setup, reads, queries, custody and export. Each query has its original
@@ -44,6 +57,9 @@ remain after that allowance. The accepted supervisor has one private keyword,
 10 at its internal pre-Popen admission. Existing build callers retain default 0.
 This check is not an atomic real-time or blocking-call guarantee. Late/unknown
 observations hold and never receive fresh time.
+Time before immutable T0 is refused before workspace acquisition. Its exact
+invalid observation is retained in the first fault, without substituting the
+later terminal observation or resetting the parent clock.
 
 Actual supervisor command ids, phase, clocks, nullable bindings and raw wait
 facts are conserved. The pure checker reconstructs the normative projection;
@@ -77,6 +93,11 @@ retains a finite diagnostic prefix and first-failure record without pretending t
 be a checker-approved complete bundle. Failed export invalidates complete state;
 actual late/null clocks remain unchanged. Cancellation is retained/re-raised after
 best-effort finite retention. No workspace is swept or deleted.
+Owned descriptor cleanup attempts each known descriptor once. Secondary close
+failure preserves/re-raises the first actual exception, including cancellation,
+and retains a bounded secondary Fault with unknown time/close outcome. With no
+earlier failure, close failure itself fails the operation. Failed close is never
+claimed successful; no close retry or process-cleanup authority is introduced.
 
 Every result, including COMPLETE_DATA, has
 `build_hold=H_PROBE_EXECUTION_UNESTABLISHED`, `build_complete=false` and
