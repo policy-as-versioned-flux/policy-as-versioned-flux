@@ -712,6 +712,47 @@ def validate_closure(rows: Any) -> dict[str,int]:
     return {'files':len(rows),'bytes':total}
 
 
+# CI keeps every ordinary closure invariant; only the one retained module may be empty.
+def _ci_empty_urllib(row: Any) -> bool:
+    return (type(row) is dict and type(row.get('bytes')) is int and row=={
+        'source':'/usr/lib/python3.12/urllib/__init__.py','target':'/usr/lib/python3.12/urllib/__init__.py',
+        'bytes':0,'sha256':'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855','elf':None})
+
+
+def validate_ci_closure(rows: Any) -> dict[str,int]:
+    if not isinstance(rows,list) or not rows or len(rows)>MAX_FILES:raise ValueError('bounded actual file closure required')
+    targets={};sources=set();total=0
+    for row in rows:
+        if not isinstance(row,dict) or set(row)!={'source','target','bytes','sha256','elf'}:
+            raise ValueError('closed actual closure member required')
+        source,target=row['source'],row['target']
+        if (not isinstance(source,str) or not isinstance(target,str) or not target.startswith('/')
+                or str(Path(target))!=target or '..' in Path(target).parts or target in targets
+                or source in sources or type(row['bytes']) is not int or (row['bytes']<=0 and not _ci_empty_urllib(row))
+                or not isinstance(row['sha256'],str) or len(row['sha256'])!=64
+                or any(c not in '0123456789abcdef' for c in row['sha256'])):
+            raise ValueError('canonical unique actual closure bytes/pins required')
+        targets[target]=row;sources.add(source);total+=row['bytes']
+    if total>MAX_BYTES:raise ValueError('tiny closure exceeds 256MiB')
+    for row in rows:
+        elf=row['elf']
+        if elf is None:continue
+        if not isinstance(elf,dict) or set(elf)!={'interpreter','needed'} or not isinstance(elf['needed'],list):
+            raise ValueError('actual ELF dependency facts required')
+        if elf['interpreter'] is not None and elf['interpreter'] not in targets:
+            raise ValueError('actual ELF interpreter absent from closure')
+        if _ci_empty_urllib(targets.get('/usr/lib/python3.12/urllib/__init__.py')) and elf['interpreter']=='/usr/lib/python3.12/urllib/__init__.py':
+            raise ValueError('empty urllib module cannot be an ELF interpreter')
+        for needed in elf['needed']:
+            if not isinstance(needed,str) or len([p for p in targets if Path(p).name==needed])!=1:
+                raise ValueError('missing or ambiguous actual ELF NEEDED member')
+            if needed=='__init__.py' and _ci_empty_urllib(targets.get('/usr/lib/python3.12/urllib/__init__.py')):
+                raise ValueError('empty urllib module cannot be an ELF dependency')
+    if '/usr/bin/python3.12' not in targets or targets['/usr/bin/python3.12']['elf'] is None:
+        raise ValueError('actual OS Python3.12 ELF required')
+    return {'files':len(rows),'bytes':total}
+
+
 def control_guardian(g: Any, request: dict[str,Any], host: dict[str,Any],
                      profile: dict[str,Any], supervisor: Any) -> Any:
     # Fixed source route, never a production config branch. Backend/paths are
@@ -862,11 +903,15 @@ def _load_control_host(g: Any, scenario: str, caller: Any, ci:bool) -> tuple[dic
     if not isinstance(anchor,dict) or set(anchor)!={'schema','files'} or anchor['schema']!=SCHEMA:
         raise ValueError('fixed TEST_ONLY anchor schema required')
     rows=anchor['files']
-    validate_closure(rows)
+    if ci:validate_ci_closure(rows)
+    else:validate_closure(rows)
     observed=[];inodes=set()
     for row in rows:
         raw=g.protected_read(row['source'],row['sha256'],MAX_BYTES)
         info=g.protected_path(row['source'],True)
+        if ci and _ci_empty_urllib(row) and (type(info.st_size) is not int or info.st_size!=0
+                or type(raw) is not bytes or raw!=b'' or hashlib.sha256(raw).hexdigest()!=row['sha256']):
+            raise ValueError('fixed empty urllib stat/bytes association changed')
         if len(raw)!=row['bytes'] or elf_dependencies(raw)!=row['elf']:
             raise ValueError('actual closure bytes/ELF dependency metadata differ')
         identity=(info.st_dev,info.st_ino)

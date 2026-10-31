@@ -129,7 +129,17 @@ protected closure member fails the unchanged `0 < size <= 256MiB` predicate.
 It records the asked source, initial jail target, observed roles and stat facts
 before reading that member, then persists protected `suite/installation.json`
 as REFUSED and exports FAIL with prior source/caller/context/principal/kernel
-records. Zero-size files remain refused. Unknown stat/read/close, caller,
+records. Other zero-size files remain refused. Unknown stat/read/close, caller,
 persistence, tamper and deadline errors do not enter that diagnostic branch.
 The actual refused member and size remain unknown until a separately authorized
 original capture retains them; portable models do not establish that cause.
+
+The CI-only closure validator admits exactly one observed empty Python source:
+`/usr/lib/python3.12/urllib/__init__.py`, with identical source/target, integer
+zero bytes, the empty SHA256 and null ELF metadata. Discovery requires its sole
+observed role to be loaded-module, reads the actual protected empty bytes, and
+retains the row and inode checks. Later CI host loading reacquires and matches
+zero stat, bytes and hash. The zero module cannot satisfy ELF loader/NEEDED
+relations. All ordinary closure validation and ordinary guardian bootstrap stay
+strict; the CI path passes the installed guardian directly. This source does
+not establish any native subcase, runtime qualification or execution permission.

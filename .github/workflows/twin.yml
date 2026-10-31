@@ -153,7 +153,7 @@ jobs:
           started=time.monotonic()
           import hashlib,json,os,signal,stat,sys
           STORE='/var/lib/policy-as-versioned-flux-linux-control'
-          REVIEWED_MANIFEST='8562b755b7f7a32dde41e64a2ecbca125bbe46aed2526632383e8545cbe988b4'
+          REVIEWED_MANIFEST='61778692f6b45fdfae0d60f7a342d9523f9d78f0d4f28cdf99faf7d9bb281733'
           NAMES=('linux_guardian.py','linux_lease_control.py','linux_lease_control_child.py','linux_lease_control_entry','linux_lease_control_ci.py','linux_lease_control_ci_entry','linux_network.py','linux_runtime_filter.py','qwen_backend.py')
           deadline=started+900
 

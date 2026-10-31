@@ -46,7 +46,7 @@ def model(monkeypatch, size=0):
         storage[path]=raw
     monkeypatch.setattr(m,'write_fixed',write)
     g=SimpleNamespace(protected_path=protected_path,protected_read=protected_read)
-    control=SimpleNamespace(elf_dependencies=lambda raw:None,validate_closure=lambda rows:{'files':len(rows)},
+    control=SimpleNamespace(elf_dependencies=lambda raw:None,validate_closure=lambda rows:{'files':len(rows)},validate_ci_closure=lambda rows:{'files':len(rows)},
         ci_principal_facts=lambda *args:{'PURE_TEST_ONLY_principal':39},
         CiPrincipalRejected=type('PrincipalRejected',(ValueError,),{}),CiPrerequisiteUnavailable=type('Unavailable',(ValueError,),{}))
     caller=SimpleNamespace(verify=lambda:None,close=lambda:closed.append(True))

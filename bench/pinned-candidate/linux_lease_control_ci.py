@@ -35,7 +35,7 @@ def admission_reference(value:Any)->dict[str,Any]:
 
 
 def validate_os_closure(rows:Any,loaded:set[str],control:Any)->dict[str,int]:
-    facts=control.validate_closure(rows)
+    facts=control.validate_ci_closure(rows)
     sources={row['source'] for row in rows}
     if not loaded<=sources:raise ValueError('actual loaded source/native alias absent from closure')
     for row in rows:
@@ -383,15 +383,17 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
     for path in sorted(paths):
         budget.require_work(time.monotonic())
         info=g.protected_path(path,True)
-        if info.st_size<=0 or info.st_size>256*1024**2:
+        roles=[]
+        if path=='/usr/bin/python3.12':roles.append('interpreter')
+        if path in modules:roles.append('loaded-module')
+        if path in caches:roles.append('bytecode-cache')
+        if path in mapped:roles.append('native-mapping')
+        if path.startswith(STORE+'/source/'):roles.append('fixed-source')
+        empty_urllib=(path=='/usr/lib/python3.12/urllib/__init__.py' and roles==['loaded-module']
+            and type(info.st_size) is int and info.st_size==0)
+        if (info.st_size<=0 or info.st_size>256*1024**2) and not empty_urllib:
             observed=time.monotonic();budget.require_work(observed)
             target='/app/'+Path(path).name if path.startswith(STORE+'/source/') else path
-            roles=[]
-            if path=='/usr/bin/python3.12':roles.append('interpreter')
-            if path in modules:roles.append('loaded-module')
-            if path in caches:roles.append('bytecode-cache')
-            if path in mapped:roles.append('native-mapping')
-            if path.startswith(STORE+'/source/'):roles.append('fixed-source')
             stat_facts={'device':info.st_dev,'inode':info.st_ino,'mode':info.st_mode,'uid':info.st_uid,
                 'gid':info.st_gid,'links':info.st_nlink,'size':info.st_size,
                 'mtime_ns':info.st_mtime_ns,'ctime_ns':info.st_ctime_ns}
@@ -403,6 +405,9 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
         if identity in identities:raise ValueError('ambiguous loaded inode alias')
         identities.add(identity)
         raw=g.protected_read(path,maximum=256*1024**2)
+        if path=='/usr/lib/python3.12/urllib/__init__.py' and (info.st_size==0 or raw==b'') and (
+                not empty_urllib or type(raw) is not bytes or raw!=b'' or sha(raw)!='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'):
+            raise ValueError('observed empty urllib bytes changed after stat')
         records[path]={'source':path,'target':'/app/'+Path(path).name if path.startswith(STORE+'/source/') else path,
             'bytes':len(raw),'sha256':sha(raw),'elf':control.elf_dependencies(raw)}
         if len(records)>4096 or sum(row['bytes'] for row in records.values())>256*1024**2:
