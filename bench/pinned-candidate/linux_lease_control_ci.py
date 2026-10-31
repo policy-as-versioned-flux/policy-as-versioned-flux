@@ -830,12 +830,30 @@ def validate_ci_caller_record(value:Any)->None:
         if not isinstance(item,dict) or set(item)!=set(names.split()):raise ValueError('closed caller evidence keys required')
     def integer(item:Any,low:int,high:int)->None:
         if type(item) is not int or not low<=item<=high:raise ValueError('bounded caller evidence integer required')
-    def raw(item:Any,cap:int)->None:
+    def raw(item:Any,cap:int)->bytes:
         keys(item,'bytes sha256 base64 complete');integer(item['bytes'],0,cap)
         if type(item['complete']) is not bool or not isinstance(item['base64'],str):raise ValueError('raw caller bytes required')
         decoded=base64.b64decode(item['base64'],validate=True)
         if base64.b64encode(decoded).decode('ascii')!=item['base64'] or len(decoded)!=item['bytes'] or sha(decoded)!=item['sha256']:
             raise ValueError('exact raw caller bytes required')
+        return decoded
+    def status_facts(data:bytes)->dict[str,Any]:
+        fields={}
+        for line in data.decode('ascii').splitlines():
+            if ':' not in line:raise ValueError('parseable retained status required')
+            key,text=line.split(':',1)
+            if key in fields:raise ValueError('unique retained status fields required')
+            fields[key]=text.split()
+        if any(len(fields.get(key,[]))!=size for key,size in (('Pid',1),('PPid',1),('Uid',4))):
+            raise ValueError('complete retained identity fields required')
+        return {'pid':_CallerRoute.number(fields['Pid'][0],2**31-1),
+            'ppid':_CallerRoute.number(fields['PPid'][0],2**31-1),
+            'uid':[_CallerRoute.number(x,4294967294) for x in fields['Uid']]}
+    def stat_facts(data:bytes,pid:int)->dict[str,Any]:
+        head,tail=data.decode('ascii').rsplit(')',1);fields=tail.split()
+        if not head.startswith(str(pid)+' (') or len(fields)<20:raise ValueError('matching retained stat PID required')
+        if _CallerRoute.number(fields[19],2**64-1)==0:raise ValueError('nonzero retained start required')
+        return {'ppid':_CallerRoute.number(fields[1],2**31-1),'start':fields[19]}
     def file(item:Any)->None:
         keys(item,'device inode mode owner_uid owner_gid nlink size mtime_ns ctime_ns')
         for field in item:integer(item[field],0,2**64-1)
@@ -854,14 +872,17 @@ def validate_ci_caller_record(value:Any)->None:
     if verified:
         integer(value['invoker_uid'],1,4294967294);integer(value['selected_pid'],2,2**31-1)
         if not finished<deadline or value['reason'] not in reasons[:2]:raise ValueError('verified caller timeline required')
-    elif value['invoker_uid'] is not None or value['selected_pid'] is not None:raise ValueError('refused evidence cannot select caller')
+    elif value['invoker_uid'] is not None or value['selected_pid'] is not None or value['reason'] in reasons[:2]:raise ValueError('refused evidence cannot select caller')
     if value['next_pid'] is not None:integer(value['next_pid'],0,2**31-1)
     snapshots=value['snapshots']
     if not isinstance(snapshots,list) or len(snapshots)>8:raise ValueError('bounded snapshots required')
+    previous_at=began
     for snapshot in snapshots:
         keys(snapshot,'pass node at requested_pid pidfd_live_before pidfd_live_after identity executable raw')
         integer(snapshot['pass'],0,1);integer(snapshot['node'],0,3);integer(snapshot['requested_pid'],2,2**31-1)
-        if not began<=finite(snapshot['at'])<=finished:raise ValueError('snapshot timeline required')
+        at=finite(snapshot['at'])
+        if not previous_at<=at<=finished:raise ValueError('ordered snapshot timeline required')
+        previous_at=at
         for field in ('pidfd_live_before','pidfd_live_after'):
             if snapshot[field] is not None and type(snapshot[field]) is not bool:raise ValueError('liveness facts required')
             if verified and snapshot[field] is not True:raise ValueError('live verified snapshot required')
@@ -881,11 +902,23 @@ def validate_ci_caller_record(value:Any)->None:
             file(executable['named_file']);file(executable['image_file'])
             if verified and executable['named_file']!=executable['image_file']:raise ValueError('bound executable image required')
         keys(snapshot['raw'],'status stat exe')
+        decoded={}
         for name,cap in (('status',65536),('stat',8192),('exe',4096)):
             item=snapshot['raw'][name]
-            if item is not None:raw(item,cap)
+            if item is not None:decoded[name]=raw(item,cap)
             if verified and (item is None or item['complete'] is not True):raise ValueError('complete verified raw snapshot required')
         if verified and (identity is None or executable is None):raise ValueError('complete verified snapshot required')
+        if verified and executable['named_file']['mode']&0o022:raise ValueError('immutable verified executable required')
+        # Missing/malformed observations may have null parsed facts in a real
+        # refusal. A provided fact must agree with every complete retained input.
+        if identity is not None:
+            for name,parser in (('status',status_facts),('stat',lambda data:stat_facts(data,snapshot['requested_pid']))):
+                item=snapshot['raw'][name]
+                if item is not None and item['complete']:
+                    facts=parser(decoded[name])
+                    if any(identity[key]!=fact for key,fact in facts.items()):raise ValueError('raw and parsed caller identity disagree')
+        if executable is not None and snapshot['raw']['exe'] is not None and snapshot['raw']['exe']['complete']:
+            if executable['path'].encode('utf-8')!=decoded['exe']:raise ValueError('raw and parsed executable disagree')
     faults=value['faults']
     if not isinstance(faults,list) or len(faults)>13 or verified and faults:raise ValueError('bounded truthful faults required')
     for fault in faults:
@@ -909,6 +942,24 @@ def validate_ci_caller_record(value:Any)->None:
             or custody['opened']['minimum']>custody['closed']['maximum']+custody['unresolved_ownership_upper_bound']+custody['transferred_to_coordinator']
             or custody['unresolved_ownership_upper_bound']<custody['close_failures']
             or custody['unresolved_ownership_upper_bound']>custody['peak_live_upper_bound']):raise ValueError('consistent custody intervals required')
+    # Positions are one forward prefix followed by one reverse prefix over the
+    # same held nodes. A failed pin can add a node before its first snapshot.
+    positions=[(item['pass'],item['node']) for item in snapshots]
+    forward=[item for item in snapshots if item['pass']==0]
+    reverse=[item for item in snapshots if item['pass']==1]
+    n=custody['node_count'];count=len(forward)
+    if (len(set(positions))!=len(positions) or not 0<=n-count<=1
+            or positions!=[(0,i) for i in range(count)]+[(1,i) for i in range(n-1,n-1-len(reverse),-1)]
+            or reverse and count!=n):raise ValueError('unique ordered caller snapshot prefixes required')
+    if len({item['requested_pid'] for item in forward})!=count:raise ValueError('unique observed caller tasks required')
+    for child,parent in zip(forward,forward[1:]):
+        if child['identity'] is not None and parent['identity'] is not None:
+            if child['identity']['ppid']!=parent['identity']['pid']:raise ValueError('connected observed caller edges required')
+    for item in reverse:
+        first=forward[item['node']]
+        if item['requested_pid']!=first['requested_pid']:raise ValueError('same held reverse caller task required')
+        if verified and (item['identity']!=first['identity'] or item['executable']!=first['executable']):
+            raise ValueError('unchanged verified reverse identity and image required')
     if verified:
         n=3 if value['reason']=='matched-one-sudo' else 4
         if (custody['node_count']!=n or custody['opened']!={'minimum':16*n,'maximum':16*n}
@@ -918,8 +969,23 @@ def validate_ci_caller_record(value:Any)->None:
         if [(s['pass'],s['node']) for s in snapshots]!=[(0,i) for i in range(n)]+[(1,i) for i in range(n-1,-1,-1)]:
             raise ValueError('two ordered passes required')
         if value['final_live']!=[True]*n or any(type(x) is not bool for x in value['final_live']):raise ValueError('complete final liveness required')
+        # Raw-consistent rows still need the exact source-appointed role grammar;
+        # neither a summary UID/PID nor agreeing but disconnected rows suffice.
+        own,endpoint=forward[0],forward[-1]
+        user=forward[1]['identity']['uid'][0]
+        if (own['identity']['uid']!=[0]*4 or own['executable']['path']!='/usr/bin/python3.12'
+                or own['executable']['named_file']['mode']&0o6000
+                or not 1<=user<=4294967294):raise ValueError('root self and nonroot sudo real UID required')
+        for item in forward[1:-1]:
+            if (item['identity']['uid']!=[user,0,0,0] or item['executable']['path']!='/usr/bin/sudo'
+                    or item['executable']['named_file']['mode']&0o6000!=0o4000
+                    or item['executable']!=forward[1]['executable']):raise ValueError('same-user protected sudo transitions required')
+        if (endpoint['identity']['uid']!=[user]*4 or endpoint['executable']['path']=='/usr/bin/sudo'
+                or endpoint['executable']['named_file']['mode']&0o6000
+                or value['invoker_uid']!=user or value['selected_pid']!=endpoint['identity']['pid']
+                or value['next_pid']!=endpoint['identity']['pid']):raise ValueError('matching observed endpoint and summary required')
     elif custody['transferred_to_coordinator']!=0:raise ValueError('refused custody cannot transfer')
-    elif value['final_live'] is not None and (not isinstance(value['final_live'],list) or len(value['final_live'])>4 or any(type(x) is not bool for x in value['final_live'])):
+    elif value['final_live'] is not None and (not isinstance(value['final_live'],list) or len(value['final_live'])>n or any(type(x) is not bool for x in value['final_live'])):
         raise ValueError('bounded final liveness required')
     if len(canonical(value))>1024**2:raise ValueError('bounded caller record required')
 
