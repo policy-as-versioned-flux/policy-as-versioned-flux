@@ -5,6 +5,7 @@ import pytest
 
 from twin import source_metadata as sm
 from twin import source_metadata_migration as migration
+from twin import source_native_observation as native
 
 
 def retained_legacy(optional=None):
@@ -227,6 +228,7 @@ def test_changed_raw_and_partial_actual_closure_reject_before_child(monkeypatch)
     def forbidden(*args,**kwargs):
         raise AssertionError('no child may run')
     monkeypatch.setattr(migration.subprocess,'Popen',forbidden)
+    monkeypatch.setattr(native,'_acquire_actual',forbidden)
     with pytest.raises(ValueError,match='parent'):
         migration.execute_new_extraction(plan,b'B')
     plan['purpose']='actual'
@@ -234,7 +236,7 @@ def test_changed_raw_and_partial_actual_closure_reject_before_child(monkeypatch)
     raw=sm.canonical(config);plan['configuration_sha256']=sm.sha256(raw);plan['archive'][sm.sha256(raw)]=raw
     closure=sm._json(plan['archive'][plan['implementation_artifact_sha256']]);closure['purpose']='actual'
     raw=sm.canonical(closure);plan['implementation_artifact_sha256']=sm.sha256(raw);plan['archive'][sm.sha256(raw)]=raw
-    with pytest.raises(ValueError,match='actual.*closure'):
+    with pytest.raises(ValueError,match='^independently selected actual host authority required$'):
         migration.execute_new_extraction(plan,b'A')
 
 
@@ -319,7 +321,8 @@ def test_forged_complete_declaration_and_arbitrary_platform_files_do_not_mint_ac
     def forbidden(*args,**kwargs):
         raise AssertionError('forged declaration must reject before actual process')
     monkeypatch.setattr(migration.subprocess,'Popen',forbidden)
-    with pytest.raises(ValueError,match='actual.*(observation|closure)'):
+    monkeypatch.setattr(native,'_acquire_actual',forbidden)
+    with pytest.raises(ValueError,match='^independently selected actual host authority required$'):
         migration.execute_new_extraction(plan,b'A')
 
 

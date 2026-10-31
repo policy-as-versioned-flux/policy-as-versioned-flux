@@ -74,12 +74,15 @@ def main():
     config = json.loads(Path(config_path).read_bytes())
     # Capture before and after: source data cannot add undeclared imports/resources.
     before = runtime_files()
-    Path(runtime_path).write_bytes(canonical(before))
+    os.umask(0o077)
+    fd = os.open(runtime_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_CLOEXEC, 0o600)
+    with os.fdopen(fd, 'wb') as runtime:
+        runtime.write(canonical(before))
     raw = Path(input_path).read_bytes()
     if len(raw) > config['limits']['input_bytes']:
         raise ValueError('input-limit')
     text = raw.decode('utf-8', errors='strict')
-    fd = os.open(syntax_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    fd = os.open(syntax_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_CLOEXEC, 0o600)
     with os.fdopen(fd, 'wb') as syntax:
         if config['profile'] == 'utf8-identity/1':
             sys.stdout.buffer.write(raw)
