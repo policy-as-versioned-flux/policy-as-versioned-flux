@@ -346,7 +346,7 @@ def test_initial_source_integrity_failure_is_not_a_neutral_skip():
         def refused(*args):raise error
         return {'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),
             'control':control,'g':None,'caller':None,'installed_module':refused,'manifest':{},'base':{},'outcome':None,
-            'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'persist_observation':lambda *args:None,
+            'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'ClosureNeededRefused':m.ClosureNeededRefused,'persist_observation':lambda *args:None,
             'Path':Path,'STORE':m.STORE,'canonical':m.canonical}
     code=compile(ast.Module(body=[stage],type_ignores=[]),'TEST_ONLY-initial-stage','exec')
     for error in (ValueError('actual source member bytes differ from reviewed manifest'),
@@ -451,7 +451,7 @@ def test_initial_stage_keeps_observed_kernel_and_principal_when_later_discovery_
     scope={'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),'g':g,'caller':None,
         'control':SimpleNamespace(ci_principal_facts=lambda *args:{'TEST_ONLY_principal':65534},CiPrerequisiteUnavailable=MissingNative,CiPrincipalRejected=type("PrincipalRejected",(ValueError,),{})),
         'installed_module':lambda *args:None,'manifest':{},'base':base,'outcome':None,
-        'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'persist_observation':m.persist_observation,
+        'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'ClosureNeededRefused':m.ClosureNeededRefused,'persist_observation':m.persist_observation,
         'admit_ci_root':lambda *args:{'TEST_ONLY_controllers':['memory','cpu','cpuset','pids']},
         'discover_closure':refused,'Path':Path,'STORE':str(tmp_path),'canonical':m.canonical}
     with pytest.raises(ValueError,match='mapping integrity'):exec(compile(ast.Module(body=[stage],type_ignores=[]),'TEST_ONLY-stage','exec'),scope)
@@ -555,7 +555,7 @@ def test_initial_literal_absence_is_neutral_skip_with_original_absence_record(mo
     stage=next(node for node in main.body if isinstance(node,ast.Try) and any(
         isinstance(call,ast.Call) and isinstance(call.func,ast.Name) and call.func.id=='installed_module' for call in ast.walk(node)))
     scope={'time':time,'budget':m.SuiteBudget(100.,1000.),'g':g,'caller':None,'control':c,'installed_module':lambda *args:None,
-        'manifest':{},'base':base,'outcome':None,'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,
+        'manifest':{},'base':base,'outcome':None,'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'ClosureNeededRefused':m.ClosureNeededRefused,
         'persist_observation':m.persist_observation,'admit_ci_root':m.admit_ci_root}
     exec(compile(ast.Module(body=[stage],type_ignores=[]),'TEST_ONLY-initial-absence-stage','exec'),scope)
     assert scope['outcome']['status']=='SKIP' and scope['outcome']['executed'] is False

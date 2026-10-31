@@ -361,6 +361,13 @@ class ClosureStatRefused(ValueError):
         self.facts=facts
 
 
+class ClosureNeededRefused(ValueError):
+    """The actual mapped-basename NEEDED predicate failed; no alias is inferred."""
+    def __init__(self,facts:dict[str,Any]):
+        super().__init__('missing/ambiguous actually mapped ELF NEEDED')
+        self.facts=facts
+
+
 def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,Any]],dict[str,Any]]:
     """Acquire actual existing OS bytes and native mappings, never execute ldd."""
     import os,sys,time
@@ -379,7 +386,7 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
             if fields[5].endswith(' (deleted)'):raise ValueError('deleted native mapping')
             mapped.add(fields[5]);paths.add(fields[5]);loaded.add(fields[5])
     for name in MEMBERS:paths.add(STORE+'/source/'+name)
-    records={};identities=set()
+    records={};identities=set();acquired_metadata={}
     for path in sorted(paths):
         budget.require_work(time.monotonic())
         info=g.protected_path(path,True)
@@ -410,6 +417,7 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
             raise ValueError('observed empty urllib bytes changed after stat')
         records[path]={'source':path,'target':'/app/'+Path(path).name if path.startswith(STORE+'/source/') else path,
             'bytes':len(raw),'sha256':sha(raw),'elf':control.elf_dependencies(raw)}
+        acquired_metadata[path]={'device':info.st_dev,'inode':info.st_ino,'stat_bytes':info.st_size,'roles':sorted(roles)}
         if len(records)>4096 or sum(row['bytes'] for row in records.values())>256*1024**2:
             raise ValueError('OS closure exceeds fixed file/byte bounds')
     # PT_INTERP may be a symlink alias on the host. Pin the actually mapped
@@ -427,7 +435,23 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
             selected['target']=interpreter
         for needed in elf['needed']:
             matches=[path for path in mapped if Path(path).name==needed]
-            if len(matches)!=1:raise ValueError('missing/ambiguous actually mapped ELF NEEDED')
+            if len(matches)!=1:
+                observed=time.monotonic();budget.require_work(observed)
+                diagnostic_paths=sorted(set(mapped)|{row['source']})
+                for path in diagnostic_paths:
+                    if any(type(acquired_metadata[path][key]) is not int or acquired_metadata[path][key]<0
+                            for key in ('device','inode','stat_bytes')):raise ValueError('unknown acquired ELF path metadata')
+                failure_facts={'stage':'discover-closure-ELF-needed-match','owner':row,
+                    'owner_metadata':acquired_metadata[row['source']],'needed':needed,
+                    'mapped_paths':sorted(mapped),'matches':sorted(matches),'match_count':len(matches),
+                    'mapped_records':[{'member':records[path],'metadata':acquired_metadata[path]} for path in sorted(mapped)],
+                    'native_maps_sha256':sha(maps.encode()),'original_started':budget.started,'original_deadline':budget.deadline,
+                    'observed_monotonic':observed,'bounds':{'required_matches':1,'closure_files':4096,
+                        'closure_bytes':256*1024**2,'diagnostic_bytes':MAX_FILE-65536}}
+                retained=canonical(failure_facts)
+                if len(retained)>MAX_FILE-65536:raise ValueError('ELF NEEDED diagnostic metadata exceeds fixed bound')
+                budget.require_work(time.monotonic())
+                raise ClosureNeededRefused(json.loads(retained))
     rows=list(records.values());facts:dict[str,Any]=dict(validate_os_closure(rows,loaded,control))
     facts.update({'native_maps_sha256':sha(maps.encode()),'loaded_sources':sorted(loaded),'cached_sources':sorted(caches),
         'identities':[{'source':path,'device':g.protected_path(path,True).st_dev,
@@ -1104,8 +1128,8 @@ def suite_main()->int:
         outcome={'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL','executed':False,'control_passed':False,
             'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,
             'finished':time.monotonic(),'reason':type(failure).__name__+': '+str(failure)}
-    except ClosureStatRefused as failure:
-        # Only this already-observed size predicate has a diagnostic disposition.
+    except (ClosureStatRefused,ClosureNeededRefused) as failure:
+        # Only these observed size/NEEDED predicates have a diagnostic disposition.
         # Unknown stat/source/caller/custody failures still propagate unchanged.
         budget.require_work(time.monotonic());caller.verify()
         persist_observation(g,base,'suite/installation.json',{
