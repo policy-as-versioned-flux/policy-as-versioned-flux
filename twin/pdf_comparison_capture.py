@@ -39,8 +39,20 @@ ARCHIVE='1c38f527c46caee0f712386d42a885b96a31ed9ce11904e872559859894d137e'
 PATCH='ce4d927e34922b737552a605ae8332651031c8b77893264e72699215ed181395'
 
 
+class _PrivateCapability:
+    """Copying or serializing a private capability cannot reset its spent state."""
+    def __copy__(self):
+        raise ValueError('private comparison capability cannot be copied')
+
+    def __deepcopy__(self, memo):
+        raise ValueError('private comparison capability cannot be copied')
+
+    def __reduce_ex__(self, protocol):
+        raise ValueError('private comparison capability cannot be serialized')
+
+
 @dataclasses.dataclass(eq=False, frozen=True, init=False, repr=False)
-class ComparisonCaptureAuthority:
+class ComparisonCaptureAuthority(_PrivateCapability):
     _context: n.NativeHostContext
     _guard: Any
     _pair: bytes
@@ -57,7 +69,7 @@ class ComparisonCaptureAuthority:
 
 
 @dataclasses.dataclass(eq=False, frozen=True, init=False, repr=False)
-class ComparisonCompletion:
+class ComparisonCompletion(_PrivateCapability):
     _record: bytes
     _held_record: bytes
     _archive: dict[str,bytes]
@@ -957,7 +969,7 @@ def compare_simulated_pair(pair_plan: dict, baseline_record: dict, baseline_arch
 
 
 @dataclasses.dataclass(eq=False, frozen=True, init=False, repr=False)
-class PatchedComparisonCompletion:
+class PatchedComparisonCompletion(_PrivateCapability):
     _completed: tuple[dict,dict]
     _plan: bytes
     _pair: bytes
@@ -1031,7 +1043,7 @@ def _private_patched_view(completion: PatchedComparisonCompletion, pair: dict, b
 
 
 @dataclasses.dataclass(eq=False, init=False, repr=False)
-class ComparisonSession:
+class ComparisonSession(_PrivateCapability):
     _selection: str
     _started: float
     _next: int

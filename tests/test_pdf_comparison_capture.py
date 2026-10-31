@@ -490,3 +490,11 @@ def test_actual_shaped_data_cannot_move_or_extend_the_independently_held_host_in
     raw=sm.canonical(policy);pin=sm.sha256(raw);archive[pin]=raw;obs['host_policy_sha256']=pin;data['host_policy_sha256']=pin
     raw=sm.canonical(obs);op=sm.sha256(raw);archive[op]=raw;data['native_events_sha256']=op
     with pytest.raises(ValueError,match='interval'):c.check_comparison_capture(data,archive,expected_plan=sm._json(baseline._plan))
+
+
+@pytest.mark.parametrize('operation',[copy.copy,copy.deepcopy])
+def test_private_authority_session_and_completion_cannot_be_copied_to_reset_consumed_state(operation):
+    pair,plan,archive=prepared_fixture();authority=authority_model(plan,archive)
+    completion=object.__new__(c.ComparisonCompletion);patched=object.__new__(c.PatchedComparisonCompletion)
+    for private in (authority,authority._session,completion,patched):
+        with pytest.raises(ValueError,match='private'):operation(private)
