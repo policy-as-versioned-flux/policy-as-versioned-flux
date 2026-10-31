@@ -438,7 +438,108 @@ def _projection_append(rows:list[dict[str,Any]],value:dict[str,Any],remaining:li
     remaining[0]-=charge;rows.append(value)
 
 
-def _check_projection_data(value:Any)->None:
+def _check_projection_binding(value:dict[str,Any],binding:Any)->None:
+    """Relate DATA to independently held acquisition facts; grants no authority."""
+    keys={'source_manifest_sha256','native_maps_sha256','original_started','original_deadline','observed_monotonic',
+        'records','metadata','mapped','sonames','original_targets','interpreter_targets'}
+    if type(binding) is not dict or set(binding)!=keys:raise ValueError('held projection DATA binding required')
+    for key in ('source_manifest_sha256','native_maps_sha256','original_started','original_deadline','observed_monotonic'):
+        if value[key]!=binding[key] or (key in ('original_started','original_deadline','observed_monotonic') and finite(binding[key])!=binding[key]):
+            raise ValueError('projection pins/original clock differ from held DATA')
+    records,metadata,mapped,parsed,original,interpreters=(binding[key] for key in
+        ('records','metadata','mapped','sonames','original_targets','interpreter_targets'))
+    if (any(type(item) is not dict or len(item)>4096 for item in (records,metadata,parsed,original,interpreters))
+            or type(mapped) is not set or len(mapped)>4096 or set(metadata)!=set(records) or set(original)!=set(records)):
+        raise ValueError('bounded held closure binding required')
+    for source,row in records.items():
+        if (type(row) is not dict or set(row)!={'source','target','bytes','sha256','elf'} or row['source']!=source
+                or not isinstance(source,str) or not source.startswith('/') or str(Path(source))!=source
+                or '..' in source.split('/') or not pin(row['sha256']) or type(row['bytes']) is not int
+                or row['bytes']<0 or row['bytes']>256*1024**2):raise ValueError('held source binding differs')
+        target='/app/'+Path(source).name if source.startswith(STORE+'/source/') else source
+        if original[source]!=target:raise ValueError('held original source projection differs')
+        elf=row['elf']
+        if elf is not None and (type(elf) is not dict or set(elf)!={'interpreter','needed'} or type(elf['needed']) is not list):
+            raise ValueError('held ordinary ELF facts required')
+    if sum(row['bytes'] for row in records.values())>256*1024**2:raise ValueError('held closure byte bound')
+    expected_objects=[]
+    for source in sorted(parsed):
+        if source not in records or source not in mapped or records[source]['elf'] is None:
+            raise ValueError('SONAME facts lack mapped held ELF source')
+        result=parsed[source];row=records[source];info=metadata[source]
+        if (type(result) is not tuple or len(result)!=3 or type(info) is not dict
+                or any(type(info.get(key)) is not int or info[key]<0 for key in ('device','inode','stat_bytes'))
+                or info['stat_bytes']!=row['bytes']):raise ValueError('held SONAME byte/stat facts differ')
+        name,status,error=result
+        expected_objects.append({'source':source,'bytes':row['bytes'],'sha256':row['sha256'],'device':info['device'],
+            'inode':info['inode'],'soname':name,'parse_status':status,'format_error':error})
+    if value['objects']!=expected_objects:raise ValueError('projection objects differ from held SONAME/stat facts')
+    interpreter_names={row['elf']['interpreter'] for row in records.values() if row['elf'] is not None and row['elf']['interpreter'] is not None}
+    for source,target in interpreters.items():
+        if source not in mapped or source not in records or target not in interpreter_names:
+            raise ValueError('fixed interpreter target lacks held resolution facts')
+    for source,row in records.items():
+        if row['target']!=interpreters.get(source,original[source]):raise ValueError('held preprojection target differs')
+    malformed=[row['source'] for row in expected_objects if row['parse_status']=='MALFORMED']
+    def refusal(reason:str,source:str|None=None,owner:str|None=None,needed:str|None=None,candidates:list[str]|None=None)->dict[str,Any]:
+        return {'reason':reason,'source':source,'owner':owner,'needed':needed,'candidates':[] if candidates is None else candidates}
+    if malformed:
+        if (value['failure']!=refusal('MALFORMED_SONAME',source=malformed[0]) or value['requests'] or value['assignments'] or interpreters):
+            raise ValueError('malformed held prefix differs from refusal DATA')
+        return
+    # Complete acquisition is required for any request or successful projection.
+    if not mapped<=set(records) or set(parsed)!={source for source in mapped if records[source]['elf'] is not None}:
+        raise ValueError('incomplete held projection acquisition')
+    expected_requests=[];seen:set[tuple[str,str]]=set();blocked=None;processed_interpreters:set[str]=set()
+    identity_sources:dict[str,set[str]]={};soname_names=set()
+    for source in mapped:identity_sources.setdefault(Path(source).name,set()).add(source)
+    for source,result in parsed.items():
+        if result[0] is not None:
+            identity_sources.setdefault(result[0],set()).add(source);soname_names.add(result[0])
+    for owner in sorted(records):
+        elf=records[owner]['elf']
+        if elf is None:continue
+        if elf['interpreter'] is not None:processed_interpreters.add(elf['interpreter'])
+        for needed in elf['needed']:
+            if not isinstance(needed,str):raise ValueError('held ordinary NEEDED text required')
+            request_key=(owner,needed)
+            if request_key in seen:continue
+            if not _local_elf_name(needed):blocked=refusal('UNSAFE_NEEDED',owner=owner,needed=needed);break
+            candidates=sorted(identity_sources.get(needed,set()))
+            if len(candidates)!=1:
+                if needed not in soname_names:raise ValueError('legacy NEEDED refusal cannot be projection DATA')
+                blocked=refusal('MULTIPLE_IDENTITY',owner=owner,needed=needed,candidates=candidates);break
+            if len(seen)>=4096:blocked=refusal('REQUEST_CAP',owner=owner,needed=needed);break
+            expected_requests.append({'owner':owner,'needed':needed,'candidates':candidates});seen.add(request_key)
+        if blocked is not None:break
+    expected_requests.sort(key=lambda row:(row['owner'],row['needed']))
+    if value['requests']!=expected_requests:raise ValueError('projection requests differ from exact held identity union/prefix')
+    if blocked is not None:
+        if set(interpreters.values())!=processed_interpreters:raise ValueError('interpreter facts exceed/miss held request prefix')
+        if value['failure']!=blocked or value['assignments']:raise ValueError('held request prefix refusal differs')
+        return
+    if not interpreter_names<=set(interpreters.values()):raise ValueError('incomplete held interpreter resolution')
+    selections:dict[str,tuple[str,str]]={};failure=None
+    for request in expected_requests:
+        source=request['candidates'][0];needed=request['needed']
+        target=interpreters.get(source,original[source])
+        if ((source in selections and selections[source][0]!=needed) or (target!=source and Path(target).name!=needed)):
+            failure=refusal('SOURCE_TARGET_CONFLICT',source=source,owner=request['owner'],needed=needed);break
+        if target==source:target=str(Path(source).parent/needed)
+        selections[source]=(needed,target)
+    if failure is None:
+        targets=set()
+        for source in sorted(records):
+            target=selections[source][1] if source in selections else interpreters.get(source,original[source])
+            if target in targets:failure=refusal('TARGET_COLLISION',source=source);break
+            targets.add(target)
+    expected_assignments=[] if failure is not None else [{'source':source,'target':target,'needed':needed}
+        for source,(needed,target) in sorted(selections.items())]
+    if value['assignments']!=expected_assignments or value['failure']!=failure:
+        raise ValueError('projection source/target relation differs from held DATA')
+
+
+def _check_projection_data(value:Any,*,_binding:Any=None)->None:
     """Pure closed DATA validation, never an acquisition or authority importer."""
     if (type(value) is not dict or set(value)!={'schema','source_manifest_sha256','native_maps_sha256',
             'original_started','original_deadline','observed_monotonic','objects','requests','assignments','failure'}
@@ -522,14 +623,16 @@ def _check_projection_data(value:Any)->None:
             if source not in assignments or assignments[source]['needed']!=request['needed']:
                 raise ValueError('successful projection lacks consistent assignment')
         if selected!=set(assignments):raise ValueError('unrequested projection assignment')
+    _check_projection_binding(value,_binding)
 
 
-def _projection_snapshot(proof:dict[str,Any],budget:SuiteBudget)->dict[str,Any]:
+def _projection_snapshot(proof:dict[str,Any],budget:SuiteBudget,*,_binding:dict[str,Any])->dict[str,Any]:
     import time
     observed=time.monotonic();budget.require_work(observed)
+    _binding['observed_monotonic']=observed
     proof['observed_monotonic']=observed
     proof['requests'].sort(key=lambda item:(item['owner'],item['needed']))
-    _check_projection_data(proof)
+    _check_projection_data(proof,_binding=_binding)
     raw=canonical(proof)
     if len(raw)>MAX_FILE-65536:raise ValueError('CI projection DATA byte cap')
     budget.require_work(time.monotonic())
@@ -537,9 +640,9 @@ def _projection_snapshot(proof:dict[str,Any],budget:SuiteBudget)->dict[str,Any]:
 
 
 def _projection_refuse(proof:dict[str,Any],budget:SuiteBudget,reason:str,*,source:str|None=None,
-                       owner:str|None=None,needed:str|None=None,candidates:list[str]|None=None)->Any:
+                       owner:str|None=None,needed:str|None=None,candidates:list[str]|None=None,_binding:dict[str,Any])->Any:
     proof['failure']={'reason':reason,'source':source,'owner':owner,'needed':needed,'candidates':[] if candidates is None else candidates}
-    raise ClosureProjectionRefused(_projection_snapshot(proof,budget))
+    raise ClosureProjectionRefused(_projection_snapshot(proof,budget,_binding=_binding))
 
 
 def discover_closure(g:Any,control:Any,budget:SuiteBudget,*,_source_manifest_sha256:str)->tuple[list[dict[str,Any]],dict[str,Any]]:
@@ -565,7 +668,12 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget,*,_source_manifest_sha
         'native_maps_sha256':sha(maps.encode()),'original_started':budget.started,'original_deadline':budget.deadline,
         'observed_monotonic':time.monotonic(),'objects':[],'requests':[],'assignments':[],'failure':None}
     remaining=[MAX_FILE-65536-len(canonical(proof))];sonames={};format_failures=[]
-    records={};identities=set();acquired_metadata={}
+    records:dict[str,dict[str,Any]]={};identities=set();acquired_metadata:dict[str,dict[str,Any]]={}
+    parse_results:dict[str,tuple[str|None,str,str|None]]={};original_targets:dict[str,str]={};interpreter_targets:dict[str,str]={}
+    binding:dict[str,Any]={'source_manifest_sha256':_source_manifest_sha256,'native_maps_sha256':sha(maps.encode()),
+        'original_started':budget.started,'original_deadline':budget.deadline,'observed_monotonic':None,
+        'records':records,'metadata':acquired_metadata,'mapped':mapped,'sonames':parse_results,
+        'original_targets':original_targets,'interpreter_targets':interpreter_targets}
     for path in sorted(paths):
         budget.require_work(time.monotonic())
         info=g.protected_path(path,True)
@@ -596,6 +704,7 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget,*,_source_manifest_sha
             raise ValueError('observed empty urllib bytes changed after stat')
         records[path]={'source':path,'target':'/app/'+Path(path).name if path.startswith(STORE+'/source/') else path,
             'bytes':len(raw),'sha256':sha(raw),'elf':control.elf_dependencies(raw)}
+        original_targets[path]=records[path]['target']
         acquired_metadata[path]={'device':info.st_dev,'inode':info.st_ino,'stat_bytes':info.st_size,
             'mode':info.st_mode,'uid':info.st_uid,'gid':info.st_gid,'links':info.st_nlink,
             'mtime_ns':info.st_mtime_ns,'ctime_ns':info.st_ctime_ns,'roles':sorted(roles)}
@@ -612,10 +721,11 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget,*,_source_manifest_sha
             else:
                 if soname_value is not None:status='VALID'
             sonames[path]=soname_value
+            parse_results[path]=(soname_value,status,error)
             _projection_append(proof['objects'],{'source':path,'bytes':len(raw),'sha256':records[path]['sha256'],
                 'device':info.st_dev,'inode':info.st_ino,'soname':soname_value,'parse_status':status,'format_error':error},remaining)
             budget.require_work(time.monotonic())
-    if format_failures:_projection_refuse(proof,budget,'MALFORMED_SONAME',source=format_failures[0])
+    if format_failures:_projection_refuse(proof,budget,'MALFORMED_SONAME',_binding=binding,source=format_failures[0])
     requests:set[tuple[str,str]]=set()
     # PT_INTERP may be a symlink alias on the host. Pin the actually mapped
     # canonical inode as source, retaining the exact ELF path only as jail target.
@@ -630,13 +740,14 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget,*,_source_manifest_sha
             selected=records[canonical_path]
             if selected['target'] not in (canonical_path,interpreter):raise ValueError('ambiguous ELF loader target')
             selected['target']=interpreter
+            interpreter_targets[canonical_path]=interpreter
         for needed in elf['needed']:
-            if not _local_elf_name(needed):_projection_refuse(proof,budget,'UNSAFE_NEEDED',owner=row['source'],needed=needed)
+            if not _local_elf_name(needed):_projection_refuse(proof,budget,'UNSAFE_NEEDED',_binding=binding,owner=row['source'],needed=needed)
             matches=[path for path in mapped if Path(path).name==needed]
             named=[path for path in mapped if sonames.get(path)==needed]
             candidates=sorted(set(matches)|set(named))
             if len(candidates)!=1 and named:
-                _projection_refuse(proof,budget,'MULTIPLE_IDENTITY',owner=row['source'],needed=needed,candidates=candidates)
+                _projection_refuse(proof,budget,'MULTIPLE_IDENTITY',_binding=binding,owner=row['source'],needed=needed,candidates=candidates)
             # Keep original diagnostic grammar on its legacy zero/multiple paths.
             if len(candidates)!=1:
                 observed=time.monotonic();budget.require_work(observed)
@@ -659,7 +770,7 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget,*,_source_manifest_sha
                 raise ClosureNeededRefused(json.loads(retained))
             key=(row['source'],needed)
             if key not in requests:
-                if len(requests)>=4096:_projection_refuse(proof,budget,'REQUEST_CAP',owner=row['source'],needed=needed)
+                if len(requests)>=4096:_projection_refuse(proof,budget,'REQUEST_CAP',_binding=binding,owner=row['source'],needed=needed)
                 _projection_append(proof['requests'],{'owner':row['source'],'needed':needed,'candidates':candidates},remaining)
                 requests.add(key)
             budget.require_work(time.monotonic())
@@ -668,21 +779,21 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget,*,_source_manifest_sha
     for request in proof['requests']:
         source=request['candidates'][0];needed=request['needed'];selected=records[source]
         if source in selections and selections[source][0]!=needed:
-            _projection_refuse(proof,budget,'SOURCE_TARGET_CONFLICT',source=source,owner=request['owner'],needed=needed)
+            _projection_refuse(proof,budget,'SOURCE_TARGET_CONFLICT',_binding=binding,source=source,owner=request['owner'],needed=needed)
         target=selected['target']
         if target==source:target=str(Path(source).parent/needed)
         elif Path(target).name!=needed:
-            _projection_refuse(proof,budget,'SOURCE_TARGET_CONFLICT',source=source,owner=request['owner'],needed=needed)
+            _projection_refuse(proof,budget,'SOURCE_TARGET_CONFLICT',_binding=binding,source=source,owner=request['owner'],needed=needed)
         selections[source]=(needed,target)
         budget.require_work(time.monotonic())
     targets={}
     for source,row in records.items():
         target=selections[source][1] if source in selections else row['target']
-        if target in targets:_projection_refuse(proof,budget,'TARGET_COLLISION',source=source)
+        if target in targets:_projection_refuse(proof,budget,'TARGET_COLLISION',_binding=binding,source=source)
         targets[target]=source
     for source,(needed,target) in sorted(selections.items()):
         _projection_append(proof['assignments'],{'source':source,'target':target,'needed':needed},remaining)
-    projection=_projection_snapshot(proof,budget)
+    projection=_projection_snapshot(proof,budget,_binding=binding)
     for source,(_,target) in selections.items():records[source]['target']=target
     rows=list(records.values());facts:dict[str,Any]=dict(validate_os_closure(rows,loaded,control))
     facts['elf_soname_projections']=projection

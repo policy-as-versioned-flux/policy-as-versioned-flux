@@ -175,3 +175,11 @@ read/close failures propagate. Existing size/NEEDED diagnostic grammars remain.
 
 These changes have pure modeled coverage only. Actual library SONAME and complete
 native closure outcomes remain unobserved until separately authorized execution.
+
+The pure projection checker additionally requires separate already-held DATA: the
+verified closure/hash/stat/maps/SONAME results, initial targets, actually observed
+interpreter resolutions and original manifest/clock. The public record grammar is
+unchanged. Complete records must match the full exact identity and target plan;
+known failure records match only their legitimately held prefix. A malformed early
+prefix cannot become a complete positive record. This context performs no new
+acquisition and grants no authority or appointment.

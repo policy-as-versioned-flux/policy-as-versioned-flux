@@ -31,6 +31,27 @@ def alias_model(monkeypatch,arch='x86_64',repeat=0):
     return f
 
 
+def binding_model(f,rows,*,interpreter_targets=None,manifest_pin=PIN):
+    """Independent pure held transport DATA, not copied from the proof under test."""
+    records={row['source']:copy.deepcopy(row)for row in rows};metadata={};parsed={};original={}
+    for source,row in records.items():
+        info=f.stats[source];metadata[source]={'device':info.st_dev,'inode':info.st_ino,'stat_bytes':info.st_size}
+        original[source]='/app/'+source.rsplit('/',1)[1]if source.startswith(f.m.STORE+'/source/')else source
+        row['target']=(interpreter_targets or {}).get(source,original[source])
+        if source in f.mapped and row['elf']is not None:
+            name=None;status='ABSENT';error=None
+            try:name=f.m._elf_soname(f.data[source])
+            except f.m._SonameFormatError as failed:status='MALFORMED';error=failed.reason
+            else:
+                if name is not None:status='VALID'
+            parsed[source]=(name,status,error)
+    maps='\n'.join('00-01 r-xp 0 0 0 '+path for path in f.mapped)
+    return {'source_manifest_sha256':manifest_pin,'native_maps_sha256':f.m.sha(maps.encode()),
+        'original_started':f.budget.started,'original_deadline':f.budget.deadline,'observed_monotonic':f.now[0],
+        'records':records,'metadata':metadata,'mapped':set(f.mapped),'sonames':parsed,
+        'original_targets':original,'interpreter_targets':{}if interpreter_targets is None else interpreter_targets}
+
+
 @pytest.mark.parametrize('arch,repeat',[('x86_64',0),('aarch64',0),('x86_64',1),('aarch64',1)])
 def test_discovery_identity_projects_canonical_source_through_actual_later_CI_host_load(monkeypatch,arch,repeat):
     f=alias_model(monkeypatch,arch,repeat)
@@ -52,9 +73,9 @@ def test_projection_DATA_is_closed_and_binds_original_source_maps_clock(monkeypa
     assert proof['assignments']==[{'source':f.library,'target':f.target,'needed':NEEDED}]
     checker=getattr(f.m,'_check_projection_data',None)
     assert checker is not None,'closed projection DATA lacks its pure checker'
-    checker(proof)
+    checker(proof,_binding=binding_model(f,rows))
     changed=copy.deepcopy(proof);changed['public_approval']=True
-    with pytest.raises(ValueError):checker(changed)
+    with pytest.raises(ValueError):checker(changed,_binding=binding_model(f,rows))
 
 
 def test_new_known_projection_refusal_retains_protected_FAIL_export_and_verified_manifest(monkeypatch):
@@ -206,7 +227,7 @@ def test_actual_later_host_load_rejects_changed_canonical_associations(monkeypat
 
 @pytest.mark.parametrize('fault',['extra','missing','schema','manifest','maps','bool-clock','NaN-clock','renewed','object-extra','object-bool','object-status','object-duplicate','request-extra','request-ambiguous','request-duplicate','assignment-extra','assignment-missing','assignment-name','assignment-duplicate','failure'])
 def test_copied_projection_DATA_tamper_is_refused_by_pure_checker_without_authority(monkeypatch,fault):
-    f=alias_model(monkeypatch);_,facts=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256=PIN);proof=copy.deepcopy(facts['elf_soname_projections'])
+    f=alias_model(monkeypatch);rows,facts=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256=PIN);proof=copy.deepcopy(facts['elf_soname_projections'])
     if fault=='extra':proof['approved']=True
     if fault=='missing':proof.pop('objects')
     if fault=='schema':proof['schema']='ACTUAL'
@@ -227,7 +248,7 @@ def test_copied_projection_DATA_tamper_is_refused_by_pure_checker_without_author
     if fault=='assignment-name':proof['assignments'][0]['needed']='other.so'
     if fault=='assignment-duplicate':proof['assignments'].append(copy.deepcopy(proof['assignments'][0]))
     if fault=='failure':proof['failure']={'reason':'unknown'}
-    with pytest.raises(ValueError):f.m._check_projection_data(proof)
+    with pytest.raises(ValueError):f.m._check_projection_data(proof,_binding=binding_model(f,rows))
 
 
 def test_existing_PT_INTERP_projection_is_retained_for_matching_needed_basename(monkeypatch):
@@ -245,6 +266,7 @@ def test_existing_PT_INTERP_projection_is_retained_for_matching_needed_basename(
     rows,facts=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256=PIN)
     assert next(r for r in rows if r['source']==f.library)['target']==f.target
     assert facts['elf_soname_projections']['assignments']==[{'source':f.library,'target':f.target,'needed':'ld-fixture.so'}]
+    f.m._check_projection_data(facts['elf_soname_projections'],_binding=binding_model(f,rows,interpreter_targets={f.library:f.target}))
 
 
 def test_original_request_cap_stops_before_4097th_request_without_next_allocation(monkeypatch):
@@ -290,7 +312,7 @@ def test_manifest_and_workflow_context_bind_same_already_held_source_bytes_befor
 
 
 def test_forged_known_failure_cannot_disagree_with_its_closed_held_DATA(monkeypatch):
-    f=alias_model(monkeypatch);_,facts=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256=PIN)
+    f=alias_model(monkeypatch);rows,facts=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256=PIN)
     proof=copy.deepcopy(facts['elf_soname_projections'])
     proof['failure']={'reason':'MALFORMED_SONAME','source':f.library,'owner':None,'needed':None,'candidates':[]}
-    with pytest.raises(ValueError):f.m._check_projection_data(proof)
+    with pytest.raises(ValueError):f.m._check_projection_data(proof,_binding=binding_model(f,rows))
