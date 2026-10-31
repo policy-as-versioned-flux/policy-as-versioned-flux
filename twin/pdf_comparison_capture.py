@@ -1051,6 +1051,7 @@ class OriginalComparisonSuite(_PrivateCapability):
     A future independently reviewed trusted selector must hold this capability.
     Contexts, selection hashes, JSON and repeated factory calls cannot appoint it.
     """
+    _capture_storage_selection: object | None
     _selection_raw: bytes
     _selection: str
     _started: float
@@ -1069,6 +1070,7 @@ class OriginalComparisonSuite(_PrivateCapability):
         raise ValueError('private original suite must be source-appointed; no constructor')
 
     def __setattr__(self, name, value):
+        if name=='_capture_storage_selection':raise ValueError('private birth storage association cannot be installed or replaced')
         if name in ('_selection_raw','_selection','_started','_guard') and hasattr(self,name):
             raise ValueError('private original suite selection/clock is immutable')
         if name=='_stopped' and getattr(self,'_stopped',False) and value is not True:

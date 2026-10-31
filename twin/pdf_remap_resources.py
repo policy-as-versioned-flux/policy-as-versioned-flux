@@ -363,9 +363,10 @@ class _StageState:
     def __reduce__(self)->Any:raise RemapHold('technical custody cannot be serialized')
 
     def __setattr__(self,name:str,value:Any)->None:
-        if name in ('_original_owner','_remap_flow') and hasattr(self,name) and value is not getattr(self,name):raise RemapHold('original technical owner/flow cannot reset')
+        if name in ('_original_owner','_remap_flow','_capture_storage') and hasattr(self,name) and value is not getattr(self,name):raise RemapHold('original technical owner/flow cannot reset')
         object.__setattr__(self,name,value)
 
+    _capture_storage:object|None
     _original_owner:c.OriginalComparisonSuite
     _remap_flow:_RemapFlow
     phase:str
@@ -535,6 +536,12 @@ def _allocate_stage(original:c.OriginalComparisonSuite)->_StageState:
     c._check_original_suite(original)
     if (original._technical_state is not None or original._stopped or original._next!=0
             or original._active_slot is not None or not original._target_custody_known or original._awaiting_comparison):raise RemapHold('initial original suite staging slot required')
+    state=_stage_placeholder(original);state._capture_storage=None
+    original._technical_state=state  # Same default owner/flow; no selected cell.
+    return state
+
+
+def _stage_placeholder(original:c.OriginalComparisonSuite)->_StageState:
     state=object.__new__(_StageState)
     state.phase='ALLOCATED';state.root='';state.deadline=None;state.final_deadline=None;state.final_attempted=False;state.last_time=None
     state.root_removal_known=False;state.clock_observation={'at':None,'deadline':None,'status':'NOT_OBSERVED'}
@@ -543,7 +550,6 @@ def _allocate_stage(original:c.OriginalComparisonSuite)->_StageState:
     state._original_owner=original
     flow=object.__new__(_RemapFlow);flow.owner=original;flow.phase='ALLOCATED';flow.reserved=False;flow.packets=();flow.entries=[];flow.records={};flow.metadata_bytes=0;flow.failure=None;flow.failure_raw=None;flow.secondary=[];flow.guard=None
     state._remap_flow=flow
-    original._technical_state=state  # Both owner/flow placeholders precede charge/clock.
     return state
 
 
