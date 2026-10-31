@@ -300,29 +300,34 @@ def _run(argv: list[str], cwd: str, limits: dict) -> dict:
         except BaseException as exc:
             interruption = exc
         finally:
-            if process is not None:
-                custody = {'deadline':min(deadline,time.monotonic()+grace),
-                    'reaping_started':False,'reservation_checked':False,'next_signal':0,'absent':False}
-                # At most one continuation, never a renewed grace or second wait.
-                for attempt in range(2):
-                    try:
-                        cleanup_failure = _finish_owned_group(process,waitid,grace,group,custody)
-                        failure = cleanup_failure or failure
-                    except BaseException as exc:
-                        if interruption is None:
-                            interruption = exc
-                        if custody['reaping_started']:
-                            break
-                    else:
-                        break
-                for name in streams:
-                    pipe = getattr(process, name)
-                    if pipe is not None:
+            try:
+                if process is not None:
+                    custody = {'deadline':min(deadline,time.monotonic()+grace),
+                        'reaping_started':False,'reservation_checked':False,'next_signal':0,'absent':False}
+                    # At most one continuation, never a renewed grace or second wait.
+                    for attempt in range(2):
                         try:
-                            pipe.close()
+                            cleanup_failure = _finish_owned_group(process,waitid,grace,group,custody)
+                            failure = cleanup_failure or failure
                         except BaseException as exc:
                             if interruption is None:
                                 interruption = exc
+                            if custody['reaping_started']:
+                                break
+                        else:
+                            break
+                    for name in streams:
+                        pipe = getattr(process, name)
+                        if pipe is not None:
+                            try:
+                                pipe.close()
+                            except BaseException as exc:
+                                if interruption is None:
+                                    interruption = exc
+            except BaseException as exc:
+                # Deadline acquisition is cleanup too; never replace saved cancellation.
+                if interruption is None:
+                    interruption = exc
     if interruption is not None:
         # A missing return cannot convey custody to the caller. Retain bounded stream
         # prefixes and facts in the already owned workspace, then propagate the original.
