@@ -516,11 +516,12 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
                 # Every output buffer is retained; no untracked extra data is accepted.
                 _closed(detail,{'buffer_sha256'} if name in ('stat','lstat','fstat','newfstatat','readlink','readlinkat','getdents64','getcwd','uname','getrlimit','sysinfo','clock_gettime','prlimit64','getrandom','arch_prctl','rt_sigaction','rt_sigprocmask') else set())
                 if detail:
-                    identity=None
+                    identity=None;fd_kind=None
                     if name=='fstat':
-                        record=fds[args[0]]
-                        identity=(descriptions[record['description']]['identity'] if 'description' in record and record['kind']!='sidecar' else record['identity'])
-                    _validate_metadata_result(p,result,_raw(artifacts,detail['buffer_sha256']),spec,files,identity,observation['platform'])
+                        record=fds[args[0]];fd_kind=record['kind']
+                        identity=descriptions[record['description']]['identity'] if 'description' in record else record['identity']
+                        if fd_kind=='sidecar': identity=identity[:6]  # size/times change through owned writes
+                    _validate_metadata_result(p,result,_raw(artifacts,detail['buffer_sha256']),spec,files,identity,observation['platform'],fd_kind=fd_kind)
                 elif name=='access' and result>0: raise ValueError('access success status differs')
         elif kind=='exit-stop':
             _closed(data,{'status','maps','fds','pid','starttime'})
@@ -818,7 +819,8 @@ def _metadata_extent(pending: dict, result: int) -> tuple[int,int]:
 
 
 def _validate_metadata_result(pending: dict, result: int, raw: bytes, spec: dict,
-                              files: dict, fd_identity: list | None, platform_record: dict) -> None:
+                              files: dict, fd_identity: list | None, platform_record: dict,
+                              *, fd_kind: str | None = None) -> None:
     name=pending['name'];a=pending['args'];_,extent=_metadata_extent(pending,result)
     if len(raw)!=extent: raise ValueError('metadata retained output extent differs')
     if result<0: return
@@ -838,6 +840,11 @@ def _validate_metadata_result(pending: dict, result: int, raw: bytes, spec: dict
         identity=[dev,ino,mode,uid,gid,nlink,size,times[2]*10**9+times[3],times[4]*10**9+times[5]]
         known=fd_identity if name=='fstat' else files.get(pending['detail']['path'],{}).get('identity')
         if known is not None and identity[:len(known)]!=known: raise ValueError('metadata stat known identity differs')
+        if name=='fstat':
+            kinds={'stdin':stat.S_IFIFO,'stdout':stat.S_IFIFO,'stderr':stat.S_IFIFO,
+                   'file':stat.S_IFREG,'directory':stat.S_IFDIR,'sidecar':stat.S_IFREG}
+            if fd_kind not in kinds or stat.S_IFMT(mode)!=kinds[fd_kind]:
+                raise ValueError('metadata stat descriptor kind differs')
     elif name=='getdents64':
         offset=0
         while offset<len(raw):
@@ -1156,12 +1163,13 @@ def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> di
                             current_maps=_reconcile_maps(name,a,result,current_maps,detail['maps'],used_files,desc)
                         elif name in ('stat','lstat','fstat','newfstatat','readlink','readlinkat','getdents64','getcwd','uname','getrlimit','sysinfo','clock_gettime','prlimit64','getrandom','arch_prctl','rt_sigaction','rt_sigprocmask'):
                             raw=_result_buffer(pending,result,mem)
-                            identity=None
+                            identity=None;fd_kind=None
                             if name=='fstat':
-                                record=records[a[0]]
-                                identity=record['description']['identity'] if 'description' in record and record['kind']!='sidecar' else record['identity']
+                                record=records[a[0]];fd_kind=record['kind']
+                                identity=record['description']['identity'] if 'description' in record else record['identity']
+                                if fd_kind=='sidecar': identity=identity[:6]  # mutable size/times are not fixed facts
                             uname=os.uname()
-                            _validate_metadata_result(pending,result,raw,spec,candidate_facts,identity,{'system':'Linux','machine':'x86_64','release':uname.release,'version':uname.version})
+                            _validate_metadata_result(pending,result,raw,spec,candidate_facts,identity,{'system':'Linux','machine':'x86_64','release':uname.release,'version':uname.version},fd_kind=fd_kind)
                             detail={'buffer_sha256':_runtime_blob(artifacts,raw,budget)}
                         _append(events,'leave',{'result':result,'detail':detail},start,spec['limits']);pending=None
                 else:
