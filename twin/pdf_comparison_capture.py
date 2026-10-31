@@ -911,20 +911,6 @@ def _baseline_view(completion: ComparisonCompletion, pair: dict) -> tuple[dict,d
     return data,completion._archive
 
 
-def _patched_view(store: n.NativeObservationStore, observed: n.ObservedExtraction, pair: dict, baseline_archive: dict) -> tuple[dict,dict]:
-    if type(store) is not n.NativeObservationStore or store._purpose!='actual' or store._host_context is None or type(observed) is not n.ObservedExtraction:raise ValueError('private actual patched completion required')
-    result=n.resolve_native_observation(store,observed)
-    held=store._entries.get(id(observed))
-    if held is None or len(held)!=5 or held[0] is not observed:raise ValueError('private completed profile2 plan required')
-    result,observation=n._completed_pdf_result((result,held[3]))
-    plan=sm._json(held[4]);plan['archive']=result['archive'];config=sm._json(_raw(result['archive'],plan['configuration_sha256']))
-    if plan['profile']!=bridge.PROFILE or plan['purpose']!='actual' or plan['parent_sha256']!=pair['fixture']['sha256'] or plan['parent_bytes']!=pair['fixture']['bytes'] or config['native_config_sha256']!=pair['config']['sha256'] or config['pdf_origin']['build_identity_sha256']!=pair['build_pair']['patched_build_sha256']:raise ValueError('patched completion pair selection differs')
-    if _raw(result['archive'],config['pdf_origin']['build_identity_sha256'])!=_raw(baseline_archive,pair['build_pair']['patched_build_sha256']):raise ValueError('patched actual build bytes differ')
-    terminal=observation['events'][-1]['data'];archive=result['archive']
-    data={'schema':'TEST_ONLY-pdf-patched-comparison-data/v1','purpose':'TEST_ONLY','observation_mode':'actual','pair_plan_sha256':sm.sha256(sm.canonical(pair)),'stdout':{'captured':{'sha256':terminal['stdout_sha256'],'bytes':len(_raw(archive,terminal['stdout_sha256']))},'complete':True},'stderr':{'captured':{'sha256':terminal['stderr_sha256'],'bytes':len(_raw(archive,terminal['stderr_sha256']))},'complete':True},'terminal_wait':{**terminal['wait'],'provenance':'natural_terminal'},'status':'COMPLETE_EXIT0_DATA','origin_effect_confirmed':True,'host_policy_sha256':observation['host_policy_sha256'],'native_observation_sha256':sm.sha256(sm.canonical(observation))}
-    return data,archive
-
-
 def _compare_data(pair: dict, baseline: dict | None, baseline_archive: dict, patched: dict | None, patched_archive: dict, *, actual_origin_confirmed: bool) -> dict:
     comparisons: dict[str,bool | None]={name:None for name in ('stdout','stderr','exit')}
     if baseline is not None and patched is not None:
@@ -938,24 +924,21 @@ def _compare_data(pair: dict, baseline: dict | None, baseline_archive: dict, pat
     return {'schema':'TEST_ONLY-pdf-pair-comparison/v1','purpose':'TEST_ONLY','pair_plan_sha256':sm.sha256(sm.canonical(pair)),'baseline_data_sha256':sm.sha256(sm.canonical(baseline)) if baseline is not None else None,'patched_data_sha256':sm.sha256(sm.canonical(patched)) if patched is not None else None,'stdout_equal':comparisons['stdout'],'stderr_equal':comparisons['stderr'],'exit_equal':comparisons['exit'],'status':status,'n01_full_stdout_equal':comparisons['stdout'],'stop_suite':status!='MATCH' or not actual_origin_confirmed,'qualification':'NONE'}
 
 
-def compare_pair(pair_plan: dict, baseline_completed: ComparisonCompletion, patched_store: n.NativeObservationStore | None=None, patched_completed: n.ObservedExtraction | PatchedComparisonCompletion | None=None) -> dict:
-    """Consume private completions once; never starts another patched converter."""
-    baseline,archive=_baseline_view(baseline_completed,pair_plan)
+def compare_pair(pair_plan: dict, baseline_completed: ComparisonCompletion, patched_completed: PatchedComparisonCompletion | None=None) -> dict:
+    """Consume source-guarded comparative completions, never adopt native handles."""
+    baseline,archive=_baseline_view(baseline_completed,pair_plan);session=baseline_completed._session
+    if patched_completed is not None and type(patched_completed) is not PatchedComparisonCompletion:raise ValueError('private paired comparative completion required')
     if baseline['status']!='COMPLETE_EXIT0_DATA':
-        if patched_store is not None or patched_completed is not None:raise ValueError('failed pristine gate cannot launch/accept a patched partner')
+        if patched_completed is not None:raise ValueError('failed pristine gate cannot accept a patched partner')
+        session._stopped=True
         return _compare_data(pair_plan,baseline,archive,None,{},actual_origin_confirmed=False)
-    if patched_completed is None:return _compare_data(pair_plan,baseline,archive,None,{},actual_origin_confirmed=False)
-    if type(patched_completed) is PatchedComparisonCompletion:
-        if patched_store is not None:raise ValueError('paired private completion cannot adopt a store')
-        patched,patched_archive=_private_patched_view(patched_completed,pair_plan,archive)
-    else:
-        if patched_store is None:raise ValueError('private patched store required')
-        if type(patched_completed) is not n.ObservedExtraction:raise ValueError('exact private patched handle required')
-        patched,patched_archive=_patched_view(patched_store,patched_completed,pair_plan,archive)
+    if patched_completed is None:
+        session._stopped=True
+        return _compare_data(pair_plan,baseline,archive,None,{},actual_origin_confirmed=False)
+    if patched_completed._session is not session:raise ValueError('same private original suite required')
+    patched,patched_archive=_private_patched_view(patched_completed,pair_plan,archive)
     result=_compare_data(pair_plan,baseline,archive,patched,patched_archive,actual_origin_confirmed=patched['status']=='COMPLETE_EXIT0_DATA')
     baseline_completed._guard.verify()
-    if type(patched_completed) is PatchedComparisonCompletion and patched_completed._session is not baseline_completed._session:raise ValueError('different private original suite')
-    session=baseline_completed._session
     session._stopped=session._stopped or result['stop_suite'];session._awaiting_comparison=False
     return result
 

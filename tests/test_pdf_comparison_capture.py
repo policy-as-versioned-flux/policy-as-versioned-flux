@@ -498,3 +498,17 @@ def test_private_authority_session_and_completion_cannot_be_copied_to_reset_cons
     completion=object.__new__(c.ComparisonCompletion);patched=object.__new__(c.PatchedComparisonCompletion)
     for private in (authority,authority._session,completion,patched):
         with pytest.raises(ValueError,match='private'):operation(private)
+
+
+def test_final_comparison_with_an_unattempted_partner_stops_the_original_session(monkeypatch):
+    pair,authority,baseline,store,plan,parent,calls,result=patched_gate_fixture(monkeypatch)
+    outcome=c.compare_pair(pair,baseline)
+    assert outcome['status']=='NOT_COMPARABLE' and outcome['stop_suite'] is True
+    assert baseline._session._stopped is True
+
+
+def test_public_native_handle_or_store_is_not_a_comparative_completion_adoption_route(monkeypatch):
+    pair,authority,baseline,store,plan,parent,calls,result=patched_gate_fixture(monkeypatch)
+    for copied in ({},store,object.__new__(c.n.ObservedExtraction)):
+        with pytest.raises(ValueError,match='private'):c.compare_pair(pair,baseline,cast(Any,copied))
+    assert calls==[]
