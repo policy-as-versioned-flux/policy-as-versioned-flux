@@ -38,13 +38,32 @@ class BasisPolicy:
         return cls(_canonical({'schema': 'twin.basis-policy/v1', 'rubric': rubric,
             'issuers': issuers, 'source': _digest(Path(__file__).read_bytes())}))
 
+    @classmethod
+    def for_task(cls, task: str, metric: str, issuers: tuple[str, ...]) -> BasisPolicy:
+        from .task_contracts import ASSETS, TaskContract
+        contract = TaskContract.freeze(task)
+        if metric not in contract.metrics or not issuers or any(not isinstance(item, str) or not item for item in issuers):
+            raise ValueError('task review requires exact metric and protected acquisition issuers')
+        rubric = json.loads((ASSETS / 'rubrics.json').read_bytes())
+        return cls(_canonical({'schema': 'twin.basis-policy/v2', 'task': task, 'metric': metric,
+            'contract': contract.digest, 'dimensions': rubric['metric_dimensions'][metric],
+            'rubric': rubric, 'issuers': issuers, 'source': _digest(Path(__file__).read_bytes())}))
+
+    @property
+    def dimensions(self) -> tuple[str, ...]:
+        value = json.loads(self.description)
+        return tuple(value['dimensions']) if value['schema'] == 'twin.basis-policy/v2' else DIMENSIONS
+
     @property
     def digest(self) -> str:
         return _digest(self.description)
 
     def verify(self) -> None:
         value = json.loads(self.description)
-        if (value.get('schema') != 'twin.basis-policy/v1'
+        if value.get('schema') == 'twin.basis-policy/v2':
+            if self.description != self.for_task(value['task'], value['metric'], tuple(value['issuers'])).description:
+                raise ValueError('task assessment policy/rubric/source changed')
+        elif (value.get('schema') != 'twin.basis-policy/v1'
                 or value.get('source') != _digest(Path(__file__).read_bytes())):
             raise ValueError('semantic assessment policy/source changed')
 
@@ -64,13 +83,19 @@ class BasisAssessment:
             raise ValueError('assessment was not acquired by the protected host')
         value, wanted = json.loads(self.packet), json.loads(request)
         record = value['record']
+        task_review = json.loads(policy.description).get('schema') == 'twin.basis-policy/v2'
+        if task_review:
+            from .task_contracts import validate
+            validate('AssessmentRecord', record)
+        policy_key, request_key = ('policy_digest', 'request_digest') if task_review else ('policy', 'request')
+        dimensions = policy.dimensions
         acquisition = value['acquisition']['entry']
         raw_record = base64.b64decode(value['raw_record'], validate=True)
         if (json.loads(raw_record) != record or _digest(raw_record) != acquisition['sha256']
                 or acquisition.get('issuer') != record.get('issuer')
-                or acquisition.get('request') != record.get('request')):
+                or acquisition.get('request') != record.get(request_key)):
             raise ValueError('independent reviewer acquisition identity or record bytes changed')
-        if (record.get('policy') != policy.digest or record.get('request') != _digest(request)
+        if (record.get(policy_key) != policy.digest or record.get(request_key) != _digest(request)
                 or record.get('issuer') not in json.loads(policy.description)['issuers']):
             raise ValueError('assessment names a foreign policy, input/source/capture or issuer')
         rows = record.get('rows')
@@ -83,29 +108,32 @@ class BasisAssessment:
             if not isinstance(row.get('reason'), str) or not row['reason'].strip():
                 raise ValueError('independent assessment needs its actual reasons')
             decisions = row.get('decisions')
-            if (not isinstance(decisions, dict) or set(decisions) != set(DIMENSIONS)
+            if (not isinstance(decisions, dict) or set(decisions) != set(dimensions)
                     or any(decision not in ('pass', 'fail', 'held', 'not-applicable')
                            for decision in decisions.values())):
                 raise ValueError('assessment must state every semantic dimension')
             actual = original['output']
             declined = actual.get('answer') is None
             if not declined and 'not-applicable' in decisions.values():
-                raise ValueError('actual answers require actual semantic assessment')
+                allowed = _later_ethics_dimensions(actual) if task_review and json.loads(policy.description)['task'] == 'ethics' else set()
+                if any(decision == 'not-applicable' and dimension not in allowed for dimension, decision in decisions.items()):
+                    raise ValueError('actual answers require actual semantic assessment')
             support = row.get('support')
-            if not isinstance(support, dict) or set(support) != set(DIMENSIONS):
+            if not isinstance(support, dict) or set(support) != set(dimensions):
                 raise ValueError('assessment needs reasons/witness locations for every dimension')
-            for dimension in DIMENSIONS:
+            for dimension in dimensions:
                 detail = support[dimension]
                 if (not isinstance(detail, dict) or not isinstance(detail.get('reason'), str)
                         or not detail['reason'].strip() or not isinstance(detail.get('witnesses'), list)
                         or decisions[dimension] == 'pass' and not detail['witnesses']):
                     raise ValueError('assessment conclusion lacks its actual reason/witness')
                 for witness in detail['witnesses']:
-                    if not isinstance(witness, dict) or set(witness) != {'path', 'quote'}:
-                        raise ValueError('review witness must identify its actual source location and quote')
+                    value_witness = task_review and isinstance(witness, dict) and set(witness) == {'path', 'value'}
+                    if not isinstance(witness, dict) or not value_witness and set(witness) != {'path', 'quote'}:
+                        raise ValueError('review witness must identify its actual source location and quote/value')
                     path, quote = witness.get('path'), witness.get('quote')
                     if (not isinstance(path, list) or not path or path[0] not in ('input', 'context', 'sources')
-                            or not isinstance(quote, str) or not quote):
+                            or not value_witness and (not isinstance(quote, str) or not quote)):
                         raise ValueError('review witness must locate an actual original source/context')
                     cursor: Any = original
                     try:
@@ -116,7 +144,10 @@ class BasisAssessment:
                             cursor = cursor[step]
                     except (KeyError, IndexError, TypeError) as exc:
                         raise ValueError('review witness source location is absent') from exc
-                    if not isinstance(cursor, str) or quote not in cursor:
+                    if value_witness:
+                        if _canonical(cursor) != _canonical(witness['value']):
+                            raise ValueError('review witness value differs at its actual source location')
+                    elif not isinstance(cursor, str) or not isinstance(quote, str) or quote not in cursor:
                         raise ValueError('review witness text is absent at its actual source location')
 
     def outcome(self, item_id: str) -> bool | None:
@@ -124,7 +155,22 @@ class BasisAssessment:
         decisions = tuple(row['decisions'].values())
         if 'fail' in decisions:
             return False
-        return True if all(value == 'pass' for value in decisions) else None
+        task_review = json.loads(self.packet)['record'].get('schema') == 'twin.task-basis-assessment/v2'
+        return True if all(value == 'pass' or task_review and value == 'not-applicable' for value in decisions) and 'pass' in decisions else None
+
+
+def _later_ethics_dimensions(actual: dict[str, Any]) -> set[str]:
+    from .task_contracts import validate
+    answer = actual['answer']
+    validate('EthicsAnswer', answer)
+    ladder = answer['ladder']
+    names = ['purpose', 'necessity', 'proportionality']
+    rungs, stop = ladder['rungs'], ladder['stopped_at']
+    if (answer['admitted'] or stop not in names or len(rungs) != names.index(stop) + 1
+            or [item['rung'] for item in rungs] != names[:len(rungs)]
+            or any(not item['passed'] for item in rungs[:-1]) or rungs[-1]['passed']):
+        raise ValueError('ethics N/A requires an actual verified stopping prefix')
+    return set(names[names.index(stop) + 1:])
 
 
 class ReviewStore:

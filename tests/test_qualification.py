@@ -69,14 +69,14 @@ def test_a_held_reference_cannot_enter_the_selected_population():
 
 def test_a_capture_cannot_borrow_a_different_actor_or_revised_population():
     actor = q.Actor.freeze(literal_actor, parse_position, {'purpose': 'TEST_ONLY'})
-    selected = q.Selection.freeze(actor, population(), basis_holds)
+    selected = q.Selection.freeze(actor, population(), basis_holds, test_only=q.TEST_ONLY_MECHANICS)
     captured = selected.capture()
     other = q.Actor.freeze(literal_actor, parse_position, {'purpose': 'TEST_ONLY', 'revision': 2})
-    foreign = q.Selection.freeze(other, population(), basis_holds)
+    foreign = q.Selection.freeze(other, population(), basis_holds, test_only=q.TEST_ONLY_MECHANICS)
     with pytest.raises(ValueError, match='selection'):
         foreign.evaluate(captured)
     with pytest.raises(ValueError, match='selection'):
-        q.Selection.freeze(actor, population(count=3), basis_holds).evaluate(captured)
+        q.Selection.freeze(actor, population(count=3), basis_holds, test_only=q.TEST_ONLY_MECHANICS).evaluate(captured)
     assert selected.evaluate(captured).score == 1.0
 
 
@@ -86,7 +86,7 @@ def test_a_capture_cannot_borrow_a_different_actor_or_revised_population():
 
 def test_reference_baseline_and_candidate_variance_are_separate_facts():
     selected = q.Selection.freeze(q.Actor.freeze(constant_actor, parse_position, {'purpose': 'TEST_ONLY'}),
-                                  population(), basis_holds)
+                                  population(), basis_holds, test_only=q.TEST_ONLY_MECHANICS)
     captured = selected.capture()
     facts = selected.facts(captured)
     assert facts['reference_score'] == 1.0
@@ -95,14 +95,14 @@ def test_reference_baseline_and_candidate_variance_are_separate_facts():
     assert facts['readings'][0].distinct == 1
     with pytest.raises(ValueError, match='reference projection'):
         wrong = q.Selection.freeze(selected.actor, population(), basis_holds,
-                                   reference_projection=wrong_reference)
+                                   reference_projection=wrong_reference, test_only=q.TEST_ONLY_MECHANICS)
         wrong.facts(wrong.capture())
 
 
 def test_a_modified_capture_cannot_be_attested_by_its_own_identity_fields():
     from dataclasses import replace
     selected = q.Selection.freeze(q.Actor.freeze(literal_actor, parse_position, {'purpose': 'TEST_ONLY'}),
-                                  population(), basis_holds)
+                                  population(), basis_holds, test_only=q.TEST_ONLY_MECHANICS)
     captured = selected.capture()
     changed = json.loads(captured.packet)
     changed['rows'][0]['output']['answer']['evolution_position'] = 0.99
@@ -140,7 +140,7 @@ def test_recording_lookup_and_test_only_permission_share_the_exact_capture(tmp_p
 
 def test_development_exposure_and_absent_approval_refuse_even_a_perfect_score(tmp_path):
     selected = q.Selection.freeze(q.Actor.freeze(literal_actor, parse_position, {'purpose': 'TEST_ONLY'}),
-                                  population(), basis_holds)
+                                  population(), basis_holds, test_only=q.TEST_ONLY_MECHANICS)
     captured = selected.capture()
     path = tmp_path / 'scores.jsonl'
     selected.record(captured, '2026-10-30T00:00:00Z', path)
@@ -172,8 +172,8 @@ def test_a_later_process_imports_only_the_protected_catalogues_exact_bundle(tmp_
     path.write_bytes(catalogue)
     restored = q.Resolver.from_catalogue(path, anchor, scores, allow_test_only=True)
     assert restored.permission('evolution-judge', selected.actor.model_version).granted
-    assert not q.Resolver.from_catalogue(path, anchor, scores).permission(
-        'evolution-judge', selected.actor.model_version).granted
+    with pytest.raises(ValueError, match='ordinary operational catalogue'):
+        q.Resolver.from_catalogue(path, anchor, scores)
     (tmp_path / 'capture.json').write_bytes(bundle + b' ')
     with pytest.raises(ValueError, match='bundle'):
         q.Resolver.from_catalogue(path, anchor, scores, allow_test_only=True)
@@ -357,7 +357,7 @@ def test_changed_support_source_revokes_the_binding_before_invocation_or_lookup(
     support.write_text('first prompt')
     pop = population()
     actor = q.Actor.freeze(literal_actor, parse_position, {'purpose': 'TEST_ONLY'}, support=(support,))
-    selected = q.Selection.freeze(actor, pop, basis_holds, review=q.PopulationReview.test_only(pop))
+    selected = q.Selection.freeze(actor, pop, basis_holds, review=q.PopulationReview.test_only(pop), test_only=q.TEST_ONLY_MECHANICS)
     captured = selected.capture()
     scores = tmp_path / 'scores.jsonl'
     selected.record(captured, '2026-10-30T00:00:00Z', scores)
@@ -376,7 +376,7 @@ def test_missing_exposure_facts_refuse_even_an_explicit_test_only_review(tmp_pat
     description['exposure'].pop(missing)
     pop = q.Population(q.canonical(description))
     selected = q.Selection.freeze(q.Actor.freeze(literal_actor, parse_position, {'purpose': 'TEST_ONLY'}),
-        pop, basis_holds, review=q.PopulationReview.test_only(pop))
+        pop, basis_holds, review=q.PopulationReview.test_only(pop), test_only=q.TEST_ONLY_MECHANICS)
     captured = selected.capture()
     scores = tmp_path / 'scores.jsonl'
     selected.record(captured, '2026-10-30T00:00:00Z', scores)
@@ -406,7 +406,7 @@ def test_a_held_development_trace_can_be_reported_without_promoting_its_referenc
     pop = q.Population.held_development_trace('evolution-judge', (held,), envelope(),
         {'status': 'development', 'history': ['already exposed'], 'training_provenance': 'unknown'})
     selected = q.Selection.freeze(q.Actor.freeze(literal_actor, parse_position, {'purpose': 'TEST_ONLY'}),
-        pop, basis_holds, review=q.PopulationReview.test_only(pop))
+        pop, basis_holds, review=q.PopulationReview.test_only(pop), test_only=q.TEST_ONLY_MECHANICS)
     captured = selected.capture()
     result = selected.evaluate(captured)
     assert result.attributable_rate is None and result.unscoreable == 1

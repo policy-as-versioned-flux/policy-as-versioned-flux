@@ -49,7 +49,7 @@ def assessed_selection():
     policy = BasisPolicy.freeze({'claim': 'TEST_ONLY semantics; no real qualification'},
         ('TEST_ONLY-independent-review',))
     return q.Selection.freeze(original.actor, original.population, basis_holds,
-        review=original.review, assessment_policy=policy)
+        review=original.review, assessment_policy=policy, test_only=q.TEST_ONLY_MECHANICS)
 
 
 def test_exact_independent_assessment_controls_the_actual_capture_evaluation(tmp_path):

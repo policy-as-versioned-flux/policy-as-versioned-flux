@@ -1,0 +1,101 @@
+{
+  "all_dimensions_present": true,
+  "authority": "Protected acquisition/store and frozen host issuer authority required. Receipt authentication does not establish truth or independent reviewer competence by self-declaration.",
+  "dimensions": {
+    "causal": [
+      "witness",
+      "applicability",
+      "sign_support",
+      "lag_support",
+      "elasticity_support",
+      "grade_support",
+      "units_calculations",
+      "alternatives_confounders"
+    ],
+    "ethics": [
+      "witness",
+      "applicability",
+      "policy_authority",
+      "purpose",
+      "necessity",
+      "proportionality",
+      "dpia",
+      "ladder_stop"
+    ],
+    "evolution": [
+      "witness",
+      "applicability",
+      "position_support",
+      "temporal_frame"
+    ],
+    "gameplay": [
+      "witness",
+      "applicability",
+      "positive_preconditions",
+      "negative_preconditions",
+      "complete_set",
+      "ownership_scope"
+    ]
+  },
+  "live_acceptance": "Both causal metric dimension sets must pass on the same output; all active dimensions for other tasks pass. Failed/held review remains consumed, counted, retained, without automatic resubmission or inference.",
+  "metric_dimensions": {
+    "causal-claims": [
+      "witness",
+      "applicability",
+      "sign_support",
+      "lag_support",
+      "elasticity_support",
+      "units_calculations",
+      "alternatives_confounders"
+    ],
+    "causal-claims-grade-accuracy": [
+      "witness",
+      "applicability",
+      "grade_support",
+      "alternatives_confounders"
+    ],
+    "ethics-gate": [
+      "witness",
+      "applicability",
+      "policy_authority",
+      "purpose",
+      "necessity",
+      "proportionality",
+      "dpia",
+      "ladder_stop"
+    ],
+    "evolution-judge": [
+      "witness",
+      "applicability",
+      "position_support",
+      "temporal_frame"
+    ],
+    "gameplay-lens": [
+      "witness",
+      "applicability",
+      "positive_preconditions",
+      "negative_preconditions",
+      "complete_set",
+      "ownership_scope"
+    ]
+  },
+  "not_applicable": "Allowed for explicit decline, or ethics necessity/proportionality strictly after actual verified failed stopping rung. No N/A dimension silently passes; metric outcome uses only contract-declared active dimensions. Other missing/uncertain support is held.",
+  "outcome": "Wrong answer remains WRONG; correct with active fail -> WRONG_BASIS; correct with held or no checkable basis -> UNSCOREABLE; correct with every active dimension pass -> RIGHT.",
+  "reviewer_input": "Actual raw answer/basis/output, input, original host sources/context and calculations; exclude expected/reference basis/metric results.",
+  "schema": "twin.basis-policy/v2-proposed",
+  "source_metadata_composition": "Applicability/witness review retains exact existing typed public source metadata, member/span lineage, observation kind, qualifier origin and day/month/unknown precision. Unknown publication cannot pass a known-age requirement; month is never promoted to a day. A producer qualifier or generator/update/review/event/capture observation cannot authenticate publisher publication. Actual protected import/authority remains host-held, not reviewer- or child-appointed.",
+  "support": "Every dimension has independent actual reason and source/context witness locations; pass requires checkable supporting witnesses. Exact bytes/value identity is necessary, never sufficient semantic support.",
+  "task_checks": {
+    "causal": "Review sign, lag, PERT magnitude, units/temporal interpretation and grade separately against actual original evidence/calculations; significance and generic mechanisms cannot fill quantities. Each grade claim retains actual evidence author/authority; human grade 4 cannot be self-created.",
+    "ethics": "Authenticate actual policy/sensor/completion provenance, ordered rung prefix, denial cause and mandatory DPIA; no general gameability/ethics or human signoff authority.",
+    "evolution": "Position is about this capability/adopter/date/frame; source coordinate in another frame cannot supply support.",
+    "gameplay": "Assess every positive and negative component/play precondition against whole pinned graph; exact complete set and own-overlay scope. No rival-absence inference; land-grab incumbency stays unchecked, as current catalogue declares."
+  },
+  "verdicts": [
+    "pass",
+    "fail",
+    "held",
+    "not-applicable"
+  ],
+  "versioning": "Signal v1 remains byte-compatible; task v2 binds exact dimensions, typed witness verifier and explicit applicability rules into policy/source identity."
+}

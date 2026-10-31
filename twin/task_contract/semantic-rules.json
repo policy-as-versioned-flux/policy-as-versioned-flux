@@ -1,0 +1,76 @@
+{
+  "constructors": {
+    "interface": "resolve_task_input(task_contract, protected_job, repo, source_store, party_bytes, party_pin) -> ResolvedTaskInput(payload, host_record, host_inputs())",
+    "rules": [
+      "Same constructor and shape for qualification/live; independently pinned registered authority/store is supplied by protected parent.",
+      "Protected registered task/metric determines all mandatory constructor/typed target/model/closure/assessment/group checks. Never branch to generic safety based on removable public context fields or optional assessment-policy presence. Selection.freeze/verify/verify_input, HostInputs use, invocation, review resume, restored catalogue/session and consumer validation all enforce this contract. Missing fields/policy/group always refuses. Live causal task cannot use ordinary single-metric judge.",
+      "PublicContext.metadata maps host-declared source IDs to the EXACT existing source_metadata.public_projection output. Reuse validate_public_projection, MetadataStore.resolve, source_binding and validate_parent_policy semantics; no flattened publication/excerpt aliases. Metadata schema definitions are imported mechanically with reference namespaces only; the original schema bytes are vendored unchanged.",
+      "Every source metadata binding is selected independently by protected job policy before child start. HostInputs/Selection retain actual registered MetadataStore and original authority policy handles privately. Resolve each source under that authority and compare exact acquired.public bytes with child-visible metadata plus retained per-source binding/public digest. Public digests/issuer strings cannot mint a handle, switch an authority, authenticate a publisher or prove historical first publication.",
+      "Public source projections retain declared source identity, receipt references, member descriptors, publication/observations, qualifier origins and exact visible span lineage as existing public_projection defines. Raw archive/receipt artifact bytes, store paths/objects, authority config/callables, private acquisition handles, split/selection decisions, expected labels/reference bases and postcapture semantic reviewer dispositions never enter child input. Existing bounded source-metadata review attribution is public provenance, not a hidden task judgement.",
+      "ModelRepo/Overlay resolution uses actual pinned clean closure and party pricing threshold. Current twenty actual definitions are preserved wherever task selects/whole-map gameplay; no renamed or five-choice substitute.",
+      "Fixed component/pair/sensor comes from protected job before child starts; no candidate target selection. Confounder list is exact shared-ancestor construction from actual declared graph and complete source closure.",
+      "Every task input field is source-authored or a declared deterministic projection whose source identity is frozen into actor/selection. Substantive estimation/conversion is measured composite computation, never a formatter.",
+      "HostContext input/source hash binds canonical full payload; preserve common source identity plus complete source_families and require every family inside the predeclared envelope. Task as_of and model_as_of remain exact independent ISO days. Source publication uses unchanged day/month/unknown object; source event/review/update/generation/capture observations remain separately typed. A genuinely known optional event_date is exact; absent/unknown event day is omitted, never day 1 or task/model date. Evidence has no forced source date; it identifies exact metadata.statement or visible excerpt and retains origin/span semantics.",
+      "Unknown publication is the exact existing bounded unknown object. Known publication must match its observed kind and actual normalization; review/update/event/generator/capture and producer-authored qualifiers cannot supply publisher-publication evidence. Reuse require_known_age: unknown holds known-age uses; month precision is never promoted to a day and holds policies requiring exact day. No quota/eligibility/count may decide the interpretation.",
+      "Preserve the existing public metadata input_construction_sha256 exactly as computed by its reviewed projector. The separate task input_constructor_sha256 composes actual task constructor, metadata validator/projector/normalizer/schema and source hashes plus frozen policy identity; never rewrite a source metadata construction field to masquerade as another projector. Changing any shape/helper/policy creates a new actor/case/population version.",
+      "Strict source schemas retain optional original source fields; these must not be discarded to fit output or token caps. Components validate through current source schema and exact resolver equality; GraphPosition/GraphEdge match actual Position.as_dict/Edge.as_dict including derived fields. Original authored edges validate upstream, emitted derived graph fields are verified against actual emission, not passed off as authored fields."
+    ]
+  },
+  "cross_field": [
+    "Target equals task component/from+to/org/sensor+policy; all IDs, definitions and names equal original pinned source.",
+    "No duplicate component IDs, graph IDs, opportunity pairs, confounder IDs or check pairs; duplicate pair refuses rather than deduplicating.",
+    "Gameplay positions/edges must exactly equal complete declared payload_for projection and all twenty definitions. Every own component/play pair occurs once in checks; true checks equal opportunity set, not post-filtered output.",
+    "Causal from != to and exact host ordered pair; min <= mode <= max; sign and lag keep original definitions. Units/elasticity_definition equal supplied Measurement; actual conversions/calculations remain candidate stated basis, never executed or authored by parser.",
+    "AssessmentRecord ordered rows equal request; decisions/support keys equal all frozen policy dimensions exactly; every active pass has actual witness and reason. Typed reviewer paths start input/context/sources; candidate paths are rooted inside public input and bound mechanically to that root. No path may access hidden expected/reference fields. Source witnesses resolve exact existing member ID/hash, half-open UTF-8 byte interval and origin role; producer qualifiers cannot become publisher quotation, transform separators cannot become source text, and unestablished derivations remain held.",
+    "Evidence.source_id selects an existing PublicContext.metadata key; visible_excerpt_id null means metadata.statement.text, otherwise exact matching visible_excerpts id and witness.text_utf8. Evidence.statement must equal that exact text, and all quotation/producer-origin and member/span lineage stays available at the referenced metadata path. No detached untyped excerpt or parallel date alias is accepted.",
+    "Causal output covers every supplied confounder exactly once; discounted status needs actual independent supporting witness. Alternatives nonempty; stronger grades require source authority, not model self-attribution.",
+    "Ethics ladder.rungs is exact ordered evaluated prefix; only final rung can fail and stop equals it; null stop requires all three pass. admitted true requires null stop. Denied with null stop is valid DPIA-blocked form.",
+    "DPIA complete true requires host-acquired completion record binding exact sensor/policy/date; missing completion is unknown/held, never silently false or true. No child creates human signoff.",
+    "Graph/value witnesses resolve exact JSON values with strict type equality; text witnesses resolve nonempty literal substrings. No negative index/path escape. Membership never establishes semantic entailment.",
+    "Proposal schema fixes task->answer/target/basis/mandatory_gate combination; causal requires edge, gameplay map, ethics sensor. Causal/gameplay mandatory_gate is null; ethics mandatory_gate is actual independently computed gate record.",
+    "Evolution headline projection uses existing position claim with grade 5, price false, host target/receipt and lossless canonical basis text. Validator gains explicit position original-source pin citations; no fabricated signal is added to satisfy existing binding-only pin accounting."
+  ],
+  "parser": [
+    "Decode exact UTF-8; reject duplicate keys, NaN/Infinity, trailing JSON, markdown and unexpected keys.",
+    "Use genuine JSON number/integer types, never bool; recursively require finite numbers and exact date validity.",
+    "One complete response or exactly Decline. Missing basis/quantity/grade/units cannot be supplied by defaults or hidden references.",
+    "Preserve raw bytes and complete answer/basis. Only predeclared terminal EOS handling; no substring extraction/repair.",
+    "Shape/refusal controls do not modify existing scorer decisions on valid answers; extra/missing valid gameplay opportunities reach unchanged exact-set scoring."
+  ],
+  "qualification": {
+    "thresholds": {
+      "causal-claims": [
+        0.8,
+        16
+      ],
+      "causal-claims-grade-accuracy": [
+        0.8,
+        16
+      ],
+      "ethics-gate": [
+        0.8,
+        16
+      ],
+      "evolution-judge": [
+        0.75,
+        12
+      ],
+      "gameplay-lens": [
+        0.65,
+        9
+      ]
+    },
+    "unchanged": [
+      "all seven original scorers",
+      "position tolerance .15",
+      "causal lag tolerance 60 days",
+      "elasticity mode tolerance .15",
+      "zero stronger-grade tolerance; at most one weaker rung",
+      "frozen-field baseline algorithm and strict beat",
+      "actual scorer-read-field variance/head readings",
+      "attributable-rate RIGHT/WRONG/WRONG_BASIS/UNSCOREABLE semantics",
+      "all ten current permission conditions",
+      "separate population authority/rights/source-family split/exposure review"
+    ]
+  }
+}

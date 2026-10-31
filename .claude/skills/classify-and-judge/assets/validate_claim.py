@@ -38,6 +38,12 @@ import yaml
 SCHEMA = "twin.headline-claim/v1"
 PIN_FIELDS = ("party", "kind", "name", "version")
 PARENT_KINDS = ("controls", "implementations", "feed")
+TASK_SCHEMAS = ('twin.causal-proposal/v1', 'twin.gameplay-proposal/v1', 'twin.ethics-judgement/v1')
+
+
+def task_document(doc):
+    return (doc.get('schema') in TASK_SCHEMAS
+            or 'task_contract_sha256' in (doc.get('run') or {}))
 
 
 def twin_facts(hub):
@@ -65,7 +71,12 @@ def permission_rules(hub, resolver=None):
         bound = resolver if resolver is not None else Resolver.from_checkout()
     except Exception as exc:  # noqa: BLE001 - failure to establish host facts refuses validation
         raise SystemExit(f"FAIL: cannot establish the protected model registry at {hub!r} ({exc})")
-    return mp.derive_clock, bound.check_claim_document, bound.permission
+    def check_document(doc, clock, lookup):
+        if task_document(doc):
+            from twin.qualified_tasks import validate_document
+            return validate_document(doc, bound, clock)
+        return bound.check_claim_document(doc, clock, lookup)
+    return mp.derive_clock, check_document, bound.permission
 
 
 def pin_key(pin):
@@ -82,11 +93,11 @@ def validate(doc, kinds, roles, headless=False, clock=None, permission=None):
     only on a `github` clock, the model-judging permission is graded here -- this function is
     the seam. Given neither, the file is checked exactly as before, which is what every
     human-run and local-clock path gets."""
-    if doc.get('schema') == 'twin.substrate-generation/v1':
+    if doc.get('schema') == 'twin.substrate-generation/v1' or doc.get('schema') in TASK_SCHEMAS:
         # Generation has no headline claim kind. It requires its protected parent receipt
         # checker even for a human/local invocation of this explicit model-only route.
         if permission is None or clock is None:
-            return ['protected generator validation requires the host resolver and derived clock']
+            return ['protected model document validation requires the host resolver and derived clock']
         check_document, lookup = permission
         return check_document(doc, clock, lookup)
     bad = []
@@ -118,7 +129,12 @@ def validate(doc, kinds, roles, headless=False, clock=None, permission=None):
          f"human-run skill records WHICH ROLE ran it")
 
     derived = doc.get("derived_from") or []
-    need(bool(derived), "derived_from is empty: a claim derived from nothing pinned is not evidence")
+    protected_task = task_document(doc)
+    if protected_task:
+        need(permission is not None and clock is not None,
+             'protected task validation requires the host resolver and derived clock')
+    else:
+        need(bool(derived), "derived_from is empty: a claim derived from nothing pinned is not evidence")
     for index, pin in enumerate(derived):
         for field in ("party", "kind", "version"):
             need(bool(pin.get(field)), f"derived_from[{index}] has no {field}")
@@ -216,7 +232,9 @@ def main(argv=None):
                         help="protected parent execution of this judge package's registered signal job")
     parser.add_argument("--run-registered-generation", metavar="ADOPTER",
                         help="protected parent execution of this judge package's registered generator job")
-    parser.add_argument("--output", help="new host evidence directory for registered signal execution")
+    parser.add_argument("--run-registered-task", nargs=2, metavar=('TASK', 'ADOPTER'),
+                        help="protected parent execution of a registered evolution/causal/gameplay/ethics job")
+    parser.add_argument("--output", help="new host evidence directory for registered execution")
     parser.add_argument("--twin", default=".",
                         help="the hub checkout holding the twin package and roles.yaml")
     parser.add_argument("--headless", action="store_true",
@@ -229,6 +247,16 @@ def main(argv=None):
                              "permission")
     args = parser.parse_args(argv)
 
+    if args.run_registered_task:
+        if args.claim or args.run_registered_signals or args.run_registered_generation or not args.output:
+            parser.error('registered task execution needs --output and no other execution or claim input')
+        sys.path.insert(0, os.path.abspath(args.twin))
+        from pathlib import Path
+        from twin.qualified_tasks import run_registered
+        task, adopter = args.run_registered_task
+        result = run_registered(task, adopter, Path(args.output), args.clock)
+        print(yaml.safe_dump(result, sort_keys=True))
+        return 0 if result['accepted'] else 2
     if args.run_registered_generation:
         if args.claim or args.run_registered_signals or not args.output:
             parser.error('registered generation needs --output and no claim or signal-job input')
@@ -262,8 +290,8 @@ def main(argv=None):
             print(f"not ok  {line}")
         print(f"FAIL: {args.claim} is not a claim file the twin can read")
         return 1
-    if doc.get('schema') == 'twin.substrate-generation/v1':
-        print(f"ok  {args.claim}: protected authored generator captures and counted dispositions match")
+    if doc.get('schema') == 'twin.substrate-generation/v1' or task_document(doc):
+        print(f"ok  {args.claim}: protected model captures, source pins and counted dispositions match")
         return 0
     kinds_used = sorted({claim["kind"] for claim in doc["claims"]})
     print(f"ok  {args.claim}: {len(doc['claims'])} claims, kinds {kinds_used}, all in the twin's "

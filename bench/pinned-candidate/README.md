@@ -124,3 +124,8 @@ The filter uses the [kernel seccomp interface](https://www.kernel.org/doc/html/n
 and [no_new_privs](https://www.kernel.org/doc/html/latest/userspace-api/no_new_privs.html),
 with constants from the Linux v6.16 [x86 syscall table](https://github.com/torvalds/linux/blob/v6.16/arch/x86/entry/syscalls/syscall_64.tbl)
 and [generic syscall definitions](https://github.com/torvalds/linux/blob/v6.16/include/uapi/asm-generic/unistd.h).
+
+The [paired Linux backend source contract](LINUX-BACKEND.md) describes the separate
+signal/substrate BF16 profiles, fixed protected guardian, bounded token journal and
+remaining observed kernel/runtime prerequisites. Source controls do not establish
+an installed target, model feasibility or qualification.
