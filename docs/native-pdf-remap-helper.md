@@ -1,8 +1,8 @@
 # Fixed PDF remap helper — source only
 
-`twin.pdf_remap_resources` owns the three fixed external Unicode-remapping resources and their extra read/effect DATA gate. It neither appoints a host nor launches a comparison. Actual staging, H selection, native capture, comparison-v2 acquisition and publication remain held.
+`twin.pdf_remap_resources` owns the three fixed external Unicode-remapping resources and their extra read/effect DATA gate. It neither appoints a host nor launches a comparison. Actual staging, H selection, native capture, actual comparison-v2 acquisition and publication remain held. The separate fixed source-only v2 route is documented in [pdf-remap-driver.md](pdf-remap-driver.md).
 
-The accepted retained-candidate proposal revision01 and root helper SOURCE-GO/CLARIFICATION-01–03 govern this source. The original comparison carrier repair `ad073fa3de74315e22a3d3a5fe7f02e320e76305` is an ancestor; no fallback to an earlier carrier exists. No comparison, bridge, native, output-origin, receipt, candidate, profile or issuer parser is modified by this helper.
+The accepted retained-candidate proposal revision01 and root helper SOURCE-GO/CLARIFICATION-01–03 govern this source. The original comparison carrier repair `ad073fa3de74315e22a3d3a5fe7f02e320e76305` is an ancestor; no fallback to an earlier carrier exists. The later fixed driver extracts only shared pure CaptureData checks from the comparator; bridge, native, output-origin, receipt, candidate, profile and issuer grammars remain unchanged.
 
 ## Pure DATA boundary
 
@@ -14,7 +14,7 @@ The resource bytes are respectively `0041 0041\n`, `0041 0042\n`, `0041 0041 004
 
 `check_remap_control(packet, baseline, patched)` accepts only closed DATA bundles (`observation`, `archive`, `plan`). It reruns unchanged comparison/native trace replay, patched bridge binding and the unchanged output-origin verifier. Both runs must show the selected raw `cwd/native-config` and external file opened through an exact canonical original route, with independently observed identity, and a full successful original-description read from offset0. Numeric descriptor generation is derived from prior opens; a genuine EOF after the full read is allowed. Unused declarations, partial/failed/zero reads, reopen/alias/seek/map/unknown offset, candidate substitution and identity drift refuse.
 
-At least one patched origin item must have `input_scalars=[65]`; every such item must show the selected mapped scalars and taint. Changed remap emits must be modified and remain witness-ineligible. Full stdout/stderr and typed natural-exit comparison remains required. Adverse DATA refuses; the future driver must retain those first originals and stop the original suite. This helper's DATA return cannot mutate or authorize that driver.
+At least one patched origin item must have `input_scalars=[65]`; every such item must show the selected mapped scalars and taint. Changed remap emits must be modified and remain witness-ineligible. Full stdout/stderr and typed natural-exit comparison remains required. Adverse DATA refuses; the fixed private source driver retains those first originals and stops the original suite. This helper's DATA return cannot mutate or authorize that driver.
 
 ## Unappointed technical body
 
@@ -30,7 +30,7 @@ Final cleanup irreversibly stops the carrier and requires `COMPLETE_STAGE`, no a
 
 ## Remaining integration and actual holds
 
-The original B10800, preparation60, target120, shared2-second target cleanup, 8GiB capacity, 52-invocation schedule, fixed candidate/schema/profile/issuer/index grammar and tiny900 contract are unchanged. There is no actual trusted original-suite selector or stage/H appointment. The existing comparison driver accepts ordinary v1; explicit v2 acquisition/completion validation, host evidence preselection, once-only original-suite DATA gate invocation, adverse-pair stop/retention and final-cleanup wiring require a separate reviewed change. No declaration here chooses build/config H or restores actual completion authority.
+The original B10800, preparation60, target120, shared2-second target cleanup, 8GiB capacity, 52-invocation schedule, fixed candidate/schema/profile/issuer/index grammar and tiny900 contract are unchanged. There is no actual trusted original-suite selector or stage/H appointment. The existing comparison driver accepts ordinary v1; the separate `pdf_remap_driver` source supplies explicit private v2 acquisition/completion validation, earlier-H evidence requirements, once-only original-suite DATA gate invocation, adverse-pair stop/retention and final-cleanup wiring. Its root/H/original appointments remain absent, so no actual run is selected. No declaration here chooses build/config H or restores actual completion authority.
 
 Pure worked traces and a private OS model test the bodies without performing any staging, PDF parsing, native execution, child, kernel, proc, tool, build or CI operation. Source acceptance does not prove genuine remap config use, actual resource closure, converter output, native kernel compatibility, cleanup efficacy, runner capacity or actual observation qualification.
 
@@ -42,4 +42,4 @@ Success observations now follow the last stage binding stat, final directory rem
 
 The private technical DATA adds `clock_observation` (`at`, original `deadline`, `status`) and `root_removal_known`. A successful physical rmdir is recorded before checking its elapsed time. If that rmdir or final close finishes late, or the resulting clock is unknown, the call raises and reports `REMOVED_HELD`, with `root_removal_known=true`, actual finite late observation (or null/UNKNOWN) and original removal/close facts. It never claims the already removed root was preserved. `root_removal_known=false` means no successful removal was observed; it does not prove presence after an uncertain OS outcome. `REMOVED` and `COMPLETE_STAGE` require an on-time final observation. Failed initial cleanup retains its first exception/cancellation and cannot borrow the final-suite window or retry.
 
-The repair changes only helper code, its pure controls and this document. The accepted carrier, build/native/bridge/origin/issuer source and all actual appointment, H, driver-v2/R21, target and publication holds remain unchanged.
+The repair changes only helper code, its pure controls and this document. The accepted carrier, build/native/bridge/origin/issuer source and all actual appointment, H, actual driver-v2/R21, target and publication holds remain unchanged; source-only driver wiring is described separately.

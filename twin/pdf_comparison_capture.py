@@ -856,9 +856,14 @@ def _wait(value: dict) -> None:
 
 
 def check_comparison_capture(record: dict, artifacts: dict[str,bytes], *, expected_plan: dict) -> dict:
-    """Check exported DATA consistency; public records never recreate completion."""
-    _closed(record,{'schema','purpose','observation_mode','plan_sha256','pair_plan_sha256','host_policy_sha256','host_evidence_sha256','run_id','invocation_sha256','process_sha256','run_clock_sha256','native_events_sha256','dependency_observation_sha256','stdout','stderr','terminal_wait','custody_sha256','cleanup','intervention','status','failure'})
+    """Ordinary v1 DATA only; exported facts never recreate private completion."""
     pair=_plan(expected_plan,artifacts)
+    return _check_capture_data(record,artifacts,expected_plan,pair)
+
+
+def _check_capture_data(record: dict, artifacts: dict[str,bytes], expected_plan: dict, pair: dict) -> dict:
+    """Shared closed DATA mechanics; callers first validate their fixed plan kind."""
+    _closed(record,{'schema','purpose','observation_mode','plan_sha256','pair_plan_sha256','host_policy_sha256','host_evidence_sha256','run_id','invocation_sha256','process_sha256','run_clock_sha256','native_events_sha256','dependency_observation_sha256','stdout','stderr','terminal_wait','custody_sha256','cleanup','intervention','status','failure'})
     if record['schema']!='TEST_ONLY-pdf-baseline-capture-data/v1' or record['purpose']!='TEST_ONLY' or record['plan_sha256']!=sm.sha256(sm.canonical(expected_plan)) or record['pair_plan_sha256']!=expected_plan['pair_plan_sha256']:raise ValueError('comparison data plan binding differs')
     mode=record['observation_mode'];status=record['status']
     if mode not in ('actual','SIMULATED_DATA','NOT_STARTED') or status not in ('COMPLETE_EXIT0_DATA','FAILED_DATA','HELD_BEFORE_OS') or record['cleanup'] not in ('removed','failed','preserved-uncertain','not-created') or record['intervention'] not in ('none','cleanup_intervention'):raise ValueError('comparison disposition differs')
