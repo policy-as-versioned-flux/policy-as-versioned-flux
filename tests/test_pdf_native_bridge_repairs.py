@@ -120,6 +120,8 @@ def test_two_host_eofs_may_interleave_with_the_same_successful_pending_close():
     stderr_entry,stderr_leave,stderr_eof=close_channel(obs,'stderr',interleave=False)
     stdout_entry,stdout_leave,stdout_eof=close_channel(obs,'stdout',interleave=True)
     obs['events'].remove(stderr_eof);obs['events'].insert(obs['events'].index(stdout_eof),stderr_eof);resequence(obs)
+    # Two closes move exit-stop to15000ns; preserve a possible wait before cleanup25000ns.
+    obs['events'][-1]['data']['wait']['observed_at_ns']=20000
     native.verify_native_observation(obs,archive,purpose='TEST_ONLY')
     result=bridge._complete_pdf_extraction(plan,parent,obs,archive);bridge.verify_pdf_extraction_bundle(plan,parent,result)
     dossier=sm._json(result['receipts'][result['dossier_sha256']]);envelope=sm._json(result['receipts'][dossier['pdf_origin_observation_sha256']])
