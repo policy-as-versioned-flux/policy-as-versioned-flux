@@ -354,14 +354,21 @@ def persist_observation(g:Any,base:dict[str,bytes],name:str,value:Any,*,budget:A
     base[name]=actual
 
 
+class ClosureStatRefused(ValueError):
+    """The observed fixed closure size bound failed, before any candidate read."""
+    def __init__(self,facts:dict[str,Any]):
+        super().__init__('unbounded OS closure member')
+        self.facts=facts
+
+
 def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,Any]],dict[str,Any]]:
     """Acquire actual existing OS bytes and native mappings, never execute ldd."""
     import os,sys,time
     budget.require_work(time.monotonic())
-    paths={'/usr/bin/python3.12'};loaded=set();caches=set()
+    paths={'/usr/bin/python3.12'};loaded=set();caches=set();modules=set()
     for module in tuple(sys.modules.values()):
         origin=getattr(module,'__file__',None)
-        if origin:loaded.add(str(origin));paths.add(str(origin))
+        if origin:loaded.add(str(origin));modules.add(str(origin));paths.add(str(origin))
         cache=getattr(module,'__cached__',None)
         if cache and Path(cache).exists():caches.add(str(cache));paths.add(str(cache))
     maps=Path('/proc/self/maps').read_text()
@@ -376,7 +383,22 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
     for path in sorted(paths):
         budget.require_work(time.monotonic())
         info=g.protected_path(path,True)
-        if info.st_size<=0 or info.st_size>256*1024**2:raise ValueError('unbounded OS closure member')
+        if info.st_size<=0 or info.st_size>256*1024**2:
+            observed=time.monotonic();budget.require_work(observed)
+            target='/app/'+Path(path).name if path.startswith(STORE+'/source/') else path
+            roles=[]
+            if path=='/usr/bin/python3.12':roles.append('interpreter')
+            if path in modules:roles.append('loaded-module')
+            if path in caches:roles.append('bytecode-cache')
+            if path in mapped:roles.append('native-mapping')
+            if path.startswith(STORE+'/source/'):roles.append('fixed-source')
+            stat_facts={'device':info.st_dev,'inode':info.st_ino,'mode':info.st_mode,'uid':info.st_uid,
+                'gid':info.st_gid,'links':info.st_nlink,'size':info.st_size,
+                'mtime_ns':info.st_mtime_ns,'ctime_ns':info.st_ctime_ns}
+            if any(type(value) is not int for value in stat_facts.values()):raise ValueError('unknown closure stat facts')
+            raise ClosureStatRefused({'stage':'discover-closure-stat-bound','source':path,'target':target,
+                'roles':sorted(roles),'stat':stat_facts,'bounds':{'minimum_exclusive':0,'maximum_inclusive':256*1024**2},
+                'observed_monotonic':observed,'protected_path_completed':True})
         identity=(info.st_dev,info.st_ino)
         if identity in identities:raise ValueError('ambiguous loaded inode alias')
         identities.add(identity)
@@ -1074,6 +1096,18 @@ def suite_main()->int:
             'schema':'TEST_ONLY-ci-principal-refusal/v1','status':'REFUSED',
             'started':budget.started,'deadline':budget.deadline,
             'observed_monotonic':time.monotonic(),'reason':str(failure),'facts':failure.facts},budget=budget)
+        outcome={'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL','executed':False,'control_passed':False,
+            'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,
+            'finished':time.monotonic(),'reason':type(failure).__name__+': '+str(failure)}
+    except ClosureStatRefused as failure:
+        # Only this already-observed size predicate has a diagnostic disposition.
+        # Unknown stat/source/caller/custody failures still propagate unchanged.
+        budget.require_work(time.monotonic());caller.verify()
+        persist_observation(g,base,'suite/installation.json',{
+            'schema':'TEST_ONLY-ci-installation-refusal/v1','status':'REFUSED',
+            'started':budget.started,'deadline':budget.deadline,
+            'observed_monotonic':time.monotonic(),'reason':str(failure),'facts':failure.facts},budget=budget)
+        caller.verify();budget.require_work(time.monotonic())
         outcome={'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL','executed':False,'control_passed':False,
             'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,
             'finished':time.monotonic(),'reason':type(failure).__name__+': '+str(failure)}

@@ -123,3 +123,13 @@ The separately source-appointed CI route uses existing `irc` UID39/GID39, with
 exact name/group and all existing safety checks. Its suitability must be
 observed before any actual attempt. The ordinary production route continues
 to select `nobody`; neither route creates an account or falls back to another.
+
+The existing-CI coordinator retains a narrow typed diagnostic when an already
+protected closure member fails the unchanged `0 < size <= 256MiB` predicate.
+It records the asked source, initial jail target, observed roles and stat facts
+before reading that member, then persists protected `suite/installation.json`
+as REFUSED and exports FAIL with prior source/caller/context/principal/kernel
+records. Zero-size files remain refused. Unknown stat/read/close, caller,
+persistence, tamper and deadline errors do not enter that diagnostic branch.
+The actual refused member and size remain unknown until a separately authorized
+original capture retains them; portable models do not establish that cause.
