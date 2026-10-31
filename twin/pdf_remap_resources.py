@@ -167,6 +167,10 @@ def check_remap_plan(packet:dict)->dict:
     if executable is None or {k:executable[k] for k in ('sha256','bytes')}!=plan['executable']:raise RemapHold('selected executable candidate differs')
     resource=pair['resource'];candidate={'path':resource['path'],**resource['blob']}
     if [row for row in rows if row['path']==resource['path']]!=[candidate]:raise RemapHold('exact external candidate required')
+    # The fixed external resource is the sole v2 addition to the accepted
+    # pristine build's ordinary dependency map. Retained bytes do not select
+    # another library. Recorder and fixed workspace additions stay separate.
+    c._reconcile_build_candidates(pair,[row for row in rows if row['path']!=resource['path']],archive)
     root=resource['path'].rsplit('/',1)[0]
     if any(row['path']==root+'/'+name for row in rows for control,name,_ in RECIPES if control!=resource['control']):raise RemapHold('only selected resource belongs to each run')
     return association
@@ -340,6 +344,8 @@ class _StageState:
     final_deadline:float|None
     final_attempted:bool
     last_time:float|None
+    root_removal_known:bool
+    clock_observation:dict
     guard:Any
     fds:set[int]
     uncertain:bool
@@ -379,10 +385,25 @@ def _clock()->float:
     return now
 
 
+def _clock_value(state:_StageState,deadline:float|None)->float:
+    state.clock_observation={'at':None,'deadline':deadline,'status':'UNKNOWN'}
+    try:now=_clock()
+    except BaseException:
+        _remember(state,'clock-hold',observation=copy.deepcopy(state.clock_observation))
+        raise
+    state.clock_observation={'at':now,'deadline':deadline,'status':'OBSERVED'}
+    return now
+
+
 def _tick(state:_StageState,deadline:float|None)->None:
-    now=_clock()
-    if deadline is None or now>=deadline or state.last_time is not None and now<state.last_time:raise RemapHold('original technical deadline exhausted/unknown/nonmonotonic')
-    state.last_time=now
+    now=_clock_value(state,deadline)
+    status=('UNKNOWN' if deadline is None else 'NONMONOTONIC' if state.last_time is not None and now<state.last_time
+            else 'LATE' if now>=deadline else 'ONTIME')
+    state.clock_observation['status']=status
+    if state.last_time is None or now>state.last_time:state.last_time=now
+    if status!='ONTIME':
+        _remember(state,'clock-hold',observation=copy.deepcopy(state.clock_observation))
+        raise RemapHold('original technical deadline exhausted/unknown/nonmonotonic')
 
 
 def _remember(state:_StageState,operation:str,**facts:Any)->None:
@@ -442,19 +463,21 @@ def _binding(state:_StageState)->None:
 
 def _remove_owned(state:_StageState,deadline:float|None)->None:
     if state.uncertain:raise RemapHold('uncertain technical ownership: preserve root')
-    _tick(state,deadline);_binding(state)
+    _tick(state,deadline);_binding(state);_tick(state,deadline)
     for name,identity in list(state.owned.items()):
-        _tick(state,deadline);_binding(state)
+        _tick(state,deadline);_binding(state);_tick(state,deadline)
         actual=_stat_identity(os.stat(name,dir_fd=state.root_fd,follow_symlinks=False))
         if actual!=identity:raise RemapHold('owned fixed resource replaced: preserve root')
+        _tick(state,deadline)
         state.uncertain=True
         os.unlink(name,dir_fd=state.root_fd)
         state.uncertain=False;del state.owned[name];_remember(state,'unlink',path=name)
-    _tick(state,deadline);_binding(state)
+    _tick(state,deadline);_binding(state);_tick(state,deadline)
     state.uncertain=True
     os.rmdir(state.root.rsplit('/',1)[1],dir_fd=state.parent_fd)
-    state.uncertain=False;_remember(state,'rmdir',path=state.root)
+    state.uncertain=False;state.root_removal_known=True;_remember(state,'rmdir',path=state.root)
     _close_remaining(state)
+    _tick(state,deadline)  # Includes the returned rmdir and every final close.
     if state.uncertain:raise RemapHold('technical close ownership uncertain after removal')
     state.phase='REMOVED'
 
@@ -463,10 +486,18 @@ def _stage_data(state:_StageState)->dict:
     value={'schema':'TEST_ONLY-pdf-remap-technical-custody/v1','qualification':'NONE','phase':state.phase,
         'root':state.root,'stage_deadline':state.deadline,'final_cleanup_deadline':state.final_deadline,
         'uncertain_ownership':state.uncertain,'open_fds':sorted(state.fds),'created_files':sorted(state.owned),
-        'identities':state.identities,'facts':state.facts,'failure':state.failure}
+        'identities':state.identities,'facts':state.facts,'failure':state.failure,
+        'root_removal_known':state.root_removal_known,'clock_observation':state.clock_observation}
     raw=sm.canonical(value)
     if len(raw)>2*MIB:raise RemapHold('technical retention exceeds charged capacity')
     return copy.deepcopy(value)
+
+
+def _success_data(state:_StageState,deadline:float|None)->dict:
+    # Bound serialization/copying precedes the final success observation as well.
+    data=_stage_data(state);_tick(state,deadline)
+    data['clock_observation']=copy.deepcopy(state.clock_observation)
+    return data
 
 
 def _stage_remap_resources(original:c.OriginalComparisonSuite,fixture_root:str)->dict:
@@ -480,6 +511,7 @@ def _stage_remap_resources(original:c.OriginalComparisonSuite,fixture_root:str)-
             or original._active_slot is not None or not original._target_custody_known or original._awaiting_comparison):raise RemapHold('initial original suite staging slot required')
     state=object.__new__(_StageState)
     state.phase='ALLOCATED';state.root='';state.deadline=None;state.final_deadline=None;state.final_attempted=False;state.last_time=None
+    state.root_removal_known=False;state.clock_observation={'at':None,'deadline':None,'status':'NOT_OBSERVED'}
     state.guard=None;state.fds=set();state.uncertain=False;state.parent_fd=None;state.root_fd=None
     state.parent_identity=None;state.root_identity=None;state.owned={};state.identities={};state.facts=[];state.failure=None
     original._technical_state=state  # Before root parsing, source reads or clocks.
@@ -487,7 +519,7 @@ def _stage_remap_resources(original:c.OriginalComparisonSuite,fixture_root:str)-
         # Reserve the complete finite custody/three-blob bound before retention;
         # never refund, including a rejected stage. No independent byte ledger.
         c._charge_technical_bytes(original,2*MIB)
-        state.root=_root(fixture_root);now=_clock()
+        state.root=_root(fixture_root);now=_clock_value(state,None)
         if now<original._started:raise RemapHold('technical clock precedes original suite')
         state.last_time=now;state.deadline=min(now+5,original._started+60,original._started+c.B_SECONDS)
         _tick(state,state.deadline);state.guard=_source_guard();state.guard.verify();_tick(state,state.deadline)
@@ -532,8 +564,8 @@ def _stage_remap_resources(original:c.OriginalComparisonSuite,fixture_root:str)-
             if before!=after or got!=raw or _stat_identity(os.stat(filename,dir_fd=state.root_fd,follow_symlinks=False))!=after:raise RemapHold('staged readback bytes/hash/identity drift')
             _close(state,reader);state.identities[control]=after
             _remember(state,'readback',path=filename,sha256=sm.sha256(got),bytes=len(got),identity=after)
-        _tick(state,state.deadline);_binding(state);state.phase='COMPLETE_STAGE'
-        return _stage_data(state)
+        _tick(state,state.deadline);_binding(state);_tick(state,state.deadline);state.phase='COMPLETE_STAGE'
+        return _success_data(state,state.deadline)
     except BaseException as error:
         state.failure=_fault(error);state.phase='FAILED';original._stopped=True
         _close_remaining(state,transient_only=True)
@@ -541,7 +573,7 @@ def _stage_remap_resources(original:c.OriginalComparisonSuite,fixture_root:str)-
             if state.root_identity is not None:_remove_owned(state,state.deadline)
             else:_close_remaining(state)
         except BaseException as cleanup_error:
-            state.phase='PRESERVED';_remember(state,'failure-cleanup-hold',error=_fault(cleanup_error));_close_remaining(state)
+            state.phase='REMOVED_HELD' if state.root_removal_known else 'PRESERVED';_remember(state,'failure-cleanup-hold',error=_fault(cleanup_error));_close_remaining(state)
         raise
 
 
@@ -559,11 +591,11 @@ def _cleanup_remap_resources(original:c.OriginalComparisonSuite)->dict:
             or original._target_custody_known is not True):raise RemapHold('complete stage and independently known terminal targets required')
     original._stopped=True;state.final_attempted=True
     try:
-        now=_clock()
+        now=_clock_value(state,None)
         if now<original._started or state.last_time is not None and now<state.last_time:raise RemapHold('final clock precedes original technical interval')
         state.final_deadline=min(now+2,original._started+c.B_SECONDS)
         _tick(state,state.final_deadline);state.guard.verify();_remove_owned(state,state.final_deadline)
+        return _success_data(state,state.final_deadline)
     except BaseException as error:
-        state.failure=_fault(error);state.phase='PRESERVED';_close_remaining(state)
+        state.failure=_fault(error);state.phase='REMOVED_HELD' if state.root_removal_known else 'PRESERVED';_close_remaining(state)
         raise
-    return _stage_data(state)

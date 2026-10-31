@@ -447,3 +447,91 @@ def test_staging_cancellation_preserves_original_exception_and_one_placeholder(m
     assert seen.value is error and original._stopped
     assert r._held_stage_data(original)['failure']['kind']==exception.__name__
     with pytest.raises(ValueError):r._stage_remap_resources(original,'/TEST_ONLY/retry')
+
+
+@pytest.mark.parametrize('change',['extra','omitted','hash','size','path','duplicate'])
+def test_rehashed_v2_standard_candidates_remain_exact_accepted_build(change):
+    packet=copy.deepcopy(prepared()[0]);plan=packet['comparison_plan'];archive=packet['archive']
+    rows=sm._json(archive[plan['candidate_inventory_sha256']]);at=next(i for i,row in enumerate(rows) if row['path']=='/lib/loader')
+    if change=='extra':rows.append({'path':'/lib/unselected','sha256':blob(archive,b'not build-selected'),'bytes':18})
+    if change=='omitted':rows.pop(at)
+    if change=='hash':rows[at].update(sha256=blob(archive,b'changed dependency'),bytes=18)
+    if change=='size':rows[at]['bytes']+=1
+    if change=='path':rows[at]['path']='/lib/another-route'
+    if change=='duplicate':rows.append(copy.deepcopy(rows[at]))
+    plan['candidate_inventory_sha256']=blob(archive,sm.canonical(rows))
+    with pytest.raises(ValueError):r.check_remap_plan(packet)
+
+
+@pytest.mark.parametrize('operation',['rmdir','last-close'])
+@pytest.mark.parametrize('clock_fault',['late','unknown'])
+def test_completed_physical_removal_is_retained_when_final_timing_is_held(monkeypatch,operation,clock_fault):
+    original,model,clock=stage_model(monkeypatch);r._stage_remap_resources(original,'/TEST_ONLY/resources')
+    clock[0]=original._started+c.B_SECONDS-.25
+    def fault():clock[0]=original._started+c.B_SECONDS+.25 if clock_fault=='late' else float('nan')
+    if operation=='rmdir':
+        remove=model.rmdir
+        def delayed(path,dir_fd=None):
+            result=remove(path,dir_fd=dir_fd);fault();return result
+        model.rmdir=delayed
+    else:
+        close=model.close
+        def delayed_close(fd):
+            result=close(fd)
+            if not model.fds:fault()
+            return result
+        model.close=delayed_close
+    monkeypatch.setattr(r,'os',model.surface())
+    with pytest.raises(ValueError):r._cleanup_remap_resources(original)
+    data=r._held_stage_data(original)
+    assert data['phase']=='REMOVED_HELD' and data['root_removal_known'] is True
+    assert '/TEST_ONLY/resources' not in model.nodes and model.fds=={}
+    assert data['clock_observation']['status']==('LATE' if clock_fault=='late' else 'UNKNOWN')
+    if clock_fault=='late':assert data['clock_observation']['at']==original._started+c.B_SECONDS+.25
+    else:assert data['clock_observation']['at'] is None
+    assert data['final_cleanup_deadline']==original._started+c.B_SECONDS
+    assert sum(row['operation']=='rmdir' for row in data['facts'])==1
+    with pytest.raises(ValueError):r._cleanup_remap_resources(original)
+
+
+@pytest.mark.parametrize('step',['stage-return','cleanup-return'])
+def test_immediate_presuccess_clock_veto_cannot_be_renewed_or_retry(monkeypatch,step):
+    original,model,clock=stage_model(monkeypatch)
+    base_clock=r.time.monotonic
+    if step=='cleanup-return':r._stage_remap_resources(original,'/TEST_ONLY/resources')
+    def final_clock():
+        state=original._technical_state
+        trigger=state is not None and state.phase==('COMPLETE_STAGE' if step=='stage-return' else 'REMOVED')
+        if trigger:return (state.deadline if step=='stage-return' else state.final_deadline)+.25
+        return base_clock()
+    monkeypatch.setattr(r.time,'monotonic',final_clock)
+    with pytest.raises(ValueError):
+        if step=='stage-return':r._stage_remap_resources(original,'/TEST_ONLY/resources')
+        else:r._cleanup_remap_resources(original)
+    data=r._held_stage_data(original)
+    assert original._stopped
+    if step=='stage-return':
+        assert data['phase']=='PRESERVED' and '/TEST_ONLY/resources' in model.nodes
+        assert any(row.get('observation',{}).get('status')=='LATE' for row in data['facts'])
+        assert data['clock_observation']['status']=='NONMONOTONIC'
+    else:assert data['phase']=='REMOVED_HELD' and data['root_removal_known']
+    with pytest.raises(ValueError):r._stage_remap_resources(original,'/TEST_ONLY/retry')
+    with pytest.raises(ValueError):r._cleanup_remap_resources(original)
+
+
+@pytest.mark.parametrize('exception',[OSError,KeyboardInterrupt,SystemExit])
+def test_initial_failure_cleanup_late_removal_retains_first_failure_and_original_window(monkeypatch,exception):
+    original,model,clock=stage_model(monkeypatch);remove=model.rmdir
+    error=exception('TEST_ONLY first failure')
+    def fail(fd,raw):raise error
+    def delayed_remove(path,dir_fd=None):
+        result=remove(path,dir_fd=dir_fd);clock[0]=original._started+6.25;return result
+    model.write=fail;model.rmdir=delayed_remove;monkeypatch.setattr(r,'os',model.surface())
+    with pytest.raises(exception) as seen:r._stage_remap_resources(original,'/TEST_ONLY/resources')
+    assert seen.value is error
+    data=r._held_stage_data(original)
+    assert data['failure']['kind']==exception.__name__ and data['phase']=='REMOVED_HELD'
+    assert data['root_removal_known'] and '/TEST_ONLY/resources' not in model.nodes and model.fds=={}
+    assert data['stage_deadline']==original._started+6 and data['final_cleanup_deadline'] is None
+    assert data['clock_observation']['status']=='LATE'
+    with pytest.raises(ValueError):r._cleanup_remap_resources(original)
