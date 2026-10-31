@@ -339,13 +339,19 @@ def test_os_boundary_timeout_and_stream_caps_reap_without_success(monkeypatch,fa
             instances.append(self)
         def wait(self,timeout):
             self.waits+=1
-            if self.waits==1:
-                raise migration.subprocess.TimeoutExpired('TEST_ONLY fake child',timeout)
+            assert signals == [(self.pid,signal.SIGTERM),(self.pid,signal.SIGKILL)]
             for writer in self.writers:os.close(writer)
             self.writers=[];self.returncode=-9
             return self.returncode
     monkeypatch.setattr(migration.subprocess,'Popen',FakeProcess)
-    monkeypatch.setattr(migration.os,'killpg',lambda pid,sig:signals.append((pid,sig)))
+    def own_group(pid,sig):
+        if sig:
+            assert not instances[0].waits, 'no destructive signal after direct-child reap'
+            signals.append((pid,sig))
+        elif instances[0].waits:
+            raise ProcessLookupError('TEST_ONLY group absence')
+    monkeypatch.setattr(migration.os,'killpg',own_group)
+    monkeypatch.setattr(migration.os,'waitid',lambda *args:None)
     if failure=='timeout':
         clock=iter([0.,100.,1000.])
         monkeypatch.setattr(migration.time,'monotonic',lambda:next(clock,1000.))
@@ -358,8 +364,10 @@ def test_os_boundary_timeout_and_stream_caps_reap_without_success(monkeypatch,fa
     result=migration.execute_new_extraction(plan,b'A')
     assert result['status']=='failure' and result['failure']==failure and 'index_sha256' not in result
     assert [sig for _,sig in signals]==[signal.SIGTERM,signal.SIGKILL]
-    assert instances[0].waits==2 and instances[0].stdout.closed and instances[0].stderr.closed
     dossier=sm._json(result['receipts'][result['dossier_sha256']])
+    assert instances[0].waits==1 and instances[0].stdout.closed and instances[0].stderr.closed
+    assert dossier['process_group']['direct_child_reaped'] is True
+    assert dossier['process_group']['absence_verified'] is True
     assert not dossier['streams_complete'] and dossier['standard_receipt_sha256'] is None
     if failure!='timeout':
         stream=failure.split('-')[0]
