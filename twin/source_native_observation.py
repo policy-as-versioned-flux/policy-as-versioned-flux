@@ -450,6 +450,9 @@ def _validate_native_run(observation: dict) -> None:
         raise ValueError('shared native cleanup deadline differs')
     wait=terminal['data']['wait'];_validate_wait(wait,terminal['data']['returncode'],success=True)
     if wait['observed_at_ns']>elapsed: raise ValueError('actual wait after terminal')
+    exit_stop=next(event['at_ns'] for event in events if event['kind']=='exit-stop')
+    if not exit_stop<=wait['observed_at_ns']<=cleanup-start:
+        raise ValueError('actual wait outside checked exit/cleanup interval')
 
 
 def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *, purpose: str) -> dict:

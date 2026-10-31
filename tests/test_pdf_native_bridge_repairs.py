@@ -125,3 +125,36 @@ def test_two_host_eofs_may_interleave_with_the_same_successful_pending_close():
     dossier=sm._json(result['receipts'][result['dossier_sha256']]);envelope=sm._json(result['receipts'][dossier['pdf_origin_observation_sha256']])
     for name,entry,leave in [('stdout',stdout_entry,stdout_leave),('stderr',stderr_entry,stderr_leave)]:
         assert envelope['streams'][name]['closure']=={'kind':'explicit-close','enter_seq':entry['seq'],'leave_seq':leave['seq']}
+
+
+WAIT_CASES=[(0,False),(8999,False),(9000,True),(9001,True),(14000,True),
+            (24999,True),(25000,True),(25001,False),(30000,False),(30001,False)]
+
+
+def assert_wait_fixture_interval(observation):
+    assert next(e['at_ns'] for e in observation['events'] if e['kind']=='exit-stop')==9000
+    run=observation['run'];assert run['cleanup_started_ns']-run['monotonic_start_ns']==25000
+    assert run['elapsed_ns']==30000
+
+
+@pytest.mark.parametrize('observed_at_ns,accepted',WAIT_CASES)
+def test_successful_wait_observation_is_inside_checked_exit_to_cleanup_interval(observed_at_ns,accepted):
+    obs,archive=native_fixture();assert_wait_fixture_interval(obs)
+    obs['events'][-1]['data']['wait']['observed_at_ns']=observed_at_ns
+    if accepted:
+        native.verify_native_observation(obs,archive,purpose='TEST_ONLY')
+    else:
+        with pytest.raises(ValueError):native.verify_native_observation(obs,archive,purpose='TEST_ONLY')
+
+
+@pytest.mark.parametrize('observed_at_ns,accepted',WAIT_CASES)
+def test_completed_bundle_preserves_wait_stage_boundaries_without_ordering_eof_before_wait(observed_at_ns,accepted):
+    plan,parent,obs,archive=bundle_fixture();assert_wait_fixture_interval(obs)
+    obs['events'][-1]['data']['wait']['observed_at_ns']=observed_at_ns
+    if accepted:
+        result=bridge._complete_pdf_extraction(plan,parent,obs,archive)
+        bridge.verify_pdf_extraction_bundle(plan,parent,result)
+        if observed_at_ns==14000:
+            assert all(9000<e['at_ns']<observed_at_ns for e in obs['events'] if e['kind']=='pipe-eof')
+    else:
+        with pytest.raises(ValueError):bridge._complete_pdf_extraction(plan,parent,obs,archive)
