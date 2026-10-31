@@ -39,7 +39,7 @@ class _Selection(_Private):
 
 class _Cell(_Private):
     def __setattr__(self,name:str,value:Any)->None:
-        if name in ('_original','_stage','_selection','_selection_raw','_guard','_allocations') and hasattr(self,name):raise StorageHold('immutable C1 ownership/source association')
+        if name in ('_original','_stage','_selection','_selection_raw','_guard','_anchor','_allocations') and hasattr(self,name):raise StorageHold('immutable C1 ownership/source association')
         object.__setattr__(self,name,value)
     _original:c.OriginalComparisonSuite
     _stage:r._StageState|None
@@ -50,6 +50,7 @@ class _Cell(_Private):
     first_failure:dict|None
     first_exception:BaseException|None
     _guard:Any
+    _anchor:Any
     busy:bool
     technical_phase:str
     _allocations:tuple[_Allocation,...]
@@ -123,11 +124,12 @@ _GUARD_VERIFY=_Guard.verify
 
 def _verify_guard(guard:Any)->None:
     if type(guard) is _Guard:
-        # Core binds this fixed verifier function/code before its reached call.
-        # Frozen-instance fault hooks in pure tests are not public construction.
+        # Entries already authenticated this inner function through the held
+        # core. Keep the local15-method guard; model transports are checked by
+        # that same entry anchor and _end, without duplicate fault callbacks.
         guard._core.verify()
         if type(guard).verify is not _GUARD_VERIFY:raise StorageHold('fixed C1 verifier dispatch changed')
-    guard.verify()
+        guard.verify()
 
 # A future trusted original genesis must already hold this exact private birth
 # object. No source factory, setter, context/hash importer or actual appointment.
@@ -210,16 +212,22 @@ def _allocate_selected_stage(original:c.OriginalComparisonSuite)->r._StageState:
     cell=object.__new__(_Cell)
     for name,value in {'_original':original,'_stage':None,'_selection':selected,'_selection_raw':selected._record,'phase':'INITIALIZING',
                        'journal':[{'operation':'INITIALIZE','status':'PENDING','slot':None}],'first_failure':None,'first_exception':None,
-                       'busy':True,'_guard':selected._guard,'technical_phase':'NOT_CHARGED'}.items():object.__setattr__(cell,name,value)
+                       'busy':True,'_guard':selected._guard,'_anchor':getattr(selected._guard,'_core',selected._guard),'technical_phase':'NOT_CHARGED'}.items():object.__setattr__(cell,name,value)
     object.__setattr__(selected,'_initial_cell',cell)
     try:
+        cell._anchor.verify()
         _verify_guard(cell._guard)
+        cell._anchor.verify()
         state=r._stage_placeholder(original)
         object.__setattr__(cell,'_stage',state)
         state._capture_storage=cell;original._technical_state=state
+        cell._anchor.verify()
         c._check_original_suite(original)
+        cell._anchor.verify()
         _original_window(original,60)
+        cell._anchor.verify()
         guard=selected._guard;_verify_guard(guard)
+        cell._anchor.verify()
         _check_birth(cell)
         if original._reserve!=RESERVE:raise StorageHold('initial frozen reserve differs')
         allocations=[]
@@ -230,11 +238,25 @@ def _allocate_selected_stage(original:c.OriginalComparisonSuite)->r._StageState:
             allocation.phase='OPEN' if index==52 else 'UNOPENED';allocation.issued=LEDGER if index==52 else 0;allocation.retained=0;allocation.permits=[]
             allocations.append(allocation)
         cell._allocations=tuple(allocations);cell._owners=[]
+        cell._anchor.verify()
         cell.technical_phase='PENDING';c._charge_technical_bytes(original,TECHNICAL);cell.technical_phase='CHARGED'
-        cell.phase='READY';_check_cell(cell);_original_window(original,60);cell.journal[0]['status']='APPLIED';cell.busy=False
+        cell.phase='READY';cell._anchor.verify();_check_cell(cell)
+        cell._anchor.verify();_original_window(original,60)
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        elapsed=c.time.monotonic()-original._started
+        if not 0<=elapsed<=60:raise StorageHold('original preparation deadline unavailable after authentication')
+        cell.journal[0]['status']='APPLIED';object.__setattr__(cell,'busy',False)
         return state
     except BaseException as error:
-        _fail(cell,error,'INITIALIZE');raise
+        # This held entry cannot dispatch a possibly revoked emergency helper.
+        object.__setattr__(original,'_stopped',True);object.__setattr__(cell,'phase','STOPPED')
+        if cell.first_failure is None:
+            object.__setattr__(cell,'first_exception',error)
+            object.__setattr__(cell,'first_failure',{'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':'INITIALIZE','exception_type':type(error).__name__[:80],
+                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'})
+        if cell.journal and cell.journal[-1]['status']=='PENDING':cell.journal[-1]['status']='HELD'
+        raise
 
 
 def _fail(cell:_Cell,error:BaseException,operation:str)->None:
@@ -286,28 +308,56 @@ def _original_window(original:c.OriginalComparisonSuite,seconds:int)->None:
 
 
 def _begin(original:c.OriginalComparisonSuite,operation:str)->_Cell:
+    # Only a fixed held entry can open the row before its direct core check.
     cell=_bound_cell(original)
     try:
-        if cell.busy or cell.phase!='READY' or original._stopped:raise StorageHold('storage transition stopped or reentered')
-        object.__setattr__(cell,'busy',True)
-        if operation not in OPERATIONS:raise StorageHold('closed storage operation required')
-        if len(cell.journal)>=MAX_JOURNAL:raise StorageHold('finite storage journal exhausted')
-        cell.journal.append({'operation':operation,'status':'PENDING','slot':original._next})
+        if (not cell.busy or cell.phase!='READY' or original._stopped or operation not in OPERATIONS or not cell.journal
+                or cell.journal[-1]!={'operation':operation,'status':'PENDING','slot':original._next}):raise StorageHold('authenticated pending entry required')
         _check_cell(cell)
         return cell
     except BaseException as error:_fail(cell,error,operation);raise
 
 
 def _end(cell:_Cell)->None:
+    cell._anchor.verify()
     _check_cell(cell)
-    cell.journal[-1]['status']='APPLIED';cell.busy=False
 
 
 def _noncapture(original:c.OriginalComparisonSuite)->_Allocation:
-    cell=_begin(original,'NONCAPTURE')
+    if type(original) is not c.OriginalComparisonSuite:raise StorageHold('exact original entry required')
+    selected=getattr(original,'_capture_storage_selection',None);cell=getattr(selected,'_initial_cell',None)
+    if (type(selected) is not _Selection or type(cell) is not _Cell or selected._original is not original or cell._original is not original
+            or cell._selection is not selected):raise StorageHold('exact held entry association required')
     try:
-        allocation=cell._allocations[52];_end(cell);return allocation
-    except BaseException as error:_fail(cell,error,'NONCAPTURE');raise
+        # Caller holds this entry/code. Authenticate the earlier protected core
+        # directly before any mutable C1 inner helper; reuse this pending row.
+        if cell.busy or cell.phase!='READY' or original._stopped:raise StorageHold('storage entry stopped or reentered')
+        object.__setattr__(cell,'busy',True)
+        if len(cell.journal)>=MAX_JOURNAL:raise StorageHold('finite storage journal exhausted')
+        cell.journal.append({'operation':'NONCAPTURE','status':'PENDING','slot':original._next})
+        cell._anchor.verify()
+        _begin(original,'NONCAPTURE')
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        allocation=cell._allocations[52]
+        cell._anchor.verify()
+        _end(cell)
+        # Independent caller-held postcheck, even if the inner finalizer changed.
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        elapsed=c.time.monotonic()-original._started
+        if not 0<=elapsed<=10800:raise StorageHold('original storage deadline unavailable after authentication')
+        cell.journal[-1]['status']='APPLIED';object.__setattr__(cell,'busy',False)
+        return allocation
+    except BaseException as error:
+        # This held entry cannot dispatch a possibly revoked emergency helper.
+        object.__setattr__(original,'_stopped',True);object.__setattr__(cell,'phase','STOPPED')
+        if cell.first_failure is None:
+            object.__setattr__(cell,'first_exception',error)
+            object.__setattr__(cell,'first_failure',{'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':'NONCAPTURE','exception_type':type(error).__name__[:80],
+                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'})
+        if cell.journal and cell.journal[-1]['status']=='PENDING':cell.journal[-1]['status']='HELD'
+        raise
 
 
 def _allocation_cell(allocation:_Allocation)->_Cell:
@@ -318,30 +368,129 @@ def _allocation_cell(allocation:_Allocation)->_Cell:
 
 
 def _reserve(allocation:_Allocation,count:int,kind:str)->_Permit:
-    cell=_allocation_cell(allocation);_begin(cell._original,'RESERVE_'+kind if kind in ('RETAINED','SCRATCH') else 'INVALID')
+    cell=_allocation_cell(allocation)
     try:
+        if (kind not in ('RETAINED','SCRATCH') or not cell.busy or not cell.journal
+                or cell.journal[-1]!={'operation':'RESERVE_'+kind,'status':'PENDING','slot':cell._original._next}):raise StorageHold('fixed authenticated reserve entry required')
         c._uint(count,allocation._limit)
         if count==0 or allocation.phase!='OPEN' or allocation.issued+count>allocation._limit or len(allocation.permits)>=MAX_PERMITS:raise StorageHold('fixed prospective bucket exhausted')
         if allocation._index<52 and cell._original._next not in (allocation._index,allocation._index+1):raise StorageHold('stale capture allocation')
         permit=object.__new__(_Permit);permit._allocation=allocation;permit._maximum=count;permit._kind=kind;permit._ordinal=len(allocation.permits);permit._entry=cell.journal[-1];permit.phase='ISSUED'
         allocation.permits.append(permit);allocation.issued+=count
-        _end(cell);return permit
+        return permit
     except BaseException as error:_fail(cell,error,'RESERVE_'+kind);raise
 
 
 def _reserve_retained(allocation:_Allocation,count:int)->_Permit:
-    return _reserve(allocation,count,'RETAINED')
+    if type(allocation) is not _Allocation:raise StorageHold('exact allocation entry required')
+    cell=allocation._cell;original=cell._original;selected=cell._selection
+    if (type(cell) is not _Cell or type(original) is not c.OriginalComparisonSuite or type(selected) is not _Selection
+            or selected._original is not original or cell._selection is not selected or getattr(selected,'_initial_cell',None) is not cell
+            or getattr(original,'_capture_storage_selection',None) is not selected):raise StorageHold('exact held entry association required')
+    try:
+        # Caller holds this entry/code. Authenticate the earlier protected core
+        # directly before any mutable C1 inner helper; reuse this pending row.
+        if cell.busy or cell.phase!='READY' or original._stopped:raise StorageHold('storage entry stopped or reentered')
+        object.__setattr__(cell,'busy',True)
+        if len(cell.journal)>=MAX_JOURNAL:raise StorageHold('finite storage journal exhausted')
+        cell.journal.append({'operation':'RESERVE_RETAINED','status':'PENDING','slot':original._next})
+        cell._anchor.verify()
+        _begin(original,'RESERVE_RETAINED')
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        permit=_reserve(allocation,count,'RETAINED')
+        cell._anchor.verify()
+        _end(cell)
+        # Independent caller-held postcheck, even if the inner finalizer changed.
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        elapsed=c.time.monotonic()-original._started
+        if not 0<=elapsed<=10800:raise StorageHold('original storage deadline unavailable after authentication')
+        cell.journal[-1]['status']='APPLIED';object.__setattr__(cell,'busy',False)
+        return permit
+    except BaseException as error:
+        # This held entry cannot dispatch a possibly revoked emergency helper.
+        object.__setattr__(original,'_stopped',True);object.__setattr__(cell,'phase','STOPPED')
+        if cell.first_failure is None:
+            object.__setattr__(cell,'first_exception',error)
+            object.__setattr__(cell,'first_failure',{'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':'RESERVE_RETAINED','exception_type':type(error).__name__[:80],
+                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'})
+        if cell.journal and cell.journal[-1]['status']=='PENDING':cell.journal[-1]['status']='HELD'
+        raise
 
 
 def _reserve_scratch(allocation:_Allocation,count:int)->_Permit:
-    return _reserve(allocation,count,'SCRATCH')
+    if type(allocation) is not _Allocation:raise StorageHold('exact allocation entry required')
+    cell=allocation._cell;original=cell._original;selected=cell._selection
+    if (type(cell) is not _Cell or type(original) is not c.OriginalComparisonSuite or type(selected) is not _Selection
+            or selected._original is not original or cell._selection is not selected or getattr(selected,'_initial_cell',None) is not cell
+            or getattr(original,'_capture_storage_selection',None) is not selected):raise StorageHold('exact held entry association required')
+    try:
+        # Caller holds this entry/code. Authenticate the earlier protected core
+        # directly before any mutable C1 inner helper; reuse this pending row.
+        if cell.busy or cell.phase!='READY' or original._stopped:raise StorageHold('storage entry stopped or reentered')
+        object.__setattr__(cell,'busy',True)
+        if len(cell.journal)>=MAX_JOURNAL:raise StorageHold('finite storage journal exhausted')
+        cell.journal.append({'operation':'RESERVE_SCRATCH','status':'PENDING','slot':original._next})
+        cell._anchor.verify()
+        _begin(original,'RESERVE_SCRATCH')
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        permit=_reserve(allocation,count,'SCRATCH')
+        cell._anchor.verify()
+        _end(cell)
+        # Independent caller-held postcheck, even if the inner finalizer changed.
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        elapsed=c.time.monotonic()-original._started
+        if not 0<=elapsed<=10800:raise StorageHold('original storage deadline unavailable after authentication')
+        cell.journal[-1]['status']='APPLIED';object.__setattr__(cell,'busy',False)
+        return permit
+    except BaseException as error:
+        # This held entry cannot dispatch a possibly revoked emergency helper.
+        object.__setattr__(original,'_stopped',True);object.__setattr__(cell,'phase','STOPPED')
+        if cell.first_failure is None:
+            object.__setattr__(cell,'first_exception',error)
+            object.__setattr__(cell,'first_failure',{'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':'RESERVE_SCRATCH','exception_type':type(error).__name__[:80],
+                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'})
+        if cell.journal and cell.journal[-1]['status']=='PENDING':cell.journal[-1]['status']='HELD'
+        raise
 
 
 def _spend_scratch(original:c.OriginalComparisonSuite,permit:_Permit)->None:
-    cell=_begin(original,'SCRATCH')
+    if type(original) is not c.OriginalComparisonSuite:raise StorageHold('exact original entry required')
+    selected=getattr(original,'_capture_storage_selection',None);cell=getattr(selected,'_initial_cell',None)
+    if (type(selected) is not _Selection or type(cell) is not _Cell or selected._original is not original or cell._original is not original
+            or cell._selection is not selected):raise StorageHold('exact held entry association required')
     try:
-        _permit(cell,permit,'SCRATCH');permit.phase='SPENT';_end(cell)
-    except BaseException as error:_fail(cell,error,'SCRATCH');raise
+        # Caller holds this entry/code. Authenticate the earlier protected core
+        # directly before any mutable C1 inner helper; reuse this pending row.
+        if cell.busy or cell.phase!='READY' or original._stopped:raise StorageHold('storage entry stopped or reentered')
+        object.__setattr__(cell,'busy',True)
+        if len(cell.journal)>=MAX_JOURNAL:raise StorageHold('finite storage journal exhausted')
+        cell.journal.append({'operation':'SCRATCH','status':'PENDING','slot':original._next})
+        cell._anchor.verify()
+        _begin(original,'SCRATCH')
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        _permit(cell,permit,'SCRATCH');permit.phase='SPENT'
+        cell._anchor.verify()
+        _end(cell)
+        # Independent caller-held postcheck, even if the inner finalizer changed.
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        elapsed=c.time.monotonic()-original._started
+        if not 0<=elapsed<=10800:raise StorageHold('original storage deadline unavailable after authentication')
+        cell.journal[-1]['status']='APPLIED';object.__setattr__(cell,'busy',False)
+    except BaseException as error:
+        # This held entry cannot dispatch a possibly revoked emergency helper.
+        object.__setattr__(original,'_stopped',True);object.__setattr__(cell,'phase','STOPPED')
+        if cell.first_failure is None:
+            object.__setattr__(cell,'first_exception',error)
+            object.__setattr__(cell,'first_failure',{'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':'SCRATCH','exception_type':type(error).__name__[:80],
+                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'})
+        if cell.journal and cell.journal[-1]['status']=='PENDING':cell.journal[-1]['status']='HELD'
+        raise
 
 
 def _permit(cell:_Cell,permit:_Permit,kind:str)->_Allocation:
@@ -353,16 +502,46 @@ def _permit(cell:_Cell,permit:_Permit,kind:str)->_Allocation:
 
 
 def _retain(original:c.OriginalComparisonSuite,permit:_Permit,payload:bytes)->_OwnedBytes:
-    cell=_begin(original,'RETAIN')
+    if type(original) is not c.OriginalComparisonSuite:raise StorageHold('exact original entry required')
+    selected=getattr(original,'_capture_storage_selection',None);cell=getattr(selected,'_initial_cell',None)
+    if (type(selected) is not _Selection or type(cell) is not _Cell or selected._original is not original or cell._original is not original
+            or cell._selection is not selected):raise StorageHold('exact held entry association required')
     try:
+        # Caller holds this entry/code. Authenticate the earlier protected core
+        # directly before any mutable C1 inner helper; reuse this pending row.
+        if cell.busy or cell.phase!='READY' or original._stopped:raise StorageHold('storage entry stopped or reentered')
+        object.__setattr__(cell,'busy',True)
+        if len(cell.journal)>=MAX_JOURNAL:raise StorageHold('finite storage journal exhausted')
+        cell.journal.append({'operation':'RETAIN','status':'PENDING','slot':original._next})
+        cell._anchor.verify()
+        _begin(original,'RETAIN')
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
         allocation=_permit(cell,permit,'RETAINED')
         if type(payload) is not bytes or not 0<len(payload)<=permit._maximum or any(owner._payload is payload for owner in cell._owners):raise StorageHold('new immutable genuinely held payload required')
         owner=object.__new__(_OwnedBytes);owner._permit=permit;owner._payload=payload;owner._entry=cell.journal[-1];owner.phase='PENDING';owner.transferred=False
         cell._owners.append(owner);permit.phase='TRANSFER_PENDING'
         # Ownership/journal precede the irreversible exact-original transfer.
         count=len(payload);original._reserve-=count;original._retained+=count;owner.transferred=True;allocation.retained+=count
-        _end(cell);owner.phase='COMMITTED';permit.phase='COMMITTED';return owner
-    except BaseException as error:_fail(cell,error,'RETAIN');raise
+        cell._anchor.verify()
+        _end(cell)
+        # Independent caller-held postcheck, even if the inner finalizer changed.
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        elapsed=c.time.monotonic()-original._started
+        if not 0<=elapsed<=10800:raise StorageHold('original storage deadline unavailable after authentication')
+        object.__setattr__(owner,'phase','COMMITTED');object.__setattr__(permit,'phase','COMMITTED')
+        cell.journal[-1]['status']='APPLIED';object.__setattr__(cell,'busy',False)
+        return owner
+    except BaseException as error:
+        # This held entry cannot dispatch a possibly revoked emergency helper.
+        object.__setattr__(original,'_stopped',True);object.__setattr__(cell,'phase','STOPPED')
+        if cell.first_failure is None:
+            object.__setattr__(cell,'first_exception',error)
+            object.__setattr__(cell,'first_failure',{'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':'RETAIN','exception_type':type(error).__name__[:80],
+                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'})
+        if cell.journal and cell.journal[-1]['status']=='PENDING':cell.journal[-1]['status']='HELD'
+        raise
 
 
 def _host_evidence(cell:_Cell,context:Any)->str:
@@ -385,8 +564,21 @@ def _host_evidence(cell:_Cell,context:Any)->str:
 
 
 def _capture_allocation(original:c.OriginalComparisonSuite,context:Any)->_Allocation:
-    cell=_begin(original,'CAPTURE')
+    if type(original) is not c.OriginalComparisonSuite:raise StorageHold('exact original entry required')
+    selected=getattr(original,'_capture_storage_selection',None);cell=getattr(selected,'_initial_cell',None)
+    if (type(selected) is not _Selection or type(cell) is not _Cell or selected._original is not original or cell._original is not original
+            or cell._selection is not selected):raise StorageHold('exact held entry association required')
     try:
+        # Caller holds this entry/code. Authenticate the earlier protected core
+        # directly before any mutable C1 inner helper; reuse this pending row.
+        if cell.busy or cell.phase!='READY' or original._stopped:raise StorageHold('storage entry stopped or reentered')
+        object.__setattr__(cell,'busy',True)
+        if len(cell.journal)>=MAX_JOURNAL:raise StorageHold('finite storage journal exhausted')
+        cell.journal.append({'operation':'CAPTURE','status':'PENDING','slot':original._next})
+        cell._anchor.verify()
+        _begin(original,'CAPTURE')
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
         if original._next>=52 or original._active_slot is not None or not original._target_custody_known or original._awaiting_comparison:raise StorageHold('next known-terminal original slot required')
         if any(a.phase=='OPEN' for a in cell._allocations[:52]):raise StorageHold('previous capture bucket not closed')
         allocation=cell._allocations[original._next]
@@ -395,14 +587,60 @@ def _capture_allocation(original:c.OriginalComparisonSuite,context:Any)->_Alloca
         if pin in original._used_hosts:raise StorageHold('held H already consumed')
         c.admit_slot(elapsed_ns=int((c.time.monotonic()-original._started)*10**9),slots_used=original._next,retained_bytes=original._retained,reserve_bytes=original._reserve)
         object.__setattr__(allocation,'_context',context);object.__setattr__(allocation,'_host_pin',pin);allocation.phase='OPEN'
-        _end(cell);return allocation
-    except BaseException as error:_fail(cell,error,'CAPTURE');raise
+        cell._anchor.verify()
+        _end(cell)
+        # Independent caller-held postcheck, even if the inner finalizer changed.
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        elapsed=c.time.monotonic()-original._started
+        if not 0<=elapsed<=10800:raise StorageHold('original storage deadline unavailable after authentication')
+        cell.journal[-1]['status']='APPLIED';object.__setattr__(cell,'busy',False)
+        return allocation
+    except BaseException as error:
+        # This held entry cannot dispatch a possibly revoked emergency helper.
+        object.__setattr__(original,'_stopped',True);object.__setattr__(cell,'phase','STOPPED')
+        if cell.first_failure is None:
+            object.__setattr__(cell,'first_exception',error)
+            object.__setattr__(cell,'first_failure',{'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':'CAPTURE','exception_type':type(error).__name__[:80],
+                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'})
+        if cell.journal and cell.journal[-1]['status']=='PENDING':cell.journal[-1]['status']='HELD'
+        raise
 
 
 def _close_capture(allocation:_Allocation)->None:
-    cell=_allocation_cell(allocation);original=cell._original;_begin(original,'CLOSE_CAPTURE')
+    if type(allocation) is not _Allocation:raise StorageHold('exact allocation entry required')
+    cell=allocation._cell;original=cell._original;selected=cell._selection
+    if (type(cell) is not _Cell or type(original) is not c.OriginalComparisonSuite or type(selected) is not _Selection
+            or selected._original is not original or cell._selection is not selected or getattr(selected,'_initial_cell',None) is not cell
+            or getattr(original,'_capture_storage_selection',None) is not selected):raise StorageHold('exact held entry association required')
     try:
+        # Caller holds this entry/code. Authenticate the earlier protected core
+        # directly before any mutable C1 inner helper; reuse this pending row.
+        if cell.busy or cell.phase!='READY' or original._stopped:raise StorageHold('storage entry stopped or reentered')
+        object.__setattr__(cell,'busy',True)
+        if len(cell.journal)>=MAX_JOURNAL:raise StorageHold('finite storage journal exhausted')
+        cell.journal.append({'operation':'CLOSE_CAPTURE','status':'PENDING','slot':original._next})
+        cell._anchor.verify()
+        _begin(original,'CLOSE_CAPTURE')
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
         if allocation._index>=52 or allocation.phase!='OPEN' or original._next!=allocation._index+1 or original._active_slot is not None or original._target_custody_known is not True or allocation._host_pin not in original._used_hosts:raise StorageHold('independently known completed slot required')
         if _host_evidence(cell,allocation._context)!=allocation._host_pin:raise StorageHold('capture H binding changed')
-        allocation.phase='CLOSED';_end(cell)
-    except BaseException as error:_fail(cell,error,'CLOSE_CAPTURE');raise
+        allocation.phase='CLOSED'
+        cell._anchor.verify()
+        _end(cell)
+        # Independent caller-held postcheck, even if the inner finalizer changed.
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        elapsed=c.time.monotonic()-original._started
+        if not 0<=elapsed<=10800:raise StorageHold('original storage deadline unavailable after authentication')
+        cell.journal[-1]['status']='APPLIED';object.__setattr__(cell,'busy',False)
+    except BaseException as error:
+        # This held entry cannot dispatch a possibly revoked emergency helper.
+        object.__setattr__(original,'_stopped',True);object.__setattr__(cell,'phase','STOPPED')
+        if cell.first_failure is None:
+            object.__setattr__(cell,'first_exception',error)
+            object.__setattr__(cell,'first_failure',{'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':'CLOSE_CAPTURE','exception_type':type(error).__name__[:80],
+                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'})
+        if cell.journal and cell.journal[-1]['status']=='PENDING':cell.journal[-1]['status']='HELD'
+        raise

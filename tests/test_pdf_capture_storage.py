@@ -155,7 +155,9 @@ def test_retention_owner_reentry_and_partial_neighbors(monkeypatch,failure):
         error=KeyboardInterrupt('PURE after transfer');calls=[]
         def guard():
             calls.append(1)
-            if len(calls)==2:raise error
+            # ROOT revision02 clarification: the fault is after genuine held
+            # transfer, independent of extra authenticating call ordinals.
+            if any(owner.transferred and owner._payload==b'abc' for owner in cell._owners):raise error
         monkeypatch.setattr(selected._guard,'verify',guard)
         with pytest.raises(KeyboardInterrupt) as caught:s._retain(original,permit,b'abc')
         assert caught.value is error and cell.first_exception is error and original._stopped
