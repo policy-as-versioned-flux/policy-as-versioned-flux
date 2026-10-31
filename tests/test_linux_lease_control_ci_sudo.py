@@ -11,6 +11,8 @@ import pytest
 
 BENCH=Path(__file__).parents[1]/'bench/pinned-candidate'
 SPEC=importlib.util.spec_from_file_location('ci_sudo_test_module',BENCH/'linux_lease_control_ci.py')
+assert SPEC is not None
+assert SPEC.loader is not None
 ci=importlib.util.module_from_spec(SPEC);sys.modules[SPEC.name]=ci;SPEC.loader.exec_module(ci)
 GUARD=ci.STORE+'/source/linux_guardian.py'
 
