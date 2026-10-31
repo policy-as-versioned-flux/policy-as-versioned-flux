@@ -147,7 +147,7 @@ not establish any native subcase, runtime qualification or execution permission.
 A separate narrow CI diagnostic retains a failed ELF NEEDED basename-match
 predicate without accepting another alias. For zero or multiple mapped basename
 matches, it records the already-read owner/ELF row, needed name, sorted mapped
-paths/matches, previously acquired device/inode/size/role facts, maps digest and
+paths/matches, previously acquired full stat/role facts, maps digest and
 original clock. It performs no extra filesystem/proc/tool query, bounds metadata
 before persistence, and uses the same protected installation REFUSED/FAIL export.
 Unknown errors still propagate. The actual dependency/matches remain unknown

@@ -78,7 +78,8 @@ def test_retained_mapping_metadata_and_original_clock_match_only_already_acquire
     facts=failure.value.facts
     assert facts['native_maps_sha256']==f.m.sha('\n'.join('00-01 r-xp 0 0 0 '+path for path in f.mapped).encode())
     assert facts['owner']['sha256']==f.m.sha(f.data[OWNER])and facts['owner']['bytes']==len(f.data[OWNER])
-    assert facts['owner_metadata']=={'device':8,'inode':f.stats[OWNER].st_ino,'stat_bytes':len(f.data[OWNER]),'roles':['interpreter','native-mapping']}
+    assert facts['owner_metadata']=={'device':8,'inode':f.stats[OWNER].st_ino,'stat_bytes':len(f.data[OWNER]),
+        'mode':0o100444,'uid':0,'gid':0,'links':1,'mtime_ns':101,'ctime_ns':102,'roles':['interpreter','native-mapping']}
     assert facts['original_started']==100. and facts['original_deadline']==1000. and facts['observed_monotonic']==150.
     assert facts['bounds']=={'required_matches':1,'closure_files':4096,'closure_bytes':256*1024**2,'diagnostic_bytes':f.m.MAX_FILE-65536}
     assert [row['member']['source']for row in facts['mapped_records']]==sorted(f.mapped)

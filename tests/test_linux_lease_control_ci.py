@@ -209,7 +209,8 @@ def test_actual_discovery_closes_native_interpreter_dependencies_and_refuses_for
     monkeypatch.setattr(Path,'read_text',lambda path,*args,**kwargs:'\n'.join('00-01 r-xp 0 0 0 '+name for name in maps))
     monkeypatch.setattr(os.path,'realpath',lambda path:'/usr/lib/ld-fixture.so' if path=='/lib/ld-fixture.so' else path)
     monkeypatch.setattr(time,'monotonic',lambda:150.)
-    g=SimpleNamespace(protected_path=lambda path,*args:SimpleNamespace(st_dev=8,st_ino=sorted(data).index(path)+1,st_size=len(data[path])),
+    g=SimpleNamespace(protected_path=lambda path,*args:SimpleNamespace(st_dev=8,st_ino=sorted(data).index(path)+1,st_size=len(data[path]),
+            st_mode=0o100444,st_uid=0,st_gid=0,st_nlink=1,st_mtime_ns=101,st_ctime_ns=102),
         protected_read=lambda path,**kwargs:data[path])
     rows,facts=m.discover_closure(g,c,m.SuiteBudget(100.,1000.))
     assert next(row for row in rows if row['source']=='/usr/lib/ld-fixture.so')['target']=='/lib/ld-fixture.so'

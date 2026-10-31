@@ -417,7 +417,9 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
             raise ValueError('observed empty urllib bytes changed after stat')
         records[path]={'source':path,'target':'/app/'+Path(path).name if path.startswith(STORE+'/source/') else path,
             'bytes':len(raw),'sha256':sha(raw),'elf':control.elf_dependencies(raw)}
-        acquired_metadata[path]={'device':info.st_dev,'inode':info.st_ino,'stat_bytes':info.st_size,'roles':sorted(roles)}
+        acquired_metadata[path]={'device':info.st_dev,'inode':info.st_ino,'stat_bytes':info.st_size,
+            'mode':info.st_mode,'uid':info.st_uid,'gid':info.st_gid,'links':info.st_nlink,
+            'mtime_ns':info.st_mtime_ns,'ctime_ns':info.st_ctime_ns,'roles':sorted(roles)}
         if len(records)>4096 or sum(row['bytes'] for row in records.values())>256*1024**2:
             raise ValueError('OS closure exceeds fixed file/byte bounds')
     # PT_INTERP may be a symlink alias on the host. Pin the actually mapped
@@ -439,8 +441,10 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
                 observed=time.monotonic();budget.require_work(observed)
                 diagnostic_paths=sorted(set(mapped)|{row['source']})
                 for path in diagnostic_paths:
-                    if any(type(acquired_metadata[path][key]) is not int or acquired_metadata[path][key]<0
-                            for key in ('device','inode','stat_bytes')):raise ValueError('unknown acquired ELF path metadata')
+                    if (any(type(acquired_metadata[path][key]) is not int for key in
+                            ('device','inode','stat_bytes','mode','uid','gid','links','mtime_ns','ctime_ns'))
+                            or any(acquired_metadata[path][key]<0 for key in ('device','inode','stat_bytes'))):
+                        raise ValueError('unknown acquired ELF path metadata')
                 failure_facts={'stage':'discover-closure-ELF-needed-match','owner':row,
                     'owner_metadata':acquired_metadata[row['source']],'needed':needed,
                     'mapped_paths':sorted(mapped),'matches':sorted(matches),'match_count':len(matches),
