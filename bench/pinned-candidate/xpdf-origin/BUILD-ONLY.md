@@ -80,3 +80,5 @@ never a successful return. Any existing terminal export is marked incomplete on 
 best-effort basis; an unobserved operation stays unknown and its workspace retained.
 The secondary fault has an 8KiB cap reserved inside the existing 1MiB failure
 metadata allowance; the original 16MiB total failure reserve is not increased.
+The fault sidecar binds the unchanged first failure by hash rather than duplicating
+its potentially long message.

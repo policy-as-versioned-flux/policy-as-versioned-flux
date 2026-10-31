@@ -1518,7 +1518,8 @@ def _retain_umask_fault(root: Path, result: dict[str, Any], payload: dict[str, t
     fault = {'schema': 'twin.xpdf-build-umask-restore-fault/v1', 'restoration': 'UNOBSERVED',
              'secondary_type': type(secondary).__name__[:128],
              'original_type': None if original is None else type(original).__name__[:128],
-             'first_failure': result['first_failure'], 'workspace': 'RETAINED', 'export_terminal': terminal}
+             'first_failure_sha256': _sha(_json(result['first_failure'])),
+             'workspace': 'RETAINED', 'export_terminal': terminal}
     raw = _json(fault)
     if len(raw) > MAX_UMASK_FAULT:
         raise BuildHold('H_CUSTODY', 'secondary restoration evidence exceeds its reserved metadata allowance')
