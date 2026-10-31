@@ -1,4 +1,6 @@
 """TEST_ONLY task/FD model; no proc, children, helpers or privileged operations."""
+from __future__ import annotations
+
 import ast
 import importlib.util
 import json
@@ -459,3 +461,10 @@ def test_inherited_temporary_close_fault_is_not_hidden_or_retried(monkeypatch):
 def test_documentation_or_role_labels_cannot_enrol_observed_caller(monkeypatch,claim):
     model=Kernel(2);endpoint,record=model.run(monkeypatch);record[claim]='TEST_ONLY-unsupported-claim'
     with pytest.raises(ValueError):ci.validate_ci_caller_record(record)
+
+
+def test_guardian_model_preserves_original_deferred_annotation_semantics():
+    model=Kernel()
+    assert model.guardian.protected_path.__annotations__['return']=='os.stat_result'
+    assert not hasattr(model.guardian.os,'stat_result')
+    assert model.fds=={} and model.opened==0 and model.paths_read==[]
