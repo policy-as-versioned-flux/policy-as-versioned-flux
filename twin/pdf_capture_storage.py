@@ -547,16 +547,27 @@ def _retain(original:c.OriginalComparisonSuite,permit:_Permit,payload:bytes)->_O
 def _host_evidence(cell:_Cell,context:Any)->str:
     from . import source_native_observation as n
     if type(context) is not n.NativeHostContext:raise StorageHold('separate earlier private H required')
-    context._guard.verify();policy=n._host_window(context)
+    context._guard.verify()
+    cell._anchor.verify()
+    if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+    policy=n._host_window(context)
+    # Held H observations can revoke dispatch before this helper resumes.
+    cell._anchor.verify()
+    if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
     if policy.get('schema')!='twin.native-host-policy/v1' or policy.get('scope')!=n.SCOPE:raise StorageHold('held native host policy required')
     selected=cell._selection;record=sm._json(selected._record)
     required=[selected._original_raw,selected._record,cell._guard.description,
               c._raw(selected._archive,record['retained_inventory_sha256']),c._raw(selected._archive,record['source_inventory_sha256'])]
     index=c._json(selected._archive,record['source_inventory_sha256'])
     root=Path(__file__).resolve().parents[1]
+    cell._anchor.verify()
+    if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
     for row in index['files']:
         required.append(c._raw(selected._archive,row['sha256']))
-        if not n._inside(str(root/row['path']),policy['roots']):raise StorageHold('fixed source outside held H roots')
+        inside=n._inside(str(root/row['path']),policy['roots'])
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        if not inside:raise StorageHold('fixed source outside held H roots')
     for raw in required:
         pin=sm.sha256(raw)
         if pin not in policy['evidence_sha256s'] or c._raw(context._evidence,pin)!=raw:raise StorageHold('storage/source/retained inventory must precede H')
@@ -584,8 +595,11 @@ def _capture_allocation(original:c.OriginalComparisonSuite,context:Any)->_Alloca
         allocation=cell._allocations[original._next]
         if allocation.phase!='UNOPENED':raise StorageHold('fixed capture bucket already opened')
         pin=_host_evidence(cell,context)
+        elapsed_ns=int((c.time.monotonic()-original._started)*10**9)
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
         if pin in original._used_hosts:raise StorageHold('held H already consumed')
-        c.admit_slot(elapsed_ns=int((c.time.monotonic()-original._started)*10**9),slots_used=original._next,retained_bytes=original._retained,reserve_bytes=original._reserve)
+        c.admit_slot(elapsed_ns=elapsed_ns,slots_used=original._next,retained_bytes=original._retained,reserve_bytes=original._reserve)
         object.__setattr__(allocation,'_context',context);object.__setattr__(allocation,'_host_pin',pin);allocation.phase='OPEN'
         cell._anchor.verify()
         _end(cell)
@@ -625,7 +639,12 @@ def _close_capture(allocation:_Allocation)->None:
         cell._anchor.verify()
         if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
         if allocation._index>=52 or allocation.phase!='OPEN' or original._next!=allocation._index+1 or original._active_slot is not None or original._target_custody_known is not True or allocation._host_pin not in original._used_hosts:raise StorageHold('independently known completed slot required')
-        if _host_evidence(cell,allocation._context)!=allocation._host_pin:raise StorageHold('capture H binding changed')
+        pin=_host_evidence(cell,allocation._context)
+        elapsed=c.time.monotonic()-original._started
+        cell._anchor.verify()
+        if type(cell._guard) is _Guard:_GUARD_VERIFY(cell._guard)
+        if pin!=allocation._host_pin:raise StorageHold('capture H binding changed')
+        if not 0<=elapsed<=10800:raise StorageHold('original storage deadline unavailable before close')
         allocation.phase='CLOSED'
         cell._anchor.verify()
         _end(cell)

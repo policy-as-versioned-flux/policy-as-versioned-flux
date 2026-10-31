@@ -103,3 +103,58 @@ def test_held_entry_checks_original_window_after_final_guard_readback(monkeypatc
         if initial:s._allocate_selected_stage(original)
         else:s._reserve_retained(allocation,1)
     assert original._stopped and s._bound_cell(original).phase=='STOPPED'
+
+
+# Unchanged independent H-window regression controls, retained at the held-entry seam.
+class RevokeDuringHeldHClock:
+ def __init__(self,value,target):self.value=value;self.target=target;self.remaining=None;self.effects=[];self.setter=s._Allocation.__setattr__;self.raw=c._raw
+ def __call__(self):
+  if self.remaining is not None:
+   self.remaining-=1
+   if self.remaining==0:
+    self.remaining=None
+    if self.target=='admit':
+     def changed_admission(**kwargs):self.effects.append('unverified changed admit_slot')
+     c.admit_slot=changed_admission
+    elif self.target=='setter':
+     def changed_setter(owner,key,value):
+      self.effects.append(('unverified setter',key));return self.setter(owner,key,value)
+     s._Allocation.__setattr__=changed_setter
+    else:
+     def changed_raw(*args,**kwargs):
+      self.effects.append('unverified raw helper');return self.raw(*args,**kwargs)
+     c._raw=changed_raw
+  return self.value
+
+
+@pytest.mark.parametrize('target',('admit','setter'))
+@pytest.mark.parametrize('clock_position',(None,1,2,3))
+@pytest.mark.parametrize('route',('capture','close'))
+def test_capture_reauthenticates_after_held_H_clock_before_admission(monkeypatch,target,clock_position,route):
+ def window(ctx,**kw):
+  c.time.monotonic()
+  return c.sm._json(ctx._policy)
+ monkeypatch.setattr(c.n,'_host_window',window)
+ original,selected=born(monkeypatch,allocate=False)
+ clock=RevokeDuringHeldHClock(original._started+1,target);monkeypatch.setattr(c.time,'monotonic',clock)
+ object.__setattr__(selected,'_guard',s._source_guard());s._allocate_selected_stage(original)
+ context=host_model(monkeypatch,original,selected)
+ monkeypatch.setattr(c.n,'_host_window',window);monkeypatch.setattr(c.time,'monotonic',clock)
+ # Held entry and all modeled transports are installed before queued action.
+ if route=='close':
+  allocation=s._capture_allocation(original,context);model_terminal(original,0,context)
+  entry=s._close_capture;args=(allocation,)
+ else:entry=s._capture_allocation;args=(original,context)
+ monkeypatch.setattr(c,'admit_slot',c.admit_slot);monkeypatch.setattr(c,'_raw',c._raw);monkeypatch.setattr(s._Allocation,'__setattr__',s._Allocation.__setattr__);clock.remaining=clock_position
+ if clock_position is None:
+  result=entry(*args)
+  assert not original._stopped and selected._initial_cell.journal[-1]['status']=='APPLIED' and not clock.effects
+  assert (result.phase=='OPEN') if route=='capture' else (allocation.phase=='CLOSED')
+  return
+ with pytest.raises(ValueError):entry(*args)
+ assert original._stopped
+ assert clock.effects==[], 'changed admission dispatch ran after held H clock and before authentication'
+
+
+def test_held_H_window_authenticates_inner_raw_dispatch(monkeypatch):
+ test_capture_reauthenticates_after_held_H_clock_before_admission(monkeypatch,"raw",2,"capture")
