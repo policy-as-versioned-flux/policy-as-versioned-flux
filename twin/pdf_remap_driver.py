@@ -60,6 +60,30 @@ def _state(original:c.OriginalComparisonSuite)->r._StageState:
     return cast(r._StageState,state)
 
 
+def _bound_flow(original:c.OriginalComparisonSuite)->r._RemapFlow:
+    """Bind existing private ownership only; never validate/appoint fresh source.
+
+    This check precedes fallible source validation so revocation and emergency
+    facts remain possible even when that validation itself raises or cancels.
+    """
+    if type(original) is not c.OriginalComparisonSuite:raise ValueError('private original suite required')
+    state=getattr(original,'_technical_state',None)
+    if (type(state) is not r._StageState or state._original_owner is not original
+            or type(state._remap_flow) is not r._RemapFlow or state._remap_flow.owner is not original):raise ValueError('existing exact original-owned remap flow required')
+    return state._remap_flow
+
+
+def _preflight_attempt(original:c.OriginalComparisonSuite,flow:r._RemapFlow,slots:tuple[int,...])->dict|None:
+    if original._stopped:raise ValueError('original remap suite permanently stopped')
+    slot=original._next
+    if type(slot) is not int or slot not in slots or len(flow.entries)!=3:return None
+    entry=flow.entries[(slot-36)//2]
+    if entry['slot']!=slot-slot%2:raise ValueError('fixed original remap entry differs')
+    if len(entry['attempts'])>=2:raise ValueError('finite original pair attempts exhausted')
+    entry['attempts'].append({'slot':slot,'plan':None,'H':None})
+    return entry
+
+
 def _raw_flow(original:c.OriginalComparisonSuite)->r._RemapFlow:
     state=_state(original)
     if (type(state) is not r._StageState or state._original_owner is not original
@@ -112,14 +136,16 @@ def _time(original:c.OriginalComparisonSuite,deadline:float)->None:
 def _stop(original:c.OriginalComparisonSuite,phase:str,code:str,error:BaseException|None,entry:dict|None=None)->None:
     # Failure slots are bounded placeholder memory inside the original fixed16MiB
     # failure reserve; even a failed normal4MiB charge cannot erase the first fact.
-    original._stopped=True
     try:
-        flow=_raw_flow(original);flow.phase='STOPPED'
+        flow=_bound_flow(original);original._stopped=True;flow.phase='STOPPED'
         if entry is not None:entry['phase']='STOPPED'
         if flow.failure is None:
-            state=_state(original)
+            state=cast(r._StageState,original._technical_state)
+            attempts=entry['attempts'] if entry is not None else []
+            slot=attempts[-1]['slot'] if attempts else None
+            if type(slot) is not int or not 0<=slot<52:slot=None
             flow.failure={'schema':'TEST_ONLY-pdf-remap-first-failure/v1','phase':phase,'code':code,
-                'original_slot':entry['slot'] if entry is not None else None,'exception_type':type(error).__name__[:80] if error else None,
+                'original_slot':slot,'exception_type':type(error).__name__[:80] if error else None,
                 'available_facts_sha256':None,'observations_complete':False,
                 'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN',
                 'technical_state_sha256':None,'root_removal_known':state.root_removal_known}
@@ -240,51 +266,63 @@ def _failed_data(authority:c.ComparisonCaptureAuthority,packet:dict,archive:dict
 
 
 def _capture_next_remap_baseline(original:c.OriginalComparisonSuite,context:n.NativeHostContext)->_BaselineCompletion:
-    flow,entry,packet=_selected(original,(36,38,40))
-    if entry['phase']!='NOT_STARTED':raise ValueError('remap baseline already attempted')
-    authority=_freeze(original,context,packet,entry);entry['phase']='BASELINE_RUNNING'
-    entry['attempts'].append({'slot':original._next,'plan':authority._plan,'H':context._policy})
-    archive=dict(authority._archive);archive.update(context._evidence);archive[sm.sha256(context._policy)]=context._policy
-    entry['baseline_archive']=archive
-    workdir=None;cleanup='preserved-uncertain';run=None;interruption=None
+    bound=_bound_flow(original);preflight_entry=None
     try:
-        c._consume(authority,patched=False);object.__setattr__(authority,'_spent',True)
-        workdir=Path(c.tempfile.mkdtemp(prefix='TEST_ONLY-pdf-remap-comparison-'));c.os.chmod(workdir,0o700)
-        for name,blob in [('input',packet['pair_plan']['fixture']),('native-config',packet['pair_plan']['config'])]:migration._write_owned(workdir/name,c._blob(blob,archive,256*MIB))
-        plan=packet['comparison_plan'];candidates=c._candidate_rows(plan,archive,str(workdir))
-        spec={'schema':'twin.native-observation-spec/v1','purpose':'actual','profile':'pdf-text-xpdf/1','plan_sha256':sm.sha256(sm.canonical(plan)),
-            'argv':migration._pdf_command(plan['executable_path'],str(workdir)),'cwd':str(workdir),'environment':dict(migration.ENVIRONMENT),'limits':dict(c.LIMITS),'candidates':candidates}
-        run=c._linux_run_comparison(authority,spec,archive);entry['baseline_run']=run
-        interruption=run.get('_interruption')
-        try:n.validate_native_custody(run['process_group'])
-        except (ValueError,KeyError,TypeError):pass
-        else:
-            object.__setattr__(original,'_target_custody_known',True);object.__setattr__(original,'_active_slot',None)
-            try:shutil.rmtree(workdir);cleanup='removed'
-            except OSError:cleanup='failed'
-        try:n._host_window(context);flow.guard.verify();_check_drivers(packet)
-        except (ValueError,OSError,TypeError):run['failure']=run['failure'] or 'post-run-host-or-source-refused'
-        data=c._finalize_capture(plan,run,archive,workspace_cleanup=cleanup);entry['baseline_data']=data
-        value=_baseline_completion(authority,packet,data,archive);entry['baseline']=value
-        if data['status']!='COMPLETE_EXIT0_DATA':
-            _stop(original,'BASELINE','CAPTURE_FAILED',None,entry);_retain_adverse(original,flow,entry,packet)
-        else:entry['phase']='BASELINE_DONE'
-        if run['_interruption'] is not None:raise run['_interruption']
-        _time(original,original._started+c.B_SECONDS)
-        return value
+        preflight_entry=_preflight_attempt(original,bound,(36,38,40))
+        flow,entry,packet=_selected(original,(36,38,40))
+        if entry['phase']!='NOT_STARTED':raise ValueError('remap baseline already attempted')
+        authority=_freeze(original,context,packet,entry);entry['phase']='BASELINE_RUNNING'
+        entry['attempts'][-1].update(plan=authority._plan,H=context._policy)
+        archive=dict(authority._archive);archive.update(context._evidence);archive[sm.sha256(context._policy)]=context._policy
+        entry['baseline_archive']=archive
+        workdir=None;cleanup='preserved-uncertain';run=None;interruption=None
+        try:
+            c._consume(authority,patched=False);object.__setattr__(authority,'_spent',True)
+            workdir=Path(c.tempfile.mkdtemp(prefix='TEST_ONLY-pdf-remap-comparison-'));c.os.chmod(workdir,0o700)
+            for name,blob in [('input',packet['pair_plan']['fixture']),('native-config',packet['pair_plan']['config'])]:migration._write_owned(workdir/name,c._blob(blob,archive,256*MIB))
+            plan=packet['comparison_plan'];candidates=c._candidate_rows(plan,archive,str(workdir))
+            spec={'schema':'twin.native-observation-spec/v1','purpose':'actual','profile':'pdf-text-xpdf/1','plan_sha256':sm.sha256(sm.canonical(plan)),
+                'argv':migration._pdf_command(plan['executable_path'],str(workdir)),'cwd':str(workdir),'environment':dict(migration.ENVIRONMENT),'limits':dict(c.LIMITS),'candidates':candidates}
+            run=c._linux_run_comparison(authority,spec,archive);entry['baseline_run']=run
+            interruption=run.get('_interruption')
+            try:n.validate_native_custody(run['process_group'])
+            except (ValueError,KeyError,TypeError):pass
+            else:
+                object.__setattr__(original,'_target_custody_known',True);object.__setattr__(original,'_active_slot',None)
+                try:shutil.rmtree(workdir);cleanup='removed'
+                except OSError:cleanup='failed'
+            try:n._host_window(context);flow.guard.verify();_check_drivers(packet)
+            except (ValueError,OSError,TypeError):run['failure']=run['failure'] or 'post-run-host-or-source-refused'
+            data=c._finalize_capture(plan,run,archive,workspace_cleanup=cleanup);entry['baseline_data']=data
+            value=_baseline_completion(authority,packet,data,archive);entry['baseline']=value
+            if data['status']!='COMPLETE_EXIT0_DATA':
+                _stop(original,'BASELINE','CAPTURE_FAILED',None,entry);_retain_adverse(original,flow,entry,packet)
+            else:entry['phase']='BASELINE_DONE'
+            if run['_interruption'] is not None:raise run['_interruption']
+            _time(original,original._started+c.B_SECONDS)
+            return value
+        except BaseException as error:
+            if isinstance(interruption,BaseException) and not isinstance(interruption,Exception):error=interruption
+            _stop(original,'BASELINE','CANCELLED' if not isinstance(error,Exception) else 'CAPTURE_MISSING',error,entry)
+            if entry['baseline'] is None:
+                try:
+                    data=_failed_data(authority,packet,archive,error,workdir if cleanup!='removed' else None,cleanup);entry['baseline_data']=data
+                    entry['baseline']=_baseline_completion(authority,packet,data,archive)
+                except BaseException as secondary:
+                    if len(flow.secondary)<32:flow.secondary.append(r._fault(secondary))
+            _retain_adverse(original,flow,entry,packet)
+            if not isinstance(error,Exception):raise error
+            if entry['baseline'] is not None:return entry['baseline']
+            raise
     except BaseException as error:
-        if isinstance(interruption,BaseException) and not isinstance(interruption,Exception):error=interruption
-        _stop(original,'BASELINE','CANCELLED' if not isinstance(error,Exception) else 'CAPTURE_MISSING',error,entry)
-        if entry['baseline'] is None:
-            try:
-                data=_failed_data(authority,packet,archive,error,workdir if cleanup!='removed' else None,cleanup);entry['baseline_data']=data
-                entry['baseline']=_baseline_completion(authority,packet,data,archive)
-            except BaseException as secondary:
-                if len(flow.secondary)<32:flow.secondary.append(r._fault(secondary))
-        _retain_adverse(original,flow,entry,packet)
-        if not isinstance(error,Exception):raise error
-        if entry['baseline'] is not None:return entry['baseline']
+        _stop(original,'BASELINE','CANCELLED' if not isinstance(error,Exception) else 'SELECTION_REFUSED',error,preflight_entry)
         raise
+
+
+def _failure_wait(observation:dict)->dict|None:
+    wait=copy.deepcopy(observation.get('failure',{}).get('wait'))
+    if wait is not None:wait['provenance']='natural_terminal';c._wait(wait)
+    return wait
 
 
 def _patched_view(value:_PatchedCompletion,original:c.OriginalComparisonSuite,packet:dict)->tuple[dict,dict,dict]:
@@ -300,7 +338,7 @@ def _patched_view(value:_PatchedCompletion,original:c.OriginalComparisonSuite,pa
     if complete:
         bridge.verify_pdf_extraction_bundle(plan,parent,result)
         wait=copy.deepcopy(observation['events'][-1]['data']['wait'])
-    elif result['status']=='failure':wait=copy.deepcopy(observation.get('failure',{}).get('wait'))
+    elif result['status']=='failure':wait=_failure_wait(observation)
     else:raise ValueError('private patched completion status differs')
     if wait is not None:wait['provenance']='natural_terminal';c._wait(wait)
     data={'schema':'TEST_ONLY-pdf-patched-comparison-data/v1','purpose':'TEST_ONLY','observation_mode':'actual','pair_plan_sha256':sm.sha256(sm.canonical(packet['pair_plan'])),
@@ -312,53 +350,59 @@ def _patched_view(value:_PatchedCompletion,original:c.OriginalComparisonSuite,pa
 
 
 def _capture_next_remap_patched(original:c.OriginalComparisonSuite,store:n.NativeObservationStore,native_plan:dict)->_PatchedCompletion:
-    flow,entry,packet=_selected(original,(37,39,41))
-    if entry['phase']!='BASELINE_DONE':raise ValueError('complete private remap baseline required')
-    baseline,_=_baseline_view(entry['baseline'],original,packet)
-    if baseline['status']!='COMPLETE_EXIT0_DATA':raise ValueError('failed baseline cannot launch partner')
-    if type(store) is not n.NativeObservationStore or store._purpose!='actual' or type(store._host_context) is not n.NativeHostContext:raise ValueError('genuine actual patched store/context required')
-    store._guard.verify();context=store._host_context;authority=_freeze(original,context,packet,entry)
-    frozen=copy.deepcopy(native_plan);parent=c._blob(packet['pair_plan']['fixture'],packet['archive'],256*MIB)
-    config,closure=n.validate_native_candidate_plan(frozen,parent)
-    if frozen['purpose']!='actual' or frozen['profile']!=bridge.PROFILE:raise ValueError('fixed actual profile2 patched plan required')
-    bridge._require_actual_selection(store,frozen)
-    policy=n._host_window(context);closure_pin=frozen['implementation_artifact_sha256']
-    if closure_pin not in policy['evidence_sha256s'] or c._raw(context._evidence,closure_pin)!=c._raw(frozen['archive'],closure_pin):raise ValueError('earlier independently selected patched candidate closure absent')
-    pair=packet['pair_plan'];resource=pair['resource']
-    if (config['native_config_sha256']!=pair['config']['sha256'] or config['pdf_origin']['build_identity_sha256']!=pair['build_pair']['patched_build_sha256']
-            or c._raw(frozen['archive'],config['native_config_sha256'])!=c._blob(pair['config'],packet['archive'],8192)
-            or c._raw(frozen['archive'],pair['build_pair']['patched_build_sha256'])!=c._raw(packet['archive'],pair['build_pair']['patched_build_sha256'])
-            or [row for row in closure['platform_files'] if row['path']==resource['path']]!=[{'path':resource['path'],**resource['blob']}]):raise ValueError('patched remap selection/resource differs')
-    r.check_remap_host_evidence(packet,policy,context._evidence,c._raw(frozen['archive'],frozen['configuration_sha256']))
-    if time.monotonic()-authority._selected_at>60:raise ValueError('original remap preparation deadline')
-    entry['phase']='PATCHED_RUNNING';entry['attempts'].append({'slot':original._next,'plan':sm.canonical({k:v for k,v in frozen.items() if k!='archive'}),'H':context._policy})
+    bound=_bound_flow(original);preflight_entry=None
     try:
-        c._consume(authority,patched=True);object.__setattr__(authority,'_spent',True)
-        completed=migration._execute_prepared_extraction(frozen,parent,observation_store=store,preparation_deadline=min(authority._selected_at+60,original._started+c.B_SECONDS))
-        entry['patched_return']=completed  # Hold the first actual return before validation.
-        result,actual_record=n._completed_pdf_result(completed);entry['patched_archive']=result['archive']
-        dossier=sm._json(c._raw(result['receipts'],result['dossier_sha256']))
-        try:n.validate_native_custody(dossier['process_group'])
-        except (ValueError,KeyError,TypeError):original._stopped=True
-        else:object.__setattr__(original,'_target_custody_known',True);object.__setattr__(original,'_active_slot',None)
-        if actual_record['host_policy_sha256']!=sm.sha256(context._policy):raise ValueError('patched actual recorder/H mismatch')
-        if result['status']=='success':n.verify_native_observation(actual_record,result['archive'],purpose='actual');bridge.verify_pdf_extraction_bundle(frozen,parent,result)
-        elif result['status']!='failure':raise ValueError('patched result status differs')
-        store._guard.verify();flow.guard.verify();n._host_window(context);_check_drivers(packet)
-        value=object.__new__(_PatchedCompletion)
-        for key,item in {'_completed':(copy.deepcopy(result),copy.deepcopy(actual_record)),'_plan':{k:copy.deepcopy(v) for k,v in frozen.items() if k!='archive'},
-            '_pair':sm.canonical(pair),'_guard':flow.guard,'_context':context,'_original':original}.items():object.__setattr__(value,key,item)
-        entry['patched']=value
-        c._retain_completion(authority,result['archive'],failed=result['status']!='success',patched=True)
-        if result['status']!='success' or original._stopped:
-            entry['patched_data']=_patched_view(value,original,packet)[0]
-            _stop(original,'PATCHED','CAPTURE_FAILED',None,entry);_retain_adverse(original,flow,entry,packet)
-        else:entry['phase']='GATE_PENDING'
-        _time(original,original._started+c.B_SECONDS)
-        return value
+        preflight_entry=_preflight_attempt(original,bound,(37,39,41))
+        flow,entry,packet=_selected(original,(37,39,41))
+        if entry['phase']!='BASELINE_DONE':raise ValueError('complete private remap baseline required')
+        baseline,_=_baseline_view(entry['baseline'],original,packet)
+        if baseline['status']!='COMPLETE_EXIT0_DATA':raise ValueError('failed baseline cannot launch partner')
+        if type(store) is not n.NativeObservationStore or store._purpose!='actual' or type(store._host_context) is not n.NativeHostContext:raise ValueError('genuine actual patched store/context required')
+        store._guard.verify();context=store._host_context;authority=_freeze(original,context,packet,entry)
+        frozen=copy.deepcopy(native_plan);parent=c._blob(packet['pair_plan']['fixture'],packet['archive'],256*MIB)
+        config,closure=n.validate_native_candidate_plan(frozen,parent)
+        if frozen['purpose']!='actual' or frozen['profile']!=bridge.PROFILE:raise ValueError('fixed actual profile2 patched plan required')
+        bridge._require_actual_selection(store,frozen)
+        policy=n._host_window(context);closure_pin=frozen['implementation_artifact_sha256']
+        if closure_pin not in policy['evidence_sha256s'] or c._raw(context._evidence,closure_pin)!=c._raw(frozen['archive'],closure_pin):raise ValueError('earlier independently selected patched candidate closure absent')
+        pair=packet['pair_plan'];resource=pair['resource']
+        if (config['native_config_sha256']!=pair['config']['sha256'] or config['pdf_origin']['build_identity_sha256']!=pair['build_pair']['patched_build_sha256']
+                or c._raw(frozen['archive'],config['native_config_sha256'])!=c._blob(pair['config'],packet['archive'],8192)
+                or c._raw(frozen['archive'],pair['build_pair']['patched_build_sha256'])!=c._raw(packet['archive'],pair['build_pair']['patched_build_sha256'])
+                or [row for row in closure['platform_files'] if row['path']==resource['path']]!=[{'path':resource['path'],**resource['blob']}]):raise ValueError('patched remap selection/resource differs')
+        r.check_remap_host_evidence(packet,policy,context._evidence,c._raw(frozen['archive'],frozen['configuration_sha256']))
+        if time.monotonic()-authority._selected_at>60:raise ValueError('original remap preparation deadline')
+        entry['phase']='PATCHED_RUNNING';entry['attempts'][-1].update(plan=sm.canonical({k:v for k,v in frozen.items() if k!='archive'}),H=context._policy)
+        try:
+            c._consume(authority,patched=True);object.__setattr__(authority,'_spent',True)
+            completed=migration._execute_prepared_extraction(frozen,parent,observation_store=store,preparation_deadline=min(authority._selected_at+60,original._started+c.B_SECONDS))
+            entry['patched_return']=completed  # Hold the first actual return before validation.
+            result,actual_record=n._completed_pdf_result(completed);entry['patched_archive']=result['archive']
+            dossier=sm._json(c._raw(result['receipts'],result['dossier_sha256']))
+            try:n.validate_native_custody(dossier['process_group'])
+            except (ValueError,KeyError,TypeError):original._stopped=True
+            else:object.__setattr__(original,'_target_custody_known',True);object.__setattr__(original,'_active_slot',None)
+            if actual_record['host_policy_sha256']!=sm.sha256(context._policy):raise ValueError('patched actual recorder/H mismatch')
+            if result['status']=='success':n.verify_native_observation(actual_record,result['archive'],purpose='actual');bridge.verify_pdf_extraction_bundle(frozen,parent,result)
+            elif result['status']!='failure':raise ValueError('patched result status differs')
+            store._guard.verify();flow.guard.verify();n._host_window(context);_check_drivers(packet)
+            value=object.__new__(_PatchedCompletion)
+            for key,item in {'_completed':(copy.deepcopy(result),copy.deepcopy(actual_record)),'_plan':{k:copy.deepcopy(v) for k,v in frozen.items() if k!='archive'},
+                '_pair':sm.canonical(pair),'_guard':flow.guard,'_context':context,'_original':original}.items():object.__setattr__(value,key,item)
+            entry['patched']=value
+            c._retain_completion(authority,result['archive'],failed=result['status']!='success',patched=True)
+            if result['status']!='success' or original._stopped:
+                entry['patched_data']=_patched_view(value,original,packet)[0]
+                _stop(original,'PATCHED','CAPTURE_FAILED',None,entry);_retain_adverse(original,flow,entry,packet)
+            else:entry['phase']='GATE_PENDING'
+            _time(original,original._started+c.B_SECONDS)
+            return value
+        except BaseException as error:
+            _stop(original,'PATCHED','CANCELLED' if not isinstance(error,Exception) else 'CAPTURE_MISSING',error,entry)
+            _retain_adverse(original,flow,entry,packet)
+            raise
     except BaseException as error:
-        _stop(original,'PATCHED','CANCELLED' if not isinstance(error,Exception) else 'CAPTURE_MISSING',error,entry)
-        _retain_adverse(original,flow,entry,packet)
+        _stop(original,'PATCHED','CANCELLED' if not isinstance(error,Exception) else 'SELECTION_REFUSED',error,preflight_entry)
         raise
 
 
@@ -522,6 +566,7 @@ def check_remap_disposition(record:dict,archive:dict,expected_packet:dict)->dict
         if patched['terminal_wait'] is not None:c._wait(patched['terminal_wait'])
         observation=sm._json(c._raw(archive,patched['native_observation_sha256']))
         if observation['host_policy_sha256']!=patched['host_policy_sha256'] or patched['origin_effect_confirmed']!=(patched['status']=='COMPLETE_EXIT0_DATA'):raise ValueError('patched observation/H/effect differs')
+        if patched['status']=='FAILED_DATA' and sm.canonical(patched['terminal_wait'])!=sm.canonical(_failure_wait(observation)):raise ValueError('failed wait differs from retained original observation')
         if patched['status']=='COMPLETE_EXIT0_DATA':
             n.verify_native_observation(observation,archive,purpose='actual');terminal=observation['events'][-1]['data']
             if patched['terminal_wait']!={**terminal['wait'],'provenance':'natural_terminal'} or any(patched[channel]['captured']!={'sha256':terminal[channel+'_sha256'],'bytes':len(c._raw(archive,terminal[channel+'_sha256']))} for channel in ('stdout','stderr')):raise ValueError('patched original terminal streams/wait differ')
