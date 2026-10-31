@@ -1,0 +1,244 @@
+{
+  "schema": "PROPOSAL_ONLY-linux-xpdf-build-A-limits/v1",
+  "execution_go": false,
+  "measured_fit": false,
+  "existing_row": {
+    "os": "ubuntu-24.04",
+    "arch": "x86_64-linux",
+    "new_job": false,
+    "runner_or_matrix_change": false,
+    "permissions": "contents: read unchanged",
+    "schedule_or_dispatch_change": false,
+    "tiny_original_seconds": 900,
+    "tiny_changed": false
+  },
+  "archive": {
+    "url": "https://dl.xpdfreader.com/xpdf-4.06.tar.gz",
+    "bytes": 999317,
+    "sha256": "1c38f527c46caee0f712386d42a885b96a31ed9ce11904e872559859894d137e",
+    "redirects": 0,
+    "retries": 0,
+    "response_status": 200,
+    "content_encoding": "identity",
+    "headers_bytes_max": 32768,
+    "body_retained_max": 999317,
+    "chunk_bytes_max": 65536,
+    "child_total_seconds_including_cleanup": 30
+  },
+  "clock": {
+    "original_seconds": 1800,
+    "starts": "before first A setup/inventory/transport",
+    "outer_step_minutes": 31,
+    "outer_timeout_proves_custody": false,
+    "transport_tail_seconds": 300,
+    "transport_renews_execution": false
+  },
+  "phases": [
+    {
+      "id": "bootstrap-input-tools",
+      "allocation_seconds": 60,
+      "cumulative_end_seconds": 60
+    },
+    {
+      "id": "two-source-preparations",
+      "allocation_seconds": 120,
+      "cumulative_end_seconds": 180,
+      "patch_seconds_including_cleanup_max": 30
+    },
+    {
+      "id": "pristine",
+      "allocation_seconds": 600,
+      "cumulative_end_seconds": 780,
+      "configure_seconds_including_cleanup_max": 120,
+      "build_seconds_including_cleanup_max": 480
+    },
+    {
+      "id": "instrumented",
+      "allocation_seconds": 600,
+      "cumulative_end_seconds": 1380,
+      "configure_seconds_including_cleanup_max": 120,
+      "build_seconds_including_cleanup_max": 480
+    },
+    {
+      "id": "associations-freeze-cleanup",
+      "allocation_seconds": 240,
+      "cumulative_end_seconds": 1620
+    },
+    {
+      "id": "local-export-readback",
+      "allocation_seconds": 120,
+      "cumulative_end_seconds": 1740
+    },
+    {
+      "id": "reserve-within-original",
+      "allocation_seconds": 60,
+      "cumulative_end_seconds": 1800
+    }
+  ],
+  "supervision": {
+    "variants_parallel": false,
+    "compiler_workers_max": 2,
+    "cleanup_seconds_max": 2,
+    "cleanup_deadline": "min(cleanup_started+2,original_command_deadline,original_A_deadline); select once shared group/children",
+    "termination_starts_no_later_than": "original_command_deadline-2; cleanup included in phase",
+    "poll_seconds_max": 0.1,
+    "tool_query_seconds_including_cleanup_max": 5,
+    "stdout_bytes_per_command_max": 16777216,
+    "stderr_bytes_per_command_max": 16777216,
+    "raw_logs_bytes_total_max": 268435456,
+    "no_destructive_signals_after_reap": true,
+    "wait_reservation": "own direct leader terminal observation using waitid WNOWAIT; no early wait/poll reaping",
+    "unsupported_WNOWAIT": "HOLD",
+    "no_next_phase_after_unknown_cleanup": true,
+    "nonchildren_all_reaped_claim": false,
+    "custody_evidence": {
+      "result_schema": "twin.xpdf-linux-build-result/v2",
+      "custody_schema": "twin.xpdf-build-command-custody/v1",
+      "inline_in_each_command": true,
+      "observations_max": 32,
+      "signal_attempts_max": 8,
+      "group_probes_max": 16,
+      "singleton_kinds": [
+        "cleanup-start",
+        "reaping-start",
+        "direct-reap",
+        "cleanup-end"
+      ],
+      "ordinal": "contiguous zero-based array position; authoritative order for equal ticks",
+      "at": "actual nullable monotonic observation; unknown never inferred",
+      "cleanup_started": "actual nullable and bound to unique cleanup-start event",
+      "deadline_relation": "exact min(actual cleanup_started+2,original command deadline,original A deadline); unknown inputs cannot establish compliance",
+      "no_signal_after": "first consuming wait attempt, not first successful reap; all15/9 attempts including absent/error/null outcomes",
+      "binding": "canonical selection/command/environment/original clocks/leader descriptor; no future/self hash",
+      "unknown_or_overflow": "held bounded prefix; no complete build or next execution phase"
+    }
+  },
+  "source": {
+    "entries_max": 4096,
+    "file_bytes_max": 4194304,
+    "expanded_regular_bytes_max": 33554432,
+    "observed_members": 288,
+    "observed_regular_files": 281,
+    "observed_declared_regular_bytes": 4820141,
+    "links_special_duplicates_or_parent_paths_allowed": false
+  },
+  "artifacts": {
+    "retained_logical_bytes_max": 2147483648,
+    "failure_reserve_within_cap_bytes": 16777216,
+    "retained_files_max": 32768,
+    "single_retained_file_bytes_max": 268435456,
+    "path_UTF8_bytes_max": 4096,
+    "metadata_record_bytes_max": 1048576,
+    "live_disk_quota_enforced": false,
+    "scratch_poll_can_overshoot": true,
+    "overflow_result": "HELD; bounded incomplete first-failure evidence only; no silent truncation or cap increase"
+  },
+  "tools": {
+    "fixed_selectors": [
+      "/usr/bin/cmake",
+      "/usr/bin/make",
+      "/usr/bin/gcc",
+      "/usr/bin/g++",
+      "/usr/bin/patch",
+      "/usr/bin/as",
+      "/usr/bin/ld",
+      "/usr/bin/ar",
+      "/usr/bin/ranlib",
+      "/usr/bin/readelf",
+      "/bin/sh"
+    ],
+    "GCC_internal_tool_candidates": "cc1/cc1plus/collect2 and exact compiler-selected tool/spec files retained, reviewed before use",
+    "upstream_CMake_minimum": "3.10",
+    "proposed_guarded_recipe_CMake_minimum": "3.24",
+    "actual_tools_and_module_review": "UNKNOWN / prerequisite HOLD",
+    "install_or_fallback": false
+  },
+  "configure": {
+    "cwd": "VARIANT_BUILD",
+    "argv_prefix": [
+      "/usr/bin/cmake",
+      "-G",
+      "Unix Makefiles",
+      "VARIANT_SOURCE"
+    ],
+    "definitions": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "CMAKE_CXX_STANDARD": "11",
+      "CMAKE_DISABLE_FIND_PACKAGE_Qt6Widgets": "TRUE",
+      "CMAKE_DISABLE_FIND_PACKAGE_Qt5Widgets": "TRUE",
+      "CMAKE_DISABLE_FIND_PACKAGE_PNG": "TRUE",
+      "MULTITHREADED": "OFF",
+      "NO_FONTCONFIG": "ON",
+      "CMAKE_C_COMPILER": "/usr/bin/gcc",
+      "CMAKE_CXX_COMPILER": "/usr/bin/g++",
+      "CMAKE_MAKE_PROGRAM": "/usr/bin/make",
+      "CMAKE_ASM_COMPILER": "/usr/bin/as",
+      "CMAKE_AR": "/usr/bin/ar",
+      "CMAKE_RANLIB": "/usr/bin/ranlib",
+      "CMAKE_LINKER": "/usr/bin/ld",
+      "CMAKE_SYSTEM_NAME": "Linux",
+      "CMAKE_SYSTEM_VERSION": "OBSERVED_LINUX_RELEASE",
+      "CMAKE_SYSTEM_PROCESSOR": "x86_64",
+      "CMAKE_CROSSCOMPILING_EMULATOR": "",
+      "CMAKE_TOOLCHAIN_FILE": "",
+      "CMAKE_MODULE_PATH": "",
+      "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "",
+      "CMAKE_PROJECT_INCLUDE": "",
+      "CMAKE_PROJECT_INCLUDE_BEFORE": "",
+      "CMAKE_C_COMPILER_LAUNCHER": "",
+      "CMAKE_CXX_COMPILER_LAUNCHER": "",
+      "CMAKE_PREFIX_PATH": "",
+      "CMAKE_INCLUDE_PATH": "",
+      "CMAKE_LIBRARY_PATH": "",
+      "CMAKE_PROGRAM_PATH": "",
+      "CMAKE_C_FLAGS": "",
+      "CMAKE_CXX_FLAGS": "",
+      "CMAKE_EXE_LINKER_FLAGS": "-Wl,--trace",
+      "CMAKE_SHARED_LINKER_FLAGS": "",
+      "CMAKE_FIND_PACKAGE_PREFER_CONFIG": "FALSE",
+      "CMAKE_FIND_USE_PACKAGE_REGISTRY": "FALSE",
+      "CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY": "FALSE",
+      "CMAKE_FIND_USE_PACKAGE_ROOT_PATH": "FALSE",
+      "CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH": "FALSE",
+      "CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH": "FALSE",
+      "CMAKE_FIND_USE_CMAKE_PATH": "FALSE",
+      "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+      "CMAKE_INSTALL_PREFIX": "OWNED_UNUSED_INSTALL_PATH"
+    },
+    "definition_order": "lexicographic by exact key; each structured -DKEY=VALUE argument, no shell",
+    "no_try_run_result_cache_prefill": true,
+    "no_STATIC_LIBRARY_try_compile_override": true,
+    "link_trace_purpose": "GNU --trace records link input paths; common recipe option, source-only candidate requiring actual reviewed GNU support"
+  },
+  "build": {
+    "argv": [
+      "/usr/bin/make",
+      "-C",
+      "VARIANT_BUILD",
+      "-j2",
+      "VERBOSE=1",
+      "SHELL=/bin/sh",
+      "pdftotext"
+    ],
+    "forbidden": [
+      "all",
+      "test",
+      "install",
+      "ctest",
+      "pdftotext -v",
+      "pdftotext --help",
+      "generated probe execution",
+      "emulator",
+      "ldd"
+    ]
+  },
+  "actual_outcomes": {
+    "Linux_build": null,
+    "tool_identities": null,
+    "binaries": null,
+    "link_candidates": null,
+    "runtime_access_closure": null,
+    "native_config_use": null,
+    "N01_N08": null
+  }
+}

@@ -1,0 +1,1097 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "twin.xpdf-linux-build-result/v2"
+    },
+    "scope": {
+      "const": "BUILD_DATA_ONLY"
+    },
+    "selection_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE_BUILD_PAIR",
+        "HELD",
+        "FAILED",
+        "INCOMPLETE"
+      ]
+    },
+    "hold_codes": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "H_EXECUTION_SELECTION",
+          "H_BOOTSTRAP",
+          "H_SOURCE_TRANSPORT",
+          "H_SOURCE_MEMBERS",
+          "H_SOURCE_CONSERVATION",
+          "H_TOOLS",
+          "H_PROBE_EXECUTION_UNESTABLISHED",
+          "H_GENERATED_EXECUTION",
+          "H_CONFIG_EQUIVALENCE",
+          "H_DEADLINE",
+          "H_STREAM_LIMIT",
+          "H_CUSTODY",
+          "H_CAPACITY",
+          "H_ELF_ASSOCIATION",
+          "H_EXPORT",
+          "H_TRANSPORT",
+          "H_NATIVE_SELECTION"
+        ]
+      }
+    },
+    "first_failure": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "command_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "required": [
+            "phase",
+            "command_id",
+            "reason"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "clock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "original_seconds": {
+          "const": 1800
+        },
+        "started": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deadline": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ended": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "original_seconds",
+        "started",
+        "deadline",
+        "ended"
+      ]
+    },
+    "environment_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "tool_manifest_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source_conservation_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "variants": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "variant": {
+            "enum": [
+              "pristine",
+              "instrumented"
+            ]
+          },
+          "source_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "recipe_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "configuration_manifest_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "products_manifest_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "binary_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ELF_association_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "link_candidate_manifest_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "runtime_access_closure": {
+            "const": "UNESTABLISHED"
+          },
+          "actual_converter_invocations": {
+            "const": 0
+          },
+          "actual_native_config_use": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "variant",
+          "source_manifest_sha256",
+          "recipe_sha256",
+          "configuration_manifest_sha256",
+          "products_manifest_sha256",
+          "binary_sha256",
+          "ELF_association_sha256",
+          "link_candidate_manifest_sha256",
+          "runtime_access_closure",
+          "actual_converter_invocations",
+          "actual_native_config_use"
+        ]
+      }
+    },
+    "commands": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "phase": {
+            "enum": [
+              "bootstrap-input-tools",
+              "two-source-preparations",
+              "pristine",
+              "instrumented",
+              "associations-freeze-cleanup",
+              "local-export-readback"
+            ]
+          },
+          "argv": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 256,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "environment_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "started": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "deadline": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ended": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stdout": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "retained_bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 16777216
+              },
+              "observed_bytes_lower_bound": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "state": {
+                "enum": [
+                  "COMPLETE",
+                  "PREFIX_ONLY",
+                  "ABSENT"
+                ]
+              }
+            },
+            "required": [
+              "sha256",
+              "retained_bytes",
+              "observed_bytes_lower_bound",
+              "state"
+            ]
+          },
+          "stderr": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "retained_bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 16777216
+              },
+              "observed_bytes_lower_bound": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "state": {
+                "enum": [
+                  "COMPLETE",
+                  "PREFIX_ONLY",
+                  "ABSENT"
+                ]
+              }
+            },
+            "required": [
+              "sha256",
+              "retained_bytes",
+              "observed_bytes_lower_bound",
+              "state"
+            ]
+          },
+          "custody": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "leader_pid": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "reservation": {
+                "enum": [
+                  "UNREAPED_DIRECT_LEADER",
+                  "NO_CHILD_CREATED",
+                  "UNESTABLISHED"
+                ]
+              },
+              "wait_kind": {
+                "enum": [
+                  "EXITED",
+                  "SIGNALED",
+                  "UNOBSERVED"
+                ]
+              },
+              "raw_wait": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "exit_code": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "signal": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "direct_reap": {
+                "enum": [
+                  "OBSERVED",
+                  "UNOBSERVED"
+                ]
+              },
+              "group_absence": {
+                "enum": [
+                  "ABSENT",
+                  "PRESENT",
+                  "UNOBSERVED"
+                ]
+              },
+              "cleanup_deadline": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cleanup_ended": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "signals": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "target": {
+                      "enum": [
+                        "OWNED_GROUP",
+                        "DIRECT_CHILD"
+                      ]
+                    },
+                    "pid": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "signal": {
+                      "enum": [
+                        15,
+                        9
+                      ]
+                    },
+                    "at": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "outcome": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "SENT",
+                            "ABSENT",
+                            "PERMISSION_DENIED",
+                            "OS_ERROR"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "target",
+                    "pid",
+                    "signal",
+                    "at",
+                    "outcome"
+                  ]
+                }
+              },
+              "workspace": {
+                "enum": [
+                  "RETAINED",
+                  "CLEANED",
+                  "NOT_CREATED"
+                ]
+              },
+              "schema": {
+                "const": "twin.xpdf-build-command-custody/v1"
+              },
+              "command_binding_sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cleanup_started": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "observations": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "ordinal": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 31
+                        },
+                        "kind": {
+                          "const": "cleanup-start"
+                        },
+                        "at": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "detail": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "selected_deadline": {
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "minimum": 0
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "selected_deadline"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "ordinal",
+                        "kind",
+                        "at",
+                        "detail"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "ordinal": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 31
+                        },
+                        "kind": {
+                          "const": "signal-attempt"
+                        },
+                        "at": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "detail": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "target": {
+                              "enum": [
+                                "OWNED_GROUP",
+                                "DIRECT_CHILD"
+                              ]
+                            },
+                            "pid": {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            "signal": {
+                              "enum": [
+                                15,
+                                9
+                              ]
+                            },
+                            "outcome": {
+                              "anyOf": [
+                                {
+                                  "enum": [
+                                    "SENT",
+                                    "ABSENT",
+                                    "PERMISSION_DENIED",
+                                    "OS_ERROR"
+                                  ]
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "target",
+                            "pid",
+                            "signal",
+                            "outcome"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "ordinal",
+                        "kind",
+                        "at",
+                        "detail"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "ordinal": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 31
+                        },
+                        "kind": {
+                          "const": "reaping-start"
+                        },
+                        "at": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "detail": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "leader_pid": {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            "operation": {
+                              "const": "FIRST_CONSUMING_WAIT"
+                            }
+                          },
+                          "required": [
+                            "leader_pid",
+                            "operation"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "ordinal",
+                        "kind",
+                        "at",
+                        "detail"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "ordinal": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 31
+                        },
+                        "kind": {
+                          "const": "direct-reap"
+                        },
+                        "at": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "detail": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "leader_pid": {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            "wait_kind": {
+                              "enum": [
+                                "EXITED",
+                                "SIGNALED"
+                              ]
+                            },
+                            "raw_wait": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "exit_code": {
+                              "anyOf": [
+                                {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 255
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "signal": {
+                              "anyOf": [
+                                {
+                                  "type": "integer",
+                                  "minimum": 1
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "leader_pid",
+                            "wait_kind",
+                            "raw_wait",
+                            "exit_code",
+                            "signal"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "ordinal",
+                        "kind",
+                        "at",
+                        "detail"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "ordinal": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 31
+                        },
+                        "kind": {
+                          "const": "group-probe"
+                        },
+                        "at": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "detail": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "leader_pid": {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            "outcome": {
+                              "anyOf": [
+                                {
+                                  "enum": [
+                                    "ABSENT",
+                                    "PRESENT",
+                                    "PERMISSION_DENIED",
+                                    "OS_ERROR"
+                                  ]
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "leader_pid",
+                            "outcome"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "ordinal",
+                        "kind",
+                        "at",
+                        "detail"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "ordinal": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 31
+                        },
+                        "kind": {
+                          "const": "cleanup-end"
+                        },
+                        "at": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "detail": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {},
+                          "required": []
+                        }
+                      },
+                      "required": [
+                        "ordinal",
+                        "kind",
+                        "at",
+                        "detail"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "leader_pid",
+              "reservation",
+              "wait_kind",
+              "raw_wait",
+              "exit_code",
+              "signal",
+              "direct_reap",
+              "group_absence",
+              "cleanup_deadline",
+              "cleanup_ended",
+              "signals",
+              "workspace",
+              "schema",
+              "command_binding_sha256",
+              "cleanup_started",
+              "observations"
+            ]
+          },
+          "disposition": {
+            "enum": [
+              "EXIT0_COMPLETE",
+              "FAILED",
+              "HELD",
+              "INTERRUPTED"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "phase",
+          "argv",
+          "environment_sha256",
+          "started",
+          "deadline",
+          "ended",
+          "stdout",
+          "stderr",
+          "custody",
+          "disposition"
+        ]
+      }
+    },
+    "files_manifest_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "runtime_access_closure": {
+      "const": "UNESTABLISHED"
+    },
+    "native_H": {
+      "type": "null"
+    },
+    "private_native_handle": {
+      "type": "null"
+    },
+    "native_N01_N08": {
+      "const": "UNRUN"
+    },
+    "actual_converter_invocations": {
+      "const": 0
+    },
+    "execution_or_publication_grant": {
+      "const": "NONE"
+    }
+  },
+  "required": [
+    "schema",
+    "scope",
+    "selection_sha256",
+    "status",
+    "hold_codes",
+    "first_failure",
+    "clock",
+    "environment_manifest_sha256",
+    "tool_manifest_sha256",
+    "source_conservation_sha256",
+    "variants",
+    "commands",
+    "files_manifest_sha256",
+    "runtime_access_closure",
+    "native_H",
+    "private_native_handle",
+    "native_N01_N08",
+    "actual_converter_invocations",
+    "execution_or_publication_grant"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:twin:proposal:xpdf-linux-build-result:v2",
+  "description": "Closed build evidence only; semantic checker must enforce clocks, bounds, exact file set, variant uniqueness/equivalence, wait/custody relations and COMPLETE_BUILD_PAIR gates. No field mints authority. Held/failed records preserve unobserved times/stream identities as null and uncertain reservation as UNESTABLISHED; complete results require all relevant actual facts nonnull under the semantic verifier. Revision01 requires inline bounded ordered custody observations, actual nullable cleanup-start and independently reconstructed command binding. Legacy summary fields cannot replace the journal. Full temporal/ordinal/projection semantics are specified by CUSTODY-CHRONOLOGY.md, not supplied trust flags.",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "COMPLETE_BUILD_PAIR"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "hold_codes": {
+            "maxItems": 0
+          },
+          "first_failure": {
+            "type": "null"
+          },
+          "variants": {
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "files_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "tool_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "source_conservation_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  ]
+}

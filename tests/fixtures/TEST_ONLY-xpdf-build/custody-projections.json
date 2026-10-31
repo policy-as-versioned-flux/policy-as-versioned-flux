@@ -1,0 +1,489 @@
+{
+  "scope": "TEST_ONLY_PURE_PROPOSAL_DATA_NOT_ACTUAL_OBSERVATIONS",
+  "binding_context": {
+    "schema": "twin.xpdf-build-custody-binding/v1",
+    "selection_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "command_id": "TEST_ONLY/pristine/1",
+    "phase": "pristine",
+    "argv": [
+      "/usr/bin/make",
+      "-C",
+      "TEST_ONLY_BUILD",
+      "-j2",
+      "VERBOSE=1",
+      "SHELL=/bin/sh",
+      "pdftotext"
+    ],
+    "environment_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "command_started": 90,
+    "command_deadline": 100,
+    "checkpoint_started": 0,
+    "checkpoint_deadline": 1800,
+    "leader_pid": 123
+  },
+  "old_projection_keys": [
+    "cleanup_deadline",
+    "cleanup_ended",
+    "direct_reap",
+    "exit_code",
+    "group_absence",
+    "leader_pid",
+    "raw_wait",
+    "reservation",
+    "signal",
+    "signals",
+    "wait_kind",
+    "workspace"
+  ],
+  "histories": {
+    "valid_order": {
+      "leader_pid": 123,
+      "reservation": "UNREAPED_DIRECT_LEADER",
+      "wait_kind": "EXITED",
+      "raw_wait": 0,
+      "exit_code": 0,
+      "signal": null,
+      "direct_reap": "OBSERVED",
+      "group_absence": "ABSENT",
+      "cleanup_deadline": 100,
+      "cleanup_ended": 100,
+      "signals": [
+        {
+          "target": "OWNED_GROUP",
+          "pid": 123,
+          "signal": 9,
+          "at": 99,
+          "outcome": "SENT"
+        }
+      ],
+      "workspace": "RETAINED",
+      "schema": "twin.xpdf-build-command-custody/v1",
+      "command_binding_sha256": "b28e992c6dba1cd7d73399457df70c95ef16a2895c4672ef7b7ef9ae82078a85",
+      "cleanup_started": 98,
+      "observations": [
+        {
+          "ordinal": 0,
+          "kind": "cleanup-start",
+          "at": 98,
+          "detail": {
+            "selected_deadline": 100
+          }
+        },
+        {
+          "ordinal": 1,
+          "kind": "signal-attempt",
+          "at": 99,
+          "detail": {
+            "target": "OWNED_GROUP",
+            "pid": 123,
+            "signal": 9,
+            "outcome": "SENT"
+          }
+        },
+        {
+          "ordinal": 2,
+          "kind": "reaping-start",
+          "at": 99.5,
+          "detail": {
+            "leader_pid": 123,
+            "operation": "FIRST_CONSUMING_WAIT"
+          }
+        },
+        {
+          "ordinal": 3,
+          "kind": "direct-reap",
+          "at": 99.6,
+          "detail": {
+            "leader_pid": 123,
+            "wait_kind": "EXITED",
+            "raw_wait": 0,
+            "exit_code": 0,
+            "signal": null
+          }
+        },
+        {
+          "ordinal": 4,
+          "kind": "group-probe",
+          "at": 99.7,
+          "detail": {
+            "leader_pid": 123,
+            "outcome": "ABSENT"
+          }
+        },
+        {
+          "ordinal": 5,
+          "kind": "cleanup-end",
+          "at": 100,
+          "detail": {}
+        }
+      ]
+    },
+    "post_first_reaping_signal": {
+      "leader_pid": 123,
+      "reservation": "UNREAPED_DIRECT_LEADER",
+      "wait_kind": "EXITED",
+      "raw_wait": 0,
+      "exit_code": 0,
+      "signal": null,
+      "direct_reap": "OBSERVED",
+      "group_absence": "ABSENT",
+      "cleanup_deadline": 100,
+      "cleanup_ended": 100,
+      "signals": [
+        {
+          "target": "OWNED_GROUP",
+          "pid": 123,
+          "signal": 9,
+          "at": 99,
+          "outcome": "SENT"
+        }
+      ],
+      "workspace": "RETAINED",
+      "schema": "twin.xpdf-build-command-custody/v1",
+      "command_binding_sha256": "b28e992c6dba1cd7d73399457df70c95ef16a2895c4672ef7b7ef9ae82078a85",
+      "cleanup_started": 98,
+      "observations": [
+        {
+          "ordinal": 0,
+          "kind": "cleanup-start",
+          "at": 98,
+          "detail": {
+            "selected_deadline": 100
+          }
+        },
+        {
+          "ordinal": 1,
+          "kind": "reaping-start",
+          "at": 98.5,
+          "detail": {
+            "leader_pid": 123,
+            "operation": "FIRST_CONSUMING_WAIT"
+          }
+        },
+        {
+          "ordinal": 2,
+          "kind": "direct-reap",
+          "at": 98.6,
+          "detail": {
+            "leader_pid": 123,
+            "wait_kind": "EXITED",
+            "raw_wait": 0,
+            "exit_code": 0,
+            "signal": null
+          }
+        },
+        {
+          "ordinal": 3,
+          "kind": "signal-attempt",
+          "at": 99,
+          "detail": {
+            "target": "OWNED_GROUP",
+            "pid": 123,
+            "signal": 9,
+            "outcome": "SENT"
+          }
+        },
+        {
+          "ordinal": 4,
+          "kind": "group-probe",
+          "at": 99.7,
+          "detail": {
+            "leader_pid": 123,
+            "outcome": "ABSENT"
+          }
+        },
+        {
+          "ordinal": 5,
+          "kind": "cleanup-end",
+          "at": 100,
+          "detail": {}
+        }
+      ]
+    },
+    "renewed_cleanup": {
+      "leader_pid": 123,
+      "reservation": "UNREAPED_DIRECT_LEADER",
+      "wait_kind": "EXITED",
+      "raw_wait": 0,
+      "exit_code": 0,
+      "signal": null,
+      "direct_reap": "OBSERVED",
+      "group_absence": "ABSENT",
+      "cleanup_deadline": 100,
+      "cleanup_ended": 100,
+      "signals": [
+        {
+          "target": "OWNED_GROUP",
+          "pid": 123,
+          "signal": 9,
+          "at": 99,
+          "outcome": "SENT"
+        }
+      ],
+      "workspace": "RETAINED",
+      "schema": "twin.xpdf-build-command-custody/v1",
+      "command_binding_sha256": "b28e992c6dba1cd7d73399457df70c95ef16a2895c4672ef7b7ef9ae82078a85",
+      "cleanup_started": 90,
+      "observations": [
+        {
+          "ordinal": 0,
+          "kind": "cleanup-start",
+          "at": 90,
+          "detail": {
+            "selected_deadline": 100
+          }
+        },
+        {
+          "ordinal": 1,
+          "kind": "signal-attempt",
+          "at": 99,
+          "detail": {
+            "target": "OWNED_GROUP",
+            "pid": 123,
+            "signal": 9,
+            "outcome": "SENT"
+          }
+        },
+        {
+          "ordinal": 2,
+          "kind": "reaping-start",
+          "at": 99.5,
+          "detail": {
+            "leader_pid": 123,
+            "operation": "FIRST_CONSUMING_WAIT"
+          }
+        },
+        {
+          "ordinal": 3,
+          "kind": "direct-reap",
+          "at": 99.6,
+          "detail": {
+            "leader_pid": 123,
+            "wait_kind": "EXITED",
+            "raw_wait": 0,
+            "exit_code": 0,
+            "signal": null
+          }
+        },
+        {
+          "ordinal": 4,
+          "kind": "group-probe",
+          "at": 99.7,
+          "detail": {
+            "leader_pid": 123,
+            "outcome": "ABSENT"
+          }
+        },
+        {
+          "ordinal": 5,
+          "kind": "cleanup-end",
+          "at": 100,
+          "detail": {}
+        }
+      ]
+    },
+    "equal_tick_valid": {
+      "leader_pid": 123,
+      "reservation": "UNREAPED_DIRECT_LEADER",
+      "wait_kind": "EXITED",
+      "raw_wait": 0,
+      "exit_code": 0,
+      "signal": null,
+      "direct_reap": "OBSERVED",
+      "group_absence": "ABSENT",
+      "cleanup_deadline": 100,
+      "cleanup_ended": 100,
+      "signals": [
+        {
+          "target": "OWNED_GROUP",
+          "pid": 123,
+          "signal": 9,
+          "at": 99,
+          "outcome": "SENT"
+        }
+      ],
+      "workspace": "RETAINED",
+      "schema": "twin.xpdf-build-command-custody/v1",
+      "command_binding_sha256": "b28e992c6dba1cd7d73399457df70c95ef16a2895c4672ef7b7ef9ae82078a85",
+      "cleanup_started": 98,
+      "observations": [
+        {
+          "ordinal": 0,
+          "kind": "cleanup-start",
+          "at": 98,
+          "detail": {
+            "selected_deadline": 100
+          }
+        },
+        {
+          "ordinal": 1,
+          "kind": "signal-attempt",
+          "at": 99,
+          "detail": {
+            "target": "OWNED_GROUP",
+            "pid": 123,
+            "signal": 9,
+            "outcome": "SENT"
+          }
+        },
+        {
+          "ordinal": 2,
+          "kind": "reaping-start",
+          "at": 99,
+          "detail": {
+            "leader_pid": 123,
+            "operation": "FIRST_CONSUMING_WAIT"
+          }
+        },
+        {
+          "ordinal": 3,
+          "kind": "direct-reap",
+          "at": 99,
+          "detail": {
+            "leader_pid": 123,
+            "wait_kind": "EXITED",
+            "raw_wait": 0,
+            "exit_code": 0,
+            "signal": null
+          }
+        },
+        {
+          "ordinal": 4,
+          "kind": "group-probe",
+          "at": 99,
+          "detail": {
+            "leader_pid": 123,
+            "outcome": "ABSENT"
+          }
+        },
+        {
+          "ordinal": 5,
+          "kind": "cleanup-end",
+          "at": 100,
+          "detail": {}
+        }
+      ]
+    },
+    "equal_tick_post_reaping_signal": {
+      "leader_pid": 123,
+      "reservation": "UNREAPED_DIRECT_LEADER",
+      "wait_kind": "EXITED",
+      "raw_wait": 0,
+      "exit_code": 0,
+      "signal": null,
+      "direct_reap": "OBSERVED",
+      "group_absence": "ABSENT",
+      "cleanup_deadline": 100,
+      "cleanup_ended": 100,
+      "signals": [
+        {
+          "target": "OWNED_GROUP",
+          "pid": 123,
+          "signal": 9,
+          "at": 99,
+          "outcome": "SENT"
+        }
+      ],
+      "workspace": "RETAINED",
+      "schema": "twin.xpdf-build-command-custody/v1",
+      "command_binding_sha256": "b28e992c6dba1cd7d73399457df70c95ef16a2895c4672ef7b7ef9ae82078a85",
+      "cleanup_started": 98,
+      "observations": [
+        {
+          "ordinal": 0,
+          "kind": "cleanup-start",
+          "at": 98,
+          "detail": {
+            "selected_deadline": 100
+          }
+        },
+        {
+          "ordinal": 1,
+          "kind": "reaping-start",
+          "at": 99,
+          "detail": {
+            "leader_pid": 123,
+            "operation": "FIRST_CONSUMING_WAIT"
+          }
+        },
+        {
+          "ordinal": 2,
+          "kind": "direct-reap",
+          "at": 99,
+          "detail": {
+            "leader_pid": 123,
+            "wait_kind": "EXITED",
+            "raw_wait": 0,
+            "exit_code": 0,
+            "signal": null
+          }
+        },
+        {
+          "ordinal": 3,
+          "kind": "signal-attempt",
+          "at": 99,
+          "detail": {
+            "target": "OWNED_GROUP",
+            "pid": 123,
+            "signal": 9,
+            "outcome": "SENT"
+          }
+        },
+        {
+          "ordinal": 4,
+          "kind": "group-probe",
+          "at": 99,
+          "detail": {
+            "leader_pid": 123,
+            "outcome": "ABSENT"
+          }
+        },
+        {
+          "ordinal": 5,
+          "kind": "cleanup-end",
+          "at": 100,
+          "detail": {}
+        }
+      ]
+    },
+    "unknown_prefix_held_only": {
+      "leader_pid": 123,
+      "reservation": "UNREAPED_DIRECT_LEADER",
+      "wait_kind": "UNOBSERVED",
+      "raw_wait": null,
+      "exit_code": null,
+      "signal": null,
+      "direct_reap": "UNOBSERVED",
+      "group_absence": "UNOBSERVED",
+      "cleanup_deadline": null,
+      "cleanup_ended": null,
+      "signals": [],
+      "workspace": "RETAINED",
+      "schema": "twin.xpdf-build-command-custody/v1",
+      "command_binding_sha256": null,
+      "cleanup_started": null,
+      "observations": [
+        {
+          "ordinal": 0,
+          "kind": "cleanup-start",
+          "at": null,
+          "detail": {
+            "selected_deadline": null
+          }
+        }
+      ]
+    }
+  },
+  "planned_rule_decisions": {
+    "valid_order": "internally consistent chronology only; no actual custody/authority claim",
+    "post_first_reaping_signal": "R4 refusal",
+    "renewed_cleanup": "R3 refusal",
+    "equal_tick_valid": "R2/R4 internally consistent ordering only",
+    "equal_tick_post_reaping_signal": "R4 refusal even at equal clock ticks",
+    "unknown_prefix_held_only": "R1/R3/R7 held, never complete"
+  },
+  "actual_collector_outcome": null,
+  "actual_check_build_bundle_outcome": null,
+  "actual_Linux_build_outcome": null,
+  "actual_native_outcome": null
+}
