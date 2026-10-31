@@ -97,6 +97,9 @@ def acquire_native_observation(store: NativeObservationStore, plan: dict, parent
 
 
 def resolve_native_observation(store: NativeObservationStore, observed: ObservedExtraction) -> dict:
+    # Check passive custody types before invoking any supplied guard or ledger.
+    if type(store) is not NativeObservationStore or type(observed) is not ObservedExtraction:
+        raise ValueError('exact private native store and opaque reference required')
     store._guard.verify()
     try:
         held, result, plan_raw, observation = store._entries[id(observed)]
@@ -202,7 +205,7 @@ def _map_rows(rows: Any, files: dict) -> list[dict]:
         previous=end
         path=row['path']
         if path and path.startswith('/'):
-            if path not in files or row['identity']!=files[path]['identity'][:2] or row['prot']&3==3 and row['prot']&4:
+            if path not in files or row['identity']!=files[path]['identity'][:2] or row['prot']&6==6:
                 raise ValueError('unacquired or writable executable native map')
             result.append(dict(row))
         elif path not in (None,'','[heap]','[stack]','[vdso]','[vvar]','[vvar_vclock]','[vsyscall]'):
@@ -234,7 +237,38 @@ def _cut_maps(rows: list[dict], start: int, end: int, prot: int | None = None) -
     return _merge_maps(result)
 
 
-def _admit(nr: int, args: list[int], detail: dict, spec: dict, fds: dict, created: set, executed: bool) -> str:
+def _executable_interval(maps: list[dict] | None, start: int, length: int) -> None:
+    """Require every affected page to have existing acquired file provenance."""
+    end=start+((length+4095)//4096)*4096
+    if maps is None or end>2**64: raise ValueError('executable mapping provenance required')
+    position=start
+    for row in maps:
+        if row['end']<=position: continue
+        if row['start']>position: break
+        if not row['path'] or not row['path'].startswith('/') or len(row['identity'])!=2:
+            raise ValueError('executable mapping file provenance required')
+        position=min(end,row['end'])
+        if position==end: return
+    raise ValueError('executable mapping interval is not fully acquired')
+
+
+def _reconcile_maps(name: str, args: list[int], result: int, current: list[dict],
+                    observed: list[dict], files: dict, mapped_file: dict | None) -> list[dict]:
+    expected=current
+    if result>=0:
+        if name=='mmap' and not args[3]&0x20:
+            if mapped_file is None: raise ValueError('acquired mmap descriptor required')
+            end=result+((args[1]+4095)//4096)*4096
+            expected=_cut_maps(current,result,end)
+            expected=_merge_maps(expected+[{'start':result,'end':end,'prot':args[2],
+                'offset':args[5],'path':mapped_file['path'],'identity':mapped_file['identity'][:2]}])
+        elif name in ('munmap','mprotect'):
+            expected=_cut_maps(current,args[0],args[0]+((args[1]+4095)//4096)*4096,None if name=='munmap' else args[2])
+    if _map_rows(observed,files)!=expected: raise ValueError('observed/replayed file mappings differ')
+    return expected
+
+
+def _admit(nr: int, args: list[int], detail: dict, spec: dict, fds: dict, created: set, executed: bool, *, maps: list[dict] | None = None) -> str:
     if str(nr) not in SYSCALLS or nr&0x40000000: raise ValueError('unsupported-native-access:syscall')
     if type(args) is not list or len(args)!=6 or any(type(x) is not int or not 0<=x<2**64 for x in args):
         raise ValueError('native syscall arguments differ')
@@ -295,6 +329,7 @@ def _admit(nr: int, args: list[int], detail: dict, spec: dict, fds: dict, create
         _closed(detail,set())
         if not args[1] or args[0]%4096 or name=='mprotect' and (args[2]&~7 or args[2]&6==6) or name=='madvise' and args[2] not in (0,1,2,3,4,8,14,15,16,17):
             raise ValueError('unsupported native map operation')
+        if name=='mprotect' and args[2]&4: _executable_interval(maps,args[0],args[1])
     elif name in ('stat','lstat','access','newfstatat','readlink','readlinkat'):
         _closed(detail,{'path'}); path=_path(detail['path'])
         if path.startswith(('/dev/','/sys/')) or path.startswith('/proc/') and not (name in ('readlink','readlinkat') and path=='/proc/self/exe'):
@@ -310,6 +345,9 @@ def _admit(nr: int, args: list[int], detail: dict, spec: dict, fds: dict, create
         if name=='rseq' and (args[1]!=32 or args[2]!=0): raise ValueError('rseq variant')
         if name=='set_robust_list' and args[1]!=24: raise ValueError('robust list variant')
         if name in ('rt_sigaction','rt_sigprocmask') and args[3]!=8: raise ValueError('signal ABI variant')
+    if name in ('stat','lstat','fstat','newfstatat','readlink','readlinkat','getdents64','getcwd','uname','getrlimit','sysinfo','clock_gettime','prlimit64','getrandom','arch_prctl','rt_sigaction','rt_sigprocmask'):
+        # The declared metadata ABI and request bounds apply before dispatch too.
+        _metadata_extent({'name':name,'args':args},0)
     if name in ('readv','writev'):
         vectors=detail['iovecs']
         if type(vectors) is not list or len(vectors)!=args[2] or len(vectors)>256: raise ValueError('native iovec count differs')
@@ -350,7 +388,7 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
     candidates=_file_rows(spec,files,artifacts)
     if type(events) is not list or not events or len(events)>MAX_EVENTS or len(sm.canonical(events))>MAX_EVENT_BYTES: raise ValueError('native event limit')
     fds: dict[int,dict]={}; generations: dict[int,int]={}; descriptions: dict[int,dict]={}; created: set[str]=set(); writes={'stdout':bytearray(),'stderr':bytearray()}
-    pending=None; executed=False; exit_seen=False; terminal=False; current_maps=[]; used=set(); start=None; previous=-1
+    pending=None; executed=False; exit_seen=False; terminal=False; current_maps: list[dict]=[]; used=set(); start=None; previous=-1
     for seq,event in enumerate(events):
         _closed(event,{'seq','at_ns','kind','data'})
         if event['seq']!=seq or type(event['seq']) is not int or _integer(event['at_ns'])<previous or event['at_ns']>spec['limits']['wall_seconds']*10**9:
@@ -372,7 +410,7 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
         elif kind=='enter':
             _closed(data,{'nr','args','detail'})
             if pending is not None or exit_seen: raise ValueError('syscall entry transition differs')
-            name=_admit(data['nr'],data['args'],data['detail'],spec,fds,created,executed)
+            name=_admit(data['nr'],data['args'],data['detail'],spec,fds,created,executed,maps=current_maps)
             if purpose=='actual' and 'path' in data['detail'] and data['detail']['path']!='/proc/self/exe' and not _inside(data['detail']['path'],host_policy['roots']) and not data['detail']['path'].startswith(spec['cwd']+'/'):
                 raise ValueError('observed path outside selected host roots')
             if not executed and name!='execve': raise ValueError('pre-exec coverage gap')
@@ -471,18 +509,19 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
                 if result!=-errno.ENOTTY: raise ValueError('owned TCGETS must fail ENOTTY')
             elif name in ('mmap','munmap','mprotect','brk'):
                 _closed(detail,{'maps'})
-                if result>=0:
-                    if name=='mmap' and not args[3]&0x20:
-                        desc=descriptions[fds[args[4]]['description']]; end=result+((args[1]+4095)//4096)*4096
-                        current_maps=_cut_maps(current_maps,result,end)
-                        current_maps=_merge_maps(current_maps+[{'start':result,'end':end,'prot':args[2],'offset':args[5],'path':desc['path'],'identity':desc['identity'][:2]}]); used.add(desc['path'])
-                    elif name in ('munmap','mprotect'):
-                        current_maps=_cut_maps(current_maps,args[0],args[0]+((args[1]+4095)//4096)*4096,None if name=='munmap' else args[2])
-                    if _map_rows(detail['maps'],files)!=current_maps: raise ValueError('observed/replayed file mappings differ')
+                mapped_description=descriptions[fds[args[4]]['description']] if name=='mmap' and not args[3]&0x20 else None
+                current_maps=_reconcile_maps(name,args,result,current_maps,detail['maps'],files,mapped_description)
+                if mapped_description is not None and result>=0: used.add(mapped_description['path'])
             else:
                 # Every output buffer is retained; no untracked extra data is accepted.
                 _closed(detail,{'buffer_sha256'} if name in ('stat','lstat','fstat','newfstatat','readlink','readlinkat','getdents64','getcwd','uname','getrlimit','sysinfo','clock_gettime','prlimit64','getrandom','arch_prctl','rt_sigaction','rt_sigprocmask') else set())
-                if detail: _raw(artifacts,detail['buffer_sha256'])
+                if detail:
+                    identity=None
+                    if name=='fstat':
+                        record=fds[args[0]]
+                        identity=(descriptions[record['description']]['identity'] if 'description' in record and record['kind']!='sidecar' else record['identity'])
+                    _validate_metadata_result(p,result,_raw(artifacts,detail['buffer_sha256']),spec,files,identity,observation['platform'])
+                elif name=='access' and result>0: raise ValueError('access success status differs')
         elif kind=='exit-stop':
             _closed(data,{'status','maps','fds','pid','starttime'})
             _integer(data['status'],0,0);_integer(data['pid']);_integer(data['starttime'])
@@ -493,9 +532,10 @@ def verify_native_observation(observation: dict, artifacts: dict[str, bytes], *,
             if data['fds']!=expected or any(r['kind']=='sidecar' for r in fds.values()): raise ValueError('final descriptor/sidecar closure differs')
             pending=None; exit_seen=True
         elif kind=='terminal':
-            _closed(data,{'returncode','stdout_sha256','stderr_sha256','sidecars','eof','reaped','cleanup'})
+            _closed(data,{'returncode','stdout_sha256','stderr_sha256','sidecars','eof','reaped','cleanup','custody'})
             _integer(data['returncode'],0,0)
             if not exit_seen or data['returncode']!=0 or data['eof']!=['stdout','stderr'] or data['reaped']!=[start['pid']] or data['cleanup']!='owned-workspace-removed': raise ValueError('incomplete EOF/reap/cleanup')
+            validate_native_custody(data['custody'],pid=start['pid'],reaped=data['reaped'])
             for name in ('stdout','stderr'):
                 if _raw(artifacts,data[name+'_sha256'])!=bytes(writes[name]): raise ValueError('observed stream/write replay differs')
             wanted=set() if spec['profile']=='pdf-text-xpdf/1' else {spec['cwd']+'/runtime',spec['cwd']+'/syntax'}
@@ -753,26 +793,89 @@ def _entry_detail(stop: dict, mem: int, proc: Path, artifacts: dict, budget: dic
     return {}
 
 
+def _metadata_extent(pending: dict, result: int) -> tuple[int,int]:
+    """x86_64 kernel output ABI; reject impossible counts before reading memory."""
+    name=pending['name'];a=pending['args']
+    if result<0: return 0,0
+    variable={'readlink':(1,2,MAX_PATH),'readlinkat':(2,3,MAX_PATH),
+              'getcwd':(0,1,MAX_PATH),'getdents64':(1,2,1048576),'getrandom':(0,1,1048576)}
+    if name in variable:
+        at,count,cap=variable[name]
+        _integer(a[count],0,cap)
+        if result>a[count] or result and not a[at]: raise ValueError('metadata returned extent exceeds requested buffer')
+        return a[at],result
+    sizes={'stat':(1,144),'lstat':(1,144),'fstat':(1,144),'newfstatat':(2,144),
+        'uname':(0,390),'getrlimit':(1,16),'sysinfo':(0,112),'clock_gettime':(1,16),
+        'prlimit64':(3,16),'arch_prctl':(1,8),'rt_sigaction':(2,32),'rt_sigprocmask':(2,8)}
+    if name not in sizes or result!=0: raise ValueError('metadata success status differs')
+    at,size=sizes[name]
+    if name=='arch_prctl' and a[0]==0x1002: return 0,0
+    optional=name in ('prlimit64','rt_sigaction','rt_sigprocmask')
+    if not a[at]:
+        if optional: return 0,0
+        raise ValueError('successful metadata requires output pointer')
+    return a[at],size
+
+
+def _validate_metadata_result(pending: dict, result: int, raw: bytes, spec: dict,
+                              files: dict, fd_identity: list | None, platform_record: dict) -> None:
+    name=pending['name'];a=pending['args'];_,extent=_metadata_extent(pending,result)
+    if len(raw)!=extent: raise ValueError('metadata retained output extent differs')
+    if result<0: return
+    if name in ('readlink','readlinkat'):
+        if not raw or b'\0' in raw: raise ValueError('invalid readlink output')
+        if pending['detail']['path']=='/proc/self/exe':
+            capacity=a[2 if name=='readlink' else 3];expected=spec['argv'][0].encode('utf8')[:capacity]
+            if raw!=expected: raise ValueError('proc exe does not name actual fixed executable')
+    elif name=='getcwd':
+        if raw!=spec['cwd'].encode('utf8')+b'\0': raise ValueError('metadata cwd differs from fixed cwd')
+    elif name in ('stat','lstat','fstat','newfstatat'):
+        dev,ino,nlink=struct.unpack_from('<QQQ',raw)
+        mode,uid,gid=struct.unpack_from('<III',raw,24);size=struct.unpack_from('<q',raw,48)[0]
+        times=struct.unpack_from('<qqqqqq',raw,72)
+        if mode&0o170000 not in (0o010000,0o020000,0o040000,0o060000,0o100000,0o120000,0o140000) or size<0 or any(not 0<=v<10**9 for v in times[1::2]):
+            raise ValueError('metadata stat ABI values differ')
+        identity=[dev,ino,mode,uid,gid,nlink,size,times[2]*10**9+times[3],times[4]*10**9+times[5]]
+        known=fd_identity if name=='fstat' else files.get(pending['detail']['path'],{}).get('identity')
+        if known is not None and identity[:len(known)]!=known: raise ValueError('metadata stat known identity differs')
+    elif name=='getdents64':
+        offset=0
+        while offset<len(raw):
+            if len(raw)-offset<24: raise ValueError('truncated linux_dirent64')
+            _,_,size,kind=struct.unpack_from('<QqHB',raw,offset)
+            if size<24 or size%8 or offset+size>len(raw) or kind not in (0,1,2,4,6,8,10,12,14): raise ValueError('invalid linux_dirent64 extent/type')
+            field=raw[offset+19:offset+size];end=field.find(b'\0')
+            if end<=0 or b'/' in field[:end]: raise ValueError('invalid linux_dirent64 name')
+            offset+=size
+    elif name=='uname':
+        fields=[raw[i:i+65] for i in range(0,390,65)]
+        if any(b'\0' not in v for v in fields): raise ValueError('unterminated utsname field')
+        values=[v.split(b'\0',1)[0] for v in fields]
+        if any(values[i]!=platform_record[k].encode('utf8') for i,k in ((0,'system'),(2,'release'),(3,'version'),(4,'machine'))): raise ValueError('utsname platform differs')
+    elif name in ('getrlimit','prlimit64') and raw:
+        soft,hard=struct.unpack('<QQ',raw)
+        if soft>hard: raise ValueError('invalid rlimit extent values')
+    elif name=='clock_gettime':
+        _,nanoseconds=struct.unpack('<qq',raw)
+        if not 0<=nanoseconds<10**9: raise ValueError('invalid timespec nanoseconds')
+    elif name=='sysinfo':
+        if struct.unpack_from('<q',raw)[0]<0 or not struct.unpack_from('<I',raw,104)[0]: raise ValueError('invalid sysinfo ABI values')
+
+
 def _result_buffer(pending: dict, result: int, mem: int) -> bytes:
     name=pending['name'];a=pending['args']
     if result<0: return b''
-    if name in ('read','pread64','readlink','readlinkat','getdents64','getcwd','getrandom'):
-        at=a[2] if name=='readlinkat' else a[0] if name in ('getcwd','getrandom') else a[1]
-        return _memory(mem,at,result)
+    if name in ('read','pread64'):
+        if result>a[2]: raise ValueError('read result exceeds requested extent')
+        return _memory(mem,a[1],result)
     if name=='readv':
         remain=result;out=bytearray()
         for base,size in pending['detail']['iovecs']:
             amount=min(remain,size);out.extend(_memory(mem,base,amount));remain-=amount
         if remain: raise ValueError('native readv result exceeds iovec')
         return bytes(out)
-    sizes={'stat':(1,144),'lstat':(1,144),'fstat':(1,144),'newfstatat':(2,144),
-        'uname':(0,390),'getrlimit':(1,16),'sysinfo':(0,112),'clock_gettime':(1,16),
-        'prlimit64':(3,16),'arch_prctl':(1,8),'rt_sigaction':(2,32),'rt_sigprocmask':(2,8)}
-    if name in sizes:
-        index,size=sizes[name]
-        if name=='arch_prctl' and a[0]!=0x1003: return b''
-        return _memory(mem,a[index],size) if a[index] else b''
-    return b''
+    address,size=_metadata_extent(pending,result)
+    return _memory(mem,address,size) if size else b''
 
 
 def _append(events: list, kind: str, data: dict, start: float, limits: dict) -> None:
@@ -781,6 +884,81 @@ def _append(events: list, kind: str, data: dict, start: float, limits: dict) -> 
     events.append({'seq':len(events),'at_ns':int(elapsed*10**9),'kind':kind,'data':data})
     # Incremental accounting avoids an O(N^2) canonicalization of the full trace.
     if sum(len(sm.canonical(e)) for e in events[-1:])>MAX_EVENT_BYTES: raise ValueError('native event limit')
+
+
+def _native_signal(target: str, pid: int, sig: int, signals: list[dict]) -> None:
+    try:
+        (os.killpg if target=='group' else os.kill)(pid,sig)
+        outcome='sent'
+    except ProcessLookupError: outcome='absent'
+    except PermissionError: outcome='permission-denied'
+    except OSError: outcome='os-error'
+    signals.append({'target':target,'pid':pid,'signal':int(sig),'outcome':outcome})
+
+
+def _finish_native_custody(pid: int | None, descendants: set[int], reaped: list[int],
+                           returncode: int | None, *, deadline: float) -> tuple[dict,int | None]:
+    """One original deadline for TERM, KILL and every owned traced descendant."""
+    signals: list[dict]=[];targets=sorted(({pid} if pid else set())|descendants)
+    if pid is not None and pid not in reaped and time.monotonic()<deadline:
+        _native_signal('group',pid,signal.SIGTERM,signals)
+    for child in targets:
+        if child not in reaped and time.monotonic()<deadline: _native_signal('pid',child,signal.SIGTERM,signals)
+    midpoint=time.monotonic()+max(0,deadline-time.monotonic())/2
+    for sig,until in ((signal.SIGTERM,midpoint),(signal.SIGKILL,deadline)):
+        if sig==signal.SIGKILL:
+            # A reaped leader no longer reserves its process-group number.
+            if pid is not None and pid not in reaped and time.monotonic()<deadline:
+                _native_signal('group',pid,sig,signals)
+            for child in targets:
+                if child not in reaped and time.monotonic()<deadline: _native_signal('pid',child,sig,signals)
+        while any(child not in reaped for child in targets) and time.monotonic()<until:
+            for child in targets:
+                if child in reaped or time.monotonic()>=until: continue
+                try: got,status=os.waitpid(child,os.WNOHANG|os.WUNTRACED|0x40000000)
+                except (ChildProcessError,OSError): continue
+                if got and (os.WIFEXITED(status) or os.WIFSIGNALED(status)):
+                    reaped.append(child)
+                    if child==pid: returncode=os.waitstatus_to_exitcode(status)
+                elif got:
+                    try: _ptrace(24,child,0,sig)
+                    except OSError: pass
+            if any(child not in reaped for child in targets): time.sleep(min(.001,max(0,until-time.monotonic())))
+    probe='not-observed'
+    if pid is not None and all(child in reaped for child in targets) and time.monotonic()<deadline:
+        try: os.killpg(pid,0);probe='present'
+        except ProcessLookupError: probe='absent'
+        except PermissionError: probe='permission-denied'
+        except OSError: probe='os-error'
+    ended=time.monotonic()
+    return {'schema':'twin.native-custody/v1','leader_pid':pid,'reservation':'traced-owned-lifetime',
+        'signals':signals,'direct_child_reaped':pid is not None and pid in reaped,
+        'absence_verified':probe=='absent' and ended<=deadline,
+        'absence_probe':probe,'descendants':sorted(descendants),'reaped':sorted(reaped),
+        'grace_deadline':deadline,'cleanup_ended':ended},returncode
+
+
+def validate_native_custody(custody: dict, *, pid: int | None = None, reaped: list[int] | None = None) -> None:
+    _closed(custody,{'schema','leader_pid','reservation','signals','direct_child_reaped','absence_verified',
+        'absence_probe','descendants','reaped','grace_deadline','cleanup_ended'})
+    leader=_integer(custody['leader_pid'],1)
+    if custody['schema']!='twin.native-custody/v1' or custody['reservation']!='traced-owned-lifetime' or custody['direct_child_reaped'] is not True or custody['absence_verified'] is not True or custody['absence_probe']!='absent':
+        raise ValueError('native terminal custody unestablished')
+    children=custody['descendants'];waited=custody['reaped']
+    if type(children) is not list or type(waited) is not list or children!=sorted(set(children)) or waited!=sorted(set(waited)):
+        raise ValueError('native custody PID inventory differs')
+    for child in children+waited: _integer(child,1)
+    if leader in children or waited!=sorted([leader]+children) or pid is not None and leader!=pid or reaped is not None and waited!=sorted(reaped): raise ValueError('native custody owned lifetime differs')
+    for key in ('grace_deadline','cleanup_ended'):
+        value=custody[key]
+        if type(value) not in (int,float) or not 0<=value<float('inf'): raise ValueError('native cleanup deadline differs')
+    if custody['cleanup_ended']>custody['grace_deadline']: raise ValueError('native cleanup exceeded original grace')
+    if type(custody['signals']) is not list: raise ValueError('native cleanup signal inventory differs')
+    for record in custody['signals']:
+        _closed(record,{'target','pid','signal','outcome'})
+        _integer(record['pid'],1);_integer(record['signal'])
+        if record['target'] not in ('group','pid') or record['pid'] not in waited or record['target']=='group' and record['pid']!=leader or record['signal'] not in (signal.SIGTERM,signal.SIGKILL) or record['outcome'] not in ('sent','absent','permission-denied','os-error'):
+            raise ValueError('native cleanup signal observation differs')
 
 
 def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> dict:
@@ -799,7 +977,7 @@ def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> di
     created: set[str]=set()
     outputs: dict[str,bytearray]={}
     acquired: list[int]=[]
-    generations={0:0,1:0,2:0}
+    generations={0:0,1:0,2:0};current_maps: list[dict]=[]
     pending=None;executed=False;exit_stop=False;pid=None;mem=-1;procfd=-1;failure=None;returncode=None;reaped=[]
     descendants: set[int]=set()
     streams={'stdout':bytearray(),'stderr':bytearray()}; observed_streams={'stdout':0,'stderr':0};write_totals={'stdout':0,'stderr':0}; eof=[];pipes=[]
@@ -867,6 +1045,7 @@ def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> di
                     if pending is None or pending['name']!='execve' or executed: raise ValueError('unexpected native exec')
                     os.close(mem);mem=os.open(proc/'mem',os.O_RDONLY|os.O_CLOEXEC)
                     maps=_maps(proc)
+                    current_maps=_map_rows(maps,candidate_facts)
                     executable=os.path.realpath(proc/'exe')
                     for row in maps:
                         path=row['path']
@@ -895,7 +1074,7 @@ def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> di
                     if stop['op']=='enter':
                         if pending is not None: raise ValueError('native entry/leave gap')
                         detail=_entry_detail(stop,mem,proc,artifacts,budget)
-                        name=_admit(stop['nr'],stop['args'],detail,spec,records,created,executed)
+                        name=_admit(stop['nr'],stop['args'],detail,spec,records,created,executed,maps=current_maps)
                         if 'path' in detail and detail['path']!='/proc/self/exe' and not _inside(detail['path'],policy['roots']) and not detail['path'].startswith(spec['cwd']+'/'):
                             raise ValueError('native lookup outside selected host roots')
                         if name in ('open','openat'):
@@ -970,9 +1149,20 @@ def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> di
                             generations[result]=generations.get(result,-1)+1;records[result]={**records[a[0]],'generation':generations[result]}
                         elif name=='lseek' and result>=0: records[a[0]]['description']['offset']=result
                         elif name=='ioctl' and result!=-errno.ENOTTY: raise ValueError('native TCGETS did not fail ENOTTY')
-                        elif name in ('mmap','mprotect','munmap','brk'): detail={'maps':_maps(proc)}
+                        elif name in ('mmap','mprotect','munmap','brk'):
+                            detail={'maps':_maps(proc)}
+                            desc=records[a[4]]['description'] if name=='mmap' and not a[3]&0x20 else None
+                            # Reconcile at this syscall stop, before any further resume.
+                            current_maps=_reconcile_maps(name,a,result,current_maps,detail['maps'],used_files,desc)
                         elif name in ('stat','lstat','fstat','newfstatat','readlink','readlinkat','getdents64','getcwd','uname','getrlimit','sysinfo','clock_gettime','prlimit64','getrandom','arch_prctl','rt_sigaction','rt_sigprocmask'):
-                            detail={'buffer_sha256':_runtime_blob(artifacts,_result_buffer(pending,result,mem),budget)}
+                            raw=_result_buffer(pending,result,mem)
+                            identity=None
+                            if name=='fstat':
+                                record=records[a[0]]
+                                identity=record['description']['identity'] if 'description' in record and record['kind']!='sidecar' else record['identity']
+                            uname=os.uname()
+                            _validate_metadata_result(pending,result,raw,spec,candidate_facts,identity,{'system':'Linux','machine':'x86_64','release':uname.release,'version':uname.version})
+                            detail={'buffer_sha256':_runtime_blob(artifacts,raw,budget)}
                         _append(events,'leave',{'result':result,'detail':detail},start,spec['limits']);pending=None
                 else:
                     # No silent restart or signal forwarding: unsupported delivery holds.
@@ -997,48 +1187,16 @@ def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> di
         except Exception as exc:
             failure='native-observation:'+type(exc).__name__+':'+str(exc)[:240]
         finally:
-            if pid is not None and pid>0 and pid not in reaped:
-                try: os.killpg(pid,signal.SIGTERM)
-                except ProcessLookupError: pass
-                deadline=time.monotonic()+2
-                while time.monotonic()<deadline:
-                    try: got,status=os.waitpid(pid,os.WNOHANG)
-                    except ChildProcessError: break
-                    if got and (os.WIFEXITED(status) or os.WIFSIGNALED(status)):
-                        reaped.append(pid);returncode=os.waitstatus_to_exitcode(status);break
-                    if got:
-                        try: _ptrace(24,pid,0,signal.SIGTERM)
-                        except OSError: pass
-                    time.sleep(0.001)
-                if pid not in reaped:
-                    try: os.killpg(pid,signal.SIGKILL)
-                    except ProcessLookupError: pass
-                    try: os.kill(pid,signal.SIGKILL)
-                    except ProcessLookupError: pass
-                    kill_deadline=time.monotonic()+2
-                    while pid not in reaped and time.monotonic()<kill_deadline:
-                        try: got,status=os.waitpid(pid,os.WNOHANG)
-                        except ChildProcessError: break
-                        if got and (os.WIFEXITED(status) or os.WIFSIGNALED(status)):
-                            reaped.append(pid);returncode=os.waitstatus_to_exitcode(status);break
-                        time.sleep(0.001)
-                    if pid not in reaped: failure='native-reap-uncertain'
-            for child_pid in descendants:
-                if child_pid in reaped: continue
-                try: os.kill(child_pid,signal.SIGKILL)
-                except ProcessLookupError: pass
-                child_deadline=time.monotonic()+2
-                while time.monotonic()<child_deadline:
-                    try: child_got,child_status=os.waitpid(child_pid,os.WNOHANG|0x40000000)
-                    except ChildProcessError: break
-                    if child_got and (os.WIFEXITED(child_status) or os.WIFSIGNALED(child_status)):
-                        reaped.append(child_pid);break
-                    time.sleep(0.001)
-                if child_pid not in reaped: failure='native-owned-descendant-reap-uncertain'
+            grace=spec['limits']['termination_grace_seconds']
+            cleanup_deadline=min(start+spec['limits']['wall_seconds']+grace,time.monotonic()+grace)
+            custody,returncode=_finish_native_custody(pid,descendants,reaped,returncode,deadline=cleanup_deadline)
+            try: validate_native_custody(custody)
+            except ValueError: failure=failure or 'native-terminal-custody-uncertain'
             for fd in set(list(held.values())+acquired+pipes+[mem,procfd]):
                 if fd>=0:
                     try: os.close(fd)
                     except OSError: pass
+    if events and events[-1]['kind']=='terminal': events[-1]['data']['custody']=copy.deepcopy(custody)
     uname=os.uname()
     observation={'schema':'twin.native-file-observation/v1','scope':SCOPE,'purpose':'actual','spec':spec,'files':used_files,
         'events':events,'platform':{'system':'Linux','machine':'x86_64','release':uname.release,'version':uname.version},'host_policy_sha256':sm.sha256(store._host_context._policy)}
@@ -1048,7 +1206,7 @@ def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> di
     return {'started_at':started,'ended_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-start,
         'exit_code':returncode,'stdout':bytes(streams['stdout']),'stderr':bytes(streams['stderr']),
         'observed_bytes_lower_bound':observed_streams,'streams_complete':failure is None and set(eof)=={'stdout','stderr'},
-        'failure':failure,'native_observation':observation,'native_artifacts':artifacts}
+        'failure':failure,'native_observation':observation,'native_artifacts':artifacts,'process_group':custody}
 
 
 def validate_native_candidate_plan(plan: dict, parent: bytes) -> tuple[dict,dict]:

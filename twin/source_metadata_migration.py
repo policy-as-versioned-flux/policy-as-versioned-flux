@@ -356,6 +356,12 @@ def _run(argv: list[str], cwd: str, limits: dict) -> dict:
 
 def _cleanup_workspace(directory, run: dict | None, *, run_started: bool = False) -> str:
     """Never remove a workspace while an owned group might still use it."""
+    if run is not None and 'native_observation' in run:
+        from . import source_native_observation as native
+        try: native.validate_native_custody(run['process_group'])
+        except (ValueError,KeyError,TypeError):
+            getattr(directory, '_finalizer').detach()
+            return 'preserved-unverified-group'
     if (run is None and run_started or run is not None
             and not (run['process_group']['direct_child_reaped']
                      and run['process_group']['absence_verified'])):
@@ -772,21 +778,26 @@ def _checked_execution(member: dict, parent: dict, index_pin: str, archive: dict
             or dossier['streams_complete'] is not True or dossier['failure'] is not None):
         raise MetadataMigrationHold('actual execution dossier differs')
     group = dossier['process_group']
-    _closed(group, {'leader_pid','reservation','signals','direct_child_reaped','absence_verified'})
-    if (type(group['leader_pid']) is not int or group['leader_pid'] <= 0
-            or group['reservation'] != 'unreaped-direct-child' or group['direct_child_reaped'] is not True
-            or group['absence_verified'] is not True or dossier['workspace_cleanup'] != 'removed'
-            or type(group['signals']) is not list or not group['signals']):
-        raise MetadataMigrationHold('owned process group cleanup unestablished')
-    if ([row.get('signal') for row in group['signals'] if type(row) is dict]
-            not in ([int(signal.SIGTERM)], [int(signal.SIGTERM),int(signal.SIGKILL)])
-            or len(group['signals']) == 1 and group['signals'][0].get('outcome') != 'absent'):
-        raise MetadataMigrationHold('owned process group signal order differs')
-    for observation in group['signals']:
-        _closed(observation, {'signal','outcome'})
-        if (type(observation['signal']) is not int or observation['signal'] not in (signal.SIGTERM,signal.SIGKILL)
-                or observation['outcome'] not in ('sent','absent','permission-denied','os-error')):
-            raise MetadataMigrationHold('owned process group signal observation differs')
+    from . import source_native_observation as native_observer
+    if observed:
+        native_observer.validate_native_custody(group)
+        if dossier['workspace_cleanup']!='removed': raise MetadataMigrationHold('native workspace cleanup unestablished')
+    else:
+        _closed(group, {'leader_pid','reservation','signals','direct_child_reaped','absence_verified'})
+        if (type(group['leader_pid']) is not int or group['leader_pid'] <= 0
+                or group['reservation'] != 'unreaped-direct-child' or group['direct_child_reaped'] is not True
+                or group['absence_verified'] is not True or dossier['workspace_cleanup'] != 'removed'
+                or type(group['signals']) is not list or not group['signals']):
+            raise MetadataMigrationHold('owned process group cleanup unestablished')
+        if ([row.get('signal') for row in group['signals'] if type(row) is dict]
+                not in ([int(signal.SIGTERM)], [int(signal.SIGTERM),int(signal.SIGKILL)])
+                or len(group['signals']) == 1 and group['signals'][0].get('outcome') != 'absent'):
+            raise MetadataMigrationHold('owned process group signal order differs')
+        for observation in group['signals']:
+            _closed(observation, {'signal','outcome'})
+            if (type(observation['signal']) is not int or observation['signal'] not in (signal.SIGTERM,signal.SIGKILL)
+                    or observation['outcome'] not in ('sent','absent','permission-denied','os-error')):
+                raise MetadataMigrationHold('owned process group signal observation differs')
     for key in ('identity','version','implementation_artifact_sha256','configuration_sha256'):
         if dossier[key] != member['transform'][key]:
             raise MetadataMigrationHold('actual execution transform tuple differs')
@@ -839,6 +850,7 @@ def _checked_execution(member: dict, parent: dict, index_pin: str, archive: dict
         if not sm._instant(host_policy['not_before'])<=started<=ended<sm._instant(host_policy['not_after']):
             raise MetadataMigrationHold('observed invocation outside selected host interval')
         terminal=observation['events'][-1]['data']
+        if group!=terminal['custody']: raise MetadataMigrationHold('native custody/dossier binding differs')
         if terminal['stdout_sha256']!=member['sha256'] or terminal['stderr_sha256']!=dossier['stderr']['sha256']:
             raise MetadataMigrationHold('observed stream/dossier binding differs')
         if profile=='pdf-text-xpdf/1':

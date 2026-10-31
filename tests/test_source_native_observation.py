@@ -51,7 +51,7 @@ def fixture():
     event('leave',{'result':6,'detail':{}})
     event('enter',{'nr':231,'args':[0]*6,'detail':{}})
     event('exit-stop',{'status':0,'maps':maps,'fds':fds,'pid':100,'starttime':123})
-    event('terminal',{'returncode':0,'stdout_sha256':blob(b'hello\n'),'stderr_sha256':blob(b''),'sidecars':{},'eof':['stdout','stderr'],'reaped':[100],'cleanup':'owned-workspace-removed'})
+    event('terminal',{'returncode':0,'stdout_sha256':blob(b'hello\n'),'stderr_sha256':blob(b''),'sidecars':{},'eof':['stdout','stderr'],'reaped':[100],'cleanup':'owned-workspace-removed','custody':{'schema':'twin.native-custody/v1','leader_pid':100,'reservation':'traced-owned-lifetime','signals':[],'direct_child_reaped':True,'absence_verified':True,'absence_probe':'absent','descendants':[],'reaped':[100],'grace_deadline':122.0,'cleanup_ended':120.0}})
     return {'schema':'twin.native-file-observation/v1','scope':n.SCOPE,'purpose':'TEST_ONLY',
             'spec':spec,'files':files,'events':events,'platform':{'system':'Linux','machine':'x86_64','release':'TEST_ONLY-kernel','version':'TEST_ONLY-build'},'host_policy_sha256':None},archive
 
