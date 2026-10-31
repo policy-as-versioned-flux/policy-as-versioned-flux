@@ -40,3 +40,7 @@ opinion about a proposed distribution.
 The fixed, currently unappointed Linux build capability and its pure checker are
 documented in [BUILD-ONLY.md](BUILD-ONLY.md). No workflow or actual build/native
 execution is enabled by that source.
+
+The separately appointed inventory-only interfaces and their DATA/held result
+meaning are documented in [DISCOVERY-ONLY.md](DISCOVERY-ONLY.md). Their private
+appointment is also absent; inventory cannot grant a full build or native run.

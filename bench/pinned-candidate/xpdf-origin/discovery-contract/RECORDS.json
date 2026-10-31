@@ -1,0 +1,116 @@
+{
+  "schema": "PROPOSAL_ONLY-closed-linux-discovery-records/v1",
+  "canonical": "UTF8 canonical JSON sorted compact keys ensure_ascii=false allow_nan=false; duplicate/unknown keys and bool-as-int refuse",
+  "selection": {
+    "exact_keys": {
+      "schema": "literal twin.xpdf-linux-discovery-selection/v1",
+      "scope": "literal DISCOVERY_ONLY",
+      "source_commit": "40lowercasehex",
+      "source_tree": "40lowercasehex",
+      "workflow_sha256": "64lowercasehex",
+      "driver_sha256": "64lowercasehex",
+      "bootstrap_selection_sha256": "64lowercasehex",
+      "query_profile_sha256": "exact reviewed QUERY-PROFILE.json hash",
+      "limits_profile": "literal discovery-A60/v1",
+      "expected_row": "exact {os:ubuntu-24.04,arch:x86_64-linux}"
+    },
+    "tool_module_review_field": "ABSENT; cannot be adopted as BUILD-SELECTION v1",
+    "authority": "None; private separately selected source appointment required"
+  },
+  "result": {
+    "exact_keys": {
+      "schema": "literal twin.xpdf-linux-discovery-result/v1",
+      "scope": "literal DISCOVERY_ONLY",
+      "selection_sha256": "64lowercasehex",
+      "run_identity": "null if not independently observed|exact {repository,workflow_path,run_id,run_attempt,job,row,source_commit}; canonical nonempty ASCII strings<=4096bytes, positive strict integer run_id/run_attempt; row exact selected x86",
+      "inventory_state": "NOT_STARTED|PARTIAL_DATA|COMPLETE_DATA",
+      "build_hold": "literal H_PROBE_EXECUTION_UNESTABLISHED",
+      "build_complete": "literal false",
+      "native_execution": "literal false",
+      "original_started": "finite monotonic number not bool|null if unobserved",
+      "deadline": "finite monotonic number not bool|null if unobserved",
+      "entered": "finite monotonic number not bool|null",
+      "finished": "finite monotonic number not bool|null",
+      "bootstrap": "null|hash of exact BootstrapInventory DATA artifact",
+      "tools": "list0..11 FileCandidate in exact selector order; role selector",
+      "module_root": "null|canonical fixed CMake root",
+      "modules": "list0..8192 FileCandidate under sole fixed CMake root; role cmake-module",
+      "commands": "list0..15 Query",
+      "faults": "list0..16 Fault first original retained",
+      "custody": "exact {known_terminal:strictbool,workspace_preserved:strictbool,reason:ASCII<=2048bytes}",
+      "files_manifest_sha256": "null if local export was not completed|64lowercasehex of prior FILES.json",
+      "gcc_internals": "list0..3 FileCandidate in fixed cc1,cc1plus,collect2 order; role gcc-internal",
+      "directory_snapshots": "list0..8192 DirectoryCandidate for observed fixed roots/subdirectories; no unrelated directory crawl"
+    },
+    "complete_rules": [
+      "All11selectors,exact15successful orderedqueries,all discovered regular module/bootstrap candidates retained and associated; no null/unknown/missing/overflow/fault",
+      "original deadline <=original_started+60 and appointed A deadline; all work<=deadline; raw clocks/order authentic",
+      "All terminal known,group absent before later actions,source/boot/environment selected independently",
+      "COMPLETE_DATA never changes build_hold/build_complete/native_execution",
+      "All3 fixed GCC internal candidates bound to raw query replies, all directory snapshots/pathsets stable and exact BootstrapInventory payload valid",
+      "run_identity/bootstrap/module_root/original clock/file-manifest facts all nonnull and independently observed",
+      "Fault/error/null/late/overflow observations may be preserved in partial data but never satisfy COMPLETE_DATA"
+    ]
+  },
+  "FileCandidate": {
+    "exact_keys": {
+      "role": "bootstrap|selector|gcc-internal|cmake-module",
+      "path": "canonical absolute POSIX <=4096UTF8bytes",
+      "resolved": "canonical absolute POSIX <=4096UTF8bytes",
+      "links": "ordered bounded list0..40 exact {path,target,identity}; identity strict9integer statvector; targetUTF8<=4096",
+      "before": "strict9integer statvector",
+      "after": "same exact strict9integer statvector",
+      "sha256": "64lowercasehex",
+      "bytes": "strictint0..268435456"
+    },
+    "semantic": "all observed route/regular-file ownership/mode/canonical-root constraints; complete before==after and bytes/hash held payload"
+  },
+  "Query": {
+    "exact_keys": {
+      "index": "strictint0..14 equal fixed prefix position",
+      "argv": "exact fixed ordered query argv at index",
+      "environment": "exact accepted constructed fresh environment using ownedhome/tmp",
+      "command_binding_sha256": "null if unobserved|64lowercasehex; exact equality with custody.command_binding_sha256; projection in BINDING-PROJECTION.md is normative",
+      "started": "finite numeric not bool|null",
+      "deadline": "finite numeric not bool|null",
+      "finished": "finite numeric not bool|null",
+      "stdout": "null|exact {sha256,bytes,complete,observed_bytes_lower_bound}; strictboundedcounts strictbool",
+      "stderr": "same nullable stream record",
+      "raw_wait_status": "strictint|null actual consumingwait result",
+      "returncode": "strictint|null decoded actual rawstatus",
+      "custody": "exact accepted twin.xpdf-build-command-custody/v1 record; originaldiscoverydeadlinebindsAdeadline"
+    },
+    "semantics": "No new phase/build authority; partial prefix can contain one final failed/incomplete command, no later query; exact fixed command_id/phase/environment/originalclock projection is normative BINDING-PROJECTION.md; no computed digest may replace originally null observation"
+  },
+  "Fault": {
+    "exact_keys": {
+      "stage": "appointment|setup|snapshot|query|custody|export|clock|capacity",
+      "operation": "ASCII<=64bytes",
+      "error_type": "ASCII<=128bytes",
+      "errno": "strictint|null",
+      "message": "UTF8<=2048bytes",
+      "at": "finite numeric not bool|null"
+    },
+    "overflow": "first16prefix only with noncomplete result; never fake complete or drop original"
+  },
+  "FILES": "exact {schema: twin.xpdf-linux-discovery-files/v1, entries:list0..8192 of exact {path,sha256,bytes,role}}; paths sorted unique safe relative names, payload hash/length exact; exclude FILES.json/RESULT.json; exact uncompressed pathset",
+  "execution_go": false,
+  "BootstrapInventory": {
+    "exact_keys": {
+      "schema": "literal twin.xpdf-linux-bootstrap-inventory/v1",
+      "selected_bootstrap_sha256": "exact independently appointed bootstrap DATA digest",
+      "interpreter": "FileCandidate role bootstrap from actual selected sys.executable",
+      "loaded_files": "list0..8192 distinct FileCandidate role bootstrap from already loaded stdlib/extension candidates under held bootstrap roots"
+    },
+    "semantics": "stable actual bytes/routes only; candidate list does not claim complete runtime-read closure or create independent startup approval"
+  },
+  "DirectoryCandidate": {
+    "exact_keys": {
+      "path": "canonical absolute path<=4096UTF8bytes under selected candidate roots or exact traversed selector parents",
+      "before": "strict9integer statvector with directory mode",
+      "after": "same strict9integer statvector",
+      "child_names_sha256": "hash canonical sorted unique actual child names snapshot before and after"
+    },
+    "semantics": "complete snapshots require identity/pathset stable; no symlink/special/unselected candidate traversal"
+  }
+}
