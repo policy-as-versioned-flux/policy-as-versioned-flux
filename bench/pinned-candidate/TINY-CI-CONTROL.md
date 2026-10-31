@@ -145,3 +145,54 @@ caller record, then exports `FAIL` / `executed: false` under the original 900-se
 before principal/kernel/leaf setup. A failed protected write/readback or changed
 record cannot become a complete export. No actual CI UID tuple or valid privilege
 transition is inferred from the original ambiguous-ancestry traceback alone.
+
+## Source-appointed CI sudo caller route
+
+The fixed CI suite uses `ci_original_caller(g, deadline, *, pid, start)` only after
+installation/source verification and admission of the protected original startup
+receipt. `pid` and `start` are comparison bindings for actual self, never process
+selectors. Neither environment/SUDO_UID, CLI/JSON, a supplied record, a workflow
+label nor a public approval flag chooses this route or a caller. The existing
+single-scenario `original_caller`, `_protected_launcher`, guardian `Identity` and
+all production/closure protected-path predicates remain unchanged.
+
+Root's explicit disposable-CI policy admits only `S(u) -> R(u)` or
+`S(u) -> S(u) -> R(u)`, from actual self's observed PPID. Each S is the exact
+protected `/usr/bin/sudo` image with `[u,0,0,0]`, nonzero same kernel-observed u,
+setuid-only privilege mask, single-link regular root-owned immutable path and no
+ACL/capability. The immediate first non-S must have `[u,u,u,u]` and a protected
+nonprivileged executable. No intermediary is skipped. The two-S policy includes
+matching same-user nested sudo. It authenticates neither monitor/PTY roles nor
+installed sudo version. No fourth ancestor, process action, signal or enumeration
+is used. The endpoint's parent is observed but not traversed.
+
+Self plus at most three ancestors are pinned using the unchanged Identity.
+Root clarification01 corrects the document schedule to pin before the new raw
+snapshot, so pidfd liveness actually brackets the bounded status/stat/exe reads.
+First-image-last acquisition and reverse old-image-close-first verification
+preserve peak12 **including** inherited temporary readers. Both passes compare
+PID/start/PPID/all UIDs and actual executable O_PATH fstat against the independently
+protected named file, then repeat final all-held liveness. Equal endpoints are
+not an atomic/continuous snapshot or proof against trusted-host interference.
+
+One-S success has48 opens/47 closes/one live transferred endpoint, peak9; two-S
+has64 opens/63 closes/one transfer, peak12. Cumulative64 is distinct from live12.
+Opaque inherited failures retain bounded count intervals and possible ownership;
+ambiguous closes are never blindly retried. No new evidence descriptor is opened
+without headroom. The coordinator's writer/readback/verify use four later
+serialized opens (68 combined for two-S), outside the frozen acquisition record;
+later export/release are separate phases. No second budget or timer is created.
+
+Closed bounded passive records retain both passes' actual raw bytes and binding
+facts (status65536/stat8192/exe4096, at most eight snapshots, one MiB record).
+Refusal remains FAIL/executedfalse before principal/kernel/closure/leaf work.
+Exclusive protected persistence, immediate hash/readback and endpoint verify
+precede those unchanged gates; final export rereads the same original bytes.
+Incomplete persistence, expired time or unknown custody cannot issue permission.
+The pure structural checker never imports a record as a live caller capability.
+
+The four retained diagnostic CI observations established only the first sudo
+UID shape `[1001,0,0,0]`. Full parent chains, file bindings, genuine pidfd/descriptor
+custody, original-budget compatibility and all twenty actual subcases remain
+unproved by this source implementation and its pure models. Independent review,
+fresh-main replay and exact new execution/publication GO are still required.

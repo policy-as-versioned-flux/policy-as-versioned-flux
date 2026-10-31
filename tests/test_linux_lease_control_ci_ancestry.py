@@ -79,7 +79,7 @@ def test_mixed_credentials_do_not_make_an_unrecognised_privileged_launcher_accep
     assert closed == [2]
 
 
-def suite_model(*, tamper=False, write_failure=False):
+def suite_model(*, tamper=False, write_failure=False, positive=False, immediate_tamper=False):
     control_ns, guardian, closed = ancestry([[1001, 0, 0, 0], [1001] * 4])
     control = SimpleNamespace(**control_ns)
     # Pre-existing source types are deliberately distinct, never ValueError catch-alls.
@@ -105,14 +105,15 @@ def suite_model(*, tamper=False, write_failure=False):
     def protected_read(path, expected=None, maximum=None):
         reads.append(path)
         raw = memory[path]
-        if tamper and path.endswith('/caller.json') and reads.count(path) == 2: raw += b'changed'
+        if path.endswith('/caller.json') and ((tamper and reads.count(path)==2) or (immediate_tamper and reads.count(path)==1)): raw += b'changed'
         if expected is not None and sha(raw) != expected: raise ValueError('TEST_ONLY protected bytes differ')
         assert maximum is None or len(raw) <= maximum
         return raw
     guardian.protected_read = protected_read
     members = ('linux_lease_control.py', 'linux_guardian.py')
     start = {'started': 100., 'deadline': 1000., 'source_manifest_sha256': '1' * 64}
-    budget = SimpleNamespace(started=100., deadline=1000., require_work=lambda now: later.append('work'))
+    def require_work(now): assert 100. <= now < 990.
+    budget = SimpleNamespace(started=100., deadline=1000., require_work=require_work)
     modules = {'ctypes': SimpleNamespace(sizeof=lambda value: 8, c_void_p=object),
                'os': SimpleNamespace(getresuid=lambda: (0, 0, 0), getpid=lambda: 201),
                'platform': SimpleNamespace(machine=lambda: 'x86_64'),
@@ -127,7 +128,23 @@ def suite_model(*, tamper=False, write_failure=False):
     def forbidden(*args, **kwargs):
         later.append('forbidden')
         raise AssertionError('must not proceed past caller refusal')
+    # Caller acquisition itself is exercised through real fixed source bodies
+    # in the sibling pure task/FD model. This seam tests protected transport of
+    # that actual model refusal, without invoking proc from the AST suite.
+    from test_linux_lease_control_ci_sudo import Kernel, ci
+    model = Kernel()
+    if positive:
+        endpoint, facts = model.run(pytest.MonkeyPatch())
+        def ci_route(*args, **kwargs): return endpoint, facts
+    else:
+        model.open_fail = lambda kind, pid: pid == 30
+        with pytest.raises(ci.CiCallerError) as observed:
+            model.run(pytest.MonkeyPatch())
+        def ci_route(*args, **kwargs): raise observed.value
+    closed = model.fds
     ns = {'__builtins__': safe_builtins, '__file__': store + '/source/linux_lease_control_ci.py',
+          'ci_original_caller': ci_route, 'CiCallerError': ci.CiCallerError,
+          'validate_ci_caller_record': ci.validate_ci_caller_record,
           'Any': object, 'Path': ModelPath, 'STORE': store, 'json': json, 'sha': sha,
           'canonical': canonical, 'MEMBERS': members, 'MAX_FILE': 16 * 1024**2,
           'OBSERVATIONS': ('caller',), 'unique_object': dict,
@@ -147,16 +164,16 @@ def suite_model(*, tamper=False, write_failure=False):
 def test_suite_exports_protected_observed_ancestry_failure_before_any_kernel_admission():
     ns, sent, memory, reads, later, closed = suite_model()
     assert ns['suite_main']() == 1
-    assert len(sent) == 1 and later == [] and closed == [2]
+    assert len(sent) == 1 and later == [] and closed == {}
     files, outcome, budget = sent[0]
     assert outcome['status'] == 'FAIL' and outcome['executed'] is False
     assert outcome['control_passed'] is outcome['production_capture_accepted'] is False
     assert (outcome['started'], outcome['deadline'], outcome['finished']) == (100., 1000., 150.)
-    assert 'ambiguous launcher credential ancestry' in outcome['reason']
+    assert 'CI caller ancestry refused' in outcome['reason']
     path = ns['STORE'] + '/ci-evidence/caller.json'
     assert files['suite/caller.json'] == memory[path]
     assert reads.count(path) == 2  # protected readback at observation and again at export
-    assert json.loads(files['suite/caller.json'])['observations'][0]['uid'] == [1001, 0, 0, 0]
+    assert json.loads(files['suite/caller.json'])['snapshots'][1]['identity']['uid'] == [1001, 0, 0, 0]
     assert files['suite/result.json'] == memory[ns['STORE'] + '/result.json']
     assert budget.deadline == 1000.
 
@@ -166,7 +183,7 @@ def test_unretained_or_changed_ancestry_diagnostics_cannot_be_exported_as_comple
     ns, sent, memory, reads, later, closed = suite_model(**{change: True})
     with pytest.raises((ValueError, OSError)):
         ns['suite_main']()
-    assert sent == [] and later == [] and closed == [2]
+    assert sent == [] and later == [] and closed == {}
 
 
 @pytest.mark.parametrize('uids', ([0, 0, 0, 0], [1001, 0, 0, 0], [1001, 1001, 1001, 1001]))
@@ -195,3 +212,42 @@ def test_failure_executable_prefix_is_explicitly_bounded_and_never_admitted():
     row = raised.value.facts['observations'][0]
     assert row['executable'] == executable[:4096]
     assert row['executable_truncated'] is True and closed == [2]
+
+@pytest.mark.parametrize('change',('normal','tamper','write_failure'))
+def test_verified_caller_record_is_protected_before_any_later_phase(change):
+    ns,sent,memory,reads,later,remaining=suite_model(positive=True,**({'immediate_tamper':True} if change=='tamper' else {'write_failure':True} if change=='write_failure' else {}))
+    if change=='normal':
+        # Stop at workflow attribution before any principal/kernel work. The
+        # same fixed suite has already persisted and reverified the endpoint.
+        with pytest.raises(AssertionError,match='must not proceed'):ns['suite_main']()
+        record=json.loads(memory[ns['STORE']+'/ci-evidence/caller.json'])
+        assert record['status']=='VERIFIED' and record['selected_pid']==30
+        assert reads.count(ns['STORE']+'/ci-evidence/caller.json')==1
+        assert later==['forbidden'] and sent==[]
+    else:
+        # Immediate protected readback or exclusive write fails before any
+        # subsequent context/principal/kernel operation.
+        with pytest.raises((ValueError,OSError)):ns['suite_main']()
+        assert remaining=={} and sent==[] and later==[]
+
+
+def test_full_uncertain_descriptor_reservation_blocks_diagnostic_writer():
+    ns,sent,memory,reads,later,remaining=suite_model()
+    original=ns['ci_original_caller']
+    def full(*args,**kwargs):
+        try:original(*args,**kwargs)
+        except ns['CiCallerError'] as error:
+            error.facts['custody']['unresolved_ownership_upper_bound']=12
+            raise
+    ns['ci_original_caller']=full
+    with pytest.raises(ValueError,match='no descriptor headroom'):ns['suite_main']()
+    assert not memory and not sent and later==[]
+
+
+def test_refusal_persistence_and_export_use_original_deadline_without_new_work_allowance():
+    ns,sent,memory,reads,later,remaining=suite_model()
+    ns['__builtins__']['__import__']('time').monotonic=lambda:995.
+    assert ns['suite_main']()==1
+    assert sent[0][1]['finished']==995. and sent[0][1]['deadline']==1000.
+    assert reads.count(ns['STORE']+'/ci-evidence/caller.json')==2
+    assert not later and not remaining

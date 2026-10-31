@@ -335,16 +335,21 @@ def write_fixed(path:Path,raw:bytes)->None:
     finally:os.close(fd)
 
 
-def persist_observation(g:Any,base:dict[str,bytes],name:str,value:Any)->None:
+def persist_observation(g:Any,base:dict[str,bytes],name:str,value:Any,*,budget:Any=None)->None:
     """Retain original protected bytes before any subsequent work can fail."""
     if name not in tuple(f'suite/{item}.json' for item in OBSERVATIONS):
         raise ValueError('fixed observed prerequisite record required')
+    import time
+    def checkpoint()->None:
+        if budget is not None and not budget.started<=time.monotonic()<budget.deadline:
+            raise ValueError('original caller persistence deadline')
+    checkpoint()
     directory=Path(STORE,'ci-evidence')
     try:directory.mkdir(mode=0o700)
     except FileExistsError:g.protected_path(str(directory),False)
-    raw=canonical(value)+b'\n';path=directory/Path(name).name
-    write_fixed(path,raw)
-    actual=g.protected_read(str(path),sha(raw),MAX_FILE)
+    checkpoint();raw=canonical(value)+b'\n';checkpoint();path=directory/Path(name).name
+    write_fixed(path,raw);checkpoint()
+    actual=g.protected_read(str(path),sha(raw),MAX_FILE);checkpoint()
     if actual!=raw:raise ValueError('persisted original prerequisite bytes differ')
     base[name]=actual
 
@@ -487,7 +492,9 @@ def owned_exports(g:Any,base:dict[str,bytes],directory:Path|None,outcome:dict[st
     files=dict(base);files['suite/result.json']=canonical(outcome)+b'\n'
     for name,raw in tuple(base.items()):
         if name in tuple(f'suite/{item}.json' for item in OBSERVATIONS):
+            if name=='suite/caller.json' and time.monotonic()>=budget.deadline:raise ValueError('original caller export deadline')
             actual=g.protected_read(str(Path(STORE,'ci-evidence',Path(name).name)),sha(raw),MAX_FILE)
+            if name=='suite/caller.json' and time.monotonic()>=budget.deadline:raise ValueError('original caller export deadline')
             if actual!=raw:raise ValueError('protected original prerequisite changed before export')
             files[name]=actual
     if outcome.get('admission_failure') is not None:
@@ -536,6 +543,387 @@ def send_export(files:dict[str,bytes],outcome:dict[str,Any],budget:SuiteBudget)-
     if time.monotonic()>budget.deadline:raise ValueError('original local export ceiling exceeded')
 
 
+class CiCallerError(ValueError):
+    """Passive failure evidence from the fixed CI route, never an Identity importer."""
+    def __init__(self,facts:dict[str,Any]):
+        super().__init__('CI caller ancestry refused: '+facts['reason'])
+        self.facts=facts
+
+
+class _CallerFault(ValueError):
+    def __init__(self,reason:str):
+        super().__init__(reason);self.reason=reason
+
+
+class _CallerRoute:
+    """Own the bounded acquisition, including fixed Identity's temporary readers.
+
+    No public adapter/factory, process action or authority-bearing serialized input.
+    The inherited calls are source-pinned and costed, including partial failure;
+    their numeric fd attribute alone never establishes ownership after an error.
+    """
+    def __init__(self,g:Any,deadline:float):
+        import time
+        self.g=g;self.deadline=finite(deadline);self.began=time.monotonic()
+        self.open_min=0;self.open_max=0;self.close_min=0;self.close_max=0
+        self.close_attempts:int|None=0
+        self.owned:set[int]=set();self.uncertain=0;self.peak=0;self.close_failures=0
+        self.nodes:list[dict[str,Any]]=[];self.snapshots:list[dict[str,Any]]=[];self.faults:list[dict[str,Any]]=[]
+        self.stage='acquire';self.node=0;self.operation='source-binding';self.next_pid:int|None=None
+        self.errors:list[BaseException]=[]
+
+    def clock(self)->float:
+        import time
+        now=time.monotonic()
+        if not self.began<=now<self.deadline:raise _CallerFault('deadline')
+        return now
+
+    def reserve(self,live:int,opens:int)->None:
+        self.clock()
+        possible=len(self.owned)+self.uncertain+live
+        if possible>12 or self.open_max+opens>64:raise _CallerFault('evidence-overflow')
+        self.peak=max(self.peak,possible)
+
+    def open(self,path:Any,flags:int,*,directory:int|None=None)->int:
+        import os
+        self.reserve(1,1)
+        fd=os.open(path,flags) if directory is None else os.open(path,flags,dir_fd=directory)
+        self.owned.add(fd);self.open_min+=1;self.open_max+=1
+        self.clock();return fd
+
+    def close(self,fd:int)->None:
+        import os
+        # Remove BEFORE the sole close attempt. An exception may mean already
+        # closed: never retry a numeric descriptor or silently free its slot.
+        if fd not in self.owned:raise _CallerFault('descriptor-close')
+        self.owned.remove(fd)
+        if self.close_attempts is not None:self.close_attempts+=1
+        try:os.close(fd)
+        except OSError as error:
+            self.close_max+=1;self.uncertain+=1;self.close_failures+=1
+            stage,operation=self.stage,self.operation
+            self.stage='close';self.operation='close-'+operation[:58];self.fault(error)
+            self.stage,self.operation=stage,operation
+            raise
+        self.close_min+=1;self.close_max+=1
+
+    def inherited(self,identity:Any,*,constructor:bool=False,pid:int=0)->None:
+        opens=5 if constructor else 2;closed=4 if constructor else 2
+        self.reserve(2 if constructor else 1,opens)
+        try:
+            if constructor:self.g.Identity.__init__(identity,pid)
+            else:identity.verify()
+        except Exception:
+            # read_text owns temporary descriptors which this caller cannot
+            # inspect after a failed fixed call. Bound rather than invent counts.
+            self.open_max+=opens;self.close_max+=opens
+            self.uncertain+=2 if constructor else 1;self.close_attempts=None
+            raise
+        self.open_min+=opens;self.open_max+=opens
+        self.close_min+=closed;self.close_max+=closed
+        if self.close_attempts is not None:self.close_attempts+=closed
+        if constructor:self.owned.add(identity.fd)
+        self.clock()
+
+    @staticmethod
+    def raw(raw:bytes,complete:bool)->dict[str,Any]:
+        return {'bytes':len(raw),'sha256':sha(raw),'base64':base64.b64encode(raw).decode('ascii'),'complete':complete}
+
+    def read(self,directory:int,name:str,cap:int,snapshot:dict[str,Any])->bytes:
+        import os
+        self.operation='read-'+name;parts=bytearray();snapshot['raw'][name]=self.raw(b'',False)
+        fd=self.open(name,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC,directory=directory)
+        try:
+            while True:
+                self.clock();chunk=os.read(fd,min(4096,cap+1-len(parts)));self.clock()
+                if not chunk:
+                    snapshot['raw'][name]=self.raw(bytes(parts),True);return bytes(parts)
+                parts.extend(chunk);snapshot['raw'][name]=self.raw(bytes(parts[:cap]),False)
+                if len(parts)>cap:raise _CallerFault('evidence-overflow')
+        except Exception as error:
+            self.fault(error)
+            try:self.close(fd)
+            except OSError:pass
+            raise
+        finally:
+            if fd in self.owned:self.close(fd)
+
+    @staticmethod
+    def number(value:str,maximum:int)->int:
+        if not re.fullmatch(r'0|[1-9][0-9]*',value) or len(value)>20:raise _CallerFault('bad-uid')
+        number=int(value)
+        if number>maximum:raise _CallerFault('bad-uid')
+        return number
+
+    def parse(self,pid:int,status:bytes,raw_stat:bytes)->dict[str,Any]:
+        fields={}
+        for line in status.decode('ascii').splitlines():
+            if ':' not in line:raise _CallerFault('observation-error')
+            key,value=line.split(':',1)
+            if key in fields:raise _CallerFault('observation-error')
+            fields[key]=value.split()
+        if len(fields.get('Pid',[]))!=1 or len(fields.get('PPid',[]))!=1 or len(fields.get('Uid',[]))!=4:
+            raise _CallerFault('bad-uid')
+        if self.number(fields['Pid'][0],2**31-1)!=pid:raise _CallerFault('identity-drift')
+        uid=[self.number(value,4294967294) for value in fields['Uid']]
+        ppid=self.number(fields['PPid'][0],2**31-1)
+        text=raw_stat.decode('ascii');head,tail=text.rsplit(')',1);values=tail.split()
+        if not head.startswith(str(pid)+' (') or len(values)<20:raise _CallerFault('observation-error')
+        if self.number(values[1],2**31-1)!=ppid:raise _CallerFault('parent-drift')
+        start=values[19]
+        if self.number(start,2**64-1)==0:raise _CallerFault('identity-drift')
+        return {'pid':pid,'ppid':ppid,'start':start,'uid':uid}
+
+    @staticmethod
+    def file(info:Any)->dict[str,int]:
+        return {name:getattr(info,attr) for name,attr in (
+            ('device','st_dev'),('inode','st_ino'),('mode','st_mode'),('owner_uid','st_uid'),
+            ('owner_gid','st_gid'),('nlink','st_nlink'),('size','st_size'),('mtime_ns','st_mtime_ns'),('ctime_ns','st_ctime_ns'))}
+
+    def snapshot(self,node:dict[str,Any],pass_number:int)->dict[str,Any]:
+        import os
+        self.operation='snapshot';self.stage='acquire' if pass_number==0 else 'reverify'
+        snapshot={'pass':pass_number,'node':self.node,'at':self.clock(),'requested_pid':node['pid'],
+            'pidfd_live_before':None,'pidfd_live_after':None,'identity':None,'executable':None,
+            'raw':{'status':None,'stat':None,'exe':None}}
+        self.snapshots.append(snapshot)
+        identity=node['identity'];directory=node['directory']
+        snapshot['pidfd_live_before']=not identity.dead();self.clock()
+        if not snapshot['pidfd_live_before']:raise _CallerFault('identity-drift')
+        status=self.read(directory,'status',65536,snapshot);raw_stat=self.read(directory,'stat',8192,snapshot)
+        parsed=self.parse(node['pid'],status,raw_stat);snapshot['identity']=parsed
+        if parsed['start']!=identity.start or parsed['uid']!=identity.uid:raise _CallerFault('identity-drift')
+        if parsed['ppid']!=identity.ppid:raise _CallerFault('parent-drift')
+        self.operation='identity-verify';self.inherited(identity)
+        self.operation='read-exe';self.clock();raw_exe=os.readlink(b'exe',dir_fd=directory);self.clock()
+        if not isinstance(raw_exe,bytes):raise _CallerFault('observation-error')
+        snapshot['raw']['exe']=self.raw(raw_exe[:4096],len(raw_exe)<=4096)
+        if len(raw_exe)>4096:raise _CallerFault('evidence-overflow')
+        path=raw_exe.decode('utf-8')
+        # Unchanged protected_path semantics plus the strict CI sudo privilege mask.
+        self.operation='protected-executable';self.clock()
+        named=self.g.protected_path(path,True) if path!='/usr/bin/sudo' else self.g.protected_path(path)
+        import stat
+        if (not stat.S_ISREG(named.st_mode) or named.st_nlink!=1
+                or path=='/usr/bin/sudo' and named.st_mode&0o6000!=0o4000
+                or 'security.capability' in os.listxattr(path,follow_symlinks=False)):
+            raise _CallerFault('unsafe-executable')
+        self.clock();self.operation='open-image'
+        image=self.open('exe',os.O_PATH|os.O_CLOEXEC,directory=directory);node['image']=image
+        actual=self.file(os.fstat(image));self.clock()
+        snapshot['executable']={'path':path,'named_file':self.file(named),'image_file':actual}
+        if self.file(named)!=actual:raise _CallerFault('executable-drift')
+        snapshot['pidfd_live_after']=not identity.dead();self.clock()
+        if not snapshot['pidfd_live_after']:raise _CallerFault('identity-drift')
+        if pass_number:
+            first=node['first']
+            if first['identity']['ppid']!=parsed['ppid']:raise _CallerFault('parent-drift')
+            if first['identity']!=parsed:raise _CallerFault('identity-drift')
+            if first['executable']!=snapshot['executable']:raise _CallerFault('executable-drift')
+        return snapshot
+
+    def fault(self,error:BaseException)->None:
+        if any(error is old for old in self.errors):return
+        self.errors.append(error)
+        message=str(error).encode('utf-8','replace')[:2048].decode('utf-8','ignore')
+        self.faults.append({'stage':self.stage,'node':self.node,'operation':self.operation[:64],
+            'error_type':type(error).__name__[:128],'errno':getattr(error,'errno',None),'message':message})
+
+    def cleanup(self)->None:
+        self.stage='close';self.operation='close-owned'
+        for fd in sorted(self.owned,reverse=True):
+            try:self.close(fd)
+            except OSError as error:self.fault(error)
+
+    def record(self,status:str,reason:str,uid:int|None,selected:int|None,live:Any,transfer:int)->dict[str,Any]:
+        import time
+        record={'schema':'TEST_ONLY-ci-caller-ancestry/v1','route':'ci-sudo-realuid/v1',
+            'status':status,'reason':reason,'started':self.began,'finished':time.monotonic(),'deadline':self.deadline,
+            'snapshots':self.snapshots,'final_live':live,'invoker_uid':uid,'selected_pid':selected,
+            'next_pid':self.next_pid,'faults':self.faults,'custody':{
+                'scope':'ci-caller-route-acquisition-through-handoff/v1','node_count':len(self.nodes),
+                'peak_live_upper_bound':self.peak,'opened':{'minimum':self.open_min,'maximum':self.open_max},
+                'closed':{'minimum':self.close_min,'maximum':self.close_max},'close_attempts':self.close_attempts,
+                'transferred_to_coordinator':transfer,'unresolved_ownership_upper_bound':self.uncertain,
+                'close_failures':self.close_failures}}
+        if len(canonical(record))>1024**2:raise ValueError('bounded CI caller record exceeded')
+        return record
+
+
+def ci_original_caller(g:Any,deadline:float,*,pid:int,start:str)->tuple[Any,dict[str,Any]]:
+    """Fixed CI source only. pid/start compare protected admission, never select a task.
+
+    Structural two-sudo policy includes same-u nesting; no monitor/version claim.
+    The fixed suite supplies the already pinned installed module and original
+    deadline. Passive records, environment and command-line data are not inputs.
+    """
+    import os
+    route=_CallerRoute(g,deadline);uid=None;live=None;selected=None;reason='observation-error'
+    try:
+        expected=STORE+'/source/linux_guardian.py'
+        if (getattr(g,'__file__',None)!=expected or getattr(g,'__name__',None)!='fixed_ci_linux_guardian'
+                or any(getattr(getattr(getattr(getattr(g,'Identity',None),name,None),'__code__',None),'co_filename',None)!=expected
+                       for name in ('__init__','verify','read','dead','close'))
+                or getattr(getattr(getattr(g,'protected_path',None),'__code__',None),'co_filename',None)!=expected):raise _CallerFault('source-pin')
+        route.clock()
+        actual=os.getpid()
+        if type(pid) is not int or pid!=actual or not isinstance(start,str):raise _CallerFault('identity-drift')
+        current=actual;seen=set();sudo_count=0
+        while True:
+            route.next_pid=current
+            if current<=1:raise _CallerFault('no-caller')
+            if current in seen:raise _CallerFault('pid-loop')
+            seen.add(current);route.node=len(route.nodes);route.operation='open-proc-directory'
+            directory=route.open('/proc/'+str(current),os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC)
+            node={'pid':current,'directory':directory,'identity':g.Identity.__new__(g.Identity),'image':None}
+            route.nodes.append(node);route.operation='identity-pin'
+            route.inherited(node['identity'],constructor=True,pid=current)
+            first=route.snapshot(node,0);node['first']=first
+            fields=first['identity'];path=first['executable']['path'];route.stage='shape';route.operation='grammar'
+            if route.node==0:
+                if fields['uid']!=[0]*4 or fields['start']!=start or path!='/usr/bin/python3.12':raise _CallerFault('identity-drift')
+                if fields['ppid']!=os.getppid():raise _CallerFault('parent-drift')
+            elif path=='/usr/bin/sudo':
+                vector=fields['uid']
+                if vector[0]==0 or vector[1:]!=[0,0,0]:raise _CallerFault('bad-uid')
+                if uid is None:uid=vector[0]
+                if uid!=vector[0]:raise _CallerFault('uid-mismatch')
+                sudo_count+=1
+                if sudo_count>2:raise _CallerFault('transition-limit')
+                if sudo_count==2 and first['executable']!=route.nodes[1]['first']['executable']:
+                    raise _CallerFault('executable-drift')
+            else:
+                if sudo_count==0:raise _CallerFault('unsupported-shape')
+                if fields['uid']!=[uid]*4:raise _CallerFault('uid-mismatch')
+                selected=node['identity'];break
+            current=fields['ppid']
+        for index in range(len(route.nodes)-1,-1,-1):
+            route.node=index;node=route.nodes[index];route.stage='reverify';route.operation='close-old-image'
+            route.close(node['image']);node['image']=None
+            route.snapshot(node,1)
+            route.operation='close-replacement-image';route.close(node['image']);node['image']=None
+        route.stage='final-live';route.operation='final-pidfd-sweep';live=[]
+        for node in route.nodes:
+            route.clock();live.append(not node['identity'].dead());route.clock()
+        if not all(live):raise _CallerFault('identity-drift')
+        if os.getppid()!=route.nodes[0]['first']['identity']['ppid']:raise _CallerFault('parent-drift')
+        # Close known acquisition handles BEFORE transferring the sole endpoint.
+        for fd in sorted(route.owned-{selected.fd},reverse=True):
+            route.operation='close-nonendpoint';route.close(fd)
+        route.clock()
+        reason='matched-one-sudo' if sudo_count==1 else 'matched-two-sudo'
+        record=route.record('VERIFIED',reason,uid,selected.pid,live,1)
+        validate_ci_caller_record(record);route.clock()
+        route.owned.remove(selected.fd)
+        return selected,record
+    except Exception as error:
+        reason=error.reason if isinstance(error,_CallerFault) else 'observation-error'
+        if isinstance(error,OSError) and route.operation.startswith('close'):reason='descriptor-close'
+        route.fault(error);route.cleanup()
+        if route.close_failures:reason='descriptor-close'
+        raise CiCallerError(route.record('REFUSED',reason,None,None,live,0)) from error
+
+
+def validate_ci_caller_record(value:Any)->None:
+    """Closed passive evidence checker. Success never imports/selects an Identity."""
+    def keys(item:Any,names:str)->None:
+        if not isinstance(item,dict) or set(item)!=set(names.split()):raise ValueError('closed caller evidence keys required')
+    def integer(item:Any,low:int,high:int)->None:
+        if type(item) is not int or not low<=item<=high:raise ValueError('bounded caller evidence integer required')
+    def raw(item:Any,cap:int)->None:
+        keys(item,'bytes sha256 base64 complete');integer(item['bytes'],0,cap)
+        if type(item['complete']) is not bool or not isinstance(item['base64'],str):raise ValueError('raw caller bytes required')
+        decoded=base64.b64decode(item['base64'],validate=True)
+        if base64.b64encode(decoded).decode('ascii')!=item['base64'] or len(decoded)!=item['bytes'] or sha(decoded)!=item['sha256']:
+            raise ValueError('exact raw caller bytes required')
+    def file(item:Any)->None:
+        keys(item,'device inode mode owner_uid owner_gid nlink size mtime_ns ctime_ns')
+        for field in item:integer(item[field],0,2**64-1)
+        import stat
+        if item['owner_uid']!=0 or item['nlink']!=1 or not stat.S_ISREG(item['mode']):raise ValueError('protected executable metadata required')
+    keys(value,'schema route status reason started finished deadline snapshots final_live invoker_uid selected_pid next_pid faults custody')
+    if value['schema']!='TEST_ONLY-ci-caller-ancestry/v1' or value['route']!='ci-sudo-realuid/v1' or value['status'] not in ('VERIFIED','REFUSED'):
+        raise ValueError('fixed caller evidence schema required')
+    reasons=('matched-one-sudo','matched-two-sudo','unsupported-shape','transition-limit','bad-uid','uid-mismatch',
+        'unsafe-executable','executable-drift','parent-drift','identity-drift','pid-loop','no-caller','deadline','source-pin',
+        'observation-error','evidence-overflow','descriptor-close','persistence-error','export-error')
+    if value['reason'] not in reasons:raise ValueError('closed caller refusal reason required')
+    began,finished,deadline=(finite(value[key]) for key in ('started','finished','deadline'))
+    if not began<=finished:raise ValueError('original caller clock required')
+    verified=value['status']=='VERIFIED'
+    if verified:
+        integer(value['invoker_uid'],1,4294967294);integer(value['selected_pid'],2,2**31-1)
+        if not finished<deadline or value['reason'] not in reasons[:2]:raise ValueError('verified caller timeline required')
+    elif value['invoker_uid'] is not None or value['selected_pid'] is not None:raise ValueError('refused evidence cannot select caller')
+    if value['next_pid'] is not None:integer(value['next_pid'],0,2**31-1)
+    snapshots=value['snapshots']
+    if not isinstance(snapshots,list) or len(snapshots)>8:raise ValueError('bounded snapshots required')
+    for snapshot in snapshots:
+        keys(snapshot,'pass node at requested_pid pidfd_live_before pidfd_live_after identity executable raw')
+        integer(snapshot['pass'],0,1);integer(snapshot['node'],0,3);integer(snapshot['requested_pid'],2,2**31-1)
+        if not began<=finite(snapshot['at'])<=finished:raise ValueError('snapshot timeline required')
+        for field in ('pidfd_live_before','pidfd_live_after'):
+            if snapshot[field] is not None and type(snapshot[field]) is not bool:raise ValueError('liveness facts required')
+            if verified and snapshot[field] is not True:raise ValueError('live verified snapshot required')
+        identity=snapshot['identity']
+        if identity is not None:
+            keys(identity,'pid start ppid uid');integer(identity['pid'],2,2**31-1);integer(identity['ppid'],0,2**31-1)
+            if identity['pid']!=snapshot['requested_pid'] or not isinstance(identity['start'],str):raise ValueError('matching snapshot identity required')
+            if not re.fullmatch(r'[1-9][0-9]{0,19}',identity['start']) or int(identity['start'])>2**64-1:raise ValueError('canonical task start required')
+            if not isinstance(identity['uid'],list) or len(identity['uid'])!=4:raise ValueError('four UID slots required')
+            for uid in identity['uid']:integer(uid,0,4294967294)
+        executable=snapshot['executable']
+        if executable is not None:
+            keys(executable,'path named_file image_file')
+            path=executable['path']
+            if not isinstance(path,str) or len(path.encode('utf-8'))>4096 or not path.startswith('/') or str(Path(path))!=path or '..' in Path(path).parts:
+                raise ValueError('canonical executable path required')
+            file(executable['named_file']);file(executable['image_file'])
+            if verified and executable['named_file']!=executable['image_file']:raise ValueError('bound executable image required')
+        keys(snapshot['raw'],'status stat exe')
+        for name,cap in (('status',65536),('stat',8192),('exe',4096)):
+            item=snapshot['raw'][name]
+            if item is not None:raw(item,cap)
+            if verified and (item is None or item['complete'] is not True):raise ValueError('complete verified raw snapshot required')
+        if verified and (identity is None or executable is None):raise ValueError('complete verified snapshot required')
+    faults=value['faults']
+    if not isinstance(faults,list) or len(faults)>13 or verified and faults:raise ValueError('bounded truthful faults required')
+    for fault in faults:
+        keys(fault,'stage node operation error_type errno message')
+        if fault['stage'] not in ('acquire','shape','reverify','final-live','close','persist','export','budget'):raise ValueError('closed fault stage required')
+        integer(fault['node'],0,3)
+        for key,cap in (('operation',64),('error_type',128)):
+            if not isinstance(fault[key],str) or not fault[key].isascii() or len(fault[key])>cap:raise ValueError('bounded fault tag required')
+        if fault['errno'] is not None:integer(fault['errno'],0,2**31-1)
+        if not isinstance(fault['message'],str) or len(fault['message'].encode('utf-8'))>2048:raise ValueError('bounded fault message required')
+    custody=value['custody']
+    keys(custody,'scope node_count peak_live_upper_bound opened closed close_attempts transferred_to_coordinator unresolved_ownership_upper_bound close_failures')
+    if custody['scope']!='ci-caller-route-acquisition-through-handoff/v1':raise ValueError('fixed custody scope required')
+    integer(custody['node_count'],0,4);integer(custody['peak_live_upper_bound'],0,12)
+    for key in ('opened','closed'):
+        keys(custody[key],'minimum maximum');integer(custody[key]['minimum'],0,64);integer(custody[key]['maximum'],custody[key]['minimum'],64)
+    for key in ('unresolved_ownership_upper_bound','close_failures'):integer(custody[key],0,12)
+    integer(custody['transferred_to_coordinator'],0,1)
+    if custody['close_attempts'] is not None:integer(custody['close_attempts'],0,64)
+    if (custody['closed']['minimum']+custody['transferred_to_coordinator']>custody['opened']['maximum']
+            or custody['opened']['minimum']>custody['closed']['maximum']+custody['unresolved_ownership_upper_bound']+custody['transferred_to_coordinator']
+            or custody['unresolved_ownership_upper_bound']<custody['close_failures']
+            or custody['unresolved_ownership_upper_bound']>custody['peak_live_upper_bound']):raise ValueError('consistent custody intervals required')
+    if verified:
+        n=3 if value['reason']=='matched-one-sudo' else 4
+        if (custody['node_count']!=n or custody['opened']!={'minimum':16*n,'maximum':16*n}
+                or custody['closed']!={'minimum':16*n-1,'maximum':16*n-1} or custody['close_attempts']!=16*n-1
+                or custody['peak_live_upper_bound']!=3*n or custody['transferred_to_coordinator']!=1
+                or custody['unresolved_ownership_upper_bound'] or custody['close_failures']):raise ValueError('exact verified custody required')
+        if [(s['pass'],s['node']) for s in snapshots]!=[(0,i) for i in range(n)]+[(1,i) for i in range(n-1,-1,-1)]:
+            raise ValueError('two ordered passes required')
+        if value['final_live']!=[True]*n or any(type(x) is not bool for x in value['final_live']):raise ValueError('complete final liveness required')
+    elif custody['transferred_to_coordinator']!=0:raise ValueError('refused custody cannot transfer')
+    elif value['final_live'] is not None and (not isinstance(value['final_live'],list) or len(value['final_live'])>4 or any(type(x) is not bool for x in value['final_live'])):
+        raise ValueError('bounded final liveness required')
+    if len(canonical(value))>1024**2:raise ValueError('bounded caller record required')
+
+
 def suite_main()->int:
     import ctypes,os,platform,sys,time
     if (sys.platform!='linux' or sys.byteorder!='little' or ctypes.sizeof(ctypes.c_void_p)!=8
@@ -557,11 +945,17 @@ def suite_main()->int:
     for name in MEMBERS:
         raw=installed_read(STORE+'/source/'+name,1024**2);check_member(manifest,name,raw);base['source/'+name]=raw
     directory=None;outcome=None
-    try:caller=control.original_caller(g)
-    except control.CallerAncestryError as failure:
-        # Refusal is unchanged. Preserve observed pinned UID/executable facts
-        # before bounded export; never guess a CI privilege-transition exception.
-        persist_observation(g,base,'suite/caller.json',failure.facts)
+    # Fixed source appointment only: admitted pid/start bind actual self; no
+    # environment, argv, passive record or actor selects ancestry policy.
+    try:caller,caller_facts=ci_original_caller(g,budget.deadline,pid=pid,start=actual_start)
+    except CiCallerError as failure:
+        # Ambiguous closures retain possible ownership. Never open a diagnostic
+        # writer/reader if that could exceed the same twelve live handles.
+        if failure.facts['custody']['unresolved_ownership_upper_bound']>=12:
+            raise ValueError('no descriptor headroom for protected caller refusal') from failure
+        if not budget.started<=time.monotonic()<budget.deadline:raise ValueError('original caller refusal deadline')
+        validate_ci_caller_record(failure.facts)
+        persist_observation(g,base,'suite/caller.json',failure.facts,budget=budget)
         outcome={'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL','executed':False,'control_passed':False,
             'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,
             'finished':time.monotonic(),'reason':type(failure).__name__+': '+str(failure)[:2000]}
@@ -569,8 +963,18 @@ def suite_main()->int:
         write_fixed(Path(STORE,'result.json'),files['suite/result.json'])
         send_export(files,outcome,budget)
         return 1
-    caller.verify()
-    persist_observation(g,base,'suite/caller.json',{'pid':caller.pid,'start':caller.start,'uid':caller.uid,'ppid':caller.ppid})
+    try:
+        # Four serialized coordinator opens are outside the frozen route counts:
+        # exclusive writer, protected readback, then Identity.verify's two reads.
+        if not budget.started<=time.monotonic()<budget.deadline:raise ValueError('original caller handoff deadline')
+        validate_ci_caller_record(caller_facts)
+        persist_observation(g,base,'suite/caller.json',caller_facts,budget=budget)
+        if not budget.started<=time.monotonic()<budget.deadline:raise ValueError('original caller handoff deadline')
+        caller.verify()
+        if not budget.started<=time.monotonic()<budget.deadline:raise ValueError('original caller handoff deadline')
+    except BaseException:
+        caller.close()
+        raise
     context_raw=installed_read(STORE+'/ci-context.json',65536)
     context=workflow_context(context_raw,sha(source_raw))
     try:os_release=g.protected_read('/usr/lib/os-release',maximum=65536)
