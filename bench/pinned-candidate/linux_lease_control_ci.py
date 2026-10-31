@@ -368,9 +368,184 @@ class ClosureNeededRefused(ValueError):
         self.facts=facts
 
 
-def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,Any]],dict[str,Any]]:
+class _SonameFormatError(ValueError):
+    """Only this new bounded parser's intentional format failures are classified."""
+    def __init__(self,reason:str):
+        super().__init__('CI SONAME format: '+reason)
+        self.reason=reason
+
+
+class ClosureProjectionRefused(ValueError):
+    """Known CI-only held-byte identity/projection refusal; no new acquisition."""
+    def __init__(self,facts:dict[str,Any]):
+        super().__init__('CI ELF projection refused: '+facts['failure']['reason'])
+        self.facts=facts
+
+
+def _local_elf_name(name:Any)->bool:
+    return isinstance(name,str) and 1<=len(name)<=255 and name not in ('.','..') and re.fullmatch(r'[A-Za-z0-9_.+~\-]+',name) is not None
+
+
+def _elf_soname(raw:bytes)->str|None:
+    """Parse only already held ELF64-LE bytes, after the ordinary ELF parser."""
+    def fail(reason:str)->Any:raise _SonameFormatError(reason)
+    def span(at:int,size:int)->memoryview:
+        if at<0 or size<0 or at+size>len(raw):fail('SEGMENT')
+        return memoryview(raw)[at:at+size]
+    def number(at:int,size:int,*,signed:bool=False)->int:
+        return int.from_bytes(span(at,size),'little',signed=signed)
+    if type(raw) is not bytes or len(raw)>256*1024**2:raise ValueError('bounded held SONAME bytes required')
+    if len(raw)<64 or raw[:7]!=b'\x7fELF\x02\x01\x01':fail('HEADER')
+    if (number(18,2) not in (62,183) or number(52,2)!=64 or number(54,2)!=56 or number(56,2)>4096):fail('HEADER')
+    loads=[];dynamic=None
+    for index in range(number(56,2)):
+        at=number(32,8)+index*56;span(at,56)
+        kind,offset,address,size=number(at,4),number(at+8,8),number(at+16,8),number(at+32,8)
+        span(offset,size)
+        if kind==1:loads.append((address,offset,size))
+        if kind==2:
+            if dynamic is not None:fail('DYNAMIC')
+            dynamic=(offset,size)
+    if dynamic is None:return None
+    offset,size=dynamic
+    if size%16 or size//16>4096:fail('DYNAMIC')
+    tags:dict[int,int]={};terminated=False
+    for at in range(offset,offset+size,16):
+        tag,value=number(at,8,signed=True),number(at+8,8)
+        if tag==0:terminated=True;break
+        if tag in (5,10,14):
+            if tag in tags:fail('DYNAMIC')
+            tags[tag]=value
+    if not terminated:fail('DYNAMIC')
+    if 14 not in tags:return None
+    if 5 not in tags or 10 not in tags or not tags[10]:fail('STRING_TABLE')
+    matches=[start+tags[5]-address for address,start,count in loads if address<=tags[5] and tags[5]+tags[10]<=address+count]
+    if len(matches)!=1:fail('STRING_TABLE')
+    strings=span(matches[0],tags[10])
+    if tags[14]>=len(strings):fail('STRING_TABLE')
+    tail=bytes(strings[tags[14]:tags[14]+256]);end=tail.find(b'\0')
+    if end<0:fail('LOCAL_NAME' if len(tail)==256 else 'STRING_TABLE')
+    try:name=tail[:end].decode('ascii')
+    except UnicodeDecodeError:fail('LOCAL_NAME')
+    if not _local_elf_name(name):fail('LOCAL_NAME')
+    return name
+
+
+def _projection_append(rows:list[dict[str,Any]],value:dict[str,Any],remaining:list[int])->None:
+    """Charge before retaining each bounded derived row; no raw byte duplicate."""
+    charge=len(canonical(value))+1
+    if len(rows)>=4096 or charge>remaining[0]:raise ValueError('CI projection DATA count/byte cap')
+    remaining[0]-=charge;rows.append(value)
+
+
+def _check_projection_data(value:Any)->None:
+    """Pure closed DATA validation, never an acquisition or authority importer."""
+    if (type(value) is not dict or set(value)!={'schema','source_manifest_sha256','native_maps_sha256',
+            'original_started','original_deadline','observed_monotonic','objects','requests','assignments','failure'}
+            or value['schema']!='TEST_ONLY-ci-elf-soname-projections/v1'
+            or not pin(value['source_manifest_sha256']) or not pin(value['native_maps_sha256'])):
+        raise ValueError('closed CI projection DATA required')
+    began,deadline,observed=(finite(value[key]) for key in ('original_started','original_deadline','observed_monotonic'))
+    if deadline!=began+900 or not began<=observed<deadline:raise ValueError('original CI projection clocks required')
+    def path(item:Any)->bool:
+        return isinstance(item,str) and 1<len(item)<=4096 and item.startswith('/') and str(Path(item))==item and '..' not in item.split('/')
+    remaining=MAX_FILE-65536-len(canonical({**value,'objects':[],'requests':[],'assignments':[],'failure':None}))
+    objects={};request_keys=[];assignment_keys=[];targets=set();requests=[];object_bytes=0
+    for label in ('objects','requests','assignments'):
+        rows=value[label]
+        if type(rows) is not list or len(rows)>4096:raise ValueError('bounded projection DATA rows required')
+        for row in rows:
+            if type(row) is not dict:raise ValueError('closed projection DATA row required')
+            if label=='objects':
+                if (set(row)!={'source','bytes','sha256','device','inode','soname','parse_status','format_error'}
+                        or not path(row['source']) or row['source'] in objects or not pin(row['sha256'])
+                        or any(type(row[key]) is not int or row[key]<0 for key in ('bytes','device','inode'))
+                        or not 0<row['bytes']<=256*1024**2):raise ValueError('closed mapped ELF object required')
+                status,name,error=row['parse_status'],row['soname'],row['format_error']
+                if not ((status=='VALID' and _local_elf_name(name) and error is None)
+                        or (status=='ABSENT' and name is None and error is None)
+                        or (status=='MALFORMED' and name is None and error in ('HEADER','SEGMENT','DYNAMIC','STRING_TABLE','LOCAL_NAME'))):
+                    raise ValueError('closed SONAME parse facts required')
+                object_bytes+=row['bytes']
+                if object_bytes>256*1024**2:raise ValueError('mapped projection bytes exceed closure cap')
+                objects[row['source']]=row
+            elif label=='requests':
+                if (set(row)!={'owner','needed','candidates'} or not path(row['owner']) or not _local_elf_name(row['needed'])
+                        or type(row['candidates']) is not list or len(row['candidates'])>4096
+                        or any(not path(item) for item in row['candidates'])
+                        or row['candidates']!=sorted(set(row['candidates']))):raise ValueError('closed projection request required')
+                request_keys.append((row['owner'],row['needed']));requests.append(row)
+            else:
+                if (set(row)!={'source','target','needed'} or not path(row['source']) or not path(row['target'])
+                        or not _local_elf_name(row['needed']) or Path(row['target']).name!=row['needed']
+                        or row['target'] in targets):raise ValueError('closed projection assignment required')
+                targets.add(row['target']);assignment_keys.append(row['source'])
+            remaining-=len(canonical(row))+1
+            if remaining<0:raise ValueError('CI projection DATA byte cap')
+    if ([row['source'] for row in value['objects']]!=sorted(objects)
+            or request_keys!=sorted(set(request_keys)) or assignment_keys!=sorted(set(assignment_keys))):
+        raise ValueError('canonical unique projection rows required')
+    failure=value['failure']
+    if failure is not None:
+        if (type(failure) is not dict or set(failure)!={'reason','source','owner','needed','candidates'}
+                or failure['reason'] not in ('MALFORMED_SONAME','UNSAFE_NEEDED','ZERO_IDENTITY','MULTIPLE_IDENTITY',
+                    'SOURCE_TARGET_CONFLICT','TARGET_COLLISION','REQUEST_CAP')
+                or any(failure[key] is not None and not path(failure[key]) for key in ('source','owner'))
+                or (failure['needed'] is not None and (not isinstance(failure['needed'],str) or len(failure['needed'])>4096))
+                or type(failure['candidates']) is not list or len(failure['candidates'])>4096
+                or any(not path(item) for item in failure['candidates'])
+                or failure['candidates']!=sorted(set(failure['candidates']))):raise ValueError('closed projection failure required')
+        reason,source,owner,needed,candidates=(failure[key] for key in ('reason','source','owner','needed','candidates'))
+        if reason=='MALFORMED_SONAME':
+            if source not in objects or objects[source]['parse_status']!='MALFORMED' or owner is not None or needed is not None or candidates:
+                raise ValueError('malformed refusal lacks its parsed object')
+        elif reason=='UNSAFE_NEEDED':
+            if owner is None or not isinstance(needed,str) or _local_elf_name(needed) or candidates:raise ValueError('unsafe-name refusal facts differ')
+        elif reason in ('ZERO_IDENTITY','MULTIPLE_IDENTITY'):
+            if owner is None or not _local_elf_name(needed) or (len(candidates)!=0 if reason=='ZERO_IDENTITY' else len(candidates)<2):
+                raise ValueError('identity refusal facts differ')
+        elif reason=='SOURCE_TARGET_CONFLICT':
+            if source is None or not any(row['owner']==owner and row['needed']==needed and source in row['candidates'] for row in requests):
+                raise ValueError('source conflict lacks its request')
+        elif reason=='TARGET_COLLISION':
+            if source is None:raise ValueError('target conflict lacks source')
+        elif len(requests)!=4096 or owner is None or not _local_elf_name(needed):raise ValueError('request cap facts differ')
+        remaining-=len(canonical(failure))
+        if remaining<0:raise ValueError('CI projection failure byte cap')
+    else:
+        if any(row['parse_status']=='MALFORMED' for row in objects.values()):raise ValueError('malformed projection cannot succeed')
+        assignments={row['source']:row for row in value['assignments']}
+        selected=set()
+        for request in requests:
+            if len(request['candidates'])!=1:raise ValueError('successful projection requires one identity')
+            source=request['candidates'][0];selected.add(source)
+            if source not in assignments or assignments[source]['needed']!=request['needed']:
+                raise ValueError('successful projection lacks consistent assignment')
+        if selected!=set(assignments):raise ValueError('unrequested projection assignment')
+
+
+def _projection_snapshot(proof:dict[str,Any],budget:SuiteBudget)->dict[str,Any]:
+    import time
+    observed=time.monotonic();budget.require_work(observed)
+    proof['observed_monotonic']=observed
+    proof['requests'].sort(key=lambda item:(item['owner'],item['needed']))
+    _check_projection_data(proof)
+    raw=canonical(proof)
+    if len(raw)>MAX_FILE-65536:raise ValueError('CI projection DATA byte cap')
+    budget.require_work(time.monotonic())
+    return json.loads(raw)
+
+
+def _projection_refuse(proof:dict[str,Any],budget:SuiteBudget,reason:str,*,source:str|None=None,
+                       owner:str|None=None,needed:str|None=None,candidates:list[str]|None=None)->Any:
+    proof['failure']={'reason':reason,'source':source,'owner':owner,'needed':needed,'candidates':[] if candidates is None else candidates}
+    raise ClosureProjectionRefused(_projection_snapshot(proof,budget))
+
+
+def discover_closure(g:Any,control:Any,budget:SuiteBudget,*,_source_manifest_sha256:str)->tuple[list[dict[str,Any]],dict[str,Any]]:
     """Acquire actual existing OS bytes and native mappings, never execute ldd."""
     import os,sys,time
+    if not pin(_source_manifest_sha256):raise ValueError('already verified source-manifest pin required')
     budget.require_work(time.monotonic())
     paths={'/usr/bin/python3.12'};loaded=set();caches=set();modules=set()
     for module in tuple(sys.modules.values()):
@@ -386,6 +561,10 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
             if fields[5].endswith(' (deleted)'):raise ValueError('deleted native mapping')
             mapped.add(fields[5]);paths.add(fields[5]);loaded.add(fields[5])
     for name in MEMBERS:paths.add(STORE+'/source/'+name)
+    proof:dict[str,Any]={'schema':'TEST_ONLY-ci-elf-soname-projections/v1','source_manifest_sha256':_source_manifest_sha256,
+        'native_maps_sha256':sha(maps.encode()),'original_started':budget.started,'original_deadline':budget.deadline,
+        'observed_monotonic':time.monotonic(),'objects':[],'requests':[],'assignments':[],'failure':None}
+    remaining=[MAX_FILE-65536-len(canonical(proof))];sonames={};format_failures=[]
     records={};identities=set();acquired_metadata={}
     for path in sorted(paths):
         budget.require_work(time.monotonic())
@@ -422,6 +601,22 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
             'mtime_ns':info.st_mtime_ns,'ctime_ns':info.st_ctime_ns,'roles':sorted(roles)}
         if len(records)>4096 or sum(row['bytes'] for row in records.values())>256*1024**2:
             raise ValueError('OS closure exceeds fixed file/byte bounds')
+        if path in mapped and records[path]['elf'] is not None:
+            if (type(raw) is not bytes or any(type(acquired_metadata[path][key]) is not int or acquired_metadata[path][key]<0
+                    for key in ('device','inode','stat_bytes')) or len(raw)!=info.st_size):
+                raise ValueError('unknown held ELF byte/stat association')
+            status='ABSENT';error: str|None=None;soname_value: str|None=None
+            # Ordinary elf_dependencies above retains precedence and exceptions.
+            try:soname_value=_elf_soname(raw)
+            except _SonameFormatError as failure:status='MALFORMED';error=failure.reason;format_failures.append(path)
+            else:
+                if soname_value is not None:status='VALID'
+            sonames[path]=soname_value
+            _projection_append(proof['objects'],{'source':path,'bytes':len(raw),'sha256':records[path]['sha256'],
+                'device':info.st_dev,'inode':info.st_ino,'soname':soname_value,'parse_status':status,'format_error':error},remaining)
+            budget.require_work(time.monotonic())
+    if format_failures:_projection_refuse(proof,budget,'MALFORMED_SONAME',source=format_failures[0])
+    requests:set[tuple[str,str]]=set()
     # PT_INTERP may be a symlink alias on the host. Pin the actually mapped
     # canonical inode as source, retaining the exact ELF path only as jail target.
     for row in list(records.values()):
@@ -436,8 +631,14 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
             if selected['target'] not in (canonical_path,interpreter):raise ValueError('ambiguous ELF loader target')
             selected['target']=interpreter
         for needed in elf['needed']:
+            if not _local_elf_name(needed):_projection_refuse(proof,budget,'UNSAFE_NEEDED',owner=row['source'],needed=needed)
             matches=[path for path in mapped if Path(path).name==needed]
-            if len(matches)!=1:
+            named=[path for path in mapped if sonames.get(path)==needed]
+            candidates=sorted(set(matches)|set(named))
+            if len(candidates)!=1 and named:
+                _projection_refuse(proof,budget,'MULTIPLE_IDENTITY',owner=row['source'],needed=needed,candidates=candidates)
+            # Keep original diagnostic grammar on its legacy zero/multiple paths.
+            if len(candidates)!=1:
                 observed=time.monotonic();budget.require_work(observed)
                 diagnostic_paths=sorted(set(mapped)|{row['source']})
                 for path in diagnostic_paths:
@@ -456,7 +657,35 @@ def discover_closure(g:Any,control:Any,budget:SuiteBudget)->tuple[list[dict[str,
                 if len(retained)>MAX_FILE-65536:raise ValueError('ELF NEEDED diagnostic metadata exceeds fixed bound')
                 budget.require_work(time.monotonic())
                 raise ClosureNeededRefused(json.loads(retained))
+            key=(row['source'],needed)
+            if key not in requests:
+                if len(requests)>=4096:_projection_refuse(proof,budget,'REQUEST_CAP',owner=row['source'],needed=needed)
+                _projection_append(proof['requests'],{'owner':row['source'],'needed':needed,'candidates':candidates},remaining)
+                requests.add(key)
+            budget.require_work(time.monotonic())
+    proof['requests'].sort(key=lambda item:(item['owner'],item['needed']))
+    selections:dict[str,tuple[str,str]]={}
+    for request in proof['requests']:
+        source=request['candidates'][0];needed=request['needed'];selected=records[source]
+        if source in selections and selections[source][0]!=needed:
+            _projection_refuse(proof,budget,'SOURCE_TARGET_CONFLICT',source=source,owner=request['owner'],needed=needed)
+        target=selected['target']
+        if target==source:target=str(Path(source).parent/needed)
+        elif Path(target).name!=needed:
+            _projection_refuse(proof,budget,'SOURCE_TARGET_CONFLICT',source=source,owner=request['owner'],needed=needed)
+        selections[source]=(needed,target)
+        budget.require_work(time.monotonic())
+    targets={}
+    for source,row in records.items():
+        target=selections[source][1] if source in selections else row['target']
+        if target in targets:_projection_refuse(proof,budget,'TARGET_COLLISION',source=source)
+        targets[target]=source
+    for source,(needed,target) in sorted(selections.items()):
+        _projection_append(proof['assignments'],{'source':source,'target':target,'needed':needed},remaining)
+    projection=_projection_snapshot(proof,budget)
+    for source,(_,target) in selections.items():records[source]['target']=target
     rows=list(records.values());facts:dict[str,Any]=dict(validate_os_closure(rows,loaded,control))
+    facts['elf_soname_projections']=projection
     facts.update({'native_maps_sha256':sha(maps.encode()),'loaded_sources':sorted(loaded),'cached_sources':sorted(caches),
         'identities':[{'source':path,'device':g.protected_path(path,True).st_dev,
                        'inode':g.protected_path(path,True).st_ino} for path in sorted(paths)]})
@@ -1116,7 +1345,7 @@ def suite_main()->int:
             installed_module(name,manifest)
         kernel=admit_ci_root(g)
         persist_observation(g,base,'suite/kernel.json',kernel)
-        rows,installation=discover_closure(g,control,budget)
+        rows,installation=discover_closure(g,control,budget,_source_manifest_sha256=sha(source_raw))
         persist_observation(g,base,'suite/installation.json',installation)
         write_fixed(Path(STORE,'host.json'),canonical({'schema':control.SCHEMA,'files':rows})+b'\n')
         host,profile,prerequisites=control.load_ci_control_host(g,'baseline',caller)
@@ -1132,7 +1361,7 @@ def suite_main()->int:
         outcome={'schema':'TEST_ONLY-ci-suite/v1','status':'FAIL','executed':False,'control_passed':False,
             'production_capture_accepted':False,'started':budget.started,'deadline':budget.deadline,
             'finished':time.monotonic(),'reason':type(failure).__name__+': '+str(failure)}
-    except (ClosureStatRefused,ClosureNeededRefused) as failure:
+    except (ClosureStatRefused,ClosureNeededRefused,ClosureProjectionRefused) as failure:
         # Only these observed size/NEEDED predicates have a diagnostic disposition.
         # Unknown stat/source/caller/custody failures still propagate unchanged.
         budget.require_work(time.monotonic());caller.verify()

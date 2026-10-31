@@ -61,7 +61,7 @@ def host_model(monkeypatch,f):
 
 def test_real_discovery_reads_and_retains_the_exact_empty_loaded_urllib(monkeypatch):
     f=fixture(monkeypatch)
-    rows,facts=f.m.discover_closure(f.g,f.control,f.budget)
+    rows,facts=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     assert next(row for row in rows if row['source']==URLLIB)==empty_row()
     assert URLLIB in f.reads and facts['files']==len(rows)and URLLIB in facts['loaded_sources']
     assert facts['bytes']==sum(row['bytes']for row in rows)
@@ -129,7 +129,7 @@ def test_discovery_does_not_broaden_empty_urllib_to_other_roles_or_paths(monkeyp
     if role=='other-empty-module':
         path='/usr/lib/python3.12/other/__init__.py';f.modules[0].__file__=path
         f.data[path]=b'';f.stats[path]=copy.copy(f.stats[URLLIB]);f.stats[path].st_ino=1000
-    with pytest.raises(f.m.ClosureStatRefused)as failure:f.m.discover_closure(f.g,f.control,f.budget)
+    with pytest.raises(f.m.ClosureStatRefused)as failure:f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     assert failure.value.facts['source']==path and path not in f.reads
 
 
@@ -153,7 +153,7 @@ def test_discovery_matches_actual_zero_stat_empty_bytes_and_original_clock(monke
     if fault=='bool-stat':f.stats[URLLIB].st_size=False
     if fault=='float-stat':f.stats[URLLIB].st_size=0.0
     if fault=='negative-stat':f.stats[URLLIB].st_size=-1
-    with pytest.raises((ValueError,OSError)):f.m.discover_closure(f.g,f.control,f.budget)
+    with pytest.raises((ValueError,OSError)):f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
 
 
 @pytest.mark.parametrize('fault',['changed-read','stat-positive','stat-bool','stat-error','caller-changed','source-pin-tamper'])
@@ -194,7 +194,7 @@ def test_ordinary_later_host_route_rejects_the_retained_zero_row_before_any_NSS_
 
 def test_nonempty_urllib_positive_neighbor_keeps_ordinary_and_ci_behavior(monkeypatch):
     f=fixture(monkeypatch);f.data[URLLIB]=b'x';f.stats[URLLIB].st_size=1
-    rows,facts=f.m.discover_closure(f.g,f.control,f.budget)
+    rows,facts=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     row=next(row for row in rows if row['source']==URLLIB)
     assert row['bytes']==1 and row['sha256']==hashlib.sha256(b'x').hexdigest()
     assert f.control.validate_closure(rows)==f.control.validate_ci_closure(rows)

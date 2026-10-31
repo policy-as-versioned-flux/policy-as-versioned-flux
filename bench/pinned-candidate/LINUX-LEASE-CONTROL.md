@@ -152,3 +152,26 @@ original clock. It performs no extra filesystem/proc/tool query, bounds metadata
 before persistence, and uses the same protected installation REFUSED/FAIL export.
 Unknown errors still propagate. The actual dependency/matches remain unknown
 until a separately authorized original capture retains those facts.
+
+## CI-only mapped SONAME projection
+
+The fixed CI collector parses DT_SONAME from each mapped ELF object's bytes already
+returned by its protected read, after the unchanged ordinary ELF parse. It resolves
+NEEDED by the exact union of mapped basenames and held-byte SONAMEs, requiring one
+identity. A canonical host source may receive a same-directory jail target with
+the exact requested name; this is a constructed readonly projection, not an
+observation of a host symlink. Fixed PT_INTERP targets remain fixed. Ambiguous
+identities, conflicting required names or target collisions refuse. No dependency
+search, new host acquisition, tool, import or process supplies this identity.
+
+The separate closed `TEST_ONLY-ci-elf-soname-projections/v1` DATA binds original
+manifest/maps/clock and protected source bytes/hash/stat facts. Its pure checker
+confers no acquisition or execution authority. The original 900-second suite,
+4096-file/256MiB closure, diagnostic/export caps, irc39 control principal and
+ordinary nobody policy remain. Ordinary ELF/closure validators, host loader and
+guardian are unchanged. Known new parser/projection refusals use the narrow
+ClosureProjectionRefused path; ordinary parse errors and unknown custody/source/
+read/close failures propagate. Existing size/NEEDED diagnostic grammars remain.
+
+These changes have pure modeled coverage only. Actual library SONAME and complete
+native closure outcomes remain unobserved until separately authorized execution.

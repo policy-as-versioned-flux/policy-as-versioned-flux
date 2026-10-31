@@ -39,7 +39,7 @@ def needed_model(monkeypatch,count=0):
 @pytest.mark.parametrize('count',[0,2])
 def test_real_discovery_retains_owner_needed_maps_and_matches_without_extra_query(monkeypatch,count):
     f=needed_model(monkeypatch,count)
-    with pytest.raises(ValueError)as failure:f.m.discover_closure(f.g,f.control,f.budget)
+    with pytest.raises(ValueError)as failure:f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     assert hasattr(failure.value,'facts'),'NEEDED refusal lost already-acquired dependency/mapping facts'
     facts=failure.value.facts
     assert facts['owner']['source']==OWNER and facts['owner']['target']==OWNER
@@ -66,7 +66,7 @@ def test_real_coordinator_exports_narrow_elf_needed_refusal_with_original_prereq
 
 
 def test_exactly_one_existing_mapped_basename_keeps_existing_acceptance(monkeypatch):
-    f=needed_model(monkeypatch,1);rows,facts=f.m.discover_closure(f.g,f.control,f.budget)
+    f=needed_model(monkeypatch,1);rows,facts=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     assert facts['files']==len(rows)and next(row for row in rows if row['source']==OWNER)['elf']['needed']==[NEEDED]
     assert next(row for row in rows if row['source']==URLLIB)['bytes']==0
 
@@ -74,7 +74,7 @@ def test_exactly_one_existing_mapped_basename_keeps_existing_acceptance(monkeypa
 @pytest.mark.parametrize('count',[0,2])
 def test_retained_mapping_metadata_and_original_clock_match_only_already_acquired_facts(monkeypatch,count):
     f=needed_model(monkeypatch,count)
-    with pytest.raises(f.m.ClosureNeededRefused)as failure:f.m.discover_closure(f.g,f.control,f.budget)
+    with pytest.raises(f.m.ClosureNeededRefused)as failure:f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     facts=failure.value.facts
     assert facts['native_maps_sha256']==f.m.sha('\n'.join('00-01 r-xp 0 0 0 '+path for path in f.mapped).encode())
     assert facts['owner']['sha256']==f.m.sha(f.data[OWNER])and facts['owner']['bytes']==len(f.data[OWNER])
@@ -147,5 +147,5 @@ def test_missing_ELF_interpreter_is_not_misclassified_as_needed_refusal(monkeypa
     monkeypatch.setattr(f.control,'elf_dependencies',lambda raw:{'interpreter':'/lib/PURE_TEST_ONLY-unmapped-loader','needed':[]}if raw==f.data[OWNER]else parse(raw))
     import os
     monkeypatch.setattr(os.path,'realpath',lambda path:path)
-    with pytest.raises(ValueError,match='actual ELF interpreter')as failure:f.m.discover_closure(f.g,f.control,f.budget)
+    with pytest.raises(ValueError,match='actual ELF interpreter')as failure:f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     assert type(failure.value)is ValueError and not hasattr(failure.value,'facts')

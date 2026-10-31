@@ -25,6 +25,8 @@ def model(monkeypatch, size=0):
         def __truediv__(self,part):return ModelPath(self.value/part)
         @property
         def name(self):return self.value.name
+        @property
+        def parent(self):return ModelPath(self.value.parent)
         def exists(self):return str(self)in caches
         def mkdir(self,**kwargs):return None
         def read_text(self):
@@ -63,7 +65,7 @@ def model(monkeypatch, size=0):
     body=[*initial,stage,*main.body[tail:]]
     function=ast.FunctionDef(name='run_model',args=ast.arguments(posonlyargs=[],args=[],kwonlyargs=[],kw_defaults=[],defaults=[]),body=body,decorator_list=[])
     scope={**vars(m),'g':g,'control':control,'caller':caller,'budget':m.SuiteBudget(100.,1000.),'base':base,'outcome':None,'directory':None,
-        'time':time,'manifest':{},'installed_module':lambda *args:None,'admit_ci_root':lambda *args:{'PURE_TEST_ONLY_kernel':True},
+        'time':time,'source_raw':b'PURE_TEST_ONLY already verified manifest','manifest':{},'installed_module':lambda *args:None,'admit_ci_root':lambda *args:{'PURE_TEST_ONLY_kernel':True},
         'send_export':send}
     exec(compile(ast.fix_missing_locations(ast.Module(body=[function],type_ignores=[])),'PURE_TEST_ONLY_actual_coordinator_model','exec'),scope)
     return SimpleNamespace(m=m,g=g,control=control,budget=scope['budget'],scope=scope,run=scope['run_model'],data=data,stats=stats,
@@ -73,7 +75,7 @@ def model(monkeypatch, size=0):
 @pytest.mark.parametrize('size',[0,256*1024**2+1])
 def test_real_discovery_stat_bound_retains_candidate_without_reading_it(monkeypatch,size):
     f=model(monkeypatch,size)
-    with pytest.raises(ValueError)as failure:f.m.discover_closure(f.g,f.control,f.budget)
+    with pytest.raises(ValueError)as failure:f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     assert hasattr(failure.value,'facts'),'Bound refusal lost the already observed candidate/stat facts'
     facts=failure.value.facts
     assert facts['source']==CANDIDATE and facts['target']==CANDIDATE
@@ -103,7 +105,7 @@ def test_real_coordinator_keeps_bound_refusal_and_original_prerequisites_in_fail
 
 
 def test_positive_size_neighbor_keeps_existing_discovery_route(monkeypatch):
-    f=model(monkeypatch,1);rows,facts=f.m.discover_closure(f.g,f.control,f.budget)
+    f=model(monkeypatch,1);rows,facts=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     assert next(row for row in rows if row['source']==CANDIDATE)['bytes']==1
     assert CANDIDATE in f.reads and facts['files']==len(f.data)
 
@@ -118,7 +120,7 @@ def test_candidate_roles_target_and_exact_stat_facts_are_preserved(monkeypatch,r
         path='/usr/lib/python3.12/__pycache__/TEST_ONLY-member.pyc';f.modules[0].__cached__=path;f.caches.add(path)
         f.data[path]=b'';f.stats[path]=copy.copy(f.stats[CANDIDATE]);f.stats[path].st_size=0;f.stats[path].st_ino=999
     else:f.stats[path].st_size=0;f.mapped.append(path)
-    with pytest.raises(f.m.ClosureStatRefused)as failure:f.m.discover_closure(f.g,f.control,f.budget)
+    with pytest.raises(f.m.ClosureStatRefused)as failure:f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     facts=failure.value.facts;info=f.stats[path]
     assert facts['source']==path and role in facts['roles']
     assert facts['target']==('/app/linux_network.py'if role=='fixed-source'else path)
@@ -134,7 +136,7 @@ def test_exact_upper_size_bound_is_not_reclassified_as_stat_refusal(monkeypatch)
         if path==CANDIDATE:raise OSError('PURE TEST_ONLY next-stage read failure')
         return read(path,*args,**kwargs)
     f.g.protected_read=refuse_read
-    with pytest.raises(OSError,match='next-stage'):f.m.discover_closure(f.g,f.control,f.budget)
+    with pytest.raises(OSError,match='next-stage'):f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
 
 
 @pytest.mark.parametrize('fault',['stat-error','stat-close-error','missing-field','bool-field','read-error','caller-changed','caller-close-error','persistence-error','persistence-tamper','export-tamper','deadline-after-stat','deadline-after-persist','deadline-after-close'])
@@ -182,10 +184,10 @@ def test_unknown_original_clock_cannot_create_stat_diagnostic_or_export(monkeypa
 
 def test_original_bounds_are_not_relaxed_or_empty_file_admitted(monkeypatch):
     f=model(monkeypatch,0)
-    with pytest.raises(f.m.ClosureStatRefused):f.m.discover_closure(f.g,f.control,f.budget)
+    with pytest.raises(f.m.ClosureStatRefused):f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     assert CANDIDATE not in f.reads
     f.stats[CANDIDATE].st_size=1
-    rows,_=f.m.discover_closure(f.g,f.control,f.budget)
+    rows,_=f.m.discover_closure(f.g,f.control,f.budget,_source_manifest_sha256='1'*64)
     assert next(row for row in rows if row['source']==CANDIDATE)['bytes']==1
 
 

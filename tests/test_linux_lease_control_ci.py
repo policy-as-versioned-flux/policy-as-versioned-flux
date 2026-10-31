@@ -212,14 +212,14 @@ def test_actual_discovery_closes_native_interpreter_dependencies_and_refuses_for
     g=SimpleNamespace(protected_path=lambda path,*args:SimpleNamespace(st_dev=8,st_ino=sorted(data).index(path)+1,st_size=len(data[path]),
             st_mode=0o100444,st_uid=0,st_gid=0,st_nlink=1,st_mtime_ns=101,st_ctime_ns=102),
         protected_read=lambda path,**kwargs:data[path])
-    rows,facts=m.discover_closure(g,c,m.SuiteBudget(100.,1000.))
+    rows,facts=m.discover_closure(g,c,m.SuiteBudget(100.,1000.),_source_manifest_sha256='1'*64)
     assert next(row for row in rows if row['source']=='/usr/lib/ld-fixture.so')['target']=='/lib/ld-fixture.so'
     assert facts['files']==13 and facts['loaded_sources']==sorted(maps+['/usr/lib/python3.12/test_only.py'])
     data['/home/runner/toolcache/untrusted.py']=b'TEST_ONLY forbidden'
     observed.append(SimpleNamespace(__file__='/home/runner/toolcache/untrusted.py'))
-    with pytest.raises(ValueError,match='OS/source'):m.discover_closure(g,c,m.SuiteBudget(100.,1000.))
+    with pytest.raises(ValueError,match='OS/source'):m.discover_closure(g,c,m.SuiteBudget(100.,1000.),_source_manifest_sha256='1'*64)
     observed.pop();maps.append('/usr/lib/other/libfixture.so');data[maps[-1]]=b'TEST_ONLY ambiguous'
-    with pytest.raises(ValueError,match='ambiguous'):m.discover_closure(g,c,m.SuiteBudget(100.,1000.))
+    with pytest.raises(ValueError,match='ambiguous'):m.discover_closure(g,c,m.SuiteBudget(100.,1000.),_source_manifest_sha256='1'*64)
 
 
 def test_coordinator_serializes_all_twenty_and_aborts_before_next_leaf_on_failed_removal(monkeypatch,tmp_path):
@@ -347,7 +347,7 @@ def test_initial_source_integrity_failure_is_not_a_neutral_skip():
         def refused(*args):raise error
         return {'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),
             'control':control,'g':None,'caller':None,'installed_module':refused,'manifest':{},'base':{},'outcome':None,
-            'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'ClosureNeededRefused':m.ClosureNeededRefused,'persist_observation':lambda *args:None,
+            'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'ClosureNeededRefused':m.ClosureNeededRefused,'ClosureProjectionRefused':m.ClosureProjectionRefused,'persist_observation':lambda *args:None,
             'Path':Path,'STORE':m.STORE,'canonical':m.canonical}
     code=compile(ast.Module(body=[stage],type_ignores=[]),'TEST_ONLY-initial-stage','exec')
     for error in (ValueError('actual source member bytes differ from reviewed manifest'),
@@ -448,13 +448,13 @@ def test_initial_stage_keeps_observed_kernel_and_principal_when_later_discovery_
     stage=next(node for node in main.body if isinstance(node,ast.Try) and any(
         isinstance(call,ast.Call) and isinstance(call.func,ast.Name) and call.func.id=='installed_module' for call in ast.walk(node)))
     class MissingNative(ValueError):pass
-    def refused(*args):raise ValueError('TEST_ONLY later native mapping integrity refusal')
+    def refused(*args,**kwargs):raise ValueError('TEST_ONLY later native mapping integrity refusal')
     scope={'time':SimpleNamespace(monotonic=lambda:150.),'budget':m.SuiteBudget(100.,1000.),'g':g,'caller':None,
         'control':SimpleNamespace(ci_principal_facts=lambda *args:{'TEST_ONLY_principal':65534},CiPrerequisiteUnavailable=MissingNative,CiPrincipalRejected=type("PrincipalRejected",(ValueError,),{})),
         'installed_module':lambda *args:None,'manifest':{},'base':base,'outcome':None,
-        'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'ClosureNeededRefused':m.ClosureNeededRefused,'persist_observation':m.persist_observation,
+        'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'ClosureNeededRefused':m.ClosureNeededRefused,'ClosureProjectionRefused':m.ClosureProjectionRefused,'persist_observation':m.persist_observation,
         'admit_ci_root':lambda *args:{'TEST_ONLY_controllers':['memory','cpu','cpuset','pids']},
-        'discover_closure':refused,'Path':Path,'STORE':str(tmp_path),'canonical':m.canonical}
+        'source_raw':b'PURE_TEST_ONLY already verified manifest','sha':m.sha,'discover_closure':refused,'Path':Path,'STORE':str(tmp_path),'canonical':m.canonical}
     with pytest.raises(ValueError,match='mapping integrity'):exec(compile(ast.Module(body=[stage],type_ignores=[]),'TEST_ONLY-stage','exec'),scope)
     assert set(base)=={'suite/principal.json','suite/kernel.json'}
     assert (tmp_path/'ci-evidence/kernel.json').read_bytes()==base['suite/kernel.json']
@@ -556,7 +556,7 @@ def test_initial_literal_absence_is_neutral_skip_with_original_absence_record(mo
     stage=next(node for node in main.body if isinstance(node,ast.Try) and any(
         isinstance(call,ast.Call) and isinstance(call.func,ast.Name) and call.func.id=='installed_module' for call in ast.walk(node)))
     scope={'time':time,'budget':m.SuiteBudget(100.,1000.),'g':g,'caller':None,'control':c,'installed_module':lambda *args:None,
-        'manifest':{},'base':base,'outcome':None,'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'ClosureNeededRefused':m.ClosureNeededRefused,
+        'manifest':{},'base':base,'outcome':None,'PrerequisiteUnavailable':m.PrerequisiteUnavailable,'ClosureStatRefused':m.ClosureStatRefused,'ClosureNeededRefused':m.ClosureNeededRefused,'ClosureProjectionRefused':m.ClosureProjectionRefused,
         'persist_observation':m.persist_observation,'admit_ci_root':m.admit_ci_root}
     exec(compile(ast.Module(body=[stage],type_ignores=[]),'TEST_ONLY-initial-absence-stage','exec'),scope)
     assert scope['outcome']['status']=='SKIP' and scope['outcome']['executed'] is False
