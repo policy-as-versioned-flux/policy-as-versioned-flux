@@ -77,16 +77,17 @@ def test_storage_owner_is_same_original_and_same_stage(monkeypatch):
 def test_storage_placeholder_survives_first_charge_and_guard_cancel(monkeypatch,location,kind):
     original,selected=born(monkeypatch,allocate=False);error=kind('PURE first allocation uncertainty');calls=[]
     def uncertain(*args):
-        calls.append(location);state=original._technical_state;cell=state._capture_storage
-        assert state._original_owner is original and state._remap_flow.owner is original
-        assert cell._original is original and cell._stage is state and cell.journal[0]['status']=='PENDING'
+        calls.append(location);state=original._technical_state;cell=s._bound_cell(original)
+        if location=='guard':assert state is None and cell._stage is None
+        else:assert state._original_owner is original and state._remap_flow.owner is original and cell._stage is state
+        assert cell._original is original and cell.journal[0]['status']=='PENDING'
         raise error
     if location=='guard':monkeypatch.setattr(selected._guard,'verify',uncertain)
     else:monkeypatch.setattr(c,'_charge_technical_bytes',uncertain)
     with pytest.raises(kind) as caught:s._allocate_selected_stage(original)
     assert caught.value is error and original._stopped and calls==[location]
-    state=original._technical_state;cell=state._capture_storage
-    assert cell.phase=='STOPPED' and cell.first_exception is error and cell.first_failure['exception_type']==kind.__name__
+    state=original._technical_state;cell=s._bound_cell(original)
+    assert cell.phase=='STOPPED' and cell.first_exception is error and cell.first_failure is not None and cell.first_failure['exception_type']==kind.__name__
     assert original._active_slot is None and original._target_custody_known
     with pytest.raises(ValueError):s._allocate_selected_stage(original)
     assert original._technical_state is state and cell.first_exception is error and calls==[location]

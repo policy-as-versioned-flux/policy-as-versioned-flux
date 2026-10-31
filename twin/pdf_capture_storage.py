@@ -35,13 +35,14 @@ class _Selection(_Private):
     _record:bytes
     _archive:dict[str,bytes]
     _guard:Any
+    _initial_cell:_Cell
 
 class _Cell(_Private):
     def __setattr__(self,name:str,value:Any)->None:
         if name in ('_original','_stage','_selection','_selection_raw','_guard','_allocations') and hasattr(self,name):raise StorageHold('immutable C1 ownership/source association')
         object.__setattr__(self,name,value)
     _original:c.OriginalComparisonSuite
-    _stage:r._StageState
+    _stage:r._StageState|None
     _selection:_Selection
     _selection_raw:bytes
     phase:str
@@ -89,6 +90,45 @@ class _OwnedBytes(_Private):
     phase:str
     transferred:bool
 
+
+@dataclasses.dataclass(eq=False,frozen=True,init=False,repr=False)
+class _Guard(_Private):
+    _core:Any
+    _methods:tuple
+    description:bytes
+
+    def verify(self)->None:
+        self._core.verify()
+        current=_method_dispatch()
+        if len(current)!=len(self._methods):raise StorageHold('fixed C1 method set differs')
+        for (name,method),(held_name,held,code,defaults,kwdefaults) in zip(current,self._methods):
+            if (name!=held_name or method is not held or method.__code__ is not code
+                    or method.__defaults__ is not defaults or method.__kwdefaults__ is not kwdefaults):raise StorageHold('fixed C1 method dispatch/code/defaults changed')
+
+
+# Core MetadataAuthority keeps its class-identity policy. These fixed local
+# enforcement methods additionally need actual dispatch/code/default custody.
+def _method_dispatch()->tuple:
+    return (('private-new',_Private.__new__),('selection-set',_Selection.__setattr__),('selection-delete',_Selection.__delattr__),
+            ('cell-set',_Cell.__setattr__),('allocation-set',_Allocation.__setattr__),
+            ('permit-set',_Permit.__setattr__),('owned-set',_OwnedBytes.__setattr__),
+            ('guard-set',_Guard.__setattr__),('guard-delete',_Guard.__delattr__),('guard-verify',_Guard.verify),
+            ('stage-set',r._StageState.__setattr__),('original-set',c.OriginalComparisonSuite.__setattr__),
+            ('private-copy',c._PrivateCapability.__copy__),('private-deepcopy',c._PrivateCapability.__deepcopy__),
+            ('private-reduce',c._PrivateCapability.__reduce_ex__))
+
+
+_GUARD_VERIFY=_Guard.verify
+
+
+def _verify_guard(guard:Any)->None:
+    if type(guard) is _Guard:
+        # Core binds this fixed verifier function/code before its reached call.
+        # Frozen-instance fault hooks in pure tests are not public construction.
+        guard._core.verify()
+        if type(guard).verify is not _GUARD_VERIFY:raise StorageHold('fixed C1 verifier dispatch changed')
+    guard.verify()
+
 # A future trusted original genesis must already hold this exact private birth
 # object. No source factory, setter, context/hash importer or actual appointment.
 _APPOINTED_STORAGE:_Selection|None=None
@@ -131,10 +171,13 @@ def check_storage_selection(record:dict,archive:dict)->dict:
 
 def _bound_cell(original:c.OriginalComparisonSuite)->_Cell:
     if type(original) is not c.OriginalComparisonSuite:raise StorageHold('exact existing original required')
+    selected=getattr(original,'_capture_storage_selection',None)
+    cell=getattr(selected,'_initial_cell',None)
+    if type(selected) is not _Selection or selected._original is not original or type(cell) is not _Cell or cell._original is not original or cell._selection is not selected:raise StorageHold('same original birth initialization cell required')
     state=getattr(original,'_technical_state',None)
+    if state is None and cell._stage is None:return cell
     if type(state) is not r._StageState or state._original_owner is not original:raise StorageHold('same original-owned stage required')
-    cell=state._capture_storage
-    if type(cell) is not _Cell or cell._original is not original or cell._stage is not state:raise StorageHold('same original/stage storage cell required')
+    if state._capture_storage is not cell or cell._stage is not state:raise StorageHold('same original/stage storage cell required')
     return cast(_Cell,cell)
 
 
@@ -142,7 +185,14 @@ def _source_guard()->Any:
     import sys
     from . import source_native_observation as n
     policy={'purpose':'TEST_ONLY','allowed_transforms':[],'reviewer_id':'C1-fixed-storage-source','reviewer_role':'source-binding-only'}
-    return sm.MetadataAuthority.freeze('C1-storage-source','C1-source-bindings','1',sm.sha256(sm.canonical(policy)),_guard_callback,_guard_callback,policy=policy,helper_modules=(sys.modules[__name__],c,r,n))
+    methods=[]
+    for name,method in _method_dispatch():
+        if method.__defaults__ is not None or method.__kwdefaults__ is not None:raise StorageHold('fixed C1 method defaults unavailable')
+        methods.append((name,method,method.__code__,None,None))
+    core=sm.MetadataAuthority.freeze('C1-storage-source','C1-source-bindings','1',sm.sha256(sm.canonical(policy)),_guard_callback,_guard_callback,policy=policy,helper_modules=(sys.modules[__name__],c,r,n))
+    guard=object.__new__(_Guard)
+    object.__setattr__(guard,'_core',core);object.__setattr__(guard,'_methods',tuple(methods));object.__setattr__(guard,'description',core.description)
+    return guard
 
 
 def _guard_callback(*args:Any)->None:
@@ -154,15 +204,22 @@ def _allocate_selected_stage(original:c.OriginalComparisonSuite)->r._StageState:
     if (type(original) is not c.OriginalComparisonSuite or type(selected) is not _Selection
             or selected._original is not original or getattr(original,'_capture_storage_selection',None) is not selected):raise StorageHold('earlier exact private birth selection absent')
     if (original._technical_state is not None or original._next!=0 or original._retained!=0 or original._stopped
-            or original._active_slot is not None or not original._target_custody_known or original._awaiting_comparison or original._used_hosts):raise StorageHold('cannot migrate an existing/started original')
-    state=r._stage_placeholder(original);cell=object.__new__(_Cell)
-    cell._original=original;cell._stage=state;cell._selection=selected;cell._selection_raw=selected._record;cell.phase='INITIALIZING'
-    cell.journal=[{'operation':'INITIALIZE','status':'PENDING','slot':None}];cell.first_failure=None;cell.first_exception=None;cell.busy=True;cell._guard=None;cell.technical_phase='NOT_CHARGED'
-    state._capture_storage=cell;original._technical_state=state
+            or original._active_slot is not None or not original._target_custody_known or original._awaiting_comparison or original._used_hosts or getattr(selected,'_initial_cell',None) is not None):raise StorageHold('cannot migrate an existing/started original')
+    # Raw passive ownership only: no reached custom setter/helper before its
+    # earlier source guard. This one attempt survives even no StageState return.
+    cell=object.__new__(_Cell)
+    for name,value in {'_original':original,'_stage':None,'_selection':selected,'_selection_raw':selected._record,'phase':'INITIALIZING',
+                       'journal':[{'operation':'INITIALIZE','status':'PENDING','slot':None}],'first_failure':None,'first_exception':None,
+                       'busy':True,'_guard':selected._guard,'technical_phase':'NOT_CHARGED'}.items():object.__setattr__(cell,name,value)
+    object.__setattr__(selected,'_initial_cell',cell)
     try:
+        _verify_guard(cell._guard)
+        state=r._stage_placeholder(original)
+        object.__setattr__(cell,'_stage',state)
+        state._capture_storage=cell;original._technical_state=state
         c._check_original_suite(original)
         _original_window(original,60)
-        guard=selected._guard;object.__setattr__(cell,'_guard',guard);guard.verify()
+        guard=selected._guard;_verify_guard(guard)
         _check_birth(cell)
         if original._reserve!=RESERVE:raise StorageHold('initial frozen reserve differs')
         allocations=[]
@@ -183,12 +240,15 @@ def _allocate_selected_stage(original:c.OriginalComparisonSuite)->r._StageState:
 def _fail(cell:_Cell,error:BaseException,operation:str)->None:
     try:
         original=cell._original
-        if _bound_cell(original) is not cell:return
-        original._stopped=True;cell.phase='STOPPED'
+        # Emergency custody does not invoke any revocable helper or setter.
+        selected=cell._selection
+        if (type(original) is not c.OriginalComparisonSuite or type(selected) is not _Selection or selected._original is not original
+                or getattr(original,'_capture_storage_selection',None) is not selected or getattr(selected,'_initial_cell',None) is not cell):return
+        object.__setattr__(original,'_stopped',True);object.__setattr__(cell,'phase','STOPPED')
         if cell.first_failure is None:
-            cell.first_exception=error
-            cell.first_failure={'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':operation if operation in OPERATIONS else 'INVALID','exception_type':type(error).__name__[:80],
-                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'}
+            object.__setattr__(cell,'first_exception',error)
+            object.__setattr__(cell,'first_failure',{'schema':'TEST_ONLY-pdf-storage-first-failure/v1','operation':operation if operation in OPERATIONS else 'INVALID','exception_type':type(error).__name__[:80],
+                'target_custody':'KNOWN_TERMINAL' if original._active_slot is None and original._target_custody_known else 'UNKNOWN'})
         if cell.journal and cell.journal[-1]['status']=='PENDING':cell.journal[-1]['status']='HELD'
     except BaseException:
         pass  # Never mask the original pending exception/cancellation.
@@ -208,7 +268,7 @@ def _check_birth(cell:_Cell)->None:
 
 def _check_cell(cell:_Cell)->None:
     original=cell._original
-    c._check_original_suite(original);cell._guard.verify();_check_birth(cell)
+    c._check_original_suite(original);_verify_guard(cell._guard);_check_birth(cell)
     if original._stopped or cell.phase!='READY' or _bound_cell(original) is not cell:raise StorageHold('storage original stopped or binding changed')
     transferred=sum(len(owner._payload) for owner in cell._owners if owner.transferred)
     if original._reserve!=RESERVE-transferred or original._retained!=TECHNICAL+transferred:raise StorageHold('original storage totals differ from genuine ownership')
@@ -229,7 +289,7 @@ def _begin(original:c.OriginalComparisonSuite,operation:str)->_Cell:
     cell=_bound_cell(original)
     try:
         if cell.busy or cell.phase!='READY' or original._stopped:raise StorageHold('storage transition stopped or reentered')
-        cell.busy=True
+        object.__setattr__(cell,'busy',True)
         if operation not in OPERATIONS:raise StorageHold('closed storage operation required')
         if len(cell.journal)>=MAX_JOURNAL:raise StorageHold('finite storage journal exhausted')
         cell.journal.append({'operation':operation,'status':'PENDING','slot':original._next})
