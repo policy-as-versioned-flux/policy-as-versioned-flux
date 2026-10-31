@@ -1,9 +1,13 @@
 """Pure comparison DATA controls: never launches a target or observes a real host."""
 import copy
+import time
 from typing import Any, cast
 import pytest
 from twin import source_metadata as sm
 from twin import pdf_comparison_capture as c
+
+
+MODEL_SUITE_START_NS=int(time.monotonic()*10**9)
 
 
 def test_copied_public_packets_are_never_actual_capture_authority():
@@ -77,7 +81,7 @@ def prepared_fixture():
     rows=obs['spec']['candidates'];inventory=blob(sm.canonical(rows))['sha256']
     left={'schema':'TEST_ONLY-pdf-comparison-build-selection/v1','variant':'pristine','source_archive_sha256':c.ARCHIVE,'patch_sha256':None,'prepared_tree_sha256':'c'*64,'toolchain_recipe_sha256':recipe,'configuration_recipe_sha256':configuration,'executable':exe,'dependency_inventory_sha256':inventory}
     right={'schema':'twin.native-build-identity/v1','source_archive_sha256':c.ARCHIVE,'source_package_sha256':blob(b'TEST_ONLY package')['sha256'],'patch_sha256':c.PATCH,'prepared_tree_sha256':blob(b'TEST_ONLY tree')['sha256'],'build_configuration_sha256':configuration,'toolchain_sha256':recipe,'build_log_sha256':blob(b'TEST_ONLY never built')['sha256'],'executable_sha256':exe['sha256'],'executable_bytes':exe['bytes'],'target':{'system':'Linux','machine':'x86_64','elf_class':64}}
-    pair={'schema':'TEST_ONLY-pdf-pair-plan/v1','purpose':'TEST_ONLY','fixture_id':c.FIXTURES[0][0],'fixture':pdf,'config':config,'resource':None,'archive_sha256':c.ARCHIVE,'patch_sha256':c.PATCH,'build_pair':{'pristine_build_sha256':record(left),'patched_build_sha256':record(right),'pristine_executable':exe,'patched_executable':exe,'same_toolchain_recipe_sha256':recipe,'accepted_differences_sha256':blob(b'TEST_ONLY reviewed fixed differences')['sha256']},'schedule_index':0,'suite_selection_sha256':blob(b'TEST_ONLY suite selection')['sha256']}
+    pair={'schema':'TEST_ONLY-pdf-pair-plan/v1','purpose':'TEST_ONLY','fixture_id':c.FIXTURES[0][0],'fixture':pdf,'config':config,'resource':None,'archive_sha256':c.ARCHIVE,'patch_sha256':c.PATCH,'build_pair':{'pristine_build_sha256':record(left),'patched_build_sha256':record(right),'pristine_executable':exe,'patched_executable':exe,'same_toolchain_recipe_sha256':recipe,'accepted_differences_sha256':blob(b'TEST_ONLY reviewed fixed differences')['sha256']},'schedule_index':0,'suite_selection_sha256':record({'schema':'TEST_ONLY-pdf-comparison-suite-selection/v1','original_started_monotonic_ns':MODEL_SUITE_START_NS,'original_seconds':10800,'max_invocations':52,'slot_seconds':182,'preparation_seconds':60,'target_seconds':120,'failed_cleanup_seconds':2,'transport_seconds':300,'storage_bytes':c.MAX_SUITE_BYTES,'reserve_bytes':1024})}
     prepared=c.prepare_comparison_plan(pair,base64.b64decode(PDF01_B64),archive,executable_path='/bin/tool',candidate_inventory=rows,recorder_inventory=rows)
     return pair,prepared['plan'],prepared['archive']
 
@@ -200,15 +204,22 @@ def test_fixed_native_collector_with_fully_mocked_kernel_retains_both_actual_sha
     assert len([row for row in ptrace if row[0]==24])==8
 
 
+def original_suite_model(context, selection_pin, *, slot=0):
+    """Test-only appointment model; no production selector or actual H is created."""
+    raw=context._evidence[selection_pin];selection=sm._json(raw)
+    original=object.__new__(c.OriginalComparisonSuite)
+    state={'_selection_raw':raw,'_selection':selection_pin,'_started':selection['original_started_monotonic_ns']/10**9,'_next':slot,'_retained':0,'_reserve':selection['reserve_bytes'],'_stopped':False,'_awaiting_comparison':False,'_used_hosts':{sm.sha256(context._policy)} if slot else set(),'_guard':GuardModel(),'_technical_state':None,'_active_slot':None,'_target_custody_known':True}
+    for key,value in state.items():setattr(original,key,value)
+    return original
+
+
 def authority_model(plan,archive,*,slot=0):
     """Explicitly fabricated private-shaped objects for pure source controls only."""
-    import time
-    session=object.__new__(c.ComparisonSession)
-    for key,value in {'_selection':'a'*64,'_started':time.monotonic(),'_next':slot,'_retained':0,'_reserve':1024,'_stopped':False,'_awaiting_comparison':False,'_used_hosts':set(),'_guard':GuardModel()}.items():setattr(session,key,value)
     pair=sm._json(archive[plan['pair_plan_sha256']]);evidence={pin:archive[pin] for pin in (plan['build_identity_sha256'],pair['build_pair']['patched_build_sha256'],plan['config']['sha256'],pair['suite_selection_sha256'])}
     policy={'schema':'twin.native-host-policy/v1','scope':c.n.SCOPE,'custodian':'PURE MODEL, NOT AN ACTUAL SELECTED HOST','not_before':'2026-10-31T00:00:00+00:00','not_after':'2026-10-31T00:05:00+00:00','roots':['/bin','/lib','/data'],'writer_control':'trusted-administrator-controlled-interval','evidence_sha256s':sorted(evidence)}
     context=object.__new__(c.n.NativeHostContext)
     for key,value in {'_policy':sm.canonical(policy),'_evidence':evidence,'_guard':GuardModel()}.items():object.__setattr__(context,key,value)
+    session=original_suite_model(context,pair['suite_selection_sha256'],slot=slot)
     authority=object.__new__(c.ComparisonCaptureAuthority)
     for key,value in {'_context':context,'_guard':GuardModel(),'_pair':sm.canonical(pair),'_archive':dict(archive),'_plan':sm.canonical(plan),'_selected_at':time.monotonic(),'_spent':False,'_suite_started':session._started,'_slots_used':slot,'_retained_bytes':0,'_reserve_bytes':1024,'_session':session,'_slot':slot}.items():object.__setattr__(authority,key,value)
     return authority
@@ -267,7 +278,7 @@ def patched_gate_fixture(monkeypatch):
     archive[sm.sha256(newcontext._policy)]=newcontext._policy;archive.update(new_evidence)
     obsbytes=sm.canonical(failure_observation);op=sm.sha256(obsbytes);archive[op]=obsbytes
     empty={'sha256':sm.sha256(b''),'bytes':0};archive[empty['sha256']]=b''
-    dossier={'native_observation_sha256':op,'stdout':empty,'stderr':empty}
+    dossier={'native_observation_sha256':op,'stdout':empty,'stderr':empty,'process_group':sm._json(archive[data['custody_sha256']])}
     dr=sm.canonical(dossier);dp=sm.sha256(dr)
     result={'status':'failure','archive':archive,'receipts':{dp:dr},'dossier_sha256':dp}
     def execute(p,raw,observation_store,preparation_deadline):
@@ -321,7 +332,7 @@ def test_private_original_session_cannot_renew_duplicate_or_continue_after_uncer
     if mutation=='out-of-order':session._next=1
     if mutation=='same-H':session._used_hosts.add(sm.sha256(authority._context._policy))
     if mutation=='awaiting-comparison':session._awaiting_comparison=True
-    if mutation=='deadline':session._started-=10700
+    if mutation=='deadline':object.__setattr__(session,'_started',session._started-10700)
     if mutation=='capacity':session._retained=c.MAX_SUITE_BYTES
     with pytest.raises(ValueError):c._consume(authority,patched=False)
     assert authority._spent is False
@@ -426,7 +437,6 @@ def test_copied_private_completion_and_changed_helper_are_not_public_adoption_ro
 
 def test_authority_freeze_requires_real_private_types_and_matching_independent_evidence(monkeypatch):
     pair,plan,archive=prepared_fixture();model=authority_model(plan,archive);session=model._session
-    session._selection=pair['suite_selection_sha256']
     monkeypatch.setattr(c.n,'_host_window',lambda context,**kw:sm._json(context._policy))
     with pytest.raises(ValueError,match='private'):c.freeze_comparison_authority(cast(Any,{}),plan,archive,session=session)
     with pytest.raises(ValueError,match='private'):c.freeze_comparison_authority(model._context,plan,archive,session=cast(Any,{}))
@@ -446,10 +456,10 @@ def test_original_session_selection_cannot_start_from_a_public_record_or_larger_
         object.__setattr__(context,'_policy',sm.canonical(policy));object.__setattr__(context,'_evidence',{pin:raw})
         return context,pin
     monkeypatch.setattr(c.n,'_host_window',lambda context,**k:sm._json(context._policy))
-    context,pin=select(selection);session=c.new_comparison_session(context,pin)
+    context,pin=select(selection);session=c.new_comparison_session(context,pin,original_suite=original_suite_model(context,pin))
     assert session._next==0 and session._stopped is False
     selection['original_seconds']=10801;context,pin=select(selection)
-    with pytest.raises(ValueError):c.new_comparison_session(context,pin)
+    with pytest.raises(ValueError):c.new_comparison_session(context,pin,original_suite=original_suite_model(context,pin))
 
 
 @pytest.mark.parametrize('deadline',[True,float('nan'),float('inf'),float('-inf')])
@@ -467,9 +477,10 @@ def test_candidate_read_uses_original_pre_setup_bound_and_later_deadline_never_r
     info=types.SimpleNamespace(st_dev=1,st_ino=2,st_mode=0o100444,st_uid=1000,st_gid=1000,st_nlink=1,st_size=1,st_mtime_ns=1,st_ctime_ns=1)
     raw=b'x';pin=sm.sha256(raw);spec={'cwd':'/work','candidates':[{'path':'/safe/file','sha256':pin,'bytes':1}]}
     def read(*a):now[0]=read_finishes;return raw
+    def opened(*a):touched.append('open');return 999
     with monkeypatch.context() as patch:
         patch.setattr(c.n.time,'monotonic',lambda:now[0]);patch.setattr(c.n,'_host_window',lambda *a,**k:{'roots':['/safe']})
-        patch.setattr(c.n,'_observe_open_route',lambda path:(path,[]));patch.setattr(c.n.os,'open',lambda *a:touched.append('open') or 999)
+        patch.setattr(c.n,'_observe_open_route',lambda path:(path,[]));patch.setattr(c.n.os,'open',opened)
         patch.setattr(c.n.os,'close',lambda fd:closed.append(fd));patch.setattr(c.n.os,'fstat',lambda *_:info)
         patch.setattr(c.n.os,'getxattr',lambda *a:(_ for _ in ()).throw(OSError(errno.ENODATA,'PURE MODEL no capability')),raising=False)
         patch.setattr(c.n,'_read_fd',read)
@@ -509,6 +520,149 @@ def test_final_comparison_with_an_unattempted_partner_stops_the_original_session
 
 def test_public_native_handle_or_store_is_not_a_comparative_completion_adoption_route(monkeypatch):
     pair,authority,baseline,store,plan,parent,calls,result=patched_gate_fixture(monkeypatch)
-    for copied in ({},store,object.__new__(c.n.ObservedExtraction)):
+    invalid_completions: list[Any]=[{},store,object.__new__(c.n.ObservedExtraction)]
+    for copied in invalid_completions:
         with pytest.raises(ValueError,match='private'):c.compare_pair(pair,baseline,cast(Any,copied))
     assert calls==[]
+
+
+@pytest.mark.parametrize('mutation',['add','remove','path','hash','size'])
+def test_pristine_candidate_selection_cannot_diverge_from_the_independently_selected_build(mutation):
+    pair,plan,archive=prepared_fixture();rows=sm._json(archive[plan['candidate_inventory_sha256']])
+    changed=copy.deepcopy(rows)
+    if mutation=='add':
+        raw=b'PURE MODEL unselected library';pin=sm.sha256(raw);archive[pin]=raw
+        changed.append({'path':'/lib/additional-library','sha256':pin,'bytes':len(raw)})
+    if mutation=='remove':changed.pop()
+    if mutation=='path':changed[-1]['path']='/lib/substituted-library'
+    if mutation=='hash':
+        raw=b'UVWXYZ';pin=sm.sha256(raw);archive[pin]=raw;changed[-1]['sha256']=pin
+    if mutation=='size':
+        raw=b'ABCDEFG';pin=sm.sha256(raw);archive[pin]=raw;changed[-1].update(sha256=pin,bytes=len(raw))
+    with pytest.raises(ValueError,match='build dependency'):
+        c.prepare_comparison_plan(pair,archive[pair['fixture']['sha256']],archive,executable_path='/bin/tool',candidate_inventory=changed,recorder_inventory=rows)
+
+
+def test_context_and_selection_hash_cannot_appoint_an_original_suite(monkeypatch):
+    pair,plan,archive=prepared_fixture();model=authority_model(plan,archive)
+    monkeypatch.setattr(c.n,'_host_window',lambda context,**k:sm._json(context._policy))
+    with pytest.raises(ValueError,match='source-appointed'):c.new_comparison_session(model._context,pair['suite_selection_sha256'])
+    with pytest.raises(ValueError,match='source-appointed'):c.OriginalComparisonSuite()
+    with pytest.raises(ValueError,match='source-appointed'):c.new_comparison_session(model._context,pair['suite_selection_sha256'],original_suite=object.__new__(c.OriginalComparisonSuite))
+
+
+@pytest.mark.parametrize('state',['slot-and-H','retained','exhausted-storage','reserve','stopped','awaiting','technical'])
+def test_repeated_session_access_returns_the_one_original_custody_without_reset(monkeypatch,state):
+    pair,plan,archive=prepared_fixture();model=authority_model(plan,archive);original=model._session
+    monkeypatch.setattr(c.n,'_host_window',lambda context,**k:sm._json(context._policy))
+    first=c.new_comparison_session(model._context,pair['suite_selection_sha256'],original_suite=original)
+    if state=='slot-and-H':c._consume(c.freeze_comparison_authority(model._context,plan,archive,session=first),patched=False)
+    if state=='retained':first._retained=12345
+    if state=='exhausted-storage':first._retained=c.MAX_SUITE_BYTES
+    if state=='reserve':first._reserve=512
+    if state=='stopped':first._stopped=True
+    if state=='awaiting':first._awaiting_comparison=True
+    if state=='technical':first._technical_state=object()
+    before=(first._next,first._retained,first._reserve,first._stopped,first._awaiting_comparison,set(first._used_hosts),first._technical_state,first._active_slot,first._target_custody_known)
+    second=c.new_comparison_session(model._context,pair['suite_selection_sha256'],original_suite=original)
+    assert first is second is original
+    assert before==(second._next,second._retained,second._reserve,second._stopped,second._awaiting_comparison,second._used_hosts,second._technical_state,second._active_slot,second._target_custody_known)
+    if state in ('slot-and-H','exhausted-storage','stopped','awaiting'):
+        with pytest.raises(ValueError):c.freeze_comparison_authority(model._context,plan,archive,session=second)
+
+
+def test_source_appointed_original_clock_stop_technical_and_unknown_target_state_cannot_be_reset():
+    pair,plan,archive=prepared_fixture();model=authority_model(plan,archive);original=model._session
+    for key,value in [('_selection','a'*64),('_selection_raw',b'{}'),('_started',time.monotonic())]:
+        with pytest.raises(ValueError):setattr(original,key,value)
+    original._stopped=True
+    with pytest.raises(ValueError):original._stopped=False
+    state=object();original._technical_state=state
+    with pytest.raises(ValueError):original._technical_state=None
+    original._technical_state=state
+    object.__setattr__(original,'_stopped',False)  # Deliberately malformed test model only.
+    c._consume(model,patched=False)
+    assert original._active_slot==0 and original._target_custody_known is False
+    with pytest.raises(ValueError):original._target_custody_known=True
+    with pytest.raises(ValueError):original._active_slot=None
+
+
+def test_rehashed_plan_inventory_cannot_bypass_the_h_pinned_build_at_authority_freeze(monkeypatch):
+    pair,plan,archive=prepared_fixture();model=authority_model(plan,archive)
+    rows=sm._json(archive[plan['candidate_inventory_sha256']]);rows.append({'path':'/lib/unselected','sha256':sm.sha256(b'x'),'bytes':1});archive[sm.sha256(b'x')]=b'x'
+    raw=sm.canonical(rows);pin=sm.sha256(raw);archive[pin]=raw;plan['candidate_inventory_sha256']=pin
+    monkeypatch.setattr(c.n,'_host_window',lambda context,**k:sm._json(context._policy))
+    with pytest.raises(ValueError,match='build dependency'):c.freeze_comparison_authority(model._context,plan,archive,session=model._session)
+
+
+def test_used_h_continuity_remains_after_a_known_terminal_model_and_repeated_access(monkeypatch):
+    pair,plan,archive=prepared_fixture();model=authority_model(plan,archive);original=model._session
+    monkeypatch.setattr(c.n,'_host_window',lambda context,**k:sm._json(context._policy))
+    c._consume(model,patched=False)
+    # Pure test model of independently validated return, never actual custody.
+    object.__setattr__(original,'_active_slot',None);object.__setattr__(original,'_target_custody_known',True)
+    repeated=c.new_comparison_session(model._context,pair['suite_selection_sha256'],original_suite=original)
+    next_authority=c.freeze_comparison_authority(model._context,plan,archive,session=repeated)
+    with pytest.raises(ValueError,match='already used'):c._consume(next_authority,patched=True)
+    assert repeated is original and original._next==1 and len(original._used_hosts)==1
+
+
+def test_actual_shaped_checked_failure_return_marks_known_custody_while_unknown_return_does_not(monkeypatch):
+    pair,authority,baseline,store,plan,parent,calls,result=patched_gate_fixture(monkeypatch)
+    complete=c.capture_patched_comparison(authority,baseline,store,plan,parent)
+    assert complete._session._stopped and complete._session._active_slot is None and complete._session._target_custody_known is True
+    pair,authority,baseline,store,plan,parent,calls,result=patched_gate_fixture(monkeypatch)
+    dossier=sm._json(result['receipts'][result['dossier_sha256']]);dossier['process_group']['absence_verified']=False
+    raw=sm.canonical(dossier);pin=sm.sha256(raw);result['receipts'][pin]=raw;result['dossier_sha256']=pin
+    c.capture_patched_comparison(authority,baseline,store,plan,parent)
+    assert authority._session._stopped and authority._session._active_slot==1 and authority._session._target_custody_known is False
+
+
+def test_fixed_source_recorders_and_staged_input_config_are_separate_from_pristine_build_selection():
+    from pathlib import Path
+    pair,plan,archive=prepared_fixture();rows=sm._json(archive[plan['candidate_inventory_sha256']])
+    drivers=c._driver_inventory()
+    for row in drivers:archive[row['sha256']]=Path(row['path']).read_bytes()
+    prepared=c.prepare_comparison_plan(pair,archive[pair['fixture']['sha256']],archive,executable_path='/bin/tool',candidate_inventory=rows,recorder_inventory=drivers)
+    candidates=c._candidate_rows(prepared['plan'],prepared['archive'],'/work')
+    assert {row['path'] for row in candidates}=={row['path'] for row in rows+drivers}|{'/work/input','/work/native-config'}
+    build=sm._json(archive[pair['build_pair']['pristine_build_sha256']])
+    assert sm._json(archive[build['dependency_inventory_sha256']])==rows
+
+
+@pytest.mark.parametrize('count',[True,False,-1,1.0,None,'1'])
+def test_technical_storage_charge_rejects_invalid_counts_without_spending(count):
+    pair,plan,archive=prepared_fixture();original=authority_model(plan,archive)._session
+    before=(original._retained,original._stopped)
+    with pytest.raises(ValueError):c._charge_technical_bytes(original,count)
+    assert (original._retained,original._stopped)==before
+
+
+def test_technical_storage_charge_has_one_shared_exact_boundary_and_no_refund(monkeypatch):
+    pair,plan,archive=prepared_fixture();model=authority_model(plan,archive);original=model._session
+    monkeypatch.setattr(c.n,'_host_window',lambda context,**k:sm._json(context._policy))
+    available=c.MAX_SUITE_BYTES-original._reserve-c.FAILURE_RESERVE
+    c._charge_technical_bytes(original,0);c._charge_technical_bytes(original,available)
+    repeated=c.new_comparison_session(model._context,pair['suite_selection_sha256'],original_suite=original)
+    assert repeated is original and original._retained==available and not original._stopped
+    with pytest.raises(ValueError,match='storage'):c._charge_technical_bytes(repeated,1)
+    assert original._retained==available and original._stopped
+    with pytest.raises(ValueError):c.freeze_comparison_authority(model._context,plan,archive,session=original)
+
+
+def test_technical_storage_charge_counts_against_later_slot_admission():
+    pair,plan,archive=prepared_fixture();model=authority_model(plan,archive);original=model._session
+    c._charge_technical_bytes(original,c.MAX_SUITE_BYTES-original._reserve-c.FAILURE_RESERVE)
+    with pytest.raises(ValueError):c._consume(model,patched=False)
+    assert original._next==0 and not original._used_hosts
+
+
+def test_technical_storage_charge_requires_exact_source_guarded_original():
+    pair,plan,archive=prepared_fixture();original=authority_model(plan,archive)._session
+    for invalid in ({},object(),object.__new__(c.OriginalComparisonSuite)):
+        with pytest.raises(ValueError):c._charge_technical_bytes(cast(Any,invalid),1)
+    class Refused:
+        def verify(self):raise ValueError('PURE MODEL source guard refusal')
+    object.__setattr__(original,'_guard',Refused())
+    with pytest.raises(ValueError,match='source guard'):c._charge_technical_bytes(original,1)
+    assert original._retained==0

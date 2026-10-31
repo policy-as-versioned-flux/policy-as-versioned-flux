@@ -286,12 +286,20 @@ def _pair_plan(pair: dict, archive: dict) -> None:
     _raw(archive,build['accepted_differences_sha256'])
 
 
+def _reconcile_build_candidates(pair: dict, rows: list[dict], archive: dict) -> None:
+    build=_json(archive,pair['build_pair']['pristine_build_sha256'])
+    selected=_inventory(sm._json(_raw(archive,build['dependency_inventory_sha256'])),archive)
+    if {row['path']:(row['sha256'],row['bytes']) for row in rows}!={row['path']:(row['sha256'],row['bytes']) for row in selected}:
+        raise ValueError('pristine build dependency selection differs')
+
+
 def prepare_comparison_plan(pair_selection: dict, fixture_bytes: bytes, retained_build_and_config_bytes: dict[str,bytes], *, executable_path: str, candidate_inventory: list[dict], recorder_inventory: list[dict]) -> dict:
     """Pure preparation; retained hashes describe selection, never approve a host."""
     archive=dict(retained_build_and_config_bytes);pair=copy.deepcopy(pair_selection)
     _pair_plan(pair,archive)
     if type(fixture_bytes) is not bytes or fixture_bytes!=_blob(pair['fixture'],archive,256*MIB):raise ValueError('frozen comparison fixture bytes differ')
     rows=_inventory(candidate_inventory,archive);drivers=_inventory(recorder_inventory,archive)
+    _reconcile_build_candidates(pair,rows,archive)
     executable=n._path(executable_path)
     row=next((r for r in rows if r['path']==executable),None)
     if row is None or {k:row[k] for k in ('sha256','bytes')}!=pair['build_pair']['pristine_executable']:raise ValueError('selected pristine executable differs')
@@ -305,6 +313,7 @@ def _plan(plan: dict, archive: dict) -> dict:
     if plan['schema']!='TEST_ONLY-pdf-baseline-plan/v1' or plan['purpose']!='TEST_ONLY' or plan['capture_kind']!='pristine-comparative-data' or plan['fixture']!=pair['fixture'] or plan['config']!=pair['config'] or plan['resource']!=pair['resource'] or plan['build_identity_sha256']!=pair['build_pair']['pristine_build_sha256'] or plan['executable']!=pair['build_pair']['pristine_executable'] or type(plan['schedule_index']) is not int or plan['schedule_index']!=2*pair['schedule_index']:raise ValueError('frozen baseline plan differs')
     if _json(archive,plan['limits_sha256'])!=LIMITS:raise ValueError('comparison limits differ')
     rows=_inventory(sm._json(_raw(archive,plan['candidate_inventory_sha256'])),archive)
+    _reconcile_build_candidates(pair,rows,archive)
     _inventory(sm._json(_raw(archive,plan['recorder_inventory_sha256'])),archive)
     path=n._path(plan['executable_path']);row=next((r for r in rows if r['path']==path),None)
     if row is None or {k:row[k] for k in ('sha256','bytes')}!=plan['executable']:raise ValueError('pristine candidate executable differs')
@@ -318,8 +327,8 @@ def freeze_comparison_authority(context: n.NativeHostContext, plan: dict, archiv
     the exact private native context and build/config evidence before using this.
     """
     if type(context) is not n.NativeHostContext or type(session) is not ComparisonSession:raise ValueError('private independent actual host context/session required')
-    session._guard.verify()
-    if session._stopped or session._awaiting_comparison:raise ValueError('comparison suite stopped or awaiting first-pair review')
+    _check_original_suite(session)
+    if session._stopped or session._awaiting_comparison or session._active_slot is not None or session._target_custody_known is not True:raise ValueError('comparison suite stopped or awaiting first-pair review')
     suite_started_monotonic=session._started;slots_used=session._next;retained_bytes=session._retained;reserve_bytes=session._reserve
     context._guard.verify();pair=_plan(plan,archive);policy=n._host_window(context)
     if (sm._instant(policy['not_after'])-sm._instant(policy['not_before'])).total_seconds()>300:raise ValueError('comparison H interval exceeds300s')
@@ -801,6 +810,7 @@ def _capture_baseline(authority: ComparisonCaptureAuthority, plan: dict, artifac
         try:n.validate_native_custody(run['process_group'])
         except (ValueError,KeyError,TypeError):pass
         else:
+            object.__setattr__(authority._session,'_target_custody_known',True);object.__setattr__(authority._session,'_active_slot',None)
             try:
                 import shutil
                 shutil.rmtree(workdir);cleanup='removed'
@@ -990,6 +1000,10 @@ def capture_patched_comparison(authority: ComparisonCaptureAuthority, baseline_c
         raise
     try:
         result,actual_record=n._completed_pdf_result(completed)
+        dossier=sm._json(_raw(result['receipts'],result['dossier_sha256']))
+        try:n.validate_native_custody(dossier['process_group'])
+        except (ValueError,KeyError,TypeError):authority._session._stopped=True
+        else:object.__setattr__(authority._session,'_target_custody_known',True);object.__setattr__(authority._session,'_active_slot',None)
         if actual_record['host_policy_sha256']!=sm.sha256(store._host_context._policy):raise ValueError('patched actual completion changed private H')
         if result['status']=='success':
             n.verify_native_observation(actual_record,result['archive'],purpose='actual');bridge.verify_pdf_extraction_bundle(frozen,parent,result)
@@ -1026,7 +1040,13 @@ def _private_patched_view(completion: PatchedComparisonCompletion, pair: dict, b
 
 
 @dataclasses.dataclass(eq=False, init=False, repr=False)
-class ComparisonSession(_PrivateCapability):
+class OriginalComparisonSuite(_PrivateCapability):
+    """The one source-appointed original custody carrier; no genesis API exists.
+
+    A future independently reviewed trusted selector must hold this capability.
+    Contexts, selection hashes, JSON and repeated factory calls cannot appoint it.
+    """
+    _selection_raw: bytes
     _selection: str
     _started: float
     _next: int
@@ -1036,34 +1056,84 @@ class ComparisonSession(_PrivateCapability):
     _awaiting_comparison: bool
     _used_hosts: set[str]
     _guard: Any
+    _technical_state: object | None
+    _active_slot: int | None
+    _target_custody_known: bool
+
+    def __new__(cls, *args, **kwargs):
+        raise ValueError('private original suite must be source-appointed; no constructor')
+
+    def __setattr__(self, name, value):
+        if name in ('_selection_raw','_selection','_started','_guard') and hasattr(self,name):
+            raise ValueError('private original suite selection/clock is immutable')
+        if name=='_stopped' and getattr(self,'_stopped',False) and value is not True:
+            raise ValueError('private original suite cannot resume after stop')
+        if name=='_target_custody_known' and hasattr(self,name) and self._target_custody_known is False and value is True:
+            raise ValueError('private target custody requires independent terminal validation')
+        if name=='_active_slot' and getattr(self,'_active_slot',None) is not None and value is None:
+            raise ValueError('private active slot requires independent terminal validation')
+        if name=='_technical_state' and getattr(self,'_technical_state',None) is not None and value is not self._technical_state:
+            raise ValueError('private original technical custody cannot be reset')
+        object.__setattr__(self,name,value)
 
 
-def new_comparison_session(context: n.NativeHostContext, selection_sha256: str) -> ComparisonSession:
-    """Conserve a custodian-appointed original suite. No JSON-only launch route."""
-    if type(context) is not n.NativeHostContext:raise ValueError('private host selection required for original suite')
-    context._guard.verify();policy=n._host_window(context)
-    if selection_sha256 not in policy['evidence_sha256s']:raise ValueError('independent original suite selection absent')
-    selection=_json(context._evidence,selection_sha256)
+# Compatibility name denotes the same carrier, never another wrapper or state.
+ComparisonSession=OriginalComparisonSuite
+
+
+def _original_selection(raw: bytes) -> dict:
+    if type(raw) is not bytes or len(raw)>MIB:raise ValueError('private original suite selection bytes required')
+    selection=sm._json(raw)
     _closed(selection,{'schema','original_started_monotonic_ns','original_seconds','max_invocations','slot_seconds','preparation_seconds','target_seconds','failed_cleanup_seconds','transport_seconds','storage_bytes','reserve_bytes'})
     expected={'schema':'TEST_ONLY-pdf-comparison-suite-selection/v1','original_started_monotonic_ns':selection['original_started_monotonic_ns'],'original_seconds':10800,'max_invocations':52,'slot_seconds':182,'preparation_seconds':60,'target_seconds':120,'failed_cleanup_seconds':2,'transport_seconds':300,'storage_bytes':MAX_SUITE_BYTES,'reserve_bytes':selection['reserve_bytes']}
-    if selection!=expected or any(type(selection[k]) is not int for k in selection if k!='schema'):raise ValueError('fixed original suite selection differs')
-    start=_uint(selection['original_started_monotonic_ns'])/10**9;reserve=_uint(selection['reserve_bytes'],MAX_SUITE_BYTES)
-    if start>time.monotonic():raise ValueError('suite starts in future')
-    admit_slot(elapsed_ns=int((time.monotonic()-start)*10**9),slots_used=0,retained_bytes=0,reserve_bytes=reserve)
-    session=object.__new__(ComparisonSession)
-    session._selection=selection_sha256;session._started=start;session._next=0;session._retained=0;session._reserve=reserve;session._stopped=False;session._awaiting_comparison=False;session._used_hosts=set();session._guard=_guard()
-    return session
+    if sm.canonical(selection)!=raw or selection!=expected or any(type(selection[k]) is not int for k in selection if k!='schema'):raise ValueError('fixed original suite selection differs')
+    _uint(selection['original_started_monotonic_ns']);_uint(selection['reserve_bytes'],MAX_SUITE_BYTES)
+    return selection
+
+
+def _check_original_suite(original: OriginalComparisonSuite) -> None:
+    """Pure private-carrier/source validation; neither appointment nor terminal proof."""
+    if type(original) is not OriginalComparisonSuite:raise ValueError('private original suite capability required')
+    fields=('_selection_raw','_selection','_started','_next','_retained','_reserve','_stopped','_awaiting_comparison','_used_hosts','_guard','_technical_state','_active_slot','_target_custody_known')
+    if any(not hasattr(original,key) for key in fields):raise ValueError('private original suite was not source-appointed')
+    original._guard.verify();selection=_original_selection(original._selection_raw)
+    if original._selection!=sm.sha256(original._selection_raw) or type(original._started) not in (int,float) or original._started!=selection['original_started_monotonic_ns']/10**9:raise ValueError('private original suite selection/clock changed')
+    _uint(original._next,52);_uint(original._retained,MAX_SUITE_BYTES);_uint(original._reserve,selection['reserve_bytes'])
+    if type(original._stopped) is not bool or type(original._awaiting_comparison) is not bool or type(original._target_custody_known) is not bool or type(original._used_hosts) is not set or len(original._used_hosts)!=original._next:raise ValueError('private original mutable custody differs')
+    for pin in original._used_hosts:_hash(pin)
+    if original._active_slot is None:
+        if original._target_custody_known is not True:raise ValueError('private original target custody unknown')
+    elif _uint(original._active_slot,51)!=original._next-1 or original._target_custody_known is not False or original._awaiting_comparison:
+        raise ValueError('private original active target custody differs')
+
+
+def _charge_technical_bytes(original: OriginalComparisonSuite, count: int) -> None:
+    """Consume shared original storage before technical retention; never refund."""
+    _check_original_suite(original);_uint(count)
+    if original._retained+count+original._reserve+FAILURE_RESERVE>MAX_SUITE_BYTES:
+        original._stopped=True
+        raise ValueError('original technical storage exhausted before retention')
+    original._retained+=count
+
+
+def new_comparison_session(context: n.NativeHostContext, selection_sha256: str, *, original_suite: OriginalComparisonSuite | None=None) -> OriginalComparisonSuite:
+    """Return the held original carrier unchanged; context/hash never creates one."""
+    if type(context) is not n.NativeHostContext or type(original_suite) is not OriginalComparisonSuite:raise ValueError('private source-appointed original suite and host context required')
+    _check_original_suite(original_suite);context._guard.verify();policy=n._host_window(context)
+    if selection_sha256!=original_suite._selection or selection_sha256 not in policy['evidence_sha256s'] or _raw(context._evidence,selection_sha256)!=original_suite._selection_raw:raise ValueError('independent original suite selection differs')
+    return original_suite
 
 
 def _consume(authority: ComparisonCaptureAuthority, *, patched: bool) -> None:
     session=authority._session
     if type(session) is not ComparisonSession:raise ValueError('private original comparison session required')
-    session._guard.verify()
-    if session._stopped or session._awaiting_comparison or session._next!=authority._slot or bool(session._next%2)!=patched:raise ValueError('comparison schedule stopped, stale or out of order')
+    _check_original_suite(session)
+    if session._stopped or session._awaiting_comparison or session._active_slot is not None or session._target_custody_known is not True or session._next!=authority._slot or bool(session._next%2)!=patched:raise ValueError('comparison schedule stopped, stale or out of order')
     host=sm.sha256(authority._context._policy)
     if host in session._used_hosts:raise ValueError('host interval already used; no renewal/reuse')
     admit_slot(elapsed_ns=int((time.monotonic()-session._started)*10**9),slots_used=session._next,retained_bytes=session._retained,reserve_bytes=session._reserve)
     session._used_hosts.add(host);session._next+=1
+    session._active_slot=authority._slot;session._target_custody_known=False
 
 
 def _retain_completion(authority: ComparisonCaptureAuthority, archive: dict, *, failed: bool, patched: bool) -> None:
