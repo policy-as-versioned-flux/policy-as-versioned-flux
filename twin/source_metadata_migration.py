@@ -545,9 +545,11 @@ def _observed_command(executable: str, workdir: str) -> list[str]:
         str(Path(workdir)/'syntax'),str(Path(workdir)/'runtime')]
 
 
-def _execute_prepared_extraction(plan: dict, parent: bytes, *, observation_store=None) -> dict | tuple[dict,dict]:
+def _execute_prepared_extraction(plan: dict, parent: bytes, *, observation_store=None, preparation_deadline: float | None = None) -> dict | tuple[dict,dict]:
     from . import source_native_observation as native_observer
+    native_observer._check_preparation_deadline(preparation_deadline)
     observed = observation_store is not None
+    if preparation_deadline is not None and not observed:raise ValueError('bounded native preparation requires private observation')
     config, closure = (native_observer.validate_native_candidate_plan(plan,parent) if observed else _validate_plan(plan,parent))
     pdf2 = plan['profile'] == 'pdf-text-xpdf-origin/2'
     native = plan['profile'] in ('pdf-text-xpdf/1','pdf-text-xpdf-origin/2')
@@ -578,7 +580,7 @@ def _execute_prepared_extraction(plan: dict, parent: bytes, *, observation_store
         invocation_pin = _json_artifact(archive, invocation)
         getattr(directory, '_finalizer').detach()
         run_started = True
-        run = (native_observer._run_native_extraction(observation_store,plan,parent,argv,workdir) if observed
+        run = ((native_observer._run_native_extraction(observation_store,plan,parent,argv,workdir) if preparation_deadline is None else native_observer._run_native_extraction(observation_store,plan,parent,argv,workdir,preparation_deadline=preparation_deadline)) if observed
                else _run(argv, workdir, config['limits']))
         if native and run['failure'] is None and run['exit_code'] == 0:
             runtime = copy.deepcopy(closure['process_files'])

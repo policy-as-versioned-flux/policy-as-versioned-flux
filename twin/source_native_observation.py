@@ -866,12 +866,22 @@ def _inside(path: str, roots: list[str]) -> bool:
     return any(path==root or path.startswith(root+'/') for root in roots)
 
 
-def _acquire_candidates(spec: dict, artifacts: dict, context: NativeHostContext) -> tuple[dict,dict]:
+def _check_preparation_deadline(deadline: float | None) -> None:
+    """Optional earlier caller bound; no time check or changed default when absent."""
+    if deadline is None:return
+    if type(deadline) not in (int,float) or not 0<=deadline<float('inf') or time.monotonic()>deadline:
+        raise ValueError('original native preparation deadline')
+
+
+def _acquire_candidates(spec: dict, artifacts: dict, context: NativeHostContext, *, preparation_deadline: float | None = None) -> tuple[dict,dict]:
+    _check_preparation_deadline(preparation_deadline)
     started=time.monotonic(); policy=_host_window(context); held={}; files={}
+    bounded=min(started+PREPARE_SECONDS,preparation_deadline) if preparation_deadline is not None else None
     try:
         total=0
         for row in spec['candidates']:
             if time.monotonic()-started>PREPARE_SECONDS: raise ValueError('native preparation deadline')
+            _check_preparation_deadline(bounded)
             path=_path(row['path'])
             resolved,route=_observe_open_route(path)
             if resolved!=path or route: raise ValueError('candidate must use acquired canonical source path')
@@ -886,11 +896,13 @@ def _acquire_candidates(spec: dict, artifacts: dict, context: NativeHostContext)
             else:
                 if capability: raise ValueError('file-capability native candidate unsupported')
             raw=_read_fd(fd,MAX_DEPENDENCY_BYTES)
+            _check_preparation_deadline(bounded)
             if path!=spec['cwd']+'/input': total+=len(raw)
             if total>MAX_DEPENDENCY_BYTES or len(held)>MAX_FILES: raise ValueError('native dependency limit')
             if _identity(before)!=_identity(os.fstat(fd)) or sm.sha256(raw)!=row['sha256'] or len(raw)!=row['bytes'] or raw!=_raw(artifacts,row['sha256']): raise ValueError('native candidate byte/identity drift')
             files[path]={**row,'identity':_identity(before)}
         _host_window(context)
+        _check_preparation_deadline(bounded)
         return held,files
     except BaseException:
         for fd in held.values(): os.close(fd)
@@ -1176,8 +1188,9 @@ def _retain_failed_pdf_streams(run: dict, artifacts: dict) -> dict:
     return records
 
 
-def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> dict:
+def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict, *, preparation_deadline: float | None = None) -> dict:
     """Real kernel route, never called by TEST_ONLY injection/replay tests."""
+    _check_preparation_deadline(preparation_deadline)
     if store._purpose!='actual' or store._host_context is None: raise ValueError('actual private host context required')
     if platform.system()!='Linux' or platform.machine()!='x86_64': raise ValueError('unsupported-native-observer-platform')
     store._guard.verify();policy=_host_window(store._host_context)
@@ -1185,7 +1198,7 @@ def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> di
     if len(list(Path('/proc/self/task').iterdir()))!=1: raise ValueError('single-threaded native recorder required')
     _put(artifacts,store._host_context._policy)
     artifacts.update(store._host_context._evidence)
-    held,candidate_facts=_acquire_candidates(spec,artifacts,store._host_context)
+    held,candidate_facts=(_acquire_candidates(spec,artifacts,store._host_context) if preparation_deadline is None else _acquire_candidates(spec,artifacts,store._host_context,preparation_deadline=preparation_deadline))
     budget={'bytes':0,'limit':2*(spec['limits']['stdout_bytes']+spec['limits']['stderr_bytes']+spec['limits']['syntax_bytes']+RUNTIME_BYTES)+MAX_EVENT_BYTES}
     if v2: budget['limit']=456*1048576
     events: list[dict]=[]
@@ -1212,6 +1225,7 @@ def _linux_run(store: NativeObservationStore, spec: dict, artifacts: dict) -> di
             if v2:
                 origin_read,origin_write=os.pipe2(os.O_CLOEXEC);pipes.extend([origin_read,origin_write])
                 origin_info=os.fstat(origin_read);origin_identity=[origin_info.st_dev,origin_info.st_ino]
+            _check_preparation_deadline(preparation_deadline)
             pid=os.fork()
             if pid==0:
                 try:
@@ -1552,8 +1566,9 @@ def prepare_native_candidate_plan(profile: str, parent: bytes, *, predecessor_sh
     return plan
 
 
-def _run_native_extraction(store: NativeObservationStore, plan: dict, parent: bytes, argv: list[str], workdir: str) -> dict:
+def _run_native_extraction(store: NativeObservationStore, plan: dict, parent: bytes, argv: list[str], workdir: str, *, preparation_deadline: float | None = None) -> dict:
     from . import source_metadata_migration as migration
+    _check_preparation_deadline(preparation_deadline)
     if type(store) is not NativeObservationStore or store._purpose!='actual' or store._host_context is None: raise ValueError('private actual observer authority absent')
     store._guard.verify();config,closure=validate_native_candidate_plan(plan,parent)
     expected=migration._pdf_origin_command(closure['process_files']['executable'],workdir) if plan['profile']=='pdf-text-xpdf-origin/2' else migration._pdf_command(closure['process_files']['executable'],workdir) if plan['profile']=='pdf-text-xpdf/1' else migration._observed_command(closure['process_files']['executable'],workdir)
@@ -1574,7 +1589,7 @@ def _run_native_extraction(store: NativeObservationStore, plan: dict, parent: by
     if _pdf2(spec):
         from . import pdf_native_bridge as bridge
         bridge._require_actual_selection(store,plan)
-    return _linux_run(store,spec,artifacts)
+    return (_linux_run(store,spec,artifacts) if preparation_deadline is None else _linux_run(store,spec,artifacts,preparation_deadline=preparation_deadline))
 
 
 def finalize_native_observation(run: dict, *, cleanup_failed: bool) -> tuple[dict,dict]:
