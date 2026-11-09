@@ -1,4 +1,4 @@
-INPUT: enclosing hub 6ae7a70a8a7bacfb7461a3e7a7515b95a4bbb039; clock PIN source 0e353029f7f5b497a2fe19ef2874846119376d6e
+INPUT: enclosing hub 2406125c39afd88665f4e9d4a1a7f68cdc2f0031; clock PIN source 0e353029f7f5b497a2fe19ef2874846119376d6e
 PASS: fresh selected feed: actual read-job shell recorded unchanged/exit0/moved=False
 PASS: stale selected feed: actual read-job shell recorded review_required/exit1/moved=True
 PASS: missing ladder: actual read-job shell recorded could_not_look/exit3/moved=None
