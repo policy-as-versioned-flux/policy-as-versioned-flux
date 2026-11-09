@@ -2,8 +2,12 @@
   ok   selfcheck: a missing banner fails; a missing section fails; a stale CONTEXT citation fails; an unclassified refusal kind fails; a missing classification fails
 1. ADR-0026 exists, is accepted, and carries the four required sections
   ok   0026-a-hole-is-priced-never-refused-the-claim-keys-on-source-and-id.md
+verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: Broken pipe
+verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write error: Broken pipe
   ok   ADR-0026: ^status: accepted$
   ok   ADR-0026: ^## Context$
+verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: Broken pipe
+verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write error: Broken pipe
   ok   ADR-0026: ^## Decision$
   ok   ADR-0026: ^## Options considered$
   ok   ADR-0026: ^## Consequences$
@@ -16,8 +20,6 @@
   ok   ADR-0026: widening
   ok   ADR-0026: self-created hole
   ok   ADR-0026: ungoverned .*namespace
-verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: Broken pipe
-verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write error: Broken pipe
   ok   ADR-0026: \(source, id\)
   ok   ADR-0026: bare catalogue id
   ok   ADR-0026: ticket 15
@@ -26,6 +28,8 @@ verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write erro
   ok   ADR-0026: ticket 38
   ok   ADR-0026: removed-control
   ok   ADR-0026: removal is priced
+verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: Broken pipe
+verify/adr-supersession/verify-adr-supersession.sh: line 102: printf: write error: Broken pipe
   ok   ADR-0026: missing instrument
   ok   ADR-0026 consequences: ticket 124 built the priced removal
   ok   ADR-0026 consequences no longer says: check_selected_set.*still refuses
