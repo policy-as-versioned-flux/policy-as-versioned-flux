@@ -2,7 +2,7 @@
 selfcheck ok: dial_table parses the real cage-tier.yaml; UNCAGED sits at the top of the permissiveness lattice, every real tier below it, tighter tiers below looser ones; a dial tightening classifies major and names the moved corpus entries and the dial CEL expression (never an enumerated dial list); a widen-only change is patch; no change is none; one field regressing while another improves is still major (spec-level, not dial-level); priorityClass ranks on the ACTUAL assigned PriorityClass's real value, so a tier's pc field repointed at a different PriorityClass registers as major even with every other dial untouched (cs-21 regression guard); cage-tier added/removed fall out of the same per-pod comparison with no special case; the major detail is one sentence with no viability language; Track 1 reuses rederive_bumps.classify_policy unchanged; classify_repo reproduces the three known-good bumps; a whole-body release whose only movement is a policy removal computes patch; cs-16: a self-scoped pair (real render-version-tree.py bodies, real generated corpus, real kyverno apply) differing ONLY in the version literal classifies 'none', never the old spurious 'major' the vacuous self-scope match used to produce, and a real narrowing bundled with the same version bump still classifies 'major' -- the fix removes the artifact without suppressing real movement; ticket 09 item 2: the real v3.0.0 -> v4.0.0 cage release computes major against the real committed corpus and names both real reasons (the tier source moved to namespaceObject, so a governed Namespace with no tier falls closed to isolated and a forged pod label is clobbered; and the cage became tighten-only), and a body that starts writing false over a workload's own true -- invisible to a dial-table comparison, proven identical first -- classifies major as a loosening
 .......................
 ----------------------------------------------------------------------
-Ran 23 tests in 9.170s
+Ran 23 tests in 10.317s
 
 OK
 {
@@ -93,7 +93,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "18d48ecd0021a133aa05e68d6be66d12ae5ac1c113e7739f7d92d5de84b7fff7",
+                  "output_sha256": "3046674f3c650711c5cebed9d60e4d7ef8c9dc69032f788eed962d7859296694",
                   "diagnostic": null
                 }
               ]
@@ -121,7 +121,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "d547f5461fd7723964a0fd1a1f922eac4bd0ffe7373677eff32e11fb4af41268",
+                  "output_sha256": "038da9a438c729f418c875245755a3f841a3874c7457e8670ad1e8649ebad07a",
                   "diagnostic": null
                 }
               ]
@@ -149,7 +149,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "ea544c111a68f908a0d3ab251483367a4769175ddf75cdb4010557d754a7d0e7",
+                  "output_sha256": "b0c29c7eed8fb51b4263769c741374fcd08ec7dba8be8708d172e3690ba9b11b",
                   "diagnostic": null
                 }
               ]
@@ -177,7 +177,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "1f9e5dad3edab27ea650438d71d18cd057e75359d11085a2575d14f476f0338b",
+                  "output_sha256": "43edd6469f38031d33590a55bcda227249be34764c39c725fc13d28ef2156916",
                   "diagnostic": null
                 }
               ]
@@ -205,7 +205,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "eb3c74b6cfe2e4e7f65cd6c5bb3baf189afbdd32dc0b4e7e3de603c5f852b0fb",
+                  "output_sha256": "a12a927e5a92285478aa8fecab959eb33665c46e3fc14662d398138cea66a519",
                   "diagnostic": null
                 }
               ]
@@ -280,7 +280,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "ea11009ef70ad712aa4c63a3eb2d9b6b5b9ab9607a2313774ab0872f55011cfb",
+                  "output_sha256": "ea96082d892abbb121432f20b53726f838b34de0cccc6ca04dc0e941fe85aac4",
                   "diagnostic": null,
                   "generation": {
                     "family": "cage-netpol",
@@ -339,7 +339,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "a61c968e306be9e9489e6f1d4e7930ada759ccca8282518a9c9c4ec62b8df8fc",
+                  "output_sha256": "98b741a5dd24773ffea8690636e3c5d5aa9099e2b5a681de05ec5c1868f76d19",
                   "diagnostic": null
                 }
               ]
@@ -367,7 +367,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "bd728980500754d0a547d236c39df07376e46b7fda32d154ae6cc548d68f3749",
+                  "output_sha256": "52cd62f8f2f60f9beaa60925be7a5f6086f3177fde8ee24eecd364349a4421f5",
                   "diagnostic": null
                 }
               ]
@@ -395,7 +395,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "a7d12b6ef4073787c35223e201287c397a04a623b0a2f4a224adde51c60099e9",
+                  "output_sha256": "b2f843760af3cb1d206489c65b0e44058a3cc07893a5dd616ed02b434e4446e7",
                   "diagnostic": null
                 }
               ]
@@ -423,7 +423,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "12c49c83a568c04a2f915de173cf64030b7417fea9f70f58ee43f24b4e886c53",
+                  "output_sha256": "6c479b0142b351b350e54954f97839e93d6ff013dbeb5144ada8318f46b9b0d7",
                   "diagnostic": null
                 }
               ]
@@ -497,7 +497,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "584d3af9cc9ad1fe3731ba6297e46ad6a75603e6f4a4bfc2809f3bc493654692",
+                  "output_sha256": "b6ef7932706d175a703e6b797b2da591a669ee2556d7f7eb0cab9a7e5f11c70b",
                   "diagnostic": null,
                   "generation": {
                     "family": "cage-netpol",
@@ -556,7 +556,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "5d5f0008901953252839c7c89479cf672fa80ff04d4f416bf4123af4faec095f",
+                  "output_sha256": "5cde19496ff8f286cf1408df1d26c19162407df306d5e44f8203f3287237f654",
                   "diagnostic": null
                 }
               ]
@@ -584,7 +584,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "37da2838b2925eb66dae868a74aa80e49b74c9e1c94f74b9acad2ed6e013055b",
+                  "output_sha256": "7b488c5686d442ac58eb02f05a4b187cea4096d4295aca27ac4fd01979a9a064",
                   "diagnostic": null
                 }
               ]
@@ -612,7 +612,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "6fcc1794e0c5b21adb2d50d2613c2793e59f6790bf0dd582b5e236d1743a337b",
+                  "output_sha256": "3f49923183040b2b723d728ab9cecc55beb5cf4751e70e44dde191ce2a5400f9",
                   "diagnostic": null
                 }
               ]
@@ -647,7 +647,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "b4893d61bf858e92ceec0de58c4c95f81863a262e2c768608611a24d1df2cfff",
+                  "output_sha256": "34e428a15b48d0c1d4b4700f3d4c51354ae2807ca1a573eacaa239019a618780",
                   "diagnostic": null,
                   "generation": {
                     "family": "cage-netpol",
@@ -706,7 +706,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "75c93dfd9869a6e2619bc9ef8b37ccbaa9e8ce3bbf5c0b67fef8936500453d14",
+                  "output_sha256": "479a46a00ffb231acf43d5f5e5888deefd1aae1598b5f82b0f5c79fa0a601402",
                   "diagnostic": null
                 }
               ]
@@ -734,7 +734,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "42afb518ed617ed446701e5bc78e8ae5d2690970c603f19110c85516bf0a8152",
+                  "output_sha256": "c0cd9fdf907ae741180d21eeccb3f91c1ed710b4eec0e601a4b60784ab55f76b",
                   "diagnostic": null
                 }
               ]
@@ -762,7 +762,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "36808b71429f354ec95e381bdb60cafc7a9c84c73a626167336a5336369740e5",
+                  "output_sha256": "403264cbc4da326babf92a4fdebf2c5130e068205643da3a867150d81d9071ca",
                   "diagnostic": null
                 }
               ]
@@ -904,7 +904,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "8596c98e96503f9dc4a5c98eea096e40f8e6744df685d0a7938ab525c6439346",
+                  "output_sha256": "f688b4952e7643b206ddf678e59a9dcf55ed468b717b89cb6937cb23004e384e",
                   "diagnostic": null
                 }
               ]
@@ -933,7 +933,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "199318c0f2bb19e324a3f46233d332635431167afe5b2e72ee86c7778914eb86",
+                  "output_sha256": "d1626c547033f2b620ba90419a365567b4d6771d6773d864918791e45c69f739",
                   "diagnostic": null
                 }
               ]
@@ -962,7 +962,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "9dc0927828697bf6653c46e64d94664ac2d464ef656ca545ce4eb23a34dd5197",
+                  "output_sha256": "193e0d424c00116847e2193aa191154512029d6520d46ced9754fd7d389941fa",
                   "diagnostic": null
                 }
               ]
@@ -990,7 +990,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "bdb58cc88f8fbec9752c3fe41bcf842218a24a2c034b27cdce07d9d2327f3f96",
+                  "output_sha256": "22d0b15c5f1c59093c43973963d77fb9839d6c78676436ffa0a71aa129b3539f",
                   "diagnostic": null
                 }
               ]
@@ -1018,7 +1018,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "c341de86e47a85f36a4c206bee802871bc859856dbd5a72dcc85664782c338c1",
+                  "output_sha256": "57eba46f62ba57eb7850073c4d6b458ec7a90249f15fe069ab4136210d0af04d",
                   "diagnostic": null
                 }
               ]
@@ -1046,7 +1046,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "60c9b60261bc4c9e57723e224a42be43c14251ee13357925c09af99c43e1600c",
+                  "output_sha256": "bd204093c103d7dbc2a01fd77afc1be8e2f5dc45820e2c02ced64643a662dc5e",
                   "diagnostic": null
                 }
               ]
@@ -1119,7 +1119,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "91e6c924619c9063798317d79820a87bec2a96a231be39294a467e35e22eda03",
+                  "output_sha256": "55ab2d8fa061e4896c1f88de269680220fe60e2f58ce1602f480b356e0189158",
                   "diagnostic": null
                 }
               ]
@@ -1148,7 +1148,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "0e5e18eb6baf8fe84037613ab0bf3ee23502eb0dbb96516d094220608107b3d6",
+                  "output_sha256": "b560e0d9f1a07d99cf782abd653b26b1c68917a9030175b6824df8a78dcaacf2",
                   "diagnostic": null
                 }
               ]
@@ -1177,7 +1177,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "a2b25a359321cb28237305b7f209d9cdd4528a83da2f0e6ecf89b23085e842b1",
+                  "output_sha256": "5c36b2b50b010cba0d56a20c534d877c43a59c0630f6560824495328c40e03e7",
                   "diagnostic": null
                 }
               ]
@@ -1205,7 +1205,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "491f25619523ace0923d86bedaf66cd8a2100ef9d2c7580b25fe1d455ea0e18f",
+                  "output_sha256": "a5fab7b8486c5efc7d791aef4cbe585f8af1cc29e077f910edb8dfc229a420ef",
                   "diagnostic": null
                 }
               ]
@@ -1233,7 +1233,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "76218754d55f1229f125c96bc4bc89d71b59a0eeb36ee711e0c5834fb7715533",
+                  "output_sha256": "26f58d1f74670098cede78b0b284e77afdac67af6f6e4648cd4c21cbe5a82187",
                   "diagnostic": null
                 }
               ]
@@ -1261,7 +1261,7 @@ OK
                   },
                   "refusals": [],
                   "exit_code": 0,
-                  "output_sha256": "cd2ab52d6f81910dcdd77bc447d6a9a9bae9549838d40698957d2a4f43ddd1b2",
+                  "output_sha256": "e86d0e00e7cd417489fccbf96b6fad8145133aa932761a58be95f3ae0b1462f1",
                   "diagnostic": null
                 }
               ]
