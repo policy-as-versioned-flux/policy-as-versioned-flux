@@ -1,13 +1,13 @@
 ..
 ----------------------------------------------------------------------
-Ran 2 tests in 0.084s
+Ran 2 tests in 0.074s
 
 OK
 
 == 1. single-tag legacy form still works ==
 ok: v1.0.0 does not exist yet
 tagged v1.0.0
-To /tmp/tmp.jokFIGYqDY/remote.git
+To /tmp/tmp.PrSGn9Sy1B/remote.git
  * [new tag]         v1.0.0 -> v1.0.0
 ok: v1.0.0 pushed
 
@@ -16,11 +16,11 @@ ok: v1.0.1 does not exist yet
 ok: v2.0.0 does not exist yet
 tagged v1.0.1
 tagged v2.0.0
-To /tmp/tmp.jokFIGYqDY/remote.git
-   ab2896f..989e258  HEAD -> main
+To /tmp/tmp.PrSGn9Sy1B/remote.git
+   0b3e57c..117bb48  HEAD -> main
  * [new tag]         v1.0.1 -> v1.0.1
  * [new tag]         v2.0.0 -> v2.0.0
-ok: v1.0.1 and v2.0.0 both landed on the same commit (989e258d87c6d1ca82c48c8b9c4a260cb9a45e4f)
+ok: v1.0.1 and v2.0.0 both landed on the same commit (117bb48ceab14139437d190e268c669a178aa622)
 
 == 3. existing-tag refusal fires for EVERY tag before ANY tag is created ==
 ok: v3.0.0 does not exist yet
@@ -44,17 +44,17 @@ ok: policy/v4.0.1-quarantine.1 accepted and ordered below policy/v4.0.1; a suffi
 == 8. ticket 53: the branch lands with the tags, in the same atomic push -- or neither does ==
 ok: v10.0.0 does not exist yet
 tagged v10.0.0
-To /tmp/tmp.jokFIGYqDY/remote.git
-   989e258..508213e  HEAD -> main
+To /tmp/tmp.PrSGn9Sy1B/remote.git
+   117bb48..267197c  HEAD -> main
  * [new tag]         v10.0.0 -> v10.0.0
-ok: refs/heads/main on the remote moved to 508213e3423505227df70896a930cf2ecd6d8f8e, the same commit v10.0.0 points at
+ok: refs/heads/main on the remote moved to 267197c96d57758ef2c9753fe1322cb1900453f4, the same commit v10.0.0 points at
 tagged v11.0.0
 tagged v12.0.0
-ok: rejected push moved neither the tags nor refs/heads/main (still 508213e3423505227df70896a930cf2ecd6d8f8e)
-ok: a detached HEAD is refused; the remote holds neither v11.0.0 nor a moved refs/heads/main (still 508213e3423505227df70896a930cf2ecd6d8f8e)
+ok: rejected push moved neither the tags nor refs/heads/main (still 267197c96d57758ef2c9753fe1322cb1900453f4)
+ok: a detached HEAD is refused; the remote holds neither v11.0.0 nor a moved refs/heads/main (still 267197c96d57758ef2c9753fe1322cb1900453f4)
 
 == 9. ticket 146: the array rewrite keeps a nested tested_engines it finds before the cut ==
-ok  the cut element keeps tested_engines and gains its commit: - { version: "9.9.9", tag: "policy/v9.9.9", commit: "5d3db455c6b2d658258c518e4f6d535399be2611", bump: "minor", tested_engines: { scope: every-served-body-v1, kyverno: ["1.18.2", "1.19.1"] } }
+ok  the cut element keeps tested_engines and gains its commit: - { version: "9.9.9", tag: "policy/v9.9.9", commit: "03035cc8322b62fe00ba56a45049417ed4167e39", bump: "minor", tested_engines: { scope: every-served-body-v1, kyverno: ["1.18.2", "1.19.1"] } }
 
 PASS: single-tag legacy form works, multi-tag dispatch cuts every tag
 on the same commit, the existing-tag refusal runs for every tag before
