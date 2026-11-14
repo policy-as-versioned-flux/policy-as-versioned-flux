@@ -99,7 +99,7 @@ A comment that says "no evidence" is a document, so I searched rather than trust
 - **Search of `hub/.scratch`**: the figures appear in ticket 09 and ticket 15, which call them "calibration knobs" (`hub/.scratch/ecosystem/issues/09-the-cage-ladder-v2.md:28`, `issues/15-price-everything-that-was-counted.md:29`), and in the 2026-09-02 review, which calls them "self-declared by the platform" (`hub/.scratch/ecosystem/REVIEW-2026-09-02.md:71`). No file gives a basis.
 - **Search of `hub/docs/adr`** for a reduce figure or a basis: none.
 - **0.98 on its own.** This is the figure driftwood's position depends on, so I searched for it separately. It does not appear beside any cage, rung or reduce wording in `hub/docs/adr` or `hub/.scratch/ecosystem/issues`. ADR-0022, which decided the `isolated` rung, names no reduction at all, and records that the decision "rests on a bare agree, not a ratification" (`hub/docs/adr/0022-the-cage-ladder-tier-per-namespace-isolated-rung-floor-and-infra.md:35-39`). Ticket 26, which landed the rung, names no figure. The commit that added 0.98 (platform 4e809f8) does not mention it in its message.
-- **Search of `troy/.scratch`** (the recovered calibration programme and October notes) for the figures, `reduce`, `cage-tiers` or `caged_residual`: none. The calibration programme does not address this table.
+- **Search of `backup/.scratch`** (the recovered calibration programme and October notes) for the figures, `reduce`, `cage-tiers` or `caged_residual`: none. The calibration programme does not address this table.
 - **No owner sentence** asks for or supplies the figures (maps A1 and P2, "Could not determine").
 
 ### What the wording hides
@@ -173,12 +173,12 @@ Nothing that prices. The daily sampler writes `drift/*.jsonl`. Its readers are `
 - `hub/twin/corroboration.py` in full; `hub/twin/pricing.py:30-130` and `:300-430`; callers of `pricing.price`.
 - `driftwood/twin/emit-forward-intel.py:90-330`; every adopter's `responses/*.yaml`; `driftwood/selection-policy/selection_policy.py:83-140`.
 - Every version of `composed/evidence.json` on each adopter's `main`, for the fine line's amount against its total and for the premium's conditional view.
-- Text search of all nine repos, `hub/.scratch` and `troy/.scratch` for the reduce figures.
+- Text search of all nine repos, `hub/.scratch` and `backup/.scratch` for the reduce figures.
 
 ## Could not determine
 
 - Whether the adopters' twin lines would differ if their emitters called `hub/twin/pricing.price`. Not run; read-only pass.
-- Whether a file outside the nine repos and `troy/.scratch` (a chat log, a slide) ever gave a basis for the four figures.
+- Whether a file outside the nine repos and `backup/.scratch` (a chat log, a slide) ever gave a basis for the four figures.
 - Whether `quote_assessment` would return `met` or `breached` for any adopter today. The selector is gone and nothing was run.
 - Why the regulator's `lower-tier` partition was chosen as the one to price rather than `higher-tier`. Only the constant was read (`composition.py:3482`).
 - Whether the `tier_binding` gate is a required check on the repositories (needs the GitHub API).

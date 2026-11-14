@@ -527,3 +527,21 @@ policy-as-versioned-feeds/feeds	ticket-79-the-pound-inputs	1e1b79a017e8f6f83c922
 policy-as-versioned-feeds/feeds	ticket-84-being-behind-costs-something	330fbf06872c2ec2c8637863b624cd902d5534ca	in main	deleted
 policy-as-versioned-driftwood/api	resume-2026-10-03-app-maintenance	1f7f49b7b1ce98f973f355d696920c038b8e020a	in main	deleted
 policy-as-versioned-driftwood/storefront	resume-2026-10-03-app-maintenance	3be69e2f1c686cac77bfd05cefe7cc2e61eb208d	in main	deleted
+policy-as-versioned-platform/platform	observations	6c06011bd68af8430090e6be61b4b66afaba9423	refs/archive/heads/observations	deleted
+policy-as-versioned-platform/platform	renovate/configure	adeae44cf50a2f6e684c7748d8eb6b84e305ddd2	refs/archive/heads/renovate/configure	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/43246074489-1	272531d8aaa267d7592ac7021a7d27796d7ee26c	refs/archive/heads/observations/drift-sample/43246074489-1	deleted
+policy-as-versioned-driftwood/driftwood	renovate/https-github.com-policy-as-versioned-feeds-feeds-1.x	2a34a2bb05f8f2c52d5e2b19eb9bdd870c41782c	refs/archive/heads/renovate/https-github.com-policy-as-versioned-feeds-feeds-1.x	deleted
+policy-as-versioned-driftwood/driftwood	renovate/https-github.com-policy-as-versioned-ico-ico-4.x	5da5ad7e17b02b6d9a9b8eac30e00af01bf489d1	refs/archive/heads/renovate/https-github.com-policy-as-versioned-ico-ico-4.x	deleted
+policy-as-versioned-driftwood/driftwood	renovate/https-github.com-policy-as-versioned-platform-platform-5.x	315294d5fd0a5ad4cc8a4cca17783b9f037f2e3d	refs/archive/heads/renovate/https-github.com-policy-as-versioned-platform-platform-5.x	deleted
+policy-as-versioned-driftwood/driftwood	renovate/https-github.com-policy-as-versioned-platform-platform-6.x	1c1cf1e541bea8b826ab01bd1a8ebcf076461857	refs/archive/heads/renovate/https-github.com-policy-as-versioned-platform-platform-6.x	deleted
+policy-as-versioned-driftwood/driftwood	wargamer/retune-driftwood-served-images	dfb5b9a87117bfd5ab23784dfa2623f69c089ae4	refs/archive/heads/wargamer/retune-driftwood-served-images	deleted
+policy-as-versioned-ico/ico	observations	da1afe9388bfcbaa2fc6c61f079aaf065fb96560	refs/archive/heads/observations	deleted
+policy-as-versioned-ico/ico	renovate/configure	1f515f710646c590d37cd739d3fd306f1a2d62b9	refs/archive/heads/renovate/configure	deleted
+policy-as-versioned-feeds/feeds	fetch/cve-2.0.1	2a7b4c3e4c9165a395d9d22765413e818ee8e34d	refs/archive/heads/fetch/cve-2.0.1	deleted
+policy-as-versioned-feeds/feeds	fetch/cve-3.1.0	3d9a80a20b623a9e61b98115f880fc5114991459	refs/archive/heads/fetch/cve-3.1.0	deleted
+policy-as-versioned-feeds/feeds	fetch/eol-2.0.1	c5a1f8f7e4c3b0c5dca0061b2661102d6b035872	refs/archive/heads/fetch/eol-2.0.1	deleted
+policy-as-versioned-feeds/feeds	fetch/fx-1.1.0	e40421b24cea042cb6a28bb829f62dde9392112c	refs/archive/heads/fetch/fx-1.1.0	deleted
+policy-as-versioned-feeds/feeds	fetch/fx-3.0.0	659cd3af92f918d4fd4b61717b35ee70299d2061	refs/archive/heads/fetch/fx-3.0.0	deleted
+policy-as-versioned-feeds/feeds	fetch/threat-register-2.0.1	fdce22e27e0be5285741046f019a80e7d5583b74	refs/archive/heads/fetch/threat-register-2.0.1	deleted
+policy-as-versioned-feeds/feeds	fetch/threat-register-3.0.1	761dd0df6c331b857c755493f2dc1d6ed371e0cc	refs/archive/heads/fetch/threat-register-3.0.1	deleted
+policy-as-versioned-feeds/feeds	observations	6d2b812f0d42aa21dc1aceff06ae2b02fb5862fc	refs/archive/heads/observations	deleted

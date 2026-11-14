@@ -32,7 +32,7 @@ The owner's reply, in full: "I'm afk. Jfdi".
 
 Read as: yes to both, and do not wait for the owner.
 
-- **Tags: given.** Each tag is cut by its repository's own signing workflow. A tag can never be moved or deleted, so the first tags are cut only at commits the loop has already run against (`CONTRACT.md` section 8, steps 6 to 8). After that a publisher's merge cuts its own tag.
+- **Tags: given and used.** Each tag is cut by its repository's own signing workflow. A tag can never be moved or deleted, so the first tags were cut only at commits the loop had already run against (`CONTRACT.md` section 8, steps 6 to 8): ico `v5.0.0`, feeds `threat-register/v5.0.0`, platform `policy/v8.0.0`. From then on a publisher's merge cuts its own tag.
 - **The key in feeds and ico: granted and not used.** The design that was then built (`CONTRACT.md`) leaves nothing in feeds or ico that would read the key: a publisher's only unattended act is to cut a tag, and the default token can do that. A secret with no reader is redundant, so it was not added. A returning fetch would need it.
 
 Two questions were settled by the write-up as following from the owner's sentence. The owner has not commented on either: the pound is a real figure, not a ranking; and the exposure compared is the whole organisation's.

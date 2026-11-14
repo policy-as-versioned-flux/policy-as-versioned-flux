@@ -376,7 +376,7 @@ The loop has to say what each rung does to function. At `quarantine` a public sh
 
 **Computed semver: parked.** It feeds no loop step and every real release computed major (FACTS, off the loop). The cage version is a hand-set semver number. One test asserts that each rung closes at least what it closed in the last release.
 
-**The calibration programme: parked.** It qualifies a language model to do the twin's judgement chores. It does not calibrate money and has no operational caller (A5; H5). The recovered spec confirms the purpose: "models to perform this estate's existing judgement skills only after earning measured permission" (`troy/.scratch/calibration-programme/spec.md:7`). With the twin parked it has no subject.
+**The calibration programme: parked.** It qualifies a language model to do the twin's judgement chores. It does not calibrate money and has no operational caller (A5; H5). The recovered spec confirms the purpose: "models to perform this estate's existing judgement skills only after earning measured permission" (`backup/.scratch/calibration-programme/spec.md:7`). With the twin parked it has no subject.
 
 **The talk material: parked.** The owner called the talk a by-product (A1, 2026-09-02, Q9). When the loop runs, the ledger is the demonstration and a talk can be rebuilt from it.
 
@@ -495,7 +495,7 @@ Whole repositories: **park**. The catalogue is NIST's own and can be read upstre
 
 ### Outside the nine repositories
 
-The untracked local keynote build and the recovered planning text under `troy/.scratch/` stay where they are, as backups. Neither is input to the loop.
+The untracked local keynote build and the recovered planning text under `backup/.scratch/` stay where they are, as backups. Neither is input to the loop.
 
 ### Documents that must change, because the sentence wins
 

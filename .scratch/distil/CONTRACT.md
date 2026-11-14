@@ -637,4 +637,8 @@ Eight reviewers read the built code on 2026-11-14 and the fixes below were made 
 
 **The budgets (2).** The built tree is over three of them: `loop.py`, `test_loop.py` and `loop.yml`. The budgets left out blank lines, the stand-in for `kubectl` that six probe tests need, and the pin check above. The tests are 36, as 6.1 lists them.
 
+**After the first real cycle.** Driftwood's first cycle ended `could-not-look`: `up.sh` applied the second cage policy seconds after Kyverno's rollout and the policy webhook refused the connection. The proof had not met this, because it applies that policy minutes later. Each `kubectl apply` in `up.sh` is now tried for two minutes (platform pull request 76). The next cycle measured.
+
+**How it landed, 2026-11-14.** Steps 0 to 9 of section 8 are done, each merge by the app: hub 320; ico 12; feeds 21; platform 75 and 76; driftwood 132 (`measure`), 133 (pins to tags), 134 (`act`). The loop then opened and landed driftwood 135 and 136 by itself and stopped at `isolated`, `saturated`, as section 1 said it would.
+
 **Left as they are, and known.** The hosted Renovate app can still push branches to driftwood (the owner's to uninstall). Driftwood's ruleset does not dismiss an approval when a new commit is pushed (a forge setting, the owner's). The ledger branch has no ruleset. `ico/penalty-schema/feed.json` keeps each fine's litigation text, which no rule reads.

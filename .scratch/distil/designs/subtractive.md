@@ -207,7 +207,7 @@ An option, not in the totals. If the owner funds a persistent cluster (D8), the 
 - **Twin:** park. It moves £758 of £1,807,494 (`maps/A4-does-the-loop-run.md:190`).
 - **Truth surface:** park. It grades the build, not exposure; 61 of its 117 passes are self-proof (`hub/talk/truth.log:183`).
 - **Computed semver:** park in step 7, once the platform release workflows stop calling it. It is a release-time dependency today (`platform/.github/workflows/cut-release.yml:162`).
-- **Calibration programme:** park. It has no caller, its registry is empty, and its tracked planning has no mention of reductions or tolerance (grep of `troy/.scratch/calibration-programme`; the only hits are captured gate output).
+- **Calibration programme:** park. It has no caller, its registry is empty, and its tracked planning has no mention of reductions or tolerance (grep of `backup/.scratch/calibration-programme`; the only hits are captured gate output).
 - **Talk material:** park. The owner called it a "by product" (T75:83).
 
 ---

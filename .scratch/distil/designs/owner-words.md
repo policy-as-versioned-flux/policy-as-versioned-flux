@@ -351,7 +351,7 @@ An unlabelled or unknown rung falls to `isolated`, as now. "nothing runs without
 
 ### 5.8 The calibration programme
 
-**Parked whole.** It tries to let a local model earn permission to do the twin's judgements. The recovered interview shows how it was commissioned: the owner's replies were "A", "2 A", "3 existing resources" and "4 yes", and "No additional owner reason was supplied" (`troy/.scratch/calibration-programme/interview.md:11`, `:19`, `:23`, `:35`). Those are letters, not sentences. Its registry is empty: `hub/twin/qualification-registry.json` holds `"entries":[]`. Map H5 found no caller outside tests and benches (relayed). The loop's own calibration need is different and small: source three inputs (section 3.4).
+**Parked whole.** It tries to let a local model earn permission to do the twin's judgements. The recovered interview shows how it was commissioned: the owner's replies were "A", "2 A", "3 existing resources" and "4 yes", and "No additional owner reason was supplied" (`backup/.scratch/calibration-programme/interview.md:11`, `:19`, `:23`, `:35`). Those are letters, not sentences. Its registry is empty: `hub/twin/qualification-registry.json` holds `"entries":[]`. Map H5 found no caller outside tests and benches (relayed). The loop's own calibration need is different and small: source three inputs (section 3.4).
 
 ### 5.9 The talk material
 
@@ -510,7 +510,7 @@ Park both repositories whole. `nist`: 18 control identifiers are used; three qua
 
 ### The recovered backup
 
-`troy/.scratch/calibration-programme/` and `troy/.scratch/ecosystem/research/`: park with the calibration programme. Keep `interview.md`; it is the only record of how the programme was commissioned.
+`backup/.scratch/calibration-programme/` and `backup/.scratch/ecosystem/research/`: park with the calibration programme. Keep `interview.md`; it is the only record of how the programme was commissioned.
 
 ### Documents that must change, because the sentence wins
 

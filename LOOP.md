@@ -23,9 +23,13 @@ A red verdict does not stop the landing path. Only the workflow's `verdict` job 
 
 ## Where it stands
 
-On today's inputs, in `act` mode, the loop takes two notches and stops at `isolated`, where the shop no longer serves. Every run after that is red: `saturated` at GBP 1,643,518.63, which is GBP 1,603,518.63 above the tolerance at the best rung there is. The owner chose a loop that may climb that far (decision 5).
+The loop is in `act` mode and stands at `isolated`, where the shop no longer serves. Every run is red: `saturated` at GBP 1,643,518.63, which is GBP 1,603,518.63 above the tolerance at the best rung there is. The owner chose a loop that may climb that far (decision 5).
 
-When this design lands, driftwood starts in `measure` mode, which records and moves nothing. It moves to `act` once platform's cluster proof is green (`.scratch/distil/CONTRACT.md` section 8, step 9).
+It got there by itself on 2026-11-14. Driftwood landed in `measure` mode and its first cycles read `tighten` and moved nothing. Platform's cluster proof was green at the pinned tag, so the mode was changed to `act` (driftwood pull request 134). The next cycle opened pull request 135, `baseline` to `quarantine`; the checker passed it and the app merged it. At `quarantine` the probe measured `egress` closed with the shop serving 3 of 3, and the cycle opened pull request 136, to `isolated`, which landed the same way. At `isolated` the probe measured both capabilities closed and the shop serving 0 of 3. No person was on that path. The ledger holds each line.
+
+The undo is two lines: `"mode": "measure"` in driftwood's `party.json`, and the rung line in `gitops/apps/namespace.yaml` back to `baseline`. That change needs a pull request with one approving review, and the owner cannot approve the owner's own pull request, so it takes an agent session, in which the app approves and merges.
+
+The stop the owner can use alone, at once: switch `loop.yml` off in driftwood's Actions tab (or `gh workflow disable loop.yml -R policy-as-versioned-driftwood/driftwood`). No cycle then runs, nothing moves, and the daily red run stops. The rung line stays where it is.
 
 That outcome rests on three things:
 
@@ -93,13 +97,14 @@ The first loop runs end to end without them. `.scratch/distil/ARCHIVE.md` lists 
 | The hosted Renovate app on driftwood | `renovate.json` keeps it silent | Uninstall it, then delete the file |
 | K16, judging a notch by its goal | The loop climbs past a first notch that costs more than it saves | The owner reverses it. Each notch is then judged alone, and the loop stays at `baseline`, red, with the shop serving |
 
-Settled on 2026-11-14 by the owner's reply "I'm afk. Jfdi" (`.scratch/distil/DECISIONS.md`, "Later the same day"). Leave to cut tags: given, to be used at steps 6 to 8 of `.scratch/distil/CONTRACT.md` section 8. The key in feeds and ico: granted and not used. Nothing built here would read it, and a secret with no reader is redundant. Only a returning fetch would need it.
+Settled on 2026-11-14 by the owner's reply "I'm afk. Jfdi" (`.scratch/distil/DECISIONS.md`, "Later the same day"). Leave to cut tags: given and used. Each publisher's own workflow cut and signed its first tag at the commit the loop had already run against: ico `v5.0.0`, feeds `threat-register/v5.0.0`, platform `policy/v8.0.0`. Driftwood pins those tags. `CUT_ON_MERGE` is `true` in ico and feeds, so a merged change of a feed's `version` cuts its own tag. The key in feeds and ico: granted and not used. Nothing built here would read it, and a secret with no reader is redundant. Only a returning fetch would need it.
 
 The numbers nobody has counted are not the owner's to supply. The penalty rate is ico's work, and the third row's band is feeds' work.
 
-## Four notes
+## Five notes
 
 - The loop's machine merges rest on decision 2 ("All AI machine driven"), not on `twin/ENACT_MODE`. That file still governs agent sessions in the hub until the owner removes the hook.
 - The cluster proof in platform's CI is not yet decision 9's proof. It runs on a throwaway cluster.
 - While a release waits for its dwell, the lines can read `saturated` and red. With one cycle a day, a dwell is usually met a day late.
 - GitHub disables `loop.yml`'s schedule after 60 days without repository activity. It is switched back on from the Actions tab.
+- Each of the loop's own pull requests shows one run of `loop.yml` with no jobs, marked failed. It is not a failed cycle. GitHub appears to hold a workflow on a pull request that the workflow token opened until someone approves it, and to close it when the app merges the pull request seconds later. That is inferred from the old chain's runs, which sat waiting for approval; it has not been confirmed.

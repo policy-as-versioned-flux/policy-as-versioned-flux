@@ -24,7 +24,7 @@ Read as a control loop: Q quantify exposure in money; T the organisation's decla
 
 - `fresh/<repo>`: clones of the remote default branches taken 2026-11-14: hub, platform, driftwood, tuppence, ludlow, nist, ico, feeds, insurer.
 - `maps/*.md`: one map per area. Mission maps: A1 owner's words, A2 original thesis, A3 accretion timeline, A4 does the loop run, A5 Codex and calibration. Hub: H1 to H15. Platform: P1 to P3. Adopters: D1, D2. Publishers: F1.
-- `troy/.scratch/`: planning text recovered from the owner's backup after the mapping pass started: the calibration programme's spec, design proposal, interview, tickets, issues and review, and October Codex resume notes. No reader had this.
+- `backup/.scratch/`: planning text recovered from the owner's backup after the mapping pass started: the calibration programme's spec, design proposal, interview, tickets, issues and review, and October Codex resume notes. No reader had this.
 
 ## What the readers found
 
