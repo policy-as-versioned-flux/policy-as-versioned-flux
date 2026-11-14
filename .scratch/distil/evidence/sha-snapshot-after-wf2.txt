@@ -1,0 +1,22 @@
+hub-local 78fdf0a23dc72540186bc77a34d4535f0f0cc6c7 status-lines=4025 branches=293
+.estate-clone/driftwood 529e159397d3e64f94b0270cc7de69c235580961 dirty=43
+.estate-clone/feeds ff3ac9ab00bdc73e1bbf83cabf91c767d35b8e88 dirty=19
+.estate-clone/ico abcb3a89ee52a9621fae6e3e0e18992cdcf76877 dirty=0
+.estate-clone/insurer d1c1844c34c3eafd03d63a743197ed58ec96a05b dirty=0
+.estate-clone/ludlow 9df8efda60b4f4291b0407b4b4b9216c1d416dfb dirty=34
+.estate-clone/nist f83126f51423951cb50c4782e833d1cfcb02f06d dirty=0
+.estate-clone/platform cb680f22eb46b0fab5e56844758242a2ab200975 dirty=392
+.estate-clone/tuppence 6e164faea7ca51529b35f4485e96ee8b92ce05d1 dirty=37
+.estate-apps/api 63619ae094c435f9eb3ffa5df0d567a067abeb5b dirty=2
+.estate-apps/ledger 036bb972dd733eb12c00791415b145648d453e18 dirty=1
+.estate-apps/reports b809e063514dedee5a1df8701d71d3a1856d5693 dirty=1
+.estate-apps/storefront a97344e4ba767564192240278492456ef76b8b2d dirty=1
+fresh/driftwood 3b561c79798b7cdbbde9e6560ff39dd334e8da59
+fresh/feeds 838abe583f14f07c82ef1eccfcf9ca3acfdf80fa
+fresh/hub fc37a6681e1cf102eb68ea174503bfe7c2752723
+fresh/ico 9d584cf0f177f5be0243f27796eda0ef052ae07d
+fresh/insurer 0b91e8dc4f34adcbc1d848ac83818f025a4d8c47
+fresh/ludlow fd2c2a86ef52ba988389bcc4a49b5a8e750c3e3f
+fresh/nist 56f093a72ed4a4bcc297c886fbfe01369c6e432c
+fresh/platform 7beb1266cd35ba26c2e924b8b307b8144dfa4aa6
+fresh/tuppence 70939762b7e148292388444451a196f5e34a0bf4
