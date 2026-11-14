@@ -21,7 +21,29 @@ The owner then gave one instruction:
 
 `ARCHIVE.md` records what that clean-up did.
 
+## Later the same day
+
+The owner wrote: "Remove all redundant code. Simplify everything". The assistant then asked two things, each a yes or no:
+
+1. May the first signed tags of the new design be cut? Tags on these repositories can never be moved or deleted.
+2. May the app's key be added to feeds and ico, so that the publishers can land and tag unattended?
+
+The owner's reply, in full: "I'm afk. Jfdi".
+
+Read as: yes to both, and do not wait for the owner.
+
+- **Tags: given.** Each tag is cut by its repository's own signing workflow. A tag can never be moved or deleted, so the first tags are cut only at commits the loop has already run against (`CONTRACT.md` section 8, steps 6 to 8). After that a publisher's merge cuts its own tag.
+- **The key in feeds and ico: granted and not used.** The design that was then built (`CONTRACT.md`) leaves nothing in feeds or ico that would read the key: a publisher's only unattended act is to cut a tag, and the default token can do that. A secret with no reader is redundant, so it was not added. A returning fetch would need it.
+
 Two questions were settled by the write-up as following from the owner's sentence. The owner has not commented on either: the pound is a real figure, not a ranking; and the exposure compared is the whole organisation's.
+
+## Where the build departs from a reading above
+
+Row 6 reads the owner's "Always" as: "a notch that costs more than it saves is not taken". The loop that was built does not judge a notch by itself. It never starts a climb unless some tighter rung predicts a lower figure with cost included, and one notch on the way may cost more than it saves (`CONTRACT.md`, K16).
+
+The reason is today's ladder and rows. The first notch, to `quarantine`, closes `egress`, and no published row needs `egress`. Judged by itself that notch costs GBP 5,500 a year and saves nothing, so it would never be taken, and the loop would stay at `baseline` for ever, red, with the shop serving. That is not what the owner was told to expect under decision 5 ("What follows from answers 1, 2 and 5 together", below). Judged by where the climb ends, `isolated` lowers the figure from GBP 17,909,890.06 to GBP 1,643,518.63, cost included, so the climb is started.
+
+This is the assistant's reading, not the owner's words. The owner's word was "Always", and cost is in the compared figure on every line. The owner can reverse it: with a notch judged by itself, the loop holds at `baseline` on today's inputs.
 
 ## Tolerance: what the industry does
 

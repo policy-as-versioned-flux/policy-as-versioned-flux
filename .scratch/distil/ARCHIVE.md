@@ -48,6 +48,8 @@ A branch stayed if running automation looks it up by name, or if a bot's open pu
 - **`wargamer/*`** and one `observations/drift-sample/…` branch in driftwood: heads of open bot pull requests.
 - **`distil/record-2026-11-14`** in the hub: the branch that carries this record.
 
+Later the same day every one of these in platform, driftwood, ico and feeds was archived as well, before the old chain left `main`. See "Before the old chain left `main`" below.
+
 ## Pull requests closed
 
 Nine ticket pull requests of 2026-09-26 closed when their branches went. Each has a note with its archive ref.
@@ -87,7 +89,7 @@ A removed worktree is rebuilt with `git worktree add <path> <ref>`. `evidence/lo
 
 ## Index files
 
-- `evidence/archive-refs.tsv`: all 168 archive refs, with repository, commit and what each is.
+- `evidence/archive-refs.tsv`: all 187 archive refs of branches and local-only work, with repository, commit and what each is. The five before-simplify refs are in the table below.
 - `evidence/deleted-branches.tsv`: all 528 deleted branches, with the commit and where it is kept.
 - `evidence/local-manifest.json`: every local worktree and tip in the 13 local repositories, taken before anything was removed.
 
@@ -113,6 +115,29 @@ git show FETCH_HEAD:<path>
 ```
 
 To put a file or folder back, check it out from that ref and commit it.
+
+### Before the old chain left `main`
+
+Two things were done in platform, driftwood, ico and feeds before any pull request replaced a `main`.
+
+**The old scheduled jobs were switched off**, so that no clock wrote again while the trees changed:
+
+| Repository | Workflow files switched off |
+|---|---|
+| platform | `fetch.yml` |
+| ico | `fetch.yml` |
+| feeds | `fetch.yml` |
+| driftwood | `drift-sample.yml`, `propose-tier.yml`, `renovate-run.yml`, `twin-sweep.yml` |
+
+No other workflow was switched off. `cut-release.yml` was left on in each repository, as it runs only by dispatch. The new design keeps a file at that path in platform, ico and feeds.
+
+**The tip of every branch but `main` was pushed to `refs/archive/heads/<branch>`** and read back: 19 branches (platform 3, driftwood 6, ico 2, feeds 8). These are the branches the clean-up had kept because the old automation looked them up by name. The `observations` branches hold the fetch clocks' readings, which are on no other ref. Each of the 19 has a row in `evidence/archive-refs.tsv`.
+
+To bring a schedule back, put its workflow file back on `main` from the before-simplify ref, then:
+
+```sh
+gh workflow enable <file> -R <organisation>/<repository>
+```
 
 ## What was not touched
 
