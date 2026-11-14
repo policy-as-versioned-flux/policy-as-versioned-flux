@@ -21,6 +21,20 @@ The owner then gave one instruction:
 
 `ARCHIVE.md` records what that clean-up did.
 
+## Later the same day
+
+The owner wrote: "Remove all redundant code. Simplify everything". The assistant then asked two things, each a yes or no:
+
+1. May the first signed tags of the new design be cut? Tags on these repositories can never be moved or deleted.
+2. May the app's key be added to feeds and ico, so that the publishers can land and tag unattended?
+
+The owner's reply, in full: "I'm afk. Jfdi".
+
+Read as: yes to both, and do not wait for the owner.
+
+- **Tags: given and used.** Each tag is cut by its repository's own signing workflow, and only at a commit the loop has already run against, because a tag can never be moved or deleted.
+- **The key in feeds and ico: granted and not used.** The design that was then built (`CONTRACT.md`) leaves nothing in feeds or ico that would read the key: a publisher's only unattended act is to cut a tag, and the default token can do that. A secret with no reader is redundant, so it was not added. A returning fetch would need it.
+
 Two questions were settled by the write-up as following from the owner's sentence. The owner has not commented on either: the pound is a real figure, not a ranking; and the exposure compared is the whole organisation's.
 
 ## Tolerance: what the industry does

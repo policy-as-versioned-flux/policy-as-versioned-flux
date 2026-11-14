@@ -8,11 +8,12 @@ This repository holds the records of the estate: what it is for, what was decide
 
 | Path | What it holds |
 |---|---|
+| `LOOP.md` | What the estate does now: the loop, where each number comes from, its state, what is parked and what waits for the owner. Start here. |
 | `.scratch/distil/` | The review of 2026-11-14 against that sentence, the owner's decisions, and the record of what was archived. Start with its `README.md`. |
 | `docs/adr/` | The decision records. |
 | `.scratch/drift-review-2026-08-27/`, `.scratch/ecosystem/` | The owner's dated words and approvals, kept byte for byte. The review cites them by line. |
 | `research/03-blogs-thesis.md` | The 2022 thesis: policy as a versioned dependency that carries its why. |
-| `CONTEXT.md` | The glossary. It still describes parts that have been put away and is due to be shortened. |
+| `CONTEXT.md` | The glossary: the loop's terms, each defined once. |
 | `twin/enact_guard.py` | The guard on agent writes, with its mode file. It stays until the owner removes its hook from `.claude/settings.json`. |
 
 ## The live repositories
