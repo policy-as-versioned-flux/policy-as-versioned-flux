@@ -1,6 +1,6 @@
 # K4: is the off-loop work really off the loop, and who asked for it?
 
-Refuter's working, 2026-11-14. Read-only. Paths are `repo/path:line` under `fresh/` unless they start with `troy/` (the recovered planning text under `scratchpad/troy/.scratch/`) or `maps/`.
+Refuter's working, 2026-11-14. Read-only. Paths are `repo/path:line` under `fresh/` unless they start with `backup/` (the recovered planning text under `scratchpad/backup/.scratch/`) or `maps/`.
 
 ## The claim under test
 
@@ -81,7 +81,7 @@ What survives: the calibration programme, and the twin's forecasting, scoring, s
 
 - 184 hub files were born between 2026-10-30 and 2026-10-31, holding 49,343 lines at HEAD (`git log --diff-filter=A`, then `wc`). That matches "about 49k".
 - No adopter or platform file imports any of it (1b). Adopter twin pins predate it (1a).
-- The confirmed spec forbids it reaching money: user story 29, "model qualification never grants merge rights, human overrides or price eligibility" (`troy/calibration-programme/spec.md:47`).
+- The confirmed spec forbids it reaching money: user story 29, "model qualification never grants merge rights, human overrides or price eligibility" (`backup/calibration-programme/spec.md:47`).
 - `twin/qualification-registry.json` is `{"entries":[]}` (map H2, row 20).
 - **Verdict for this part: holds.**
 
@@ -93,12 +93,12 @@ Dated trail from the recovered text. Quotation marks mark the owner's own words 
 |---|---|---|---|
 | 2026-09-21 | "A model may judge on a GitHub clock, within thresholds." | Laya/loophole map; amended ticket 75 Q10 | `fresh/hub/.scratch/ecosystem/issues/75-...md:165-172` |
 | 2026-10-03 | "you tell me, you control them all, you don't need me to answer" | Codex resuming September's work | `driftwood/accepted-majors/platform-7.0.0.yaml:3-6` |
-| Standing, 2026-10 | Goal objective: "new session quota, resume do not stop implementation phase until the whole thing is built" | Codex goal | `troy/calibration-programme/WORK-STATE-BEFORE-PLAN.json:3` |
-| 2026-10-22 | "1. agree to renew this until the end of the year / 2. resume this / 3. delegate / 4. delegate" | Item (4) was "investigating calibration target, population and outcome sources". Here "calibration" meant ticket 46's *monetary* calibration, a quantify-side target. The recommended target was the 2027 direct-recovery-expense pilot | `troy/ecosystem/research/resume-user-decisions-20261022/OWNER-INSTRUCTION.md:3-12`; `.../resume-active-20261022T2203/NEXT-OWNER-DECISIONS.md:7` |
-| 2026-10-23 | Accepted all three recommendations, including "Calibration policy: implement the prospective 2027 institutional direct-recovery-expense pilot". The exact reply sits in `OWNER-DECISION.json`, which was **not recovered** | Proposal list | `troy/ecosystem/research/adopt-three-owner-policies-20261023/ADOPTION.md:1-5` |
-| About 2026-10-26/27 | "Your two instructions": a labelled challenge corpus, and a dedicated pilot evidence custodian. Exact words **not recovered**: `resume-20261027-delegated-evidence/OWNER-DECISION.json` is absent | Unknown | `troy/ecosystem/research/resume-20261027-delegated-evidence/REPORT.md:3`; `fresh/hub/.scratch/ecosystem/issues/168-...md:9` |
-| 2026-10-28 | None. The Codex goal tool returned "blocked" after three no-progress turns. One of the five open requirements was `authentic_independent_semantic_skill_labels_and_sufficient_population` | The assistant's own reading of NORTH-STAR | `troy/ecosystem/research/resume-20261028-post-dataset-audit-003/REPORT.md:1-7`; `WORK-STATE-BEFORE-PLAN.json` `pending_requirement_ids` |
-| 2026-10-30 | `A` | "the two-option outcome question". Recorded meaning: "models that earn measured permission to perform the existing judgement skills". "No additional owner reason was supplied" | `troy/calibration-programme/interview.md:11` |
+| Standing, 2026-10 | Goal objective: "new session quota, resume do not stop implementation phase until the whole thing is built" | Codex goal | `backup/calibration-programme/WORK-STATE-BEFORE-PLAN.json:3` |
+| 2026-10-22 | "1. agree to renew this until the end of the year / 2. resume this / 3. delegate / 4. delegate" | Item (4) was "investigating calibration target, population and outcome sources". Here "calibration" meant ticket 46's *monetary* calibration, a quantify-side target. The recommended target was the 2027 direct-recovery-expense pilot | `backup/ecosystem/research/resume-user-decisions-20261022/OWNER-INSTRUCTION.md:3-12`; `.../resume-active-20261022T2203/NEXT-OWNER-DECISIONS.md:7` |
+| 2026-10-23 | Accepted all three recommendations, including "Calibration policy: implement the prospective 2027 institutional direct-recovery-expense pilot". The exact reply sits in `OWNER-DECISION.json`, which was **not recovered** | Proposal list | `backup/ecosystem/research/adopt-three-owner-policies-20261023/ADOPTION.md:1-5` |
+| About 2026-10-26/27 | "Your two instructions": a labelled challenge corpus, and a dedicated pilot evidence custodian. Exact words **not recovered**: `resume-20261027-delegated-evidence/OWNER-DECISION.json` is absent | Unknown | `backup/ecosystem/research/resume-20261027-delegated-evidence/REPORT.md:3`; `fresh/hub/.scratch/ecosystem/issues/168-...md:9` |
+| 2026-10-28 | None. The Codex goal tool returned "blocked" after three no-progress turns. One of the five open requirements was `authentic_independent_semantic_skill_labels_and_sufficient_population` | The assistant's own reading of NORTH-STAR | `backup/ecosystem/research/resume-20261028-post-dataset-audit-003/REPORT.md:1-7`; `WORK-STATE-BEFORE-PLAN.json` `pending_requirement_ids` |
+| 2026-10-30 | `A` | "the two-option outcome question". Recorded meaning: "models that earn measured permission to perform the existing judgement skills". "No additional owner reason was supplied" | `backup/calibration-programme/interview.md:11` |
 | 2026-10-30 | `2 A` | Population: this estate, its three adopters and existing domains | `interview.md:19` |
 | 2026-10-30 | `3 existing resources` | No new spending | `interview.md:23` |
 | 2026-10-30 | `4 yes` | Take the whole proposal into a spec and tickets | `interview.md:35`; `design-proposal.md:5` |
@@ -131,7 +131,7 @@ The word "calibration" drifted:
 
 1. **"The calibration trigger cannot be read verbatim anywhere."** Wrong now. It is the 2026-10-30 grilling session (`interview.md`), with the owner's replies `A`, `2 A`, `3 existing resources` and `4 yes`. It sits inside a Codex goal whose objective was "... do not stop implementation phase until the whole thing is built", after the goal blocked on 2026-10-28.
 2. **"The only owner words are 'Approve stronger plant checks'."** Wrong. The four interview replies above came the same day, plus the 2026-09-21 "within thresholds" amendment.
-3. **"The bar is ADR-0029's ten conditions: about 326 items per skill."** Wrong on the number. The programme keeps the existing measured minima of 16/12/16/16/9/16/16 (`spec.md:71-79`; `fresh/hub/twin/skill-thresholds.yaml:30-31` shows `threshold: 0.8`, `min_items: 16`). 326/3,260 came from a different ten-bin calibration-error question (`troy/ecosystem/research/resume-20261028-candidate-adapter-audit/REPORT.md:71`). The ten conditions themselves are right.
+3. **"The bar is ADR-0029's ten conditions: about 326 items per skill."** Wrong on the number. The programme keeps the existing measured minima of 16/12/16/16/9/16/16 (`spec.md:71-79`; `fresh/hub/twin/skill-thresholds.yaml:30-31` shows `threshold: 0.8`, `min_items: 16`). 326/3,260 came from a different ten-bin calibration-error question (`backup/ecosystem/research/resume-20261028-candidate-adapter-audit/REPORT.md:71`). The ten conditions themselves are right.
 4. **"A single demonstrated developmental reference case" and "the commissioned dataset is unreadable".** Both incomplete.
    - Four publication cases were admitted (0.27, 0.61, 0.34, 0.14) and 42 withheld (`resume-20261028-case-admission/REPORT.md:1`).
    - A 105-input agent-authored dataset (17 development, 88 held out) was consumed by the incumbent heuristics in 104 calls. Supported-correct results: signal 0/16, evolution 0/12, causal 0/16 and grade 0/16; gameplay, substrate and ethics passed mechanics only (`resume-20261028-scoped-diagnostic/REPORT.md:3-13`).

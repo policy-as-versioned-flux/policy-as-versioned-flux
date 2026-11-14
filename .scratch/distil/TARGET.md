@@ -558,7 +558,7 @@ Only questions that change the design. The target works under each recommended o
 | L23 | Ico | the repository, whole | 6,497 | shrink | high |
 | L24 | Feeds | the repository, whole | 85,412 | shrink | high |
 | L25 | Nist and insurer | both repositories, whole | 16,822 | park | normal |
-| L26 | Local-only and recovered material | the owner's working copy: 40 branches, 8 detached checkouts and 1 stash in no remote history (first counted as 31 tips), 215 empty worktree directories, the untracked keynote build; `troy/.scratch/` | 112,849 (14,449 recovered text lines; about 98,400 keynote text lines, per A3; nought in the worktrees) | park | high |
+| L26 | Local-only and recovered material | the owner's working copy: 40 branches, 8 detached checkouts and 1 stash in no remote history (first counted as 31 tips), 215 empty worktree directories, the untracked keynote build; `backup/.scratch/` | 112,849 (14,449 recovered text lines; about 98,400 keynote text lines, per A3; nought in the worktrees) | park | high |
 
 Reasons and checks, row by row:
 

@@ -309,7 +309,7 @@ Workload image: a small public HTTP service that runs as a non-root user and tol
 
 **Computed semver: park.** It feeds no loop step and every real release computed major (FACTS "Off the loop").
 
-**The calibration programme: park, out of every working tree and CI.** About 49k lines to qualify a 4B model for twin judgement skills; the qualification registry is empty; it does not touch the reduction table (A5 summary; A4 surprise 14). The recovered planning text in troy/.scratch stays where it is.
+**The calibration programme: park, out of every working tree and CI.** About 49k lines to qualify a 4B model for twin judgement skills; the qualification registry is empty; it does not touch the reduction table (A5 summary; A4 surprise 14). The recovered planning text in backup/.scratch stays where it is.
 
 **Talk material: park.** The owner called the talk a by-product (T75:83). This ten-minute demonstration is the talk's live beat. The one-minute story (hub/.scratch/talk-spec/the-whole-model.md:15-17) is merged into the README's opening.
 
@@ -426,7 +426,7 @@ Keep: stays in the working tree as is. Shrink: stays, made much smaller. Merge: 
 
 | Area | Disposition | Reason |
 |---|---|---|
-| troy/.scratch `calibration-programme/`, `ecosystem/research/` resumes | Park | Recovered planning text; stays in the owner's backup. |
+| backup/.scratch `calibration-programme/`, `ecosystem/research/` resumes | Park | Recovered planning text; stays in the owner's backup. |
 | Local calibration branch tips and empty worktrees (A5) | Park | Not on any remote; leave as they are. |
 
 ---

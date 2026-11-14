@@ -27,7 +27,9 @@ The loop is in `act` mode and stands at `isolated`, where the shop no longer ser
 
 It got there by itself on 2026-11-14. Driftwood landed in `measure` mode and its first cycles read `tighten` and moved nothing. Platform's cluster proof was green at the pinned tag, so the mode was changed to `act` (driftwood pull request 134). The next cycle opened pull request 135, `baseline` to `quarantine`; the checker passed it and the app merged it. At `quarantine` the probe measured `egress` closed with the shop serving 3 of 3, and the cycle opened pull request 136, to `isolated`, which landed the same way. At `isolated` the probe measured both capabilities closed and the shop serving 0 of 3. No person was on that path. The ledger holds each line.
 
-The undo is two lines: `"mode": "measure"` in driftwood's `party.json`, and the rung line in `gitops/apps/namespace.yaml` back to `baseline`.
+The undo is two lines: `"mode": "measure"` in driftwood's `party.json`, and the rung line in `gitops/apps/namespace.yaml` back to `baseline`. That change needs a pull request with one approving review, and the owner cannot approve the owner's own pull request, so it takes an agent session, in which the app approves and merges.
+
+The stop the owner can use alone, at once: switch `loop.yml` off in driftwood's Actions tab (or `gh workflow disable loop.yml -R policy-as-versioned-driftwood/driftwood`). No cycle then runs, nothing moves, and the daily red run stops. The rung line stays where it is.
 
 That outcome rests on three things:
 
@@ -105,4 +107,4 @@ The numbers nobody has counted are not the owner's to supply. The penalty rate i
 - The cluster proof in platform's CI is not yet decision 9's proof. It runs on a throwaway cluster.
 - While a release waits for its dwell, the lines can read `saturated` and red. With one cycle a day, a dwell is usually met a day late.
 - GitHub disables `loop.yml`'s schedule after 60 days without repository activity. It is switched back on from the Actions tab.
-- Each of the loop's own pull requests shows one run of `loop.yml` with no jobs, marked failed. It is not a failed cycle. GitHub holds a workflow on a pull request that the workflow token opened until someone approves it, and closes it when the app merges the pull request seconds later.
+- Each of the loop's own pull requests shows one run of `loop.yml` with no jobs, marked failed. It is not a failed cycle. GitHub appears to hold a workflow on a pull request that the workflow token opened until someone approves it, and to close it when the app merges the pull request seconds later. That is inferred from the old chain's runs, which sat waiting for approval; it has not been confirmed.

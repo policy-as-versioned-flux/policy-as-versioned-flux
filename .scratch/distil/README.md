@@ -39,7 +39,7 @@ Two passes of agents, all read-only:
 ## Paths in the citations
 
 - `hub/…`, `platform/…`, `driftwood/…` and the like are paths in clones of the nine remote default branches taken on 2026-11-14. The commits are in `evidence/sha-snapshot-before.txt` under `fresh/`. The clones were temporary and are not kept here.
-- `troy/.scratch/…` is planning text read from the owner's backup disk.
+- `backup/.scratch/…` is planning text read from the owner's backup disk.
 
 ## Known gaps
 

@@ -111,12 +111,12 @@ Sources: `fresh/ludlow/composed/evidence.json`; `fresh/ludlow/composed/HEADER.ya
    - Sizes were then reset to real filings on 2026-10-04 (tuppence `party.yaml:21-25` from `c70edb11`; ludlow `:22-26` from `4f81da7e`). The tolerances were left as they were.
    - The result: ludlow's 5,000 GBP is 0.0000034% of its turnover.
 5. **Qualification: the 2026-10-23 adoption.**
-   - The owner "accepted all three recommendations" (`fresh/hub/.scratch/ecosystem/issues/27-the-cage-ladder-round-2.md:184-188`; `troy/.scratch/ecosystem/research/adopt-three-owner-policies-20261023/ADOPTION.md:1-3`).
+   - The owner "accepted all three recommendations" (`fresh/hub/.scratch/ecosystem/issues/27-the-cage-ladder-round-2.md:184-188`; `backup/.scratch/ecosystem/research/adopt-three-owner-policies-20261023/ADOPTION.md:1-3`).
    - That set `assurance_bands` at 0.1x / 1x / 10x tolerance. For example, driftwood `attest_at: 40000` (`party.yaml:57`, commit `d2c6f83`).
    - The record says "Existing party tolerances and strict comparison semantics remain" (ADOPTION.md:3; ticket 27:187).
-   - The owner had answered "delegate" to the item that asked for the proposals (`troy/.../resume-user-decisions-20261022/OWNER-INSTRUCTION.md:7-12`).
-   - The brief put to the owner asked him to "use or revise the proposed GBP/year cutoffs". It did not ask about the tolerance (`troy/.../resume-active-20261022T2203/NEXT-OWNER-DECISIONS.md:3`).
-   - The exact reply is said to be in `OWNER-DECISION.json`. That file is not in the troy backup, the local working tree, or git history I could read. The three adoption commit bodies carry only a title.
+   - The owner had answered "delegate" to the item that asked for the proposals (`backup/.../resume-user-decisions-20261022/OWNER-INSTRUCTION.md:7-12`).
+   - The brief put to the owner asked him to "use or revise the proposed GBP/year cutoffs". It did not ask about the tolerance (`backup/.../resume-active-20261022T2203/NEXT-OWNER-DECISIONS.md:3`).
+   - The exact reply is said to be in `OWNER-DECISION.json`. That file is not in the backup disk, the local working tree, or git history I could read. The three adoption commit bodies carry only a title.
    - So: what the owner wrote on 2026-10-23 **could not be determined**. On the record, he accepted cutoffs anchored to the tolerance figures. He was not asked to set the tolerance.
 
 ## 4. Attacks on sentence 3 (the ICO line)
