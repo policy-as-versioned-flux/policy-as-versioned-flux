@@ -10,7 +10,7 @@ Written 2026-11-14. This was a read-only review. Nothing has been built, run, mo
 - **The distilled design is small.** One adopter, two publishers, the platform and a hub that holds records: 3,000 authored lines by budget, nearer 3,600 after checking. One change closes the loop: the figure falls only when a probe finds closed, on the running pods, a capability that a published loss row says the loss needs. (Section 5)
 - **On today's published numbers the new loop would not move.** Driftwood's upper bound is GBP 16.3M a year against a tolerance of GBP 40,000. No published row yet says which capability the loss needs, so no rung can be shown to help, and the loop would report `saturated` at the loosest rung and say why. A notch needs that list published with an outside source. Whether driftwood needs any cage at all turns on a penalty rate that nobody has counted. (Sections 5.4 and 5.5)
 - **Nothing is removed by this document.** The ledger gives a call for each of 26 areas. About 20,300 lines would stay in working trees; the rest would stay in git history. (Section 6, `LEDGER.md`)
-- **Protect first.** 40 local branches, 8 detached checkouts and 1 stash on your machine are in no remote history. (Section 6)
+- **Protect first.** 40 local branches, 8 detached checkouts and 1 stash on your machine are in no remote history. (Section 6. Done on 2026-11-14: see `ARCHIVE.md`.)
 - **Ten decisions are yours.** The first is what "ratcheting" means: whether the cage can ever release. (Section 7)
 
 **Citations.** `repo/path:line` is a path in the clones of the nine remote default branches taken 2026-11-14. AT:n is line n of `hub/.scratch/drift-review-2026-08-27/evidence/AMBITION_TIMELINE.json`, the record of your dated words. T75:n is `hub/.scratch/ecosystem/issues/75-grilling-what-is-this-for-the-twelve-questions.md`. RA:n is `hub/.scratch/drift-review-2026-08-27/REGRILL-ANSWERS.md`. `maps/A4` and the like are the mapping files. K1 to K4 are the four keystone checks, each an attempt to refute a main finding. `verdicts/L12` and the like are the blind checks of each ledger row. "Relayed" means a map or verdict found it and I did not open the source. Section 9 lists what I opened myself.
@@ -329,6 +329,8 @@ It would be staged if any figure fell without a probe being refused, if a reduct
 | Park | L03, L07, L08, L10, L13, L14, L21, L22, L25 | 1,708,181 | None | Hub at commit fc37a668; tag `twin/v0.1.0`; platform tag v6.3.0; the four parked repositories whole |
 | Cut | L19 (driftwood's generated tree) | 26,437 | None | Driftwood tag v5.3.0 carries it |
 | | **Total** | **2,207,933** | **about 20,300** | |
+
+**Update, 2026-11-14:** the first two points below were dealt with the same day. The local-only work is on archive refs and nothing was removed before that; see `ARCHIVE.md`.
 
 Three things are **not** safe today and need an act before any tidy-up:
 

@@ -21,7 +21,7 @@ The owner then gave one instruction:
 
 `ARCHIVE.md` records what that clean-up did.
 
-Two questions were settled by the write-up as following from the owner's sentence, and the owner did not object: the pound is a real figure, not a ranking; and the exposure compared is the whole organisation's.
+Two questions were settled by the write-up as following from the owner's sentence. The owner has not commented on either: the pound is a real figure, not a ranking; and the exposure compared is the whole organisation's.
 
 ## Tolerance: what the industry does
 
