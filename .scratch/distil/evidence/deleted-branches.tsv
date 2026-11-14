@@ -1,0 +1,529 @@
+repository	branch	commit	where it is kept	state
+policy-as-versioned-flux/policy-as-versioned-flux	calibration-tiny-linux-public-integration-20261031	a4c2c0d0880a1a4e51fbcf316633e879ec915eb4	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	calibration/01-02-integration-20261030	c96a77f732a156ef8623c4e75475526739030c9e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	calibration/03-actor-substrate-20261030	3c806321971daac61ec4b20127a2cab26ad9daef	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	calibration/05-signal-lifecycle-20261030	828663451e6d214604553eead842171e7d2599ca	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	calibration/final-consumers-revision01-unsigned-20261030	3cb2b7fa95ef1c524b9b6afd67d1ea9757cebb0e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	calibration/linux-network-control-20261030	5319e3a45ebf5f0dcab1f553e84ae809b4b5b307	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	calibration/metadata-generator-custody-13bb9df7	13bb9df762d5088e67a29400b8e06f095affba72	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-125-seam1-signature-flake	9c61638e64350fb2a421ebeb783677af2c448afb	refs/archive/heads/chart-125-seam1-signature-flake	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-127-128-129	f91e7d5f06c1f4bd5fd05a556bbbe0736d9d1de9	refs/archive/heads/chart-127-128-129	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-130-root-machinery	985cb1711253d5061e594e552d6b65a625126278	refs/archive/heads/chart-130-root-machinery	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-131-132-133	dc1e9f52ddba1981f5ff98b9caad49df34ceccf4	refs/archive/heads/chart-131-132-133	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-134-identity-lane	be58fbebdd781e0e63bc055b7aeb7f342b612726	refs/archive/heads/chart-134-identity-lane	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-135-136	a94d7bc4fa47d9674090fad7f86953ce30d61940	refs/archive/heads/chart-135-136	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-138-as-of	f4c73d9ffa6cc7ce8b8ef685b6cf1856f6fa1087	refs/archive/heads/chart-138-as-of	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-2026-09-05-a-branch-run-records-nothing	21bdfd8b92bf32336a274204fde3ed2119a416fa	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-2026-09-05-refusal-by-another-name	c8f37c48a35e7f5ff9103b63e5c71158c11cf8f9	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-2026-09-05-the-adopter-gate-grades-the-change	6afceb3102370beb5c01112d114f7784bf58d5be	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-2026-09-10-the-map-line-and-the-moving-count	60b70d7b4ab84e33d7490f5fe9715a35791f2eee	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	chart-2026-09-21-the-cage-names-what-it-does-not-deliver	e0374f2cddb7b6b0f6055b88b1c189afeaf3d63d	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ci-2026-09-04-the-hub-tests-itself	491a0ac174d269c031e653cd15c679b81152f805	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ci/macos15-portability-20261030	0de40204510963478bdf35468bca3b4cee6b900c	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	close-111-86-chart-140	398aaa374ceac319d8be6a2421b0950c92648217	refs/archive/heads/close-111-86-chart-140	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	close-113-phase-b	e391de1822a28fdc70a7eee386accc8c98c0c04e	refs/archive/heads/close-113-phase-b	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	close-133-134-137	aa5f65dae156b219df86946a4224e5adc3356b83	refs/archive/heads/close-133-134-137	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	close-140	b167b4b22163c3c0c2cfc73e31c9c8dfdec4b67c	refs/archive/heads/close-140	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	codex/169-decay-date-boundary	b76dd1ae9df7063e91558da57fea8527aae1c911	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	codex/actual-skill-bases-20261026	41ac7b3fa83fbbd9bb3f3cac3266cda32588539a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	codex/can-record-default-ref-20261026	ac21289ae3fdf14994d73ab314d97ac9cf9da8c5	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	codex/causal-calibration-20261027	62378df0eceaead49ba7065657762aabccacd1bc	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	codex/default-record-event-hint-20261026	c589b196535f64fee5273fbe94fde7efdda5fd5b	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	codex/ico-feed-presence-v2-20261026	a0dee4e476548c08fee438d78463f86fd9da8447	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	codex/observation-delivery-isolated-writer-20261025	4cbd620b65af2868d3386ddae596511bfa1471e1	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	codex/pound-seam-all-reasons-20261026	aca7104a0de78a0965c6d1409b64b060b9896dfa	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	codex/record-final-incumbent-archives-20261025	f0642504f0a05a1b49cb7e7b8127afb57e2192a8	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	cs-06-cross-party-composition	b030ce8681b7500e1b90d2b83ff2a2332dfe2b76	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	delivery/claude-handoff-final-evidence-20261004	d868e0e1dd1668f81c2bf46f6b25a901c24cb909	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/app-lift-154-record-20261018-914f391a	914f391a8d7d484d8d63f1f31172908978e1bd43	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/enforcement-supersede-records-20261018	16db58f2166bbd1e5737ec4b533d5d5ee12f3357	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/engine150-measured-record-reviewed-20261018	5ae5db906a4ea474168557dd859e0f5b856f60e1	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/reconcile-153-cve-inventory-delivery-20261021	c08f0f923cb135a71353a0576725ee1f9951e190	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/reconcile-27-160-161-20261021	480b74e07791cdc60937ad38e1936ec30e2d824e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/reconcile-engine148150-20261018	d806d66f86816529f4b8505b93756f8ec73052bd	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/reconcile-twin143-and-warn27-20261018	d030277e4d95a28dc5ae205c5c043a65926238d4	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/record-delivered-engine-prerequisites-20261018	1543c7855d77f44b3200baa5fe503f869ef520dc	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/record-insurance-decisions-and-disclosure-task-20261021	92039c90970de2d85061bbf0056d0a710b3a3a9d	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	docs/recorded-signature-caller-regressions-20261017	f0081bc4d4990ae0c328780122f64fc3ed75130c	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	feat/publisher-price-vertical-20261018-final	c31b26f46946fd54cae419559f3e7c859f7f3e98	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	feat/shared-observation-delivery-20261017	465a91807b0fa47ecedfe6f6e5fb01dcc4bf7ae7	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-2026-09-05-refresh-keeps-work	e09ee5e05865e02aa544ddd2841a610b0d453615	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-2026-09-05-tickets-96-97-crossref	76290d139ef7d230d3625a3414cd2aeac098f4a6	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-2026-09-06-served-only-comment	0e7026d88f78b35fdcb729e91b4df1878d5f3a4f	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-local-gates-drop-github-markers	10724f50efeeee6cb600790183330eeb99eca32e	refs/archive/heads/fix-local-gates-drop-github-markers	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-phase-b-stale-records	f13d315c305e0b01d50dc5c1eef55b58e382c04a	refs/archive/heads/fix-phase-b-stale-records	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-register-adopter-movement-waits-20261024	48dc1beee20debedf33e271eb3ef660e7d5ed1ee	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-shadow-recovery-financial-date-20261024	7abbd6200df4a4a1e7a122ad1a317ab544b28e7b	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-truth-recording-20261005	c16b838992822d17cc3b222d41567df825a6b30f	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-tu-observation-contract-20261018	5bda8b1beef339fb8c2d06402e01c6e3b18ba5fe	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-twin-observation-classifier-20261018	4b49ce70f05fde7d0a2f156516d0842ddb9ae70f	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix-verify-before-tag-test	d83dfe113e4f3b830fb6c2343f6658435e475ecc	refs/archive/heads/fix-verify-before-tag-test	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/cloud-admission-revision-test-name-20261022	7855c189316e2b42b178edcf8065998af716ac94	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/cloud-document-version-20261022	62d6599a16cf1be22033ab79f0382ffe659c9ba9	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/cloud-field-observation-context-20261017	995704bf9c654d14a4a977d91849f902127eff60	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/cloud-native-readiness-and-clock-continuity-20261017	22c1e095b8aedbf92743a96670bddd12ccd373ec	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/development-year-end-renewal-20261022	a675ee166678fd6b1b0d5d5ebcb35ad96be5b127	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/incumbent-final-group-20261022	51887cf3c58f9cee0775c5bbf9d0869c7340b741	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/lifted-apps-effective-renovate-20261005	11f7cf3ce8a0beb17cbacb5d8bb3e708828e955d	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/local-clock-native-receipt-20261022	682a0a24a083d9a59a7596a9ba548cd417f8f65a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/native-cloud-refusal-probe-capture-20261017	5aa3f319ca3129622500b505ae3d8c6c274c7773	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/native-engine-accepted-parent-20261017	cf5f586823ae7daeb2a41bb6f291dd3cff0aab02	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/offline-clock-tests-and-proof-aggregation-20261022	f3a4b1c1b19e826160060355f298d78bdba8a5fc	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/owner-floor-and-workload-verifiers-20261023	72ad71e6ff259789055da24673e79f5ca0920ca2	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/pound-manifest-20261017	61715481dc9f9dd263558466b6e8d4d9f6857e2f	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/pound-seam-selection-attribution-20261005	caccfc1d8fbba5b5d3a2fc7c300d3dc95d1f80ff	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/publisher-price-fixture-source-version-20261023	7cc8b8b9bd50d1a287fb0965d29ac12c2124f91a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/publisher-reliability-signal-20261018-983b60ee	983b60eeb83812d8ab69b85b69547a50a421a5e4	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/record-ack-and-native-delivery-map-20261022	830942bdaf94ead14a8f8b9855b125cdd572bf0a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/record-cloud-admission-and-archives-20261023	b7d77b7f65c6f92effe1df8076eb35ab74a246e7	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/record-map-regressions-20261004	78fe7d4b843cd89c639e710ec33b91c8dc8b83de	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/recovery-expense-feed-signal-20261023	8a735125a1c97e4809d55dca6a61171d902b5b9e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/served-gate-compiler-context-20261017	7cc685c6706aeb4ac221bd83e62a29c19ace47be	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/tickets141145-registers-20261018-31cba681	31cba681a0dce387e323d07204c595ea829fddad	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/truth-conflict-integrations-20261017	b2556ec69c6507fab8a99c8e207c13fbcc2eb845	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/truth-proof-embedding-20261017	1213b3ec299b02474d7f6385198f8edf779460fa	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/truth-reviewer-identity-20261017	4c60dc3b58f954a741fb8a584eaba17a4b267a2e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/twin-initial-release-20261023	3fa9c32c5a1335083f6f294d5f07082d4aadbbeb	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	fix/twin-tag-checkout-cage-20261023	71c6578bc0ddda43d9dfbf99ec0f28ad22f66af6	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	implement-2026-09-10-next	416a32e9699e8e0bb5bac2f5f1b36709879d65a0	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	implement-2026-09-10-remaining	1abb816b7d16c1a899397deb63a403b48ed72719	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	implement-2026-09-10-rollout	400a91aaa37c32b0938da3d733f4c956ae74aeaa	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	implement-observation-reader-20260910	a5c203b8f0ef54ca704c08a0c0e6c1cae010ae51	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	implement-release-clock-record-20260910	8c0668764b19296f1370e777eeb68cb0ba3b9c3c	refs/archive/heads/implement-release-clock-record-20260910	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrate/cloud-engine-hub-20261017	c9dc16b79bbc2e073c295764bca67ee264664dae	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrations/truth/39004223783-1/fd7c4eb7407524dc3a52e79990ced865f642cc6e	b26ad8b421bb078d60fdea88ce9eeb4b6f5d4f01	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrations/truth/39009267502-1/07c3de97f9a012b3244496f43d8fd541b2f64a74	bf2a494e4bf5528603343501f8f1707ee5b0f8e8	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrations/truth/39718179078-1/438675dd60739c7938748d2f9b4264355c361155	cdcb8db569f88e135e967c292fdf87beebb6bea0	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrations/truth/39764654927-1/0f15227c02ef73b149b8df703645598af048ce26	3c9c943f57805239143fbaae2e3c30f3ebbc50e8	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrations/truth/39772865727-1/2e6f3d3f586323e999e2bd66dfa91e1d0f54b2c7	ca8c30eb65029670c43942976dffdf4a5e69229a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrations/truth/39775711848-1/7d80e9a902db7af90a0202f4bb64e776a653915b	5bfe3ec6294706519c0fb05bc19eccec270ed89c	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrations/truth/40094925523-1/c5e62f2e954467b7391cfc7cc0f762a8ace9eea6	3c898f90e7e2bba763b594407fbc858bf7c17074	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrations/truth/40375648244-1/7b4ccdb7d8f5e58e5005457e3c6fd0ee004be28a	7a8106135125b7208f92ebc06479232af923dcac	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	integrations/truth/41112037602-1/77bf33454a8553d24ba9cf608ec7f251f61947e5	7713f92cd89e10e1d79c2ae87679c97f4212686e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/37376803849-1	087a09a7bac32fbdd20433b7e7d3c95d960d371a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/37461746437-1	1457d62ad38083c95c161bf339f46539bd21f6b2	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/37617905904-1	6ea46b9314c60ec6e8700d5bb5c12dfc577cd974	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/37775458438-1	ec0c8a7291be6b94fee45114a2711709d20729e8	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/37927810159-1	be4cad24bf2e57f712e497a9a09f18da2db466fc	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38048173093-1	afe8414aa7689d0b57da35734c08327d0a968f08	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38136166425-1	ba31527f8888f6dacdd6a459d60d5a8e2eb600b5	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38256291396-1	7b0863bef28c7dbc9bfe630327223cdcf2df35e6	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38401102555-1	dc4f1538ec8f22361853b04077a6363de2fef753	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38550774545-1	e74308d516beba1e41dac199ef91a02c9df7c311	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38719279864-1	ffe8162856e53e9c742c30188bd16f0818d77954	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38884971647-1	afe7b858ba2641dbc5641cb57f6e2accdfa12661	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38982615703-1	1cfd5d267520ea1c4bed767c731c99b7225d3717	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38982691598-1	1d14de3d6bd24023629377bf2594fb546873e2e0	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38988276917-1	0f5e88deb30cb2ae4b7c634eaf676e3c0f911fed	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38990680037-1	95ce386dc7650548ce72b36f8790a07051f0efd8	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/38995442753-1	603e3536f11e28f16d5bb14ee623f4ada38054be	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39002205601-1	a8032db5872f89fd174c564ee84f51a4ed91a04c	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39004223783-1	5a464ef55791773185104c6d67d12cacb4156c42	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39005759407-1	6ca443844ff146cdaa02b735b806ac5dead59d83	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39009267502-1	392966a12b5d1c5591d86343c123af438d7002c7	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39014163089-1	a8b81ae9f8f5022e15498a276a3ee167642f4335	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39022030820-1	6aaba0bd8c33521f45a75510007f84f7ef7208ef	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39117097816-1	e5c83d9694650e591777f2a746f28a4a31c37c2e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39123654979-1	d096cd2f0515a8aa2f9de1b671f5f227beba5478	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39169162198-1	2c3a651a9c4353401c26491b05d4236ba3d69b1f	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39243403108-1	947e3677305c58822a74ed00d086f69d65a48a4c	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39407782976-1	36e3b43ad48f02c136a96ff01109d56c0a680042	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39585718351-1	10d31bc6bd35ef7d1589a32274a3e3f56136e186	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39699289312-1	c8703ff48d594f364da2269614d1398693e0c756	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39718179078-1	f1c86bc07b471e34715eb93c88e7a06dc967f58a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39764654927-1	49094053cd9bc6d6d1bc16d233b285355f171d85	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39772865727-1	38b9d56ec79b69cc5d877e9b7ec26f810a4a93ae	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39775711848-1	714c14d2c213df3ed8de9162cf4a6542b2a2d3cc	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39864789462-1	cdf629a9ddbb0ec6f785c5b5b13547bcd9b61962	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39939657965-1	65e90cc3ef00835d6526a8e65d1ee736502b1df4	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39957170536-1	728c17cdd6db8127d0708fd82b7143057876bc0e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/39980052757-1	43e451120dbe09176609741e0bde88808d455082	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40083344362-1	cd863845f370fed7b38bf9763fdfaa20bc0ffd9d	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40093416587-1	bc4045806d51d0f36cd3e5b6827323449454eef6	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40094925523-1	a35f8bc5a98ba5af17611ff4a7cefc95016538f0	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40183546501-1	3d0cadd9372a3e97ce36746a274ddc3f7ca10d6a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40315797439-1	aa69ad848ebb2782ca9dbbd1b6c577cfa8440c4a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40368242732-1	fc84531eb827fc8447fbece0ab050f0a05d93f9a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40375648244-1	e7719ff1b8f74109d57805c143f0d077875e63c1	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40392297975-1	707b93992c30cfdcc91473603f8a5c4ce0313042	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40408283226-1	99299f92e814f1b8ac904720c0456e76864f7150	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40492714579-1	cbb56557543cfa538640e3a3d89aef5dd4a4738b	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40681540078-1	f6ee22c90514dc9071f4aede5847cd40c489bd04	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/40867827343-1	2f7397ac0a118868efb9bafe3e4356a587f0f136	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/41049555836-1	4b54a3edcbea597aae14cceaebfe9310835a3981	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/41104655550-1	bdef030d405ec90186bffafdac52713c335aae40	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/41112037602-1	41947ca2b0ec4a3305007e4a60e521ff5b74eebf	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/41196000950-1	495bba9ad0d508a2b811d5b1a3ed10bddee4e4c9	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/41304485342-1	673064a6b6bafbfd9660b755dfef44344ede8b5f	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/41640390476-1	c777158e966ddacbe8a4461d2cdd302a4c73a69e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/41836657171-1	64e8d71737a5a25193dd6dda0a1d1f7847a780f0	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/42036192094-1	3f51ce2632727b884850f9c288b187255987b788	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/42223807317-1	afe13336dbc444328b3c977953d5a898e2108772	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/42370195689-1	218dc7451be9ee74962a8f556a822c407d6f74d0	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/42479099422-1	302049ecc2be04cc3bca212d62f26812dfd746a4	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/42633771650-1	dcbacda8cf41f5ce4002872caa6853b161868b08	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/42827516617-1	2c93099a166d96513726e4acf83843b28349a913	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/43024776854-1	17ca1df710dee17e9b1022b02affd3153c2145a7	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/43232523080-1	5392b30a16814751d2c131984381c96b3643d809	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	observations/truth/43595117272-1	b04ad183c9c040002cba33d1332e9769aef518d0	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-2026-09-04-the-62-77-landing	004dfb3390fab8ed3a7786592825b0e2ade6684e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-2026-09-04-the-app-and-workflows	1e8b24fd23d739143ae7c4aeb82147a27156af91	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-2026-09-06-stale-blockers	5a5f098de824b0c9eead3e0caf248018d159de1a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-2026-09-09-a-cancelled-branch-run	37bdf67be1d6d14679f10a075dbd9c121aaa791e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-2026-09-09-run-197-fall	c16232f456485bcd1f12ed705d108d18f2305205	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-2026-09-10-the-cuts-and-what-they-cost	c688c8a147afab99339cc8afe06a80738ff3ba4f	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-2026-09-10-ticket-107-the-lane-answered	30e3b862a73738dc93c4a96aec250c8ff6390cef	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-fixes-2026-09-23	bc09c45bd16fb94071d88bfc3a6ea617241a3ace	refs/archive/heads/record-fixes-2026-09-23	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-run-277-supersede-echo	164d4b31e5df864c5187fd1e473148917ac10dfb	refs/archive/heads/record-run-277-supersede-echo	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-run-290-priced-holes	dc66130128c71d6c50a9cac48c34fa4861aa716d	refs/archive/heads/record-run-290-priced-holes	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record-run-339	64b24cd6acdb9481d3e5e1b341a089d166d0a7db	refs/archive/heads/record-run-339	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/155-inventory-encoder-native-20261023	820b8091c6de985499b545a54c2ba7c330ca5269	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/46-signed-adapter-releases-20261023	10ac532c5f6d273500daecf56b3c5e64a48a29d2	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/accepted-assurance-and-runtime-delivery-20261023-signed	64d6e15ce5fca558a79c9787877b7c0fb331fc15	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/compatible-feeds-adoptions-20261023	75dab6e27453cecc7a23f4f2eddc9abe8f7b9644	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/delegated-response-reconciliation-20261021	542125ba891a646749b253a2d367c1996611c513	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/handbook-archive-log-20261021	d6eb22bfc0919ddf1d26155981aa5c4485410b19	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/owner-adoptions-final-20261023	0492837b5889a63c134c09e4ce35f86d095a3221	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/party-bands-and-compiler-validation-20261022	a44a6559912821c9283ecab28a0914d29539e6e6	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/quote-disclosure-delivery-20261021	bf11624ba5e3b4bd117ac97db9f54b9637aff393	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	record/workload-cage-tooling-delivery-20261021	a064848aa60f2a76d09391e0332b9c030e31d10b	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	recover-truth-records-20261005	31ae3cb8389a0ba6f83404d3f417204d7c8ee8e8	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	recover/truth-followon-20261017	97e9a7acfde059f09d9b9635df2b2b41314c1e91	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	recover/truth-followon404-20261017	3e154ad1dde13cda2bd7adba9f6b49c0254895bb	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	recover/truth-followon409-20261017	fdf6f9634073bcb3925494223ea96a033869feec	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	recover/truth-followon412-20261017	0b95a341b3800cea6e148d451856b4efe4afd33a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	redo-rescue-as-cherry-picks	3c2861220548d45867259de91cd6fb5c928a57fc	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	repair-2026-09-04-gate-regressions	d74aa2d620dae74f83c7b938bf3f5f90f17b56e7	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	repair/run377-hub-verifiers-20261004	f10faa536aa441a7f64f42a0aceed6a3d7b8f205	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	rescue-run-101	667d3ef1fa6467435b1657976da7819d612d6066	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	rescue-runs-76-84-88	a769e06e1219e7715fda7ffe995bed0ec08d05a6	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	resume/2026-10-04-claude-handoff	6ed89616d7d43dece00b5daa8f0a03c56b53d5e7	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	resume/2026-10-04-valuation-date	5bc47331a536476f3580542be794908f5053f816	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	resume/delivered-facts-157-160-20261018	1e26de9f69437c4a5010d615cb9a18edb900e542	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	source/metadata-legacy-adapter-revision03	e22924c07e8f18eeb5a4b87387c3acc545f58bf6	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	source/pdf-build-discovery-comparison-remap-20261031	ff966b18d89367f5e08650fd02074d6b1463f5b2	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	source/public-native-observation-20261031	70f1c4b281ea3508bdc1c2a8f7ce3b17a4b3adc7	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	source/public-pdf-host-bridge-20261031	78b6c38bd9e7723888dcc89d08052417ce208f7e	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	source/public-pdf-origin-components-20261031	469350cc0724d975169ce188b2aebb5b88b4d038	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	source/tiny-ci-fresh-main-20261031	79f8dc21785b06b665ec221be9e31ddc4d5656d7	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-100-a-branch-run-says-what-it-can-record	20ad61d5d67f6d81e8978b090fd5649b85891fd5	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-101-the-gates-verify-a-real-signature	aca7eca966968f898167f5ed1bdc0b829db0d8fd	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-102-the-cited-tree-names-who-added-the-check	704610639b9843611084f5cdf76c49431ca532a4	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-103-release-gate-computes-the-bump	a7e71973b71a2ddcafbd99b6010135e7e1188345	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-105-pinned-trust-roots	ebe89f745172a0569f9b99233711e4926d2c7bab	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-106-composition-selfcheck-fixture-namespace	f2eb00b7b99b946ed40dc68b213138631c0826ac	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-107-the-sampler-waits-for-what-exists	b8490f88679260fb1e3216301ed898792571414f	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-108-the-recording-commit	469ceabd57a0a5b306331bf4be723489082de063	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-110-rollout-measured	8b31ee9d55ec7d6cc67a5e4b4123fa71f32a0a95	refs/archive/heads/ticket-110-rollout-measured	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-111-the-cage-delivers-its-classes	937fbc35db58a95600683947632dc9a122ae852b	refs/archive/heads/ticket-111-the-cage-delivers-its-classes	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-112-threshold-states-corpus	5861ad6ac1fd290d7572155c885f2d47f1eff8d3	refs/archive/heads/ticket-112-threshold-states-corpus	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-113-infra-is-a-role-not-a-rung	c5ed865de8f4d4e93e74e79123165d529afacdc3	refs/archive/heads/ticket-113-infra-is-a-role-not-a-rung	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-113-release-gate-one-line	42210bb61bec123b5396d488a2d3610ab64c9872	refs/archive/heads/ticket-113-release-gate-one-line	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-114-unobserved-party-not-green	c77da189ad9f3496bdf393a54b3db84e09b0c639	refs/archive/heads/ticket-114-unobserved-party-not-green	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-115-loophole-procedure	4696ce40881d9f4a46ec4626172cf287734e26a8	refs/archive/heads/ticket-115-loophole-procedure	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-116-twelve-loophole-candidates	79150f21edcc7311a8958f1b6f31bed37139e908	refs/archive/heads/ticket-116-twelve-loophole-candidates	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-117-two-tickets-share-the-number-111	e83b0107a1bc64a12a00736c73964b32bf3748e4	refs/archive/heads/ticket-117-two-tickets-share-the-number-111	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-118-luck-may-not-promote	6c7da70751a731c306ebd311353a269ddfe830a6	refs/archive/heads/ticket-118-luck-may-not-promote	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-119-unlabelled-namespace-is-priced	74d81ce244d4265d24d82fad1691b1ddcb41b2e0	refs/archive/heads/ticket-119-unlabelled-namespace-is-priced	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-120-adr-0026-candidates	ef2b812a2ead5735f38f31f01029d776eabee88f	refs/archive/heads/ticket-120-adr-0026-candidates	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-121-implementing-a-control-moves-the-price	974fc436194f8f056c355b99f2baa901429d5eba	refs/archive/heads/ticket-121-implementing-a-control-moves-the-price	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-122-ramp-survives-rename	c1eeb18000d6e97118bde79c14e11f3f1c638fc5	refs/archive/heads/ticket-122-ramp-survives-rename	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-123-a-withdrawal-is-the-regulators	67d49ab20144abf8041c8bcf5f36a30092b99d8d	refs/archive/heads/ticket-123-a-withdrawal-is-the-regulators	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-124-price-the-removal	8459c04682f3dbc9fb22264e535ae72a341f97b2	refs/archive/heads/ticket-124-price-the-removal	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-125-signature-leak	dab51474fd7a0c493129af556a451a42f1fff216	refs/archive/heads/ticket-125-signature-leak	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-126-a-withdrawn-control-is-not-selectable	fb0df361dff88e33590636ee6f4760cdd7284af5	refs/archive/heads/ticket-126-a-withdrawn-control-is-not-selectable	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-127-pound-seam-switching-price	943529cc67a56c16b0d80bdb8bf1afa16b0eac9a	refs/archive/heads/ticket-127-pound-seam-switching-price	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-128-behind-a-major-unreadable	9ec114a365c26cea6cc4382e913a727f5c38d3ca	refs/archive/heads/ticket-128-behind-a-major-unreadable	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-129-major-acceptance-record	b6d6ebac2cf9d3be257d4453f8de04c8b7bdd983	refs/archive/heads/ticket-129-major-acceptance-record	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-130-the-composed-root-is-delivered	1c18e42029895583f2d501cd1521d28f6fad1028	refs/archive/heads/ticket-130-the-composed-root-is-delivered	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-130-the-composed-set-moves	a5ab0ce147db90f1500b58a8e6fa1322ee47b262	refs/archive/heads/ticket-130-the-composed-set-moves	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-131-sibling-cut-release	832df1be8aec6ec3924f2aacadc72d8dac2be532	refs/archive/heads/ticket-131-sibling-cut-release	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-132-adopter-gate-reads-acceptance	cf7f0dbaec09e0cacc70597d209c44f684797536	refs/archive/heads/ticket-132-adopter-gate-reads-acceptance	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-134-clock-observation-comparison	36599174d31c88016f94b46593b23e2cf96eb30c	refs/archive/heads/ticket-134-clock-observation-comparison	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-135-lifted-app-verdict	f14be36e7ce3ce17d642bcadeedf7e7abbde6eaf	refs/archive/heads/ticket-135-lifted-app-verdict	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-136-selfcheck-driftwood	bc866d5752708af6046e2f7874fbb18b0db938b6	refs/archive/heads/ticket-136-selfcheck-driftwood	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-137-parent-tree-per-feed-edge	1d70e99af3ff936a9e49e3848272ba25b3a1c181	refs/archive/heads/ticket-137-parent-tree-per-feed-edge	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-138-grader-as-of	9e2d348fc26968b1fe0722af87aef69582db5a7a	refs/archive/heads/ticket-138-grader-as-of	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-139-ungoverned-namespace-born	cf370c3de87eb2edfaccf353bd7548d83208867a	refs/archive/heads/ticket-139-ungoverned-namespace-born	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-140-fact4-defaulted-false	16ff6ae4d95fbe7e14d9161ad49b9de97c4d2838	refs/archive/heads/ticket-140-fact4-defaulted-false	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-141-declared-pricing-threshold	eabf2d0eb64b168c89db29e34c9adc42de302dd8	refs/archive/heads/ticket-141-declared-pricing-threshold	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-142a-schedule-blind-spots-and-clock-cage	64c7880e76873b37819e1fc9c7990f1e100e63ff	refs/archive/heads/ticket-142a-schedule-blind-spots-and-clock-cage	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-143a-twin-sweep-split	6e561bb9ee0e96373c0c34e11899d18a0a72946c	refs/archive/heads/ticket-143a-twin-sweep-split	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-145-agent-cage-price	bcedadf29c8508f4ea14da1c45f36035e682893f	refs/archive/heads/ticket-145-agent-cage-price	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-146-engine-cells	f455cab3d350641482f210bdb9c6ac35d2f8cb82	refs/archive/heads/ticket-146-engine-cells	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-146-resolved	f1dafd9b75a3122099de059cc518fd8390edaa90	refs/archive/heads/ticket-146-resolved	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-146-tags-read-only	2cd2be512c6e3f5aacb5884effad151299e3d2bb	refs/archive/heads/ticket-146-tags-read-only	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-147-declared-engine	40f9f38ed5970495a63383b6e51e20797fb4d726	refs/archive/heads/ticket-147-declared-engine	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-148-unsupported-pairing	103e8502529ac7131710ac8766d27435f562945c	refs/archive/heads/ticket-148-unsupported-pairing	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-152-grill	01be9f3d9f418be148c6ed89a8df7995c788a108	refs/archive/heads/ticket-152-grill	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-161-engine-pin	c74ddf18bbe5468ccd3f2780a5d5a0fb23bfa8f1	refs/archive/heads/ticket-161-engine-pin	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-161-reference-workload	bbc3fec0185adb40838f473e3bc2e9f6a416d019	refs/archive/heads/ticket-161-reference-workload	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-17-twin-follow-ups-from-the-aug-05-itemisation	378a6a3a691b9bfc15cc038e11e4a0e3a67fff82	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-30-grill	59ff0202d58747687de0a19c8d24c6535ed8062d	refs/archive/heads/ticket-30-grill	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-31-sensor-admission	9b565cc59f185c2a4892560d6e3f0dc059cf1dd8	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-33-lift-ledger-storefront-and-reports	767718a8c644cb458e8f363947644e754a5dc059	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-34-followup-2026-09-08	646afe326525298ab476849932c75c8c03edee3a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-34-handbook-as-a-compose-time-render	120baf7de706c7743bec8d13949208a4e30715cb	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-35-grill	1f47f3bcaf57e2675dd1a40e868b009f0067d489	refs/archive/heads/ticket-35-grill	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-35-review-fixes	8715bb66dfe12f841810d549da76e102a3e818f4	refs/archive/heads/ticket-35-review-fixes	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-38-priced-holes-in-composition	20d3ea91d7966ca0c319beffc0865b0d5846f477	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-39-supersede-adr-0013-0017-0018	3655bb8f127245e3ead265ed7f574863d8763b48	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-44-eco-system-misuse-catalogue-graded-by-the-gate	c2ab1343b6f81c1cb045cedc34c85706bca26e64	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-45-switching-cost-computed-in-composition	5423ea2485ee017e4711e1ef2f4603d303f4b500	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-48-the-demos-remaining-beats	d78a8672c425611f81078c7982a1653b0daba6b0	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-51-the-supply-constraint-actor-path	d28a8a84efd49f4e2b4a639a112d5a8e3e2b1366	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-53-the-release-pushes-tags-but-not-the-branch	c3474fede75098fc0d809e13b0432a7919b05bce	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-55-every-red-on-the-clock-is-real-explained-and-finishable	9447b0392ef3e8f869e75c84e969d15cb6725f89	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-56-and-85-the-clocks-are-graded	7335de8e298738dadba9bb26b4a2bdd3773ee5f4	refs/archive/heads/ticket-56-and-85-the-clocks-are-graded	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-57-feeds-and-insurer-become-runnable-workflows-registered	fa129d3b4f2f6aa2fc1014179c5e41c1ce267892	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-59-a-fall-blocks-and-status-is-derived	9810abd113bfb97ac618eea001987ceadeb180d8	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-62-and-77-pins-are-checked-for-content	fd0722f0b37c69afc35d6a19fa9084116faab155	refs/archive/heads/ticket-62-and-77-pins-are-checked-for-content	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-63-the-unlabelled-default-flips-to-isolated	f212f7055d312a69d8a989aad2f485d0454107cb	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-64-the-twin-is-three-adopters	2545d1a2dd7876005d6fc3847cd3138f4b0ae7fa	refs/archive/heads/ticket-64-the-twin-is-three-adopters	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-65-enact-guard-closes-the-git-dir-family	fae36d4efd766e3c12865d844b5cce37e2ef1572	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-66-the-deck-check-grades-the-run-its-own-truth-line-names	4ada3a5155bd131927e413f2186166472c8a25d0	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-67-the-record-matches-the-surface	9e89dbbe1394284fd3b16227d4a4041d74a68a4b	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-69-an-untagged-pin-is-a-priced-hole	7287a4e251fd5f85e1196f6be7b0819784372d4d	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-70-the-observation-lane-is-detectively-enforced-and-honest	8e8ef942b5d06832725ce5ac9bdc68223be65b18	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-71-grill	58e7ddb2b2914bdecbe3f4cd3612608e4ceb274c	refs/archive/heads/ticket-71-grill	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-71-upstream-status	bfb23605babf6e8111d5d2ae8f117c4f5a1d51b3	refs/archive/heads/ticket-71-upstream-status	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-72-a-feed-bump-re-renders-the-twin-s-derived-artefacts	d0f93f3ab45d8bf9e304fc905c570e2a4ab4ca1c	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-73-verifier-trust-instant	f5232bc8c82243bcbfc3e2241e6099cae360a6da	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-76-every-green-rests-on-an-observation	49e051ed6241d6eee7f4235ffb46e7b58d520de3	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-78-the-proposer-can-only-tighten	6a4fe60da9ae88616b2c0a74ce31be86d4103892	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-79-the-pound-inputs	bf02a0f0da41629591fab9065d74b4093737c139	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-80-follow-up	31e032cef968a12591a03b1fdb9f00d12e941cdd	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-80-the-record-matches-the-code	f19240c7da72bd48fc7c21b036345e052fceeb5d	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-81-record-round-3-landed	e6075bfc9ec33b6b3717046b8758ba5c891eeab9	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-81-round-3-of-the-sampler-wait-order-lands	669fa620baa9e5d64b46f77b39046fedce2331de	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-82-licence-attribution-and-disclaimers	a98a862d21a2606833a9be1ceb8c6e5b18312da7	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-83-the-truth-line-says-what-it-measured	ecb5a14dd120cdd6b64ff2abd8414695cdf44286	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-84-being-behind-costs-something	71ab892ca3c0cee7a9ff28561ae91b7a7c129855	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-86-the-cage-enters-the-citable-number	f0f8ea74572a16c2da48e6dbce046c37ce50ccdf	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-87-the-forge-enforces-the-review	a149c27688f83a312f668b5f9a0a6fcd19c5408e	refs/archive/heads/ticket-87-the-forge-enforces-the-review	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-89-deny-is-not-a-rung	f8968f6fc435ed6115fd542ba74a8b1c1fef1bcb	refs/archive/heads/ticket-89-deny-is-not-a-rung	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-91-the-currency-controller-is-owned	4211105d6fc06268d14c23f0c3f73b80b3f4d5e4	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-92-follow-up-trailers-and-hooks	b7bf96d5358ef9a69259554e2b317b344f285fb6	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-92-the-local-clock	b90a780ad263e626590048bf626a01433bbaf60a	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-92-the-local-clock-round-4	b340ec7c70b641ce835201b8393bbc95fd9ecec3	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-92-tidy-trailer-space-and-102-answer	6984b9fdec15065730a0c4d060597cb9e59b0a23	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-93-the-twin-derives-a-probability	33ce9fede4ddc28d24f578b208d8b1c3a74cef52	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-96-the-citable-line-says-the-mode	539a1cb413935bc620ef0b506ad01661a231f118	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-98-a-refusal-by-another-name-is-graded	48a1749ad38c36fa1ade8380a3f82011b77a79d8	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket-99-the-adopter-gate-grades-the-change	c8b300bb0080297878d7d10d878dea777e180700	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	ticket46-independent-report-observation-20261017	9e121292725126364562d51a288c57afb71c9003	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	tidy-2026-09-08-tickets-33-45	de2fa830a3d9aabe1bad71bab0b78ac30e55b341	in main	deleted
+policy-as-versioned-flux/policy-as-versioned-flux	wayfinder-laya-loophole-20260921	c673c245f5eae9ab9688c9e35ca89405fdf867b2	refs/archive/heads/wayfinder-laya-loophole-20260921	deleted
+policy-as-versioned-platform/platform	codex/cloud-release-pinned-dependency-20261025	c5bb2b875eabab3da191a186dcfb1b50808b5ad8	in main	deleted
+policy-as-versioned-platform/platform	codex/platform-selfcheck-shadow-cloud-fixture-20261025	20d508cfb42566c6c175668626635c9de5790e15	in main	deleted
+policy-as-versioned-platform/platform	ecosystem/build-2026-09-03	6ebdba7da49daae1249b9459ccf14869f4e738e6	in main	deleted
+policy-as-versioned-platform/platform	ecosystem/thin-slice	72d94f09ec3b5cee48b04210d8fb1e42a0d1d4c8	in main	deleted
+policy-as-versioned-platform/platform	feat/consumer-retirement-20261017	a379622effc904a74f22daf5b458258b884c379c	in main	deleted
+policy-as-versioned-platform/platform	feat/direct-recovery-pilot-20261023	e9550e2d3075848ee2ba07ab123953a48e3d2042	in main	deleted
+policy-as-versioned-platform/platform	feat/namespace-tier-move-evidence-20261019	7c6888a935fa2c90a9beb7a0b57bb3b032e53016	in main	deleted
+policy-as-versioned-platform/platform	feat/publisher-price-reliability-20261018-final	ff60326fe61500c9e9a46fed18dd0e0158ba2d1d	in main	deleted
+policy-as-versioned-platform/platform	fix-2026-09-09-absence-count-is-derived	871e0ef0d87175d5f00dacbff62166e45e2a2e69	in main	deleted
+policy-as-versioned-platform/platform	fix-transition-replay-20260910	ab4a81618ef0ce8fd14d9bf6e543b9adef645495	in main	deleted
+policy-as-versioned-platform/platform	fix/break-glass-finite-bands-20261018	b4686ae7f2b77942bbe9ba0646f248078a67af7e	in main	deleted
+policy-as-versioned-platform/platform	fix/cloud-native-population-20261022	3a72a791d38442c716542018d0a21c2c74a8deb6	in main	deleted
+policy-as-versioned-platform/platform	fix/condition-basis-spacing-reviewed-20261018	0e6fd296803276b139d36d84925bfe93ac908012	in main	deleted
+policy-as-versioned-platform/platform	fix/eol-historical-selfcheck-20261017	f1354374511bccecc6de09d1df464962fd97211b	in main	deleted
+policy-as-versioned-platform/platform	fix/insurance-validity-asof-20261017	55d88f9aeec57aa390c664bc56b0306d286a016c	in main	deleted
+policy-as-versioned-platform/platform	fix/inventory-canonical-composition-20261017	80d66a7f6b75a15235a48ced2676245774126827	in main	deleted
+policy-as-versioned-platform/platform	fix/inventory-complete-composition-20261017	cadda329e00b8d028c9ce8ded0f6cc9150a06356	in main	deleted
+policy-as-versioned-platform/platform	fix/inventory-git-diagnostics-20261022	f4060f10d202acfcd4eccf43f9c76405f2901ad0	in main	deleted
+policy-as-versioned-platform/platform	fix/inventory-publication-20261017	1bd8c239ce39cb02e7a7afe6938a6e294d3e8a22	in main	deleted
+policy-as-versioned-platform/platform	fix/native-historical-cloud-fixture-20261017	931c0e41e6c8308a2e61aff409d459505719345f	in main	deleted
+policy-as-versioned-platform/platform	fix/official-reader-credential-free-fallback-20261018	ace07802551c3b448d6ec7f449772014d6afbbda	in main	deleted
+policy-as-versioned-platform/platform	implement-engine-fixtures-20260910	97dd40d8408451aa05c53b13d11719b0e9c394a9	in main	deleted
+policy-as-versioned-platform/platform	implement-floor-change-evidence-20260910	70cf92d6abfa8cbae74101791752f97c42505cf7	in main	deleted
+policy-as-versioned-platform/platform	maintenance/run377-fixture-and-oscal-20261004	0547a5fa7babe34227be5085ff63b1cf196d8cae	in main	deleted
+policy-as-versioned-platform/platform	policy-composition/tickets-09-16-wip	a64b52f39e5b8e345518ed23a95626d1f3daaad2	in main	deleted
+policy-as-versioned-platform/platform	repair-2026-09-04-gate-regressions	734e002c5f48dc02711fcc1140367948be4da703	in main	deleted
+policy-as-versioned-platform/platform	repair/array-commit-for-4-0-0	6aef448a8c1cfcd230e86325065589be6e2d689a	in main	deleted
+policy-as-versioned-platform/platform	repair/evidence-reaches-main	b83eba1481ce21c4b6afe6a8d4ca6be0e8045a47	in main	deleted
+policy-as-versioned-platform/platform	resume/2026-10-03-security6	e18d0e2faca3b8ae5c1c4c8a03a9560008a42b5e	in main	deleted
+policy-as-versioned-platform/platform	resume/2026-10-04-compatibility7	e0b6f9f3cb33e90e9208c59affdff5afb89fc637	in main	deleted
+policy-as-versioned-platform/platform	resume/technical-quote-conditions-20261018-ea409	ea409dde8389a949ec3abd3955271252deeca44d	in main	deleted
+policy-as-versioned-platform/platform	retire-policy-4-0-0	92eadf508df09795280b4d282ec607da0ac9da4f	refs/archive/heads/retire-policy-4-0-0	deleted
+policy-as-versioned-platform/platform	retire-static-access-20261021	c7e65e76fe0d366787d9f86559400f49d8e3e577	in main	deleted
+policy-as-versioned-platform/platform	ticket-106-composition-selfcheck-fixture-namespace	c28b28ec72b7da2aa220e70127d9b48159d77af7	in main	deleted
+policy-as-versioned-platform/platform	ticket-110-offline-supersede	41761fa9747b63d73f52bbc8d9ac40bf3b28faf8	in main	deleted
+policy-as-versioned-platform/platform	ticket-110-selfcheck-derives-supersede	616f961e6b97e4346ca94eb67ea42120244022a1	refs/archive/heads/ticket-110-selfcheck-derives-supersede	deleted
+policy-as-versioned-platform/platform	ticket-111-the-cage-delivers-its-classes	a5b1e637bf8ea324f6475a14bb0f9ce2e87fdd39	refs/archive/heads/ticket-111-the-cage-delivers-its-classes	deleted
+policy-as-versioned-platform/platform	ticket-113-infra-is-a-role-not-a-rung	026a8bad22b4c59b2b702912f12e3767ed8d69d5	refs/archive/heads/ticket-113-infra-is-a-role-not-a-rung	deleted
+policy-as-versioned-platform/platform	ticket-119-unlabelled-namespace-is-priced	b3d77e36675efcc1be11cbdf11442c7109ba029f	refs/archive/heads/ticket-119-unlabelled-namespace-is-priced	deleted
+policy-as-versioned-platform/platform	ticket-121-implementing-a-control-moves-the-price	61ccfa75c8277bf06a323719c16f85f634d1112d	refs/archive/heads/ticket-121-implementing-a-control-moves-the-price	deleted
+policy-as-versioned-platform/platform	ticket-122-ramp-survives-rename	d504bfbee3b80f461a39cfeccffdcb49864b979f	refs/archive/heads/ticket-122-ramp-survives-rename	deleted
+policy-as-versioned-platform/platform	ticket-123-a-withdrawal-is-the-regulators	52162aea827f682695ed08e0dfa087f3948c2c36	refs/archive/heads/ticket-123-a-withdrawal-is-the-regulators	deleted
+policy-as-versioned-platform/platform	ticket-124-price-the-removal	f9311d894006c88a92837789ac9f92902092b446	refs/archive/heads/ticket-124-price-the-removal	deleted
+policy-as-versioned-platform/platform	ticket-126-a-withdrawn-control-is-not-selectable	4ffb2381de55e19e9129a025b36ede86b6080f8f	refs/archive/heads/ticket-126-a-withdrawn-control-is-not-selectable	deleted
+policy-as-versioned-platform/platform	ticket-128-behind-a-major-unreadable	1698f4853d023606d23a211f00cae2bbb40deabc	refs/archive/heads/ticket-128-behind-a-major-unreadable	deleted
+policy-as-versioned-platform/platform	ticket-130-the-composed-root-is-delivered	254a155e186cad574e696dd09d648a88a6142f02	refs/archive/heads/ticket-130-the-composed-root-is-delivered	deleted
+policy-as-versioned-platform/platform	ticket-134-observation-is-not-source	323e8a01f3b6a20f284bbc9bc8397d3bb72abe32	refs/archive/heads/ticket-134-observation-is-not-source	deleted
+policy-as-versioned-platform/platform	ticket-136-vendor-by-feed-name	c8688690ee1b26732d4f7dbb3b590af859f0169e	refs/archive/heads/ticket-136-vendor-by-feed-name	deleted
+policy-as-versioned-platform/platform	ticket-137-parent-tree-per-feed-edge	6b812cf9eceb2b338c71c74f6d4b89542d33c347	refs/archive/heads/ticket-137-parent-tree-per-feed-edge	deleted
+policy-as-versioned-platform/platform	ticket-138-as-of-docstring	35fb57e6e5600173213d51b6b48a8f7f6bc8a128	refs/archive/heads/ticket-138-as-of-docstring	deleted
+policy-as-versioned-platform/platform	ticket-139-since-after-as-of	ac05cb13b50730f3566ca70151989943f3dfa628	refs/archive/heads/ticket-139-since-after-as-of	deleted
+policy-as-versioned-platform/platform	ticket-141-party-declares-pricing-threshold	e2911390bff2a69eeca2d7dd6c92f4b3d0721557	refs/archive/heads/ticket-141-party-declares-pricing-threshold	deleted
+policy-as-versioned-platform/platform	ticket-145-agent-cage-price	0f462338c5ef2c0e14c2185d50304f0faa1b2a94	refs/archive/heads/ticket-145-agent-cage-price	deleted
+policy-as-versioned-platform/platform	ticket-146-engine-cells	1dba561fbeb8f2fbd47004b2d79a3180327f3dd7	refs/archive/heads/ticket-146-engine-cells	deleted
+policy-as-versioned-platform/platform	ticket-148-unsupported-pairing	923447e4b1ebeb104554aec464750f24fd6a5898	refs/archive/heads/ticket-148-unsupported-pairing	deleted
+policy-as-versioned-platform/platform	ticket-34-followup-2026-09-08	304e5ce43562bdec4ab5ef64b2bc55973ee4936d	in main	deleted
+policy-as-versioned-platform/platform	ticket-34-handbook-as-a-compose-time-render	470ce1a2db1a91070c265fb689f73d32f2675372	in main	deleted
+policy-as-versioned-platform/platform	ticket-45-switching-cost-computed-in-composition	6c097ef192e28e89d35a541bcf12b5e39aad2332	in main	deleted
+policy-as-versioned-platform/platform	ticket-55-instrument-faults	04184df08c5865e324546f69451b9642afb7c3ae	in main	deleted
+policy-as-versioned-platform/platform	ticket-62-and-77	2faea44574170c5f5bd58c7b6c79583ed0c7502a	in main	deleted
+policy-as-versioned-platform/platform	ticket-67-the-record-matches-the-surface	ae13f1eb07c76a937b3467bebfe761db9978bc98	in main	deleted
+policy-as-versioned-platform/platform	ticket-79-the-pound-inputs	a6636b956b21d364988888c7151b0e344b3a5efd	in main	deleted
+policy-as-versioned-platform/platform	ticket-80-three-forks-not-a-config-base	fabe1174001336d8b70f77c5c5b4951e665f660d	in main	deleted
+policy-as-versioned-platform/platform	ticket-84-being-behind-costs-something	b498634071d8a7919fadea2cfbbb770e1407606c	in main	deleted
+policy-as-versioned-platform/platform	ticket-89-deny-is-not-a-rung	8062791c0430bba2617b18dd8641d9ed6a5afd99	in main	deleted
+policy-as-versioned-platform/platform	ticket-91-the-currency-controller-is-owned	5b3e827a3448d93f0b578dafec5cbe241009069c	in main	deleted
+policy-as-versioned-platform/platform	ticket-98-refusal-by-another-name	7f95d4a755932e82dd81443904a6da2c599a0112	in main	deleted
+policy-as-versioned-platform/platform	ticket155-explicit-workload-cages-20261021	d89ccc4b7c52a5e06323069df197f5b6b8735adc	in main	deleted
+policy-as-versioned-platform/platform	ticket27-party-assurance-bands-20261021	e84546939a19a4edfecc8cf04cae40f3a551a2a9	in main	deleted
+policy-as-versioned-platform/platform	ticket27-shared-assurance-factors-20261017	ff83d637dfe09cb5ba1dffbaf135a7708b868938	in main	deleted
+policy-as-versioned-platform/platform	ticket37-counted-condition-evidence-20261018	2d3d44dc9fc59f41ca403faaf76f27fed321e949	in main	deleted
+policy-as-versioned-platform/platform	truth-surface-computed-semver	b10c9e80daccb2fad85c80f68f9b9562853edf44	in main	deleted
+policy-as-versioned-platform/platform	truth-surface-live-tails	3124d18841bdf5132e5c0ddff6d6c6a0b801685e	in main	deleted
+policy-as-versioned-driftwood/driftwood	adopt-v3.0.0-composed	9609853efe747d088630acf60a9c610f8b31f03b	in main	deleted
+policy-as-versioned-driftwood/driftwood	adopt/assurance-isolated-recovery-20261023	d2c6f835e006b221711a72ab7886eaea5b34decd	in main	deleted
+policy-as-versioned-driftwood/driftwood	adopt/illustrative-insurer-quote-v2-20261021	8cdaf28182d0dddbb20503d8c29d00e52ec13da5	in main	deleted
+policy-as-versioned-driftwood/driftwood	adopt/owner-policies-final-pointer-20261023	beaeeb9bcc33515fffa689fe56a06ad403b2dda6	in main	deleted
+policy-as-versioned-driftwood/driftwood	bootstrap-apps-inventory	c9eff7a354ccb7eef4c51bde38e2915b4b686b95	in main	deleted
+policy-as-versioned-driftwood/driftwood	build-tools/5.6.0-tier-move-evidence-20261019	e91986c5a045bf4b7979f754d3a0943eb3c3be8b	in main	deleted
+policy-as-versioned-driftwood/driftwood	build-tools/6.0.0-access-retirement-20261021	f0bb9f5049d67ac1c480aeaf1836030d801a4d7e	in main	deleted
+policy-as-versioned-driftwood/driftwood	build-tools/6.1.0-workload-risk-producer-20261021	6041db1ebe64056080a50bcfd5cee15fe5291a48	in main	deleted
+policy-as-versioned-driftwood/driftwood	build-tools/6.2.1-inventory-git-diagnostics-20261022	1c584aeea91bb7cfba5c24a75377f07187935c24	in main	deleted
+policy-as-versioned-driftwood/driftwood	build/feeds-abi-5.1-final-pointer-20261023	73949dee1203f49fc844604fbdeb6353155aec53	in main	deleted
+policy-as-versioned-driftwood/driftwood	build/feeds-generic-abi-4.1-20261023	dc5e1c8249a90928e02f47416c7102f4b4812b67	in main	deleted
+policy-as-versioned-driftwood/driftwood	codex/adopt-delivery-no-writer-gate-20261025	b43b9e284d94f59c36062d12c08d13bed6b83d08	in main	deleted
+policy-as-versioned-driftwood/driftwood	delivery-stage2-20261004	de03c5bfc3bde938b30c538d6027508e7f14ee38	in main	deleted
+policy-as-versioned-driftwood/driftwood	delivery-stage2-atomic-20261004	98d13782173342bbdfbd14271e1626e3b11b0d73	in main	deleted
+policy-as-versioned-driftwood/driftwood	delivery-stage2-composed-B-current-main-20261004	2dd89404f699a4af70e6a44451793347a4af11ef	in main	deleted
+policy-as-versioned-driftwood/driftwood	delivery/shadow-instrument-final-pointer-20261023	89a25355b38d8985232cca009d206b5b9989ced0	in main	deleted
+policy-as-versioned-driftwood/driftwood	ecosystem/build-2026-09-03	66b708b14f4df55621eae89b4f4b4600f2ca6b8e	in main	deleted
+policy-as-versioned-driftwood/driftwood	ecosystem/thin-slice	75eff99318e70ffde5c81ee4b667f82b6addc86e	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix-scheduled-tools-20260910	84d7f4fbfe82f2663c678f50177cc2cf98308d34	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix-twin-signed-tag-resolution-20261024	81c4da481607b05b826d63326b78bcbbb190e875	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/await-owned-probe-cleanup-20261023	d192cb22d671957058aae5e47a9555fa87d2e31a	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/combined-shadow-twin-20261023	120a48c69144e9b23b9efb93cbc7e9095ec34805	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/development-controller-renewal-20261022	0b0d5e99e507481c39ff89f3348391be2faa5aae	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/inventory-proposal-delivery-20261017	03d668ec1f346ee8817dddcdcad6feccb4a03cb1	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/lifted-apps-source-cleanup-20261005	82687a513f7bdfe04c72426a10d8e36f09bd597b	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/observation-delivery-20261017	02a8890cd125307b57459795746b05afa219b836	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/offline-observation-signing-20261017	0cafa5a051c7e78da882934936a03b3fcd9d8359	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/oscal-risk-join-order-20261017	113d718ef2e73a08bd38c66ee8f349598fa1e781	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/party-validator-compiler-route-20261021	6025711cf4b06c5756196d22728beb3fff9e45bc	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/ticket161-landing-day-20261018-275ef506	275ef5069ac4baa54735ee5845417882b2f1ca19	in main	deleted
+policy-as-versioned-driftwood/driftwood	fix/truth441-multirow-signal-derivation-20261022	2033231a1e27b0031ce7026147771787d5822e60	in main	deleted
+policy-as-versioned-driftwood/driftwood	implement-platform-tools-20260910	b0d41f56ea15afe84fed5121e39594f202fb21ca	in main	deleted
+policy-as-versioned-driftwood/driftwood	implement-ticket-86-20260910	5aab7daea9b8f0a3333c0e967d19d3ca1cd48896	in main	deleted
+policy-as-versioned-driftwood/driftwood	maint/compiler-v5.3.1-driftwood-20261018	11386182177289590107b76288280375412cdef5	in main	deleted
+policy-as-versioned-driftwood/driftwood	maint/compiler-v5.4.0-driftwood-20261018	f0c734a3ea50163e44ea04295859d868029365cb	in main	deleted
+policy-as-versioned-driftwood/driftwood	maint/compiler-v5.5.0-driftwood-20261018-final	613f53f71a650d5d7915b80a31e609d370d250f3	in main	deleted
+policy-as-versioned-driftwood/driftwood	maintenance-delivery-order-after-final-20261004	8d9ae2ec514ca75c2c460b4f057a3a741e69b21a	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/38986190615-1	ae88f01c64cd6a0b265fc6d6d09fe9d5840ed10a	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/38989497737-1	ccaf300a6ca86e2080df4fc0d84ab92d6d09696f	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/39026194433-1	84950d70fffbdb8e19f0911230f079cd2597febf	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/39122015854-1	5326bc3ebd422bd28135e210126c2d0ce5391f72	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/39259206859-1	329d0075ce223b91d275d9245ece55bb45c62657	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/39416573721-1	e249757d7a5bf01588140cf656074542b73edb10	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/39595096779-1	cf7b7176feb841af9ccb9ab6ab9b6d495e41cdcc	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/39774217062-1	83a18130723205d6e9722cdadc82c8c20b4958dc	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/39947853753-1	c875ddb5811c300ce9284d1eafe1b2e27e11d337	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/40088379895-1	449476f24a8b39486757c6d6591f797a34496578	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/40189331023-1	d557b41a18c443d28b91f3bf20d7e6238240a151	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/40327738480-1	d2636db3e524cf4097f55fef9baa65ce6811d238	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/40502218965-1	ec55bb20136387ef3abbe9c4878a4d70673b4944	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/40692151166-1	2fd66be37df8a594cd636ecefea687303e7f890f	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/40878624594-1	368dd1e1bc2f65a42c8041c3c2db694683886e73	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/41059341460-1	77b858b866e7a4c2845036d0f6d75b4ba3c03b3d	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/41201690113-1	6b104d8b95e73b306ce1bc1c3fc6151da00b9e98	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/41311340320-1	09ea84f0fdae42ca0067b62c7541cd58c23647b1	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/41476655888-1	e994276dd3aee4202d3fe32ed4dda622ce489b2e	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/41652347964-1	598feb3cd927c011ceffd41ef8ad3eb454b914d7	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/41848986624-1	eb96ca2df567635f5c78e81f3ff5fa1a970b5f99	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/42047378691-1	dcfb54332c181e4cd05b9551f0ffe831f3edf8b2	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/42232802788-1	701a7b48e340780d94117949059ea14f31683f5c	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/42375271124-1	4337e1b3abda7a4d47e6dd11b6a8011b362fa357	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/42485045892-1	e4f7882982ef811103b3a331290798febe6dcdc0	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/42654240268-1	46a1a3a099f15d09c51d6580eadf1a3ebff6dac8	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/42838934125-1	72ee3d297e4c43566161207fe26875fb6ef349e2	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/43038293575-1	1162972ff7b6f4f7c427e1935b46f9203bcc75b3	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/43444424804-1	ca010ce0dd27df047c6b7c6f906537173a4021db	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/drift-sample/43600336109-1	ec9883625760356100b5fedc81f2472d1801c2bf	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/twin-sweep/38986190532-1	0e8b1b08ff6575b2d125e12979a70ffa049725fd	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/twin-sweep/38989497666-1	7049af48eb3478429018ae46f706512aec6a40e8	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/twin-sweep/39029081279-1	a95015038117ffcb0debca5af52d344b6bc0eb4d	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/twin-sweep/39125544807-1	404a58e2346aa0c5db7d90276bd6cd506bb828e7	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/twin-sweep/39270264833-1	625e269cc84756682a689cfa3659ab39f1a8f7e3	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/twin-sweep/39424007978-1	210b5d11ae8eaf566d0d6a949298f1c5fa049668	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/twin-sweep/39603062704-1	ccec9f2462e13e0ab657ce951505c1458f37cacc	in main	deleted
+policy-as-versioned-driftwood/driftwood	observations/twin-sweep/39782231337-1	9787b5e74710728ce8db8bc7650310a667a9e7e2	in main	deleted
+policy-as-versioned-driftwood/driftwood	phaseb-policy-5.0.0	0d189b3679787df1dde097f7d1b4a7bb39095ffa	in main	deleted
+policy-as-versioned-driftwood/driftwood	platform-v4.0.0-retire-4	2cce2e32c5691e01f901c0ee267b4f61f2807d28	in main	deleted
+policy-as-versioned-driftwood/driftwood	policy-composition/tickets-09-16-wip	371805bf2a28c056cfcd38aad92e447949d32bee	in main	deleted
+policy-as-versioned-driftwood/driftwood	promote/composition-v5.0.0-20261021	3d0e49150b8998ef4fd304071d204bdfc6bcc66c	in main	deleted
+policy-as-versioned-driftwood/driftwood	recover/original-clocks-20261017	afa5c542dfee65721f086d6ebbe3fe4114eabcd4	in main	deleted
+policy-as-versioned-driftwood/driftwood	repair/every-composing-job-fetches-its-parents	f7cd3ee35207b39f302ec67936b4be6149ac8373	in main	deleted
+policy-as-versioned-driftwood/driftwood	repair/signals-follow-the-pin	6a2df165481b1d68546911de3fdf1c4e0a567e83	in main	deleted
+policy-as-versioned-driftwood/driftwood	rollout-platform-v3.3.0	4d04ac0500ccd2b4601bff47f7e0c03663c4b5a0	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-101-the-gates-verify-a-real-signature	f57e7420bcfe84d8d9f1bb6864db78f48fb623b8	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-105-pinned-trust-roots	37548380153544944dedac279f3c45835db20f94	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-107-the-sampler-waits-for-what-exists	2ba377ec87e990cf1f219b43d13d2f782d973ba0	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-130-the-composed-root-is-delivered	659a1358436be45f32adc31e05bbc9233dba987b	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-131-sibling-cut-release	96f40bfade67fca09c8559904ab3bbe150ce084c	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-132-gate-reads-acceptance	9f2362db8274d377ab93828b67015cd95f3ae9d0	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-140-fact4-omitted-zero	139bcc49b18078f703cb7ecb46009992c02bf293	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-143a-twin-sweep-split	294080a73f6d0dce23ae302ee89f0b8854cc1131	refs/archive/heads/ticket-143a-twin-sweep-split	deleted
+policy-as-versioned-driftwood/driftwood	ticket-147-declared-engine	171c38c8c94039d5697e916ea3f2ac1c806caafd	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-161-reference-workload	8312f1a0ebeec4fd5f8d2a5f5a0c0953b5834aeb	refs/archive/heads/ticket-161-reference-workload	deleted
+policy-as-versioned-driftwood/driftwood	ticket-33-lift-ledger-storefront-and-reports	60827c724d7058d9b3379de2cfb9edd123dacb73	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-34-followup-2026-09-08	65c90781ba771e70b77f7f6668d885ce83503849	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-34-handbook-as-a-compose-time-render	82683b0338d0e4fe33f25379c25394ad664f1fba	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-51-the-supply-constraint-actor-path	a06bfbbe8c3d4a7d4ef3382a989c5a0ba41313b7	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-60-grade-the-lane-sample	9efa3074b9a32aae4c7a06d2353a0cc227600a62	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-60-sampler-waits	b780246021f2ea52f2a9080d307c134366902826	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-61-allowed-commands	4aa72b508e21ab50f7f5f8a4784876ad1c27fc85	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-61-one-renovate	fc1a25210b30283d7b828abeb4c677f557a38e4f	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-61-renovate-completes-step-2	a6b8c18100e4644b139ae4a8d7dcb74677d58f5f	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-62-and-77	c054852394c96c399cf9ceafb1f942af523cea46	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-64-the-twin-is-three-adopters	d239d09584a732503c9512b3232b83a115924a6a	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-67-the-record-matches-the-surface	f3a6f34deb5dc20566cbfdd686c082577028d2de	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-84-being-behind-costs-something	4882d8d82bad8791f76454ca53068cbd404837cc	in main	deleted
+policy-as-versioned-driftwood/driftwood	ticket-86-the-cage-enters-the-citable-number	35e46eeee249da7c144f42782e266939ba2da36c	in main	deleted
+policy-as-versioned-driftwood/driftwood	truth-surface-reconcile	6237273a89f7c115c4fde8d6f332818935e96b64	in main	deleted
+policy-as-versioned-ico/ico	build/penalty-schema-adapter-4.0.1-20261023	f4ae1f9c6ec8326a9dafe56a2d3c1374733652bc	in main	deleted
+policy-as-versioned-ico/ico	build/penalty-schema-release-queue-reset-20261023	cfd76d9dfc41ab2d088290e2c91f2b374914e259	in main	deleted
+policy-as-versioned-ico/ico	ecosystem/build-2026-09-03	cc2eefdee54cf93b5fbe974cc235b8ef17fb3aa5	in main	deleted
+policy-as-versioned-ico/ico	ecosystem/thin-slice	a5c1987d1a5f8e13300f77a0c99b491c4713b18f	in main	deleted
+policy-as-versioned-ico/ico	feat/publisher-widening-adapter-20261018	ff7426bce61c871763a0f67cc94fc4e73eca93ae	in main	deleted
+policy-as-versioned-ico/ico	reset-bump-after-v4.0.0	f48a71940b80afe34243a1e7a0cc1883111647eb	in main	deleted
+policy-as-versioned-ico/ico	ticket-103-release-gate-computes-the-bump	a35d6701ebd47543b81b759f5896bf120279b2bf	in main	deleted
+policy-as-versioned-ico/ico	ticket-62-and-77	70086fd7f5ca6af602ca77b155b1e53f415eca5e	in main	deleted
+policy-as-versioned-ico/ico	ticket-67-the-record-matches-the-surface	995458c1ba5c9b24da58d2b59d9879d740950a92	in main	deleted
+policy-as-versioned-ico/ico	ticket-79-the-pound-inputs	9899bc5b49564efa46875855aae4e64822535a62	in main	deleted
+policy-as-versioned-feeds/feeds	build/threat-register-generic-abi-4.1.0-20261023	8c578e39c584f7eae81eabcfcf4bb341309a8045	in main	deleted
+policy-as-versioned-feeds/feeds	build/threat-register-release-queue-reset-20261023	25214d1391290b41ddb893378fc6bc4477e3ccdf	in main	deleted
+policy-as-versioned-feeds/feeds	ecosystem/build-2026-09-03	47db69a79be51c8a74930e0bbcad31814ae7b2e4	in main	deleted
+policy-as-versioned-feeds/feeds	feat/direct-recovery-pilot-20261023	030bb900344a732bc8f3fb922fe06edd7be7d72d	in main	deleted
+policy-as-versioned-feeds/feeds	feat/publisher-widening-adapter-20261018	8cbcea0b4ef5f5aa3a203e5bcc6569795d6de29d	in main	deleted
+policy-as-versioned-feeds/feeds	fix-skill-gate-drop-github-markers	579575f7b70c717b0fc2c8fed476e2d25a76ab89	refs/archive/heads/fix-skill-gate-drop-github-markers	deleted
+policy-as-versioned-feeds/feeds	fix/cve-read-timeout-20261023	07b96d429c37b57f9a34de62c39647e2a8271dad	in main	deleted
+policy-as-versioned-feeds/feeds	fix/eol-first-publication-signing-20261017	48b77692cbb8f593c14f550aefe7e8cad72a6ef7	in main	deleted
+policy-as-versioned-feeds/feeds	pilot/recovery-expense-2027-model-20261023	1d54097c6746646a87c70677f29243a506666eee	in main	deleted
+policy-as-versioned-feeds/feeds	pilot/recovery-forecasts-carrier-1.0.2-20261023	63b0c9a709fc8acd9cf8d410ef69fece68a58669	in main	deleted
+policy-as-versioned-feeds/feeds	pilot/recovery-profile-carrier-1.0.1-20261023	aa330e617c14fba2dd9f5a556424f8d31238f2e9	in main	deleted
+policy-as-versioned-feeds/feeds	reset-bump-after-threat-register-v3.0.0	ab8af7d65726bfe7529d81b2b076abfc6b1de6f8	in main	deleted
+policy-as-versioned-feeds/feeds	resume/2026-10-03-primary-cve-fx-threat-feeds	37dfe4a2de50f1a1fd7aeb6348d819373188e0e6	in main	deleted
+policy-as-versioned-feeds/feeds	resume/2026-10-04-dated-fx	d62f74e52ed992798a75cf3f4f138ec9c83db80a	in main	deleted
+policy-as-versioned-feeds/feeds	ticket-145-agent-cage-price	b1d9459b39fe53026b57530a683af5df78188b7b	refs/archive/heads/ticket-145-agent-cage-price	deleted
+policy-as-versioned-feeds/feeds	ticket-56-and-85	52762808163b7955cd6f1c5de3b85ff0d3f3af20	in main	deleted
+policy-as-versioned-feeds/feeds	ticket-62-and-77	a4919cf0b4d712ab6d3d1881713acf65abfafb9d	in main	deleted
+policy-as-versioned-feeds/feeds	ticket-67-the-record-matches-the-surface	b571107a0fef7022f75a0d21face3b236b355f86	in main	deleted
+policy-as-versioned-feeds/feeds	ticket-79-the-pound-inputs	1e1b79a017e8f6f83c922b9acbf0bba2afe8455a	in main	deleted
+policy-as-versioned-feeds/feeds	ticket-84-being-behind-costs-something	330fbf06872c2ec2c8637863b624cd902d5534ca	in main	deleted
+policy-as-versioned-driftwood/api	resume-2026-10-03-app-maintenance	1f7f49b7b1ce98f973f355d696920c038b8e020a	in main	deleted
+policy-as-versioned-driftwood/storefront	resume-2026-10-03-app-maintenance	3be69e2f1c686cac77bfd05cefe7cc2e61eb208d	in main	deleted
