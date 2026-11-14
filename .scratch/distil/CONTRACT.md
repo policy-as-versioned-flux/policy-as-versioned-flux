@@ -1,6 +1,6 @@
 # CONTRACT: the simplified estate
 
-Written 2026-11-14 by the architect stage, revised the same day after three reviews, and amended by the orchestrator after the owner's reply "I'm afk. Jfdi" (`DECISIONS.md`, "Later the same day"): leave to cut tags is given, and the red exit moves to a job of its own (5.3). The builders share this file and nothing else. `DECISIONS.md` and `FORGE.md` outrank it. It outranks `TARGET.md`.
+Written 2026-11-14 by the architect stage, revised the same day after three reviews, and amended by the orchestrator after the owner's reply "I'm afk. Jfdi" (`DECISIONS.md`, "Later the same day"): leave to cut tags is given, and the red exit moves to a job of its own (5.3). The builders share this file and nothing else. `DECISIONS.md` and `FORGE.md` outrank it. It outranks `TARGET.md`. Section 11 lists what the review of the built code changed. Where sections 1 to 10 and section 11 differ, section 11 and the code win.
 
 **The mission, in the owner's words.** "quantified risk and a reactive ratcheting process cage to mitigate the quantified risk until the risk is within financial tolerance of the organisation". Then: "Remove all redundant code. Simplify everything".
 
@@ -39,7 +39,7 @@ Written 2026-11-14 by the architect stage, revised the same day after three revi
 | K13 | `pins.sh` verifies a tag's signature when a pin names a tag. | So that moving to tags is a change to pin lines only. It cannot be proven until a tag exists. | delegated |
 | K14 | Driftwood's workloads stay bare Pods, with no rollout stamp. | Every cycle builds a new cluster, so every pod is admitted at the current rung. | delegated |
 | K15 | The party file and the ladder file are JSON, not YAML. | The standard library reads JSON and refuses a duplicate key in three lines. YAML needed a dependency, a second action and a hash pin in five jobs. | delegated |
-| K16 | A notch is judged by the goal it leads to, not by its own gain. | Decision 6 says cost always counts. Judged alone, the first notch would never be taken, and the loop would sit at `baseline`, against decision 5. | delegated reading of decision 6 |
+| K16 | A notch is judged by the goal it leads to, not by its own gain. | Decision 6 says cost always counts. Judged alone, the first notch would never be taken, and the loop would sit at `baseline`, which is not what the owner was told to expect under decision 5. This departs from the wording of `DECISIONS.md` row 6, "a notch that costs more than it saves is not taken"; `DECISIONS.md` records the departure, and the owner can reverse it. | delegated |
 
 Two things follow from the owner's sentence, and the owner has commented on neither: the pound is a real figure, and the exposure compared is the whole organisation's.
 
@@ -598,3 +598,43 @@ No builder adds any of these.
 - Banners on the 37 decision records. Moving or editing the owner's dated words.
 - Any size, rate or reduction keyed by an adopter's name in code. Any model.
 - Anything in `driftwood/api` or `driftwood/storefront`.
+
+## 11. What the review changed
+
+Eight reviewers read the built code on 2026-11-14 and the fixes below were made before anything merged. Each is in the code. Sections 1 to 10 are left as the builders had them.
+
+**The merge gate (4.1, 5.3, 7).**
+
+- `check-diff` runs `git diff --unified=0 --merge-base BASE HEAD`, so a head with two merge bases is refused. It reads git's output as bytes and splits on newlines only. A rung diff is exactly one line out and one line in, in one place.
+- Every ref is named in full (`refs/remotes/origin/main`, `HEAD:refs/heads/ledger`), in `loop.yml` and in `pins.sh`. A tag named `origin/main` can no longer stand in for the branch.
+- For a pin change, `check` works the pins out itself with `bump-pins`, and the pull request's `party.json` must equal the result byte for byte. It then checks the proposed pins out with `pins.sh`, and runs the loop those pins name on the inputs they name with no probe. That run must end `could-not-look` (code 3). A refused input (code 1) does not land, so the loop cannot lock itself by its own hand.
+- `land` approves the commit that was checked and no other, and merges with `--match-head-commit`. Its token is asked for this repository only, with `contents` and `pull_requests` write only. The key file is removed as soon as the JWT is signed.
+- Every proposal is a branch made fresh: `write` deletes `loop/rung` or `loop/pins` first, which closes any pull request left from an earlier run, then pushes with no force.
+- A tag's version is read with `[0-9]` only.
+
+**The loop (1, 3, 4.1).**
+
+- A number that is not finite is refused, in the party file, the ladder and both feeds. An amount that is not a sum of money is refused.
+- A threat feed with no row for the party is refused: no rows is not a figure of nought.
+- A capability the rung declares closed that was measured neither open nor closed is `could-not-look`.
+- A refused rung write leaves no line. A file with CRLF line endings is refused, not rewritten.
+- 3.3's `max(cap, 1.2 x max(ex), median(ex))` loses its third term, which could never be the largest. No figure changes.
+- Sums of pence are rounded to the penny, against 3.5's "nothing else is rounded": plain float addition printed 30894.489999999998.
+
+**The cage and the proof (3.4, 4.3, 6.2).**
+
+- Two more lines leave each v7 file: the unused `tier` variable in `cage-netpol.yaml`, and the `claims-a-policy-version` condition in `cage-tier.yaml`, which the next condition implies.
+- `up.sh` applies the governed Namespace together with the reference, so Kyverno has seen the Namespace before any of its pods is admitted.
+- Run 2 of the proof deletes the pod and calls `up.sh` again without `--no-netpol`. The proof therefore runs the same path driftwood runs every cycle.
+
+**The publishers (2.2, 2.3, 3.2, 3.3).**
+
+- Each publisher's test refuses what the loop would refuse: a duplicate key, a number that is not finite, a row of another party, a regime or tier the penalty feed does not hold.
+- `ico/DISCLAIMER.md` and both `.gitignore` files are `rewrite`, not `keep`: the disclaimer described the old layout.
+- The litigation texts copied from v4 lose the sentences that pointed at fields this feed does not carry. The second threat row's basis loses its sentence about an evidence ladder that no longer exists.
+
+**The records (2.5).** `LOOP.md` and ADR-0039 say plainly that K16 departs from the wording of `DECISIONS.md` row 6. The parked table names the twin, the talk and the calibration programme.
+
+**The budgets (2).** The built tree is over three of them: `loop.py`, `test_loop.py` and `loop.yml`. The budgets left out blank lines, the stand-in for `kubectl` that six probe tests need, and the pin check above. The tests are 36, as 6.1 lists them.
+
+**Left as they are, and known.** The hosted Renovate app can still push branches to driftwood (the owner's to uninstall). Driftwood's ruleset does not dismiss an approval when a new commit is pushed (a forge setting, the owner's). The ledger branch has no ruleset. `ico/penalty-schema/feed.json` keeps each fine's litigation text, which no rule reads.

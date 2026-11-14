@@ -14,18 +14,18 @@ A cycle runs in driftwood's `.github/workflows/loop.yml`: every day at 06:47 UTC
 4. **Compare.** The tolerance comes from `party.json`.
 5. **Predict.** The loop finds the goal for the tolerance, and whether it is release-ready. A prediction only chooses a direction.
 6. **Decide.** The verdicts are checked in the order `CONTEXT.md` lists them, and the first that applies is the cycle's verdict.
-7. **One notch.** A move changes the rung line and nothing else. Cost always enters the figure (decision 6). A notch is judged by the goal it leads to (K16, a delegated reading of decision 6). So a notch may cost more than it saves, on the way to a goal whose figure is lower with cost included. The loop never starts a climb unless some tighter rung predicts a lower figure. A rung that has stopped earning its cost is given back by `release`.
-8. **Enact.** In `act` mode the workflow opens a pull request for the notch with the default token. A second job checks that the diff is one rung line, one notch, in the direction of the verdict. The app approves and merges it. The merge starts the next cycle on a new cluster built from `main`. A pin change takes the same path and may touch pin lines only.
+7. **One notch.** A move changes the rung line and nothing else. Cost always enters the figure (decision 6). A notch is judged by the goal it leads to (K16, delegated). This departs from the wording of `.scratch/distil/DECISIONS.md` row 6, which reads "a notch that costs more than it saves is not taken". The loop instead never starts a climb unless some tighter rung predicts a lower figure, cost included, and one notch on the way may cost more than it saves. Judged one notch at a time, the first notch closes nothing today's rows need, so the loop would stay at `baseline` for ever. That is not what the owner was told to expect under decision 5, to which the owner answered "Yes. No limitation". The other reading leaves the loop at `baseline`, red, with the shop serving. The owner can reverse K16 (see what waits for the owner). A rung that has stopped earning its cost is given back by `release`.
+8. **Enact.** In `act` mode the workflow opens a pull request for the notch with the default token. A second job checks that the diff is one rung line, one notch, in the direction of the verdict. The app approves and merges it. The merge starts the next cycle on a new cluster built from `main`. A pin change takes the same path and may touch pin lines only. The second job works the pins out itself, and the pull request must match its result.
 9. **Record.** One JSON line per cycle goes to the ledger, whatever the verdict. A run whose pins cannot be checked out, or whose input is refused, is red and writes no line.
 10. **The rule on numbers.** An unsourced number may raise the figure. Only a measured, declared closure, or a publisher's change landed on its `main`, may lower it. One exception, by decision 6: a rung's cost leaves the figure when the loop leaves that rung. A missing penalty rate is 1. An uncited tier is the tier with the larger mean penalty. A row with a missing number is unpriced and named.
 
-A red verdict does not stop the landing path. Only the workflow's `verdict` job turns red, so a pin change, which is how a publisher's correction or a platform fix arrives, still lands.
+A red verdict does not stop the landing path. Only the workflow's `verdict` job turns red, so a pin change, which is how a publisher's correction or a platform fix arrives, still lands. A pin change lands only if the loop it pins accepts the inputs it pins, so a refused input cannot land by the loop's own hand.
 
 ## Where it stands
 
 On today's inputs, in `act` mode, the loop takes two notches and stops at `isolated`, where the shop no longer serves. Every run after that is red: `saturated` at GBP 1,643,518.63, which is GBP 1,603,518.63 above the tolerance at the best rung there is. The owner chose a loop that may climb that far (decision 5).
 
-When this design lands, driftwood starts in `measure` mode, which records and moves nothing. It moves to `act` once platform's cluster proof is green (`CONTRACT.md` section 8, step 9).
+When this design lands, driftwood starts in `measure` mode, which records and moves nothing. It moves to `act` once platform's cluster proof is green (`.scratch/distil/CONTRACT.md` section 8, step 9).
 
 That outcome rests on three things:
 
@@ -37,9 +37,7 @@ What would change it:
 
 - **A counted penalty rate.** In the unit tests a counted rate of 0.0005, a test value and not a count, puts the figure at `isolated` at GBP 17,763.80. `baseline` then predicts GBP 30,894.49, which is at or below GBP 32,000, the tolerance less the 20% margin. After the dwell the loop releases to `quarantine`, then to `baseline`. Counting the rate is ico's work.
 - **A changed third row.** With the first two rows only, `isolated` reads `within` at GBP 15,431.49, still at the rung where the shop does not serve. The third row's band is feeds' work.
-- **A cited tier.** The first row with the lower tier cited is GBP 1,377,706.90 a year.
 - **A tolerance the owner names.** It is one line in `party.json`. No rung on these inputs has a figure below GBP 1,643,518.63.
-- **A measured rung cost**, in `rungs.json`.
 
 ## On the inputs of 2026-11-14
 
@@ -80,6 +78,7 @@ The owner's answer 7 was "It's all purpose". What is not being worked on now is 
 | The exploited-flaw list | feeds tag `cve/v3.0.0` | A pull request in feeds that restores it from the tag |
 | The image inventory and scanner | platform tag `v6.3.0` | A pull request in platform that restores them from the tag, and a scanner in CI |
 | The fetch clocks, and all else | `refs/archive/main/2026-11-14-before-simplify` in each repository | A pull request that checks the files out from that ref. A returning fetch adds rows, and would need the key in that publisher |
+| The twin, the talk and the calibration programme | The hub's `refs/archive/main/2026-11-14-before-simplify`, recorded in `.scratch/distil/ARCHIVE.md` | A pull request in the hub that checks them out from that ref |
 
 The first loop runs end to end without them. `.scratch/distil/ARCHIVE.md` lists every archive ref and the repositories archived on GitHub, and says how to bring each back.
 
@@ -92,8 +91,9 @@ The first loop runs end to end without them. `.scratch/distil/ARCHIVE.md` lists 
 | The secrets hook and the signing permission | The three `cut-release.yml` files quote the `id-token` key so that the hook passes them. The old files wrote it unquoted | The owner confirms the spelling, or adjusts the hook |
 | Removing the guard's hook from the hub | `twin/` and `.claude/settings.json` stay | One commit of the owner's removes the hook and the three `twin/` files together |
 | The hosted Renovate app on driftwood | `renovate.json` keeps it silent | Uninstall it, then delete the file |
+| K16, judging a notch by its goal | The loop climbs past a first notch that costs more than it saves | The owner reverses it. Each notch is then judged alone, and the loop stays at `baseline`, red, with the shop serving |
 
-Settled on 2026-11-14 by the owner's reply "I'm afk. Jfdi" (`CONTRACT.md` section 8). Leave to cut tags: given, and used at steps 6 to 8. The key in feeds and ico: granted and not used. Nothing built here would read it, and a secret with no reader is redundant. Only a returning fetch would need it.
+Settled on 2026-11-14 by the owner's reply "I'm afk. Jfdi" (`.scratch/distil/DECISIONS.md`, "Later the same day"). Leave to cut tags: given, to be used at steps 6 to 8 of `.scratch/distil/CONTRACT.md` section 8. The key in feeds and ico: granted and not used. Nothing built here would read it, and a secret with no reader is redundant. Only a returning fetch would need it.
 
 The numbers nobody has counted are not the owner's to supply. The penalty rate is ico's work, and the third row's band is feeds' work.
 

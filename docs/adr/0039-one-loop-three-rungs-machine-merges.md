@@ -32,7 +32,7 @@ Each decision carries the contract's label. *Owner-instructed* restates an answe
 | K13 | `pins.sh` verifies a tag's signature when a pin names a tag | delegated |
 | K14 | Driftwood's workloads stay bare Pods, with no rollout stamp | delegated |
 | K15 | The party file and the ladder file are JSON, not YAML | delegated |
-| K16 | A notch is judged by the goal it leads to, not by its own gain | delegated reading of decision 6 |
+| K16 | A notch is judged by the goal it leads to, not by its own gain. This departs from `.scratch/distil/DECISIONS.md` row 6, which reads "a notch that costs more than it saves is not taken". The loop instead never starts a climb unless some tighter rung predicts a lower figure, cost included, and one notch on the way may cost more than it saves. Judged one notch at a time, the first notch closes nothing today's rows need, so the loop would stay at `baseline` for ever, which is not what the owner was told to expect under decision 5. The other reading leaves the loop at `baseline`, red, with the shop serving. The owner can reverse it (`LOOP.md`, what waits for the owner) | delegated |
 
 Two things are derived from the owner's sentence, and the owner has commented on neither
 (`.scratch/distil/DISTILLATION.md` section 7): the pound is a real figure, not a ranking, because
@@ -57,7 +57,7 @@ because the tolerance is the organisation's.
   decision 2, the app now merges a notch or a pin change in the same run that proposed it, after a
   job that checks the diff.
 
-**Superseded in full.** ADR-0021. There is no twin scenario and no selection policy package. The
+**Superseded in full.** ADR-0021. There is no twin scenario while the twin is parked. There is no selection policy package. The
 loop's goal chooses the rung.
 
 **Sided with.** ADR-0015 rejected "a tighten-only proposer" because "It ratchets the estate toward

@@ -1,6 +1,6 @@
 # Context: the loop
 
-The terms of the loop that `LOOP.md` describes. Each is defined here and nowhere else in the hub.
+The terms of the loop that `LOOP.md` describes. Each is defined here.
 The older decision records in `docs/adr/` use older words. Where they differ, this file holds.
 
 ## Parties
@@ -27,6 +27,8 @@ The older decision records in `docs/adr/` use older words. Where they differ, th
 - **Basis**: where a number came from: a kind, a date and a sentence. The kinds, weakest first, are
   `not-counted`, `unsourced`, `editorial`, `published` and `counted`. A row is **sourced** only if
   neither of its bases is `editorial`, its tier is cited and the penalty rate is counted.
+- **Sourced share**: the sourced rows' share of the figure. An unsourced cost counts as unsourced.
+- **Weakest basis**: the weakest basis that enters the figure, and the number it is the basis of.
 
 ## The cage
 
