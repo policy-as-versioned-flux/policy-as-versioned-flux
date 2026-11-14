@@ -43,4 +43,4 @@ Two passes of agents, all read-only:
 
 ## Known gaps
 
-`DISTILLATION.md` section 9 lists what the review did not establish. The main ones: nothing was run; nothing that needs the forge was checked, including open pull requests; and about 116 hub test files were counted but not read one by one.
+`DISTILLATION.md` section 9 lists what the review did not establish. The main ones: nothing was run; when the review was written nothing that needs the forge had been checked (the clean-up later listed the open pull requests: 74 on 2026-11-14); and about 116 hub test files were counted but not read one by one.
