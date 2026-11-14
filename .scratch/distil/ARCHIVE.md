@@ -91,9 +91,32 @@ A removed worktree is rebuilt with `git worktree add <path> <ref>`. `evidence/lo
 - `evidence/deleted-branches.tsv`: all 528 deleted branches, with the commit and where it is kept.
 - `evidence/local-manifest.json`: every local worktree and tip in the 13 local repositories, taken before anything was removed.
 
+## The simplification that followed
+
+Later on 2026-11-14 the owner wrote: "Remove all redundant code. Simplify everything". Before any file left a `main`, each of the five core repositories got a ref at its `main` as it stood:
+
+`refs/archive/main/2026-11-14-before-simplify`
+
+| Repository | Commit |
+|---|---|
+| hub | `ec43f2a60cb0` |
+| platform | `7beb1266cd35` |
+| driftwood | `34ef5a5bc6f1` |
+| ico | `9d584cf0f177` |
+| feeds | `838abe583f14` |
+
+Every `repo/path:line` citation in this folder resolves against that ref. To read a file that has left `main`:
+
+```sh
+git fetch origin refs/archive/main/2026-11-14-before-simplify
+git show FETCH_HEAD:<path>
+```
+
+To put a file or folder back, check it out from that ref and commit it.
+
 ## What was not touched
 
-- **Content on `main`** in any repository. The twin, the truth surface, the calibration programme and the October copies are where they were. Parking them follows the build sequence in `DISTILLATION.md` section 8.
+- **Content on `main`** in any repository, by the clean-up itself. The simplification above came after it.
 - **Tags.** None was added, moved or removed. The archive refs are not tags, so no tool that lists tags or branches sees them and no workflow starts because of them.
 - **The hub working copy's files**, including the files moved to the backup disk. Its local `main` is still behind the remote.
 - **Scratch files that git ignores** in two local clones (ludlow, 62 MB; nist, 6 MB). They are in no repository and were left in place.

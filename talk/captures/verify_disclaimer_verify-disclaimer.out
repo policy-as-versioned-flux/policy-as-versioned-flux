@@ -1,8 +1,0 @@
-[1;36m==>[0m 1. every party.yaml carries the disclaimer as a comment; every README carries it
-[1;36m==>[0m 2. ico and nist carry DISCLAIMER.md; nist/NOTICE cites the catalogue it attributes
-[1;36m==>[0m 3. the hub LICENSE is Apache-2.0 and its README says so
-[1;36m==>[0m 4. the guard bites: each violation planted in a copy is refused, the restored copy passes
-ok  guard bites: a party.yaml without the comment, the line as a key, a bare README, a drifted NOTICE sha256, a missing DISCLAIMER.md and a hub without LICENSE are each refused when planted, cleared once restored
-ok  real estate: 8 parties carry the line on party.yaml and README | DISCLAIMER.md on ico, nist | nist/NOTICE cites 5 provenance facts | hub LICENSE Apache-2.0
-
-PASS: all eight parties say they are a demonstration on their signed artefact and their README, the two regulators carry the long form, nist attributes NIST's public-domain work by URL and sha256, and the hub is licensed Apache-2.0 like the units

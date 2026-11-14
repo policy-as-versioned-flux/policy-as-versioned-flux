@@ -1,44 +1,30 @@
-# Policy as Versioned Code, on Flux
+# policy-as-versioned-flux: the hub
 
-A faithful-to-intent re-implementation of Chris Nesbitt-Smith's *[Policy as [Versioned] Code](https://talks.cns.me/PolicyAsVersionedCode.html)* [thesis](https://blog.cns.me/posts/policy-versioned-code-mea-culpa-technical-argument-nesbitt-smith-pedef/)
-on Flux CD — policy as a semver, signed, versioned dependency, governed by one Kyverno engine across
-a Kubernetes workload plane and a Crossplane cloud plane, with reviewed upgrades, multi-version
-runtime coexistence, ground-truth compliance, and an agent-assisted human-governance layer.
+This repository holds the records of the estate: what it is for, what was decided, and what was put away. It holds no running code.
 
-**Licence:** [Apache-2.0](LICENSE), the same licence as the eight unit repositories. Third-party
-material this repository quotes and cites — press releases, filings, regulator notices, the NIST
-catalogue — stays under its authors' own terms; it is cited, not relicensed. The eight parties in
-the estate are demonstration parties, not affiliated with any real authority they name (ticket 82,
-checked by [`verify/disclaimer/`](verify/disclaimer/)).
+> "quantified risk and a reactive ratcheting process cage to mitigate the quantified risk until the risk is within financial tolerance of the organisation" (the owner, 2026-11-14)
 
-## Start here
+## Where things are
 
-| Document | What it is |
+| Path | What it holds |
 |---|---|
-| [docs/PRD.md](docs/PRD.md) | **The product requirements** — the faithful-to-intent build, phased P1→P2→P3 |
-| [NORTH-STAR.md](NORTH-STAR.md) | **The north star** — the eco-system, ratified 2026-08-27; every map serves a part of it |
-| [twin/](twin/) | **The twin** — the eco-system's intelligence participant: priced forecasts and forward intel under a declared perspective, one twin per adopter org |
-| [docs/modern-reference-transport.md](docs/modern-reference-transport.md) | The **modern reference** for transport and attestation (OCI, cosign, CAF) |
-| [CONTEXT.md](CONTEXT.md) | The **ubiquitous language** (glossary) — read this to speak precisely |
-| [docs/HISTORY.md](docs/HISTORY.md) | **How this got here** — a newcomer-readable narrative, real commits/PRs/tags linked, one sitting |
-| [docs/adr/](docs/adr/) | The **decisions** and why (ADR-0001…0010) |
-| [docs/upstream/](docs/upstream/) | Upstream **project actions** (the gitsign/Flux #1068 effort) |
-| [docs/shift-left-dev-workflow.md](docs/shift-left-dev-workflow.md) | The **usable** -able: reproduce the cluster's admission verdict on your laptop, native CLIs only |
-| [research/](research/) | The **research dossiers** the design is built on (originals, Flux, synthesis) |
+| `.scratch/distil/` | The review of 2026-11-14 against that sentence, the owner's decisions, and the record of what was archived. Start with its `README.md`. |
+| `docs/adr/` | The decision records. |
+| `.scratch/drift-review-2026-08-27/`, `.scratch/ecosystem/` | The owner's dated words and approvals, kept byte for byte. The review cites them by line. |
+| `research/03-blogs-thesis.md` | The 2022 thesis: policy as a versioned dependency that carries its why. |
+| `CONTEXT.md` | The glossary. It still describes parts that have been put away and is due to be shortened. |
+| `twin/enact_guard.py` | The guard on agent writes, with its mode file. It stays until the owner removes its hook from `.claude/settings.json`. |
 
-## The decisions, in one breath
+## The live repositories
 
-Signed git tags (gitsign, keyless) · pinned everywhere + Renovate PR · Kyverno CEL `ValidatingPolicy`
-(Audit and Deny are rungs on the cage ladder; there is no gate) · cloud plane by harvesting ControlPlane **collie** (Crossplane +
-OSCAL via C2P) · ControlPlane **Flux Operator** + `ResourceSet` matrix · **deterministic** policy (no
-time conditions) · **editorial** governance + an **AI agent** layer · **layered ground-truth**
-compliance · catch-all **orphan guard** · **no bespoke tooling** · proven **free on KiND**.
+- [platform](https://github.com/policy-as-versioned-platform/platform): the loop and the cage.
+- [driftwood](https://github.com/policy-as-versioned-driftwood/driftwood): the adopter, with its apps [api](https://github.com/policy-as-versioned-driftwood/api) and [storefront](https://github.com/policy-as-versioned-driftwood/storefront).
+- [ico](https://github.com/policy-as-versioned-ico/ico) and [feeds](https://github.com/policy-as-versioned-feeds/feeds): the publishers.
 
-## Project actions queued
+## What was here before
 
-1. Rework + post the gitsign revival comment on [fluxcd/source-controller#1068](https://github.com/fluxcd/source-controller/issues/1068).
-2. Harvest [`controlplaneio/collie`](https://github.com/controlplaneio/collie) — catalogue + intent as data, toolchain dropped (ADR-0004).
+Until 2026-11-14 this repository also held the twin, its tests and benches, the truth surface, the talk, the calibration programme and the planning text of earlier work. None of it was deleted from history. It is at `refs/archive/main/2026-11-14-before-simplify`, and `.scratch/distil/ARCHIVE.md` says how to bring any of it back.
 
-## References
+## Licence
 
-See [docs/references.md](docs/references.md) for the full citation registry.
+[Apache-2.0](LICENSE). Third-party material that is cited stays under its authors' own terms. The parties in the estate are demonstration parties, not affiliated with any real authority they name.
