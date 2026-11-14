@@ -1,3 +1,0 @@
-kind-driftwood driftwood True 
-kind-tuppence tuppence True 
-kind-ludlow ludlow True 

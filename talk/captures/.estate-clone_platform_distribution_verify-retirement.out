@@ -1,8 +1,0 @@
-[1;36m==>[0m 1. before retirement: a pod on 5.0.0 is unremarkable to the machinery (version is declared)
-[1;36m==>[0m 2. retire 5.0.0 from the array (one deletion) and re-render BOTH halves
-[1;36m==>[0m 3. after retirement: the same pod is REPORTED (no served version governs it)
-[1;36m==>[0m 4. ...and CAGED on the bottom rung by the same shrunk array
-  ok   retiring 5.0.0 moved the straggler onto the bottom rung, running and unreachable
-[1;36m==>[0m    (live: dropping the array element prunes Kustomization policy-v5-0-0)
-SKIP (live tail): kind cluster 'driftwood' is not listed by kind get clusters
-SKIP: offline proof holds; live tail could not look: kind cluster 'driftwood' is not listed by kind get clusters — retiring a version (one array deletion) prunes it and moves a straggler out of every served policy version: reported by name, caged on the bottom rung by the same shrunk array, and refused by nothing

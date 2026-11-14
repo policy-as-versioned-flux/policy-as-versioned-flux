@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    policy-as-versioned.dev/governed: 'true'
-  name: corpus-governed-no-tier
