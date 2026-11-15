@@ -104,3 +104,23 @@ Put to the owner as four questions:
 2. The tolerance figure.
 3. The machine or the spend for a cluster that stays up.
 4. Whether K16 stays or is reversed.
+
+## 15 November: the four answers
+
+The four questions were put to the owner that day in one dialog. Each came with options the assistant had written, one of them marked as the assistant's recommendation. The owner chose one option for each. The labels in the third column are the options' own words, which the assistant wrote. The choice among them is the owner's. "Read as" is the assistant's reading.
+
+| # | Question | The option the owner chose | The assistant's recommendation | Read as |
+|---|---|---|---|---|
+| 1 | Which counted penalty rate should ico publish? | "All reports: 0.0002095" | "Cyber only: 0.000529" | ico publishes the count over all breach reports, at its point value. The owner did not take the assistant's recommendation. |
+| 2 | What is driftwood's tolerance? | "£430,000, 0.5% of turnover (Recommended)" | The same | The tolerance is 0.5% of turnover: GBP 430,000 at the declared turnover. It is no longer a fixture. The owner chose it from options the assistant offered. |
+| 3 | Where should the cluster that stays up run? | "This Mac, kind left running (Recommended)" | The same | A kind cluster on the owner's own machine, left running. GitHub's runners cannot reach it, so the proof and the break test run from an agent session, not from the daily workflow, and are recorded as such. |
+| 4 | Keep K16 or reverse it? | "Keep it (Recommended)" | The same | K16 stays. The owner has seen that it departs from the wording of the option chosen on 14 November, and has kept it. |
+
+What the dialog told the owner with each option:
+
+- **The rate.** "20 penalties over 95,466 breach reports of every kind. The most events, but its own researcher calls it too low for a serious breach. The shop reopens at either tolerance."
+- **The tolerance.** "The low end of audit materiality. With any counted rate except the top of the serious-breaches count, the shop reopens." The question said the options were the assistant's suggestions, and that a release takes 7 to 8 days after the change lands.
+- **The cluster.** "No spend. It needs Docker running and a few GB of disk, and stops when the Mac or Docker stops. GitHub's runners cannot reach it, so the proof and the break test would run from a session on this Mac, not from the daily workflow, and be recorded as such."
+- **K16.** "A climb is judged by where it ends. Without this the loop can never reach the tightest rung on today's rows."
+
+What follows from the answers is recorded where it lands: the rate in ico's feed, the tolerance in driftwood's `party.json`, and the proof on the cluster that stays up in `CONTRACT.md` section 11.
