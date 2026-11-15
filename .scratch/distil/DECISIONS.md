@@ -76,3 +76,31 @@ Sources:
 ## What follows from answers 1, 2 and 5 together
 
 On today's inputs the first automatic act of the new loop could move driftwood's shop to a rung where it stops serving, on a penalty rate that nobody has counted and that is taken as 1. The owner was told this in decision 5 and chose it. Driftwood is a demonstration firm. Every ledger line will still print the share of the figure that is sourced.
+
+## 15 November: "Do everything"
+
+On the morning of 2026-11-15 the assistant's report listed two things that waited for the owner: K16, and which penalty rate ico publishes, with the tolerance. It also listed what was not done. Three paths had not yet run live: the daily schedule, a release with its dwell, and the proof on a cluster that stays up. Three things were left alone on purpose: feeds' second row, still priced although its text said the door was closed; the stale opening comments of the two cage files; and the words "FOR THIS EXAMPLE" in ico's litigation notes.
+
+The owner's reply, in full: "Do everything".
+
+Read as: leave to do the things listed as not done. It is not an answer to any open choice. It names no penalty rate, no tolerance, no machine or spend for a cluster that stays up, and it does not say to reverse K16. So no rate was published, the tolerance was not changed, no cluster was stood up, and K16 stays as built. Three other things wait for the owner in `LOOP.md`: the guard's hook, the hosted Renovate app and the quoted `id-token` key. They were not in the report the owner answered, and they are for the owner's own hand. They were left.
+
+Done under it (`CONTRACT.md` section 11 has the detail):
+
+- **Feeds' second row (K18, delegated).** Its N was read again at driftwood `main` `08ba2d0` and is 0, so the row prices at 0.00. It stays in the register, open, with `needs` empty. Feeds pull request 23 carried it as version 5.1.0, and the app's merge cut and signed `threat-register/v5.1.0`. From the first cycle that follows the tag, the figure at `isolated` falls by GBP 431.49, to GBP 1,643,087.14, still `saturated`. When this was written no cycle had yet followed it.
+- **The cage comments.** Platform pull request 78, merged by the app, gives each cage file one true opening comment line. No rule changed and no tag was cut.
+- **The litigation wording.** Ico pull request 14 removes the words "FOR THIS EXAMPLE" from three litigation notes. It is a draft, held so that one ico tag carries it with the penalty rate, if the owner chooses one.
+- **The penalty-rate tables** were run again on `policy/v8.0.1` and feeds 5.1.0. None of the 18 outcomes changes. One threshold moves at four figures, from 0.2539 to 0.2540 (`penalty-rate/CHOICE.md`).
+
+Not done:
+
+- A release and its dwell. One can start only when a rate or a tolerance makes the loop release-ready, which is the owner's choice, and it then takes 7 days. The margin, the dwell and the tolerance were not touched to force one.
+- The proof on a cluster that stays up. The owner has not named the machine or the spend.
+- The guard's hook, the hosted Renovate app and the quoted `id-token` key, which are for the owner's own hand.
+
+Put to the owner as four questions:
+
+1. Which count of the penalty rate ico publishes, and which end of its interval.
+2. The tolerance figure.
+3. The machine or the spend for a cluster that stays up.
+4. Whether K16 stays or is reversed.

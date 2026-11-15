@@ -41,6 +41,7 @@ Written 2026-11-14 by the architect stage, revised the same day after three revi
 | K15 | The party file and the ladder file are JSON, not YAML. | The standard library reads JSON and refuses a duplicate key in three lines. YAML needed a dependency, a second action and a hash pin in five jobs. | delegated |
 | K16 | A notch is judged by the goal it leads to, not by its own gain. | Decision 6 says cost always counts. Judged alone, the first notch would never be taken, and the loop would sit at `baseline`, which is not what the owner was told to expect under decision 5. This departs from a consequence written in the option the owner chose: option (c) of `DISTILLATION.md` section 7 item 6 reads "cost is added to exposure, so a notch that costs more than it saves is not taken", and the owner answered "Always". `DECISIONS.md` records the departure, and the owner can reverse it. | delegated |
 | K17 | The loop never moves the platform pin. `bump-pins` follows ico and feeds only. A platform change reaches the adopter by a pull request that changes the platform pin line. Decided 2026-11-15, after the second look (section 11). | The pinned platform holds `check-diff` and `bump-pins`, which gate what lands, so a loop that pinned a new platform tag itself would be following its own code. The pull request is pushed from an agent session, so its own cycle runs the new platform on a cluster before the app merges it. | delegated |
+| K18 | A row whose counted door is found closed stays in the register at the rate its own method gives, 0, with the reading dated. It is not removed and not left at the old rate. Decided 2026-11-15 (section 11). | Feeds' second row is the case. Its rate is N x C / M, and N, read again on 2026-11-15, is 0. Leaving N = 1 knowingly overstates the rate. Removing the row loses the reading and its history. | delegated, applying "Do everything" |
 
 Two things follow from the owner's sentence, and the owner has commented on neither: the pound is a real figure, and the exposure compared is the whole organisation's.
 
@@ -602,7 +603,7 @@ No builder adds any of these.
 
 ## 11. What the review changed
 
-Eight reviewers read the built code on 2026-11-14 and the fixes below were made before anything merged. Each is in the code. Sections 1 to 10 are left as the builders had them, but for the corrections of the second look, which the end of this section lists.
+Eight reviewers read the built code on 2026-11-14 and the fixes below were made before anything merged. Each is in the code. Sections 1 to 10 are left as the builders had them, but for the corrections of the second look, which the part "After the second look" lists, and for K18, which the part **After "Do everything"** adds to the table at the top.
 
 **The merge gate (4.1, 5.3, 7).**
 
@@ -634,7 +635,7 @@ Eight reviewers read the built code on 2026-11-14 and the fixes below were made 
 - `ico/DISCLAIMER.md` and both `.gitignore` files are `rewrite`, not `keep`: the disclaimer described the old layout.
 - The litigation texts copied from v4 lose the sentences that pointed at fields this feed does not carry. The second threat row's basis loses its sentence about an evidence ladder that no longer exists.
 
-**The records (2.5).** `LOOP.md` and ADR-0039 say plainly that K16 departs from the wording of `DECISIONS.md` row 6. The second look corrected what it departs from: see the end of this section. The parked table names the twin, the talk and the calibration programme.
+**The records (2.5).** `LOOP.md` and ADR-0039 say plainly that K16 departs from the wording of `DECISIONS.md` row 6. The second look corrected what it departs from: see "After the second look" below. The parked table names the twin, the talk and the calibration programme.
 
 **The budgets (2).** The built tree is over budget in `loop.py`, `test_loop.py` and `loop.yml` most of all. The budgets left out blank lines, the stand-in for `kubectl` that six probe tests need, and the pin check above. The tests are 36, as 6.1 lists them.
 
@@ -680,6 +681,8 @@ Not done:
 - The words "for this example" in ico's litigation texts. They are inside the feed and wait for its next change. The texts themselves stay: each is the reason for its fine's status.
 - Feeds' second row is priced with `needs` empty although its text says the door is closed, and its id names an agent that no longer exists. Those are a number and an id.
 
+Later on 2026-11-15 the cage comments and the rate of feeds' second row were done, and the litigation wording was prepared and held. The row keeps its id. See **After "Do everything"** below.
+
 **How the second look landed, 2026-11-15.** Each merge was the app's.
 
 - Platform 77 carried the refusals and K17. `unit` and `cluster` were green on the pull request and again on `main`. The tag `policy/v8.0.1` was then cut by dispatch. The tests are now 38.
@@ -689,4 +692,32 @@ Not done:
 - A driftwood cycle, started by dispatch, then opened pull request 138 for the feeds pin. `check` passed it and `land` merged it. No person was on that path after the dispatch.
 - The ledger's lines 7 to 9 are the three cycles on `main` that followed: after 137, the dispatched one, and after 138. Each reads `saturated` at GBP 1,643,518.63 at `isolated`. The last ran on feeds `e949341d`.
 
-Not yet run live: the daily schedule, a release and its dwell, and the proof on a cluster that stays up.
+**After "Do everything", 2026-11-15.** The assistant's report of that morning named two things that waited for the owner: K16, and which penalty rate ico publishes, with the tolerance. It also listed what was not done: three paths not yet run live, and the three items under "Not done" above. The owner replied, in full: "Do everything". It was read as leave to do what the report listed as not done. It was not read as an answer to any open choice: it names no penalty rate, no tolerance, no machine or spend for a cluster that stays up, and it does not say to reverse K16. So no rate was published, the tolerance was not changed, no cluster was stood up, and K16 stays as built. Those four were put to the owner as questions (`DECISIONS.md`, "15 November"). The guard's hook, the hosted Renovate app and the quoted `id-token` key were not in that report. They stay in the owner's hand (section 8). Where this part differs from the text above, this part wins.
+
+What was found:
+
+- Feeds' second row takes its rate from N x C / M. N was read again at driftwood `main` `08ba2d0`: the one workflow, `loop.yml`, names `actions/checkout` three times, each by commit and none by tag. So N is 0. Up to 5.0.1 the row kept N = 1 "as an upper bound".
+- C and M were not read again. The method counts one kind of door only, so 0 is not an upper bound on every misuse of the credential.
+
+What changed:
+
+- **K18 (delegated, applying "Do everything").** Feeds' second row now has `events_a_year` `[0, 0, 0]`, and its basis text says what was read again, what was not, and that 0 is not an upper bound on every misuse. Nothing else in the feed changed. The row stays in the register, priced at 0.00, open, with `needs` empty. A second model, codex, reviewed the choice and said go, with two wording changes, which were made. K18 is added to the table at the top of this file.
+- **What it does to the figure.** On the pinned loop (`policy/v8.0.1`), run offline before the merge with probe stand-ins proved against the real ledger lines, and with the penalty rate still `null`, the figure falls by GBP 431.49 at every rung. `isolated` goes from 1,643,518.63 to 1,643,087.14 (exposure 1,628,087.14, cost 15,000), still `saturated`. `quarantine` goes from 17,915,390.06 to 17,914,958.57, and `baseline` from 17,909,890.06 to 17,909,458.57. No verdict, goal or release-readiness changes. The pin check, the loop with no probe, ends with code 3.
+- **The cage comments.** In each of `cage/cage-tier.yaml` and `cage/cage-netpol.yaml` the four stale opening comment lines became one line that is true of that file. No rule changed: below its first line each file is byte for byte what it was. No tag was cut, because a tag for a comment would mean a pin change for nothing. So platform `main` is one change ahead of the pinned tag `policy/v8.0.1` (`e91e5db`), and the next platform tag will carry it. The cage keeps version 8.0.0.
+- **The litigation wording.** A draft pull request removes the words " FOR THIS EXAMPLE" from three litigation notes in ico's feed: British Airways, Marriott International and TikTok. It is held on purpose and not merged, so the feed and its version are unchanged. A merge cuts a tag that can never be moved, and one ico tag should carry this together with the penalty rate, if the owner chooses one.
+- **The penalty-rate tables** were run again on the loop of `policy/v8.0.1` and feeds 5.1.0 (`penalty-rate/CHOICE.md`). None of the 18 outcomes in its table of where the three counts land changes. Every figure moves, by GBP 0.57 to GBP 431.49. One threshold moves at four figures: at GBP 430,000 the highest rate at which `isolated` is within tolerance is now 0.2540, not 0.2539.
+
+Not done:
+
+- A release and its dwell. One can start only when a rate or a tolerance makes the loop release-ready, which is the owner's choice, and it then takes 7 days. The margin, the dwell and the tolerance were not touched to force one.
+- The proof on a cluster that stays up. The owner has not named the machine or the spend.
+
+**How it landed, 2026-11-15.** Each merge was the app's.
+
+- Feeds 23, commit `9a43342`, merged as `489e2fe`. The merge cut and signed the tag `threat-register/v5.1.0`: run 43694567853, with `test` and `cut` green.
+- Platform 78, commit `4988db8`, merged as `ae58ab9`. `unit` and `cluster` were green on the pull request.
+- Ico 14, commit `bf9b54e` on the branch `held/litigation-wording`, is a draft pull request, held and not merged.
+- No cycle was dispatched after the tag was cut, on purpose: the next scheduled cycle should find the tag and follow it with no person and no dispatch. When this was written the loop had not yet followed 5.1.0. The last ledger line, line 9 (run 43663748023), still read GBP 1,643,518.63 on feeds 5.0.1, and driftwood's `party.json` still pinned `threat-register/v5.0.1`.
+- The first scheduled run of `loop.yml` was due at 06:47 UTC. It had not started by 08:33 UTC. GitHub runs schedules late under load, and earlier scheduled workflows in the estate started hours late. It is watched, not dispatched.
+
+Not yet run live: the daily schedule, whose first run was due at 06:47 UTC on 2026-11-15 and had not started by 08:33 UTC; a release and its dwell, which can start only when the owner's choice of a rate or a tolerance makes the loop release-ready; and the proof on a cluster that stays up, which waits for the owner to name the machine or the spend.

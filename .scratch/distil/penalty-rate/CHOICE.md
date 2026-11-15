@@ -1,12 +1,12 @@
 # The penalty rate: a choice for the owner
 
-Written 15 November 2026. Research only. Nothing lands in ico's feed. The owner chooses.
+Written 15 November 2026. Run again the same day on the loop of `policy/v8.0.1` and feeds 5.1.0. Research only. Nothing lands in ico's feed. The owner chooses.
 
 ## The choice, in short
 
-The loop stands at `isolated`. The shop serves 0 of 3. Every cycle is red, at a figure of GBP 1,643,518.63 against a tolerance of GBP 40,000.
+The loop stands at `isolated`. The shop serves 0 of 3. Every cycle is red. On feeds 5.1.0 the figure is GBP 1,643,087.14 against a tolerance of GBP 40,000. The live loop has not yet followed that tag: driftwood still pins feeds 5.0.1, and its last ledger line reads GBP 1,643,518.63. Every loop figure below is the one on `policy/v8.0.1` and feeds 5.1.0.
 
-That figure rests on one number nobody had counted: the penalty rate, the chance that one personal data breach draws an ICO monetary penalty. ico publishes it as `penalty_rate` in `penalty-schema/feed.json`. It is `null` today, and the loop reads `null` as 1.
+The figure rests on one number nobody had counted: the penalty rate, the chance that one personal data breach draws an ICO monetary penalty. ico publishes it as `penalty_rate` in `penalty-schema/feed.json`. It is `null` today, and the loop reads `null` as 1.
 
 Three researchers have now counted it, each a different way. A checker tried to break each count. The counts differ by a factor of about 18 at their point values, and about 200 from the lowest low to the highest high.
 
@@ -15,9 +15,9 @@ Two money choices are open, and they are coupled: the rate and the tolerance. Th
 | What the loop does | Tolerance GBP 40,000 | Tolerance GBP 430,000 |
 |---|---|---|
 | Waits 7 days, releases two notches, rests at `baseline`, green. The shop serves | a rate up to 0.0005618 (1 in 1,780) | a rate up to 0.01800 (1 in 56) |
-| Turns green at `isolated` and never releases. The shop stays closed | above that, up to 0.01417 (1 in 71) | above that, up to 0.2539 (about 1 in 4) |
-| Stays red at `isolated`, at a smaller figure. The shop stays closed | above 0.01417 | above 0.2539 |
-| No rate (`null`, read as 1): red, closed, GBP 1,643,518.63 | GBP 1,603,518.63 over | GBP 1,213,518.63 over |
+| Turns green at `isolated` and never releases. The shop stays closed | above that, up to 0.01417 (1 in 71) | above that, up to 0.2540 (about 1 in 4) |
+| Stays red at `isolated`, at a smaller figure. The shop stays closed | above 0.01417 | above 0.2540 |
+| No rate (`null`, read as 1): red, closed, GBP 1,643,087.14 | GBP 1,603,087.14 over | GBP 1,213,087.14 over |
 
 Where the three counts land, at their low, point and high:
 
@@ -34,7 +34,7 @@ Where the three counts land, at their low, point and high:
 
 - A row's amount is `mean(events a year) x (mean(loss an event) + penalty rate x mean(penalty at the adopter's turnover))`.
 - The figure is the sum of the open rows plus the cost of the current rung. One rate serves every row.
-- There are three rows: a checkout data exfiltration (closed by `isolated`), a misused write credential, and an insider or lost-device disclosure. The last two are open at every rung. At `isolated` nearly all of the exposure, the sum of the open rows, is the insider row, which is not a cyber event. With no rate that is nearly all of the figure. At the counted rates the rung's cost of GBP 15,000 is a large part of it, and most of it below a rate of about 0.008.
+- There are three rows: a checkout data exfiltration (closed by `isolated`), a misused write credential, and an insider or lost-device disclosure. The last two are open at every rung. Since feeds 5.1.0 the misused write credential prices at GBP 0.00. So at `isolated` all of the exposure, the sum of the open rows, is the insider row alone, at every rate. The insider row is not a cyber event. With no rate the exposure is nearly all of the figure. At the counted rates the rung's cost of GBP 15,000 is a large part of it, and most of it below a rate of about 0.008.
 - A release needs the loop to be release-ready on every cycle for `dwell_days`, which is 7. Release-ready means a looser rung is predicted at or below `(1 - margin) x tolerance`: GBP 32,000 at GBP 40,000, and GBP 344,000 at GBP 430,000.
 
 ## Table 1. The three counts, after their checks
@@ -54,36 +54,37 @@ What the checks changed:
 
 ## Table 2. What the loop does at each rate
 
-Every row was run, not reasoned. The rows are in order of rate. The two figures do not depend on the tolerance. "Figure at `isolated`" is the first cycle after the rate arrives. "Figure at `baseline`" is what the loop prints at `baseline` at that rate. Where the loop rests, its figure is the one for that rung. Green is the verdict `within`. Red is `saturated`.
+Every row was run, not reasoned, on the loop of `policy/v8.0.1` and feeds 5.1.0. The rows are in order of rate. The two figures do not depend on the tolerance. "Figure at `isolated`" is the first cycle after the rate arrives. "Figure at `baseline`" is what the loop prints at `baseline` at that rate. Where the loop rests, its figure is the one for that rung. Green is the verdict `within`. Red is `saturated`.
 
 | Rate | Where it comes from | Figure at `isolated` | Figure at `baseline` | Rests, at GBP 40,000 | Rests, at GBP 430,000 |
 |---|---|---|---|---|---|
-| 0.000128 | All reports, low | GBP 17,158.72 | GBP 24,240.18 | `baseline`, green, serving | `baseline`, green, serving |
-| 0.0002095 | All reports, point | GBP 17,291.29 | GBP 25,698.05 | `baseline`, green, serving | `baseline`, green, serving |
-| 0.000237 | Cyber only, low | GBP 17,336.01 | GBP 26,189.96 | `baseline`, green, serving | `baseline`, green, serving |
-| 0.0004 | All reports, high | GBP 17,601.14 | GBP 29,105.69 | `baseline`, green, serving | `baseline`, green, serving |
-| 0.000529 | Cyber only, point | GBP 17,810.97 | GBP 31,413.24 | `baseline`, green, serving | `baseline`, green, serving |
-| **0.0005618** | **At GBP 40,000, the highest rate that still releases to `baseline`** | GBP 17,864.32 | GBP 31,999.96 | `baseline`, green, serving | `baseline`, green, serving |
-| 0.0005619 | The next rate up | GBP 17,864.49 | GBP 32,001.75 | `isolated`, green, closed | `baseline`, green, serving |
-| 0.0010 | Serious breaches, low | GBP 18,577.09 | GBP 39,838.46 | `isolated`, green, closed | `baseline`, green, serving |
-| 0.001407 | Cyber only, high | GBP 19,239.09 | GBP 47,118.84 | `isolated`, green, closed | `baseline`, green, serving |
-| 0.0038 | Serious breaches, point | GBP 23,131.47 | GBP 89,924.68 | `isolated`, green, closed | `baseline`, green, serving |
-| **0.01417** | **At GBP 40,000, the highest rate at which `isolated` is within tolerance** | GBP 39,998.98 | GBP 275,422.61 | `isolated`, green, closed | `baseline`, green, serving |
-| 0.01418 | The next rate up | GBP 40,015.25 | GBP 275,601.50 | `isolated`, red, closed | `baseline`, green, serving |
-| **0.01800** | **At GBP 430,000, the highest rate that still releases to `baseline`** | GBP 46,228.74 | GBP 343,933.43 | `isolated`, red, closed | `baseline`, green, serving |
-| 0.01801 | The next rate up | GBP 46,245.01 | GBP 344,112.31 | `isolated`, red, closed | `isolated`, green, closed |
-| 0.026 | Serious breaches, high | GBP 59,241.29 | GBP 487,036.95 | `isolated`, red, closed | `isolated`, green, closed |
-| **0.2539** | **At GBP 430,000, the highest rate at which `isolated` is within tolerance** | GBP 429,936.16 | GBP 4,563,698.37 | `isolated`, red, closed | `isolated`, green, closed |
-| 0.2540 | The next rate up | GBP 430,098.81 | GBP 4,565,487.15 | `isolated`, red, closed | `isolated`, red, closed |
-| 1 | Today: `null`, read as 1 | GBP 1,643,518.63 | GBP 17,909,890.06 | `isolated`, red, closed | `isolated`, red, closed |
+| 0.000128 | All reports, low | GBP 17,158.15 | GBP 24,239.61 | `baseline`, green, serving | `baseline`, green, serving |
+| 0.0002095 | All reports, point | GBP 17,290.68 | GBP 25,697.44 | `baseline`, green, serving | `baseline`, green, serving |
+| 0.000237 | Cyber only, low | GBP 17,335.39 | GBP 26,189.34 | `baseline`, green, serving | `baseline`, green, serving |
+| 0.0004 | All reports, high | GBP 17,600.45 | GBP 29,105.00 | `baseline`, green, serving | `baseline`, green, serving |
+| 0.000529 | Cyber only, point | GBP 17,810.23 | GBP 31,412.50 | `baseline`, green, serving | `baseline`, green, serving |
+| **0.0005618** | **At GBP 40,000, the highest rate that still releases to `baseline`** | GBP 17,863.56 | GBP 31,999.20 | `baseline`, green, serving | `baseline`, green, serving |
+| 0.0005619 | The next rate up | GBP 17,863.73 | GBP 32,000.99 | `isolated`, green, closed | `baseline`, green, serving |
+| 0.0010 | Serious breaches, low | GBP 18,576.14 | GBP 39,837.51 | `isolated`, green, closed | `baseline`, green, serving |
+| 0.001407 | Cyber only, high | GBP 19,237.97 | GBP 47,117.72 | `isolated`, green, closed | `baseline`, green, serving |
+| 0.0038 | Serious breaches, point | GBP 23,129.32 | GBP 89,922.53 | `isolated`, green, closed | `baseline`, green, serving |
+| **0.01417** | **At GBP 40,000, the highest rate at which `isolated` is within tolerance** | GBP 39,992.36 | GBP 275,415.99 | `isolated`, green, closed | `baseline`, green, serving |
+| 0.01418 | The next rate up | GBP 40,008.62 | GBP 275,594.87 | `isolated`, red, closed | `baseline`, green, serving |
+| **0.01800** | **At GBP 430,000, the highest rate that still releases to `baseline`** | GBP 46,220.47 | GBP 343,925.16 | `isolated`, red, closed | `baseline`, green, serving |
+| 0.01801 | The next rate up | GBP 46,236.73 | GBP 344,104.03 | `isolated`, red, closed | `isolated`, green, closed |
+| 0.026 | Serious breaches, high | GBP 59,229.57 | GBP 487,025.23 | `isolated`, red, closed | `isolated`, green, closed |
+| **0.2540** | **At GBP 430,000, the highest rate at which `isolated` is within tolerance** | GBP 429,988.83 | GBP 4,565,377.17 | `isolated`, red, closed | `isolated`, green, closed |
+| 0.2541 | The next rate up | GBP 430,151.45 | GBP 4,567,165.93 | `isolated`, red, closed | `isolated`, red, closed |
+| 1 | Today: `null`, read as 1 | GBP 1,643,087.14 | GBP 17,909,458.57 | `isolated`, red, closed | `isolated`, red, closed |
 
 Notes on the table:
 
-- **The thresholds, to nine places.** Found by halving. At GBP 40,000 the loop releases at 0.000561802 and not at 0.000561803, and `isolated` is within tolerance at 0.014170628 and not at 0.014170629. At GBP 430,000 the loop releases at 0.018003721 and not at 0.018003722, and `isolated` is within tolerance at 0.253939249 and not at 0.253939250.
+- **What the re-run changed.** Feeds 5.1.0 prices the misused write credential at GBP 0.00. None of the 18 outcomes in the table of where the three counts land changes. Every figure in Table 2 falls, by GBP 0.57 to GBP 431.49. One threshold moves at four figures: at GBP 430,000 the highest rate at which `isolated` is within tolerance is now 0.2540, not 0.2539. So at GBP 430,000 a rate of 0.2540 now leaves `isolated` green, not red.
+- **The thresholds, to nine places.** Found by halving. At GBP 40,000 the loop releases at 0.000561844 and not at 0.000561845, and `isolated` is within tolerance at 0.014174699 and not at 0.014174700. At GBP 430,000 the loop releases at 0.018004184 and not at 0.018004185, and `isolated` is within tolerance at 0.254006869 and not at 0.254006870.
 - **A release is two notches after one wait.** The dwell is served once at `isolated`. The next cycle, at `quarantine`, releases again.
-- **Where the loop rests depends on where it stands.** A loop already at `baseline` would stay there, green, up to 0.001009031 at GBP 40,000 and up to 0.022811430 at GBP 430,000. A loop at `isolated` stays at `isolated` above the release threshold, because it is not release-ready. The margin makes that gap. In that gap the line prints `goal` `baseline` and `release_ready` false, and the loop does not move.
+- **Where the loop rests depends on where it stands.** A loop already at `baseline` would stay there, green, up to 0.001009084 at GBP 40,000 and up to 0.022812008 at GBP 430,000. A loop at `isolated` stays at `isolated` above the release threshold, because it is not release-ready. The margin makes that gap. In that gap the line prints `goal` `baseline` and `release_ready` false, and the loop does not move.
 - **The soft edges change nothing at GBP 430,000 and little at GBP 40,000.** The soft top of all reports (0.00053) and the soft low of cyber only (0.00014) release at both tolerances. The other tops of the third count (0.022 and 0.029) do what 0.026 does: red at GBP 40,000, green and closed at GBP 430,000.
-- **The room at GBP 40,000 is thin.** The cyber-only point releases with GBP 586.76 to spare, and the soft top of all reports with GBP 568.87. At GBP 430,000 the highest counted value that still releases is the third count's point, GBP 254,075.32 under the line. That threshold, 0.01800, falls inside the third count's interval, between its point and its high. So for that count the end still decides.
+- **The room at GBP 40,000 is thin.** The cyber-only point releases with GBP 587.50 to spare, and the soft top of all reports with GBP 569.62. At GBP 430,000 the highest counted value that still releases is the third count's point, GBP 254,077.47 under the line. That threshold, 0.01800, falls inside the third count's interval, between its point and its high. So for that count the end still decides.
 - **The cyber-only side figure for large breaches** (0.0067, interval 0.003 to 0.013) is green and closed at GBP 40,000 and releases at GBP 430,000, across its interval.
 - **A counted rate does not make any row sourced.** At every rate the rows stay `upper` and the sourced share stays 0, because no row cites a tier and the row bases are editorial. The weakest basis moves from "not-counted: uk-gdpr penalty_rate" to "unsourced: cost of" the current rung.
 
@@ -101,7 +102,7 @@ Read from the records, not run: the cycle runs once a day and on a merge that ch
 Each option names a count. The owner also chooses an end of its interval, and a tolerance.
 
 - **Leave `null`.** *For:* it needs no judgement about the class of breach, and nothing has to be defended. *Against:* 1 is not a count either, and the highest value any count defends is 0.026, or 0.029 on one sensitivity. *The loop:* red and closed at both tolerances.
-- **All reports.** *For:* the most events, 20, and the ICO's own totals on both sides. It is the only one that covers the insider row, which is nearly all of the exposure at `isolated`. *Against:* its researcher says it is too low for a serious breach, and its checker calls that reading sound. *The loop:* the shop reopens at any end and at both tolerances.
+- **All reports.** *For:* the most events, 20, and the ICO's own totals on both sides. It is the only one that covers the insider row, which is all of the exposure at `isolated`. *Against:* its researcher says it is too low for a serious breach, and its checker calls that reading sound. *The loop:* the shop reopens at any end and at both tolerances.
 - **Cyber only.** *For:* it counts the kind of event the largest row prices, on ten events. *Against:* it leaves out breaches that are not cyber, and its researcher puts the rate for a large breach about ten times higher. *The loop:* at GBP 40,000 the low and the point reopen the shop, and the high leaves it green and closed. At GBP 430,000 all three reopen it.
 - **Serious breaches.** *For:* it is aimed at a serious breach at a commercial firm. Among the reports of 2019 to 2022, no penalty went to a commercial firm for a breach that was not cyber: 0 of 11,326 (17,769 commercial reports less 6,443 cyber ones; the subtraction is this file's). So, as far as that cohort shows, a cyber rate does not run low for the insider row. Doorstep Dispensaree, a pharmacy fined for paper records, is outside that class: the ICO files it under Health, and by the third count's account, which its check did not verify, it did not start from a breach report. *Against:* three events, an estimated denominator, a class chosen after the numbers were seen, and the breaches reported in 2018 left out. *The loop:* the shop stays closed at GBP 40,000, green at the low and the point and red at the high. At GBP 430,000 the low and the point reopen it, and the high leaves it green and closed.
 - **Which end.** *For the high end:* the number replaces 1, so it lowers the figure, and the high end puts the doubt in the count on the side of the larger figure. *Against:* `LOOP.md` step 10 lets a publisher's change lower the figure, so a point value breaks no rule. The feed's only kind for a number is `counted`. A point value is a count. The top of an interval is not, and its basis text would have to say so. The top of the third count is a judgement.
@@ -121,13 +122,17 @@ Not done here.
 
 ## What was run, and what was not
 
-- **Run.** The loop program, the rungs and the two feeds are the commits driftwood pinned on 14 November (platform `1c92754`, ico `93d1fc8`, feeds `2ea67d1`). The party file and the namespace file are driftwood's own, at `420d7e2`. All were read from each repository's history and not from a working copy. The ledger is a copy of driftwood's six lines. Each run is one `cycle` of that program:
+The tables were run twice. Every loop figure, threshold and outcome in this file now comes from the second run.
+
+- **The first run, 14 November's pins.** The loop program, the rungs and the two feeds were the commits driftwood pinned on 14 November (platform `1c92754`, ico `93d1fc8`, feeds `2ea67d1`). The party file and the namespace file were driftwood's own, at `420d7e2`. All were read from each repository's history and not from a working copy. The ledger was a copy of driftwood's six lines. Each run was one `cycle` of that program:
   `python3 -B loop.py cycle --party <party copy> --namespace-file <namespace copy at the rung> --penalties <ico feed copy with the rate> --threats <feeds feed> --rungs <rungs.json> --probe <probe file for the rung> [--ledger <ledger copy>] --cause check --cluster none --run 0 --commit 0 --rung-set-by=check --out <temp file>`
-- The probe files are in the shape of the ledger lines, one for each rung, for a cage that works at that rung. Rebuilt from each line's own fields, they give the five ledger lines that carry a verdict again: the same figure, exposure, cost and verdict.
+  Rebuilt from each line's own fields, the probe files gave the five ledger lines that then carried a verdict again: the same figure, exposure, cost and verdict. Several hundred runs in all. A second driver, written apart from the first, ran the same landed files again. It got the same three rung figures, confirmed each of the six thresholds at its two boundary rates, and got the resting rung and colour at each count's low, point and high, at both tolerances.
+- **The re-run, 15 November.** The loop program and the rungs are platform `e91e5db`, which driftwood pins as `policy/v8.0.1`. ico's feed is `penalty-schema/feed.json` as at `8f4b1c6`, the same file as at `93d1fc8`. The threat feed is feeds 5.1.0, tagged at `489e2fe`. The re-run used the candidate, which differs from the tag only in the words of one basis text; every number is the same. The party file and the namespace file are driftwood's own, at `08ba2d0`: the party file's pin lines changed, the namespace file did not. The ledger is a copy of driftwood's nine lines, fresh for each run. The real ledger was not written.
+- One driver ran the re-run. It calls the loop's own `cycle` with a clock it sets, starting at 06:47 UTC on 15 November and one day a cycle, and moves the rung line as the loop does. It was proved three ways. On the old feed, 5.0.1, it gives every number the first run gave, to the penny and to the ninth place. On the old feed it rebuilds all eight ledger lines that now carry a verdict: the same `figure`, `exposure`, `cost`, `verdict`, `rung_to`, `goal`, `unreachable`, `release_ready`, `rows`, `sourced_share`, `weakest_basis`, `serving` and `capabilities`. And 24 single cycles were also run through the same `cycle` command, with the labels `--cluster stand-in` and `--rung-set-by rerun`, every field equal to the driver's line. No second, separate driver was written for the new feed. 3,496 cycles in all.
+- The probe files are in the shape of the ledger lines, one for each rung, for a cage that works at that rung. In the re-run each is rebuilt from the last real line that looked at its rung.
 - The feed copy carries the rate and the basis kind `counted`. The party copy changes only the tolerance amount, to 430000. Written as `share_of_turnover` 0.005, the loop prints the same tolerance.
-- Each rate was run from `isolated`, cycle after cycle, until the loop made no move. Each threshold was found by halving between 0.000000001 and 1, in steps of 0.000000001. Several hundred runs in all.
-- A second driver, written apart from the first, ran the same landed files again. It got the same three rung figures. It confirmed each of the six thresholds at its two boundary rates. At each count's low, point and high, at both tolerances, it got the resting rung and colour the tables state.
-- **Not run.** No cluster, no workflow, no pin move, no merge and no network. The probe files stand in for a working cage. The web sources were not fetched again: the counts and their checks are the six reports'. The loop as changed on 15 November (platform `policy/v8.0.1`) was run at `isolated` for `null`, 0.0004 and 0.026 only. It gives the same three figures. The other tolerances in `../DECISIONS.md` (GBP 86,000, GBP 860,000, GBP 1,720,000) were not run.
+- Each rate was run from `isolated`, cycle after cycle, until a cycle made no move and was not release-ready. Three more cycles then checked that none moved. Each threshold was found by halving between 0.000000001 and 1, in steps of 0.000000001.
+- **Not run.** No cluster, no workflow, no pin move, no merge and no network. The probe files stand in for a working cage. The web sources were not fetched again: the counts and their checks are the six reports'. ico's four tests were run in the first run only; ico's feed did not change. The other tolerances in `../DECISIONS.md` (GBP 86,000, GBP 860,000, GBP 1,720,000) were not run.
 
 ## What is still unknown
 
