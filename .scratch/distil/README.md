@@ -1,6 +1,6 @@
 # distil: the mission as one loop
 
-Status: all ten decisions are answered, and the owner answered the four questions of 2026-11-15 the same day (`DECISIONS.md`); the loop is green at `isolated` and waiting out the dwell, with a release expected on 2026-11-22, and its daily schedule has not yet run once (`../../LOOP.md`, `standing-proof/2026-11-15.md`)
+Status: all ten decisions are answered, and the owner answered the four questions of 2026-11-15 the same day (`DECISIONS.md`); the loop is green at `isolated` and waiting out the dwell (`../../LOOP.md`). On 2026-11-15 its daily schedule ran for the first time and cage 8.0.2 landed under `policy/v8.0.2`; a release is expected on 2026-11-22, the guard's hook was removed on the owner's word after the agent harness first refused the push (hub pull request 326), Renovate is to be configured correctly in every repository as the owner answered, and an adversarial review of every line of code is under way (`DECISIONS.md`, "What followed from the four answers" and the section on "Stop leaving things alone", with its "The two answers")
 
 A read-only review of the whole estate, made on 2026-11-14 against one sentence from the owner:
 
@@ -17,6 +17,7 @@ The review itself built, ran, moved and removed nothing. The clean-up that follo
 | `CONTRACT.md` | The design that was built from the decisions. Its section 11 says what each review changed and how the changes landed. |
 | `penalty-rate/CHOICE.md` | Three counts of the penalty rate, and what the loop does under each at two tolerances. A choice for the owner, made on 2026-11-15. The six files beside it are the counts and their checks. |
 | `standing-proof/2026-11-15.md` | The proof on a cluster that stays up, run on 2026-11-15 from an agent session: the break test, re-caging running pods, and two findings. `lines.jsonl` beside it holds its eight lines, which went to no ledger. |
+| `standing-proof/2026-11-15-b.md` | The same cluster rebuilt on cage 8.0.2 later that day: the climb in place that the first proof found refused, now admitted. `lines-b.jsonl` beside it holds its three lines, which went to no ledger. |
 | `ARCHIVE.md` | What the clean-up of 2026-11-14 archived, and how to bring any of it back. |
 | `LEDGER.md` | Every area of the nine repositories in 26 rows: what was proposed, what a second reader found, and the call. |
 | `TARGET.md` | The distilled design in full. Superseded wherever `DISTILLATION.md` sections 5.6 and 7 or `LEDGER.md` differ; its section 16 lists where. |
