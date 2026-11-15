@@ -23,11 +23,13 @@ A red verdict does not stop the landing path. Only the workflow's `verdict` job 
 
 ## Where it stands
 
-The loop is in `act` mode and stands at `isolated`, where the shop no longer serves. Every run is red: `saturated` at GBP 1,643,518.63, which is GBP 1,603,518.63 above the tolerance at the best rung there is. The climb rests on two decisions together. The owner chose a loop that may climb that far (decision 5). The assistant chose to judge a notch by its goal (K16, delegated), and without that the loop stays at `baseline`.
+The loop is in `act` mode and stands at `isolated`, where the shop no longer serves. Every run is red: `saturated`. The last ledger line reads GBP 1,643,518.63 on feeds 5.0.1, which is GBP 1,603,518.63 above the tolerance at the best rung there is. Feeds 5.1.0 lowers the figure to GBP 1,643,087.14, which is GBP 1,603,087.14 above the tolerance, from the first cycle that follows the new tag. The climb rests on two decisions together. The owner chose a loop that may climb that far (decision 5). The assistant chose to judge a notch by its goal (K16, delegated), and without that the loop stays at `baseline`.
 
 It got there by itself on 2026-11-14. Driftwood landed in `measure` mode and its first cycles read `tighten` and moved nothing. Platform's cluster proof was green at the pinned tag, so the mode was changed to `act` (driftwood pull request 134). The next cycle opened pull request 135, `baseline` to `quarantine`; the checker passed it and the app merged it. At `quarantine` the probe measured `egress` closed with the shop serving 3 of 3, and the cycle opened pull request 136, to `isolated`, which landed the same way. At `isolated` the probe measured both capabilities closed and the shop serving 0 of 3. No person was on that path. The ledger holds each line.
 
 On 2026-11-15 the loop followed a publisher by itself. Feeds merged a text correction as version 5.0.1 (feeds pull request 22), and that merge cut and signed `threat-register/v5.0.1`. The next driftwood cycle opened pull request 138 for the new pin; the checker passed it and the app merged it. The cycle after that ran on the new feed and read the same verdict at the same figure. No person was on that path either, but for its start: the cycle was started by dispatch, not by the schedule. The platform pin moved the other way, by a pull request from an agent session (137, to `policy/v8.0.1`). Its own cycle ran that platform on a cluster before the app merged it.
+
+Later on 2026-11-15 the owner answered the assistant's report of that morning in two words: "Do everything". The report had named two things that waited for the owner: K16, and which penalty rate ico publishes, with the tolerance. It had also listed what was not done. The reply was read as leave to do what was listed as not done. It was not read as an answer to any open choice: it names no penalty rate, no tolerance, no machine or spend for a cluster that stays up, and it does not say to reverse K16. Feeds read its second row's N again and found it 0, so the row now prices at 0.00 (K18, delegated). Feeds pull request 23 carried that as version 5.1.0, and its merge cut and signed `threat-register/v5.1.0`. Platform pull request 78 gave each cage file one true opening comment line in place of four stale ones. No rule changed and no tag was cut, so the pinned `policy/v8.0.1` still carries the old comments. Ico pull request 14 removes the words "FOR THIS EXAMPLE" from three litigation notes. It is a draft, held so that one ico tag carries it with the penalty rate, if the owner chooses one. No cycle was dispatched after the tag was cut, so that the schedule finds the tag and the loop follows it with no person and no dispatch. The first scheduled run was due at 06:47 UTC and had not started by 08:33 UTC. It is watched, not dispatched. When this was written the loop had not yet followed the new tag: driftwood still pins `threat-register/v5.0.1`, and the last ledger line is line 9, run 43663748023.
 
 To read today's verdict, follow "How to read the ledger" in driftwood's README. On `main`, a run whose only red job is `verdict` is expected: its line is written, and the line says which verdict it was. A pull request's run can be red at `verdict` too, and it writes no line. A red `cycle` job is a fault: an input was refused or the pins would not check out, and no line was written. A red `write`, `check` or `land` job is a fault: a line or a move did not land.
 
@@ -44,8 +46,8 @@ Besides those two decisions, that outcome rests on three things:
 What would change it:
 
 - **A counted penalty rate.** In the unit tests a counted rate of 0.0005, a test value and not a count, puts the figure at `isolated` at GBP 17,763.80. `baseline` then predicts GBP 30,894.49, which is at or below GBP 32,000, the tolerance less the 20% margin. After the dwell the loop releases to `quarantine`, then to `baseline`. Three counts now exist and none is published. Which one ico publishes is put to the owner: `.scratch/distil/penalty-rate/CHOICE.md`.
-- **A changed third row.** With the first two rows only, `isolated` reads `within` at GBP 15,431.49, still at the rung where the shop does not serve. The third row's band is feeds' work.
-- **A tolerance the owner names.** It is one line in `party.json`. No rung on these inputs has a figure below GBP 1,643,518.63.
+- **A changed third row.** With the first two rows only, `isolated` reads `within` at GBP 15,000.00 on feeds 5.1.0 (GBP 15,431.49 on 5.0.1), still at the rung where the shop does not serve. The third row's band is feeds' work.
+- **A tolerance the owner names.** It is one line in `party.json`. No rung has a figure below GBP 1,643,087.14 on feeds 5.1.0.
 
 ## On the inputs of 2026-11-14
 
@@ -72,7 +74,7 @@ The three rows, each with bound `upper`, at the higher tier's mean penalty of GB
 | Turnover, GBP 86,000,000 | driftwood `party.json` | Declared by the demonstration party, as of 2026-06-30 |
 | Tolerance, GBP 40,000 | driftwood `party.json` | A fixture of 2026-07-31, not declared by the owner |
 | Margin 0.2, dwell 7 days | driftwood `party.json` | Settings with no outside basis |
-| Three rows | feeds `threat-register/feed.json` | Every basis is `editorial` except the second row's rate, which is `published` and kept as an upper bound. The first row's `needs` is the publisher's claim, with an ATT&CK source. The other two need nothing |
+| Three rows | feeds `threat-register/feed.json` | Every basis is `editorial` except the second row's rate, which is `published`. Since 5.1.0 that rate is 0: its N was read again on 2026-11-15. The first row's `needs` is the publisher's claim, with an ATT&CK source. The other two need nothing |
 | Penalties | ico `penalty-schema/feed.json`, UK GDPR | Tiers priced from ICO penalty notices. No row cites a tier, so each takes the higher one. No count of the penalty rate is published, so it is 1 |
 | Rung costs, GBP 500, 6,000 and 15,000 | platform `cage/rungs.json` | Unsourced: typed on 2026-07-31 for the version 7 rungs. No measurement |
 | Capabilities | the probe, each cycle | Measured live |
@@ -102,9 +104,11 @@ The first loop runs end to end without them. `.scratch/distil/ARCHIVE.md` lists 
 | Removing the guard's hook from the hub | `twin/` and `.claude/settings.json` stay | One commit of the owner's removes the hook and the three `twin/` files together |
 | The hosted Renovate app on driftwood | `renovate.json` keeps it silent | Uninstall it, then delete the file |
 
+The first four rows, K16, the tolerance, the penalty rate and the cluster that stays up, were put to the owner as questions on 2026-11-15, after "Do everything", which was not read as an answer to them (`.scratch/distil/DECISIONS.md`, "15 November").
+
 Settled on 2026-11-14 by the owner's reply "I'm afk. Jfdi" (`.scratch/distil/DECISIONS.md`, "Later the same day"). Leave to cut tags: given and used. Each repository's own workflow cut and signed the first tag of the new design at the commit the loop had already run against: ico `v5.0.0`, feeds `threat-register/v5.0.0`, platform `policy/v8.0.0`. Driftwood pinned those tags (pull request 133). It now pins platform `policy/v8.0.1` (pull request 137) and feeds `threat-register/v5.0.1` (pull request 138, the loop's own). `CUT_ON_MERGE` is `true` in ico and feeds, so a merged change of a feed's `version` cuts its own tag. A platform tag is cut only by dispatch, and the platform pin moves only by a pull request to the pin line (K17). The key in feeds and ico: read as given, and not used. Nothing built here would read it, and a secret with no reader is redundant. Only a returning fetch would need it.
 
-The numbers nobody had counted were not the owner's to supply. Counting the penalty rate was ico's work, and it is now done three ways. Choosing between the counts is put to the owner. The third row's band is feeds' work.
+The numbers nobody had counted were not the owner's to supply. Counting the penalty rate was ico's work, and it is now done three ways. Choosing between the counts is put to the owner. The third row's band is feeds' work. Feeds read its second row's N again on 2026-11-15 and found it 0 (version 5.1.0).
 
 ## Six notes
 
@@ -113,4 +117,4 @@ The numbers nobody had counted were not the owner's to supply. Counting the pena
 - While a release waits for its dwell, the lines can read `saturated` and red. With one cycle a day, a dwell is usually met a day late.
 - GitHub disables `loop.yml`'s schedule after 60 days without repository activity. It is switched back on from the Actions tab.
 - Each of the loop's own pull requests shows one run of `loop.yml` with no jobs, marked failed. It is not a failed cycle. GitHub documents that a pull request opened by the workflow token starts its runs in an approval-required state. Both `loop/rung` pull requests show such a run: runs 43651161098 and 43651510938 have no jobs. That the run ends failed because the app merges the pull request seconds later is inferred. GitHub does not document it.
-- These paths have not yet run live: the daily schedule, whose first run was due at 06:47 UTC on 2026-11-15, after this was written; a release and its dwell; and the proof on a cluster that stays up. A `loop/pins` change and a tag cut by a merge both ran on 2026-11-15.
+- These paths have not yet run live: the daily schedule, whose first run was due at 06:47 UTC on 2026-11-15 and had not started by 08:33 UTC; a release and its dwell; and the proof on a cluster that stays up. A `loop/pins` change and a tag cut by a merge both ran on 2026-11-15.

@@ -1,6 +1,6 @@
 # distil: the mission as one loop
 
-Status: nine of ten decisions answered on 2026-11-14 (`DECISIONS.md`); the tolerance figure is open; the penalty rate is counted three ways and which count is published is open (`penalty-rate/CHOICE.md`)
+Status: nine of ten decisions answered on 2026-11-14 (`DECISIONS.md`); after the owner's "Do everything" of 2026-11-15, feeds 5.1.0 prices its second row at 0, platform pull request 78 corrected the cage comments, ico pull request 14 is held, and four questions are put to the owner: which count of the penalty rate is published, the tolerance figure, a cluster that stays up, and K16 (`DECISIONS.md`, `penalty-rate/CHOICE.md`)
 
 A read-only review of the whole estate, made on 2026-11-14 against one sentence from the owner:
 
