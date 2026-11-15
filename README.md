@@ -14,7 +14,6 @@ This repository holds the records of the estate: what it is for, what was decide
 | `.scratch/drift-review-2026-08-27/`, `.scratch/ecosystem/` | The owner's dated words and approvals, kept byte for byte. The review cites them by line. |
 | `research/03-blogs-thesis.md` | The 2022 thesis: policy as a versioned dependency that carries its why. |
 | `CONTEXT.md` | The glossary: the loop's terms. |
-| `twin/enact_guard.py` | The guard on agent writes, with its mode file. It stays until the owner removes its hook from `.claude/settings.json`. |
 
 ## The live repositories
 
