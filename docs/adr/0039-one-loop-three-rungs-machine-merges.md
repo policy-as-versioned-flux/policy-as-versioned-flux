@@ -10,6 +10,10 @@ tolerance stays a fixture. The design built on them is `.scratch/distil/CONTRACT
 the reason for each decision below. `LOOP.md` describes the loop and its state. `CONTEXT.md`
 defines the terms.
 
+On 2026-11-15 the owner answered four further questions (`.scratch/distil/DECISIONS.md`,
+"15 November: the four answers"). The tolerance is now 0.5% of turnover, GBP 430,000. Ico publishes a counted penalty rate, 0.0002095, the count the owner chose. The owner
+kept K16. The proof on a cluster that stays up ran the same day (K19).
+
 ## Decision
 
 Each decision carries the contract's label. *Owner-instructed* restates an answer in
@@ -32,9 +36,10 @@ Each decision carries the contract's label. *Owner-instructed* restates an answe
 | K13 | `pins.sh` verifies a tag's signature when a pin names a tag | delegated |
 | K14 | Driftwood's workloads stay bare Pods, with no rollout stamp | delegated |
 | K15 | The party file and the ladder file are JSON, not YAML | delegated |
-| K16 | A notch is judged by the goal it leads to, not by its own gain. This departs from a consequence written in the option the owner chose: option (c) of `.scratch/distil/DISTILLATION.md` section 7 item 6 reads "cost is added to exposure, so a notch that costs more than it saves is not taken", and the owner answered "Always". The loop instead never starts a climb unless some tighter rung predicts a lower figure, cost included, and one notch on the way may cost more than it saves. Judged one notch at a time, the first notch closes nothing today's rows need, so the loop would stay at `baseline` for ever, which is not what the owner was told to expect under decision 5. Option (c) as written leaves the loop at `baseline`, red, with the shop serving. The owner can reverse it (`LOOP.md`, what waits for the owner) | delegated |
+| K16 | A notch is judged by the goal it leads to, not by its own gain. This departs from a consequence written in the option the owner chose: option (c) of `.scratch/distil/DISTILLATION.md` section 7 item 6 reads "cost is added to exposure, so a notch that costs more than it saves is not taken", and the owner answered "Always". The loop instead never starts a climb unless some tighter rung predicts a lower figure, cost included, and one notch on the way may cost more than it saves. Judged one notch at a time, the first notch closes nothing today's rows need, so the loop would stay at `baseline` for ever, which is not what the owner was told to expect under decision 5. On the inputs of 2026-11-14, option (c) as written would have left the loop at `baseline`, red, with the shop serving. The owner was asked whether to keep or reverse it, and kept it on 2026-11-15 (`.scratch/distil/DECISIONS.md`, "15 November: the four answers") | delegated; kept by the owner on 2026-11-15 |
 | K17 | The loop never moves the platform pin. `bump-pins` follows ico and feeds only, and a platform change reaches the adopter by a pull request that changes the platform pin line. The pinned platform holds `check-diff` and `bump-pins`, which gate what lands, so a loop that pinned a new platform tag itself would be following its own code. The pull request is pushed from an agent session, so its own cycle runs the new platform on a cluster before the app merges it. Decided 2026-11-15, after the second look (`.scratch/distil/CONTRACT.md` section 11) | delegated |
 | K18 | A row whose counted door is found closed stays in the register at the rate its own method gives, 0, with the reading dated. It is not removed and not left at the old rate. Feeds' second row is the case: its N, read again, is 0, so leaving the old rate would knowingly overstate it, and removing the row would lose the reading and its history. Decided 2026-11-15, after the owner's "Do everything" (`.scratch/distil/CONTRACT.md` section 11) | delegated, applying "Do everything" |
+| K19 | The proof on a cluster that stays up runs from an agent session on the owner's machine, with the pinned harness and loop unchanged. Its lines say `cluster: standing` and go to no ledger. Flux stays out: K5 stands. The owner chose a kind cluster on the owner's own machine, and GitHub's runners cannot reach it. Decided 2026-11-15, after the owner's four answers (`.scratch/distil/CONTRACT.md` section 11, `.scratch/distil/standing-proof/2026-11-15.md`) | delegated, applying the owner's answer 3 |
 
 Two things are derived from the owner's sentence, and the owner has commented on neither
 (`.scratch/distil/DISTILLATION.md` section 7): the pound is a real figure, not a ranking, because
