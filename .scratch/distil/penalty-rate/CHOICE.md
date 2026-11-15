@@ -1,6 +1,8 @@
 # The penalty rate: a choice for the owner
 
-Written 15 November 2026. Run again the same day on the loop of `policy/v8.0.1` and feeds 5.1.0. Research only. Nothing lands in ico's feed. The owner chooses.
+Written 15 November 2026. Run again the same day on the loop of `policy/v8.0.1` and feeds 5.1.0. Research, written before the owner chose.
+
+**Chosen on 15 November 2026.** The owner chose the count over all reports, at its point value, 0.0002095, and a tolerance of 0.5% of turnover, GBP 430,000 (`../DECISIONS.md`, "15 November: the four answers"). The assistant had recommended the cyber-only count. The rest of this file is the research as it was put to the owner: where it says the owner chooses, or has not chosen, read it as of that moment.
 
 ## The choice, in short
 
@@ -10,7 +12,7 @@ The figure rests on one number nobody had counted: the penalty rate, the chance 
 
 Three researchers have now counted it, each a different way. A checker tried to break each count. The counts differ by a factor of about 18 at their point values, and about 200 from the lowest low to the highest high.
 
-Two money choices are open, and they are coupled: the rate and the tolerance. The GBP 40,000 in driftwood's `party.json` is labelled "fixture 2026-07-31, not owner-declared". The assistant suggested 0.5% of turnover, GBP 430,000, on 14 November (`../DECISIONS.md`, "Tolerance: what the industry does"). The owner has chosen neither. From where the loop stands today:
+Two money choices are open, and they are coupled: the rate and the tolerance. The GBP 40,000 in driftwood's `party.json` is labelled "fixture 2026-07-31, not owner-declared". The assistant suggested 0.5% of turnover, GBP 430,000, on 14 November (`../DECISIONS.md`, "Tolerance: what the industry does"). When this was written the owner had chosen neither. From where the loop stood then:
 
 | What the loop does | Tolerance GBP 40,000 | Tolerance GBP 430,000 |
 |---|---|---|
