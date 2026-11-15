@@ -26,10 +26,10 @@ Each decision carries the contract's label. *Owner-instructed* restates an answe
 | K3 | Three rungs: `baseline`, `quarantine`, `isolated`. The old `restricted` is merged into `quarantine` | delegated |
 | K4 | Two capabilities only: `egress` and `inbound` | delegated |
 | K5 | The cluster is built by `kubectl apply -k` from pinned checkouts. Flux is not installed | delegated |
-| K6 | The publishers' pins are followed by `loop.py bump-pins` with plain git. The platform pin is not followed (K17). Renovate is not run | delegated |
+| K6 | The publishers' pins are followed by `loop.py bump-pins` with plain git. The platform pin is not followed (K17). Renovate does not follow the pins (since 2026-11-15 the hosted Renovate app has a configuration in each repository but the hub; no Renovate manager reads `party.json`) | delegated |
 | K7 | No reusable workflow. Driftwood's workflow checks platform out at its pin and runs its scripts | delegated |
 | K8 | No exploited-flaw list, image inventory, scanner or fetch. They are parked, not dropped | delegated |
-| K9 | Ico and feeds have no scheduled job and no landing job. Their one unattended act is to cut a tag when a merge changes the feed's version | delegated, applying decision 2 |
+| K9 | Ico and feeds have no scheduled job and no landing job. Their one unattended act is to cut a tag when a merge changes the feed's version. A merge to `main` that changes `version` cuts the tag, and no variable switches it on: the repository variable `CUT_ON_MERGE` that did was deleted on 2026-11-15, after the review of every line (`.scratch/distil/CONTRACT.md` section 11) | delegated, applying decision 2 |
 | K10 | Network tests run from the probe pod, not inside every workload container | delegated |
 | K11 | A loss the cage cannot touch is a priced row with no `needs`, on the publisher's editorial band | delegated, applying decision 5 |
 | K12 | No veto on a refused release | delegated, applying decisions 1 and 2 |
