@@ -25,7 +25,7 @@ The 69 local tips were 41 branches, 15 detached checkouts, 1 stash and 12 snapsh
 
 Seven repositories stay live.
 
-| Repository | Branches deleted | of which archived first | Local-only tips archived | Branches now |
+| Repository | Branches deleted | of which archived first | Local-only tips archived | Branches after the clean-up |
 |---|---|---|---|---|
 | hub | 315 | 74 | 49 | 2 |
 | platform | 73 | 21 | 4 | 4 |
@@ -46,7 +46,7 @@ A branch stayed if running automation looks it up by name, or if a bot's open pu
 - **`release/2.0.x`** in platform: a protected maintenance branch.
 - **`renovate/*`** everywhere: Renovate does not raise an update again once its pull request is closed.
 - **`wargamer/*`** and one `observations/drift-sample/…` branch in driftwood: heads of open bot pull requests.
-- **`distil/record-2026-11-14`** in the hub: the branch that carries this record.
+- **`distil/record-2026-11-14`** in the hub: the branch that carried this record (gone since pull request 317 merged; its commit is in `main`).
 
 Later the same day every one of these in platform, driftwood, ico and feeds was archived as well, before the old chain left `main`. See "Before the old chain left `main`" below.
 
@@ -107,7 +107,7 @@ Later on 2026-11-14 the owner wrote: "Remove all redundant code. Simplify everyt
 | ico | `9d584cf0f177` |
 | feeds | `838abe583f14` |
 
-Every `repo/path:line` citation in this folder resolves against that ref. To read a file that has left `main`:
+Every `repo/path:line` citation in this folder resolves against that ref, except those that start `backup/`, which point at the owner's backup disk. To read a file that has left `main`:
 
 ```sh
 git fetch origin refs/archive/main/2026-11-14-before-simplify

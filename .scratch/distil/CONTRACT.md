@@ -1,6 +1,6 @@
 # CONTRACT: the simplified estate
 
-Written 2026-11-14 by the architect stage, revised the same day after three reviews, and amended by the orchestrator after the owner's reply "I'm afk. Jfdi" (`DECISIONS.md`, "Later the same day"): leave to cut tags is given, and the red exit moves to a job of its own (5.3). The builders share this file and nothing else. `DECISIONS.md` and `FORGE.md` outrank it. It outranks `TARGET.md`. Section 11 lists what the review of the built code changed. Where sections 1 to 10 and section 11 differ, section 11 and the code win.
+Written 2026-11-14 by the architect stage, revised the same day after three reviews, and amended by the orchestrator after the owner's reply "I'm afk. Jfdi" (`DECISIONS.md`, "Later the same day"): leave to cut tags is given, and the red exit moves to a job of its own (5.3). The builders share this file and nothing else. `DECISIONS.md` outranks it. It outranks `TARGET.md`. Section 11 lists what the review of the built code changed. Where sections 1 to 10 and section 11 differ, section 11 and the code win.
 
 **The mission, in the owner's words.** "quantified risk and a reactive ratcheting process cage to mitigate the quantified risk until the risk is within financial tolerance of the organisation". Then: "Remove all redundant code. Simplify everything".
 
@@ -29,17 +29,18 @@ Written 2026-11-14 by the architect stage, revised the same day after three revi
 | K3 | The ladder has three rungs: `baseline`, `quarantine`, `isolated`. The old `restricted` is merged into `quarantine`. | Only two capabilities can be tested live, and a rung must close something a probe can see (LEDGER C7). | delegated |
 | K4 | Two capabilities only: `egress` and `inbound`. | A read-only root filesystem read as closed at every rung, because driftwood's own manifests already set it. No row needs the others. | delegated |
 | K5 | The cluster is built by `kubectl apply -k` from pinned checkouts. Flux is not installed. | On a cluster made after the merge, Flux proves nothing a checkout does not. It returns with the cluster that stays up, which waits for the owner (decision 9, section 8). | delegated |
-| K6 | Pins are followed by `loop.py bump-pins` with plain git. Renovate is not run. | Following a branch by commit could not be checked offline in Renovate. One function handles branch pins now and tag pins later. | delegated |
+| K6 | The publishers' pins are followed by `loop.py bump-pins` with plain git. The platform pin is not followed (K17). Renovate is not run. | Following a branch by commit could not be checked offline in Renovate. One function handles branch pins now and tag pins later. | delegated |
 | K7 | No reusable workflow. Driftwood's workflow checks platform out at the commit in `party.json` and runs its scripts. | Every pin then lives in one file, on one line each. | delegated |
 | K8 | No exploited-flaw list, image inventory, scanner or fetch. They are parked, not dropped. `LOOP.md` says where each is kept and what brings it back. | The first loop runs end to end without them. They need about 500 lines and a scanner in CI. | delegated |
 | K9 | Ico and feeds have no scheduled job and no landing job. Their one unattended act is to cut a tag when a merge changes the feed's version. A repository variable switches it on (5.2). | With K8 there is nothing to fetch. A tag needs no key: the default token can create one, and driftwood finds it with `git ls-remote`. | delegated, applying decision 2 |
 | K10 | Network tests run from the probe pod, not inside every workload container. | Whether the workload images carry a shell is not known. The settle check proves every pod carries the stamp the network rule selects on. | delegated |
 | K11 | A loss the cage cannot touch is a priced row with no `needs`, on the publisher's editorial band. | The exposure compared is the whole organisation's. A register without the row could read `within` by leaving the loss out. An unsourced number can only raise the figure. | delegated, applying decision 5 |
-| K12 | No veto on a refused release. | No person is on the merge path (decision 2), so nobody refuses. | owner-instructed |
+| K12 | No veto on a refused release. | No person is on the merge path (decision 2), so nobody refuses. | delegated, applying decisions 1 and 2 |
 | K13 | `pins.sh` verifies a tag's signature when a pin names a tag. | So that moving to tags is a change to pin lines only. It cannot be proven until a tag exists. | delegated |
 | K14 | Driftwood's workloads stay bare Pods, with no rollout stamp. | Every cycle builds a new cluster, so every pod is admitted at the current rung. | delegated |
 | K15 | The party file and the ladder file are JSON, not YAML. | The standard library reads JSON and refuses a duplicate key in three lines. YAML needed a dependency, a second action and a hash pin in five jobs. | delegated |
-| K16 | A notch is judged by the goal it leads to, not by its own gain. | Decision 6 says cost always counts. Judged alone, the first notch would never be taken, and the loop would sit at `baseline`, which is not what the owner was told to expect under decision 5. This departs from the wording of `DECISIONS.md` row 6, "a notch that costs more than it saves is not taken"; `DECISIONS.md` records the departure, and the owner can reverse it. | delegated |
+| K16 | A notch is judged by the goal it leads to, not by its own gain. | Decision 6 says cost always counts. Judged alone, the first notch would never be taken, and the loop would sit at `baseline`, which is not what the owner was told to expect under decision 5. This departs from a consequence written in the option the owner chose: option (c) of `DISTILLATION.md` section 7 item 6 reads "cost is added to exposure, so a notch that costs more than it saves is not taken", and the owner answered "Always". `DECISIONS.md` records the departure, and the owner can reverse it. | delegated |
+| K17 | The loop never moves the platform pin. `bump-pins` follows ico and feeds only. A platform change reaches the adopter by a pull request that changes the platform pin line. Decided 2026-11-15, after the second look (section 11). | The pinned platform holds `check-diff` and `bump-pins`, which gate what lands, so a loop that pinned a new platform tag itself would be following its own code. The pull request is pushed from an agent session, so its own cycle runs the new platform on a cluster before the app merges it. | delegated |
 
 Two things follow from the owner's sentence, and the owner has commented on neither: the pound is a real figure, and the exposure compared is the whole organisation's.
 
@@ -438,7 +439,7 @@ Triggers: `schedule` at `47 6 * * *`; `workflow_dispatch`; `push` to `main` on `
 | `check` | `needs: [cycle, write]`. `if: ${{ MAIN && needs.cycle.outputs.mode == 'act' }}` | `contents: read`, `pull-requests: read`. Default token. Runs platform code | It reads `mode`, `rung` and `rung_to` from `needs.cycle.outputs`, which is why `cycle` is in its `needs`. Checks out `main` with full history. Runs `pins.sh` from `main`, so the checker is the platform commit that `main` pins, never the pull request's. For the open pull request from `loop/rung`: `loop.py check-diff --kind rung --base origin/main --head <head commit> --from <rung> --to <rung_to> --rungs ...`. For `loop/pins`: `--kind pins`. Its output `land` lists the `number:commit` pairs that passed |
 | `land` | `needs: [check]`. `if: ${{ MAIN && needs.check.outputs.land != '' }}` | `environment: observation-delivery`. The only job that sees `PAVC_OTHER_HAND_PRIVATE_KEY`. No checkout, so `env` sets `GH_REPO: ${{ github.repository }}`. Runs no code from any repository | Mints an installation token for the app `pavc-other-hand` (app id 4819564) in shell: a JWT with `iat` 60 seconds back and `exp` 540 ahead, signed RS256 with `openssl dgst -sha256 -sign`; then `GET /repos/{repo}/installation` and `POST /app/installations/{id}/access_tokens`. The key is written to a file of mode 600 under `$RUNNER_TEMP` and removed in the same step. Masks the token. For each pair: `gh pr review <n> --approve`, then `gh pr merge <n> --merge --match-head-commit <commit>` |
 
-**How a rung change reaches `main` unattended.** `cycle` decides and makes the patch with a read-only token. `write` opens the pull request as `github-actions[bot]`. `check` refuses anything but one rung line, one notch, in the direction of this run's verdict. `land` approves and merges as the app. The app did not open the pull request, so its approval satisfies the one-review rule. A pull request opened with the default token starts no workflow, which is why the check is a job of the same run. The merge is the app's, so it does start a run: the `push` trigger fires and the next cycle begins.
+**How a rung change reaches `main` unattended.** `cycle` decides and makes the patch with a read-only token. `write` opens the pull request as `github-actions[bot]`. `check` refuses anything but one rung line, one notch, in the direction of this run's verdict. `land` approves and merges as the app. The app did not open the pull request, so its approval satisfies the one-review rule. A pull request opened with the default token starts only a held run with no jobs (`LOOP.md`, the notes), which is why the check is a job of the same run. The merge is the app's, so it does start a run: the `push` trigger fires and the next cycle begins.
 
 **A release** takes the same path with no special case. The verdict is `release`, the patch moves the line one rung looser, and `check` is given that direction. The margin and the dwell are values in `party.json`. The rule that uses them is in `loop.py` only.
 
@@ -545,7 +546,7 @@ Every pull request is opened by the orchestrator under the owner's login, and ap
 - After each of steps 2 to 5 the orchestrator closes that repository's stale pull requests, each with a note naming its archive ref. It deletes a stale branch only if its tip still equals its archive ref. A tip that moved is archived again first, and one more hub pull request corrects the record.
 - Before step 5 merges, the orchestrator pushes the orphan branch `ledger` to driftwood, holding `loop.jsonl` with the one reset line of 3.5.
 - Steps 6 to 9 are kept apart so that a failure names its cause. Pins do not move in `measure` mode, so the pull requests of steps 7 and 9 are the orchestrator's: `check-diff` is not used and the orchestrator's session lands them. From the merge of step 9 the loop moves the rung by itself. On today's inputs it takes two notches, the shop stops serving, and every run after that ends red with `saturated`. The undo is one line: `"mode": "measure"` in `party.json`, and the rung line back to `baseline`.
-- Once driftwood is in `act` mode it follows platform's `main` by itself. From then on a platform pull request merges only with `unit` and `cluster` both green.
+- Once driftwood is in `act` mode it follows the newest tags of ico and feeds by itself. It does not follow platform (K17): a `policy/v*` tag is cut only by dispatch, and the platform pin moves only by a pull request to the pin line. From then on a platform pull request merges only with `unit` and `cluster` both green.
 - If the proof stays red, platform is fixed by further pull requests under the gate of step 4, no platform tag is cut, and driftwood stays in `measure` mode on a commit pin for platform.
 
 **What waits for the owner.**
@@ -558,7 +559,7 @@ Every pull request is opened by the orchestrator under the owner's login, and ap
 | Removing the guard's hook from the hub | `twin/` and `.claude/settings.json` stay | One commit of the owner's removes the hook and the three `twin/` files together |
 | The hosted Renovate app on driftwood | `renovate.json` keeps it silent | Uninstall it, then delete the file |
 
-**Settled on 2026-11-14 by the owner's reply "I'm afk. Jfdi".** Leave to cut tags: given, and used at steps 6 to 8. The key in feeds and ico: granted and not used. Nothing built here would read it, and a secret with no reader is redundant. Only a returning fetch would need it (`LOOP.md`, what is parked).
+**Settled on 2026-11-14 by the owner's reply "I'm afk. Jfdi".** Leave to cut tags: given, and used at steps 6 to 8. The key in feeds and ico: read as given, and not used. Nothing built here would read it, and a secret with no reader is redundant. Only a returning fetch would need it (`LOOP.md`, what is parked).
 
 The numbers nobody has counted are not the owner's to supply: the penalty rate is ico's work, and the third row's band is feeds' work. `LOOP.md` names both.
 
@@ -587,7 +588,7 @@ No builder adds any of these.
 - Flux, its sources, a git server, a second way to build the cluster.
 - Renovate's runner. A reusable workflow. Any `uses:` of another repository. Any action but `actions/checkout`. PyYAML or any other installed package.
 - The exploited-flaw list, an image inventory, a scanner, any fetch, any scheduled job in ico, feeds or platform. They are parked (K8).
-- A landing job, an environment or a key in ico, feeds or platform (the key was granted on 2026-11-14 and is not used). A separate CI workflow in ico or feeds.
+- A landing job, an environment or a key in ico, feeds or platform (leave for the key was read as given on 2026-11-14, and the key is not used). A separate CI workflow in ico or feeds.
 - Deployments, a rollout stamp, readiness checks. The cluster that stays up is not built here: it waits for the owner (section 8).
 - A `restricted` rung. Any capability but `egress` and `inbound`. Priority classes. The firewall sidecar. An offline Kyverno test.
 - A reduction typed per rung, anywhere. A floor. A setting that keeps the loop off a rung where the workload stops serving.
@@ -601,12 +602,12 @@ No builder adds any of these.
 
 ## 11. What the review changed
 
-Eight reviewers read the built code on 2026-11-14 and the fixes below were made before anything merged. Each is in the code. Sections 1 to 10 are left as the builders had them.
+Eight reviewers read the built code on 2026-11-14 and the fixes below were made before anything merged. Each is in the code. Sections 1 to 10 are left as the builders had them, but for the corrections of the second look, which the end of this section lists.
 
 **The merge gate (4.1, 5.3, 7).**
 
 - `check-diff` runs `git diff --unified=0 --merge-base BASE HEAD`, so a head with two merge bases is refused. It reads git's output as bytes and splits on newlines only. A rung diff is exactly one line out and one line in, in one place.
-- Every ref is named in full (`refs/remotes/origin/main`, `HEAD:refs/heads/ledger`), in `loop.yml` and in `pins.sh`. A tag named `origin/main` can no longer stand in for the branch.
+- Every git ref the jobs compare is named in full (`refs/remotes/origin/main`, `HEAD:refs/heads/ledger`), in `loop.yml` and in `pins.sh`. A tag named `origin/main` can no longer stand in for the branch.
 - For a pin change, `check` works the pins out itself with `bump-pins`, and the pull request's `party.json` must equal the result byte for byte. It then checks the proposed pins out with `pins.sh`, and runs the loop those pins name on the inputs they name with no probe. That run must end `could-not-look` (code 3). A refused input (code 1) does not land, so the loop cannot lock itself by its own hand.
 - `land` approves the commit that was checked and no other, and merges with `--match-head-commit`. Its token is asked for this repository only, with `contents` and `pull_requests` write only. The key file is removed as soon as the JWT is signed.
 - Every proposal is a branch made fresh: `write` deletes `loop/rung` or `loop/pins` first, which closes any pull request left from an earlier run, then pushes with no force.
@@ -633,12 +634,59 @@ Eight reviewers read the built code on 2026-11-14 and the fixes below were made 
 - `ico/DISCLAIMER.md` and both `.gitignore` files are `rewrite`, not `keep`: the disclaimer described the old layout.
 - The litigation texts copied from v4 lose the sentences that pointed at fields this feed does not carry. The second threat row's basis loses its sentence about an evidence ladder that no longer exists.
 
-**The records (2.5).** `LOOP.md` and ADR-0039 say plainly that K16 departs from the wording of `DECISIONS.md` row 6. The parked table names the twin, the talk and the calibration programme.
+**The records (2.5).** `LOOP.md` and ADR-0039 say plainly that K16 departs from the wording of `DECISIONS.md` row 6. The second look corrected what it departs from: see the end of this section. The parked table names the twin, the talk and the calibration programme.
 
-**The budgets (2).** The built tree is over three of them: `loop.py`, `test_loop.py` and `loop.yml`. The budgets left out blank lines, the stand-in for `kubectl` that six probe tests need, and the pin check above. The tests are 36, as 6.1 lists them.
+**The budgets (2).** The built tree is over budget in `loop.py`, `test_loop.py` and `loop.yml` most of all. The budgets left out blank lines, the stand-in for `kubectl` that six probe tests need, and the pin check above. The tests are 36, as 6.1 lists them.
 
-**After the first real cycle.** Driftwood's first cycle ended `could-not-look`: `up.sh` applied the second cage policy seconds after Kyverno's rollout and the policy webhook refused the connection. The proof had not met this, because it applies that policy minutes later. Each `kubectl apply` in `up.sh` is now tried for two minutes (platform pull request 76). The next cycle measured.
+**After the first real cycle.** The cycle on driftwood pull request 132 ended `could-not-look`: `up.sh` applied the second cage policy seconds after Kyverno's rollout and the policy webhook refused the connection. It was a pull request's cycle, so it wrote no ledger line. The proof had not met this, because it applies that policy minutes later. Each `kubectl apply` in `up.sh` is now tried for two minutes (platform pull request 76). The next cycle measured.
 
 **How it landed, 2026-11-14.** Steps 0 to 9 of section 8 are done, each merge by the app: hub 320; ico 12; feeds 21; platform 75 and 76; driftwood 132 (`measure`), 133 (pins to tags), 134 (`act`). The loop then opened and landed driftwood 135 and 136 by itself and stopped at `isolated`, `saturated`, as section 1 said it would.
 
 **Left as they are, and known.** The hosted Renovate app can still push branches to driftwood (the owner's to uninstall). Driftwood's ruleset does not dismiss an approval when a new commit is pushed (a forge setting, the owner's). The ledger branch has no ruleset. `ico/penalty-schema/feed.json` keeps each fine's litigation text, which no rule reads.
+
+**After the second look, 2026-11-15.** Codex, another model, and four checkers read the landed estate on 2026-11-14 and 2026-11-15. This part says what they found and what changed. Where it differs from the text above, this part wins.
+
+What codex found:
+
+- The loop followed its own code. It would have pinned a new platform tag by itself, and the pinned platform holds `check-diff` and `bump-pins`, which gate what lands.
+- The figure can fall with no closure and no publisher's change, when the adopter's turnover or a rung's cost changes. The records said it could not.
+- The loop accepted malformed values the publishers' tests refuse: a negative tier rate, a three-point value out of order, a `null` penalty rate whose basis kind is `counted`.
+- This section said driftwood's first cycle ended `could-not-look`. The ledger holds no such line.
+- The records said one ledger line per cycle. A pull request's cycle writes none.
+- Each fine's litigation text in ico's feed is read by no rule.
+- `CONTEXT.md` said neither cage policy denies anything. At `isolated` the network rule lets no traffic in or out.
+
+What the checkers found:
+
+- **K16.** The records called K16 a departure from the assistant's reading. It departs from a consequence written in the option the owner chose: option (c) of `DISTILLATION.md` section 7 item 6.
+- **Stale words.** Sentences that were true before the first tags, before `act` mode and before `CUT_ON_MERGE` was set. "Commit" stood where a pin is now a signed tag and its commit. The publishers' READMEs wrote of `CUT_ON_MERGE` as if it were unset. 5.3 said a pull request opened with the default token starts no workflow. Feeds' second row said in the present tense that a workflow runs which driftwood deleted on 2026-11-14.
+
+What changed:
+
+- **K17 (delegated).** `bump-pins` follows ico and feeds only. The platform pin moves only by a pull request to the pin line, pushed from an agent session, whose own cycle runs the new platform on a cluster before the app merges it. The rule lives in `bump-pins` alone: `check` works the pins out itself and compares byte for byte, so a proposed platform move cannot match. This overrides the words "or a platform fix" in 5.3, and the lines on `bump-pins` in 4.1 and section 7 as far as they cover the platform pin.
+- **The refusals.** The loop refuses the malformed values the publishers' tests refuse. A three-point value that is not `null` must be three numbers, none below 0, in ascending order. A tier's `rate` and `cap`, and each pricing fine's `amount`, must be above 0. A penalty rate that is not `null` needs a basis of kind `counted`, and a `null` rate must not have one. The three fallbacks of step 10 stay.
+- **The rule on numbers** is corrected in the records, with no new code. `LOOP.md` step 10 says what can lower the figure and by which path. A change to the turnover or to a rung's cost needs a pull request the loop cannot write. This overrides step 10 of section 1.
+- **One line per cycle.** A cycle on `main` writes one line. A pull request's cycle, and a run whose input is refused, write none. This overrides the Words and step 9 of section 1.
+- **Corrected in place above.** In sections 1 to 10: the opening paragraph, which cited a file that never existed; K6, K12 and K16, and the new K17; 5.3's sentence on a pull request opened with the default token; section 8's lines on following platform and on the key; and section 10's line on the key. In this section: the full ref names, the budgets and the first cycle.
+- **The other records.** `LOOP.md` now says where to read the verdict, which red run is a fault and what has not yet run live. ADR-0039 names the half-life rule among what it reverses. `DECISIONS.md`, `CONTEXT.md`, `ARCHIVE.md` and the hub's README carry the smaller corrections.
+- **The publishers.** Feeds' second row now says in the past tense that the sweep ran. Its feed becomes version 5.0.1, and no number in it changes. Ico's README and disclaimer change. Ico's feed does not, so ico cuts no tag.
+- **The cage keeps version 8.0.0.** The platform change touches no file under `cage/` or `harness/`, and the tag that carries it is `policy/v8.0.1`. A tag names a release of the repository. `policy-version` in `cage/`, the policy names `cage-tier-8-0-0` and `cage-netpol-8-0-0`, and the label on the fixture's pod and on driftwood's pods are the cage's own version. They do not move.
+- **Who chose the climb.** Section 1 says the owner chose the climb in decision 5. The climb rests on decision 5 and on K16 together, and K16 is delegated. This overrides that sentence.
+- **The penalty rate** is research. Three counts exist. Nothing lands in ico's feed, and the choice between the counts is put to the owner (`penalty-rate/CHOICE.md`).
+
+Not done:
+
+- The opening comments of the two cage files, which describe a validating, many-version shape these files do not have.
+- The words "for this example" in ico's litigation texts. They are inside the feed and wait for its next change. The texts themselves stay: each is the reason for its fine's status.
+- Feeds' second row is priced with `needs` empty although its text says the door is closed, and its id names an agent that no longer exists. Those are a number and an id.
+
+**How the second look landed, 2026-11-15.** Each merge was the app's.
+
+- Platform 77 carried the refusals and K17. `unit` and `cluster` were green on the pull request and again on `main`. The tag `policy/v8.0.1` was then cut by dispatch. The tests are now 38.
+- Ico 13 changed words only. Its `cut` job ran on the merge and printed "v5.0.0 exists: nothing to cut".
+- Driftwood 137 moved the platform pin to `policy/v8.0.1` and corrected the README. Its own cycle ran the new platform on a cluster and read `saturated` at GBP 1,643,518.63, as `main` does. It was merged before any other cycle could run, because the platform it replaced would have followed the new tag by itself.
+- Feeds 22 carried version 5.0.1. Its merge cut and signed `threat-register/v5.0.1`: the first tag cut by a merge.
+- A driftwood cycle, started by dispatch, then opened pull request 138 for the feeds pin. `check` passed it and `land` merged it. No person was on that path after the dispatch.
+- The ledger's lines 7 to 9 are the three cycles on `main` that followed: after 137, the dispatched one, and after 138. Each reads `saturated` at GBP 1,643,518.63 at `isolated`. The last ran on feeds `e949341d`.
+
+Not yet run live: the daily schedule, a release and its dwell, and the proof on a cluster that stays up.

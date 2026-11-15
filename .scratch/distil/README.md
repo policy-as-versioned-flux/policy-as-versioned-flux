@@ -1,6 +1,6 @@
 # distil: the mission as one loop
 
-Status: nine of ten decisions answered on 2026-11-14 (`DECISIONS.md`); the tolerance figure is open
+Status: nine of ten decisions answered on 2026-11-14 (`DECISIONS.md`); the tolerance figure is open; the penalty rate is counted three ways and which count is published is open (`penalty-rate/CHOICE.md`)
 
 A read-only review of the whole estate, made on 2026-11-14 against one sentence from the owner:
 
@@ -14,6 +14,8 @@ The review itself built, ran, moved and removed nothing. The clean-up that follo
 |---|---|
 | `DISTILLATION.md` | The report. Start with "The short version" at the top. |
 | `DECISIONS.md` | The owner's answers to the ten decisions, quoted, and what each changes. Where it differs from the report, it wins. |
+| `CONTRACT.md` | The design that was built from the decisions. Its section 11 says what each review changed and how the changes landed. |
+| `penalty-rate/CHOICE.md` | Three counts of the penalty rate, and what the loop does under each at two tolerances. A choice for the owner. The six files beside it are the counts and their checks. |
 | `ARCHIVE.md` | What the clean-up of 2026-11-14 archived, and how to bring any of it back. |
 | `LEDGER.md` | Every area of the nine repositories in 26 rows: what was proposed, what a second reader found, and the call. |
 | `TARGET.md` | The distilled design in full. Superseded wherever `DISTILLATION.md` sections 5.6 and 7 or `LEDGER.md` differ; its section 16 lists where. |
