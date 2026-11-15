@@ -27,18 +27,5 @@
       "mcp__deepwiki__read_wiki_contents",
       "Bash(trufflehog *)"
     ]
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/twin/enact_guard.py\""
-          }
-        ]
-      }
-    ]
   }
 }
