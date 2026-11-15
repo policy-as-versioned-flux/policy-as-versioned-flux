@@ -1,6 +1,6 @@
 # distil: the mission as one loop
 
-Status: nine of ten decisions answered on 2026-11-14 (`DECISIONS.md`); after the owner's "Do everything" of 2026-11-15, feeds 5.1.0 prices its second row at 0, platform pull request 78 corrected the cage comments, ico pull request 14 is held, and four questions are put to the owner: which count of the penalty rate is published, the tolerance figure, a cluster that stays up, and K16 (`DECISIONS.md`, `penalty-rate/CHOICE.md`)
+Status: all ten decisions are answered, and the owner answered the four questions of 2026-11-15 the same day (`DECISIONS.md`); the loop is green at `isolated` and waiting out the dwell, with a release expected on 2026-11-22, and its daily schedule has not yet run once (`../../LOOP.md`, `standing-proof/2026-11-15.md`)
 
 A read-only review of the whole estate, made on 2026-11-14 against one sentence from the owner:
 
@@ -15,7 +15,8 @@ The review itself built, ran, moved and removed nothing. The clean-up that follo
 | `DISTILLATION.md` | The report. Start with "The short version" at the top. |
 | `DECISIONS.md` | The owner's answers to the ten decisions, quoted, and what each changes. Where it differs from the report, it wins. |
 | `CONTRACT.md` | The design that was built from the decisions. Its section 11 says what each review changed and how the changes landed. |
-| `penalty-rate/CHOICE.md` | Three counts of the penalty rate, and what the loop does under each at two tolerances. A choice for the owner. The six files beside it are the counts and their checks. |
+| `penalty-rate/CHOICE.md` | Three counts of the penalty rate, and what the loop does under each at two tolerances. A choice for the owner, made on 2026-11-15. The six files beside it are the counts and their checks. |
+| `standing-proof/2026-11-15.md` | The proof on a cluster that stays up, run on 2026-11-15 from an agent session: the break test, re-caging running pods, and two findings. `lines.jsonl` beside it holds its eight lines, which went to no ledger. |
 | `ARCHIVE.md` | What the clean-up of 2026-11-14 archived, and how to bring any of it back. |
 | `LEDGER.md` | Every area of the nine repositories in 26 rows: what was proposed, what a second reader found, and the call. |
 | `TARGET.md` | The distilled design in full. Superseded wherever `DISTILLATION.md` sections 5.6 and 7 or `LEDGER.md` differ; its section 16 lists where. |

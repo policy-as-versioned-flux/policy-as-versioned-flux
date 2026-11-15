@@ -2,7 +2,7 @@
 
 Written 15 November 2026. Run again the same day on the loop of `policy/v8.0.1` and feeds 5.1.0. Research, written before the owner chose.
 
-**Chosen on 15 November 2026.** The owner chose the count over all reports, at its point value, 0.0002095, and a tolerance of 0.5% of turnover, GBP 430,000 (`../DECISIONS.md`, "15 November: the four answers"). The assistant had recommended the cyber-only count. The rest of this file is the research as it was put to the owner: where it says the owner chooses, or has not chosen, read it as of that moment.
+**Chosen on 15 November 2026.** The owner chose the count over all reports, at its point value, 0.0002095, and a tolerance of 0.5% of turnover, GBP 430,000 (`../DECISIONS.md`, "15 November: the four answers"). The assistant had recommended the cyber-only count. Ico published the rate as `v5.1.0`, and the loop followed it the same day: ledger line 11 reads GBP 17,290.68, `within`, release-ready, at a tolerance of GBP 430,000. The rest of this file is the research as it was put to the owner: where it says the owner chooses, or has not chosen, read it as of that moment.
 
 ## The choice, in short
 

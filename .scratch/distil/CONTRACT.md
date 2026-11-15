@@ -28,7 +28,7 @@ Written 2026-11-14 by the architect stage, revised the same day after three revi
 | K2 | The loop moves one notch towards a goal rung. It tightens at once and releases after the dwell, by the same machine path. | Decisions 1 and 2. | owner-instructed |
 | K3 | The ladder has three rungs: `baseline`, `quarantine`, `isolated`. The old `restricted` is merged into `quarantine`. | Only two capabilities can be tested live, and a rung must close something a probe can see (LEDGER C7). | delegated |
 | K4 | Two capabilities only: `egress` and `inbound`. | A read-only root filesystem read as closed at every rung, because driftwood's own manifests already set it. No row needs the others. | delegated |
-| K5 | The cluster is built by `kubectl apply -k` from pinned checkouts. Flux is not installed. | On a cluster made after the merge, Flux proves nothing a checkout does not. It returns with the cluster that stays up, which waits for the owner (decision 9, section 8). | delegated |
+| K5 | The cluster is built by `kubectl apply -k` from pinned checkouts. Flux is not installed. | On a cluster made after the merge, Flux proves nothing a checkout does not. It returns with the cluster that stays up, which waits for the owner (decision 9, section 8). The cluster of 2026-11-15 runs without Flux (K19). | delegated |
 | K6 | The publishers' pins are followed by `loop.py bump-pins` with plain git. The platform pin is not followed (K17). Renovate is not run. | Following a branch by commit could not be checked offline in Renovate. One function handles branch pins now and tag pins later. | delegated |
 | K7 | No reusable workflow. Driftwood's workflow checks platform out at the commit in `party.json` and runs its scripts. | Every pin then lives in one file, on one line each. | delegated |
 | K8 | No exploited-flaw list, image inventory, scanner or fetch. They are parked, not dropped. `LOOP.md` says where each is kept and what brings it back. | The first loop runs end to end without them. They need about 500 lines and a scanner in CI. | delegated |
@@ -39,9 +39,10 @@ Written 2026-11-14 by the architect stage, revised the same day after three revi
 | K13 | `pins.sh` verifies a tag's signature when a pin names a tag. | So that moving to tags is a change to pin lines only. It cannot be proven until a tag exists. | delegated |
 | K14 | Driftwood's workloads stay bare Pods, with no rollout stamp. | Every cycle builds a new cluster, so every pod is admitted at the current rung. | delegated |
 | K15 | The party file and the ladder file are JSON, not YAML. | The standard library reads JSON and refuses a duplicate key in three lines. YAML needed a dependency, a second action and a hash pin in five jobs. | delegated |
-| K16 | A notch is judged by the goal it leads to, not by its own gain. | Decision 6 says cost always counts. Judged alone, the first notch would never be taken, and the loop would sit at `baseline`, which is not what the owner was told to expect under decision 5. This departs from a consequence written in the option the owner chose: option (c) of `DISTILLATION.md` section 7 item 6 reads "cost is added to exposure, so a notch that costs more than it saves is not taken", and the owner answered "Always". `DECISIONS.md` records the departure, and the owner can reverse it. | delegated |
+| K16 | A notch is judged by the goal it leads to, not by its own gain. | Decision 6 says cost always counts. Judged alone, the first notch would never be taken, and the loop would sit at `baseline`, which is not what the owner was told to expect under decision 5. This departs from a consequence written in the option the owner chose: option (c) of `DISTILLATION.md` section 7 item 6 reads "cost is added to exposure, so a notch that costs more than it saves is not taken", and the owner answered "Always". `DECISIONS.md` records the departure, and the owner can reverse it. | delegated; kept by the owner on 2026-11-15 |
 | K17 | The loop never moves the platform pin. `bump-pins` follows ico and feeds only. A platform change reaches the adopter by a pull request that changes the platform pin line. Decided 2026-11-15, after the second look (section 11). | The pinned platform holds `check-diff` and `bump-pins`, which gate what lands, so a loop that pinned a new platform tag itself would be following its own code. The pull request is pushed from an agent session, so its own cycle runs the new platform on a cluster before the app merges it. | delegated |
 | K18 | A row whose counted door is found closed stays in the register at the rate its own method gives, 0, with the reading dated. It is not removed and not left at the old rate. Decided 2026-11-15 (section 11). | Feeds' second row is the case. Its rate is N x C / M, and N, read again on 2026-11-15, is 0. Leaving N = 1 knowingly overstates the rate. Removing the row loses the reading and its history. | delegated, applying "Do everything" |
+| K19 | The proof on a cluster that stays up runs from an agent session on the owner's machine, with the pinned harness and loop unchanged. Its lines say `cluster: standing` and go to no ledger. Flux stays out. Decided 2026-11-15 (section 11). | The owner chose a kind cluster on the owner's own machine (answer 3), and GitHub's runners cannot reach it. Running the pinned `up.sh`, `probe.py` and `loop.py` unchanged makes it the same loop on a cluster that outlives a cycle. Its lines are not cycles of the daily loop, so they do not enter the ledger or the dwell. K5 stands. | delegated, applying the owner's answer 3 |
 
 Two things follow from the owner's sentence, and the owner has commented on neither: the pound is a real figure, and the exposure compared is the whole organisation's.
 
@@ -515,6 +516,8 @@ The job is green only if all three hold. Any `could-not-look` is red. Run 2 show
 
 **This is not yet decision 9's proof.** The owner accepted a cluster that stays up for the proof and the break test. This proof runs on a throwaway kind cluster and says so: `cluster: harness`. The other cluster waits for the owner (section 8).
 
+A proof on a cluster that stays up ran on 2026-11-15, from an agent session (section 11, "After the four answers", and `standing-proof/2026-11-15.md`).
+
 **If kind does not enforce the `quarantine` rule**, run 2 reads `egress` open and the job is red. Whether kind enforces it is not known: only the no-traffic rule has been seen working there. Driftwood then stays in `measure` mode until a change to platform makes the proof green.
 
 ## 7. Pins
@@ -554,15 +557,15 @@ Every pull request is opened by the orchestrator under the owner's login, and ap
 
 | What | Until then | When it comes |
 |---|---|---|
-| The tolerance figure | GBP 40,000, labelled a fixture on every line | Change the `tolerance` line of `party.json`: `amount` or `share_of_turnover`, and `basis` |
-| A cluster that stays up, for decision 9's proof and break test | The proof runs on a throwaway kind cluster, labelled `harness` | The owner names the machine or the spend |
 | The secrets hook and the signing permission | The three `cut-release.yml` files quote the `id-token` key so that the hook passes them. The old files wrote it unquoted | The owner confirms the spelling, or adjusts the hook |
 | Removing the guard's hook from the hub | `twin/` and `.claude/settings.json` stay | One commit of the owner's removes the hook and the three `twin/` files together |
 | The hosted Renovate app on driftwood | `renovate.json` keeps it silent | Uninstall it, then delete the file |
 
+Two rows have left this table. The owner answered them on 2026-11-15, with the penalty rate and K16 (`DECISIONS.md`, "15 November: the four answers"). The tolerance is now 0.5% of turnover, GBP 430,000, on the `tolerance` line of driftwood's `party.json`. The cluster that stays up is a kind cluster on the owner's own machine: K19, and `standing-proof/2026-11-15.md`. Section 11, "After the four answers", says what followed.
+
 **Settled on 2026-11-14 by the owner's reply "I'm afk. Jfdi".** Leave to cut tags: given, and used at steps 6 to 8. The key in feeds and ico: read as given, and not used. Nothing built here would read it, and a secret with no reader is redundant. Only a returning fetch would need it (`LOOP.md`, what is parked).
 
-The numbers nobody has counted are not the owner's to supply: the penalty rate is ico's work, and the third row's band is feeds' work. `LOOP.md` names both.
+The numbers nobody has counted are not the owner's to supply: the penalty rate is ico's work, and the third row's band is feeds' work. `LOOP.md` names both. The penalty rate has since been counted three ways. On 2026-11-15 the owner chose which count ico publishes, and ico published it as `v5.1.0` (section 11). The third row's band is still feeds' work.
 
 ## 9. The carry-over from LEDGER section 3
 
@@ -603,7 +606,7 @@ No builder adds any of these.
 
 ## 11. What the review changed
 
-Eight reviewers read the built code on 2026-11-14 and the fixes below were made before anything merged. Each is in the code. Sections 1 to 10 are left as the builders had them, but for the corrections of the second look, which the part "After the second look" lists, and for K18, which the part **After "Do everything"** adds to the table at the top.
+Eight reviewers read the built code on 2026-11-14 and the fixes below were made before anything merged. Each is in the code. Sections 1 to 10 are left as the builders had them, but for the corrections of the second look, which the part "After the second look" lists, for K18, which the part **After "Do everything"** adds to the table at the top, and for the changes the part **After the four answers** lists: K16's label, K19, pointers in K5, 6.2 and section 8, and section 8's table.
 
 **The merge gate (4.1, 5.3, 7).**
 
@@ -712,12 +715,68 @@ Not done:
 - A release and its dwell. One can start only when a rate or a tolerance makes the loop release-ready, which is the owner's choice, and it then takes 7 days. The margin, the dwell and the tolerance were not touched to force one.
 - The proof on a cluster that stays up. The owner has not named the machine or the spend.
 
+Both moved later the same day, after the four answers: the loop became release-ready at 10:55:04 and waits out the dwell, and the proof on a cluster that stays up ran from an agent session. See **After the four answers** below.
+
 **How it landed, 2026-11-15.** Each merge was the app's.
 
 - Feeds 23, commit `9a43342`, merged as `489e2fe`. The merge cut and signed the tag `threat-register/v5.1.0`: run 43694567853, with `test` and `cut` green.
 - Platform 78, commit `4988db8`, merged as `ae58ab9`. `unit` and `cluster` were green on the pull request.
-- Ico 14, commit `bf9b54e` on the branch `held/litigation-wording`, is a draft pull request, held and not merged.
+- Ico 14, commit `bf9b54e` on the branch `held/litigation-wording`, is a draft pull request, held and not merged. Later the same day it carried the rate too and was merged, and one tag, `v5.1.0`, carries both (below).
 - No cycle was dispatched after the tag was cut, on purpose: the next scheduled cycle should find the tag and follow it with no person and no dispatch. When this was written the loop had not yet followed 5.1.0. The last ledger line, line 9 (run 43663748023), still read GBP 1,643,518.63 on feeds 5.0.1, and driftwood's `party.json` still pinned `threat-register/v5.0.1`.
 - The first scheduled run of `loop.yml` was due at 06:47 UTC. It had not started by 08:33 UTC. GitHub runs schedules late under load, and earlier scheduled workflows in the estate started hours late. It is watched, not dispatched.
 
-Not yet run live: the daily schedule, whose first run was due at 06:47 UTC on 2026-11-15 and had not started by 08:33 UTC; a release and its dwell, which can start only when the owner's choice of a rate or a tolerance makes the loop release-ready; and the proof on a cluster that stays up, which waits for the owner to name the machine or the spend.
+*Corrected later on 2026-11-15.* The schedule did not get the chance to find the tag. The cycle started by the merge of the owner's tolerance followed both new tags first, by a push cycle, not the schedule: see **After the four answers** below. The first scheduled run had still not started at 10:58 UTC.
+
+**After the four answers, 2026-11-15.** The four questions of the part above were put to the owner in one dialog, each with options the assistant wrote and one marked as the assistant's recommendation. The owner chose one option for each (`DECISIONS.md`, "15 November: the four answers"). The labels of the options are the assistant's words; the choices are the owner's. Where this part differs from the text above, this part wins.
+
+The answers:
+
+- **The penalty rate.** The count over all breach reports, 0.0002095. It was not the assistant's recommendation, which was the cyber-only count.
+- **The tolerance.** 0.5% of turnover: GBP 430,000 at driftwood's turnover. It is no longer a fixture.
+- **The cluster that stays up.** A kind cluster on the owner's own machine, left running.
+- **K16.** Kept.
+
+What changed:
+
+- **Ico 5.1.0.** Ico pull request 14 carried the litigation wording held earlier (`bf9b54e`) and the rate (`0a34cca`). The app merged it as `39ddfaf`, and the merge cut and signed `v5.1.0` (run 43705453283, `test` and `cut` green). One tag carries both changes. `penalty_rate` is 0.0002095, of basis kind `counted`: 20 ICO monetary penalties over 95,466 breach reports of every kind, ICO financial years 2018/19 to 2025/26. The basis text gives the interval (0.000128 to 0.000400), what the check found, and the caveat as its own researcher states it: a rate over every report, too low for a serious breach by an amount the method cannot state. It names the two other counts and points at hub commit `d1aebbb`. One agent drafted the text from the research. A second checked each sentence against the research, compared the feed key by key, and ran the pinned loop and the pin check. The orchestrator then made three wording changes and ran the tests and the pin check again. Ico's README line on the rate is brought up to date.
+- **The tolerance.** Driftwood pull request 139 (`81373c2`, merged by the app as `f22cd9a`) changed one line of `party.json`: `share_of_turnover` 0.005, with the basis "0.5% of turnover, the low end of audit materiality: GBP 430,000 at this turnover. Chosen by the owner on 2026-11-15, from options the assistant offered." The figure is the owner's. Writing it as a share, so that it moves with the turnover, is the assistant's choice (delegated). The loop prints it as 430000.0. This overrides the fixture of 3.1 as the published value. 3.1 stays as a test input.
+- **The loop followed both tags by itself.** The merge of 139 started a cycle on `main` (run 43705857417, cause `push`). It wrote ledger line 10 at 10:51:31 on the old pins: both capabilities closed, serving 0 of 3, figure GBP 1,643,518.63 against GBP 430,000, `saturated`, not release-ready. In the same run it opened driftwood pull request 140 (`loop/pins`) for ico `v5.1.0` at `39ddfaf` and feeds `threat-register/v5.1.0` at `489e2fe`. `check` passed it and the app merged it as `4126d2e`. That merge started the next cycle (run 43706149681, cause `push`). It wrote ledger line 11 at 10:55:04: both capabilities closed, serving 0 of 3, rows 22,906.76 (closed), 0.00 and 2,290.68, exposure 2,290.68, cost 15,000, figure GBP 17,290.68, tolerance 430,000, `within`, goal `baseline`, release-ready, weakest basis "unsourced: cost of isolated". It is the first green run of the loop: every job passed. No person was on that path after the tolerance merge. So what followed feeds 5.1.0 was a push cycle, not the schedule.
+- **K16** is kept. Its label in the table at the top becomes "delegated; kept by the owner on 2026-11-15". It no longer waits for the owner.
+- **K19 (delegated, applying the owner's answer 3).** The proof on a cluster that stays up ran from an agent session on the owner's machine. A kind cluster named `loop` was built by the pinned `harness/up.sh` of `policy/v8.0.1`, unedited, with driftwood's `gitops/apps` at `main`, and has its own kubeconfig, so the owner's own kube contexts were not touched. The pins were checked out with driftwood's own `pins.sh`, unedited, and each tag's signature was verified. Each run is one `probe.py` and one `loop.py cycle`, as in `loop.yml`, with `--cause session --cluster standing` and no `--write`. Its eight lines are in `standing-proof/lines.jsonl`, and `standing-proof/2026-11-15.md` records them. It showed the break test for real on a cluster that was already running: deleting `cage-reach-isolated` was seen by the next probe, and the line read `cage-ineffective` at GBP 17,924,390.06 while git and the labels still said `isolated`. It showed running pods re-caged without a restart, from `isolated` to `quarantine` and back to `isolated` by way of `baseline`, once something touched the pod. Those pods had been created at `isolated`; the first finding below is about a pod created at `baseline`. Its last line, on the new pins, reads `within` at GBP 17,290.68, release-ready, as ledger line 11 does. The cluster is left running.
+- **Changed in place above.** K16's label; the new K19; pointers in K5, in 6.2 and in section 8; section 8's table, which loses the tolerance and the cluster that stays up; and, in this section, three dated pointers in the part **After "Do everything"** and its closing sentence, now the last sentence of this file. This part also overrides, without editing them: section 1's paragraph "On today's inputs", 5.3's sentence "On today's inputs every run at `isolated` is red at `verdict`", and section 8's sentence that on today's inputs every run after the two notches ends red with `saturated` (on the inputs of 2026-11-15 the line at `isolated` is `within`); the bullet of "After the second look" that says nothing lands in ico's feed and the choice between the counts is put to the owner, and the litigation wording its "Not done" list leaves for the feed's next change (both are now in ico `v5.1.0`); the `null` rate of 3.3 as the published value (ico now publishes 0.0002095, counted; 3.3 stays as a test input); 3.5's lists for `cause` and `cluster`, which the standing proof's lines extend with `session` and `standing` (those lines go to no ledger); and section 10's "it waits for the owner" for the cluster that stays up, which now stands, still without Flux, Deployments or a rollout stamp.
+
+What the proof on a cluster that stays up found. Neither is fixed.
+
+- **A climb from `baseline` cannot be made in place.** A pod created at `baseline` cannot be tightened while it runs: the API server refuses the update, and until the pod is replaced it has `baseline`'s reach whatever the Namespace says. Worse, every update to such a pod is refused while the Namespace sits at a tighter rung. On a cluster that stays up, a climb from `baseline` therefore needs the pods replaced.
+- **Loosening to `baseline` in place is partial.** The label and the network rule follow. The limits and the dropped capabilities stay as the pod was created.
+
+The daily loop is not affected by either: it builds a new cluster every cycle, so every pod is created at the rung in git. Closing them needs a change to the cage (a new cage version, a tag and a pin change), or Deployments with a rollout on each rung change, which section 10 names as the work of the cluster that stays up. That was not in the scope of the owner's answer.
+
+The release that waits:
+
+- The dwell is 7 days. It started with ledger line 11, at 10:55:04 on 2026-11-15, and is met from 10:55:04 on 2026-11-22.
+- The first cycle on `main` after that reads `release`, `isolated` to `quarantine`. Its merge starts a cycle that releases again, to `baseline`. That merge starts a cycle at `baseline`, where the pinned loop predicts GBP 25,697.44, `within`, with the shop serving. (`quarantine` predicts GBP 31,197.44.) These three cycles follow each other within the hour.
+- It depends on two things. A cycle must run on `main` on or after 2026-11-22 10:55:04, and the only thing that starts one unattended is the daily schedule, which has not yet run once. And every line until then must be release-ready: a line that is not release-ready starts the wait again, while a `could-not-look` line is passed over.
+- Nothing was done to hurry it. The margin and the dwell are unchanged.
+
+Not done:
+
+- The daily schedule has not run once. Its first run (cron `47 6 * * *`) had still not started at 10:58 UTC. Driftwood's scheduled workflows start hours late as a rule: the earlier workflow with the same cron, `propose-tier`, started at 14:42 on 11 November, 15:35 on 12 November, 14:54 on 13 November and 13:47 on 14 November, 7 to 9 hours after 06:47. So the first run of `loop.yml` is expected between about 13:45 and 15:35 UTC. Until it runs, the schedule is unproven. It is watched, not dispatched.
+- The release has not happened. It is expected on 2026-11-22.
+- The two findings of the proof on a cluster that stays up are not fixed.
+- In the owner's hand, unchanged: the guard's hook in the hub, the hosted Renovate app on driftwood, and the quoted `id-token` key (section 8).
+- Numbers still unsourced: the three rung costs, the rows' bands (editorial), the margin and the dwell.
+- Platform `main` is one change ahead of the pinned tag: the cage files' comment.
+- Noticed and not changed: the source text of the Doorstep Dispensaree fine in ico's feed says "12 Dec 2019", while the research names 17 and 20 December 2019 for that notice. The year is the same and no price moves. It is a source text inside the feed, and waits for the feed's next change.
+
+**How the four answers landed, 2026-11-15.** Each merge was the app's.
+
+- Hub 324 recorded the four answers, merged as `d1aebbb`.
+- Ico 14, commits `bf9b54e` and `0a34cca`, merged as `39ddfaf`. The merge cut and signed `v5.1.0`: run 43705453283.
+- Driftwood 139, commit `81373c2`, merged as `f22cd9a`. Its own cycle (run 43705528010) looked at a cluster and read `saturated` on the old pins: GBP 1,643,518.63 against GBP 430,000.
+- Run 43705857417, started by that merge, wrote ledger line 10 and opened driftwood 140, which the app merged as `4126d2e`.
+- Run 43706149681, started by that merge, wrote ledger line 11: `within`, release-ready.
+- Driftwood `main` is `4126d2e`. It pins platform `policy/v8.0.1` (`e91e5db`), ico `v5.1.0` (`39ddfaf`) and feeds `threat-register/v5.1.0` (`489e2fe`). Mode `act`, rung `isolated`, shop not serving. The ledger has 11 lines.
+- The proof on a cluster that stays up wrote no ledger line and no commit.
+
+Not yet run live: the daily schedule, whose first run had still not started at 10:58 UTC on 2026-11-15 and is expected between about 13:45 and 15:35 UTC that day; and a release, which now waits out its dwell. The dwell is met from 10:55:04 UTC on 2026-11-22; the release then needs a cycle to run on `main`, and every line until then to be release-ready. The proof on a cluster that stays up has run, from an agent session, not from the daily workflow (K19).

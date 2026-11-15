@@ -6,7 +6,7 @@ The owner answered the ten decisions of `DISTILLATION.md` section 7 on 2026-11-1
 |---|---|---|---|---|
 | 1 | Can the cage ever release? | "Yes doesn't need person to merge" | The cage tightens and releases by itself. A release needs no person. | Section 5.3 had a person merge each release. The margin and the dwell stay as settings, so one release does not cause the next tightening. |
 | 2 | Who merges? | "All AI machine driven" | Every merge in the loop is made by a machine identity. No hop waits for a person. | Goes further than the recommended option. Releases, feed bumps of every size and publisher tags are machine-made too. The app's key would have to be a secret in feeds and ico. That is a grant of identity, to be confirmed with the owner when that step is built. |
-| 3 | What is the tolerance, and on what basis? | "What is the industry norm?" | A question back. Not yet decided. | See "Tolerance" below. Until the owner names a figure the loop compares against GBP 40,000 and labels it a fixture. |
+| 3 | What is the tolerance, and on what basis? | "What is the industry norm?" | A question back. Not yet decided. | See "Tolerance" below. Until the owner names a figure the loop compares against GBP 40,000 and labels it a fixture. Answered on 2026-11-15: see below. |
 | 4 | Mean year or bad year? | "Ok" | The mean loss a year, by formula. | As recommended. Monte-Carlo stays as a cross-check in the tests. |
 | 5 | May the loop act unattended on unsourced numbers? | "Yes. No limitation" | Yes, across the whole ladder, including a rung where the workload stops serving. | The `may_stop_serving` setting is not needed. The range is the whole ladder. |
 | 6 | Does the cage's running cost count? | "Always" | Cost always enters the comparison. | Section 7 recommended printing it only. Each rung's running cost is now part of the figure, so a notch that costs more than it saves is not taken. Today's four cost figures have no source and are labelled so. |
@@ -41,7 +41,7 @@ Row 6 says a notch that costs more than it saves is not taken. That is a consequ
 
 The reason is today's ladder and rows. The first notch, to `quarantine`, closes `egress`, and no published row needs `egress`. Judged by itself that notch costs GBP 5,500 a year and saves nothing, so it would never be taken, and the loop would stay at `baseline` for ever, red, with the shop serving. That is not what the owner was told to expect under decision 5 (`DISTILLATION.md` section 7 item 5: "the first automatic act could take a shop off the network"). Judged by where the climb ends, `isolated` lowers the figure from GBP 17,909,890.06 to GBP 1,643,518.63, cost included, so the climb is started.
 
-The owner's word was "Always", and cost is in the compared figure on every line. The departure is the assistant's, delegated (K16). The owner can reverse it: with a notch judged by itself, the loop holds at `baseline` on today's inputs.
+The owner's word was "Always", and cost is in the compared figure on every line. The departure is the assistant's, delegated (K16). The owner can reverse it: with a notch judged by itself, the loop holds at `baseline` on today's inputs. The owner kept K16 on 2026-11-15 ("15 November: the four answers").
 
 ## Tolerance: what the industry does
 
@@ -62,7 +62,7 @@ What each would mean for driftwood, whose declared turnover is GBP 86,000,000:
 | Audit materiality, high end | 1% | GBP 860,000 |
 | Cyber-risk preset, high | 2% | GBP 1,720,000 |
 
-**The assistant's pick: 0.5% of turnover.** The loop compares a mean year, and a figure that is tolerable every year should sit at the low end of what would be material in any one year. A share of turnover also scales with the firm, which today's fixtures do not: ludlow's GBP 5,000 is the smallest of the three for the largest firm. The figure is the owner's to set.
+**The assistant's pick: 0.5% of turnover.** The loop compares a mean year, and a figure that is tolerable every year should sit at the low end of what would be material in any one year. A share of turnover also scales with the firm, which today's fixtures do not: ludlow's GBP 5,000 is the smallest of the three for the largest firm. The figure is the owner's to set. The owner chose it on 2026-11-15: 0.5% of turnover, GBP 430,000 ("15 November: the four answers").
 
 Sources:
 
@@ -76,6 +76,8 @@ Sources:
 ## What follows from answers 1, 2 and 5 together
 
 On today's inputs the first automatic act of the new loop could move driftwood's shop to a rung where it stops serving, on a penalty rate that nobody has counted and that is taken as 1. The owner was told this in decision 5 and chose it. Driftwood is a demonstration firm. Every ledger line will still print the share of the figure that is sourced.
+
+Written on 2026-11-14. The rate has since been counted and published: see "What followed from the four answers".
 
 ## 15 November: "Do everything"
 
@@ -95,7 +97,7 @@ Done under it (`CONTRACT.md` section 11 has the detail):
 Not done:
 
 - A release and its dwell. One can start only when a rate or a tolerance makes the loop release-ready, which is the owner's choice, and it then takes 7 days. The margin, the dwell and the tolerance were not touched to force one.
-- The proof on a cluster that stays up. The owner has not named the machine or the spend.
+- The proof on a cluster that stays up. The owner has not named the machine or the spend. The owner named the machine later the same day: see "What followed from the four answers".
 - The guard's hook, the hosted Renovate app and the quoted `id-token` key, which are for the owner's own hand.
 
 Put to the owner as four questions:
@@ -124,3 +126,13 @@ What the dialog told the owner with each option:
 - **K16.** "A climb is judged by where it ends. Without this the loop can never reach the tightest rung on today's rows."
 
 What follows from the answers is recorded where it lands: the rate in ico's feed, the tolerance in driftwood's `party.json`, and the proof on the cluster that stays up in `CONTRACT.md` section 11.
+
+## What followed from the four answers
+
+`CONTRACT.md` section 11 has the detail, and `standing-proof/2026-11-15.md` the proof.
+
+- **The rate (answer 1).** Ico pull request 14 carried the litigation wording and the rate together, and the app's merge (`39ddfaf`) cut and signed `v5.1.0` (run 43705453283). `penalty_rate` is 0.0002095, of kind `counted`, and its basis text gives the interval, the check, and its researcher's caveat that it is too low for a serious breach.
+- **The tolerance (answer 2).** Driftwood pull request 139 changed one line of `party.json`: the tolerance is `share_of_turnover` 0.005, which the loop prints as GBP 430,000. Writing it as a share, so that it moves with the turnover, is the assistant's choice (delegated). The app merged it as `f22cd9a`.
+- **The loop followed by itself.** The tolerance merge started a cycle on `main` (run 43705857417, cause `push`), which wrote ledger line 10, `saturated` on the old pins, and opened pull request 140 for both new pins. The app merged that as `4126d2e`, and the next cycle (run 43706149681) wrote line 11 at 10:55:04 UTC: GBP 17,290.68, `within`, release-ready. That was a push cycle, not the schedule, which had not yet run once.
+- **The release now waiting.** The dwell of 7 days started with line 11 and is met from 10:55:04 UTC on 2026-11-22. A release then needs a cycle on `main`, which only the daily schedule starts unattended, and every line until then release-ready. The margin and the dwell were not changed to hurry it.
+- **The cluster that stays up (answer 3).** A kind cluster on the owner's machine, built by the pinned harness and left running, gave eight lines, each one probe and one cycle run by hand from an agent session, written to no ledger (K19, delegated, applying the owner's answer 3). In the break test the next probe saw the deleted network rule as `cage-ineffective`, and running pods were re-caged from `isolated` to `quarantine`, and back to `isolated` by way of `baseline`, with no restart (those pods had been created at `isolated`). Two findings are not fixed: a pod created at `baseline` cannot be tightened while it runs, and keeps `baseline`'s reach until it is replaced, whatever the Namespace says; and loosening to `baseline` in place is partial, because the limits and the dropped capabilities stay as the pod was created. Flux is not installed, so the cluster does not follow git.
