@@ -1,6 +1,6 @@
 # policy-as-versioned-flux: the hub
 
-This repository holds the records of the estate: what it is for, what was decided, and what was put away. It holds no running code.
+This repository holds the records of the estate: what it is for, what was decided, and what was put away. It holds no code of the loop.
 
 > "quantified risk and a reactive ratcheting process cage to mitigate the quantified risk until the risk is within financial tolerance of the organisation" (the owner, 2026-11-14)
 

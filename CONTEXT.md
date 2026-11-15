@@ -33,7 +33,7 @@ The older decision records in `docs/adr/` use older words. Where they differ, th
 ## The cage
 
 - **Cage**: limits put on a running pod from outside, by two Kyverno policies, platform's
-  `cage/cage-tier.yaml` and `cage/cage-netpol.yaml`. Neither denies anything.
+  `cage/cage-tier.yaml` and `cage/cage-netpol.yaml`. Neither uses a Kyverno deny action.
 - **Rung**: a named cage setting. The ladder is `baseline`, `quarantine`, `isolated`, loosest
   first, in platform's `cage/rungs.json`. A rung keeps what the looser rungs close, and has a cost a
   year with a basis. What a rung does to a pod is read from `cage/cage-tier.yaml`.
@@ -60,7 +60,8 @@ The older decision records in `docs/adr/` use older words. Where they differ, th
 
 - **Cycle**: one pass of the loop, one run of driftwood's `loop.yml`. In `measure` mode a cycle
   records only. In `act` mode it also opens and lands the notch. The mode is set in `party.json`.
-- **Ledger**: a file with one line per cycle: `loop.jsonl` on driftwood's branch `ledger`.
+- **Ledger**: a file with one line for each cycle on `main`: `loop.jsonl` on driftwood's branch
+  `ledger`. A pull request's cycle, and a run whose input is refused, write no line.
 - **Goal**: for a limit, the loosest rung whose predicted figure is at or below it. If none is, the
   rung with the lowest predicted figure, the looser on a tie. A rung's **predicted** figure is the
   amounts of the rows that would stay open if exactly the capabilities declared closed up to that
@@ -70,7 +71,8 @@ The older decision records in `docs/adr/` use older words. Where they differ, th
 
 ## Verdicts
 
-Each cycle gives exactly one, the first that applies, in this order.
+Each cycle gives exactly one, the first that applies, in this order. A run whose input is refused
+gives none.
 
 - **could-not-look**: the loop could not measure, so it gives no judgement and moves nothing.
 - **cage-ineffective**: a capability the current rung declares closed is measured open. Red. No move.
@@ -88,6 +90,6 @@ Each cycle gives exactly one, the first that applies, in this order.
 
 ## Identities and pins
 
-- **Pin**: the exact commit of another repository that driftwood uses, one line each in `party.json`.
+- **Pin**: the signed tag of another repository that driftwood uses, and that tag's commit, one line each in `party.json`.
 - **The app**: the GitHub App `pavc-other-hand`, a machine identity. **The key**: its private key.
 - **Default token**: the credential GitHub gives a workflow run.
